@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v11.0
 milestone_name: — One-Screen MVP
-status: Roadmap created — ready to discuss/plan Phase 55
+status: executing
 stopped_at: v11.0 roadmap created; next /gsd-discuss-phase 55
-last_updated: "2026-10-03T05:52:22.357Z"
-last_activity: 2026-10-03 — v11.0 roadmap created
+last_updated: "2026-10-03T10:10:57.538Z"
+last_activity: 2026-10-03 -- Phase 55 execution started
 progress:
-  total_phases: 8
+  total_phases: 14
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 14
+  completed_plans: 1
   percent: 0
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-03)
 
 **Core value:** A worker can find the SOP for the machine in front of them and follow it step by step with nothing else on the screen — and the business can see, in one ledger, who decided and did what.
-**Current focus:** Phase 55 — Cut the Dropped Features & One Organisation (not started)
+**Current focus:** Phase 55 — cut-the-dropped-features-one-organisation
 
 ## Current Position
 
-Phase: 55 (1 of 8 in v11.0)
-Plan: —
-Status: Roadmap created — ready to discuss/plan Phase 55
-Last activity: 2026-10-03 — v11.0 roadmap created
+Phase: 55 (cut-the-dropped-features-one-organisation) — EXECUTING
+Plan: 2 of 14
+Status: Ready to execute
+Last activity: 2026-10-03 -- Phase 55 execution started
 
 ### v11.0 roadmap (created 2026-10-03)
 
@@ -281,6 +281,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 43 P03 | 35min | 2 tasks | 7 files |
 | Phase 43-dead-surface-removal-route-truth P04 | 50min | 3 tasks | 13 files |
 | Phase 43 P05 | 50min | 2 tasks | 6 files |
+| Phase 55 P01 | 40min | 3 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -561,6 +562,7 @@ Recent decisions affecting current work:
 - [Phase ?]: 43-03: versions/page.tsx's two pre-existing react-hooks/set-state-in-effect errors left untouched — out of scope per D-02
 - [Phase 43-dead-surface-removal-route-truth]: Deleted /admin/governance and /admin/sops page-level shims per 43-CONTEXT D-01; bookmark compatibility moved to two static next.config.ts redirects (non-permanent, fixed destinations)
 - [Phase 43]: Migration 00068 restores the org-scoped SELECT policy on public.blocks that migration 00037 silently dropped, fixing a full-deny RLS gap for any session-scoped read of blocks/block_versions
+- [Phase 55-01]: Dropped list is JSON data read by a per-feature fixme-gated sweep; walk eval fixture SOP is unassigned and machine-less
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -706,6 +708,6 @@ deliberate decision, not a side-effect.
 
 ## Session Continuity
 
-Last session: 2026-10-03
+Last session: 2026-10-03T10:10:54.179Z
 Stopped at: v11.0 roadmap created; next /gsd-discuss-phase 55
 Resume file: None

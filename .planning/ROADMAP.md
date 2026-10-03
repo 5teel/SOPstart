@@ -1734,11 +1734,11 @@ Executes 55 → 56 → 57 → 58 → 59 → 60 → 61 → 62, strictly sequentia
   4. The sign-up page no longer creates an organisation, there is nowhere to switch organisation, and someone with no invitation is told to ask their admin
   5. Every existing SOP, completion record and photo is still there and opens exactly as before — nothing in the database was dropped
 
-**Plans:** 14 plans (strictly sequential, main tree — every plan edits a shared map)
+**Plans:** 1/14 plans executed
 Plans:
 **Wave 1**
 
-- [ ] 55-01-PLAN.md — Wave 0: dropped-features.json, phase55 sweep/contract specs + project, walk eval fixture + cleanup + skeleton, failure + bundle baselines
+- [x] 55-01-PLAN.md — Wave 0: dropped-features.json, phase55 sweep/contract specs + project, walk eval fixture + cleanup + skeleton, failure + bundle baselines
 
 **Wave 2** *(blocked on Wave 1 completion)*
 

@@ -968,6 +968,7 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 **Milestone character:** SIMPLIFICATION. Cut the app to a minimal product on one screen, re-found the data on eight plain types (decisions · objectives · requests · notifications · SOP · steps · standards · users), and delete every feature that did not make the cut. Supersedes v8.0 Phase 42 (CRE-01..04, PRG-01..02 → carried by WRK-01..03) and the unstarted v9.0 phases (OBL → RQS-03, LOG → DEC-01, FBK → RQS-01, STD → SOP-02; LAD, VAS, PAR → backlog).
 
 **Standing constraints:**
+
 - Words on screen are plain: "section" and "step", never "block". No internal IDs in UI copy.
 - Every phase that touches a screen ships a deployed eval (`tests/evals/`, `npm run eval -- --phase N`) and the screenshots are read before a pass is declared.
 - `src/lib/journeys/journeys.ts` and `.planning/codebase/CAPABILITY-MATRIX.md` change in the same commit as the route or the gate they describe.
@@ -1060,12 +1061,12 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 
 ### One Organisation (ORG) — Phase 55
 
-- [ ] **ORG-01**: The app serves one organisation: there is no way to sign up and create another, no organisation switch, and people join only by invitation
+- [x] **ORG-01**: The app serves one organisation: there is no way to sign up and create another, no organisation switch, and people join only by invitation
 
 ### Removal (CUT) — Phases 55, 62
 
-- [ ] **CUT-01**: None of the dropped worker features can be reached or is shipped: offline use, voice of any kind, phone scan and QR machine plates, shared-device login
-- [ ] **CUT-02**: None of the dropped authoring features can be reached or is shipped: video generation, flow diagram, image annotation, the YouTube and photo-scan ways of starting, the reusable-content library pages, version compare and restore
+- [x] **CUT-01**: None of the dropped worker features can be reached or is shipped: offline use, voice of any kind, phone scan and QR machine plates, shared-device login
+- [x] **CUT-02**: None of the dropped authoring features can be reached or is shipped: video generation, flow diagram, image annotation, the YouTube and photo-scan ways of starting, the reusable-content library pages, version compare and restore
 - [ ] **CUT-03**: None of the dropped governance and training features can be reached or is shipped: refresher cadence, CSV export, the departments screen, org-chart views
 - [ ] **CUT-04**: The code, routes, API endpoints, packages and scheduled jobs that existed only for dropped features are deleted, the app builds and lints clean without them, and a guard fails the build if a dropped route or package comes back
 - [ ] **CUT-05**: The pathways map and the feedback (UAT) page are rebuilt to describe the one-screen app and show no screen that no longer exists
@@ -1106,7 +1107,7 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 | NTF-01..02 (2) | Phase 60 | Pending |
 | OBJ-01..03 (3) | Phase 60 | Pending |
 | SMK-01..03 (3) | Phase 61 | Pending |
-| ORG-01 | Phase 55 | Pending |
+| ORG-01 | Phase 55 | Complete |
 | CUT-01..02 (2) | Phase 55 | Pending |
 | CUT-03..05 (3) | Phase 62 | Pending |
 
