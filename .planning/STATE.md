@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v11.0
 milestone_name: — One-Screen MVP
 status: executing
-stopped_at: Phase 56 context gathered
-last_updated: "2026-10-03T16:34:59.735Z"
-last_activity: 2026-10-03 -- Phase 56 planning complete
+stopped_at: Completed 56-01-PLAN.md
+last_updated: "2026-10-03T23:12:05.878Z"
+last_activity: 2026-10-03 -- Phase 56 execution started
 progress:
   total_phases: 14
   completed_phases: 1
-  total_plans: 14
-  completed_plans: 14
+  total_plans: 24
+  completed_plans: 15
   percent: 7
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-03)
 
 **Core value:** A worker can find the SOP for the machine in front of them and follow it step by step with nothing else on the screen — and the business can see, in one ledger, who decided and did what.
-**Current focus:** Phase 55 — cut-the-dropped-features-one-organisation
+**Current focus:** Phase 56 — a-simpler-sop-the-decision-ledger
 
 ## Current Position
 
-Phase: 56
-Plan: Not started
+Phase: 56 (a-simpler-sop-the-decision-ledger) — EXECUTING
+Plan: 2 of 10
 Status: Ready to execute
-Last activity: 2026-10-03 -- Phase 56 planning complete
+Last activity: 2026-10-03 -- Phase 56 execution started
 
 ### v11.0 roadmap (created 2026-10-03)
 
@@ -289,6 +289,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 55 P10 | 40min | 3 tasks | 60 files |
 | Phase 55 P11 | ~45min | 3 tasks | 60 files |
 | Phase 55 P13 | 10min | 3 tasks | 12 files |
+| Phase 56 P01 | 25min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -577,6 +578,7 @@ Recent decisions affecting current work:
 - [Phase 55]: 55-10: SOP_TABS is read/walk; ?tab=flow maps to read; Konva allow-list narrowed to admin/site; DAT-01 sops write census 41 to 40
 - [Phase 55]: [55-11] sop-section-blocks keeps read-only listSectionBlocks (builder junction map needs it); library actions deleted
 - [Phase 55]: D-07: bundle baseline moved down by hand after the cut — /sops/[sopId]/page 1048 → 817 KB, /sops/page 940 → 817 KB; capture script not run — Phase 55 cut
+- [Phase 56]: 56-01: decision-writer sweep discovers writes by method-chain parsing; column tokens count only inside a function that writes the table
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -722,6 +724,6 @@ deliberate decision, not a side-effect.
 
 ## Session Continuity
 
-Last session: 2026-10-03T14:46:44.614Z
-Stopped at: Phase 56 context gathered
+Last session: 2026-10-03T23:12:05.866Z
+Stopped at: Completed 56-01-PLAN.md
 Resume file: .planning/phases/56-a-simpler-sop-the-decision-ledger/56-CONTEXT.md

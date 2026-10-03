@@ -1004,7 +1004,7 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 
 ### The SOP Itself (SOP) — Phases 56, 58
 
-- [ ] **SOP-01**: A SOP is sections and steps; hazard, PPE, step and check are kinds of step, and every existing SOP is converted so that none of its hazard or PPE content is lost
+- [x] **SOP-01**: A SOP is sections and steps; hazard, PPE, step and check are kinds of step, and every existing SOP is converted so that none of its hazard or PPE content is lost
 - [ ] **SOP-02**: An admin can put a standard — a plain label such as "LOTO" — on a whole SOP, a section or a single step, and manage the list of standards in the Workshop; content that was linked from the old reusable library stays in the SOPs that used it
 - [ ] **SOP-03**: Every SOP belongs either to one or more machines or to the whole site, and its department comes from its machine rather than being picked separately
 - [ ] **SOP-04**: An admin can publish a new version of a SOP; workers always get the latest published version and earlier versions are kept on record
@@ -1030,7 +1030,7 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 
 ### Decision Ledger (DEC) — Phases 56, 59
 
-- [ ] **DEC-01**: Every approval, rejection, sign-off, assignment, publish, change of owner, recorded observation and cleared AI finding is written as one decision: who, when, what was decided and what it was about
+- [x] **DEC-01**: Every approval, rejection, sign-off, assignment, publish, change of owner, recorded observation and cleared AI finding is written as one decision: who, when, what was decided and what it was about
 - [ ] **DEC-02**: An admin can read the ledger in the Office, newest first, and narrow it by kind of decision
 - [ ] **DEC-03**: No one, in any role, can change or delete a decision once it is written, and that is enforced by the database rather than by the screen
 - [ ] **DEC-04**: A decision made by an AI agent is recorded with the agent named as who made it
@@ -1100,7 +1100,7 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 | WRK-03..04 (2) | Phase 58 | Pending |
 | WRK-05..07 (3) | Phase 61 | Pending |
 | OFF-01..06 (6) | Phase 59 | Pending |
-| DEC-01 | Phase 56 | Pending |
+| DEC-01 | Phase 56 | Complete |
 | DEC-02 | Phase 59 | Pending |
 | DEC-03..04 (2) | Phase 56 | Pending |
 | RQS-01..04 (4) | Phase 60 | Pending |

@@ -1809,11 +1809,11 @@ Plans:
   4. Approving, rejecting, signing off, assigning, publishing, changing an owner, recording an observation and clearing an AI finding each write one decision naming who, when, what and what it was about; a decision made by an AI agent names the agent
   5. Nobody — worker, supervisor or admin — can change or delete a decision once it is written; the database refuses the attempt even when the screen is bypassed
 
-**Plans:** 10 plans
+**Plans:** 1/10 plans executed
 Plans:
 **Wave 1**
 
-- [ ] 56-01-PLAN.md — Wave 0: phase56 project, data-keyed decision-writer list + sweep, publish-gate hash pin, convert fixture SOP, eval skeleton
+- [x] 56-01-PLAN.md — Wave 0: phase56 project, data-keyed decision-writer list + sweep, publish-gate hash pin, convert fixture SOP, eval skeleton
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
