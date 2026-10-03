@@ -48,7 +48,7 @@ export default defineConfig({
     },
     {
       name: 'phase12.5-stubs',
-      testMatch: /sb-ux-(blueprint|voice|flow|cmdk|contract|walkthrough|escalate|blocks)\.test\.ts$/,
+      testMatch: /sb-ux-(blueprint|flow|cmdk|contract|walkthrough|escalate|blocks)\.test\.ts$/,
       use: { browserName: 'chromium' },
     },
     {

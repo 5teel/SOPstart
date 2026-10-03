@@ -72,11 +72,6 @@ test.describe('SB-LINE-01 — Desktop walkthrough layout (Wave 2 contract)', () 
     expect(src).toMatch(/dynamic\([\s\S]*?DesktopWalkthrough[\s\S]*?ssr:\s*false/)
   })
 
-  test('WalkthroughSwitcher uses next/dynamic for WalkthroughVoiceModal with ssr:false', () => {
-    const src = read(SWITCHER)
-    expect(src).toMatch(/dynamic\([\s\S]*?WalkthroughVoiceModal[\s\S]*?ssr:\s*false/)
-  })
-
   test('WalkthroughSwitcher statically imports MobileWalkthrough (SSR path)', () => {
     const src = read(SWITCHER)
     expect(src).toMatch(
@@ -95,11 +90,6 @@ test.describe('SB-LINE-01 — Desktop walkthrough layout (Wave 2 contract)', () 
     expect(src).toMatch(/variant\s*===\s*['"]desktop['"]/)
     expect(src).toMatch(/<MobileWalkthrough/)
     expect(src).toMatch(/<DesktopWalkthrough/)
-  })
-
-  test('WalkthroughSwitcher mounts WalkthroughVoiceButton (D-14)', () => {
-    const src = read(SWITCHER)
-    expect(src).toMatch(/<WalkthroughVoiceButton/)
   })
 
   test('MobileWalkthrough has data-walkthrough="mobile" marker for UAT', () => {

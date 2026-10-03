@@ -24,10 +24,15 @@ import path from 'node:path'
 
 const ROOT = process.cwd()
 const SELF = path.join('tests', 'phase55', 'deletion-sweep.spec.ts')
-const TEST_SCAN_EXCLUDED_PREFIXES = [path.join('tests', 'phase55') + path.sep, path.join('tests', 'evals', 'cut-features.eval.ts')]
+const TEST_SCAN_EXCLUDED_PREFIXES = [
+  path.join('tests', 'phase55') + path.sep,
+  path.join('tests', 'evals', 'cut-features.eval.ts'),
+  // asserts the ask-bar microphone is absent, so it must name the test id
+  path.join('tests', 'evals', 'plant-home.eval.ts'),
+]
 
 // Each deleting plan appends its feature key here when it flips the block live.
-const LIVE_FEATURES: string[] = []
+const LIVE_FEATURES: string[] = ['voice-capture']
 // 55-13 flips this once the eight packages are uninstalled.
 const PACKAGES_LIVE = false
 

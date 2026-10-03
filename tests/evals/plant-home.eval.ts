@@ -44,7 +44,7 @@ test.describe('Phase 52 — worker plant home (deployed)', () => {
     plantSopId = fixture.plantSopId
   })
 
-  test('eval-site worker at 1440 sees the scene, a pin on EVAL Press, the Now card, the panel, a chip fit, the ask highlight and the voice dialog — no scope column, no console errors', async ({
+  test('eval-site worker at 1440 sees the scene, a pin on EVAL Press, the Now card, the panel, a chip fit, the ask highlight and no microphone — no scope column, no console errors', async ({
     page,
     context,
   }) => {
@@ -134,14 +134,8 @@ test.describe('Phase 52 — worker plant home (deployed)', () => {
     await shot(page, 'plant-home-ask')
     await ask.fill('')
 
-    // 9. Voice dialog opens and closes (the token is only fetched on mic press
-    // inside the modal, so opening here never starts the microphone).
-    await page.getByTestId('plant-ask-mic').click()
-    const dialog = page.getByRole('dialog')
-    await expect(dialog).toBeVisible({ timeout: 15_000 })
-    await shot(page, 'plant-home-voice')
-    await page.keyboard.press('Escape')
-    await expect(dialog).toHaveCount(0)
+    // 9. The ask bar is search only: no microphone.
+    await expect(page.getByTestId('plant-ask-mic')).toHaveCount(0)
 
     // 10. Show me reopens the panel on the Now card's machine.
     await page.getByTestId('plant-now-show').click()

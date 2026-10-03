@@ -162,7 +162,6 @@ test.describe('PlantHome wiring', () => {
       'onMachineClick={open}',
       'onShowMe={open}',
       'onClose={close}',
-      'voiceSopId={voiceSopId}',
       'onChange={onQueryChange}',
     ]) {
       expect(src, `missing ${wiring}`).toContain(wiring)

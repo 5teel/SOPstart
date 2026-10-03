@@ -1,24 +1,12 @@
 /**
- * Phase 15 / Wave 0 — Static-import leak guard (Pitfall 5, guards SB-LINE-06).
- * Phase 52 (D-13) added a second sanctioned dynamic reference site for
- * WalkthroughVoiceModal — see below.
+ * Phase 15 / Wave 0 -- Static-import leak guard (Pitfall 5, guards SB-LINE-06).
  *
- * Ensures that DesktopWalkthrough and WalkthroughVoiceModal are NEVER
- * statically imported. DesktopWalkthrough's ONLY allowed reference site is
- * `src/components/sop/walkthrough/WalkthroughSwitcher.tsx`; WalkthroughVoiceModal's
- * allowed reference sites are that same file AND
- * `src/components/sop/plant/PlantAskBar.tsx` (the plant home's ask-bar mic,
- * D-13) — both only via `next/dynamic`. Any other import path would pull the
- * desktop / voice code into the mobile worker bundle and bust SB-LINE-06
- * bundle isolation.
+ * DesktopWalkthrough's ONLY allowed reference site is
+ * `src/components/sop/walkthrough/WalkthroughSwitcher.tsx`, and only via
+ * `next/dynamic`. Any other import path would pull the desktop code into the
+ * mobile worker bundle and bust SB-LINE-06 bundle isolation.
  *
- * Runs LIVE (no `test.fixme`). At Phase-14-head the components don't exist
- * yet, so the regex finds zero matches and the test passes vacuously.
- * Once Wave 2 adds the dynamic import inside WalkthroughSwitcher.tsx the
- * test will continue passing because that single permitted reference
- * uses `next/dynamic`. Any future regression where a developer adds
- * `import { DesktopWalkthrough } from '...'` outside the switcher will
- * make this test fail.
+ * Runs LIVE (no `test.fixme`).
  */
 import { test, expect } from '@playwright/test'
 import fs from 'node:fs'
@@ -33,11 +21,6 @@ const ALLOWED_FILE = path.join(
   'walkthrough',
   'WalkthroughSwitcher.tsx'
 )
-const ALLOWED_VOICE_FILES = [
-  ALLOWED_FILE,
-  path.join('src', 'components', 'sop', 'plant', 'PlantAskBar.tsx'),
-]
-
 type Hit = { file: string; line: number; text: string; usesDynamic: boolean }
 
 function walk(dir: string, out: string[]): void {
@@ -102,22 +85,6 @@ test('SB-LINE-06: no static import of DesktopWalkthrough outside WalkthroughSwit
   if (violations.length > 0) {
     console.error(
       'DesktopWalkthrough import-leak violations:\n' +
-        violations.map((v) => `  ${v.file}:${v.line}  ${v.text}`).join('\n')
-    )
-  }
-  expect(violations).toEqual([])
-})
-
-test('SB-LINE-06: no static import of WalkthroughVoiceModal outside WalkthroughSwitcher.tsx or plant/PlantAskBar.tsx', () => {
-  const hits = findImports('WalkthroughVoiceModal')
-  const allowedPaths = ALLOWED_VOICE_FILES.map((f) => f.replace(/\\/g, '/'))
-  const violations = hits.filter((h) => {
-    if (!allowedPaths.includes(h.file)) return true
-    return !h.usesDynamic
-  })
-  if (violations.length > 0) {
-    console.error(
-      'WalkthroughVoiceModal import-leak violations:\n' +
         violations.map((v) => `  ${v.file}:${v.line}  ${v.text}`).join('\n')
     )
   }

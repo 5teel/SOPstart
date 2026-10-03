@@ -85,7 +85,7 @@ export const JOURNEYS: Journey[] = [
       { id: 'select', type: 'action', label: 'Tap name from roster', detail: 'roster_worker_id stored in sessionStorage. Shared-device account (RLS key) session unchanged.' },
       { id: 'sops', type: 'screen', label: 'SOP library', route: '/sops', detail: 'Worker browses SOPs. "Updated since last completion" badge appears on any SOP newer than their last completion (AFL-VER-04 / D-08).' },
       { id: 'detail', type: 'screen', label: 'Procedure detail', route: '/sops/[sopId]', detail: 'One document in the order the job needs it: Orient (title, scope, which job inside the SOP), Prepare (hazards/PPE acknowledged inline, tools and parts for that job), Do (the job\'s steps listed in full, "Walk it step by step" button).' },
-      { id: 'walk', type: 'screen', label: 'Step-by-step walkthrough (Walk it tab)', route: '/sops/[sopId]', detail: 'Worker steps through using tap or voice (Phase 22). Walk it tab on the SOP detail (?tab=walk; legacy ?tab=walkthrough still lands).' },
+      { id: 'walk', type: 'screen', label: 'Step-by-step walkthrough (Walk it tab)', route: '/sops/[sopId]', detail: 'Worker steps through by tapping. Walk it tab on the SOP detail (?tab=walk; legacy ?tab=walkthrough still lands).' },
       { id: 'complete', type: 'action', label: 'Complete + worker self-sign', detail: 'Completing the SOP IS the worker signature (D-09). recordSignature() binds roster_worker_id to the completion record for attribution.' },
       { id: 'countersign', type: 'decision', label: 'Counter-sign required?', branches: [
         { label: 'Yes — supervisor counter-signs', to: 'sup' },
@@ -144,7 +144,7 @@ export const JOURNEYS: Journey[] = [
         { label: 'On a phone, and the site has a map', to: 'phone' },
         { label: 'No map drawn yet', to: 'lib' },
       ] },
-      { id: 'plant', type: 'screen', label: 'Plant home — the site map', route: '/sops', detail: 'The site drawing with every machine clickable (Phase 52). An amber pin on a machine counts that worker\'s procedures there that are due, never done, or updated — worked out live from the worker\'s own list, never stored (D-05/D-06). The "Next for you" card shows the single next procedure with Walk it and Show me. Department chips move the view to that department\'s machines. The ask bar lights up matching machines as the worker types, and its mic opens the same voice Q&A as the walkthrough. Admins see the library table here instead; their floor is on Governance (Phase 54).' },
+      { id: 'plant', type: 'screen', label: 'Plant home — the site map', route: '/sops', detail: 'The site drawing with every machine clickable (Phase 52). An amber pin on a machine counts that worker\'s procedures there that are due, never done, or updated — worked out live from the worker\'s own list, never stored (D-05/D-06). The "Next for you" card shows the single next procedure with Walk it and Show me. Department chips move the view to that department\'s machines. The ask bar lights up matching machines as the worker types. Admins see the library table here instead; their floor is on Governance (Phase 54).' },
       { id: 'pick', type: 'decision', label: 'How do they get there?', branches: [
         { label: 'Click a machine', to: 'panel' },
         { label: 'Now card → Walk it', to: 'walk' },
@@ -194,7 +194,6 @@ export const JOURNEYS: Journey[] = [
       { id: 'photo', type: 'action', label: 'Capture photo', detail: "Compressed and uploaded straight away; the step can't be finished until the photo shows Uploaded." },
       { id: 'meas', type: 'action', label: 'Enter reading', detail: 'Flagged if out of range.' },
       { id: 'decide', type: 'action', label: 'Choose path', detail: 'May branch or escalate.' },
-      { id: 'ask', type: 'action', label: '(Optional) Voice interaction — ask a question or say "next"/"done"', detail: 'Phase 22: voice-driven mode on the mobile immersive surface. Mic pill → push-to-talk → classifyIntent routes to: (a) voice "next"/"done" → handleMarkComplete (same D-02 safety-ack path as the tap button); (b) voice question → AI Q&A grounded in this SOP, answer read aloud via TTS; step text is read aloud on each advance (VDW-LIT-03). Always-on tap equivalents remain (D-04). No new route — voice is a mode layer on the SOP detail Walk it tab (?tab=walk).' },
       { id: 'next', type: 'decision', label: 'More steps?', branches: [
         { label: 'Yes', to: 'read' },
         { label: 'Last step done', to: 'complete' },
