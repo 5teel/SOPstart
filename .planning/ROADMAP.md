@@ -1734,7 +1734,7 @@ Executes 55 → 56 → 57 → 58 → 59 → 60 → 61 → 62, strictly sequentia
   4. The sign-up page no longer creates an organisation, there is nowhere to switch organisation, and someone with no invitation is told to ask their admin
   5. Every existing SOP, completion record and photo is still there and opens exactly as before — nothing in the database was dropped
 
-**Plans:** 1/14 plans executed
+**Plans:** 2/14 plans executed
 Plans:
 **Wave 1**
 
@@ -1742,7 +1742,7 @@ Executes 55 → 56 → 57 → 58 → 59 → 60 → 61 → 62, strictly sequentia
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 55-02-PLAN.md — Rewire reads: worker list/detail/Now card from the server; builder autosave straight to updateSectionLayout
+- [x] 55-02-PLAN.md — Rewire reads: worker list/detail/Now card from the server; builder autosave straight to updateSectionLayout
 
 **Wave 3** *(blocked on Wave 2 completion)*
 

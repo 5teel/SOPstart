@@ -4,13 +4,13 @@ milestone: v11.0
 milestone_name: — One-Screen MVP
 status: executing
 stopped_at: v11.0 roadmap created; next /gsd-discuss-phase 55
-last_updated: "2026-10-03T10:10:57.538Z"
+last_updated: "2026-10-03T10:17:23.168Z"
 last_activity: 2026-10-03 -- Phase 55 execution started
 progress:
   total_phases: 14
   completed_phases: 0
   total_plans: 14
-  completed_plans: 1
+  completed_plans: 2
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-03)
 ## Current Position
 
 Phase: 55 (cut-the-dropped-features-one-organisation) — EXECUTING
-Plan: 2 of 14
+Plan: 3 of 14
 Status: Ready to execute
 Last activity: 2026-10-03 -- Phase 55 execution started
 
@@ -282,6 +282,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 43-dead-surface-removal-route-truth P04 | 50min | 3 tasks | 13 files |
 | Phase 43 P05 | 50min | 2 tasks | 6 files |
 | Phase 55 P01 | 40min | 3 tasks | 12 files |
+| Phase 55 P02 | 35min | 3 tasks | 19 files |
 
 ## Accumulated Context
 
@@ -563,6 +564,7 @@ Recent decisions affecting current work:
 - [Phase 43-dead-surface-removal-route-truth]: Deleted /admin/governance and /admin/sops page-level shims per 43-CONTEXT D-01; bookmark compatibility moved to two static next.config.ts redirects (non-permanent, fixed destinations)
 - [Phase 43]: Migration 00068 restores the org-scoped SELECT policy on public.blocks that migration 00037 silently dropped, fixing a full-deny RLS gap for any session-scoped read of blocks/block_versions
 - [Phase 55-01]: Dropped list is JSON data read by a per-feature fixme-gated sweep; walk eval fixture SOP is unassigned and machine-less
+- [Phase 55]: [55-02] Builder autosave flushes pending edit on unmount/pagehide/visibilitychange; overwrite-toast effect has no cleanup
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -708,6 +710,6 @@ deliberate decision, not a side-effect.
 
 ## Session Continuity
 
-Last session: 2026-10-03T10:10:54.179Z
+Last session: 2026-10-03T10:17:19.179Z
 Stopped at: v11.0 roadmap created; next /gsd-discuss-phase 55
 Resume file: None
