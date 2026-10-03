@@ -54,9 +54,6 @@ next-env.d.ts
 # supabase
 supabase/.temp/
 
-# serwist service worker (build artifact)
-/public/sw.js
-/public/sw.js.map
 
 # FFmpeg WASM binaries (copied from node_modules during setup)
 public/ffmpeg/

@@ -39,7 +39,10 @@ export async function updateSession(request: NextRequest) {
   // Build identity for the deployed-site eval runner (scripts/run-evals.mjs):
   // returns only the git SHA Railway injected at build time. No tenant data.
   const isVersionRoute = path === '/api/version'
-  const isPublicRoute = path === '/' || isAuthRoute || isSchemaIntrospection || isCronRoute || isVersionRoute
+  // The kill-switch worker must reach signed-out browsers: a redirected
+  // service-worker script fails the update check and the old worker stays.
+  const isServiceWorkerScript = path === '/sw.js'
+  const isPublicRoute = path === '/' || isAuthRoute || isSchemaIntrospection || isCronRoute || isVersionRoute || isServiceWorkerScript
 
   if (!isPublicRoute && !claims) {
     // Phase 53 PHN-02: preserve the requested path (e.g. a scanned /m/<code>

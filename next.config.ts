@@ -1,11 +1,4 @@
-import withSerwistInit from '@serwist/next'
 import type { NextConfig } from 'next'
-
-const withSerwist = withSerwistInit({
-  swSrc: 'src/app/sw.ts',
-  swDest: 'public/sw.js',
-  disable: process.env.NODE_ENV === 'development',
-})
 
 const nextConfig: NextConfig = {
   // 'canvas' (Phase 26 / Plan 26-05, D-03): Konva's node fallback. Externalizing
@@ -16,8 +9,8 @@ const nextConfig: NextConfig = {
   /**
    * One shared chunk for Next's next/dynamic runtime (fix(53), SB-LINE-06).
    * Left to the default heuristics it rode along in whichever vendors chunk
-   * happened to share its route set; when /m/[code] joined the offline-db
-   * vendors chunk, the runtime fell under minSize as a shared group and was
+   * happened to share its route set; once a new route changed that set, the
+   * runtime fell under minSize as a shared group and was
    * copied into a per-route vendors chunk on every next/dynamic route
    * (/sops, /sops/[sopId], builder, activity, api/schema). Pinning it here
    * keeps one copy no matter which routes are added later.
@@ -75,4 +68,4 @@ const nextConfig: NextConfig = {
   },
 }
 
-export default withSerwist(nextConfig)
+export default nextConfig
