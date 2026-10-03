@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v11.0
 milestone_name: — One-Screen MVP
 status: executing
-stopped_at: Completed 56-01-PLAN.md
-last_updated: "2026-10-03T23:12:05.878Z"
+stopped_at: Completed 56-02-PLAN.md
+last_updated: "2026-10-03T23:22:05.364Z"
 last_activity: 2026-10-03 -- Phase 56 execution started
 progress:
   total_phases: 14
   completed_phases: 1
   total_plans: 24
-  completed_plans: 15
+  completed_plans: 16
   percent: 7
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-03)
 ## Current Position
 
 Phase: 56 (a-simpler-sop-the-decision-ledger) — EXECUTING
-Plan: 2 of 10
+Plan: 3 of 10
 Status: Ready to execute
 Last activity: 2026-10-03 -- Phase 56 execution started
 
@@ -290,6 +290,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 55 P11 | ~45min | 3 tasks | 60 files |
 | Phase 55 P13 | 10min | 3 tasks | 12 files |
 | Phase 56 P01 | 25min | 2 tasks | 8 files |
+| Phase 56 P02 | 40min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -579,6 +580,7 @@ Recent decisions affecting current work:
 - [Phase 55]: [55-11] sop-section-blocks keeps read-only listSectionBlocks (builder junction map needs it); library actions deleted
 - [Phase 55]: D-07: bundle baseline moved down by hand after the cut — /sops/[sopId]/page 1048 → 817 KB, /sops/page 940 → 817 KB; capture script not run — Phase 55 cut
 - [Phase 56]: 56-01: decision-writer sweep discovers writes by method-chain parsing; column tokens count only inside a function that writes the table
+- [Phase 56]: 56-02: unreadable hazard/PPE cards and unknown block types fail the per-SOP gate; empty non-safety blocks are dropped and counted
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -724,6 +726,6 @@ deliberate decision, not a side-effect.
 
 ## Session Continuity
 
-Last session: 2026-10-03T23:12:05.866Z
-Stopped at: Completed 56-01-PLAN.md
+Last session: 2026-10-03T23:22:05.352Z
+Stopped at: Completed 56-02-PLAN.md
 Resume file: .planning/phases/56-a-simpler-sop-the-decision-ledger/56-CONTEXT.md
