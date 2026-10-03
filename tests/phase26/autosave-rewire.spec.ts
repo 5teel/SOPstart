@@ -2,8 +2,8 @@
  * Phase 26 Plan 26-04 Task 2 — P11 autosave RE-WIRE (behavioural parity).
  *
  * The bespoke `<EditableDocument>` replaces `<Puck onChange={handleChange}>`.
- * This asserts, end-to-end, that editing a block's text writes a draftLayouts
- * row (dirty) whose reloaded layout_data renders the edited text through the
+ * This asserts, end-to-end, that editing a block's text sends an
+ * updateSectionLayout payload whose reloaded layout_data renders the edited text through the
  * worker LayoutRenderer — with junctionId + block_provenance preserved. The
  * proof runs in `scripts/autosave-rewire-check.tsx`; we shell out because
  * Playwright's JSX transform is incompatible with real react-dom/server.

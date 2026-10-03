@@ -1,7 +1,8 @@
 /**
  * Phase 26 Plan 26-04 Task 2 — P11 autosave RE-WIRE parity harness (behavioural).
  *
- * Proves the bespoke edit canvas feeds the EXISTING autosave path unchanged:
+ * Proves the bespoke edit canvas feeds the autosave path (a direct
+ * `updateSectionLayout` save):
  * this REPLACES the behaviour that `<Puck onChange={handleChange}>` gave for
  * free. The full loop is exercised end-to-end against the real modules:
  *
@@ -9,16 +10,16 @@
  *      EditableDocument),
  *   2. edit a block's primary text exactly as InlineText's onBlur does
  *      (updateBlockProps),
- *   3. persist { content, root } via a draftLayouts store whose PUT payload is
- *      byte-identical to `useBuilderAutosave` (the hook reads only
- *      { content, root } — RESEARCH A4),
- *   4. RELOAD: re-seed a fresh document from the PERSISTED row and render it
+ *   3. persist { content, root } through a stand-in for the `updateSectionLayout`
+ *      call whose payload is the one `useBuilderAutosave` sends (the hook reads
+ *      only { content, root } — RESEARCH A4),
+ *   4. RELOAD: re-seed a fresh document from the PERSISTED layout and render it
  *      through the worker `LayoutRenderer` (react-dom/server), asserting the
  *      edited text is what a worker would now read.
  *
- * The only stand-in is the Dexie table (an in-memory Map) — IndexedDB is
- * browser infra, not our logic; the row shape matches `useBuilderAutosave`
- * exactly (see the field list below vs src/hooks/useBuilderAutosave.ts L23-31).
+ * The only stand-in is the server action (an in-memory Map keyed by sectionId) —
+ * the database is infra, not our logic; the payload matches `useBuilderAutosave`
+ * (see the field list below vs saveLayout in src/hooks/useBuilderAutosave.ts).
  *
  * Why a tsx subprocess (not an in-Playwright render): Playwright's test
  * transform rewrites project JSX to {__pw_type…} descriptors that real
@@ -48,7 +49,6 @@ const { CURRENT_LAYOUT_VERSION } =
 
 const failures: string[] = []
 const SECTION_ID = 'sec-1'
-const SOP_ID = 'sop-1'
 const ORIGINAL = 'Original converted body text'
 const EDITED = 'EDITED worker-visible body text'
 
@@ -68,22 +68,18 @@ const seedLayout = {
   root: { props: {} },
 }
 
-// In-memory stand-in for db.draftLayouts (keyed by section_id, as Dexie is).
-const draftLayouts = new Map<string, any>()
+// In-memory stand-in for the updateSectionLayout server action (keyed by sectionId).
+const savedLayouts = new Map<string, any>()
 
-// Mirrors useBuilderAutosave's db.draftLayouts.put payload EXACTLY
-// (src/hooks/useBuilderAutosave.ts) — this is the "unchanged hook" contract.
-function putDraft(sectionId: string, sopId: string, data: unknown) {
-  const now = Date.now()
-  draftLayouts.set(sectionId, {
-    section_id: sectionId,
-    sop_id: sopId,
-    layout_data: data,
-    layout_version: CURRENT_LAYOUT_VERSION,
-    updated_at: now,
-    syncState: 'dirty',
-    _cachedAt: now,
-  })
+// Mirrors the payload useBuilderAutosave sends to updateSectionLayout
+// (src/hooks/useBuilderAutosave.ts).
+function updateSectionLayout(input: {
+  sectionId: string
+  layoutData: unknown
+  layoutVersion: number
+  clientUpdatedAt: number
+}) {
+  savedLayouts.set(input.sectionId, input)
 }
 
 // ── 1. Edit the block's text (as InlineText onBlur → EditableDocument does). ──
@@ -92,23 +88,28 @@ const root = seedLayout.root
 content = updateBlockProps(content as any, 'block-a', { content: EDITED }) as any[]
 
 // ── 2. EditableDocument's change effect → handleChange({ content, root }). ──
-putDraft(SECTION_ID, SOP_ID, { content, root })
+updateSectionLayout({
+  sectionId: SECTION_ID,
+  layoutData: { content, root },
+  layoutVersion: CURRENT_LAYOUT_VERSION,
+  clientUpdatedAt: Date.now(),
+})
 
-// ── 3. A draftLayouts row was written, dirty, with the edited layout_data. ──
-const row = draftLayouts.get(SECTION_ID)
-if (!row) failures.push('no draftLayouts row written on edit')
+// ── 3. An updateSectionLayout payload was sent with the edited layoutData. ──
+const row = savedLayouts.get(SECTION_ID)
+if (!row) failures.push('no updateSectionLayout payload sent on edit')
 else {
-  if (row.syncState !== 'dirty') failures.push(`row.syncState = ${row.syncState}, expected 'dirty'`)
-  if (row.section_id !== SECTION_ID) failures.push('row.section_id mismatch')
-  const edited = row.layout_data?.content?.[0]?.props
+  if (row.sectionId !== SECTION_ID) failures.push('payload.sectionId mismatch')
+  if (row.layoutVersion !== CURRENT_LAYOUT_VERSION) failures.push('payload.layoutVersion mismatch')
+  const edited = row.layoutData?.content?.[0]?.props
   if (edited?.content !== EDITED) failures.push('persisted text is not the edited value')
   // P11 lossless: frozen-contract metadata survived the edit → persist.
   if (edited?.junctionId !== 'junc-a') failures.push('junctionId dropped on autosave')
   if (!edited?.block_provenance) failures.push('block_provenance dropped on autosave')
 }
 
-// ── 4. RELOAD: fresh document seeded from the PERSISTED row renders the edit. ──
-const persisted = draftLayouts.get(SECTION_ID)?.layout_data
+// ── 4. RELOAD: fresh document seeded from the PERSISTED layout renders the edit. ──
+const persisted = savedLayouts.get(SECTION_ID)?.layoutData
 const reloadedMarkup = renderToStaticMarkup(
   createElement(LayoutRenderer as any, {
     layoutData: persisted,
@@ -127,5 +128,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  'AUTOSAVE-REWIRE OK — edit → draftLayouts (dirty) → reload renders the edited worker text; junctionId + block_provenance preserved (P11).'
+  'AUTOSAVE-REWIRE OK — edit → updateSectionLayout payload → reload renders the edited worker text; junctionId + block_provenance preserved (P11).'
 )

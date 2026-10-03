@@ -37,8 +37,6 @@ function walk(dir: string, out: string[] = []): string[] {
 const OFFLINE = '@/lib/offline'
 
 test.describe('worker list derives from the server (55-02)', () => {
-  test.fixme(true, 'flips live in 55-02')
-
   test('useWorkerSops takes requestedIds and reads the server', () => {
     const src = code('src/hooks/useWorkerSops.ts')
     expect(src).toMatch(/export function useWorkerSops\(\s*requestedIds/)
@@ -64,7 +62,6 @@ test.describe('worker list derives from the server (55-02)', () => {
 })
 
 test.describe('SOP detail and Now card read the server (55-02)', () => {
-  test.fixme(true, 'flips live in 55-02')
 
   test('useSopDetail has no cache branch', () => {
     const src = code('src/hooks/useSopDetail.ts')
@@ -81,7 +78,6 @@ test.describe('SOP detail and Now card read the server (55-02)', () => {
 })
 
 test.describe('builder autosave writes straight to the server (55-02)', () => {
-  test.fixme(true, 'flips live in 55-02')
 
   test('useBuilderAutosave debounces then calls updateSectionLayout', () => {
     const src = code('src/hooks/useBuilderAutosave.ts')

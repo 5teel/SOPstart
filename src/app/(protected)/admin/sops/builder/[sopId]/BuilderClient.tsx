@@ -3,9 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { SopWithSections } from '@/types/sop'
 import { LayoutDataSchema } from '@/lib/builder/layout-schema'
-import { useDraftLayoutSync } from '@/hooks/useDraftLayoutSync'
-import { useNetworkStore } from '@/stores/network'
-import { db } from '@/lib/offline/db'
+import { useBuilderSaveStatus } from '@/hooks/useBuilderAutosave'
 import { BuilderTreeRail } from '@/components/admin/builder/BuilderTreeRail'
 import { RerunReviewerButton } from '@/components/admin/ai-reviewer/RerunReviewerButton'
 import { EditableDocument } from '@/components/admin/builder-v2/EditableDocument'
@@ -32,7 +30,7 @@ interface BuilderClientProps {
  * Phase 26 (D-01): the Build stage canvas. Puck is removed — the canvas now
  * mounts the bespoke `<EditableDocument>` which renders the SAME worker block
  * components with edit affordances and autosaves through the UNCHANGED
- * `useBuilderAutosave` → Dexie → Supabase path (P11).
+ * `useBuilderAutosave` → `updateSectionLayout` path (P11), debounced 750 ms.
  *
  * Selection-sync, AI-flag overlays, structured-field panels and the tiered
  * inserter are RE-WIRED off Puck in later waves; this wave mounts the canvas
@@ -55,48 +53,33 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
     canvasRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
   }, [activeSectionId])
 
-  // Autosave/sync hooks. useDraftLayoutSync registers the mount/online/
-  // visibility triggers that flush dirty draftLayouts rows to Supabase.
-  const { syncing, lastSyncResult } = useDraftLayoutSync()
-  const isOnline = useNetworkStore((s) => s.isOnline)
+  // Save state comes from the direct-save hook (useBuilderAutosave), not a store of drafts.
+  const pending = useBuilderSaveStatus((s) => s.pending)
+  const lastSavedAt = useBuilderSaveStatus((s) => s.lastSavedAt)
+  const saveError = useBuilderSaveStatus((s) => s.error)
+  const overwrittenSectionIds = useBuilderSaveStatus((s) => s.overwrittenSectionIds)
+  const clearOverwritten = useBuilderSaveStatus((s) => s.clearOverwritten)
 
-  // Track last-synced timestamp for the SAVED pill (polls Dexie every 2s).
-  const [lastSavedAt, setLastSavedAt] = useState<number | null>(null)
+  // 1 s tick so the "SAVED Ns AGO" label counts up.
   const [savedTick, setSavedTick] = useState(0)
   useEffect(() => {
-    let cancelled = false
-    async function refresh() {
-      try {
-        const rows = await db.draftLayouts.where('sop_id').equals(sopId).toArray()
-        const synced = rows.filter((r) => r.syncState === 'synced')
-        const latest = synced.reduce((acc, r) => (r.updated_at > acc ? r.updated_at : acc), 0)
-        if (!cancelled) setLastSavedAt(latest > 0 ? latest : null)
-      } catch {
-        // Dexie not ready / SSR — leave lastSavedAt as-is
-      }
-    }
-    void refresh()
-    const poll = setInterval(refresh, 2_000)
     const tick = setInterval(() => setSavedTick((t) => t + 1), 1_000)
-    return () => {
-      cancelled = true
-      clearInterval(poll)
-      clearInterval(tick)
-    }
-  }, [sopId])
+    return () => clearInterval(tick)
+  }, [])
 
   // D-07: surface a quiet toast when a cross-admin overwrite is reported.
   const [overwriteToast, setOverwriteToast] = useState<string | null>(null)
   useEffect(() => {
-    if (!lastSyncResult?.overwrittenByServer?.length) return
-    const overwrittenTitles = lastSyncResult.overwrittenByServer.map(
+    if (!overwrittenSectionIds.length) return
+    const overwrittenTitles = overwrittenSectionIds.map(
       (id) => sections.find((s) => s.id === id)?.title ?? id.slice(0, 8)
     )
     setOverwriteToast(`Updated by another admin - ${overwrittenTitles.join(', ')}`)
-    const t = setTimeout(() => setOverwriteToast(null), 4000)
-    return () => clearTimeout(t)
+    clearOverwritten()
+    // No cleanup: clearOverwritten() re-runs this effect, and a cleanup would cancel the hide timer.
+    setTimeout(() => setOverwriteToast(null), 4000)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lastSyncResult])
+  }, [overwrittenSectionIds])
 
   // D-16: section-level toast when layout_data is structurally broken.
   const [layoutErrorToast, setLayoutErrorToast] = useState<string | null>(null)
@@ -184,13 +167,14 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
     setSopProposals((prev) => prev.filter((p) => p.id !== proposalId))
   }
 
-  const savePillLabel = !isOnline
-    ? 'OFFLINE · QUEUED'
-    : syncing
+  const savePillLabel =
+    pending > 0
       ? 'SAVING…'
-      : lastSavedAt
-        ? `SAVED ${Math.max(0, Math.round((Date.now() - lastSavedAt) / 1000))}s AGO`
-        : 'SAVED'
+      : saveError
+        ? 'NOT SAVED'
+        : lastSavedAt
+          ? `SAVED ${Math.max(0, Math.round((Date.now() - lastSavedAt) / 1000))}s AGO`
+          : 'SAVED'
   // Reference savedTick so React re-runs the render each tick for the label.
   void savedTick
 
