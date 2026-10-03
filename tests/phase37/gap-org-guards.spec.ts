@@ -1,6 +1,6 @@
 /**
- * Gap closure regression guards -- 37-VERIFICATION.md CR-01 (+ its rule-5
- * sibling on the video versions page) and WR-02/WR-05.
+ * Gap closure regression guards -- 37-VERIFICATION.md CR-01 and WR-02/WR-05
+ * (the video versions page sibling guard went with the page in Phase 55).
  *
  * Positional source-contract assertions (readFileSync + \r\n strip) matching
  * the phase's existing idiom (tests/phase37/assessor-gate.spec.ts). Also adds
@@ -21,7 +21,6 @@ function readSrc(relPath: string): string {
 }
 
 const COMPLETION_PAGE = readSrc('src/app/(protected)/activity/[completionId]/page.tsx')
-const VIDEO_PAGE = readSrc('src/app/(protected)/admin/sops/[sopId]/video/page.tsx')
 const OBS_ACTIONS = readSrc('src/actions/observations.ts')
 
 test.describe('CR-01 -- completion detail page org-scope guard', () => {
@@ -52,15 +51,6 @@ test.describe('CR-01 -- completion detail page org-scope guard', () => {
     // Only one remaining reference to the row's own org field -- the guard
     // itself -- proving the predicate no longer consumes it (CR-01 T-37-07-02).
     expect((COMPLETION_PAGE.match(/data\.organisation_id/g) ?? []).length).toBe(1)
-  })
-})
-
-test.describe('Rule-5 sibling -- video versions page org-scope guard', () => {
-  test('the org guard is present and the sops select includes organisation_id', () => {
-    expect(VIDEO_PAGE).toContain('sop.organisation_id !== organisationId')
-    const selectIndex = VIDEO_PAGE.indexOf(".from('sops')")
-    const selectSlice = VIDEO_PAGE.slice(selectIndex, selectIndex + 200)
-    expect(selectSlice).toContain('organisation_id')
   })
 })
 
