@@ -14,9 +14,9 @@
  *
  *   2. **Forbidden-marker gate.** None of the route's `forbiddenMarkers`
  *      string literals may appear in that route's own chunk set. Route A
- *      additionally keeps its two POSITIVE chunk-existence assertions
- *      (`DesktopWalkthrough`, `WalkthroughVoiceModal` must exist somewhere
- *      in the build) — that check is scoped to route A only.
+ *      additionally keeps its POSITIVE chunk-existence assertion
+ *      (`DesktopWalkthrough` must exist somewhere in the build) — that
+ *      check is scoped to route A only.
  *
  *   3. **Marker self-validation (new in 41-01).** Every forbidden marker,
  *      across every route, must be found SOMEWHERE in the overall build
@@ -106,7 +106,6 @@ const GATED_ROUTES: GatedRoute[] = [
         markers: ['Search org or collections…', 'follows collection'],
       },
       { label: 'konva (52 D-02)', markers: ['react-konva', 'konva'] },
-      { label: 'voice modal (52 D-13)', markers: ['Please acknowledge the safety hazards first'] },
       { label: 'plant home (52 D-01)', markers: ['No procedures for this machine yet.'] },
       { label: 'phone home (53 D-01)', markers: ['Show the machines on your site'] },
       { label: 'scan sheet (53 D-09)', markers: ["That's not a SOPstart plate"] },
@@ -240,9 +239,9 @@ for (const entry of GATED_ROUTES) {
 
 // ---------------------------------------------------------------------------
 // Route-A-only positive chunk-existence assertions (Wave 4 — LIVE, no
-// carve-out). Both DesktopWalkthrough and WalkthroughVoiceModal must exist
-// as their own dynamic chunks somewhere in the build. If either is absent,
-// somebody statically imported them outside of WalkthroughSwitcher.tsx —
+// carve-out). DesktopWalkthrough must exist as its own dynamic chunk
+// somewhere in the build. If it is absent, somebody statically imported it
+// outside of WalkthroughSwitcher.tsx —
 // which would silently inflate the mobile First Load JS even if delta
 // hasn't tripped yet.
 // ---------------------------------------------------------------------------
@@ -288,21 +287,15 @@ function findSymbolInBuildOutput(symbol: string, pageBundlePath: string): { foun
 
 const routeA = GATED_ROUTES[0]
 const desktopFound = findSymbolInBuildOutput('DesktopWalkthrough', routeA.pageBundlePath)
-const voiceFound = findSymbolInBuildOutput('WalkthroughVoiceModal', routeA.pageBundlePath)
 
 if (!desktopFound.found) {
   fail(
     'DesktopWalkthrough chunk not found in any build manifest or chunk — was the component statically imported instead of via next/dynamic({ ssr: false })?'
   )
 }
-if (!voiceFound.found) {
-  fail(
-    'WalkthroughVoiceModal chunk not found in any build manifest or chunk — was the component statically imported instead of via next/dynamic({ ssr: false })?'
-  )
-}
 
 console.log(
-  `check-bundle-size: ✓ Bundle isolation OK (chunks present, delta within tolerance) — DesktopWalkthrough at ${desktopFound.locations[0]}, WalkthroughVoiceModal at ${voiceFound.locations[0]}`
+  `check-bundle-size: ✓ Bundle isolation OK (chunks present, delta within tolerance) — DesktopWalkthrough at ${desktopFound.locations[0]}`
 )
 console.log(
   `check-bundle-size: ✓ Source-viewer isolation OK — pdfjs + mammoth not in ${routeA.route} bundle (D-21-09).`

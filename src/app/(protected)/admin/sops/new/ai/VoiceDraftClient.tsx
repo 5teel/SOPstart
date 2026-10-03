@@ -14,7 +14,6 @@
 import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useDeepgramWebSocket } from '@/hooks/useDeepgramWebSocket'
-import { useTtsPlayback } from '@/components/sop/voice/useTtsPlayback'
 import { isVoiceCaptureSupported } from '@/lib/voice/media-recorder'
 import ParseJobStatus from '@/components/admin/ParseJobStatus'
 import type { Department } from '@/types/sop'
@@ -32,7 +31,6 @@ const OPENER =
 export function VoiceDraftClient({ departments }: { departments: Department[] }) {
   const router = useRouter()
   const { start, stop } = useDeepgramWebSocket()
-  const { speak } = useTtsPlayback()
 
   const [messages, setMessages] = useState<Msg[]>([{ role: 'assistant', text: OPENER }])
   const [brief, setBrief] = useState('')
@@ -80,7 +78,6 @@ export function VoiceDraftClient({ departments }: { departments: Department[] })
       setMessages([...next, { role: 'assistant', text: json.reply }])
       setBrief(json.brief ?? '')
       setReady(json.ready === true)
-      if (!muted && json.reply) void speak(json.reply)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Network error')
     } finally {
