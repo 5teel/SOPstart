@@ -10,9 +10,6 @@ import { signOffCompletion, recordSignature } from '@/actions/completions'
 import { requestAssessorReview } from '@/actions/observations'
 import type { CompletionStatus } from '@/types/sop'
 
-// sessionStorage key for roster identity (set by RosterSelector on shared devices — D-11)
-const ROSTER_STORAGE_KEY = 'safestart_roster_worker_id'
-
 interface Photo {
   id: string
   step_id: string
@@ -137,19 +134,16 @@ export function CompletionDetailClient({
         setOverrideSheetOpen(false)
         setOverrideReason('')
 
-        // D-10 / AFL-VER-05: Record supervisor counter-signature bound to roster identity.
-        // On shared devices, the supervisor's roster id is stored in sessionStorage by RosterSelector.
-        // On personal-login devices, fall back to the supervisor's own user id (currentUserId).
-        // Using workerId here would record the WORKER's uid as the supervisor roster id,
-        // corrupting the sign-off chain (WR-05 fix).
+        // D-10 / AFL-VER-05: Record the supervisor counter-signature as the signed-in
+        // supervisor (currentUserId). Using workerId here would record the WORKER's uid
+        // as the counter-signer, corrupting the sign-off chain (WR-05 fix).
         // recordSignature is best-effort — sign-off is already committed above; signature
         // failure is non-fatal (logged only). The completion is legally recorded via signOffCompletion.
-        const supervisorRosterId = sessionStorage.getItem(ROSTER_STORAGE_KEY) ?? currentUserId
-        if (supervisorRosterId) {
+        if (currentUserId) {
           recordSignature({
             completionId,
             role: 'supervisor',
-            rosterUserId: supervisorRosterId,
+            rosterUserId: currentUserId,
           }).catch((err) => {
             console.warn('recordSignature (supervisor) failed — non-fatal:', err)
           })

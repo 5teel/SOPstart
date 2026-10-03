@@ -28,30 +28,12 @@ export async function submitCompletion(
     return { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
   }
 
-  const { supabase, userId, organisationId } = await getSessionContext()
+  const { userId, organisationId } = await getSessionContext()
   if (!userId) return { success: false, error: 'Not authenticated' }
   if (!organisationId) return { success: false, error: 'No organisation found' }
 
   const admin = createAdminClient()
-  const { localId, sopId, sopVersion, contentHash, stepData, photoStoragePaths, stepAckTrace, rosterWorkerId } =
-    parsed.data
-
-  // Phase 23 D-11: validate rosterWorkerId belongs to the same org before writing.
-  // (RESEARCH Pitfall 4, CLAUDE.md 2026-06-15 — cross-tenant attribution attack surface)
-  // Uses the regular session client so RLS org-scope is enforced automatically.
-  let resolvedRosterWorkerId: string | null = null
-  if (rosterWorkerId) {
-    const { data: memberCheck } = await supabase
-      .from('organisation_members')
-      .select('user_id')
-      .eq('user_id', rosterWorkerId)
-      .eq('organisation_id', organisationId)
-      .single()
-    if (!memberCheck) {
-      return { success: false, error: 'Roster user not in this organisation.' }
-    }
-    resolvedRosterWorkerId = rosterWorkerId
-  }
+  const { localId, sopId, sopVersion, contentHash, stepData, photoStoragePaths, stepAckTrace } = parsed.data
 
   // Photo paths must sit in this org's folder for this completion (the folder
   // getPhotoUploadUrl signs); a client-supplied path never reaches another tenant's files.
@@ -65,16 +47,13 @@ export async function submitCompletion(
   // step_ack_trace (Phase 15 D-21): append-only evidence of sequential reading.
   // Server treats client-supplied trace as informational — D-20 / threat model
   // T-15-02-01: it's evidence, not a gate.
-  // roster_worker_id (Phase 23 D-11): attribution column — worker_id STAYS as user.id (the
-  // shared-device account uid, the RLS key). roster_worker_id is the floor-identity attribution column only.
   const { error: insertError } = await admin
     .from('sop_completions')
     .insert({
       id: localId,
       organisation_id: organisationId,
       sop_id: sopId,
-      worker_id: userId,               // shared-device account uid (RLS key — DO NOT change)
-      roster_worker_id: resolvedRosterWorkerId,  // D-11 attribution (null for personal-login sessions)
+      worker_id: userId,               // the signed-in worker (RLS key)
       sop_version: sopVersion,
       content_hash: contentHash,
       step_data: stepData as Record<string, number>,
