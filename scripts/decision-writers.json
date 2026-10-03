@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "tables": [
+    "sop_approvals",
+    "sop_completion_signatures",
+    "sop_observations",
+    "sop_review_events",
+    "sop_block_update_decisions",
+    "completion_sign_offs",
+    "sop_assignments",
+    "sop_review_cadences",
+    "ai_field_proposals"
+  ],
+  "columnKeys": [
+    { "table": "sops", "token": "owner_user_id:", "what": "owner change" },
+    { "table": "sops", "token": "status: 'published'", "what": "publish" },
+    { "table": "sop_section_blocks", "token": "verified_by_admin_id:", "what": "verify / AI finding cleared" }
+  ],
+  "entries": [
+    { "file": "src/actions/approvals.ts", "function": "approveStep", "status": "hook", "key": "sop_approvals", "kind": "approve", "plan": 5 },
+    { "file": "src/actions/approvals.ts", "function": "requestChanges", "status": "hook", "key": "sop_approvals", "kind": "reject", "plan": 5 },
+    { "file": "src/lib/governance/publish-core.ts", "function": "performPublish", "status": "hook", "key": "status: 'published'", "kind": "publish", "plan": 5 },
+    { "file": "src/actions/governance.ts", "function": "setSopOwner", "status": "hook", "key": "owner_user_id:", "kind": "owner_change", "plan": 5 },
+    { "file": "src/actions/governance.ts", "function": "confirmSopCurrent", "status": "hook", "key": "sop_review_events", "kind": "review", "plan": 5 },
+    { "file": "src/actions/governance.ts", "function": "setReviewCadence", "status": "hook", "key": "sop_review_cadences", "kind": "cadence_change", "plan": 5 },
+    { "file": "src/actions/completions.ts", "function": "signOffCompletion", "status": "hook", "key": "completion_sign_offs", "kind": "sign_off/reject", "plan": 5 },
+    { "file": "src/actions/completions.ts", "function": "recordSignature", "status": "hook", "key": "sop_completion_signatures", "kind": "sign_off/countersign", "plan": 5 },
+    { "file": "src/actions/assignments.ts", "function": "assignSopToRole", "status": "hook", "key": "sop_assignments", "kind": "assign", "plan": 8 },
+    { "file": "src/actions/assignments.ts", "function": "assignSopToUser", "status": "hook", "key": "sop_assignments", "kind": "assign", "plan": 8 },
+    { "file": "src/actions/assignments.ts", "function": "removeAssignment", "status": "hook", "key": "sop_assignments", "kind": "unassign", "plan": 8 },
+    { "file": "src/actions/observations.ts", "function": "recordObservation", "status": "hook", "key": "sop_observations", "kind": "observation", "plan": 8 },
+    { "file": "src/actions/sop-section-blocks.ts", "function": "verifyBlock", "status": "hook", "key": "verified_by_admin_id:", "kind": "verify/ai_finding_cleared", "plan": 8 },
+    { "file": "src/actions/sop-section-blocks.ts", "function": "unverifyBlock", "status": "hook", "key": "verified_by_admin_id:", "kind": "verify_withdrawn", "plan": 8 },
+    { "file": "src/actions/ai-fields.ts", "function": "acceptProposal", "status": "hook", "key": "ai_field_proposals", "kind": "approve", "plan": 8 },
+    { "file": "src/actions/ai-fields.ts", "function": "rejectProposal", "status": "hook", "key": "ai_field_proposals", "kind": "reject", "plan": 8 }
+  ],
+  "extraHooks": [
+    { "file": "src/actions/ai-fields.ts", "function": "applyAiWrite", "status": "hook", "anchor": "gateWrite(", "kind": "ai_field_write", "actor": "agent", "plan": 8 }
+  ],
+  "allow": [
+    { "file": "src/actions/assignments.ts", "function": "selfAddSop", "key": "sop_assignments", "reason": "A worker bookmarking a SOP on their own list is not a governance decision (RESEARCH A7); logging it would be noise." },
+    { "file": "src/actions/assignments.ts", "function": "selfRemoveSop", "key": "sop_assignments", "reason": "A worker removing a SOP from their own list is not a governance decision (RESEARCH A7)." },
+    { "file": "src/actions/versioning.ts", "function": "notifyAssignedWorkers", "key": "sop_assignments", "reason": "Housekeeping: re-points existing assignments to the new version when it replaces the old one. The version publish is the decision." },
+    { "file": "src/actions/sops.ts", "function": "deleteSop", "key": "sop_assignments", "reason": "Housekeeping: assignments are cleared as part of deleting the SOP itself." },
+    { "file": "src/lib/ai-fields/approval.ts", "function": "defaultAdminInsert", "key": "ai_field_proposals", "reason": "gateWrite inserts a proposal, which is a request, not a decision (Phase 60). Its accept/reject is logged in acceptProposal/rejectProposal." }
+  ]
+}

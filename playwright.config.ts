@@ -673,5 +673,28 @@ export default defineConfig({
       testMatch: /tests\/phase55\/.*\.(spec|test)\.ts$/,
       use: { browserName: 'chromium' },
     },
+    {
+      // Phase 56 -- a simpler SOP + the decision ledger.
+      // Nyquist harness (Wave 0 / Plan 56-01).
+      //
+      // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
+      // DELIBERATELY BROAD testMatch (tests/phase56/**) so later plans drop
+      // specs in with NO further config edit. Unit specs for pure modules live
+      // here too with static `@/` imports (precedent: tests/phase55/sop-pack.spec.ts),
+      // so no separate -unit project is added. Live-DB specs self-skip unless
+      // PHASE56_LIVE=1, so quick runs never spend the shared OTP budget
+      // (CLAUDE.md 2026-09-28).
+      //
+      // Verify registration: `npx playwright test --list --project=phase56`
+      //
+      // Files registered here:
+      //   decision-writers-sweep (DEC-01; reads scripts/decision-writers.json;
+      //     discovery LIVE from 56-01, per-writer wiring fixme until 56-05/56-08)
+      //   publish-gate-pin (SOP-01; sha256 of assertPublishGates, LIVE from 56-01)
+      name: 'phase56',
+      testDir: '.',
+      testMatch: /tests\/phase56\/.*\.(spec|test)\.ts$/,
+      use: { browserName: 'chromium' },
+    },
   ],
 })
