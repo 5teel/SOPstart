@@ -169,3 +169,23 @@ test.describe('00070 shape', () => {
     expect(sql70).not.toMatch(/security\s+definer/i)
   })
 })
+
+test.describe('applier', () => {
+  const applier = fs
+    .readFileSync(path.join(process.cwd(), 'scripts', 'apply-phase56-migration.mjs'), 'utf8')
+    .replace(/\r\n/g, '\n')
+
+  test('MIGRATION_FILES lists 00069 before 00070 (apply order is load-bearing, CLAUDE.md 2026-07-28)', () => {
+    const block = applier.slice(applier.indexOf('const MIGRATION_FILES'), applier.indexOf(']', applier.indexOf('const MIGRATION_FILES')))
+    const i69 = block.indexOf('00069_sop_kinds_placement_standards.sql')
+    const i70 = block.indexOf('00070_decisions_ledger.sql')
+    expect(i69).toBeGreaterThan(-1)
+    expect(i70).toBeGreaterThan(-1)
+    expect(i69).toBeLessThan(i70)
+  })
+
+  test('the applier runs the append-only probe', () => {
+    expect(applier).toContain('probe-decisions-immutable')
+    expect(applier).toContain('probeDecisionsImmutable(managementSql)')
+  })
+})
