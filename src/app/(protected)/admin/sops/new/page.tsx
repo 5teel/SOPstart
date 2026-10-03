@@ -34,7 +34,7 @@ const METHODS: { eyebrow: string; title: string; description: string; href: stri
   {
     eyebrow: '02 · AI draft',
     title: 'Draft it with AI',
-    description: 'Type a short brief, or talk it through with an AI interviewer that asks follow-up questions. Either way you get a first version to review in the builder.',
+    description: 'Type a short brief and get a first version to review in the builder.',
     href: '/admin/sops/new/ai',
   },
   {

@@ -29,7 +29,7 @@ export default async function NewAiSopPage() {
       badge="AI DRAFT"
       mono
       title="Draft a SOP with AI"
-      description="Type a brief or talk it through — either way you review the draft in the builder before publish."
+      description="Type a brief — you review the draft in the builder before publish."
     >
       <AiDraftFork departments={departments} />
     </AdminPageShell>
