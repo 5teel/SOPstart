@@ -38,6 +38,8 @@ export const EVAL_PLANT_SOP_TITLE = 'Eval plant fixture SOP'
 export const EVAL_PLANT_MACHINE = 'EVAL Press'
 // Phase 55: dedicated walk fixture (published, unassigned, on no machine; step 2 needs a photo).
 export const EVAL_WALK_SOP_TITLE = 'Eval walk fixture SOP'
+// Phase 56: the converter's known-answer fixture (published, unassigned, on no machine).
+export const EVAL_CONVERT_SOP_TITLE = 'Eval convert fixture SOP'
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!

@@ -23,6 +23,8 @@ export const EVAL_PLANT_SOP_TITLE = 'Eval plant fixture SOP'
 // Phase 55 (55-01): a published, UNASSIGNED, machine-less SOP whose step 2 asks for a
 // photo -- the walk eval completes it, so it must never be the plant fixture SOP.
 export const EVAL_WALK_SOP_TITLE = 'Eval walk fixture SOP'
+// Phase 56 (56-01): the converter's known-answer SOP -- published, UNASSIGNED, machine-less.
+export const EVAL_CONVERT_SOP_TITLE = 'Eval convert fixture SOP'
 
 const { data: list } = await sb.auth.admin.listUsers({ perPage: 500 })
 for (const [role, email] of Object.entries(EVAL_USERS)) {
@@ -250,4 +252,99 @@ for (const step of [
 }
 console.log(`walk fixture ${EVAL_WALK_SOP_TITLE} → ${walkSop.id}`)
 
-console.log(`SOPstart Eval Site → org=${siteOrg.id} admin=${siteAdmin.id} department=${dept.id} sop=${sop.id} worker=${siteWorker.id} plantSop=${plantSop.id} walkSop=${walkSop.id}`)
+// --- Phase 56 (56-01): converter known-answer fixture ---
+// Published, assigned to NOBODY and linked to NO machine (CLAUDE.md 2026-09-29 shared-fixture
+// learning). Known answer: hazard 4 (2 cards + Warning + Caution), ppe 1 holding both items,
+// step 2 (one asks for a photo), check 1. The Warning hazard sorts before 'Isolate the press.'
+// and the Caution hazard before 'Photograph the isolation lock.'
+let convertSop
+{
+  const { data, error } = await sb.from('sops').select('id, status').eq('organisation_id', siteOrg.id).eq('title', EVAL_CONVERT_SOP_TITLE).maybeSingle()
+  if (error) throw error
+  convertSop = data
+}
+if (!convertSop) {
+  const { data, error } = await sb
+    .from('sops')
+    .insert({
+      organisation_id: siteOrg.id,
+      title: EVAL_CONVERT_SOP_TITLE,
+      source_file_name: EVAL_CONVERT_SOP_TITLE,
+      source_file_type: 'docx',
+      source_file_path: '',
+      uploaded_by: siteAdmin.id,
+      status: 'published',
+      published_at: new Date().toISOString(),
+      version: 1,
+      source_type: 'blank',
+    })
+    .select('id, status')
+    .single()
+  if (error) throw error
+  convertSop = data
+  console.log('created fixture SOP', EVAL_CONVERT_SOP_TITLE, convertSop.id)
+} else if (convertSop.status !== 'published') {
+  const { error } = await sb.from('sops').update({ status: 'published', published_at: new Date().toISOString() }).eq('id', convertSop.id)
+  if (error) throw error
+  console.log('published fixture SOP', EVAL_CONVERT_SOP_TITLE, convertSop.id)
+}
+
+const layout = (content) => ({ root: { props: {} }, content })
+const convertSections = [
+  {
+    sort_order: 0, section_type: 'hazards', title: 'Hazards',
+    content: 'Pinch point at the rollers.\nHot surface on the oven door.',
+    layout_data: layout([
+      { type: 'HazardCardBlock', props: { id: 'evh1', title: 'Hazard', body: 'Pinch point at the rollers.', severity: 'warning' } },
+      { type: 'HazardCardBlock', props: { id: 'evh2', title: 'Hazard', body: 'Hot surface on the oven door.', severity: 'warning' } },
+    ]),
+  },
+  {
+    sort_order: 1, section_type: 'ppe', title: 'PPE',
+    content: 'Safety glasses\nCut-resistant gloves',
+    layout_data: layout([
+      { type: 'PPECardBlock', props: { id: 'evp1', title: 'PPE Required', items: ['Safety glasses', 'Cut-resistant gloves'] } },
+    ]),
+  },
+  {
+    sort_order: 2, section_type: 'procedure', title: 'Procedure', content: null,
+    layout_data: layout([
+      { type: 'StepBlock', props: { id: 'evs1', number: 1, text: 'Isolate the press.' } },
+      { type: 'CalloutBlock', props: { id: 'evw1', title: 'Warning', body: 'Stored energy in the hydraulic line.' } },
+      { type: 'CalloutBlock', props: { id: 'evt1', title: 'Tip', body: 'Use your own lock.' } },
+      { type: 'StepWithPhotosBlock', props: { id: 'evs2', number: 2, text: 'Photograph the isolation lock.', photos: [], layout: 'single' } },
+      { type: 'CalloutBlock', props: { id: 'evc1', title: 'Caution', body: 'Do not reach past the guard.' } },
+      { type: 'MeasurementBlock', props: { id: 'evm1', label: 'Hydraulic pressure', unit: 'bar', tolerance: { min: 0, max: 5 }, voiceEnabled: false } },
+    ]),
+  },
+]
+let convertProcedureSectionId
+for (const sec of convertSections) {
+  const { data: existing, error } = await sb.from('sop_sections').select('id').eq('sop_id', convertSop.id).eq('sort_order', sec.sort_order).limit(1).maybeSingle()
+  if (error) throw error
+  const row = { ...sec, approved: true, layout_version: 1 }
+  let id = existing?.id
+  if (existing) {
+    const { error: upErr } = await sb.from('sop_sections').update(row).eq('id', existing.id)
+    if (upErr) throw upErr
+  } else {
+    const { data, error: inErr } = await sb.from('sop_sections').insert({ sop_id: convertSop.id, ...row }).select('id').single()
+    if (inErr) throw inErr
+    id = data.id
+  }
+  if (sec.section_type === 'procedure') convertProcedureSectionId = id
+}
+for (const step of [
+  { step_number: 1, text: 'Isolate the press.', warning: 'Stored energy in the hydraulic line.', tip: 'Use your own lock.', caution: null, photo_required: false },
+  { step_number: 2, text: 'Photograph the isolation lock.', warning: null, tip: null, caution: 'Do not reach past the guard.', photo_required: true },
+]) {
+  const { data: existing, error } = await sb.from('sop_steps').select('id').eq('section_id', convertProcedureSectionId).eq('step_number', step.step_number).maybeSingle()
+  if (error) throw error
+  const { error: writeErr } = existing
+    ? await sb.from('sop_steps').update(step).eq('id', existing.id)
+    : await sb.from('sop_steps').insert({ section_id: convertProcedureSectionId, ...step, time_estimate_minutes: 1 })
+  if (writeErr) throw writeErr
+}
+console.log(`convert fixture ${EVAL_CONVERT_SOP_TITLE} → ${convertSop.id}`)
+
+console.log(`SOPstart Eval Site → org=${siteOrg.id} admin=${siteAdmin.id} department=${dept.id} sop=${sop.id} worker=${siteWorker.id} plantSop=${plantSop.id} walkSop=${walkSop.id} convertSop=${convertSop.id}`)

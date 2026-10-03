@@ -3,7 +3,7 @@ phase: 56
 slug: a-simpler-sop-the-decision-ledger
 status: draft
 nyquist_compliant: false
-wave_0_complete: false
+wave_0_complete: true
 created: 2026-10-04
 ---
 
@@ -64,9 +64,9 @@ created: 2026-10-04
 
 ## Wave 0 Requirements
 
-- [ ] `playwright.config.ts` — `phase56` project (56-01)
-- [ ] `tests/phase56/decision-writers-sweep.spec.ts` + `scripts/decision-writers.json`, `tests/phase56/publish-gate-pin.spec.ts` (56-01)
-- [ ] `tests/evals/sop-ledger.eval.ts` skeleton + convert fixture SOP in `scripts/eval-fixtures.mjs` (56-01)
+- [x] `playwright.config.ts` — `phase56` project (56-01)
+- [x] `tests/phase56/decision-writers-sweep.spec.ts` + `scripts/decision-writers.json`, `tests/phase56/publish-gate-pin.spec.ts` (56-01)
+- [x] `tests/evals/sop-ledger.eval.ts` skeleton + convert fixture SOP in `scripts/eval-fixtures.mjs` (56-01)
 - [ ] `scripts/convert-sops-to-steps.ts --all` dry run against production (read-only) BEFORE any write path exists (56-02)
 - [ ] Specs created by their owning plans: convert (02), schema-shape (03), schema-runtime (04), decision-shape (05), standards-actions (06), convert-apply (07), placement (09)
 - [ ] Probes confirming research assumptions A2 (placement trigger as invoker, incl. FK cascade) — 56-04 schema-runtime; A3 (`ReviewerFlag.block_id` = junction id) — confirmed in planning from `useReviewerFlags`/`ReviewStation` keying by junction id
