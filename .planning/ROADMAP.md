@@ -1734,7 +1734,7 @@ Executes 55 → 56 → 57 → 58 → 59 → 60 → 61 → 62, strictly sequentia
   4. The sign-up page no longer creates an organisation, there is nowhere to switch organisation, and someone with no invitation is told to ask their admin
   5. Every existing SOP, completion record and photo is still there and opens exactly as before — nothing in the database was dropped
 
-**Plans:** 6/14 plans executed
+**Plans:** 7/14 plans executed
 Plans:
 **Wave 1**
 
@@ -1762,7 +1762,7 @@ Executes 55 → 56 → 57 → 58 → 59 → 60 → 61 → 62, strictly sequentia
 
 **Wave 7** *(blocked on Wave 6 completion)*
 
-- [ ] 55-07-PLAN.md — Delete YouTube and photo-scan on-ramps (and the Generate video SOP entry) from UploadDropzone
+- [x] 55-07-PLAN.md — Delete YouTube and photo-scan on-ramps (and the Generate video SOP entry) from UploadDropzone
 
 **Wave 8** *(blocked on Wave 7 completion)*
 
