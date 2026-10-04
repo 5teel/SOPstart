@@ -844,6 +844,40 @@
       "path": "/dashboard",
       "dir": "src/app/(protected)/dashboard",
       "ref": "[\"'\\x60]/dashboard"
+    },
+    {
+      "feature": "site-and-departments-pages",
+      "phase": 57,
+      "kind": "route-page",
+      "path": "/admin/departments",
+      "dir": "src/app/(protected)/admin/departments",
+      "ref": "[\"'`]/admin/departments"
+    },
+    {
+      "feature": "site-and-departments-pages",
+      "phase": 57,
+      "kind": "route-page",
+      "path": "/admin/site",
+      "dir": "src/app/(protected)/admin/site",
+      "ref": "[\"'`]/admin/site([\"'`?]|$)"
+    },
+    {
+      "feature": "site-and-departments-pages",
+      "phase": 57,
+      "kind": "file",
+      "path": "src/components/admin/departments/DepartmentGrid.tsx"
+    },
+    {
+      "feature": "site-and-departments-pages",
+      "phase": 57,
+      "kind": "file",
+      "path": "src/components/admin/departments/DepartmentCard.tsx"
+    },
+    {
+      "feature": "site-and-departments-pages",
+      "phase": 57,
+      "kind": "file",
+      "path": "src/components/admin/departments/DepartmentFormModal.tsx"
     }
   ],
   "allow": [
