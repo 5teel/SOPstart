@@ -19,13 +19,15 @@ export interface Room {
 }
 
 // ponytail: fixed hit-areas by owner decision (D-01) -- this table is the one
-// place to tune them after reading the eval screenshots. Starting point is the
-// sketch-008 placement (RESEARCH Pattern 3); Workshop sits right of Smoko and
-// below the tallest machine box so no room overlaps another or a machine.
+// place to tune them. Tuned in 57-10 against the real org's scene (2752x1536,
+// machine polygons overlaid): Office sits on the Office terminal, Noticeboard
+// on empty floor between the IS machines and the pallets, Smoko on empty floor
+// right of the pallet stack (clear of the Office room), Workshop on empty floor
+// under the workbench. None overlaps a machine polygon of that scene.
 export const ROOMS: ReadonlyArray<Room> = [
   { id: 'office', name: 'Office', frac: [[0.716, 0.697], [0.82, 0.697], [0.82, 0.865], [0.716, 0.865]] },
-  { id: 'smoko', name: 'Smoko room', frac: [[0.01, 0.762], [0.01, 0.699], [0.092, 0.614], [0.192, 0.717], [0.192, 0.78], [0.11, 0.865]] },
-  { id: 'workshop', name: 'Workshop', frac: [[0.215, 0.905], [0.215, 0.865], [0.275, 0.825], [0.355, 0.865], [0.355, 0.905], [0.295, 0.945]] },
+  { id: 'smoko', name: 'Smoko room', frac: [[0.676, 0.648], [0.709, 0.616], [0.75, 0.648], [0.718, 0.68]] },
+  { id: 'workshop', name: 'Workshop', frac: [[0.871, 0.448], [0.9, 0.421], [0.935, 0.448], [0.906, 0.479]] },
   { id: 'noticeboard', name: 'Noticeboard', frac: [[0.554, 0.606], [0.593, 0.606], [0.593, 0.71], [0.554, 0.71]] },
 ]
 
