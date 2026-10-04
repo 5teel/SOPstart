@@ -100,14 +100,18 @@ function extractFirstSignOff(signOffs: CompletionSignOff[] | null): CompletionSi
 // ---------------------------------------------------------------
 // useWorkerCompletions
 //
-// Fetches the current worker's own completion history.
-// RLS automatically scopes to the authenticated user's completions.
+// Fetches the current user's OWN completion history. RLS alone is not a
+// self-scope: supervisors read their workers' rows and admins read the org's,
+// so every consumer (Smoko room, worker Office, /activity) filters on the
+// caller's id explicitly (57 review WR-01, same class as useWorkerSops).
 // ---------------------------------------------------------------
 export function useWorkerCompletions() {
   return useQuery<WorkerCompletion[]>({
     queryKey: ['completions', 'worker'],
     queryFn: async () => {
       const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return []
 
       const { data, error } = await supabase
         .from('sop_completions')
@@ -123,6 +127,7 @@ export function useWorkerCompletions() {
           completion_photos ( id ),
           completion_sign_offs ( id, supervisor_id, decision, reason, created_at )
         `)
+        .eq('worker_id', user.id)
         .order('submitted_at', { ascending: false })
         .limit(50)
 
