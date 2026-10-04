@@ -5,20 +5,16 @@
  * page guards can all import it — a sync export in a server-action module
  * breaks `next build` (CLAUDE.md learning 2026-06-27).
  *
- * Mapping (Phase 30 CONTEXT, locked decision UX-01; admin retargeted to
- * /sops in Phase 41 SUR-01 — the SOP list is one shared route now):
- *   worker → /sops · supervisor → /activity · safety_manager → /activity ·
- *   admin → /sops · absent/unknown role → /pending (safe default, A1).
+ * Mapping (Phase 57 D-10): every role lands on the one screen (/);
+ * absent/unknown role -> /pending (safe default, A1).
  */
 export function roleHome(role: string | null | undefined): string {
   switch (role) {
     case 'worker':
-      return '/sops'
     case 'supervisor':
     case 'safety_manager':
-      return '/activity'
     case 'admin':
-      return '/sops'
+      return '/'
     default:
       return '/pending'
   }

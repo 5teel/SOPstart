@@ -4,8 +4,7 @@
  * Contract (30-02-PLAN must_haves + orchestrator decision #5):
  *   - `roleHome(role)` lives in src/lib/auth/role-home.ts (NEVER exported from
  *     src/actions/* — 'use server' sync-export trap, CLAUDE.md 2026-06-27):
- *       worker → /sops · supervisor → /activity · safety_manager → /activity ·
- *       admin → /sops (Phase 41 SUR-01 — one shared SOP route) · absent/unknown
+ *       every role → / (Phase 57 D-10, the one screen) · absent/unknown
  *       role → /pending (safe default A1).
  *   - middleware.ts + actions/auth.ts redirect through roleHome (JWT claim
  *     `user_role` via shared parseJwtPayload — never raw atob, 2026-06-26).
@@ -29,16 +28,15 @@ function read(p: string): string {
 }
 
 test.describe('UX-01 — one home per role', () => {
-  test('roleHome maps worker→/sops, supervisor/safety_manager→/activity, admin→/sops, unknown→/pending', () => {
+  test('roleHome sends every role to / and an unknown role to /pending (Phase 57 D-10)', () => {
     const src = read(ROLE_HOME)
-    // all 5 cases of the mapping present in the ONE decision function
-    expect(src).toContain("case 'worker'")
-    expect(src).toContain("case 'supervisor'")
-    expect(src).toContain("case 'safety_manager'")
-    expect(src).toContain("case 'admin'")
-    expect(src).toContain("'/sops'")
-    expect(src).toContain("'/activity'")
-    expect(src).not.toContain("'/admin/sops'")
+    // one decision function, all four roles share the one screen
+    for (const role of ['worker', 'supervisor', 'safety_manager', 'admin']) {
+      expect(src).toContain(`case '${role}'`)
+    }
+    expect(src).toContain("return '/'")
+    expect(src).not.toContain("'/sops'")
+    expect(src).not.toContain("'/activity'")
     expect(src).toContain("'/pending'")
     // NOT a 'use server' file (sync export would break next build)
     expect(src).not.toContain("'use server'")

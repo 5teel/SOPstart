@@ -73,7 +73,7 @@ test.describe('Dead controls: scan-document, wiring lens, dead state (D-02/D-04/
 
     const blankPageSrc = read('src/app/(protected)/admin/sops/new/blank/page.tsx')
     expect(blankPageSrc).not.toContain('listBlockCategories')
-    expect(blankPageSrc).toContain('<WizardClient departments={departments} />')
+    expect(blankPageSrc).toContain('<WizardClient departments={departments} machineId={machineId} />')
 
     const versionsSrc = read('src/app/(protected)/admin/sops/[sopId]/versions/page.tsx')
     expect(versionsSrc).not.toContain('selectedForCompare')

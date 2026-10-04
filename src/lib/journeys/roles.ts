@@ -56,7 +56,7 @@ export const ROLES: RoleDef[] = [
     kind: 'org',
     colour: '#2563eb',
     who: 'Front-line tradesperson / inspector following procedures on-site.',
-    landsOn: { label: 'My SOPs', route: '/sops' },
+    landsOn: { label: 'The one screen', route: '/' },
     can: [
       'Read and walk through assigned / visible SOPs step-by-step',
       'Capture photos, complete steps, sign off their own instance',
@@ -70,7 +70,7 @@ export const ROLES: RoleDef[] = [
     kind: 'org',
     colour: '#7c3aed',
     who: 'Oversees a crew and reviews their completed work.',
-    landsOn: { label: 'Activity', route: '/activity' },
+    landsOn: { label: 'The one screen', route: '/' },
     can: [
       'Review worker completion records and sign-offs',
       'Open a completion to inspect captured photos and step results',
@@ -83,7 +83,7 @@ export const ROLES: RoleDef[] = [
     kind: 'org',
     colour: '#0d9488',
     who: 'Owns safety governance — supervisor oversight plus full admin authoring.',
-    landsOn: { label: 'Activity', route: '/activity' },
+    landsOn: { label: 'The one screen', route: '/' },
     can: [
       'Everything a Supervisor can do',
       'Full admin authoring: create / upload / parse SOPs, manage the content library',
@@ -97,7 +97,7 @@ export const ROLES: RoleDef[] = [
     kind: 'org',
     colour: '#b45309',
     who: 'The organisation’s administrator — set up by Potenco and by invitation.',
-    landsOn: { label: 'SOP list', route: '/sops' },
+    landsOn: { label: 'The one screen', route: '/' },
     can: [
       'Create / upload / AI-parse SOPs and run them to publish',
       'Manage the content library (department tagging)',

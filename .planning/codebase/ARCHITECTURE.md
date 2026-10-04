@@ -190,7 +190,7 @@ SafeStart is a multi-tenant Next.js 16 App Router SaaS web app that implements a
 **Protected Entry:**
 - Location: `src/app/(protected)/layout.tsx`
 - Triggers: `updateSession` middleware redirects authenticated users here
-- Responsibilities: Role-based home via `roleHome()` in `src/lib/auth/role-home.ts` — workers → `/sops`, supervisors and safety managers → `/activity`, admins → `/sops`, no role → `/pending`
+- Responsibilities: Role-based home via `roleHome()` in `src/lib/auth/role-home.ts` — every role → `/` (the one screen), no role → `/pending`
 
 **Middleware (Session Gate):**
 - Location: `src/lib/supabase/middleware.ts`

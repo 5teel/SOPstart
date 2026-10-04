@@ -121,7 +121,7 @@ test.describe('Route truth: legacy shims retired to config redirects (D-01, acti
     expect(journeysSrc).toContain("route: '/api/sops/[sopId]/publish'")
 
     const archSrc = read('.planning/codebase/ARCHITECTURE.md')
-    expect(archSrc).toContain('admins → `/sops`')
+    expect(archSrc).toContain('every role → `/` (the one screen)')
     expect(archSrc).toContain('/admin/sops/builder/[sopId]')
     expect(archSrc).not.toContain('admins → `/dashboard`')
     expect(archSrc).not.toContain('/admin/sops/[sopId]/review')
