@@ -1094,7 +1094,7 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 | SHL-07 | Phase 62 | Pending |
 | PLC-01..05 (5) | Phase 57 | Pending |
 | FOC-01..04 (4) | Phase 58 | Pending |
-| SOP-01..03 (3) | Phase 56 | Pending |
+| SOP-01..03 (3) | Phase 56 | Complete |
 | SOP-04 | Phase 58 | Pending |
 | WRK-01..02 (2) | Phase 61 | Pending |
 | WRK-03..04 (2) | Phase 58 | Pending |
@@ -1102,7 +1102,7 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 | OFF-01..06 (6) | Phase 59 | Pending |
 | DEC-01 | Phase 56 | Complete |
 | DEC-02 | Phase 59 | Pending |
-| DEC-03..04 (2) | Phase 56 | Pending |
+| DEC-03..04 (2) | Phase 56 | Complete |
 | RQS-01..04 (4) | Phase 60 | Pending |
 | NTF-01..02 (2) | Phase 60 | Pending |
 | OBJ-01..03 (3) | Phase 60 | Pending |
