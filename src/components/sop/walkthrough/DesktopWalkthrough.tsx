@@ -4,6 +4,8 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { CheckCircle2, ClipboardCheck, AlertTriangle, Zap, Lightbulb, Wrench, Clock } from 'lucide-react'
 import type { SopWithSections, SopSection } from '@/types/sop'
 import { isEmergencySection, isHazardSection, isPpeSection } from '@/lib/sop/sections'
+import { standardNames } from '@/lib/sop/placement'
+import { StandardLabels } from '@/components/sop/StandardLabels'
 import { useWalkthroughStore } from '@/stores/walkthrough'
 import { useCompletionStore } from '@/stores/completionStore'
 import { PageShell } from '@/components/layout/PageShell'
@@ -260,6 +262,7 @@ export function DesktopWalkthrough({ sop }: { sop: SopWithSections }) {
                   Step {currentIdx + 1} of {totalSteps}
                   {currentSection?.title ? ` · ${currentSection.title}` : ''}
                 </span>
+                <StandardLabels names={standardNames(currentSection?.standard_attachments)} />
               </div>
 
               <div data-region="title">

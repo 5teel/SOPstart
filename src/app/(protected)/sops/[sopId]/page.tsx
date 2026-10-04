@@ -9,6 +9,8 @@ import { WorkerPreviewToggle, WorkerPreviewClamp } from '@/components/sop/Worker
 import { ReadTab } from '@/components/sop/tabs'
 import { WalkthroughSwitcher } from '@/components/sop/walkthrough/WalkthroughSwitcher'
 import { procedureSections, scopeSopToJob } from '@/lib/sop/sections'
+import { placementLabel, placementSummary, standardNames } from '@/lib/sop/placement'
+import { StandardLabels } from '@/components/sop/StandardLabels'
 
 function SopDetailInner() {
   const params = useParams<{ sopId: string }>()
@@ -95,7 +97,20 @@ function SopDetailInner() {
             <Link href="/sops" className="text-sm text-[var(--ink-500)] hover:text-[var(--ink-900)] flex-shrink-0">
               ← SOPs
             </Link>
-            <p className="text-base font-semibold truncate">{sop.title ?? 'Untitled SOP'}</p>
+            <div className="min-w-0">
+              <p className="text-base font-semibold truncate">{sop.title ?? 'Untitled SOP'}</p>
+              <p data-testid="sop-meta" className="flex items-center gap-1.5 text-meta text-[var(--ink-500)] truncate">
+                {placementLabel(
+                  placementSummary(
+                    sop.placement,
+                    (sop.sop_machines ?? []).flatMap((m) =>
+                      m.site_machines ? [{ name: m.site_machines.name, department: m.site_machines.departments?.name ?? null }] : [],
+                    ),
+                  ),
+                )}
+                <StandardLabels names={standardNames(sop.standard_attachments)} />
+              </p>
+            </div>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
             {isAdmin && (

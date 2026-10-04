@@ -5,6 +5,8 @@ import { CheckCircle2, Camera, X, AlertTriangle, Shield, Siren, ListChecks, Clip
 import type { LucideIcon } from 'lucide-react'
 import { useWalkthroughStore } from '@/stores/walkthrough'
 import { SopImageInline } from '@/components/sop/SopImageInline'
+import { StandardLabels } from '@/components/sop/StandardLabels'
+import { standardNames } from '@/lib/sop/placement'
 import type { SopWithSections } from '@/types/sop'
 import type { StepPhoto } from '@/hooks/useStepPhotos'
 
@@ -76,8 +78,11 @@ export function ImmersiveStepCard({ sop, onStepChange, completedSteps, stepPhoto
       data-immersive="true"
     >
       <header className="px-4 py-3 border-b border-[var(--ink-100)] flex items-center justify-between">
-        <div className="mono text-meta uppercase tracking-wider text-[var(--ink-500)] truncate">
-          {sectionTitle} · Step {currentIdx + 1}/{steps.length}
+        <div className="flex min-w-0 items-center gap-2">
+          <div className="mono text-meta uppercase tracking-wider text-[var(--ink-500)] truncate">
+            {sectionTitle} · Step {currentIdx + 1}/{steps.length}
+          </div>
+          <StandardLabels names={standardNames(ownerSection?.standard_attachments)} />
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           {done && (

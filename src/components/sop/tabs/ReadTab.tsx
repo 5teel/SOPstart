@@ -13,6 +13,8 @@ import {
   procedureSections,
   type Section,
 } from '@/lib/sop/sections'
+import { standardNames } from '@/lib/sop/placement'
+import { StandardLabels } from '@/components/sop/StandardLabels'
 import { useWalkthroughStore } from '@/stores/walkthrough'
 import type { SopWithSections } from '@/types/sop'
 
@@ -55,6 +57,7 @@ function SafetyCard({ section, tone, icon: Icon }: { section: Section; tone: str
       <div className="flex items-center gap-2 px-4 py-2.5 border-b" style={{ borderColor: `color-mix(in srgb, ${tone} 20%, transparent)` }}>
         <Icon size={14} style={{ color: tone }} className="flex-shrink-0" />
         <span className="mono text-xs font-bold uppercase tracking-wider" style={{ color: tone }}>{section.title}</span>
+        <StandardLabels names={standardNames(section.standard_attachments)} />
       </div>
       <p className="px-4 py-3 text-sm leading-relaxed text-[var(--ink-900)] whitespace-pre-line">{section.content}</p>
     </div>
@@ -217,6 +220,7 @@ export function ReadTab({
                 <p className="mt-1 text-lg font-semibold text-[var(--ink-900)]">
                   {job.title}
                   <span className="mono ml-2 text-meta font-normal text-[var(--ink-500)]">{job.sop_steps.length} steps</span>
+                  <span className="ml-2 inline-flex items-center gap-1.5 align-middle"><StandardLabels names={standardNames(job.standard_attachments)} /></span>
                 </p>
               </div>
               <Link
@@ -279,7 +283,7 @@ export function ReadTab({
             <div className="divide-y divide-[var(--ink-100)] border-t border-[var(--ink-100)]">
               {references.map((s) => (
                 <div key={s.id} className="px-4 py-3">
-                  <p className="text-sm font-semibold text-[var(--ink-900)]">{s.title}</p>
+                  <p className="flex items-center gap-2 text-sm font-semibold text-[var(--ink-900)]">{s.title}<StandardLabels names={standardNames(s.standard_attachments)} /></p>
                   <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-[var(--ink-700)]">{s.content}</p>
                 </div>
               ))}
