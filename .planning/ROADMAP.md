@@ -1853,7 +1853,7 @@ Plans:
   4. A worker sees how many SOPs are due at each place and a "next for you" card with Walk it and Show me; an admin sees where a SOP has no owner or an overdue review, a count on the Office and the Workshop, and a card saying how many things wait in the Office with a button that opens it; typing in the search box filters the list and lights the matching shapes (machine names and the titles of the SOPs on them)
   5. An admin can switch the site into edit mode from the map to add, rename, reshape or remove machines and departments and to drag each room's shape to a new place; there is no departments screen
 
-**Plans:** 8/10 plans executed
+**Plans:** 9/10 plans executed
 Plans:
 **Wave 1**
 
@@ -1886,7 +1886,7 @@ Plans:
 
 **Wave 8** *(blocked on Wave 7 completion)*
 
-- [ ] 57-09-PLAN.md — Library table + library-only helpers deleted with their guards; access-view guards repointed; list-page dropped + swept; UAT links
+- [x] 57-09-PLAN.md — Library table + library-only helpers deleted with their guards; access-view guards repointed; list-page dropped + swept; UAT links
 
 **Wave 9** *(blocked on Wave 8 completion)*
 
