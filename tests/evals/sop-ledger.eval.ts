@@ -1,33 +1,58 @@
 /**
  * Deployed-site eval -- Phase 56 "A simpler SOP + the decision ledger".
  *
- * Skeleton from Plan 56-01 (fixme stubs, completed in 56-10). Provision
- * fixtures first: `node scripts/eval-fixtures.mjs`. Runs via
+ * Provision fixtures first: `node scripts/eval-fixtures.mjs`. Runs via
  * `npm run eval -- --phase 56` against EVAL_BASE_URL.
  *
  * Writes only to the isolated "SOPstart Eval Site" org, never the real SOPstart
- * org. Decisions it writes can never be deleted -- that is the point of the
- * ledger -- and live in the eval-site org.
+ * org. Decisions it writes are permanent by design (the ledger refuses UPDATE and
+ * DELETE for every role) and live in the eval-site org.
  *
+ * Two minted sessions for the whole file (admin + worker) -- one shared OTP budget.
  * Self-skips when EVAL_BASE_URL is unset so the normal suite never touches production.
  */
-import { test } from '@playwright/test'
+import { test, expect, type BrowserContext, type Page } from '@playwright/test'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
-import { EVAL_ENV_READY, EVAL_CONVERT_SOP_TITLE, EVAL_WALK_SOP_TITLE, EVAL_PLANT_SOP_TITLE } from './lib/session'
-import { ensurePlantFixture, REAL_SOPSTART_ORG_ID } from './lib/plant-fixture'
+import { randomUUID } from 'node:crypto'
+import {
+  EVAL_BASE_URL,
+  EVAL_ENV_READY,
+  EVAL_CONVERT_SOP_TITLE,
+  EVAL_WALK_SOP_TITLE,
+  EVAL_PLANT_SOP_TITLE,
+  EVAL_SITE_SOP_TITLE,
+  signInAs,
+} from './lib/session'
+import { ensurePlantFixture, REAL_SOPSTART_ORG_ID, shot, watchConsole } from './lib/plant-fixture'
+import { deleteEvalCompletions } from './lib/completion-cleanup'
 
-// Used by the 56-10 test bodies.
 export const SLOW = { timeout: 25_000 }
+const STD = 'EVAL LOTO'
+const STD2 = 'EVAL LOTO 2'
+// SOPs the converter legitimately could not convert (56-07-SUMMARY.md: "Needs Simon: none").
+const NEEDS_SIMON_TITLES: string[] = []
 
 test.describe.serial('Phase 56 -- simpler SOP + decision ledger (deployed)', () => {
   test.skip(!EVAL_ENV_READY, 'set EVAL_BASE_URL (+ Supabase keys in .env.local) -- run via `npm run eval`')
 
   let db: SupabaseClient
   let siteOrgId: string
+  let startedAt: string
+  let adminCtx: BrowserContext
+  let workerCtx: BrowserContext
+  let adminId: string
+  let workerId: string
+  let siteDraftSopId: string
   const sopIds: Record<'convert' | 'walk' | 'plant', string> = { convert: '', walk: '', plant: '' }
 
-  test.beforeAll(async () => {
+  const cleanupStandards = async () => {
+    if (!db || !siteOrgId) return
+    await db.from('standards').delete().eq('organisation_id', siteOrgId).like('name', 'EVAL LOTO%')
+  }
+
+  test.beforeAll(async ({ browser }) => {
     if (!EVAL_ENV_READY) return
+    startedAt = new Date().toISOString()
     db = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
       auth: { persistSession: false },
     })
@@ -44,12 +69,320 @@ test.describe.serial('Phase 56 -- simpler SOP + decision ledger (deployed)', () 
       if (error || !data) throw new Error(`"${title}" not found in the eval-site org -- run node scripts/eval-fixtures.mjs`)
       sopIds[key] = data.id
     }
+    const { data: draft, error: draftErr } = await db
+      .from('sops')
+      .select('id')
+      .eq('organisation_id', siteOrgId)
+      .eq('title', EVAL_SITE_SOP_TITLE)
+      .maybeSingle()
+    if (draftErr || !draft) throw new Error(`"${EVAL_SITE_SOP_TITLE}" not found in the eval-site org`)
+    siteDraftSopId = draft.id
+
+    await cleanupStandards()
+    await deleteEvalCompletions(db, sopIds.walk)
+
+    const opts = { viewport: { width: 1440, height: 900 }, baseURL: EVAL_BASE_URL }
+    adminCtx = await browser.newContext(opts)
+    workerCtx = await browser.newContext(opts)
+    adminId = (await signInAs(adminCtx, 'siteAdmin')).user.id
+    workerId = (await signInAs(workerCtx, 'siteWorker')).user.id
   })
 
-  test.fixme('A -- every SOP has an ok conversion run; convert fixture counts match the known answer; library-linked SOPs converted', async () => {})
-  test.fixme('B -- old SOP page and builder render the converted fixture exactly as before', async () => {})
-  test.fixme('C -- standards: add, attach to the SOP and a section, worker sees the label, rename, remove', async () => {})
-  test.fixme('D -- placement: machine + department, or Whole site', async () => {})
-  test.fixme('E -- owner change, completion reject and an AI write each write one decision; the AI one names the agent', async () => {})
-  test.fixme('F -- ledger is non-empty, refuses service-key update and delete, refuses an unnamed agent', async () => {})
+  test.afterAll(async () => {
+    if (!EVAL_ENV_READY) return
+    await cleanupStandards()
+    if (sopIds.plant) await db.from('sops').update({ owner_user_id: null }).eq('id', sopIds.plant)
+    if (sopIds.walk) await deleteEvalCompletions(db, sopIds.walk)
+    if (siteDraftSopId) await db.from('sops').update({ title: EVAL_SITE_SOP_TITLE }).eq('id', siteDraftSopId)
+    await adminCtx?.close()
+    await workerCtx?.close()
+  })
+
+  /** Worker opens the SOP and returns the standard labels in the meta row. */
+  const workerLabels = async (page: Page, sopId: string) => {
+    await page.goto(`/sops/${sopId}`)
+    await expect(page.getByTestId('sop-meta')).toBeVisible(SLOW)
+    return page.getByTestId('sop-meta').getByTestId('standard-label').allInnerTexts()
+  }
+
+  test('A -- every SOP has an ok conversion run; convert fixture counts match the known answer; library-linked SOPs converted', async () => {
+    const { data: sops, error: sopsErr } = await db.from('sops').select('id, title').limit(5000)
+    expect(sopsErr).toBeNull()
+    const { data: runs, error: runsErr } = await db
+      .from('sop_conversion_runs')
+      .select('sop_id, ok, before, after, created_at')
+      .order('created_at', { ascending: false })
+      .limit(20000)
+    expect(runsErr).toBeNull()
+    const latest = new Map<string, { ok: boolean; before: Record<string, number>; after: Record<string, number> }>()
+    for (const r of runs ?? []) if (!latest.has(r.sop_id as string)) latest.set(r.sop_id as string, r as never)
+
+    const bad = (sops ?? []).filter((s) => !NEEDS_SIMON_TITLES.includes(s.title as string) && !latest.get(s.id as string)?.ok)
+    expect(bad.map((s) => s.title), 'SOPs without an ok conversion run').toEqual([])
+    console.log(`A: ${sops?.length} SOPs, all with an ok latest run`)
+
+    const { data: steps, error: stepsErr } = await db
+      .from('sop_focus_steps')
+      .select('kind, text, sort_order, section_id, photo_required')
+      .eq('sop_id', sopIds.convert)
+    expect(stepsErr).toBeNull()
+    const count = (k: string) => (steps ?? []).filter((s) => s.kind === k).length
+    expect(count('hazard')).toBe(4)
+    expect(count('ppe')).toBe(1)
+    expect(count('check')).toBe(1)
+    const ppe = (steps ?? []).find((s) => s.kind === 'ppe')!
+    expect(ppe.text).toContain('Safety glasses')
+    expect(ppe.text).toContain('Cut-resistant gloves')
+    expect((steps ?? []).filter((s) => s.photo_required).length).toBe(1)
+
+    const by = (text: string) => (steps ?? []).find((s) => (s.text as string).includes(text))!
+    const stored = by('Stored energy')
+    const isolate = by('Isolate the press.')
+    const guard = by('Do not reach past the guard')
+    const photo = by('Photograph the isolation lock.')
+    expect(stored.section_id).toBe(isolate.section_id)
+    expect(stored.sort_order).toBeLessThan(isolate.sort_order)
+    expect(guard.section_id).toBe(photo.section_id)
+    expect(guard.sort_order).toBeLessThan(photo.sort_order)
+
+    const run = latest.get(sopIds.convert)!
+    expect(run.after.hazard).toBeGreaterThanOrEqual(run.before.hazardSources)
+
+    // Library-linked content: a junction whose block is not a parsed_inline one.
+    const { data: junctions, error: jErr } = await db
+      .from('sop_section_blocks')
+      .select('blocks(category), sop_sections(sop_id)')
+      .limit(20000)
+    expect(jErr).toBeNull()
+    const linkedSops = new Set<string>()
+    for (const j of (junctions ?? []) as unknown as { blocks: { category: string | null } | null; sop_sections: { sop_id: string } | null }[]) {
+      if (j.blocks?.category !== 'parsed_inline' && j.sop_sections) linkedSops.add(j.sop_sections.sop_id)
+    }
+    const unconverted = [...linkedSops].filter((id) => !latest.get(id)?.ok)
+    expect(unconverted).toEqual([])
+    console.log(`A: ${linkedSops.size} library-linked SOPs, all converted`)
+  })
+
+  test('B -- old SOP page and builder render the converted fixture exactly as before', async () => {
+    const page = await workerCtx.newPage()
+    const errors = watchConsole(page)
+    await page.goto(`/sops/${sopIds.convert}`)
+    const main = page.locator('main')
+    await expect(main.getByText('Pinch point at the rollers.')).toBeVisible(SLOW)
+    await expect(main.getByText('Hot surface on the oven door.')).toBeVisible(SLOW)
+    await expect(main.getByText('Safety glasses').first()).toBeVisible(SLOW)
+    await expect(main.getByText('Cut-resistant gloves').first()).toBeVisible(SLOW)
+    const steps = page.getByTestId('job-steps')
+    await expect(steps.getByText('Isolate the press.')).toHaveCount(1, SLOW)
+    await expect(steps.getByText('Photograph the isolation lock.')).toHaveCount(1)
+    await expect(main.getByText('Isolate the press.')).toHaveCount(1)
+    await shot(page, 'ledger-b-read')
+
+    const ack = page.getByTestId('safety-acknowledge')
+    if (await ack.count()) await ack.click()
+    await page.getByTestId('walk-it').click()
+    await expect(page.getByTestId('step-counter')).toContainText(/of 2\b/, SLOW)
+    await shot(page, 'ledger-b-walk')
+    expect(errors, errors.join('\n')).toEqual([])
+    await page.close()
+
+    const admin = await adminCtx.newPage()
+    await admin.goto(`/admin/sops/builder/${sopIds.convert}`)
+    await expect(admin.getByText('Hydraulic pressure').first()).toBeVisible({ timeout: 40_000 })
+    await expect(admin.getByText('Stored energy in the hydraulic line.').first()).toBeVisible(SLOW)
+    await shot(admin, 'ledger-b-builder')
+    await admin.close()
+  })
+
+  test('C -- standards: add, attach to the SOP and a section, worker sees the label, rename, remove', async () => {
+    test.setTimeout(240_000)
+    const admin = await adminCtx.newPage()
+    const worker = await workerCtx.newPage()
+    await admin.goto(`/admin/sops/builder/${sopIds.convert}`)
+    const trigger = admin.getByTestId('tools-menu-trigger')
+    await expect(trigger).toHaveCount(1, { timeout: 40_000 })
+    await trigger.click()
+    await admin.getByRole('menuitem', { name: /^Standards/ }).click()
+    const panel = admin.getByTestId('standards-panel')
+    await expect(panel).toBeVisible(SLOW)
+
+    await panel.getByTestId('standard-add-input').fill(STD)
+    await panel.getByTestId('standard-add').click()
+    const row = (name: string) => panel.locator(`[data-testid="standard-row"][data-standard-name="${name}"]`)
+    await expect(row(STD)).toHaveCount(1, SLOW)
+
+    const sopToggle = panel.locator(`[data-testid="standard-toggle"][data-target-kind="sop"][data-standard-name="${STD}"]`)
+    await expect(sopToggle).toHaveCount(1, { timeout: 10_000 })
+    await sopToggle.click()
+    await expect(sopToggle).toHaveAttribute('aria-pressed', 'true', SLOW)
+    const sectionToggle = panel.locator(
+      `xpath=//span[normalize-space()="Procedure"]/following-sibling::div[1]//button[@data-target-kind="section" and @data-standard-name="${STD}"]`
+    )
+    await expect(sectionToggle).toHaveCount(1, { timeout: 10_000 })
+    await sectionToggle.click()
+    await expect(sectionToggle).toHaveAttribute('aria-pressed', 'true', SLOW)
+    await expect(panel.getByText('Saved ✓')).toBeVisible(SLOW)
+    await shot(admin, 'ledger-c-panel')
+
+    // Worker sees it on the SOP, on the Read section heading and on the walk.
+    await expect(async () => {
+      expect(await workerLabels(worker, sopIds.convert)).toContain(STD)
+    }).toPass(SLOW)
+    const main = worker.locator('main')
+    await expect(
+      main.locator('p').filter({ hasText: 'Procedure' }).filter({ has: worker.getByTestId('standard-label') }).first()
+    ).toBeVisible(SLOW)
+    await shot(worker, 'ledger-c-worker-read')
+    const ack = worker.getByTestId('safety-acknowledge')
+    if (await ack.count()) await ack.click()
+    await worker.getByTestId('walk-it').click()
+    await expect(worker.getByTestId('step-counter')).toBeVisible(SLOW)
+    await expect(worker.locator('[data-region="meta"]').getByTestId('standard-label').filter({ hasText: STD })).toBeVisible(SLOW)
+    await shot(worker, 'ledger-c-worker-walk')
+
+    // Rename.
+    await row(STD).getByRole('button', { name: 'Rename', exact: true }).click()
+    await panel.getByLabel(`Rename ${STD}`).fill(STD2)
+    await panel.getByRole('button', { name: 'Save', exact: true }).click()
+    await expect(row(STD2)).toHaveCount(1, SLOW)
+    await expect(async () => {
+      const labels = await workerLabels(worker, sopIds.convert)
+      expect(labels).toContain(STD2)
+      expect(labels).not.toContain(STD)
+    }).toPass(SLOW)
+    await shot(worker, 'ledger-c-worker-renamed')
+
+    // Remove (two-step confirm).
+    await row(STD2).getByRole('button', { name: 'Remove', exact: true }).click()
+    await row(STD2).getByRole('button', { name: /^Remove —/ }).click()
+    await expect(row(STD2)).toHaveCount(0, SLOW)
+    await expect(async () => {
+      const labels = await workerLabels(worker, sopIds.convert)
+      expect(labels.filter((l) => l.startsWith(STD))).toEqual([])
+    }).toPass(SLOW)
+    await shot(worker, 'ledger-c-worker-removed')
+    await admin.close()
+    await worker.close()
+  })
+
+  test('D -- placement: machine + department, or Whole site', async () => {
+    const page = await workerCtx.newPage()
+    await page.goto(`/sops/${sopIds.plant}`)
+    const meta = page.getByTestId('sop-meta')
+    await expect(meta).toContainText('EVAL Press', SLOW)
+    await expect(meta).toContainText('Forming')
+    await shot(page, 'ledger-d-machine')
+    await page.goto(`/sops/${sopIds.walk}`)
+    await expect(page.getByTestId('sop-meta')).toContainText('Whole site', SLOW)
+    await shot(page, 'ledger-d-whole-site')
+    await page.close()
+  })
+
+  test('E -- owner change, completion reject and an AI write each write one decision; the AI one names the agent', async () => {
+    test.setTimeout(240_000)
+    const since = async (filter: Record<string, string>) => {
+      let q = db.from('decisions').select('*').eq('organisation_id', siteOrgId).gte('created_at', startedAt)
+      for (const [k, v] of Object.entries(filter)) q = q.eq(k, v)
+      const { data, error } = await q
+      expect(error).toBeNull()
+      return data ?? []
+    }
+
+    // (1) owner change through /governance
+    const { error: resetErr } = await db.from('sops').update({ owner_user_id: null }).eq('id', sopIds.plant)
+    expect(resetErr).toBeNull()
+    const { data: readBack } = await db.from('sops').select('owner_user_id').eq('id', sopIds.plant).single()
+    expect(readBack?.owner_user_id).toBeNull()
+
+    const admin = await adminCtx.newPage()
+    await admin.goto('/governance')
+    const fixtureRow = admin.getByTestId('gov-row').filter({ hasText: EVAL_PLANT_SOP_TITLE })
+    await expect(fixtureRow).toBeVisible(SLOW)
+    await fixtureRow.getByRole('button', { name: /Assign owner/ }).click()
+    await fixtureRow.getByRole('button', { name: /^admin \(/ }).click()
+    await expect(async () => {
+      const rows = await since({ kind: 'owner_change', sop_id: sopIds.plant })
+      expect(rows.length).toBe(1)
+      expect(rows[0].actor_id).toBe(adminId)
+      expect(rows[0].actor_kind).toBe('person')
+    }).toPass(SLOW)
+    await shot(admin, 'ledger-e-owner')
+
+    // (2) completion rejection through /activity/<id>
+    const completionId = randomUUID()
+    const { error: insErr } = await db.from('sop_completions').insert({
+      id: completionId,
+      organisation_id: siteOrgId,
+      sop_id: sopIds.walk,
+      worker_id: workerId,
+      sop_version: 1,
+      content_hash: 'eval-ledger',
+      status: 'pending_sign_off',
+      step_data: {},
+    })
+    expect(insErr).toBeNull()
+    await admin.goto(`/activity/${completionId}`)
+    const reject = admin.getByRole('button', { name: 'Reject', exact: true })
+    await expect(reject).toHaveCount(1, { timeout: 40_000 })
+    await reject.click()
+    await admin.getByLabel('Reason for rejection').fill('Eval: the guard was not closed in the photo.')
+    await admin.getByRole('button', { name: 'Confirm Rejection' }).click()
+    await expect(async () => {
+      const rows = await since({ kind: 'reject', subject_kind: 'completion', subject_id: completionId })
+      expect(rows.length).toBe(1)
+      expect(rows[0].actor_id).toBe(adminId)
+    }).toPass(SLOW)
+    await shot(admin, 'ledger-e-reject')
+
+    // (3) AI field write through the agent endpoint
+    const res = await admin.request.post('/api/ai-fields/write', {
+      data: {
+        fieldId: 'sop.title',
+        context: { organisationId: siteOrgId, sopId: siteDraftSopId },
+        newValue: 'Eval site fixture SOP (agent edit)',
+        agentName: 'SOPstart assistant',
+      },
+    })
+    expect(res.status()).toBe(200)
+    expect((await res.json()).result.outcome).toBe('applied')
+    await expect(async () => {
+      const rows = await since({ kind: 'ai_field_write', sop_id: siteDraftSopId })
+      expect(rows.length).toBe(1)
+      expect(rows[0].actor_kind).toBe('agent')
+      expect(rows[0].actor_name).toBe('SOPstart assistant')
+    }).toPass(SLOW)
+    await db.from('sops').update({ title: EVAL_SITE_SOP_TITLE }).eq('id', siteDraftSopId)
+    await admin.close()
+  })
+
+  test('F -- ledger is non-empty, refuses service-key update and delete, refuses an unnamed agent', async () => {
+    const { count, error } = await db.from('decisions').select('id', { count: 'exact', head: true }).eq('source', 'backfill')
+    expect(error).toBeNull()
+    expect(count ?? 0).toBeGreaterThan(0)
+
+    const { data: oldest } = await db
+      .from('decisions')
+      .select('id, summary, created_at')
+      .order('created_at', { ascending: true })
+      .limit(1)
+      .single()
+    expect(oldest).toBeTruthy()
+
+    const upd = await db.from('decisions').update({ summary: 'tampered' }).eq('id', oldest!.id)
+    expect(upd.error).not.toBeNull()
+    const del = await db.from('decisions').delete().eq('id', oldest!.id)
+    expect(del.error).not.toBeNull()
+    const { data: after } = await db.from('decisions').select('summary, created_at').eq('id', oldest!.id).single()
+    expect(after).toEqual({ summary: oldest!.summary, created_at: oldest!.created_at })
+
+    const unnamed = await db.from('decisions').insert({
+      organisation_id: siteOrgId,
+      kind: 'verify',
+      actor_kind: 'agent',
+      actor_name: null,
+      subject_kind: 'probe',
+      summary: 'eval unnamed agent probe',
+    })
+    expect(unnamed.error?.code).toBe('23514')
+  })
 })
