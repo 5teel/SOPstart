@@ -1712,7 +1712,7 @@ Plans:
 Executes 55 → 56 → 57 → 58 → 59 → 60 → 61 → 62, strictly sequential.
 
 - [x] **Phase 55: Cut the Dropped Features & One Organisation** - Offline, voice, phone/QR, shared-device login, video generation, flow diagram, annotation, YouTube and photo-scan on-ramps, library pages and version compare/restore deleted; sign-up no longer creates an organisation; the worker path keeps working online (completed 2026-10-03)
-- [ ] **Phase 56: A Simpler SOP & the Decision Ledger** - Every SOP converted to sections and steps (hazard and PPE as kinds of step), standards as labels, machine-or-site placement; one append-only decision ledger written by every existing approve / sign-off / assign / publish path
+- [x] **Phase 56: A Simpler SOP & the Decision Ledger** - Every SOP converted to sections and steps (hazard and PPE as kinds of step), standards as labels, machine-or-site placement; one append-only decision ledger written by every existing approve / sign-off / assign / publish path (completed 2026-10-04)
 - [ ] **Phase 57: The One Screen & Its Places** - List · isometric site · detail panel as the landing screen, four signposted rooms, search, "next for you" card, pins, site edit mode; no header navigation
 - [ ] **Phase 58: The SOP Focus Screen — Walk & Edit** - Opening a SOP removes the map and the list; walk one step at a time to a sign-off, or edit with the AI check and tick-each-step before publish; new versions
 - [ ] **Phase 59: The Office** - Inbox that drains, sign-off and approvals, decision ledger, people and roles, the existing access wiring — one room, with the detail panel widening for tables
@@ -1809,7 +1809,7 @@ Plans:
   4. Approving, rejecting, signing off, assigning, publishing, changing an owner, recording an observation and clearing an AI finding each write one decision naming who, when, what and what it was about; a decision made by an AI agent names the agent
   5. Nobody — worker, supervisor or admin — can change or delete a decision once it is written; the database refuses the attempt even when the screen is bypassed
 
-**Plans:** 9/10 plans executed
+**Plans:** 10/10 plans complete
 Plans:
 **Wave 1**
 
@@ -1837,7 +1837,7 @@ Plans:
 
 **Wave 6** *(blocked on Wave 5 completion)*
 
-- [ ] 56-10-PLAN.md — Deployed eval for all five success criteria, full suite once, screenshots read, validation signed off
+- [x] 56-10-PLAN.md — Deployed eval for all five success criteria, full suite once, screenshots read, validation signed off
 
 ### Phase 57: The One Screen & Its Places
 

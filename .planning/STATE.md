@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v11.0
 milestone_name: — One-Screen MVP
-status: executing
+status: verifying
 stopped_at: Completed 56-05-PLAN.md
-last_updated: "2026-10-04T00:10:58.549Z"
+last_updated: "2026-10-04T00:41:48.015Z"
 last_activity: 2026-10-03 -- Phase 56 execution started
 progress:
   total_phases: 14
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 24
-  completed_plans: 23
-  percent: 7
+  completed_plans: 24
+  percent: 14
 ---
 
 # Project State
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-10-03)
 
 Phase: 56 (a-simpler-sop-the-decision-ledger) — EXECUTING
 Plan: 10 of 10
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-10-03 -- Phase 56 execution started
 
 ### v11.0 roadmap (created 2026-10-03)
@@ -295,6 +295,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 56 P04 | 25min | 2 tasks | 4 files |
 | Phase 56 P05 | 20min | 2 tasks | 8 files |
 | Phase 56 P06 | 25min | 2 tasks | 7 files |
+| Phase 56 P10 | 70min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -590,6 +591,7 @@ Recent decisions affecting current work:
 - [Phase 56]: 56-04: 00069/00070 applied live via Management API fallback; migration history table not updated (stops at 00067); repair 00068-00070 before any bare supabase db push
 - [Phase 56]: 56-05: publish decision written inside performPublish after the flip; assertPublishGates untouched, hash pin unchanged
 - [Phase 56]: 56-06: standards actions use the session client only; sections scoped through their SOP; no ledger write for label management
+- [Phase 56]: 56-10: eval A scopes to SOPs predating the last conversion run; gate regressions fixed at cause (harness stub, admin read moved to plain module)
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -735,6 +737,6 @@ deliberate decision, not a side-effect.
 
 ## Session Continuity
 
-Last session: 2026-10-04T00:10:58.539Z
+Last session: 2026-10-04T00:41:43.156Z
 Stopped at: Completed 56-05-PLAN.md
 Resume file: .planning/phases/56-a-simpler-sop-the-decision-ledger/56-CONTEXT.md
