@@ -23,14 +23,14 @@
     },
     {
       "route": "/page",
-      "value": 805,
+      "value": 792,
       "capturedAt": "2026-10-05T00:00:00.000Z",
-      "note": "Phase 57-04: first measurement of the one screen (worker path with the next/dynamic AdminShell seam already in place; 57-05 fills only the lazy chunk). Recorded by hand once as a decision artefact; never re-captured."
+      "note": "Phase 57-04: first measurement of the one screen (worker shell split via next/dynamic, AdminShell lazy seam in place; 57-05 fills only the lazy chunk). Measured 792 KB once the gate stopped charging sibling routes' segment chunks (it read 805 KB before that fix). Recorded by hand once as a decision artefact; never re-captured. NOTE: the lazy WorkerShell chunk is not in the manifest, so this figure excludes it."
     }
   ],
   "routes": {
     "/sops/[sopId]/page": 817,
     "/sops/page": 817,
-    "/page": 805
+    "/page": 792
   }
 }

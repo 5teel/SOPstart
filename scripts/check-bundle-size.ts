@@ -186,14 +186,46 @@ function resolveChunkSet(entry: GatedRoute): Set<string> {
     fail(`RSC manifest missing route ${routeKey}.`)
   }
   const clientModules = routeManifest.clientModules ?? {}
+  const routeDir = path
+    .relative(path.join(NEXT_DIR, 'server', 'app'), path.dirname(entry.rscManifestPath))
+    .split(path.sep)
+    .filter(Boolean)
+  const excluded: string[] = []
   for (const moduleId of Object.keys(clientModules)) {
     const chunks = clientModules[moduleId].chunks ?? []
     for (let i = 0; i < chunks.length; i += 2) {
       const file = chunks[i + 1]
-      if (typeof file === 'string') chunkSet.add(file)
+      if (typeof file !== 'string') continue
+      if (ownsSegmentChunk(file, routeDir)) chunkSet.add(file)
+      else if (!excluded.includes(file)) excluded.push(file)
     }
   }
+  if (excluded.length > 0) {
+    console.log(
+      `check-bundle-size: ${entry.route} not charged for ${excluded.length} other-route segment chunk(s): ${excluded.join(', ')}`
+    )
+  }
   return chunkSet
+}
+
+// Phase 57-04: a route's client-reference manifest lists the client modules of
+// EVERY route in the app (57 entries, identical for /, /sops, /sops/[sopId]),
+// each with its chunks. Summing them all charged a route for sibling routes'
+// own segment chunks (the new root `app/page-*.js`, `app/(auth)/layout-*.js`),
+// moving /sops by +4 KB when only a new route was added. Segment chunks under
+// static/chunks/app/<dir>/ belong to a route only when <dir> is the route's
+// own dir or an ancestor. The ROOT `page-*` is never an ancestor's page. A
+// non-root ancestor page (the /sops list chunk on /sops/[sopId]) stays charged
+// on purpose: the Phase 54 baseline and markers were captured that way, and
+// dropping it would loosen the detail route's gate by 16 KB. Shared numbered
+// chunks are still counted: the manifest cannot say who loads them.
+function ownsSegmentChunk(file: string, routeDir: string[]): boolean {
+  const m = /^static\/chunks\/app\/(.+)\/([^/]+)$/.exec(file) ?? /^static\/chunks\/app\/()([^/]+)$/.exec(file)
+  if (!m) return true
+  const dir = m[1].split('/').filter(Boolean).map(decodeURIComponent)
+  const isPage = m[2].startsWith('page-')
+  if (dir.length > routeDir.length || (isPage && dir.length === 0 && routeDir.length > 0)) return false
+  return dir.every((seg, i) => seg === routeDir[i])
 }
 
 function chunkBodies(chunkSet: Set<string>): string {
