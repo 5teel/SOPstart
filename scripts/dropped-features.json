@@ -818,6 +818,32 @@
       "phase": 55,
       "kind": "symbol",
       "pattern": "\\b(signUpOrganisation|switchOrganisation|getUserMemberships|UserMembership|orgSignUpSchema|OrgSignUpInput|OrgSignUpForm|OrgSwitcher)\\b|Register a new organisation|Register your organisation"
+    },
+    {
+      "feature": "header-nav",
+      "phase": 57,
+      "kind": "file",
+      "path": "src/components/layout/TopHeader.tsx"
+    },
+    {
+      "feature": "header-nav",
+      "phase": 57,
+      "kind": "file",
+      "path": "src/components/layout/NotificationBadge.tsx"
+    },
+    {
+      "feature": "header-nav",
+      "phase": 57,
+      "kind": "file",
+      "path": "src/components/layout/NavPendingSpinner.tsx"
+    },
+    {
+      "feature": "header-nav",
+      "phase": 57,
+      "kind": "route-page",
+      "path": "/dashboard",
+      "dir": "src/app/(protected)/dashboard",
+      "ref": "[\"'\\x60]/dashboard"
     }
   ],
   "allow": [

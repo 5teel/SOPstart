@@ -16,7 +16,7 @@ export default async function NewAiSopPage() {
   if (!userId) redirect('/login')
 
   if (!role || !['admin', 'safety_manager'].includes(role)) {
-    redirect('/dashboard')
+    redirect('/')
   }
 
   // Phase 40 DAT-01: category options now come from the fixed SOP_CATEGORIES

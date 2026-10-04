@@ -8,8 +8,8 @@
  *       role → /pending (safe default A1).
  *   - middleware.ts + actions/auth.ts redirect through roleHome (JWT claim
  *     `user_role` via shared parseJwtPayload — never raw atob, 2026-06-26).
- *   - /dashboard survives ONLY as a redirect shim (role → home); the
- *     AdminDashboard/PendingDashboard UI is deleted; pending UI lives at /pending.
+ *   - The dashboard route is retired in Phase 57 (a next.config redirect now);
+ *     pending UI lives at /pending.
  *   - Phase 57: the header is gone, so its nav repoint test went with it.
  *
  * Source-contract idiom mirrors tests/phase28/governance-queue.spec.ts.
@@ -54,33 +54,14 @@ test.describe('UX-01 — one home per role', () => {
     expect(src).not.toContain('atob(')
   })
 
-  test('auth actions redirect through roleHome, not hardcoded /dashboard', () => {
-    const src = read(AUTH_ACTIONS)
-    expect(src).toContain('roleHome')
-    expect(src).not.toContain("redirect('/dashboard')")
+  test('auth actions redirect through roleHome', () => {
+    expect(read(AUTH_ACTIONS)).toContain('roleHome')
   })
 
-  test('/dashboard page is a redirect-only shim (no AdminDashboard/PendingDashboard UI)', () => {
-    const src = read(
-      path.join(ROOT, 'src', 'app', '(protected)', 'dashboard', 'page.tsx'),
-    )
-    expect(src).toContain('roleHome(')
-    expect(src).toContain('redirect(')
-    expect(src).not.toContain('DashTile')
-    expect(src).not.toContain('AdminDashboard')
-  })
-
-  test('/pending page + app-level not-found.tsx exist; journeys/roles land no role on /dashboard', () => {
+  test('/pending page + app-level not-found.tsx exist; no journey maps the retired dashboard', () => {
     expect(fs.existsSync(path.join(ROOT, 'src', 'app', '(protected)', 'pending', 'page.tsx'))).toBe(true)
     expect(fs.existsSync(path.join(ROOT, 'src', 'app', 'not-found.tsx'))).toBe(true)
-    const journeys = read(path.join(ROOT, 'src', 'lib', 'journeys', 'journeys.ts'))
-    const roles = read(path.join(ROOT, 'src', 'lib', 'journeys', 'roles.ts'))
-    // roles.ts (landsOn) never points anyone at the shim.
-    expect(roles).not.toContain("'/dashboard'")
-    // journeys.ts maps /dashboard EXACTLY ONCE — as the legacy redirect shim
-    // (30-08: the route survives in the tree per decision #5, so /pathways
-    // needs it covered for 0 not-mapped; no journey LANDS anyone there).
-    expect(journeys.split("'/dashboard'").length - 1).toBe(1)
-    expect(journeys).toContain('Redirect-only shim')
+    // Phase 57 D-10: the redirect shim is gone; its negative assertions live in
+    // tests/phase57/retirement-sweep.spec.ts.
   })
 })

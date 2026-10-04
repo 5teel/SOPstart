@@ -64,6 +64,12 @@ const nextConfig: NextConfig = {
         destination: '/sops',
         permanent: false,
       },
+      // Phase 57 D-10: the dashboard is gone; old links land on the one screen. Fixed destination.
+      {
+        source: '/dashboard',
+        destination: '/',
+        permanent: false,
+      },
     ]
   },
 }

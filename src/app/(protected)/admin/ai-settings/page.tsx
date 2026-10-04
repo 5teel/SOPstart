@@ -17,7 +17,7 @@ export default async function AiSettingsPage() {
   if (!userId) redirect('/login')
 
   if (!role || !['admin', 'safety_manager'].includes(role) || !organisationId) {
-    redirect('/dashboard')
+    redirect('/')
   }
 
   const admin = createAdminClient()

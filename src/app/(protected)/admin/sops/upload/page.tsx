@@ -15,7 +15,7 @@ export default async function UploadSopsPage() {
 
   // Check user is admin or safety_manager
   if (!role || !['admin', 'safety_manager'].includes(role)) {
-    redirect('/dashboard')
+    redirect('/')
   }
 
   return (

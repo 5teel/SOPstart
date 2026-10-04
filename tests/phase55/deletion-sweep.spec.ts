@@ -32,13 +32,13 @@ const TEST_SCAN_EXCLUDED_PREFIXES = [
 ]
 
 // Each deleting plan appends its feature key here when it flips the block live.
-const LIVE_FEATURES: string[] = ['voice-capture', 'voice', 'phone-qr', 'shared-device', 'youtube', 'photo-scan', 'video-generation', 'offline', 'flow-diagram', 'annotation', 'version-compare', 'library', 'org-signup']
+const LIVE_FEATURES: string[] = ['voice-capture', 'voice', 'phone-qr', 'shared-device', 'youtube', 'photo-scan', 'video-generation', 'offline', 'flow-diagram', 'annotation', 'version-compare', 'library', 'org-signup', 'header-nav']
 // 55-13 flips this once the eight packages are uninstalled.
 const PACKAGES_LIVE = true
 
 const FEATURES = [
   'voice-capture', 'voice', 'phone-qr', 'shared-device', 'youtube', 'photo-scan', 'video-generation',
-  'offline', 'flow-diagram', 'annotation', 'version-compare', 'library', 'org-signup',
+  'offline', 'flow-diagram', 'annotation', 'version-compare', 'library', 'org-signup', 'header-nav',
 ]
 
 interface Entry {
@@ -236,7 +236,7 @@ test.describe('dropped list is not vacuous', () => {
     expect(dropped.version).toBe(1)
     expect(dropped.entries.length).toBeGreaterThanOrEqual(100)
     for (const e of dropped.entries) {
-      expect(e.phase).toBe(55)
+      expect([55, 57]).toContain(e.phase)
       expect(FEATURES, `unknown feature ${e.feature}`).toContain(e.feature)
       for (const src of [e.ref, e.pattern]) if (src) expect(() => new RegExp(src), src).not.toThrow()
     }

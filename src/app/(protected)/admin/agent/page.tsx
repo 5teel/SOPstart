@@ -12,7 +12,7 @@ export const metadata: Metadata = {
  * Phase 26.5 Plan 08 — /admin/agent SSR route (D-09 surface 2).
  *
  * Auth guard: same shape as /admin/departments/page.tsx — redirects
- * non-admin/safety_manager to /dashboard. Fetches org-wide pending
+ * non-admin/safety_manager to /. Fetches org-wide pending
  * proposals + recent memory via getAgentDashboardData() (Plan 07) and hands
  * them to the client queue + activity feed.
  */
@@ -21,7 +21,7 @@ export default async function AgentDashboardPage() {
   if (!userId) redirect('/login')
 
   if (!role || !['admin', 'safety_manager'].includes(role)) {
-    redirect('/dashboard')
+    redirect('/')
   }
 
   const result = await getAgentDashboardData()

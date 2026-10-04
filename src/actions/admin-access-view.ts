@@ -9,7 +9,7 @@
  * (SUR-02) — the access/wiring patch bay becomes a lens on `/sops` fed by
  * this one action.
  *
- * `/admin/sops`'s page-level `redirect('/dashboard')` for non-admins goes
+ * `/admin/sops`'s page-level `redirect('/')` for non-admins goes
  * away once `/sops` is reachable by every role (RESEARCH Pitfall 4) — this
  * action is the ONLY gate in front of the org model / grants / collections
  * from that point on, so `requireAdminContext()` is the first statement,

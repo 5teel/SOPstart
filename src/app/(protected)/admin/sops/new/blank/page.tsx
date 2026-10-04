@@ -25,7 +25,7 @@ export default async function NewBlankSopPage({
 
   // Admin / safety_manager guard — matches Phase 2 precedent
   if (!role || !['admin', 'safety_manager'].includes(role)) {
-    redirect('/dashboard')
+    redirect('/')
   }
 
   // Phase 25: departments for the wizard's department multi-select field.

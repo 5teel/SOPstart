@@ -22,7 +22,7 @@ test.describe('D-09/D-10/D-11 — org agent dashboard (/admin/agent)', () => {
   test('page.tsx guards admin/safety_manager and fetches getAgentDashboardData', () => {
     const src = fs.readFileSync(PAGE, 'utf-8')
     expect(src).toMatch(/redirect\(['"]\/login['"]\)/)
-    expect(src).toContain("redirect('/dashboard')")
+    expect(src).toContain("redirect('/')")
     expect(src).toMatch(/\['admin',\s*'safety_manager'\]/)
     expect(src).toContain('getAgentDashboardData')
   })

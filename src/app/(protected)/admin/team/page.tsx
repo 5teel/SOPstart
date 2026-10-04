@@ -24,7 +24,7 @@ export default async function AdminTeamPage() {
 
   // Check user is admin
   if (!role || !['admin', 'safety_manager'].includes(role)) {
-    redirect('/dashboard')
+    redirect('/')
   }
 
   // Independent reads — fetch concurrently ([2026-07-13] no serial waterfall).
@@ -38,7 +38,7 @@ export default async function AdminTeamPage() {
     listOrgTree(),
   ])
 
-  if (!org) redirect('/dashboard')
+  if (!org) redirect('/')
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">

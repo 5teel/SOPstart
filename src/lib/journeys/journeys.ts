@@ -59,7 +59,6 @@ export const JOURNEYS: Journey[] = [
       { id: 's', type: 'start', label: 'Has an account' },
       { id: 'login', type: 'screen', label: 'Login screen', route: '/login' },
       { id: 'auth', type: 'action', label: 'Enter email + password', detail: 'Supabase Auth verifies and sets a session. roleHome(role) sends every role to the one screen, or to /pending when there is no role (UX-01, Phase 57).' },
-      { id: 'legacy-dash', type: 'screen', label: 'Legacy /dashboard link (optional)', route: '/dashboard', detail: 'Redirect-only shim (UX-01 decision #5) — old bookmarks and internal guard fallbacks forward through roleHome(role) to the real role home. No UI renders here.' },
       { id: 'role', type: 'decision', label: 'Role?', branches: [
         { label: 'Worker, supervisor, safety manager or admin', to: 'one-screen' },
         { label: 'No role yet', to: 'pending-home' },
@@ -198,7 +197,7 @@ export const JOURNEYS: Journey[] = [
         { label: 'Just watched a completion', to: 'activity' },
       ] },
       { id: 'team', type: 'screen', label: 'Team — person panel', route: '/admin/team', detail: 'Click a person chip on the org chart or columns board to open their PersonPanel; "Record observation" pre-fills the worker.' },
-      { id: 'activity', type: 'screen', label: 'Sign-off — record button / row action', route: '/activity', detail: '"Record observation" header button, or a per-completion "I observed this" row action pre-filling worker + SOP + completion_id.' },
+      { id: 'activity', type: 'screen', label: 'Sign-off — record button / row action', route: '/activity', detail: '"Record observation" button, or a per-completion "I observed this" row action pre-filling worker + SOP + completion_id.' },
       { id: 'modal', type: 'screen', label: 'Record observation modal', detail: 'Shared modal: worker chip, SOP picker (assigned-first), verdict buttons, optional note. "Permanent record — cannot be edited or deleted after saving" (D-08).' },
       { id: 'assessor-check', type: 'decision', label: 'Recording "performed to SOP"? Is the recorder a signed-off assessor on this SOP? (ASR-01 gate — "needs support" is never gated, D-04)', branches: [
         { label: 'Signed off — proceed as normal', to: 'save' },
@@ -246,11 +245,11 @@ export const JOURNEYS: Journey[] = [
     group: 'Create an SOP',
     persona: 'SOP Admin',
     title: 'Switch into admin tools',
-    summary: 'An admin signs in and lands directly on the SOP library table (UX-01 one home per role) — SOP · Machine · Status · Owner · Checks · Review, with Where / Status / Owner / Checks chips to narrow it. Admin surfaces live in the primary header for admin roles — Governance · Create New SOP · Team · Site · Settings sit right of Sign-off (2026-07-30, supersedes the UX-02 account-menu door).',
+    summary: 'An admin signs in and lands on the one screen — the SOP list, the isometric site and the detail pane. The Office card and the rooms (Office, Smoko room, Workshop, Noticeboard) carry the admin surfaces; every page they open has one Back to the site bar.',
     steps: [
       { id: 's', type: 'start', label: 'Signed in as admin / safety manager' },
-      { id: 'home', type: 'screen', label: 'Admin home — SOP library table', route: '/sops', detail: 'roleHome(admin) lands here via the brand mark, on the SOP library table (SOP · Machine · Status · Owner · Checks · Review, chips for Where / Status / Owner / Checks, Edit opens the builder). The primary header adds Governance (/governance) · Create New SOP (/admin/sops/new) · Team · Site · Settings for admin roles; worker surfaces (SOPs · Sign-off) stay one tap away.' },
-      { id: 'menu', type: 'decision', label: 'Open another admin surface? (app header: Governance · Create New SOP · Team · Site · Settings; the Access map is a button on the library table, /sops?view=access)', branches: [
+      { id: 'home', type: 'screen', label: 'Admin home — the one screen', route: '/', detail: 'roleHome(admin) lands here. The Office card (sign-offs, inbox, team) and the rooms open Governance, Team, Settings and the new-SOP wizard; edit mode (Edit the site) is on the same screen. Profile, Sign out, Pathways and Feedback sit in the account control at the foot of the list.' },
+      { id: 'menu', type: 'decision', label: 'Open another admin surface? (the Office card and rooms: Governance · Write a new SOP · Team · Settings; Site is Edit the site on the same screen)', branches: [
         { label: 'SOPs', to: 'sops' },
         { label: 'Governance inbox', to: 'gov' },
         { label: 'Team', to: 'team' },
@@ -275,7 +274,7 @@ export const JOURNEYS: Journey[] = [
     summary: 'An admin uploads an existing Word/PDF/Excel/PowerPoint/photo and AI turns it into a structured, mobile-friendly procedure.',
     steps: [
       { id: 's', type: 'start', label: 'Has an existing SOP doc' },
-      { id: 'picker', type: 'screen', label: 'New SOP method picker', route: '/admin/sops/new', detail: 'Header "Create New SOP" link (admin roles) lands here directly. 3 tiles, Upload first: Upload a document · Draft it with AI · Start blank. The type-vs-talk choice moved off this screen onto /admin/sops/new/ai.' },
+      { id: 'picker', type: 'screen', label: 'New SOP method picker', route: '/admin/sops/new', detail: 'The Workshop room "Write a new SOP" link (admin roles) lands here directly. 3 tiles, Upload first: Upload a document · Draft it with AI · Start blank. The type-vs-talk choice moved off this screen onto /admin/sops/new/ai.' },
       { id: 'up', type: 'screen', label: 'Upload', route: '/admin/sops/upload', detail: 'Drag in .docx/.pdf/.xlsx/.pptx/photo.' },
       { id: 'parse', type: 'action', label: 'AI parses the document', detail: 'Async pipeline (30–120s); extracts sections, steps, hazards.' },
       { id: 'status', type: 'decision', label: 'Parse result?', branches: [
@@ -394,7 +393,7 @@ export const JOURNEYS: Journey[] = [
       { id: 's', type: 'start', label: 'SOP published' },
       { id: 'lib', type: 'screen', label: 'SOP library (table)', route: '/sops' },
       { id: 'assign', type: 'screen', label: 'Assign', route: '/admin/sops/[sopId]/assign', detail: 'By role / trade / sub-trade.' },
-      { id: 'notify', type: 'action', label: 'Workers notified', detail: 'Appears in their library + dashboard.' },
+      { id: 'notify', type: 'action', label: 'Workers notified', detail: 'Appears in their SOP list on the one screen.' },
       { id: 'e', type: 'end', label: 'Assigned' },
     ],
   },
@@ -511,7 +510,7 @@ export const JOURNEYS: Journey[] = [
     title: 'Map the site and its machines',
     summary: 'An admin turns the plant floor into a drawing — a scene image with named, departmentised machines — so any SOP can say which machines it belongs to.',
     steps: [
-      { id: 's', type: 'start', label: 'Admin opens Site in the header' },
+      { id: 's', type: 'start', label: 'Admin opens Edit the site on the one screen' },
       { id: 'empty', type: 'screen', label: 'No site yet', route: '/admin/site', detail: 'Two choices: Generate from a description (shown only when scene generation is set up on the server), or Upload a JPG/PNG up to 15 MB.' },
       { id: 'method', type: 'decision', label: 'How to make the scene?', branches: [
         { label: 'Generate', to: 'generate' },
@@ -584,7 +583,7 @@ export const JOURNEYS: Journey[] = [
     summary: 'The team reviews design directions and before/after changes and leaves structured feedback for analysis.',
     steps: [
       { id: 's', type: 'start', label: 'Asked to review' },
-      { id: 'menu', type: 'action', label: 'Open the account menu', detail: 'Pathways + Feedback live under the avatar menu — internal team tooling, out of the primary nav (UX-08).' },
+      { id: 'menu', type: 'action', label: 'Open the account control', detail: 'Pathways + Feedback live in the account control at the foot of the list — internal team tooling, admin only (UX-08).' },
       { id: 'paths', type: 'screen', label: 'Review current workflows', route: '/pathways', detail: 'See how the app works today (this page).' },
       { id: 'uat', type: 'screen', label: 'Feedback hub', route: '/uat' },
       { id: 'open', type: 'action', label: 'Open a test → compare before/after' },

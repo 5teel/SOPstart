@@ -11,7 +11,7 @@
  * GovernanceInbox.tsx and derived by src/lib/governance/inbox.ts. The real
  * admin/safety_manager gate on the DATA is listGovernanceQueue ->
  * requireAdmin() in src/actions/governance.ts — the page's own
- * redirect('/dashboard') is a second, shallower guard in front of that, kept
+ * redirect to the site root is a second, shallower guard in front of that, kept
  * here so both layers stay pinned (CLAUDE.md 2026-07-13: a guard pointing at
  * an emptied file is a guard that stopped guarding).
  *
@@ -66,7 +66,7 @@ test.describe('governance inbox — queue read + role guard', () => {
     expect(src).toContain("import { requireAdminContext } from '@/lib/auth/guards'")
     expect(src).toContain("import { loadInbox } from '@/lib/governance/load-inbox'")
     expect(src).toContain('const ctx = await requireAdminContext()')
-    expect(src).toContain("if ('error' in ctx) redirect('/dashboard')")
+    expect(src).toContain("if ('error' in ctx) redirect('/')")
     expect(src).toContain('await loadInbox(')
     // the queue read itself lives in loadInbox (Phase 57 D-16)
     expect(read(path.join(ROOT, 'src', 'lib', 'governance', 'load-inbox.ts'))).toContain('listGovernanceQueue()')

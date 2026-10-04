@@ -129,7 +129,7 @@ test.describe('SC-1 — /admin/team page source contract', () => {
     expect(src).toContain("from '@/lib/auth/session-context'")
     expect(src).toContain('getSessionContext()')
     expect(src).toContain("'admin', 'safety_manager'")
-    expect(src).toContain("redirect('/dashboard')")
+    expect(src).toContain("redirect('/')")
   })
 
   test('renders no AdminNav (admin nav lives in the app header — sketch 004, 2026-07-30)', () => {

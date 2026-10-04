@@ -22,7 +22,7 @@ export default async function BuilderPage({
 
   // Check user is admin or safety_manager (mirrors review/page.tsx)
   if (!role || !['admin', 'safety_manager'].includes(role)) {
-    redirect('/dashboard')
+    redirect('/')
   }
 
   // Fetch SOP with nested sections, steps, images — includes layout_data/layout_version via *

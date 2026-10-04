@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { getSessionContext } from '@/lib/auth/session-context'
 
 /**
- * Server-side guard: redirects to /dashboard if current user is not a platform
+ * Server-side guard: redirects to / if current user is not a platform
  * super-admin (Potenco internal only).
  *
  * Phase 25: The /admin/global-blocks and /admin/global-blocks/suggestions routes
@@ -21,6 +21,6 @@ export async function requirePlatformAdmin() {
   // Call the SECURITY DEFINER helper from migration 00022 (renamed in 00026).
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabase as any).rpc('is_platform_admin')
-  if (error || data !== true) redirect('/dashboard')
+  if (error || data !== true) redirect('/')
   return { id: userId }
 }

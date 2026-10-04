@@ -38,7 +38,7 @@ export default async function CompletionDetailPage({ params }: CompletionDetailP
 
   const { supabase, userId, role, organisationId } = await getSessionContext()
   if (!userId) redirect('/login')
-  if (!role) redirect('/dashboard')
+  if (!role) redirect('/')
 
   // Fetch completion with all joins (use admin client to bypass RLS for presigned URLs)
   const admin = createAdminClient()

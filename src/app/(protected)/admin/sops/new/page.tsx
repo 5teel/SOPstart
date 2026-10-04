@@ -51,7 +51,7 @@ export default async function NewSopMethodPickerPage() {
   if (!userId) redirect('/login')
 
   if (!role || !['admin', 'safety_manager'].includes(role)) {
-    redirect('/dashboard')
+    redirect('/')
   }
 
   return (

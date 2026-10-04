@@ -13,7 +13,7 @@ import { GovernanceInbox } from '@/components/admin/governance/GovernanceInbox'
  */
 export default async function GovernancePage() {
   const ctx = await requireAdminContext()
-  if ('error' in ctx) redirect('/dashboard')
+  if ('error' in ctx) redirect('/')
 
   const inbox = await loadInbox()
 

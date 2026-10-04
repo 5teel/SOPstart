@@ -4,7 +4,7 @@
  * Source-contract assertions (no browser/Chromium binary required for CI):
  *  - DepartmentCard.tsx contains the card anatomy tokens from UI-SPEC
  *  - DepartmentGrid.tsx contains "NEW DEPARTMENT" add-card copy + archive toggle
- *  - /admin/departments page.tsx guards to /dashboard and calls listDepartments
+ *  - /admin/departments page.tsx guards to / and calls listDepartments
  *  - DepartmentFormModal.tsx has colour picker + code field
  *
  * Runtime e2e portions are marked test.fixme — they require:
@@ -138,9 +138,9 @@ test.describe('admin/departments — page.tsx source contract', () => {
     expect(src).toContain('listDepartments')
   })
 
-  test('page redirects non-admin/safety_manager to /dashboard (REQ-1)', () => {
+  test('page redirects non-admin/safety_manager to / (REQ-1)', () => {
     const src = read(PAGE)
-    expect(src).toContain('dashboard')
+    expect(src).toContain("redirect('/')")
     expect(src).toContain("'admin', 'safety_manager'")
   })
 

@@ -19,7 +19,7 @@ test.describe('SOP Builder authoring entry points (SB-AUTH)', () => {
     )
     expect(pageRsc).toContain("from './WizardClient'")
     expect(pageRsc).toContain("redirect('/login')")
-    expect(pageRsc).toContain("redirect('/dashboard')")
+    expect(pageRsc).toContain("redirect('/')")
     expect(pageRsc).toContain("'admin', 'safety_manager'")
     // Repointed 2026-07-13: WizardClient gained categories/departments props
     // (Phase 13/25), so the bare `<WizardClient />` pin had rotted.

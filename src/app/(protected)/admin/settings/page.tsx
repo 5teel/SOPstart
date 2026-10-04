@@ -56,7 +56,7 @@ export default async function AdminSettingsPage() {
   if (!userId) redirect('/login')
 
   if (!role || !['admin', 'safety_manager'].includes(role)) {
-    redirect('/dashboard')
+    redirect('/')
   }
 
   // Approval chains config panel (D29-05, relocated here in 30-08). Phase 40

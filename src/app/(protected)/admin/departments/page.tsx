@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 /**
  * Phase 25 Plan 04 — /admin/departments SSR route.
  *
- * Auth guard: redirects non-admin/safety_manager to /dashboard (REQ-1, T-25-01).
+ * Auth guard: redirects non-admin/safety_manager to / (REQ-1, T-25-01).
  * Fetches: listDepartments() (DepartmentWithCounts[]) + team members for owner selector.
  * Renders: page h1 + sub-heading + shared sub-nav + DepartmentGrid.
  *
@@ -25,7 +25,7 @@ export default async function DepartmentsPage() {
   if (!userId) redirect('/login')
 
   if (!role || !['admin', 'safety_manager'].includes(role)) {
-    redirect('/dashboard')
+    redirect('/')
   }
 
   // Departments + org members are independent reads — fetch concurrently.

@@ -72,7 +72,7 @@ test.describe('UX-03 — governance lives at /governance', () => {
     expect(config).toContain("destination: '/governance',")
     const page = read(GOV_PAGE)
     expect(page).toContain('requireAdminContext()')
-    expect(page).toContain("redirect('/dashboard')")
+    expect(page).toContain("redirect('/')")
     // No unrelated governance surface renders here.
     expect(page).not.toContain('ApprovalChainEditor')
     expect(page).not.toContain('GovernanceQueueRow')
