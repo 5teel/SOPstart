@@ -19,6 +19,8 @@ export const EVAL_SITE_DEPARTMENT = 'Forming'
 // published SOPs (worker Dexie sync filters status === 'published'), unlike
 // the Phase 51 draft fixture above which only needed to exist for linking.
 export const EVAL_SITE_WORKER_EMAIL = 'eval-site-worker@sopstart.com'
+// Phase 57 (57-01, D-06): a supervisor in the same eval-site org -- the supervisor Office card eval.
+export const EVAL_SITE_SUPERVISOR_EMAIL = 'eval-site-supervisor@sopstart.com'
 export const EVAL_PLANT_SOP_TITLE = 'Eval plant fixture SOP'
 // Phase 55 (55-01): a published, UNASSIGNED, machine-less SOP whose step 2 asks for a
 // photo -- the walk eval completes it, so it must never be the plant fixture SOP.
@@ -119,6 +121,21 @@ if (!siteWorker) {
   const { error } = await sb.from('organisation_members').upsert({ organisation_id: siteOrg.id, user_id: siteWorker.id, role: 'worker' }, { onConflict: 'organisation_id,user_id' })
   if (error) throw error
   console.log(`${EVAL_SITE_WORKER_EMAIL} → worker of ${EVAL_SITE_ORG_NAME} (${siteWorker.id})`)
+}
+
+// --- Phase 57 (57-01, D-06): eval-site supervisor (same org, never the real SOPstart org) ---
+let siteSupervisor = list.users.find(u => u.email === EVAL_SITE_SUPERVISOR_EMAIL)
+if (siteSupervisor && siteSupervisor.user_metadata?.eval_fixture !== true) throw new Error(`${EVAL_SITE_SUPERVISOR_EMAIL} exists but is not an eval fixture — refusing to change its membership`)
+if (!siteSupervisor) {
+  const { data, error } = await sb.auth.admin.createUser({ email: EVAL_SITE_SUPERVISOR_EMAIL, email_confirm: true, user_metadata: { eval_fixture: true } })
+  if (error) throw error
+  siteSupervisor = data.user
+  console.log('created', EVAL_SITE_SUPERVISOR_EMAIL)
+}
+{
+  const { error } = await sb.from('organisation_members').upsert({ organisation_id: siteOrg.id, user_id: siteSupervisor.id, role: 'supervisor' }, { onConflict: 'organisation_id,user_id' })
+  if (error) throw error
+  console.log(`${EVAL_SITE_SUPERVISOR_EMAIL} → supervisor of ${EVAL_SITE_ORG_NAME} (${siteSupervisor.id})`)
 }
 
 let plantSop

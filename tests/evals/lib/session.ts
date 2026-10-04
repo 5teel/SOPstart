@@ -29,6 +29,9 @@ export const EVAL_USERS = {
   // Phase 52: worker member of the eval-site org (never the real SOPstart
   // org), so a plant-home eval can see a pin without risking Simon's data.
   siteWorker: 'eval-site-worker@sopstart.com',
+  // Phase 57 D-06: supervisor member of the eval-site org (never the real
+  // org), so the supervisor Office card can be proved on the deployed site.
+  siteSupervisor: 'eval-site-supervisor@sopstart.com',
 } as const
 export type EvalRole = keyof typeof EVAL_USERS
 export const EVAL_SITE_ORG_NAME = 'SOPstart Eval Site'
