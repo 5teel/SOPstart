@@ -1713,7 +1713,7 @@ Executes 55 → 56 → 57 → 58 → 59 → 60 → 61 → 62, strictly sequentia
 
 - [x] **Phase 55: Cut the Dropped Features & One Organisation** - Offline, voice, phone/QR, shared-device login, video generation, flow diagram, annotation, YouTube and photo-scan on-ramps, library pages and version compare/restore deleted; sign-up no longer creates an organisation; the worker path keeps working online (completed 2026-10-03)
 - [x] **Phase 56: A Simpler SOP & the Decision Ledger** - Every SOP converted to sections and steps (hazard and PPE as kinds of step), standards as labels, machine-or-site placement; one append-only decision ledger written by every existing approve / sign-off / assign / publish path (completed 2026-10-04)
-- [ ] **Phase 57: The One Screen & Its Places** - List · isometric site · detail panel as the landing screen, four signposted rooms, search, "next for you" card, pins, site edit mode; no header navigation
+- [x] **Phase 57: The One Screen & Its Places** - List · isometric site · detail panel as the landing screen, four signposted rooms, search, "next for you" card, pins, site edit mode; no header navigation (completed 2026-10-04)
 - [ ] **Phase 58: The SOP Focus Screen — Walk & Edit** - Opening a SOP removes the map and the list; walk one step at a time to a sign-off, or edit with the AI check and tick-each-step before publish; new versions
 - [ ] **Phase 59: The Office** - Inbox that drains, sign-off and approvals, decision ledger, people and roles, the existing access wiring — one room, with the detail panel widening for tables
 - [ ] **Phase 60: Requests, Notifications & Objectives** - People and agents raise requests the Office answers; notifications with a bell; objectives as quiet metadata; the site overview fills in
@@ -1853,7 +1853,7 @@ Plans:
   4. A worker sees how many SOPs are due at each place and a "next for you" card with Walk it and Show me; an admin sees where a SOP has no owner or an overdue review, a count on the Office and the Workshop, and a card saying how many things wait in the Office with a button that opens it; typing in the search box filters the list and lights the matching shapes (machine names and the titles of the SOPs on them)
   5. An admin can switch the site into edit mode from the map to add, rename, reshape or remove machines and departments and to drag each room's shape to a new place; there is no departments screen
 
-**Plans:** 9/10 plans executed
+**Plans:** 10/10 plans complete
 Plans:
 **Wave 1**
 
@@ -1890,7 +1890,7 @@ Plans:
 
 **Wave 9** *(blocked on Wave 8 completion)*
 
-- [ ] 57-10-PLAN.md — Deployed eval for all five success criteria (three roles, both pin kinds), full suite once, screenshots read, rooms tuned, validation signed off
+- [x] 57-10-PLAN.md — Deployed eval for all five success criteria (three roles, both pin kinds), full suite once, screenshots read, rooms tuned, validation signed off
 
 **UI hint**: yes
 
