@@ -106,6 +106,12 @@ test.describe('SHL-05 admin seam', () => {
     expect(src).not.toMatch(/^import .*AdminShell/m)
   })
 
+  test('OneScreen imports WorkerShell statically so the / gate measures the worker download', () => {
+    const src = strip(read('src', 'components', 'shell', 'OneScreen.tsx'))
+    expect(src).toMatch(/^import \{[^}]*\bWorkerShell\b[^}]*\} from '@\/components\/shell\/WorkerShell'/m)
+    expect(src).not.toMatch(/import\('@\/components\/shell\/WorkerShell'\)/)
+  })
+
   test('no other file under src references the AdminShell module', () => {
     const hits = walk(path.join(ROOT, 'src'))
       .filter((f) => !f.endsWith(path.join('shell', 'AdminShell.tsx')))

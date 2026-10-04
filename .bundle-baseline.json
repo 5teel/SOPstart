@@ -1,6 +1,6 @@
 {
   "capturedAt": "2026-10-05T00:00:00.000Z",
-  "note": "Phase 55 D-07 moved the worker routes DOWN by hand to the measured post-cut First Load JS and they are never re-captured. Phase 57-04 added /page (the one screen), recorded by hand once. Phase 57-08 retired the list page: /sops/page left the gate (history) and /sops/[sopId]/page and /page moved DOWN by hand to their measured post-deletion values (nothing moved up). Raising a value needs a signed-off decision recorded in ROADMAP.",
+  "note": "Phase 55 D-07 moved the worker routes DOWN by hand to the measured post-cut First Load JS and they are never re-captured. Phase 57-04 added /page (the one screen), recorded by hand once. Phase 57-08 retired the list page: /sops/page left the gate (history) and /sops/[sopId]/page moved DOWN by hand to its measured post-deletion value. /page was then set to 831 KB, the first measurement of the worker's real first download on / (signed-off by the phase-57 orchestrator, 2026-10-05; see history). Raising a value needs a signed-off decision recorded in ROADMAP.",
   "previousBaseline": {
     "/sops/[sopId]/page": {
       "value": 1059,
@@ -44,10 +44,16 @@
       "value": 792,
       "capturedAt": "2026-10-05T00:00:00.000Z",
       "note": "Phase 57-08: moved DOWN by hand to 565 KB, the measured First Load JS (worker shell still behind next/dynamic in OneScreen, so the lazy WorkerShell chunk is excluded). A trial build with the worker shell statically imported again measured /sops/[sopId]/page 795 KB (unchanged) and /page 831 KB; setting 831 would be an UP move from 792, which CLAUDE.md 2026-09-13 reserves for a signed-off decision, so the split stays and the choice is left to the owner -- see 57-08-SUMMARY."
+    },
+    {
+      "route": "/page",
+      "value": 565,
+      "capturedAt": "2026-10-05T00:00:00.000Z",
+      "note": "Phase 57-08 follow-up: baseline is now 831 KB (measured). The previous 792/565 values were measured with the worker shell in a lazy chunk the gate could not see; this 831 entry is the first measurement of the worker's actual first download on /. Like-for-like, the retired /sops list page measured 795 KB after the 57-04 gate fix and the 57-06 header deletion, so the one screen costs +36 KB (stage, rooms, frame, Now card). Decision by the phase-57 orchestrator on 2026-10-05; WorkerShell is a static import again, AdminShell stays the lazy seam."
     }
   ],
   "routes": {
     "/sops/[sopId]/page": 795,
-    "/page": 565
+    "/page": 831
   }
 }
