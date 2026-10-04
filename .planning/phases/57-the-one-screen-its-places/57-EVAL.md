@@ -1,6 +1,6 @@
-# Deployed-site eval — 2026-10-04T15:13:13.045Z
+# Deployed-site eval — 2026-10-04T15:51:01.308Z
 
-Target: https://sopstart.com · commit 5fe93d3 · 44 passed / 0 failed / 0 skipped
+Target: https://sopstart.com · commit c56d581 · 45 passed / 0 failed / 0 skipped
 
 | | Test | Failure |
 |---|------|---------|
@@ -36,6 +36,7 @@ Target: https://sopstart.com · commit 5fe93d3 · 44 passed / 0 failed / 0 skipp
 | ✅ | Phase 57 — the one screen (deployed) › PLC-05 D-08 D-22: edit mode shows the site workspace and the departments strip |  |
 | ✅ | Phase 57 — the one screen (deployed) › D-10 D-17: retired URLs (dashboard, list, departments, site, governance views) redirect to the one screen |  |
 | ✅ | Phase 57 — the one screen (deployed) › Pitfall 7: real-org overview screenshot, read-only |  |
+| ✅ | Phase 57 — the one screen (deployed) › CLAUDE.md pathways: the pathways map reports zero unmapped screens |  |
 | ✅ | Phase 57 — the one screen (deployed) › D-10: signed-out root shows the landing page |  |
 | ✅ | Phase 51 — site editor (deployed) › admin uploads a scene, draws two machines (one after zoom+pan), names them, tags a department, moves a corner, links a SOP from the builder, and reloads |  |
 | ✅ | Phase 51 — site editor (deployed) › a worker gets the overview, not the editor, at the edit-mode address |  |
@@ -50,32 +51,3 @@ Target: https://sopstart.com · commit 5fe93d3 · 44 passed / 0 failed / 0 skipp
 | ✅ | Phase 56 -- simpler SOP + decision ledger (deployed) › F -- ledger is non-empty, refuses service-key update and delete, refuses an unnamed agent |  |
 
 Screenshots (inspect these — CSS/sizing bugs are invisible to assertions): `.planning\evals\latest\57-admin-edit-refused.png`, `.planning\evals\latest\57-admin-edit.png`, `.planning\evals\latest\57-admin-machine.png`, `.planning\evals\latest\57-admin-office.png`, `.planning\evals\latest\57-admin-overview.png`, `.planning\evals\latest\57-admin-workshop.png`, `.planning\evals\latest\57-bridge-activity.png`, `.planning\evals\latest\57-bridge-governance.png`, `.planning\evals\latest\57-real-org-noticeboard.png`, `.planning\evals\latest\57-real-org-office.png`, `.planning\evals\latest\57-real-org-overview.png`, `.planning\evals\latest\57-real-org-smoko.png`, `.planning\evals\latest\57-real-org-workshop.png`, `.planning\evals\latest\57-supervisor-overview.png`, `.planning\evals\latest\57-worker-mobile.png`, `.planning\evals\latest\57-worker-noticeboard.png`, `.planning\evals\latest\57-worker-overview.png`, `.planning\evals\latest\57-worker-search.png`, `.planning\evals\latest\57-worker-zoomed.png`, `.planning\evals\latest\access-wiring-only.png`, `.planning\evals\latest\builder-machines.png`, `.planning\evals\latest\cut-builder-tools.png`, `.planning\evals\latest\cut-existing-completion.png`, `.planning\evals\latest\cut-existing-sop.png`, `.planning\evals\latest\cut-login.png`, `.planning\evals\latest\cut-new-ai.png`, `.planning\evals\latest\cut-not-found.png`, `.planning\evals\latest\cut-profile.png`, `.planning\evals\latest\cut-sign-up.png`, `.planning\evals\latest\cut-upload.png`, `.planning\evals\latest\cut-versions.png`, `.planning\evals\latest\cut-walk-phone.png`, `.planning\evals\latest\cut-walk-signoff.png`, `.planning\evals\latest\cut-worker-plant.png`, `.planning\evals\latest\governance-after-assign.png`, `.planning\evals\latest\governance-inbox.png`, `.planning\evals\latest\governance-panel.png`, `.planning\evals\latest\ledger-b-builder-hazards.png`, `.planning\evals\latest\ledger-b-builder.png`, `.planning\evals\latest\ledger-b-read.png`, `.planning\evals\latest\ledger-b-walk.png`, `.planning\evals\latest\ledger-c-panel.png`, `.planning\evals\latest\ledger-c-worker-read.png`, `.planning\evals\latest\ledger-c-worker-removed.png`, `.planning\evals\latest\ledger-c-worker-renamed.png`, `.planning\evals\latest\ledger-c-worker-walk.png`, `.planning\evals\latest\ledger-d-machine.png`, `.planning\evals\latest\ledger-d-whole-site.png`, `.planning\evals\latest\ledger-e-owner.png`, `.planning\evals\latest\ledger-e-reject.png`, `.planning\evals\latest\site-editor.png`, `.planning\evals\latest\site-empty.png`, `.planning\evals\latest\sop-read-desktop.png`, `.planning\evals\latest\sop-read-mobile.png`, `.planning\evals\latest\sop-walk-desktop.png`, `.planning\evals\latest\sop-walk-mobile.png`
-
-## Screenshots read (second run, commit 5fe93d3; the first run at 9e9708c also passed 44/44)
-
-| Screenshot | What was checked | Seen |
-|---|---|---|
-| `57-worker-overview` | three panes, no header, four signposts, Now card, due pin | Pass. List / map / detail; Now card "Eval plant fixture SOP"; pin 1 on EVAL Press; four room signs present. Eval scene is placeholder boxes, so room outlines sit on empty ground by design of the fixture. |
-| `57-worker-zoomed` | Noticeboard selected: camera, row highlight, detail rows | Pass. Noticeboard outline sits on the floor of the big box; detail lists the convert and walk fixture SOPs, each with Walk. |
-| `57-worker-mobile` (390x844) | list-only layout, glove-sized rows | Pass. Search, Now card, Rooms, Departments, Machines stack with the summary under; rows are 44px+ (asserted). |
-| `57-admin-overview` | Office card number, room pins, health pin | Pass. Office 2 equals the Office pin; Workshop pin 1 (the eval-site draft); red "!" pin on EVAL Press. Smoko and Office signs sit close together on the eval scene (placeholder art), still legible. |
-| `57-admin-machine` | Walk, Edit, NO OWNER badge, new-SOP-for-machine | Pass. Badge, Walk, Edit and "New SOP for this machine" all present; "no photo yet" is the fixture, not a bug. |
-| `57-admin-edit` / `57-admin-edit-refused` | edit mode strip and workspace; refusal with counts | Pass. Departments strip over the site workspace; refusal reads "Forming is still used by 2 machines and 0 SOP rules. Move them first." in the hazard token colour. |
-| `57-bridge-governance` | Back to the site on a bridged page, no header | Pass. Single "Back to the site" bar, inbox shows "2 open" (matches the Office card). |
-| `57-supervisor-overview` | supervisor Office card | Pass. "0 waiting for your sign-off" card with Open the Office. |
-| `57-real-org-overview` (first run) | rooms on the real 2752x1536 scene | FAIL on placement. Smoko and Workshop floated on the white ground outside the building. Fixed in `5fe93d3` (see below). Office sat exactly on the Office terminal (expected, D-18); Noticeboard on empty floor. |
-| `57-real-org-overview`, `-smoko`, `-workshop` (second run) | same, after the fix | Pass. Smoko is on empty floor right of the pallet stack; Workshop is on floor under the workbench, in front of the band saw. No room covers a machine polygon (checked with the polygons overlaid on the scene image). |
-
-## Added after the run
-
-The deleted sop-surface eval carried the pathways "0 not mapped yet" assertion, so it was folded into `one-screen.eval.ts` (CLAUDE.md pathways rule) after the full run. Run on its own against sopstart.com at 5fe93d3: 1 passed. The full run above is therefore 44 tests; the file now has 20.
-
-## Room placement fix
-
-`ROOMS` in `src/lib/site/rooms.ts` came from the sketch fractions (57-01) and was never checked against a scene. On the real org's scene Smoko and Workshop sat outside the building. Both moved to empty floor; Office and Noticeboard unchanged. `rooms.spec.ts` stays green (no vertex of one room inside another).
-
-## Notes for Simon
-
-- The real org's Office terminal is a machine under the Office room; the room hit-area wins the click (D-18). Click the list row to reach the machine.
-- The eval-site scene is grey boxes, so room placement there proves only that signposts and hit-areas render, not that they sit on anything meaningful.
-
