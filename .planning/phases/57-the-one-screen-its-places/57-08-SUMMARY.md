@@ -35,7 +35,7 @@ key-files:
     - src/components/sop/CategoryBottomSheet.tsx
     - src/components/sop/SopLibraryCard.tsx
 decisions:
-  - "WorkerShell stays behind next/dynamic: a static import is bundle-neutral for /sops/[sopId] now, but raises the / baseline 792 -> 831 KB, an up move reserved for a signed-off decision"
+  - "WorkerShell is a static import again (orchestrator decision 2026-10-05): bundle-neutral for /sops/[sopId] (795), and the / baseline is 831 KB, the first measurement of the worker's real first download"
   - "Whole-subject specs deleted only where every assertion was about a deleted subject; library-table, library-filter-deeplink and list-rows keep their surviving halves for 57-09 (inventory rows unchanged)"
 requirements-completed: []
 metrics:
@@ -68,7 +68,7 @@ Every old list address now redirects on the server, every link points at the one
 
 ```
 check-bundle-size: /sops/[sopId]/page = 795 KB (baseline 795 KB, delta 0 KB, tolerance +-2 KB)
-check-bundle-size: /page = 565 KB (baseline 565 KB, delta 0 KB, tolerance +-2 KB)
+check-bundle-size: /page = 831 KB (baseline 831 KB, delta 0 KB, tolerance +-2 KB)   [after 97644f2; was 565 in run 3]
 check-bundle-size: Bundle isolation OK / pdfjs + mammoth / konva isolation OK
 check-bundle-size: Marker self-validation OK
 ```
@@ -81,13 +81,22 @@ check-bundle-size: Marker self-validation OK
 |-------|--------|-------|------|
 | `/sops/page` | 817 | removed | moved to history, "Phase 57-08: route deleted" |
 | `/sops/[sopId]/page` | 817 | 795 | list page route chunks left the build |
-| `/page` | 792 | 565 | measured with the worker shell still behind `next/dynamic` |
+| `/page` | 792 | 565, then 831 | 565 measured with the worker shell behind `next/dynamic`; 831 is the real first download after the static import was restored (orchestrator decision, up move signed off) |
 
-### WorkerShell inline vs dynamic -- decision left open
+### WorkerShell static import -- decided (phase-57 orchestrator, 2026-10-05)
 
-Trial build with `WorkerShell` statically imported in `OneScreen` (the 57-04 plan's original shape): `/sops/[sopId]/page` stays 795 KB (the +16 KB hoist is gone now the list page is deleted), but `/page` reads **831 KB**. Recording 831 would be an UP move from 792, which CLAUDE.md 2026-09-13 reserves for a signed-off decision, and this plan's acceptance says "at most a decrease". I reverted to the dynamic split (only the explanatory comment in `OneScreen.tsx` changed) and set `/page` to the measured 565.
+Decision: restore the STATIC `WorkerShell` import in `OneScreen` (the 57-04 plan's original design; the `next/dynamic` split only existed to dodge the now-deleted `/sops` list route). `AdminShell` stays the `next/dynamic({ ssr:false })` seam. Commit `97644f2`.
 
-Consequence: the `/` gate does not measure the worker's download (the lazy WorkerShell chunk is outside the manifest). If you want it to, the change is: restore the static import in `src/components/shell/OneScreen.tsx` and set `/page` to 831 in `.bundle-baseline.json` with a ROADMAP note. The orchestrator brief asked for exactly that when `/sops/[sopId]` was unaffected; I held back because it raises a baseline.
+Final numbers (`npm run build` + postbuild gate, exit 0):
+
+```
+check-bundle-size: /sops/[sopId]/page = 795 KB (baseline 795 KB, delta 0 KB, tolerance +-2 KB)
+check-bundle-size: /page = 831 KB (baseline 831 KB, delta 0 KB, tolerance +-2 KB)
+```
+
+`/page` baseline set to the measured 831 KB (tolerance unchanged, `/sops/[sopId]` baseline untouched). The history note in `.bundle-baseline.json` says: the earlier 792/565 values were measured with the worker shell in a lazy chunk the gate could not see; 831 is the first measurement of the worker's actual first download on `/`; like-for-like the retired `/sops` list page measured 795 KB after the 57-04 gate fix and 57-06 header deletion, so the one screen costs +36 KB (stage, rooms, frame, Now card). A new phase57 assertion in `one-query.spec.ts` pins the static WorkerShell import next to the existing lazy-AdminShell seam assertion; no phase41 spec pinned the old dynamic import.
+
+Gates after the change: `npx tsc --noEmit` clean; `npx playwright test --project=phase57 --project=phase41 --project=phase15-stubs` 234 passed, 6 skipped, 0 failed (run once).
 
 ## Guard sweep (Task 1) -- hits and repoints
 
@@ -123,7 +132,7 @@ Consequence: the `/` gate does not measure the worker's download (the lazy Worke
 
 **3. [Rule 3 - blocking] Extra spec edits outside `files_modified`.** `tests/phase57/machine-body.spec.ts` and `tests/phase52/plant-now-card.spec.ts` read PlantHome.tsx; `tests/phase54/deletion-sweep.spec.ts` asserted the library-table gate label; `scripts/capture-bundle-baseline.ts` still listed `/sops/page`. All repointed in the deletion commit.
 
-**4. WorkerShell kept dynamic** -- see the section above (brief asked for static import; held back to avoid a baseline up-move).
+**4. WorkerShell kept dynamic, then made static** -- first held back to avoid a baseline up-move; the orchestrator then signed off the move (see the decision section above, commit `97644f2`).
 
 ## Residue (documented, not fixed)
 
@@ -153,10 +162,10 @@ None. `/sops` redirects use fixed destinations; `sop` is appended only when it i
 ## Notes for the orchestrator
 
 - REQUIREMENTS.md not touched (SHL-01 / PLC-03 tick at plan close is yours); STATE.md and ROADMAP.md not touched; nothing pushed.
-- Open decision: `/` baseline 565 (current) vs 831 with WorkerShell inline.
+- Resolved: `/` baseline is 831 KB with WorkerShell inline (decision above); no open decisions.
 
 ## Self-Check: PASSED
 
 - Commits 104f4cb, eb46968, c40b8fa exist on master.
 - `src/app/(protected)/sops/page.tsx` absent; `src/app/(protected)/sops/[sopId]/` present.
-- `.bundle-baseline.json` diff: `/sops/page` to history, `/sops/[sopId]/page` 817 -> 795, `/page` 792 -> 565, nothing up.
+- `.bundle-baseline.json` diff: `/sops/page` to history, `/sops/[sopId]/page` 817 -> 795, `/page` 792 -> 565 (then 565 -> 831 by orchestrator decision in `97644f2`, measured, with history note).
