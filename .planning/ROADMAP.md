@@ -1809,7 +1809,7 @@ Plans:
   4. Approving, rejecting, signing off, assigning, publishing, changing an owner, recording an observation and clearing an AI finding each write one decision naming who, when, what and what it was about; a decision made by an AI agent names the agent
   5. Nobody — worker, supervisor or admin — can change or delete a decision once it is written; the database refuses the attempt even when the screen is bypassed
 
-**Plans:** 8/10 plans executed
+**Plans:** 9/10 plans executed
 Plans:
 **Wave 1**
 
@@ -1833,7 +1833,7 @@ Plans:
 **Wave 5** *(blocked on Wave 4 completion)*
 
 - [x] 56-08-PLAN.md — Assignment, observation, verify / AI-finding and agent-named AI write hooks; reconcile script; sweep fully live
-- [ ] 56-09-PLAN.md — Placement + derived department + SOP/section standards on the SOP page, Read and walk; Whole site in the machines picker
+- [x] 56-09-PLAN.md — Placement + derived department + SOP/section standards on the SOP page, Read and walk; Whole site in the machines picker
 
 **Wave 6** *(blocked on Wave 5 completion)*
 
