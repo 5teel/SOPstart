@@ -48,8 +48,11 @@ const ROOT = process.cwd()
 const READ_TAB = path.join(ROOT, 'src', 'components', 'sop', 'tabs', 'ReadTab.tsx')
 const WORKER_SOP_DETAIL = path.join(ROOT, 'src', 'app', '(protected)', 'sops', '[sopId]', 'page.tsx')
 const PROFILE_COMPETENCY_SECTION = path.join(ROOT, 'src', 'components', 'profile', 'CompetencySection.tsx')
-const SOP_LIBRARY_CARD = path.join(ROOT, 'src', 'components', 'sop', 'SopLibraryCard.tsx')
-const WORKER_SOP_LIBRARY = path.join(ROOT, 'src', 'app', '(protected)', 'sops', 'page.tsx')
+// 57-08: the worker list page and its library card are gone. The worker's
+// surfaces are the one screen's worker shell and the plant machine body / Now card.
+const SHELL = (f: string) => path.join(ROOT, 'src', 'components', 'shell', f)
+const PLANT = (f: string) => path.join(ROOT, 'src', 'components', 'sop', 'plant', f)
+const REL_BADGE = PLANT('RelBadge.tsx')
 const STATE_PILL = path.join(ROOT, 'src', 'components', 'admin', 'competency', 'StatePill.tsx')
 const TRAINING_RECORD_SECTION = path.join(ROOT, 'src', 'components', 'admin', 'competency', 'TrainingRecordSection.tsx')
 const TRAINING_MATRIX_VIEW = path.join(ROOT, 'src', 'components', 'admin', 'competency', 'TrainingMatrixView.tsx')
@@ -60,8 +63,13 @@ const TARGETS: Array<{ label: string; file: string }> = [
   { label: 'ReadTab.tsx (worker SOP read surface)', file: READ_TAB },
   { label: 'worker SOP detail / walkthrough route page.tsx', file: WORKER_SOP_DETAIL },
   { label: 'profile CompetencySection.tsx (informational only)', file: PROFILE_COMPETENCY_SECTION },
-  { label: 'SopLibraryCard.tsx', file: SOP_LIBRARY_CARD },
-  { label: 'worker SOP library page.tsx', file: WORKER_SOP_LIBRARY },
+  { label: 'WorkerShell.tsx (worker one screen)', file: SHELL('WorkerShell.tsx') },
+  { label: 'OneScreen.tsx', file: SHELL('OneScreen.tsx') },
+  { label: 'RoomBodies.tsx', file: SHELL('RoomBodies.tsx') },
+  { label: 'SiteSummary.tsx', file: SHELL('SiteSummary.tsx') },
+  { label: 'MachinePanel.tsx (machine body)', file: PLANT('MachinePanel.tsx') },
+  { label: 'NowCard.tsx', file: PLANT('NowCard.tsx') },
+  { label: 'RelBadge.tsx', file: REL_BADGE },
   { label: 'StatePill.tsx (shared chip renderer)', file: STATE_PILL },
   { label: 'TrainingRecordSection.tsx (per-worker record panel)', file: TRAINING_RECORD_SECTION },
   { label: 'TrainingMatrixView.tsx (supervisor matrix surface)', file: TRAINING_MATRIX_VIEW },
@@ -139,8 +147,7 @@ test.describe('REF-01 / CMP-04 -- refresher and version-currency state never gat
 
 // ---------------------------------------------------------------------------
 // Second, stricter assertion class (Plan 36-10): the chip-DEFINING markup
-// itself (StatePill.tsx's two sibling chips, SopLibraryCard.tsx's refresher
-// badge) must carry no `disabled=` and no `onClick` anywhere near the chip's
+// itself (StatePill.tsx's two sibling chips, RelBadge.tsx's due badge) must carry no `disabled=` and no `onClick` anywhere near the chip's
 // own label text -- i.e. the chip is passive, not merely un-gated by
 // GATE_PATTERN's comparison/if-branch check. Scoped to a window around each
 // chip label (sliceAroundOccurrences) rather than the whole file, so the
@@ -153,7 +160,7 @@ test.describe('REF-01 / CMP-04 -- refresher and version-currency state never gat
 // ---------------------------------------------------------------------------
 const CHIP_DEFINING_TARGETS: Array<{ label: string; file: string; chipLabels: string[] }> = [
   { label: 'StatePill.tsx', file: STATE_PILL, chipLabels: ['Outdated version', 'Refresher overdue', 'Refresher due'] },
-  { label: 'SopLibraryCard.tsx', file: SOP_LIBRARY_CARD, chipLabels: ['data-refresher-due-badge'] },
+  { label: 'RelBadge.tsx', file: REL_BADGE, chipLabels: ['plant-rel-badge'] },
 ]
 
 test.describe('REF-01 / CMP-04 -- chip markup itself is passive (no disabled=/onClick near the chip label)', () => {

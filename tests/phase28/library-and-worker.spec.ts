@@ -16,7 +16,7 @@
  * and applied via `window.history.replaceState` (CLAUDE.md 2026-05-13
  * URL-state rule), never a <Link> href. The governance queue moved to its own
  * route, /governance, rendered by GovernanceInbox.tsx and derived by
- * src/lib/governance/inbox.ts. admin/sops/page.tsx is now a thin redirect
+ * src/lib/governance/inbox.ts. the retired admin SOP page is now a thin redirect
  * shim and no longer carries any of this behaviour.
  *
  * Verifies (source-contract, no live DB required):
@@ -142,7 +142,6 @@ test.describe('admin scope counts — counts from listGovernanceQueue + deep lin
     // server actions (Next 16.2.1 action queue) and never landed — the one
     // redirect is server-side, and no client copy may come back.
     expect(tableSrc).not.toContain("router.replace('/governance')")
-    expect(read(path.join(ROOT, 'src', 'app', '(protected)', 'sops', 'page.tsx'))).not.toContain("'/governance'")
     const proxySrc = read(path.join(ROOT, 'src', 'lib', 'supabase', 'middleware.ts'))
     expect(proxySrc).toContain("path === '/sops'")
     expect(proxySrc).toContain("view === 'attention'")

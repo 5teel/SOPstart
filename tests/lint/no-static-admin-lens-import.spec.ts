@@ -11,13 +11,13 @@
  *      `WiringPatchBayShell` may each only be statically
  *      imported from their own named file below. `AdminLibraryTable` and `AdminShell`
  *      have an empty allow-list — it is only ever reached via `next/dynamic`
- *      (`src/app/(protected)/sops/page.tsx`), so ANY static import is a
- *      violation.
+ *      (`OneScreen.tsx`), so ANY static import is a violation.
  *
- *   2. `src/app/(protected)/sops/page.tsx` (the merged worker/admin
- *      surface) must not import any admin table/lens component, nor
- *      `DepartmentPicker`, nor `setSopCategory`, nor anything from
- *      `@/actions/governance`, `@/actions/org-model`, `@/actions/grants`.
+ *   2. The worker shell files (the one screen's worker half, Phase 57) must
+ *      not import any admin table/lens component, nor `DepartmentPicker`, nor
+ *      `setSopCategory`, nor anything from `@/actions/governance`,
+ *      `@/actions/org-model`, `@/actions/grants`. `OneScreen.tsx` reaches the
+ *      admin shell only through `dynamic(`.
  *
  * Runs LIVE (no test.fixme).
  */
@@ -39,7 +39,15 @@ const ALLOWED_IMPORTERS: Record<string, string[]> = {
   AdminLibraryTable: [],
 }
 
-const SOPS_PAGE = path.join(REPO_ROOT, 'src', 'app', '(protected)', 'sops', 'page.tsx')
+const WORKER_SHELL_FILES = [
+  'OneScreen.tsx',
+  'ShellFrame.tsx',
+  'WorkerShell.tsx',
+  'RoomBodies.tsx',
+  'SiteSummary.tsx',
+  'OfficeCard.tsx',
+  'AccountControl.tsx',
+].map((f) => path.join(REPO_ROOT, 'src', 'components', 'shell', f))
 
 type Hit = { file: string; line: number; text: string }
 
@@ -96,8 +104,7 @@ test.describe('T-41-02 — admin lens components cannot leak into the worker imp
     })
   }
 
-  test('src/app/(protected)/sops/page.tsx does not import any admin lens/table code (live guard, no fixme)', () => {
-    const src = fs.readFileSync(SOPS_PAGE, 'utf-8')
+  test('the worker shell files do not import any admin lens/table code (live guard, no fixme)', () => {
     const forbidden = [
       'GovernanceQueueRow',
       'WiringPatchBayShell',
@@ -106,15 +113,23 @@ test.describe('T-41-02 — admin lens components cannot leak into the worker imp
       '@/actions/governance',
       '@/actions/org-model',
       '@/actions/grants',
-      // Phase 54: page.tsx mounts AdminLibraryTable only via next/dynamic
-      // (SC-4/T-54-04) — it must never import the data layer behind it, nor
-      // the Access lens, directly.
+      // The admin data layer and the Access lens are the admin shell's.
       'listAdminSopRows',
       '@/actions/admin-sop-list',
       '@/lib/sop/admin-health',
       'AdminAccessLens',
     ]
-    const present = forbidden.filter((token) => src.includes(token))
-    expect(present, `Forbidden admin imports found in sops/page.tsx: ${present.join(', ')}`).toEqual([])
+    for (const file of WORKER_SHELL_FILES) {
+      const src = fs.readFileSync(file, 'utf-8')
+      const present = forbidden.filter((token) => src.includes(token))
+      expect(present, `Forbidden admin imports found in ${path.basename(file)}: ${present.join(', ')}`).toEqual([])
+    }
+  })
+
+  test('OneScreen reaches the admin shell only through dynamic(), and WorkerShell is a worker-shell file', () => {
+    const one = fs.readFileSync(WORKER_SHELL_FILES[0], 'utf-8')
+    expect(one).toMatch(/dynamic\(\s*\(\)\s*=>\s*import\([^)]*AdminShell/)
+    expect(one).not.toMatch(/^import\s+[^;]*\bAdminShell\b[^;]*from/m)
+    expect(WORKER_SHELL_FILES.some((f) => f.endsWith('WorkerShell.tsx'))).toBe(true)
   })
 })

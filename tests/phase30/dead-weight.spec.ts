@@ -53,21 +53,14 @@ test.describe('UX-08 — dead-weight sweep', () => {
     ).toBe(false)
   })
 
-  // LIVE from 30-06: decision #3 — sop_departments SELECT using(true) verified
-  // live, so the filter was FIXED (real junction fetch), not removed.
-  test('worker /sops department filter is fixed or removed (no placebo return true)', () => {
-    const src = fs.readFileSync(
-      path.join(ROOT, 'src', 'app', '(protected)', 'sops', 'page.tsx'), 'utf-8',
-    )
-    // The fix is WIRED: junction fetch feeds the filter predicate.
-    expect(src).toContain("from('sop_departments')")
-    // Repointed 2026-08-04: the predicate moved into deptMatches(sopId) when
-    // the library tab merged into the Miller scopes. Assert the junction feeds
-    // it AND that the list actually applies it (wiring, not token presence).
-    expect(src).toMatch(/sopDeptMap\[sop(\.id|Id)\]/)
-    expect(src).toContain('deptMatches(s.id)')
-    // UX-04: no worker-side Create SOP tab either.
-    expect(src).not.toContain('Create SOP')
+  // UX-04: no worker-side Create SOP entry. The department-filter half of this
+  // guard went with the worker list page (57-08): the list is retired, so the
+  // placebo filter it pinned no longer exists to be placebo.
+  test('the worker shell offers no Create SOP entry', () => {
+    const shellDir = path.join(ROOT, 'src', 'components', 'shell')
+    for (const f of ['OneScreen.tsx', 'WorkerShell.tsx', 'RoomBodies.tsx', 'SiteSummary.tsx', 'OfficeCard.tsx']) {
+      expect(fs.readFileSync(path.join(shellDir, f), 'utf-8'), f).not.toContain('Create SOP')
+    }
   })
 
   // LIVE from 30-06: walkthrough journeys repointed to /sops/[sopId] Walk tab.

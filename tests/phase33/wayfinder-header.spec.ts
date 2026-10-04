@@ -67,8 +67,8 @@ test.describe('SC-6 — Wayfinder builder header', () => {
     expect(src).not.toContain('#0a0a0b')
     expect(src).toMatch(/border-\[var\(--ink-100\)\]/)
     // Back zone keeps its href — repointed off the /admin/sops shim straight
-    // to /sops in 41-07 (SUR-03/SUR-04: no in-app click pays a redirect hop).
-    expect(src).toMatch(/href="\/sops"/)
+    // to the list in 41-07; repointed in 57-08 to the one screen (no redirect hop).
+    expect(src).toMatch(/href="\/"\s+data-testid="wayfinder-back"/)
     // Here zone: amber tick over a --brand-yellow rule + title + version.
     expect(src).toContain('var(--brand-yellow, #fbbf24)')
     expect(src).toContain('{sopTitle}')

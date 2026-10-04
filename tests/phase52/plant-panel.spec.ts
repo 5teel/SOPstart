@@ -1,6 +1,7 @@
 /**
- * Phase 52 -- HOM-04. Worker-variant machine panel stub for MachinePanel.
- * Plan 52-02 Task 3 flips these to live source-contract assertions.
+ * Phase 52 -- HOM-04. Worker-variant machine body (MachineBody / SopRows).
+ * Repointed in 57-08: the overlay panel is gone (width and inert assertions
+ * with it); the body and its rows are what the one screen's detail renders.
  *
  * Registration: playwright.config.ts `phase52` project
  *   testDir: '.', testMatch: /tests\/phase52\/.*\.(spec|test)\.ts$/
@@ -9,12 +10,11 @@
 import { test, expect } from '@playwright/test'
 import fs from 'node:fs'
 import path from 'node:path'
-import { PLANT_PANEL_WIDTH } from '@/lib/site/scene'
 
 const ROOT = path.resolve(__dirname, '..', '..')
 const SRC = fs.readFileSync(path.join(ROOT, 'src', 'components', 'sop', 'plant', 'MachinePanel.tsx'), 'utf-8')
 
-test.describe('MachinePanel (worker variant)', () => {
+test.describe('MachineBody / SopRows (worker variant)', () => {
   test('the close control calls onClose', () => {
     expect(SRC).toMatch(/data-testid="plant-panel-close"[\s\S]{0,80}onClick=\{onClose\}/)
   })
@@ -52,19 +52,9 @@ test.describe('MachinePanel (worker variant)', () => {
     expect((SRC.match(/No procedures for this machine yet\./g) ?? []).length).toBe(1)
   })
 
-  test('the panel width matches PLANT_PANEL_WIDTH (380px)', () => {
-    expect(PLANT_PANEL_WIDTH).toBe(380)
-    expect(PLANT_PANEL_WIDTH / 4).toBe(95)
-    expect(SRC).toMatch(/\bw-95\b/)
-  })
-
   test('the panel renders no admin controls (no owner/rev lines, no edit affordance, no route push)', () => {
     for (const banned of ['/walkthrough', 'router.push', 'useRouter', 'Edit', 'owner', 'rev ']) {
       expect(SRC).not.toContain(banned)
     }
-  })
-
-  test('the closed panel is not tabbable (inert)', () => {
-    expect(SRC).toMatch(/inert=\{!open\}/)
   })
 })

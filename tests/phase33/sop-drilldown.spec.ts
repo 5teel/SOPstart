@@ -3,7 +3,7 @@
  * selectable — no pinned `?sop=` URL required (closes G2).
  *
  * Contract (33-08-PLAN must_haves, RESEARCH Pattern 4):
- *   - Server page (`.../admin/sops/page.tsx` access-view assembly) fetches
+ *   - Server page (the retired admin SOP page access-view assembly) fetches
  *     `id, title, status` per collection via one `.in('collection_id', ids)`
  *     join read and passes `sopsByCollection` down.
  *   - `WiringPatchBay.tsx` grows `expandedCollections: Set<string>`; SOP rows
@@ -24,7 +24,7 @@
  * documented `test.fixme` runtime smoke.
  *
  * Repointed in 41-08 (Phase 41, SUR-01/02/04): the server assembly moved from
- * admin/sops/page.tsx (now a redirect shim) to `listAdminAccessData`
+ * the retired admin SOP page (now a redirect) to `listAdminAccessData`
  * (src/actions/admin-access-view.ts).
  *
  * Repointed a second time in 54-05 (Phase 54, D-07/D-08): the Miller frame

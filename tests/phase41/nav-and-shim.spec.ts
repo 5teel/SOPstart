@@ -14,7 +14,10 @@ import path from 'node:path'
 const ROOT = process.cwd()
 const NEXT_CONFIG = path.join(ROOT, 'next.config.ts')
 const LIBRARY_TABLE = path.join(ROOT, 'src', 'components', 'admin', 'AdminLibraryTable.tsx')
-const WORKER_LIST = path.join(ROOT, 'src', 'components', 'sop', 'WorkerSimpleList.tsx')
+// 57-08: the worker list is gone; the worker half of the one screen is the shell.
+const WORKER_SHELL = ['OneScreen.tsx', 'WorkerShell.tsx', 'RoomBodies.tsx', 'SiteSummary.tsx', 'OfficeCard.tsx'].map(
+  (f) => path.join(ROOT, 'src', 'components', 'shell', f),
+)
 const SOP_DETAIL_PAGE = path.join(ROOT, 'src', 'app', '(protected)', 'sops', '[sopId]', 'page.tsx')
 
 function read(p: string): string {
@@ -38,11 +41,10 @@ test.describe('legacy /admin/sops — static next.config.ts redirect (Phase 43 D
 })
 
 test.describe('SUR-04 — one path from a SOP to its builder', () => {
-  test('SUR-04: AdminLibraryTable contains /admin/sops/builder/; WorkerSimpleList does not', () => {
+  test('SUR-04: AdminLibraryTable contains /admin/sops/builder/; the worker shell does not', () => {
     const table = read(LIBRARY_TABLE)
     expect(table).toContain('/admin/sops/builder/')
-    const workerList = read(WORKER_LIST)
-    expect(workerList).not.toContain('/admin/sops/builder')
+    for (const f of WORKER_SHELL) expect(read(f), f).not.toContain('/admin/sops/builder')
   })
 
   test('SUR-04: the worker SOP detail page keeps its own "Edit in builder" DESTINATION (not a second list→builder chain)', () => {

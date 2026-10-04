@@ -9,13 +9,11 @@
  *     Start blank.
  *   - Destinations remain: /admin/sops/upload, /admin/sops/new/ai
  *     /admin/sops/new/blank.
- *   - Worker /sops "Create SOP" tab removal is 30-06 scope (shares
- *     sops/page.tsx) — that test stays fixme here until 30-06 flips it.
+ *   - The worker has no "Create SOP" entry anywhere on the one screen.
  *
- * Repointed in 43-04 (Phase 43, D-01): admin/sops/page.tsx is deleted — the
- * legacy URL is now a next.config.ts redirect with no page of its own to
- * read. The "no duplicate create entry" check now asserts only the merged
- * surface (/sops).
+ * Repointed in 57-08: the worker list page is gone, so the "no duplicate
+ * create entry" checks read the worker shell files (the one screen's worker
+ * half) instead.
  */
 import { test, expect } from '@playwright/test'
 import fs from 'node:fs'
@@ -25,8 +23,8 @@ const ROOT = process.cwd()
 const METHOD_PICKER = path.join(
   ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'new', 'page.tsx',
 )
-const WORKER_SOPS_PAGE = path.join(
-  ROOT, 'src', 'app', '(protected)', 'sops', 'page.tsx',
+const WORKER_SHELL = ['OneScreen.tsx', 'WorkerShell.tsx', 'RoomBodies.tsx', 'SiteSummary.tsx', 'OfficeCard.tsx'].map(
+  (f) => path.join(ROOT, 'src', 'components', 'shell', f),
 )
 const JOURNEYS = path.join(ROOT, 'src', 'lib', 'journeys', 'journeys.ts')
 
@@ -78,33 +76,25 @@ test.describe('UX-04 — one create entry', () => {
     expect(src).not.toContain('<AdminNav')
   })
 
-  test('/sops has no duplicate create entry (the Workshop Write a new SOP link is the one entry)', () => {
-    // Repointed 2026-09-30 (Phase 43, D-01): admin/sops/page.tsx is deleted
-    // (the legacy URL is now a next.config.ts redirect, no page to read) —
-    // the merged surface (/sops) is the only remaining place to check.
-    const mergedSrc = read(WORKER_SOPS_PAGE)
+  test('the worker shell has no create entry (the Workshop Write a new SOP link is the one entry)', () => {
+    const shellSrc = WORKER_SHELL.map(read).join('\n')
     const pickerLinks: string[] = [
-      ...(mergedSrc.match(/href="\/admin\/sops\/new"/g) ?? []),
+      ...(shellSrc.match(/href="\/admin\/sops\/new"/g) ?? []),
     ]
     expect(pickerLinks).toHaveLength(0)
     // Phase 57: the header is gone; the one create entry is the Workshop's "Write a new SOP".
     const workshop = read(path.join(ROOT, 'src', 'components', 'shell', 'AdminRoomBodies.tsx'))
     expect(workshop).toContain('room-workshop-new')
-    for (const src of [mergedSrc]) {
-      expect(src).not.toContain('href="/admin/sops/upload"')
-      expect(src).not.toContain('href="/admin/sops/new/ai"')
-      expect(src).not.toContain('href="/admin/sops/new/blank"')
-      expect(src).not.toContain('mode=voice')
-      expect(src).not.toContain('Voice Draft')
-    }
+    expect(shellSrc).not.toContain('href="/admin/sops/upload"')
+    expect(shellSrc).not.toContain('href="/admin/sops/new/ai"')
+    expect(shellSrc).not.toContain('href="/admin/sops/new/blank"')
+    expect(shellSrc).not.toContain('mode=voice')
+    expect(shellSrc).not.toContain('Voice Draft')
   })
 
-  test('no stray intake hrefs anywhere in src outside the picker (worker tab = 30-06)', () => {
+  test('no stray intake hrefs anywhere in src outside the picker', () => {
     const intakeHref = /href="\/admin\/sops\/(upload|new\/(ai|blank))/
-    const allowed = new Set([
-      METHOD_PICKER,
-      WORKER_SOPS_PAGE, // "Create SOP" tab removal lands in 30-06 (shares this file)
-    ])
+    const allowed = new Set([METHOD_PICKER])
     const offenders = walk(path.join(ROOT, 'src'))
       .filter((f) => !allowed.has(f) && intakeHref.test(read(f)))
     expect(offenders).toEqual([])
@@ -115,8 +105,8 @@ test.describe('UX-04 — one create entry', () => {
     expect(src).toContain("route: '/admin/sops/new'")
   })
 
-  test('worker /sops "Create SOP" tab removed', () => {
-    const src = read(WORKER_SOPS_PAGE)
+  test('the worker shell has no "Create SOP" entry', () => {
+    const src = WORKER_SHELL.map(read).join('\n')
     expect(src).not.toContain('/admin/sops/upload')
     expect(src).not.toContain('Create SOP')
   })

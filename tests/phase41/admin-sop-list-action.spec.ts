@@ -1,6 +1,6 @@
 /**
  * Phase 41 Plan 02 — source-contract spec for `listAdminSopRows`
- * (src/actions/admin-sop-list.ts), extracted from admin/sops/page.tsx.
+ * (src/actions/admin-sop-list.ts), extracted from the retired admin SOP page.
  *
  * Pins: guard-before-first-read ordering (positional, not mere presence —
  * CLAUDE.md 2026-07-28), the guard-failure return shape, every preserved

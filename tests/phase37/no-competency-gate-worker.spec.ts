@@ -33,8 +33,9 @@ const ROOT = process.cwd()
 
 const READ_TAB = path.join(ROOT, 'src', 'components', 'sop', 'tabs', 'ReadTab.tsx')
 const WORKER_SOP_DETAIL = path.join(ROOT, 'src', 'app', '(protected)', 'sops', '[sopId]', 'page.tsx')
-const WORKER_SOP_LIBRARY = path.join(ROOT, 'src', 'app', '(protected)', 'sops', 'page.tsx')
-const SOP_LIBRARY_CARD = path.join(ROOT, 'src', 'components', 'sop', 'SopLibraryCard.tsx')
+// 57-08: the worker list page and library card are gone; the worker surfaces are the shell + plant files.
+const SHELL = (f: string) => path.join(ROOT, 'src', 'components', 'shell', f)
+const PLANT = (f: string) => path.join(ROOT, 'src', 'components', 'sop', 'plant', f)
 const PROFILE_COMPETENCY_SECTION = path.join(ROOT, 'src', 'components', 'profile', 'CompetencySection.tsx')
 const CLASSIFY = path.join(ROOT, 'src', 'lib', 'competency', 'classify.ts')
 // Phase 53-02: the worker list derivation moved out of page.tsx into this hook.
@@ -43,8 +44,12 @@ const WORKER_SOPS_HOOK = path.join(ROOT, 'src', 'hooks', 'useWorkerSops.ts')
 const TARGETS: Array<{ label: string; file: string }> = [
   { label: 'ReadTab.tsx (worker SOP read surface)', file: READ_TAB },
   { label: 'worker SOP detail / walkthrough route page.tsx', file: WORKER_SOP_DETAIL },
-  { label: 'worker SOP library page.tsx', file: WORKER_SOP_LIBRARY },
-  { label: 'SopLibraryCard.tsx', file: SOP_LIBRARY_CARD },
+  { label: 'WorkerShell.tsx (worker one screen)', file: SHELL('WorkerShell.tsx') },
+  { label: 'OneScreen.tsx', file: SHELL('OneScreen.tsx') },
+  { label: 'RoomBodies.tsx', file: SHELL('RoomBodies.tsx') },
+  { label: 'SiteSummary.tsx', file: SHELL('SiteSummary.tsx') },
+  { label: 'MachinePanel.tsx (machine body)', file: PLANT('MachinePanel.tsx') },
+  { label: 'NowCard.tsx', file: PLANT('NowCard.tsx') },
   { label: 'profile CompetencySection.tsx (informational only)', file: PROFILE_COMPETENCY_SECTION },
   { label: 'classify.ts (competency ladder -- must stay assessor-unaware)', file: CLASSIFY },
   { label: 'useWorkerSops.ts (worker list derivation)', file: WORKER_SOPS_HOOK },

@@ -46,12 +46,15 @@ test.describe('worker list derives from the server (55-02)', () => {
     expect(src).not.toContain(OFFLINE)
   })
 
-  test('sops page has no sync, no offline labels, and still refreshes assignments', () => {
-    const src = code('src/app/(protected)/sops/page.tsx')
+  test('the worker shell has no sync, no offline labels, and reads the server through useWorkerSops', () => {
+    // Repointed in 57-08: the list page is gone; WorkerShell is where the worker's list is read.
+    const src = code('src/components/shell/WorkerShell.tsx')
     for (const gone of ['useAssignedSops', 'useSopSync', 'lastSyncMeta', "'assigned-sops'", 'Offline copy', 'Not saved for offline yet']) {
       expect(src, gone).not.toContain(gone)
     }
-    expect(src).toContain("invalidateQueries({ queryKey: ['user-sop-assignments'] })")
+    expect(src).toContain("from '@/hooks/useWorkerSops'")
+    expect(src).toMatch(/useWorkerSops\(\)/)
+    expect(src).toContain('<NowCard')
   })
 
   test('worker-signal exports WorkerSopRow and has no cache import', () => {
@@ -215,12 +218,12 @@ test.describe('review fixes (55-review)', () => {
     expect(client).toContain('[sopId]')
   })
 
-  test('WR-04: a failed library read throws and the /sops page renders an error state, not an empty list', () => {
+  test('WR-04: a failed library read throws and the worker shell renders an error state, not an empty list', () => {
     const hook = code('src/hooks/useWorkerSops.ts')
     expect(hook).toContain('if (error) throw new Error(error.message)')
     expect(hook).toContain('libraryError')
-    const page = code('src/app/(protected)/sops/page.tsx')
-    expect(page).toContain('if (libraryError)')
-    expect(page).toContain('sops-load-error')
+    const shell = code('src/components/shell/WorkerShell.tsx')
+    expect(shell).toContain('if (libraryError)')
+    expect(shell).toContain('sops-load-error')
   })
 })
