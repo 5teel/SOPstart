@@ -89,7 +89,11 @@ export function AdminShell({ siteName, userEmail, initialPlace }: ShellProps) {
   const pendingSignOffs = usePendingSignOffCount().data ?? 0
 
   const data = shell && !('error' in shell) ? shell : null
-  const loadError = isError ? 'Could not load the site.' : shell && 'error' in shell ? shell.error : null
+  const loadError = isError
+    ? 'Could not load the site.'
+    : shell && 'error' in shell
+      ? shell.error
+      : (data?.floorError ?? null)
 
   const site: ShellSite = data?.floor ?? EMPTY_SITE
   const rowsById = new Map((data?.governance ?? []).map((g) => [g.id, g]))
@@ -145,7 +149,9 @@ export function AdminShell({ siteName, userEmail, initialPlace }: ShellProps) {
   return (
     <ShellFrame
       site={site}
-      loading={isLoading}
+      // A failed read is not an undrawn site: hold the stage blank instead of
+      // offering "Draw the site" over a site that exists (57 review WR-03).
+      loading={isLoading || loadError !== null}
       initialPlace={initialPlace}
       canEdit
       sopsById={sopsById}

@@ -15,6 +15,8 @@ import type { AdminSiteFloor } from '@/lib/validators/site'
 
 export interface AdminShellData {
   floor: AdminSiteFloor
+  /** Set when the site read failed: the floor above is empty, not "not drawn yet". */
+  floorError: string | null
   governance: GovernanceRow[]
   inboxCount: number
   inboxChips: Record<'all' | InboxChip, number>
@@ -41,11 +43,13 @@ export async function getAdminShell(): Promise<AdminShellData | { error: string 
     return { error: siteErr.message }
   }
 
+  const floorError = 'error' in inbox.floor ? inbox.floor.error : null
   const floor: AdminSiteFloor =
     'error' in inbox.floor ? { layout: null, machines: [], links: [], departments: [] } : inbox.floor
 
   return {
     floor,
+    floorError,
     governance: inbox.governance,
     inboxCount: inbox.items.length,
     inboxChips: inboxCounts(inbox.items),
