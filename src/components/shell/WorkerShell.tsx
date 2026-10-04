@@ -22,7 +22,7 @@ import { SiteSummary } from '@/components/shell/SiteSummary'
 import { MachineBody } from '@/components/sop/plant/MachinePanel'
 import { NowCard } from '@/components/sop/plant/NowCard'
 import { useRole } from '@/components/providers/RoleProvider'
-import { useSupervisorCompletions } from '@/hooks/useCompletions'
+import { usePendingSignOffCount } from '@/hooks/useCompletions'
 import { useWorkerSops } from '@/hooks/useWorkerSops'
 import { zoneColour } from '@/lib/site/scene'
 import type { Place } from '@/lib/shell/place'
@@ -56,8 +56,7 @@ export function WorkerShell({ siteName, userEmail, initialPlace }: ShellProps) {
   const site: ShellSite = siteResult && !('error' in siteResult) ? siteResult : EMPTY_SITE
 
   const { workerSops, libraryLoading, assignmentsLoading, libraryError, refetchLibrary } = useWorkerSops()
-  const pendingQuery = useSupervisorCompletions({ type: 'all' }, isSupervisor)
-  const pending = (pendingQuery.data ?? []).filter((c) => c.status === 'pending_sign_off').length
+  const pending = usePendingSignOffCount(isSupervisor).data ?? 0
 
   const sopsById = new Map(workerSops.map((s) => [s.id, s]))
   const machinePins = derivePlantPins(site.machines, site.links, sopsById)

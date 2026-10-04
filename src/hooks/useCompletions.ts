@@ -218,6 +218,33 @@ export function useSupervisorCompletions(filter: FilterState, enabled = true) {
 }
 
 // ---------------------------------------------------------------
+// usePendingSignOffCount
+//
+// Server-side count of every completion the caller can see that is still
+// waiting for sign-off. The Office pin, card and summary all read this one
+// number; counting from a row-limited list under-counts past the limit
+// (57 review WR-02). RLS scopes it to the supervisor's workers / the org.
+// ---------------------------------------------------------------
+export function usePendingSignOffCount(enabled = true) {
+  return useQuery<number>({
+    enabled,
+    queryKey: ['completions', 'pending-count'],
+    queryFn: async () => {
+      const { count, error } = await createClient()
+        .from('sop_completions')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'pending_sign_off')
+      if (error) {
+        console.error('usePendingSignOffCount error:', error)
+        return 0
+      }
+      return count ?? 0
+    },
+    refetchOnWindowFocus: true,
+  })
+}
+
+// ---------------------------------------------------------------
 // useCompletionDetail
 //
 // Fetches a single completion with full step, photo, and sign-off data.

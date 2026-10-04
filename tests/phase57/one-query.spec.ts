@@ -82,9 +82,15 @@ test.describe('SHL-05 supervisor parity', () => {
     expect((WORKER.match(/const pending =/g) ?? []).length).toBe(1)
   })
 
-  test('the sign-off count is fetched only for a supervisor and counts pending_sign_off', () => {
-    expect(WORKER).toContain("useSupervisorCompletions({ type: 'all' }, isSupervisor)")
-    expect(WORKER).toContain("c.status === 'pending_sign_off'")
+  test('the sign-off count is fetched only for a supervisor and is a server-side count of pending_sign_off', () => {
+    expect(WORKER).toContain('usePendingSignOffCount(isSupervisor)')
+    // WR-02: a count query, never a filter over a row-limited list
+    expect(WORKER).not.toContain("c.status === 'pending_sign_off'")
+    const hook = strip(read('src', 'hooks', 'useCompletions.ts'))
+    const body = hook.slice(hook.indexOf('export function usePendingSignOffCount'))
+    expect(body).toContain("{ count: 'exact', head: true }")
+    expect(body).toContain(".eq('status', 'pending_sign_off')")
+    expect(body).not.toContain('.limit(')
   })
 
   test('the Office body shows the same number it is handed', () => {
@@ -142,7 +148,7 @@ test.describe('SHL-05 admin parity', () => {
   test('there is one admin read, one sign-off read, and sign-offs stay out of the inbox number', () => {
     expect((ADMIN.match(/\['shell-admin'\]/g) ?? []).length).toBe(1)
     expect((ADMIN.match(/queryFn: \(\) => getAdminShell\(\)/g) ?? []).length).toBe(1)
-    expect(ADMIN).toContain("c.status === 'pending_sign_off'")
+    expect(ADMIN).toContain('const pendingSignOffs = usePendingSignOffCount().data ?? 0')
     expect(ADMIN).toContain('pendingSignOffs={pendingSignOffs}')
     expect(ADMIN).not.toMatch(/inboxCount\s*[+]/)
   })

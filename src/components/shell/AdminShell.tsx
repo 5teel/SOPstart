@@ -21,7 +21,7 @@ import { OfficeCard } from '@/components/shell/OfficeCard'
 import { ShellFrame, type ShellSite } from '@/components/shell/ShellFrame'
 import { SmokoBody } from '@/components/shell/RoomBodies'
 import { SiteSummary } from '@/components/shell/SiteSummary'
-import { useSupervisorCompletions } from '@/hooks/useCompletions'
+import { usePendingSignOffCount } from '@/hooks/useCompletions'
 import type { ShellProps } from '@/components/shell/WorkerShell'
 import { healthPinCount, machineHealth, machinePanelSops, noticeboardSops } from '@/lib/sop/admin-health'
 import type { Place } from '@/lib/shell/place'
@@ -86,8 +86,7 @@ function SiteEditSurface({ exit }: { exit(): void }) {
 
 export function AdminShell({ siteName, userEmail, initialPlace }: ShellProps) {
   const { data: shell, isLoading, isError } = useQuery({ queryKey: SHELL_KEY, queryFn: () => getAdminShell() })
-  const signOffs = useSupervisorCompletions({ type: 'all' })
-  const pendingSignOffs = (signOffs.data ?? []).filter((c) => c.status === 'pending_sign_off').length
+  const pendingSignOffs = usePendingSignOffCount().data ?? 0
 
   const data = shell && !('error' in shell) ? shell : null
   const loadError = isError ? 'Could not load the site.' : shell && 'error' in shell ? shell.error : null
