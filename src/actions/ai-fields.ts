@@ -228,7 +228,7 @@ export async function acceptProposal(
     revalidatePath(`/admin/sops/${sopId}`)
     revalidatePath(`/admin/sops/builder/${sopId}`)
   }
-  revalidatePath('/sops')
+  revalidatePath('/')
 
   return { success: true }
 }
@@ -284,7 +284,7 @@ export async function rejectProposal(
   })
 
   // ── 4. Revalidate ─────────────────────────────────────────────────────────
-  revalidatePath('/sops')
+  revalidatePath('/')
 
   return { success: true }
 }

@@ -533,7 +533,7 @@ export function UploadDropzone() {
                 ) : (
                   <button
                     type="button"
-                    onClick={() => router.push('/sops?status=draft')}
+                    onClick={() => router.push('/?place=workshop')}
                     className="flex-1 min-h-tap px-4 bg-[var(--ink-900)] text-white font-semibold rounded-lg hover:bg-[var(--ink-700)] active:bg-[var(--ink-700)] transition-colors"
                   >
                     Review drafts

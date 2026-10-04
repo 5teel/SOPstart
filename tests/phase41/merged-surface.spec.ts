@@ -206,9 +206,8 @@ test.describe('legacy /admin/sops deep links — next.config.ts redirect + middl
     expect(config).toContain("source: '/admin/sops',")
     expect(config).toContain("destination: '/sops',")
     const middleware = stripComments(read(MIDDLEWARE))
-    expect(middleware).toContain(
-      "path === '/sops' && request.nextUrl.searchParams.get('view') === 'attention'",
-    )
-    expect(middleware).toContain("new URL('/governance', request.url)")
+    expect(middleware).toContain("path === '/sops'")
+    expect(middleware).toContain("view === 'attention'")
+    expect(middleware).toContain("destination = '/governance'")
   })
 })

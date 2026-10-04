@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { roleHome } from '@/lib/auth/role-home'
 import { safeNextPath } from '@/lib/auth/next-redirect'
 
+const SOP_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request })
   const supabase = createServerClient(
@@ -57,13 +59,25 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
-  // Legacy `/sops?view=attention` is /governance now (Phase 54). Server-side
-  // on purpose: a client router.replace fired on mount raced the page's own
-  // mount-time server actions, and Next 16.2.1's action queue orphans a server
-  // action dispatched while a navigation has discarded another — the router
-  // then waits on it forever (fixed upstream in 16.3). CLAUDE.md 2026-09-29.
-  if (path === '/sops' && request.nextUrl.searchParams.get('view') === 'attention') {
-    const redirect = NextResponse.redirect(new URL('/governance', request.url))
+  // The worker list page is gone (Phase 57): the one screen at / is the only
+  // list of places. Every legacy list address redirects to a fixed
+  // destination (the attention view to /governance, the access view to the
+  // Access page, anything else to the one screen). Server-side on purpose: a
+  // client router.replace fired on mount raced the page's own mount-time
+  // server actions, and Next 16.2.1's action queue orphans a server action
+  // dispatched while a navigation has discarded another — the router then
+  // waits on it forever (fixed upstream in 16.3). CLAUDE.md 2026-09-29.
+  // The sop value is appended only when it is a UUID; nothing else from the
+  // query reaches the destination, so the redirect cannot be steered offsite.
+  if (path === '/sops' || (path === '/governance' && request.nextUrl.searchParams.get('view') === 'library')) {
+    const view = request.nextUrl.searchParams.get('view')
+    const sop = request.nextUrl.searchParams.get('sop')
+    let destination = '/'
+    if (path === '/sops' && view === 'attention') destination = '/governance'
+    else if (path === '/sops' && view === 'access') {
+      destination = sop && SOP_ID.test(sop) ? `/admin/access?sop=${sop}` : '/admin/access'
+    }
+    const redirect = NextResponse.redirect(new URL(destination, request.url))
     response.cookies.getAll().forEach((c) => redirect.cookies.set(c))
     return redirect
   }

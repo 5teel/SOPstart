@@ -144,7 +144,7 @@ function ToolsMenu({
               <>
                 <div className="my-1 h-px bg-[var(--ink-100)]" />
                 <div role="menuitem">
-                  <DeleteSopButton sopId={sopId} redirectTo="/sops" showLabel />
+                  <DeleteSopButton sopId={sopId} redirectTo="/?place=workshop" showLabel />
                 </div>
               </>
             )}
@@ -389,14 +389,14 @@ export function BuilderStageShell({
         >
           {/* Back zone */}
           <Link
-            href="/sops"
+            href="/"
             data-testid="wayfinder-back"
             className="flex flex-shrink-0 items-center gap-2 px-4.5 border-r border-[var(--ink-100)] text-[var(--ink-500)] hover:text-[var(--ink-900)] no-underline transition-colors"
           >
             <span className="text-reading" aria-hidden="true">←</span>
             <span className="flex flex-col leading-tight">
               <span className="text-micro uppercase tracking-wider text-[var(--ink-300)]">Back to</span>
-              <span className="text-xs">SOP list</span>
+              <span className="text-xs">The site</span>
             </span>
           </Link>
 

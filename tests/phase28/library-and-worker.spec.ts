@@ -144,8 +144,9 @@ test.describe('admin scope counts — counts from listGovernanceQueue + deep lin
     expect(tableSrc).not.toContain("router.replace('/governance')")
     expect(read(path.join(ROOT, 'src', 'app', '(protected)', 'sops', 'page.tsx'))).not.toContain("'/governance'")
     const proxySrc = read(path.join(ROOT, 'src', 'lib', 'supabase', 'middleware.ts'))
-    expect(proxySrc).toContain("path === '/sops' && request.nextUrl.searchParams.get('view') === 'attention'")
-    expect(proxySrc).toContain("NextResponse.redirect(new URL('/governance', request.url))")
+    expect(proxySrc).toContain("path === '/sops'")
+    expect(proxySrc).toContain("view === 'attention'")
+    expect(proxySrc).toContain("destination = '/governance'")
   })
 
   test('the governance inbox groups by chip; every flag from classify.ts is still represented', () => {

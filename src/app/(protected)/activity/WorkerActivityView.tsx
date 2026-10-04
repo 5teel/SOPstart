@@ -32,10 +32,10 @@ export function WorkerActivityView() {
             </p>
           </div>
           <Link
-            href="/sops"
+            href="/"
             className="mt-2 px-6 h-12 flex items-center rounded-lg bg-[var(--ink-900)] text-[var(--paper)] font-semibold text-sm hover:opacity-80 transition-opacity"
           >
-            Browse SOPs
+            Back to the site
           </Link>
         </div>
       ) : (

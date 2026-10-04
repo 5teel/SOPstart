@@ -67,6 +67,38 @@ test.describe('retire sweep', () => {
     expect(placeForPath('/admin/access')).toBe('/?place=office')
   })
 
-  test.fixme('list page and plant home are gone; proxy redirects the list and attention views [57-08]', () => {})
+  test('retire list: the proxy redirects every list address to a fixed destination, server-side', () => {
+    const proxy = stripComments(read('src/lib/supabase/middleware.ts'))
+    expect(proxy).toContain("path === '/sops'")
+    expect(proxy).toContain("view === 'attention'")
+    expect(proxy).toContain("destination = '/governance'")
+    expect(proxy).toContain(": '/admin/access'")
+    expect(proxy).toMatch(/let destination = '\/'/)
+    expect(proxy).toMatch(/sop && SOP_ID\.test\(sop\)/)
+    expect(proxy).toContain('/admin/access?sop=${sop}')
+    // /governance?view=library is the retired library scope: it goes home (D-17).
+    expect(proxy).toMatch(/path === '\/governance' && request\.nextUrl\.searchParams\.get\('view'\) === 'library'/)
+    // refreshed session cookies survive the hop; the redirect is built from a fixed string
+    expect(proxy).toContain('response.cookies.getAll().forEach((c) => redirect.cookies.set(c))')
+    expect(proxy).toContain('NextResponse.redirect(new URL(destination, request.url))')
+    // no client-side copy of the redirect may come back (CLAUDE.md 2026-09-29)
+    const clientCopies = walkSrc(path.join(ROOT, 'src'))
+      .filter((f) => /router\.(replace|push)\(\s*['"`]\/governance['"`]\s*\)/.test(stripComments(fs.readFileSync(f, 'utf-8'))))
+      .map((f) => path.relative(ROOT, f))
+    expect(clientCopies, clientCopies.join(', ')).toEqual([])
+  })
+
+  test('retire list: legacy admin bookmarks still reach the proxy block; every redirect destination is a fixed path', () => {
+    const config = read('next.config.ts')
+    expect(config).toMatch(/source: '\/admin\/sops',\s*destination: '\/sops'/)
+    const destinations = [...config.matchAll(/destination:\s*'([^']*)'/g)].map((m) => m[1])
+    for (const d of destinations) {
+      expect(d.startsWith('/'), d).toBe(true)
+      expect(d.startsWith('//'), d).toBe(false)
+      expect(d, d).not.toMatch(/http|\$\{/)
+    }
+  })
+
+  test.fixme('list page and plant home are gone [57-08 task 3]', () => {})
   test.fixme('library table and its helpers are gone; dropped-features entries are live [57-09]', () => {})
 })

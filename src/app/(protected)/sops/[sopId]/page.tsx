@@ -75,10 +75,10 @@ function SopDetailInner() {
           This SOP may have been deleted or you may not have access to it.
         </p>
         <Link
-          href="/sops"
+          href="/"
           className="mt-2 inline-flex items-center gap-2 px-4 h-tap border border-[var(--ink-300)] rounded-lg text-sm font-medium text-[var(--ink-700)] hover:border-[var(--ink-900)] transition-colors"
         >
-          ← SOPs
+          ← Back to the site
         </Link>
       </div>
     )
@@ -94,8 +94,8 @@ function SopDetailInner() {
       <header className="sticky top-0 z-10 bg-[var(--paper)]/95 backdrop-blur border-b border-[var(--ink-100)]">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <Link href="/sops" className="text-sm text-[var(--ink-500)] hover:text-[var(--ink-900)] flex-shrink-0">
-              ← SOPs
+            <Link href="/" className="text-sm text-[var(--ink-500)] hover:text-[var(--ink-900)] flex-shrink-0">
+              ← Back to the site
             </Link>
             <div className="min-w-0">
               <p className="text-base font-semibold truncate">{sop.title ?? 'Untitled SOP'}</p>
