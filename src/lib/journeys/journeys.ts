@@ -543,6 +543,21 @@ export const JOURNEYS: Journey[] = [
 
   // ================================ Everyone ================================
   {
+    id: 'one-screen',
+    group: 'Everyone',
+    persona: 'Everyone',
+    title: 'The one screen',
+    summary: 'Signed-in members open / and get the list, the isometric site and a detail pane in one screen.',
+    steps: [
+      { id: 's', type: 'start', label: 'Opens the site' },
+      { id: 'screen', type: 'screen', label: 'The one screen - list, site, detail', route: '/', detail: 'Rooms are always signposted on the site. Selecting a machine or the Noticeboard lists its SOPs with Walk. Searching lights the matching shapes. Esc returns to the overview. Every place has an address, /?place=... A visitor who is not signed in sees the landing with Log In instead; a member with no role goes to the holding screen.' },
+      { id: 'walk', type: 'action', label: 'Walk a SOP', detail: 'Walk beside a SOP row, or Walk it on the Now card.' },
+      { id: 'sop', type: 'screen', label: 'Procedure', route: '/sops/[sopId]' },
+      { id: 'smoko', type: 'screen', label: 'Smoko room - my record', route: '/activity', detail: 'The Smoko room and the Office both bridge to Activity.' },
+      { id: 'e', type: 'end', label: 'Back on the site' },
+    ],
+  },
+  {
     id: 'give-feedback',
     group: 'Everyone',
     persona: 'Everyone',

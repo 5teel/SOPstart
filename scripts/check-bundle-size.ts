@@ -7,6 +7,13 @@
  *
  * Runs after `next build` (wired via `postbuild` script in package.json).
  *
+ * Phase 57 / Plan 57-04 — a third route, `/page` (the one screen at `/`).
+ * It is recorded in the baseline by hand, once, as a decision artefact, AFTER
+ * the lazy admin seam exists (so the admin plan changes only the lazy chunk,
+ * never the baseline). It forbids the admin site editor, konva, pdfjs and
+ * mammoth. A missing baseline still fails the build, but the measured size is
+ * printed first so it can be recorded by hand.
+ *
  * Enforced contracts, per entry in GATED_ROUTES:
  *
  *   1. **Delta gate.** First Load JS for the route must stay within
@@ -107,6 +114,21 @@ const GATED_ROUTES: GatedRoute[] = [
       { label: 'plant home (52 D-01)', markers: ['No procedures for this machine yet.'] },
     ],
   },
+  {
+    // Phase 57: the one screen. The Next.js app-router key for src/app/page.tsx.
+    route: '/page',
+    rscManifestPath: path.join(NEXT_DIR, 'server', 'app', 'page_client-reference-manifest.js'),
+    pageBundlePath: path.join(NEXT_DIR, 'server', 'app', 'page.js'),
+    forbiddenMarkers: [
+      { label: 'pdfjs-dist (D-21-09)', markers: ['pdfjs-dist', 'PDFWorker', 'getDocument'] },
+      { label: 'mammoth (D-21-09)', markers: ['mammoth', 'convertToHtml'] },
+      { label: 'konva (57 D-03)', markers: ['react-konva', 'konva'] },
+      {
+        label: 'site editor (SiteWorkspace.tsx -- admin module must stay lazy)',
+        markers: ['Draw machine'],
+      },
+    ],
+  },
 ]
 
 function fail(msg: string): never {
@@ -203,7 +225,10 @@ for (const entry of GATED_ROUTES) {
   const currentKB = Math.round(totalBytes / 1024)
   const baselineKB = baseline.routes[entry.route]
   if (typeof baselineKB !== 'number' || baselineKB <= 0) {
-    fail(`baseline missing or invalid for route ${entry.route}.`)
+    console.error(`check-bundle-size: measured ${entry.route} = ${currentKB} KB (no baseline recorded yet).`)
+    fail(
+      `baseline missing or invalid for route ${entry.route}. Record the measured value by hand in .bundle-baseline.json (routes + history) as a decision artefact; never re-capture it.`
+    )
   }
   const deltaKB = currentKB - baselineKB
   const sign = deltaKB > 0 ? '+' : ''

@@ -21,7 +21,7 @@ function read(relPath: string): string {
   return fs.readFileSync(path.join(ROOT, relPath), 'utf-8').replace(/\r\n/g, '\n')
 }
 
-test.describe('SB-LINE-06 — two-route bundle gate', () => {
+test.describe('SB-LINE-06 — bundle gate (two worker routes, plus / from Phase 57)', () => {
   test('check-bundle-size.ts is route-array shaped and gates /sops/page', () => {
     const src = read('scripts/check-bundle-size.ts')
     expect(src).toContain('GATED_ROUTES')
@@ -37,15 +37,26 @@ test.describe('SB-LINE-06 — two-route bundle gate', () => {
     expect(src).toContain('priorRoutes')
   })
 
-  test('.bundle-baseline.json carries both route keys with positive values', () => {
+  test('.bundle-baseline.json carries every gated route key with positive values', () => {
     const baseline = JSON.parse(read('.bundle-baseline.json')) as {
       routes: Record<string, number>
     }
     expect(Object.keys(baseline.routes).sort()).toEqual(
-      ['/sops/[sopId]/page', '/sops/page'].sort()
+      ['/page', '/sops/[sopId]/page', '/sops/page'].sort()
     )
+    expect(baseline.routes['/page']).toBeGreaterThan(0)
     expect(baseline.routes['/sops/[sopId]/page']).toBeGreaterThan(0)
     expect(baseline.routes['/sops/page']).toBeGreaterThan(0)
+  })
+
+  test('/page entry (the one screen) keeps the site editor and heavy engines out', () => {
+    const src = read('scripts/check-bundle-size.ts')
+    expect(src).toContain("route: '/page'")
+    expect(src).toContain("'Draw machine'")
+    expect(src).toContain("'react-konva'")
+    expect(src).toContain("'pdfjs-dist'")
+    expect(src).toContain("'mammoth'")
+    expect(src).toContain('page_client-reference-manifest.js')
   })
 
   test('/sops/page entry declares at least one forbidden marker per admin surface', () => {

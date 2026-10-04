@@ -1,6 +1,6 @@
 {
   "capturedAt": "2026-10-03T12:00:00.000Z",
-  "note": "Phase 55 D-07: moved DOWN by hand to the measured post-cut First Load JS (/sops/[sopId]/page 1048 -> 817 KB, /sops/page 940 -> 817 KB); never re-captured. Raising a value needs a signed-off decision recorded in ROADMAP.",
+  "note": "Phase 55 D-07: moved DOWN by hand to the measured post-cut First Load JS (/sops/[sopId]/page 1048 -> 817 KB, /sops/page 940 -> 817 KB); never re-captured. Raising a value needs a signed-off decision recorded in ROADMAP. Phase 57-04 added /page (the one screen), recorded by hand once.",
   "previousBaseline": {
     "/sops/[sopId]/page": {
       "value": 1059,
@@ -20,10 +20,17 @@
       "value": 940,
       "capturedAt": "2026-09-12T23:49:45.614Z",
       "note": "pre-Phase 55 (measured 936 KB on the unchanged tree)"
+    },
+    {
+      "route": "/page",
+      "value": 805,
+      "capturedAt": "2026-10-05T00:00:00.000Z",
+      "note": "Phase 57-04: first measurement of the one screen (worker path with the next/dynamic AdminShell seam already in place; 57-05 fills only the lazy chunk). Recorded by hand once as a decision artefact; never re-captured."
     }
   ],
   "routes": {
     "/sops/[sopId]/page": 817,
-    "/sops/page": 817
+    "/sops/page": 817,
+    "/page": 805
   }
 }

@@ -154,5 +154,25 @@ test.describe('SHL-01 one screen structure', () => {
     expect(src).toContain('<RoleProvider role={role}>')
   })
   test.fixme('the protected layout has no header; bridge pages carry the Back bar [57-06]', () => {})
-  test.fixme('pathways map shows no unmapped screen for the new routes [57-04]', () => {})
+  test('pathways map covers every page route, including /', () => {
+    // routes.ts imports server-only (Playwright cannot load it), so the walk is replicated here.
+    const found = new Set<string>()
+    if (fs.existsSync(path.join(ROOT, 'src/app/page.tsx'))) found.add('/')
+    const walkRoutes = (dir: string, segs: string[]) => {
+      for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+        if (!e.isDirectory()) continue
+        if (e.name === 'api' || e.name.startsWith('@') || e.name.startsWith('_')) continue
+        const isGroup = e.name.startsWith('(') && e.name.endsWith(')')
+        const next = isGroup ? segs : [...segs, e.name]
+        const full = path.join(dir, e.name)
+        if (fs.existsSync(path.join(full, 'page.tsx'))) found.add('/' + next.join('/'))
+        walkRoutes(full, next)
+      }
+    }
+    walkRoutes(path.join(ROOT, 'src/app'), [])
+    const journeys = read('src/lib/journeys/journeys.ts').replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')
+    const mapped = new Set([...journeys.matchAll(/route: '([^']+)'/g)].map((m) => m[1].split('?')[0]))
+    expect(found.has('/')).toBe(true)
+    expect([...found].filter((r) => !mapped.has(r)).sort()).toEqual([])
+  })
 })
