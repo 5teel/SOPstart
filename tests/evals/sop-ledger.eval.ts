@@ -193,7 +193,12 @@ test.describe.serial('Phase 56 -- simpler SOP + decision ledger (deployed)', () 
 
     const admin = await adminCtx.newPage()
     await admin.goto(`/admin/sops/builder/${sopIds.convert}`)
-    await expect(admin.getByText('Hydraulic pressure').first()).toBeVisible({ timeout: 40_000 })
+    // The canvas shows one section at a time: Hazards first, so open Procedure from the rail.
+    const procedure = admin.getByText('Procedure', { exact: true }).first()
+    await expect(procedure).toBeVisible({ timeout: 40_000 })
+    await shot(admin, 'ledger-b-builder-hazards')
+    await procedure.click()
+    await expect(admin.getByText('Hydraulic pressure').first()).toBeVisible(SLOW)
     await expect(admin.getByText('Stored energy in the hydraulic line.').first()).toBeVisible(SLOW)
     await shot(admin, 'ledger-b-builder')
     await admin.close()
