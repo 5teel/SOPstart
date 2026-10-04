@@ -307,6 +307,8 @@ export function ShellFrame({
               if (room) select({ kind: 'room', id: room })
             }}
           />
+        ) : loading ? (
+          <div data-testid="shell-stage-loading" className="h-full" />
         ) : (
           <div data-testid="shell-no-site" className="grid h-full place-items-center p-6 text-center">
             <div className="flex flex-col items-center gap-3">
