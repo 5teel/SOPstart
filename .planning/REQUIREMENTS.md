@@ -979,21 +979,21 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 
 ### One Screen (SHL) — Phases 57, 59, 60, 62
 
-- [ ] **SHL-01**: After signing in, every user lands on one screen made of three panes — a list on the left, the isometric site in the middle, a detail panel on the right — and there is no header navigation anywhere in the app
-- [ ] **SHL-02**: A user can select any room or machine either by clicking its shape on the site or by clicking its row in the list; both highlight the shape, move the camera to it and fill the detail panel identically
+- [x] **SHL-01**: After signing in, every user lands on one screen made of three panes — a list on the left, the isometric site in the middle, a detail panel on the right — and there is no header navigation anywhere in the app
+- [x] **SHL-02**: A user can select any room or machine either by clicking its shape on the site or by clicking its row in the list; both highlight the shape, move the camera to it and fill the detail panel identically
 - [ ] **SHL-03**: With nothing selected, the detail panel shows the site overview: objectives, the user's notifications and open requests
-- [ ] **SHL-04**: A user can type in the list's search box and see matching rooms and machines filtered in the list and highlighted on the site; the search matches machine names and the titles of the SOPs on them
-- [ ] **SHL-05**: The list shows one "next for you" card: for a worker, the single next SOP due with Walk it and Show me; for an admin or supervisor, how many things are waiting in the Office with a button that opens it
+- [x] **SHL-04**: A user can type in the list's search box and see matching rooms and machines filtered in the list and highlighted on the site; the search matches machine names and the titles of the SOPs on them
+- [x] **SHL-05**: The list shows one "next for you" card: for a worker, the single next SOP due with Walk it and Show me; for an admin or supervisor, how many things are waiting in the Office with a button that opens it
 - [ ] **SHL-06**: When the detail panel shows a table (decision ledger, people and roles, access, training matrix) it widens, and the site stays visible and re-centres on the selected place
 - [ ] **SHL-07**: Every place and every tab inside a room has its own address, so a link or a browser refresh returns to the same place, and every address from the old app (SOP list, governance, activity, profile, team, site, settings, content, builder, upload) redirects to the matching place on the one screen
 
 ### Places on the Site (PLC) — Phase 57
 
-- [ ] **PLC-01**: The site always shows four fixed rooms — Office, Smoko room, Workshop, Noticeboard — signposted by name at every zoom level, alongside the machines; an admin can position each room's shape in the site editor
-- [ ] **PLC-02**: Selecting a machine shows its SOPs with a status badge each; a worker can walk any published one, and an admin can walk it, edit it, or start a new SOP for that machine
-- [ ] **PLC-03**: Selecting the Noticeboard shows the SOPs that belong to the whole site rather than to a machine, with the same badges and actions as a machine
-- [ ] **PLC-04**: Machines and rooms carry pins: a worker sees how many SOPs are due for them at each place; an admin sees where a SOP has no owner or an overdue review, and a count on the Office and Workshop of what is waiting there
-- [ ] **PLC-05**: An admin can switch the site into edit mode from the map and add, rename, reshape or remove machines and departments there; departments exist only as zones on the drawing and there is no separate departments screen
+- [x] **PLC-01**: The site always shows four fixed rooms — Office, Smoko room, Workshop, Noticeboard — signposted by name at every zoom level, alongside the machines; an admin can position each room's shape in the site editor
+- [x] **PLC-02**: Selecting a machine shows its SOPs with a status badge each; a worker can walk any published one, and an admin can walk it, edit it, or start a new SOP for that machine
+- [x] **PLC-03**: Selecting the Noticeboard shows the SOPs that belong to the whole site rather than to a machine, with the same badges and actions as a machine
+- [x] **PLC-04**: Machines and rooms carry pins: a worker sees how many SOPs are due for them at each place; an admin sees where a SOP has no owner or an overdue review, and a count on the Office and Workshop of what is waiting there
+- [x] **PLC-05**: An admin can switch the site into edit mode from the map and add, rename, reshape or remove machines and departments there; departments exist only as zones on the drawing and there is no separate departments screen
 
 ### Focus on the SOP (FOC) — Phase 58
 
