@@ -1853,7 +1853,40 @@ Plans:
   4. A worker sees how many SOPs are due at each place and a "next for you" card with Walk it and Show me; an admin sees where a SOP has no owner or an overdue review, a count on the Office and the Workshop, and a card saying how many things wait in the Office with a button that opens it; typing in the search box filters the list and lights the matching shapes (machine names and the titles of the SOPs on them)
   5. An admin can switch the site into edit mode from the map to add, rename, reshape or remove machines and departments and to drag each room's shape to a new place; there is no departments screen
 
-**Plans**: TBD
+**Plans:** 9 plans
+Plans:
+**Wave 1**
+
+- [ ] 57-01-PLAN.md — Wave 0: phase57 project, repoint inventory of every stale guard/eval, requirement spec stubs, one-screen eval skeleton + supervisor fixture, rooms.ts + place.ts pure modules
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 57-02-PLAN.md — PlantStage room layer (signposts, flyInset, focus replay) + ShellFrame (three panes, one select(), search, Esc) + AccountControl
+- [ ] 57-03-PLAN.md — loadInbox() shared by /governance and the Office, getAdminShell(), departments by name with refusal-checked remove, DepartmentsStrip
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 57-04-PLAN.md — Worker + supervisor shell: bodies, rooms, Now/Office card, site summary, session-branching / page, /page bundle gate, pathways
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 57-05-PLAN.md — Admin shell (one lazy module): health pins, Office/Workshop/Noticeboard bodies, new SOP for this machine, edit mode with departments; floor card off /governance
+
+**Wave 5** *(blocked on Wave 4 completion)*
+
+- [ ] 57-06-PLAN.md — No header anywhere: Back to the site bar, roleHome → /, /dashboard retired, /pending sign-out, dropped list
+
+**Wave 6** *(blocked on Wave 5 completion)*
+
+- [ ] 57-07-PLAN.md — Access bridge /admin/access; departments screen and site page deleted → /?place=edit
+
+**Wave 7** *(blocked on Wave 6 completion)*
+
+- [ ] 57-08-PLAN.md — List page, plant home and library table deleted; /sops redirects in the proxy; links, bundle gate and ~25 guards repointed
+
+**Wave 8** *(blocked on Wave 7 completion)*
+
+- [ ] 57-09-PLAN.md — Deployed eval for all five success criteria (three roles), full suite once, screenshots read, rooms tuned, validation signed off
 **UI hint**: yes
 
 ### Phase 58: The SOP Focus Screen — Walk & Edit
