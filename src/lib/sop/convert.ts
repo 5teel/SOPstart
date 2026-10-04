@@ -325,13 +325,15 @@ export function convertSop(input: { sopId: string; sections: Section[]; sopImage
   const sections = [...input.sections].sort((a, b) => a.sort_order - b.sort_order)
   for (const section of sections) {
     const layout = (section.layout_data as { content?: unknown } | null)?.content
-    const slots = Array.isArray(layout) ? fromLayout(section, layout, before) : fromRows(section, before)
+    // An emptied canvas (`content: []`) must not shadow the step rows the worker page still renders.
+    const useLayout = Array.isArray(layout) && layout.length > 0
+    const slots = useLayout ? fromLayout(section, layout, before) : fromRows(section, before)
     applyToolsAndTime(slots, sortedRows(section))
     slots.forEach((s, i) => {
       s.d.sortOrder = i
       steps.push(s.d)
     })
-    if (slots.length && Array.isArray(layout)) layoutSections++
+    if (slots.length && useLayout) layoutSections++
     else if (slots.length) rowSections++
   }
 

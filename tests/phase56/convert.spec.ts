@@ -198,6 +198,20 @@ test.describe('kinds', () => {
     expect(c.gate.ok).toBe(true)
   })
 
+  test('an empty layout content array falls back to the rows, so a row-level warning is kept', () => {
+    const c = convertSop({
+      sopId: 'x', sopImagePaths: [],
+      sections: [section({ layout: [], rows: [{ id: 'row1', text: 'Do it', warning: 'Hot' }] })],
+    })
+    expect(c.steps.map((s) => [s.kind, s.sourceKey])).toEqual([
+      ['hazard', 'row:row1:warning'],
+      ['step', 'row:row1'],
+    ])
+    expect(c.before.hazardSources).toBe(1)
+    expect(c.source).toBe('rows')
+    expect(c.gate.ok).toBe(true)
+  })
+
   test('step-less hazard / PPE content rows become hazard lines / one ppe step', () => {
     const c = convertSop({
       sopId: 'x', sopImagePaths: [],
