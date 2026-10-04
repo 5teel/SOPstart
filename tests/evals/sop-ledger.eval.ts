@@ -106,7 +106,7 @@ test.describe.serial('Phase 56 -- simpler SOP + decision ledger (deployed)', () 
   }
 
   test('A -- every SOP has an ok conversion run; convert fixture counts match the known answer; library-linked SOPs converted', async () => {
-    const { data: sops, error: sopsErr } = await db.from('sops').select('id, title').limit(5000)
+    const { data: sops, error: sopsErr } = await db.from('sops').select('id, title, created_at').limit(5000)
     expect(sopsErr).toBeNull()
     const { data: runs, error: runsErr } = await db
       .from('sop_conversion_runs')
@@ -117,9 +117,13 @@ test.describe.serial('Phase 56 -- simpler SOP + decision ledger (deployed)', () 
     const latest = new Map<string, { ok: boolean; before: Record<string, number>; after: Record<string, number> }>()
     for (const r of runs ?? []) if (!latest.has(r.sop_id as string)) latest.set(r.sop_id as string, r as never)
 
-    const bad = (sops ?? []).filter((s) => !NEEDS_SIMON_TITLES.includes(s.title as string) && !latest.get(s.id as string)?.ok)
+    // The converter runs on demand until Phase 58: a SOP created after the last run (a live probe
+    // spec's throwaway org, a real upload) is not yet converted and is out of scope here.
+    const lastRunAt = (runs ?? [])[0]?.created_at as string
+    const inScope = (sops ?? []).filter((s) => (s.created_at as string) <= lastRunAt)
+    const bad = inScope.filter((s) => !NEEDS_SIMON_TITLES.includes(s.title as string) && !latest.get(s.id as string)?.ok)
     expect(bad.map((s) => s.title), 'SOPs without an ok conversion run').toEqual([])
-    console.log(`A: ${sops?.length} SOPs, all with an ok latest run`)
+    console.log(`A: ${inScope.length} of ${sops?.length} SOPs predate the last run; all have an ok latest run`)
 
     const { data: steps, error: stepsErr } = await db
       .from('sop_focus_steps')
@@ -158,7 +162,8 @@ test.describe.serial('Phase 56 -- simpler SOP + decision ledger (deployed)', () 
     for (const j of (junctions ?? []) as unknown as { blocks: { category: string | null } | null; sop_sections: { sop_id: string } | null }[]) {
       if (j.blocks?.category !== 'parsed_inline' && j.sop_sections) linkedSops.add(j.sop_sections.sop_id)
     }
-    const unconverted = [...linkedSops].filter((id) => !latest.get(id)?.ok)
+    const inScopeIds = new Set(inScope.map((s) => s.id as string))
+    const unconverted = [...linkedSops].filter((id) => inScopeIds.has(id) && !latest.get(id)?.ok)
     expect(unconverted).toEqual([])
     console.log(`A: ${linkedSops.size} library-linked SOPs, all converted`)
   })
