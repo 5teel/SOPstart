@@ -262,7 +262,9 @@ export async function updateDepartment(
 
 export async function archiveDepartment(
   departmentId: string
-): Promise<{ success: true } | { error: string; machines?: number; sops?: number }> {
+): Promise<
+  { success: true } | { error: string; machines?: number; sops?: number; people?: number; blocks?: number }
+> {
   if (!departmentId) return { error: 'departmentId required' }
 
   const ctx = await requireAdmin()
@@ -278,7 +280,11 @@ export async function archiveDepartment(
     .maybeSingle()
   if (!dept) return { error: 'Department not found' }
 
-  // D-08 / D-22: refuse while anything on the drawing or in a visibility rule uses it.
+  // D-08 / D-22: refuse while anything still points at it -- a machine on the
+  // drawing, a SOP visibility rule, a person's membership or a library block
+  // (57 review WR-05). The junctions carry no org column; the department is
+  // already proven in-org above, and the admin read arms of their RLS cover
+  // the session client.
   const { count: machineCount } = await ctx.supabase
     .from('site_machines')
     .select('id', { count: 'exact', head: true })
@@ -288,9 +294,21 @@ export async function archiveDepartment(
     .from('sop_departments')
     .select('sop_id', { count: 'exact', head: true })
     .eq('department_id', departmentId)
+  const { count: memberCount } = await ctx.supabase
+    .from('member_departments')
+    .select('member_id', { count: 'exact', head: true })
+    .eq('department_id', departmentId)
+  const { count: blockCount } = await ctx.supabase
+    .from('block_departments')
+    .select('block_id', { count: 'exact', head: true })
+    .eq('department_id', departmentId)
   const machines = machineCount ?? 0
   const sops = sopCount ?? 0
-  if (machines > 0 || sops > 0) return { error: 'Still in use', machines, sops }
+  const people = memberCount ?? 0
+  const blocks = blockCount ?? 0
+  if (machines > 0 || sops > 0 || people > 0 || blocks > 0) {
+    return { error: 'Still in use', machines, sops, people, blocks }
+  }
 
   const { error } = await ctx.supabase
     .from('departments')
@@ -340,6 +358,7 @@ export async function setDepartmentOwner(
     .from('departments')
     .update({ owner_user_id: userId, updated_at: new Date().toISOString() })
     .eq('id', departmentId)
+    .eq('organisation_id', ctx.organisationId)
 
   if (error) {
     console.error('[setDepartmentOwner] update error', error)

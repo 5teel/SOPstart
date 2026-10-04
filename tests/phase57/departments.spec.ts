@@ -69,7 +69,12 @@ test.describe('PLC-05 departments: actions', () => {
     expect(body.indexOf("'site_machines'")).toBeLessThan(upd)
     expect(body.indexOf("'sop_departments'")).toBeGreaterThan(-1)
     expect(body.indexOf("'sop_departments'")).toBeLessThan(upd)
-    expect(body).toContain('machines, sops')
+    // WR-05: people and library blocks are "in use" too
+    expect(body.indexOf("'member_departments'")).toBeGreaterThan(-1)
+    expect(body.indexOf("'member_departments'")).toBeLessThan(upd)
+    expect(body.indexOf("'block_departments'")).toBeGreaterThan(-1)
+    expect(body.indexOf("'block_departments'")).toBeLessThan(upd)
+    expect(body).toContain('machines, sops, people, blocks')
     expect(body).toContain("'Still in use'")
     // lookup, machine count and the archive write each carry the session org (sop_departments has no org column; the department is already proven in-org)
     expect((body.match(/\.eq\('organisation_id', ctx\.organisationId\)/g) ?? []).length).toBeGreaterThanOrEqual(3)
@@ -149,6 +154,8 @@ test.describe('PLC-05 strip', () => {
   test('a refusal shows both counts and every success calls onChanged', () => {
     expect(STRIP).toContain('result.machines')
     expect(STRIP).toContain('result.sops')
+    expect(STRIP).toContain('result.people')
+    expect(STRIP).toContain('result.blocks')
     expect((STRIP.match(/onChanged\(\)/g) ?? []).length).toBeGreaterThanOrEqual(4)
   })
 

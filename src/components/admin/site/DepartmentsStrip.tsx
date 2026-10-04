@@ -4,7 +4,8 @@
  * Phase 57 (D-08, D-22, PLC-05): add, rename, recolour and remove departments
  * from the site editor -- no departments screen. A department is a name and a
  * colour; its zone stays the hull of its machines. Remove is refused by the
- * server while a machine or a SOP visibility rule still uses it.
+ * server while a machine, a SOP visibility rule, a person or a library item
+ * still uses it.
  */
 import { useState } from 'react'
 import { archiveDepartment, createDepartment, updateDepartment } from '@/actions/departments'
@@ -70,7 +71,7 @@ function DepartmentRow({ dept, onChanged }: { dept: SiteDepartment; onChanged():
     }
     if (result.machines !== undefined || result.sops !== undefined) {
       setRefused(
-        `${dept.name} is still used by ${plural(result.machines ?? 0, 'machine')} and ${plural(result.sops ?? 0, 'SOP rule')}. Move them first.`,
+        `${dept.name} is still used by ${plural(result.machines ?? 0, 'machine')}, ${plural(result.sops ?? 0, 'SOP rule')}, ${plural(result.blocks ?? 0, 'library item')} and ${result.people === 1 ? '1 person' : `${result.people ?? 0} people`}. Move them first.`,
       )
       return
     }
