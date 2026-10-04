@@ -1,8 +1,8 @@
 ---
 phase: 56
 slug: a-simpler-sop-the-decision-ledger
-status: draft
-nyquist_compliant: false
+status: complete
+nyquist_compliant: true
 wave_0_complete: true
 created: 2026-10-04
 ---
@@ -40,23 +40,23 @@ created: 2026-10-04
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 56-02-01 | 02 | 2 | SOP-01 | T-56-07 | 18 registry types map per D-02/D-03/A-02; unknown type or empty hazard/PPE text = failure | unit (pure, static imports) | `npx playwright test --project=phase56 tests/phase56/convert.spec.ts -g kinds` | ❌ W0 | ⬜ pending |
-| 56-02-01, 56-02-02 | 02 | 2 | SOP-01 | T-56-07 | hazard ≥ (HazardCards + Warning/Caution), ppe ≥ PPE cards, every PPE item present, per SOP; failing SOP writes nothing | unit + live read-only dry run | `npx playwright test --project=phase56 tests/phase56/convert.spec.ts -g gate`; `npx tsx scripts/convert-sops-to-steps.ts --all --report …/56-CONVERSION-DRYRUN.md` | ❌ W0 | ⬜ pending |
-| 56-02-01, 56-07-01 | 02, 07 | 2, 4 | SOP-01 | T-56-07g | Re-run on unchanged SOP = no-op (hash); after a layout edit only generated rows change; originals untouched; step-level standard attachment survives | unit (plan diff) + live | `… convert.spec.ts -g plan`; `PHASE56_LIVE=1 npx playwright test --project=phase56 tests/phase56/convert-apply.spec.ts` | ❌ W0 | ⬜ pending |
-| 56-07-02 | 07 | 4 | SOP-01 | T-56-07e | Production apply: every passing SOP converted; sop_steps count and layout_data unchanged; re-run 0 converted | live runner + report | `npx tsx scripts/convert-sops-to-steps.ts --apply --all --report …/56-CONVERSION-APPLY.md` | ❌ W0 | ⬜ pending |
-| 56-10-01 | 10 | 6 | SOP-01 | — | Old SOP page + builder render the converted fixture's original content | deployed eval | `npm run eval -- --phase 56` (`sop-ledger.eval.ts` A, B) | ❌ W0 | ⬜ pending |
-| 56-04-02, 56-06-01 | 04, 06 | 3, 4 | SOP-02 | T-56-04, T-56-20 | Add/rename/remove; remove detaches everywhere (cascade); admin-only writes; cross-org attach refused | live DB spec + source contract | `PHASE56_LIVE=1 … tests/phase56/schema-runtime.spec.ts`; `… tests/phase56/standards-actions.spec.ts` | ❌ W0 | ⬜ pending |
-| 56-03-01 | 03 | 2 | SOP-02 | T-56-04 | New tables pass org-scope RLS lint (USING + matching WITH CHECK) | lint | `npx playwright test --project=phase15-stubs rls-org-scope` | ✅ | ⬜ pending |
-| 56-06-02, 56-09-02, 56-10-01 | 06, 09, 10 | 4, 5, 6 | SOP-02 | T-56-22 | Panel reachable from Tools; label visible to worker (SOP + section level, Read + walk); bundle gate holds | source contract + build + eval | `npx playwright test --project=phase56`; `npm run build`; eval C | ❌ W0 | ⬜ pending |
-| 56-04-02 | 04 | 3 | SOP-03 | T-56-11 | `placement` flips with `sop_machines` insert/delete under an admin session and after FK cascade; SOP delete with links succeeds | live DB spec | `PHASE56_LIVE=1 … tests/phase56/schema-runtime.spec.ts -g placement` | ❌ W0 | ⬜ pending |
-| 56-09-01, 56-09-03, 56-10-01 | 09, 10 | 5, 6 | SOP-03 | T-56-26 | Shown department = machine departments; site SOP shows Whole site; access RLS untouched | unit + eval screenshot | `… tests/phase56/placement.spec.ts`; eval D | ❌ W0 | ⬜ pending |
-| 56-01-01, 56-08-02 | 01, 08 | 1, 5 | DEC-01 | T-56-16 | Every write to the 7 decision tables (+ owner / publish / verify columns, cadence, AI proposals) is a listed hook or a reasoned allow entry (data-keyed sweep) | source sweep | `… tests/phase56/decision-writers-sweep.spec.ts` | ❌ W0 | ⬜ pending |
-| 56-05-02, 56-08-01, 56-08-02 | 05, 08 | 4, 5 | DEC-01 | T-56-12 | Each hooked writer awaits `recordDecision(` AFTER its primary write; gate body hash unchanged | source contract | `… decision-writers-sweep.spec.ts`; `… publish-gate-pin.spec.ts` | ❌ W0 | ⬜ pending |
-| 56-10-01 | 10 | 6 | DEC-01 | — | Real actions write a ledger row (owner change via inbox; completion reject; AI write) | deployed eval | eval E | ❌ W0 | ⬜ pending |
-| 56-03-02, 56-04-01, 56-10-01 | 03, 04, 10 | 2, 3, 6 | DEC-01 | T-56-17 | Backfill: per-source counts equal across 7 tables; ledger non-empty on deploy | migration assertion + applier + eval | `node scripts/apply-phase56-migration.mjs`; eval F | ❌ W0 | ⬜ pending |
-| 56-04-01, 56-04-02, 56-10-01 | 04, 10 | 3, 6 | DEC-03 | T-56-01 | UPDATE / DELETE on an EXISTING row refused as owner and service role (row unchanged); TRUNCATE refused; triggers `tgenabled='A'`; no UPDATE/DELETE/TRUNCATE grant to app roles; no authenticated INSERT | live probe + live spec + eval | `node scripts/probe-decisions-immutable.mjs`; schema-runtime ledger test; eval F | ❌ W0 | ⬜ pending |
-| 56-05-01, 56-04-02, 56-08-02, 56-10-01 | 05, 04, 08, 10 | 4, 3, 5, 6 | DEC-04 | T-56-03 | Unnamed agent refused by type, by `buildDecisionRow` and by DB CHECK; named agent row stored; `applyAiWrite` produces one | unit + live + eval | `… tests/phase56/decision-shape.spec.ts`; schema-runtime ledger test; eval E/F | ❌ W0 | ⬜ pending |
-| 56-08-03 | 08 | 5 | DEC-01, DEC-04 | T-56-12 | Every `DecisionKind` drives `buildDecisionRow` → service-key INSERT and lands (passes DB CHECKs); sample table typed `Record<DecisionKind, DecisionInput>`; unnamed/blank agent and actor-less person refused (23514) | live spec (`PHASE56_LIVE=1`, no sessions) | `PHASE56_LIVE=1 npx playwright test --project=phase56 decision-kinds-live` | ❌ W0 | ⬜ pending |
+| 56-02-01 | 02 | 2 | SOP-01 | T-56-07 | 18 registry types map per D-02/D-03/A-02; unknown type or empty hazard/PPE text = failure | unit (pure, static imports) | `npx playwright test --project=phase56 tests/phase56/convert.spec.ts -g kinds` | ✅ | ✅ green |
+| 56-02-01, 56-02-02 | 02 | 2 | SOP-01 | T-56-07 | hazard ≥ (HazardCards + Warning/Caution), ppe ≥ PPE cards, every PPE item present, per SOP; failing SOP writes nothing | unit + live read-only dry run | `npx playwright test --project=phase56 tests/phase56/convert.spec.ts -g gate`; `npx tsx scripts/convert-sops-to-steps.ts --all --report …/56-CONVERSION-DRYRUN.md` | ✅ | ✅ green |
+| 56-02-01, 56-07-01 | 02, 07 | 2, 4 | SOP-01 | T-56-07g | Re-run on unchanged SOP = no-op (hash); after a layout edit only generated rows change; originals untouched; step-level standard attachment survives | unit (plan diff) + live | `… convert.spec.ts -g plan`; `PHASE56_LIVE=1 npx playwright test --project=phase56 tests/phase56/convert-apply.spec.ts` | ✅ | ✅ green |
+| 56-07-02 | 07 | 4 | SOP-01 | T-56-07e | Production apply: every passing SOP converted; sop_steps count and layout_data unchanged; re-run 0 converted | live runner + report | `npx tsx scripts/convert-sops-to-steps.ts --apply --all --report …/56-CONVERSION-APPLY.md` | ✅ | ✅ green |
+| 56-10-01 | 10 | 6 | SOP-01 | — | Old SOP page + builder render the converted fixture's original content | deployed eval | `npm run eval -- --phase 56` (`sop-ledger.eval.ts` A, B) | ✅ | ✅ green |
+| 56-04-02, 56-06-01 | 04, 06 | 3, 4 | SOP-02 | T-56-04, T-56-20 | Add/rename/remove; remove detaches everywhere (cascade); admin-only writes; cross-org attach refused | live DB spec + source contract | `PHASE56_LIVE=1 … tests/phase56/schema-runtime.spec.ts`; `… tests/phase56/standards-actions.spec.ts` | ✅ | ✅ green |
+| 56-03-01 | 03 | 2 | SOP-02 | T-56-04 | New tables pass org-scope RLS lint (USING + matching WITH CHECK) | lint | `npx playwright test --project=phase15-stubs rls-org-scope` | ✅ | ✅ green |
+| 56-06-02, 56-09-02, 56-10-01 | 06, 09, 10 | 4, 5, 6 | SOP-02 | T-56-22 | Panel reachable from Tools; label visible to worker (SOP + section level, Read + walk); bundle gate holds | source contract + build + eval | `npx playwright test --project=phase56`; `npm run build`; eval C | ✅ | ✅ green |
+| 56-04-02 | 04 | 3 | SOP-03 | T-56-11 | `placement` flips with `sop_machines` insert/delete under an admin session and after FK cascade; SOP delete with links succeeds | live DB spec | `PHASE56_LIVE=1 … tests/phase56/schema-runtime.spec.ts -g placement` | ✅ | ✅ green |
+| 56-09-01, 56-09-03, 56-10-01 | 09, 10 | 5, 6 | SOP-03 | T-56-26 | Shown department = machine departments; site SOP shows Whole site; access RLS untouched | unit + eval screenshot | `… tests/phase56/placement.spec.ts`; eval D | ✅ | ✅ green |
+| 56-01-01, 56-08-02 | 01, 08 | 1, 5 | DEC-01 | T-56-16 | Every write to the 7 decision tables (+ owner / publish / verify columns, cadence, AI proposals) is a listed hook or a reasoned allow entry (data-keyed sweep) | source sweep | `… tests/phase56/decision-writers-sweep.spec.ts` | ✅ | ✅ green |
+| 56-05-02, 56-08-01, 56-08-02 | 05, 08 | 4, 5 | DEC-01 | T-56-12 | Each hooked writer awaits `recordDecision(` AFTER its primary write; gate body hash unchanged | source contract | `… decision-writers-sweep.spec.ts`; `… publish-gate-pin.spec.ts` | ✅ | ✅ green |
+| 56-10-01 | 10 | 6 | DEC-01 | — | Real actions write a ledger row (owner change via inbox; completion reject; AI write) | deployed eval | eval E | ✅ | ✅ green |
+| 56-03-02, 56-04-01, 56-10-01 | 03, 04, 10 | 2, 3, 6 | DEC-01 | T-56-17 | Backfill: per-source counts equal across 7 tables; ledger non-empty on deploy | migration assertion + applier + eval | `node scripts/apply-phase56-migration.mjs`; eval F | ✅ | ✅ green |
+| 56-04-01, 56-04-02, 56-10-01 | 04, 10 | 3, 6 | DEC-03 | T-56-01 | UPDATE / DELETE on an EXISTING row refused as owner and service role (row unchanged); TRUNCATE refused; triggers `tgenabled='A'`; no UPDATE/DELETE/TRUNCATE grant to app roles; no authenticated INSERT | live probe + live spec + eval | `node scripts/probe-decisions-immutable.mjs`; schema-runtime ledger test; eval F | ✅ | ✅ green |
+| 56-05-01, 56-04-02, 56-08-02, 56-10-01 | 05, 04, 08, 10 | 4, 3, 5, 6 | DEC-04 | T-56-03 | Unnamed agent refused by type, by `buildDecisionRow` and by DB CHECK; named agent row stored; `applyAiWrite` produces one | unit + live + eval | `… tests/phase56/decision-shape.spec.ts`; schema-runtime ledger test; eval E/F | ✅ | ✅ green |
+| 56-08-03 | 08 | 5 | DEC-01, DEC-04 | T-56-12 | Every `DecisionKind` drives `buildDecisionRow` → service-key INSERT and lands (passes DB CHECKs); sample table typed `Record<DecisionKind, DecisionInput>`; unnamed/blank agent and actor-less person refused (23514) | live spec (`PHASE56_LIVE=1`, no sessions) | `PHASE56_LIVE=1 npx playwright test --project=phase56 decision-kinds-live` | ✅ | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -67,9 +67,9 @@ created: 2026-10-04
 - [x] `playwright.config.ts` — `phase56` project (56-01)
 - [x] `tests/phase56/decision-writers-sweep.spec.ts` + `scripts/decision-writers.json`, `tests/phase56/publish-gate-pin.spec.ts` (56-01)
 - [x] `tests/evals/sop-ledger.eval.ts` skeleton + convert fixture SOP in `scripts/eval-fixtures.mjs` (56-01)
-- [ ] `scripts/convert-sops-to-steps.ts --all` dry run against production (read-only) BEFORE any write path exists (56-02)
-- [ ] Specs created by their owning plans: convert (02), schema-shape (03), schema-runtime (04), decision-shape (05), standards-actions (06), convert-apply (07), placement (09)
-- [ ] Probes confirming research assumptions A2 (placement trigger as invoker, incl. FK cascade) — 56-04 schema-runtime; A3 (`ReviewerFlag.block_id` = junction id) — confirmed in planning from `useReviewerFlags`/`ReviewStation` keying by junction id
+- [x] `scripts/convert-sops-to-steps.ts --all` dry run against production (read-only) BEFORE any write path exists (56-02)
+- [x] Specs created by their owning plans: convert (02), schema-shape (03), schema-runtime (04), decision-shape (05), standards-actions (06), convert-apply (07), placement (09)
+- [x] Probes confirming research assumptions A2 (placement trigger as invoker, incl. FK cascade) — 56-04 schema-runtime; A3 (`ReviewerFlag.block_id` = junction id) — confirmed in planning from `useReviewerFlags`/`ReviewStation` keying by junction id
 
 ---
 
@@ -77,5 +77,5 @@ created: 2026-10-04
 
 | Behavior | Requirement | Why Manual | Test Instructions |
 |----------|-------------|------------|-------------------|
-| Dry-run conversion report read before `--apply` | SOP-01 | A count report is a judgment artefact; the gate is mechanical but the first production apply is a one-way write | 56-02 pastes the per-SOP before/after table into its SUMMARY; 56-07 Task 2 step 1 checks every failing SOP against the Needs-Simon list before applying |
-| Deployed screenshots of old SOP page + builder on a converted SOP, standards labels, placement line | SOP-01, SOP-02, SOP-03 | CSS/token bugs invisible to assertions (CLAUDE.md 2026-07-14) | 56-10 Task 2 reads `.planning/evals/latest/*.png` before declaring pass |
+| Dry-run conversion report read before `--apply` | SOP-01 | A count report is a judgment artefact; the gate is mechanical but the first production apply is a one-way write | 56-02 pasted the per-SOP before/after table into its SUMMARY; 56-07 Task 2 step 1 checked it before applying. DONE (70 ok / 0 failing) |
+| Deployed screenshots of old SOP page + builder on a converted SOP, standards labels, placement line | SOP-01, SOP-02, SOP-03 | CSS/token bugs invisible to assertions (CLAUDE.md 2026-07-14) | 56-10 Task 2 read all 13 `ledger-*.png` screenshots before declaring pass. DONE (see 56-10-SUMMARY.md) |
