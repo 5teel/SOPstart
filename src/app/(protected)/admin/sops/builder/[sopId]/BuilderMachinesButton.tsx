@@ -11,7 +11,7 @@ import { placementLabel, placementSummary } from '@/lib/sop/placement'
 /**
  * Phase 51 (51-06, D-12) — Tools-menu row + portaled modal for linking this
  * SOP to the site-map machines it belongs to. Writes through the exact same
- * setSopMachines() action the /admin/site editor uses (D-12), so the two
+ * setSopMachines() action the site edit mode uses (D-12), so the two
  * surfaces can never drift.
  *
  * Portaled modal shell: Escape closes, backdrop click closes,
@@ -176,7 +176,7 @@ export function BuilderMachinesButton({ sopId }: { sopId: string }) {
               {!loading && !loadError && machines.length === 0 && (
                 <div className="p-4 flex flex-col gap-2">
                   <p className="text-meta text-[var(--ink-500)]">No machines on the site map yet.</p>
-                  <Link href="/admin/site" className="text-ui text-[var(--ink-900)] underline">
+                  <Link href="/?place=edit" className="text-ui text-[var(--ink-900)] underline">
                     Open the site map
                   </Link>
                 </div>

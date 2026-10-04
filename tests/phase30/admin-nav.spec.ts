@@ -31,7 +31,7 @@ const SETTINGS_PAGE = path.join(
 // Phase 43 (D-01): the /admin/governance and /admin/sops page-level shims
 // are deleted; both legacy URLs are now static next.config.ts redirects
 // with no page of their own to read here.
-const ADMIN_PAGES = ['team', 'departments'].map(
+const ADMIN_PAGES = ['team'].map(
   (dir) => path.join(ROOT, 'src', 'app', '(protected)', 'admin', dir, 'page.tsx'),
 )
 const ADMIN_ROWS = path.join(
@@ -68,7 +68,7 @@ test.describe('UX-02 — one shared admin nav', () => {
     const src = read(SETTINGS_PAGE)
     expect(src).toContain("['admin', 'safety_manager']")
     expect(src).toContain('/admin/ai-settings')
-    expect(src).toContain('/admin/departments')
+    expect(src).toContain('/?place=edit')
     expect(src).toContain('/admin/agent')
     // ApprovalChainPanel relocation is 30-08 scope (governance fold) — not asserted here.
   })

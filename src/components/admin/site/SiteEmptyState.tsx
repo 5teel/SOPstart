@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * Phase 51 — D-11 empty state for /admin/site: two large choices, Generate
+ * Phase 51 — D-11 empty state for the site edit mode: two large choices, Generate
  * (only when GEMINI_API_KEY is configured, D-06) and Upload (always).
  * Both on-ramps record the scene through the single upsertSiteLayout path.
  */

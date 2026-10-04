@@ -35,11 +35,11 @@ const SECTIONS = [
       'Which AI models power each part of SOPstart, with per-organisation overrides.',
   },
   {
-    href: '/admin/departments',
+    href: '/?place=edit',
     eyebrow: 'ORGANISATION',
     title: 'Departments',
     description:
-      'Define departments once — SOPs, content and people all reference them.',
+      'Managed on the site map: edit the site, then use the departments strip. SOPs, content and people all reference them.',
   },
   {
     href: '/admin/agent',

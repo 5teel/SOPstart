@@ -7,7 +7,7 @@
  *   - journeys.ts curate-globals journey was removed
  *
  * This spec ensures those routes never creep back in via Link, router.push, or
- * journey config — and that /admin/departments is present as the replacement.
+ * journey config — and that the site edit mode (departments strip) is present as the replacement.
  */
 
 import { test, expect } from '@playwright/test'
@@ -35,9 +35,9 @@ function walkDir(dir: string, ext: string): string[] {
   return results
 }
 
-test('journeys.ts contains /admin/departments', () => {
+test('journeys.ts names the site edit mode', () => {
   const content = readJourneys()
-  expect(content).toContain('/admin/departments')
+  expect(content).toContain('?place=edit')
 })
 
 test('journeys.ts does NOT contain /admin/global-blocks', () => {

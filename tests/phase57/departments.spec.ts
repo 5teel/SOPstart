@@ -166,5 +166,31 @@ test.describe('PLC-05 strip', () => {
     expect((EMPTY.match(/if \(onDone\) onDone\(\)\s*\n\s*else router\.refresh\(\)/g) ?? []).length).toBe(2)
   })
 
-  test.fixme('the old departments and site pages redirect to edit mode [57-07]', () => {})
+})
+
+test.describe('PLC-05 departments: the retired screen (57-07)', () => {
+  test('both old pages are fixed redirects to edit mode and their routes are gone', () => {
+    const config = read('next.config.ts')
+    for (const source of ['/admin/departments', '/admin/site']) {
+      expect(config, source).toMatch(
+        new RegExp(String.raw`source: '${source}',\s*destination: '/\?place=edit',\s*permanent: false`),
+      )
+      expect(fs.existsSync(path.join(ROOT, 'src', 'app', '(protected)', source)), source).toBe(false)
+    }
+  })
+
+  test('the three department screen components are deleted; the picker and chip survive', () => {
+    for (const f of ['DepartmentGrid', 'DepartmentCard', 'DepartmentFormModal']) {
+      expect(fs.existsSync(path.join(ROOT, 'src', 'components', 'admin', 'departments', `${f}.tsx`)), f).toBe(false)
+    }
+    for (const f of ['DepartmentPicker', 'DChip']) {
+      expect(fs.existsSync(path.join(ROOT, 'src', 'components', 'admin', 'departments', `${f}.tsx`)), f).toBe(true)
+    }
+  })
+
+  test('per-person membership still uses the same picker and action on /admin/team (D-09)', () => {
+    const table = read('src', 'components', 'admin', 'RoleAssignmentTable.tsx')
+    expect(table).toMatch(/<DepartmentPicker[^>]*mode="member"/)
+    expect(fs.existsSync(path.join(ROOT, 'src', 'app', '(protected)', 'admin', 'team', 'page.tsx'))).toBe(true)
+  })
 })

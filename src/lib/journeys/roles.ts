@@ -183,7 +183,7 @@ export const ACCESS_MATRIX: AccessRow[] = [
   { surface: 'Activity (review sign-off)', route: '/activity',    access: { worker: 'own', supervisor: true,  safety_manager: true, admin: true } },
   { surface: 'Governance inbox', route: '/governance', access: { worker: false, supervisor: false, safety_manager: true, admin: true } },
   { surface: 'Team & roles',         route: '/admin/team',        access: { worker: false, supervisor: false, safety_manager: true, admin: true } },
-  { surface: 'Departments',          route: '/admin/departments', access: { worker: false, supervisor: false, safety_manager: true, admin: true } },
+  { surface: 'Departments (site edit mode)', route: '/', access: { worker: false, supervisor: false, safety_manager: true, admin: true } },
 ]
 
 export const ACCESS_ROLE_ORDER = ['worker', 'supervisor', 'safety_manager', 'admin'] as const

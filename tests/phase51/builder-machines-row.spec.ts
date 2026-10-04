@@ -45,7 +45,7 @@ test.describe('modal', () => {
     expect(src).toContain('listSopMachines(')
     expect(src).toContain('data-testid="machines-picker"')
     expect(src).toContain('aria-label="Find a machine"')
-    expect(src).toContain('href="/admin/site"')
+    expect(src).toContain('href="/?place=edit"')
     expect(src).toContain('Pick machines for this SOP')
   })
 

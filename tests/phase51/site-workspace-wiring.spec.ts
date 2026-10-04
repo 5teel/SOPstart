@@ -1,6 +1,6 @@
 /**
  * Phase 51 -- SIT-02/SIT-03/SIT-04. Source-contract assertions for
- * `SiteWorkspace.tsx` and `src/app/(protected)/admin/site/page.tsx`.
+ * `SiteWorkspace.tsx` and (Phase 57) the edit mode that mounts it in `AdminShell.tsx`.
  *
  * `workspace` describe activated by Plan 51-05 Task 1.
  * `route` describe activated by Plan 51-05 Task 2.
@@ -21,7 +21,7 @@ function read(rel: string): string {
 
 const WORKSPACE_PATH = 'src/components/admin/site/SiteWorkspace.tsx'
 const EMPTY_STATE_PATH = 'src/components/admin/site/SiteEmptyState.tsx'
-const PAGE_PATH = 'src/app/(protected)/admin/site/page.tsx'
+const SHELL_PATH = 'src/components/shell/AdminShell.tsx'
 const JOURNEYS_PATH = 'src/lib/journeys/journeys.ts'
 
 /** Returns the [start, end) character span of a top-level `function <name>(` body. */
@@ -122,24 +122,22 @@ test.describe('workspace', () => {
 })
 
 test.describe('route', () => {
-  test('/admin/site is guarded by requireAdminContext() server-side and redirects non-admins', () => {
-    const src = read(PAGE_PATH)
-    expect(src).toContain('requireAdminContext()')
-    expect(src).toContain('redirect(')
+  test('the site is edited from AdminShell edit mode; the read self-guards with requireAdminContext() (Phase 57 D-10)', () => {
+    const src = read(SHELL_PATH)
     expect(src).not.toContain('createAdminClient')
-    const guardIdx = src.indexOf('requireAdminContext()')
-    const listIdx = src.indexOf('listSiteForOrg(')
-    expect(guardIdx).toBeGreaterThan(-1)
-    expect(listIdx).toBeGreaterThan(-1)
-    expect(guardIdx).toBeLessThan(listIdx)
+    expect(src).toContain('listSiteForOrg()')
     expect(src).toContain('<SiteWorkspace')
     expect(src).toContain('<SiteEmptyState')
     expect(src).toContain('canGenerate')
+    const action = read('src/actions/site.ts')
+    const fn = action.slice(action.indexOf('export async function listSiteForOrg('))
+    expect(fn.indexOf('requireAdminContext()')).toBeGreaterThan(-1)
+    expect(fn.indexOf('requireAdminContext()')).toBeLessThan(fn.indexOf('.from('))
   })
 
-  test('journeys.ts maps a journey step with route /admin/site', () => {
+  test('journeys.ts maps the site edit mode on the one screen', () => {
     const src = read(JOURNEYS_PATH)
-    expect(src).toContain("route: '/admin/site'")
+    expect(src).toContain('?place=edit')
     expect(src).toContain("id: 'map-the-site'")
   })
 })

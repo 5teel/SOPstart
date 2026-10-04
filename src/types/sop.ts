@@ -383,7 +383,7 @@ export interface Department {
 }
 
 /**
- * Department extended with aggregate counts for the /admin/departments UI.
+ * Department extended with aggregate counts for the departments strip.
  * Counts are computed by server action listDepartments() via separate queries.
  */
 export interface DepartmentWithCounts extends Department {
