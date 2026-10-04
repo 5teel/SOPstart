@@ -162,10 +162,9 @@ test.describe('Phase 51 — site editor (deployed)', () => {
     const errors = watchConsole(page)
     await signInAs(context, 'siteAdmin')
 
-    // 1. Empty state via the header link.
-    await page.goto('/sops')
-    await page.locator('header').getByRole('link', { name: 'Site', exact: true }).click()
-    await expect(page).toHaveURL(/\/admin\/site$/)
+    // 1. Empty state in edit mode of the one screen.
+    await page.goto('/?place=edit')
+    await expect(page).toHaveURL((u) => u.pathname === '/' && u.search === '?place=edit')
     await expect(page.getByTestId('site-empty-state')).toBeVisible(SLOW)
     await expect(page.getByText('Upload an image')).toBeVisible()
     const canGenerate = (await page.getByTestId('site-generate-button').count()) > 0
@@ -264,8 +263,8 @@ test.describe('Phase 51 — site editor (deployed)', () => {
     await page.keyboard.press('Escape')
     await expect(picker).toBeHidden()
 
-    // 7. /admin/site + reload — both machines and the link persist.
-    await page.goto('/admin/site')
+    // 7. edit mode + reload — both machines and the link persist.
+    await page.goto('/?place=edit')
     await page.reload()
     const rows = page.getByTestId('site-machine-row')
     await expect(rows).toHaveCount(2, SLOW)
@@ -362,11 +361,12 @@ test.describe('Phase 51 — site editor (deployed)', () => {
     expect(errors).toEqual([])
   })
 
-  test('a worker is sent away from /admin/site', async ({ page, context }) => {
+  test('a worker gets the overview, not the editor, at the edit-mode address', async ({ page, context }) => {
     await page.setViewportSize({ width: 1440, height: 900 })
-    await signInAs(context, 'worker')
-    await page.goto('/admin/site')
-    await expect(page).not.toHaveURL(/\/admin\/site/)
-    await expect(page.locator('header').getByRole('link', { name: 'Site', exact: true })).toHaveCount(0)
+    await signInAs(context, 'siteWorker')
+    await page.goto('/?place=edit')
+    await expect(page.getByTestId('shell-summary')).toBeVisible(SLOW)
+    await expect(page.getByTestId('site-draw-machine')).toHaveCount(0)
+    await expect(page.getByTestId('dept-strip')).toHaveCount(0)
   })
 })

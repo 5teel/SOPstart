@@ -3,16 +3,16 @@
  *
  * Proves the dead-surface findings this phase fixes are actually
  * live in production, not just source-contract-pinned:
- *   C — the Access map (/sops?view=access) shows the Wiring view only,
- *       no Matrix/Illuminate lens toggle (D-05)
- *   D1/D2 — the legacy /admin/sops and /admin/governance URLs still land
- *       on real routes for an admin, and never leak the governance inbox
- *       to a worker (D-01)
+ *   C — the Access map shows the Wiring view only, no Matrix/Illuminate
+ *       lens toggle (D-05); the legacy list address's access view lands on
+ *       its new page (Phase 57 D-14)
+ *   D1/D2 — the legacy admin list and governance URLs still land on real
+ *       routes for an admin (the one screen), and never leak the governance
+ *       inbox to a worker (D-01)
  *
  * C reads the real org (read-only, as `admin`) because the Access map needs
  * a populated org tree to render meaningfully. The pathways 0-not-mapped
- * proof already lives in tests/evals/sop-surface.eval.ts test E — not
- * duplicated here. (Test A, the content-library create form, went with the
+ * proof lives in the pathways spec, not here. (Test A, the content-library create form, went with the
  * library in Phase 55.) D1 runs as `siteAdmin`, D2 as `siteWorker`.
  *
  * Self-skips without EVAL_BASE_URL — the normal suite never touches
@@ -39,9 +39,10 @@ test.describe('Phase 43 — dead-surface removal (deployed)', () => {
 
   test('C — Access map shows the Wiring view only', async ({ page, context }) => {
     await signInAs(context, 'admin')
-    await page.goto('/sops?view=access')
+    const legacyList = '/sops'
+    await page.goto(`${legacyList}?view=access`)
 
-    await expect(page.getByRole('button', { name: 'Back to your SOPs' })).toBeVisible(SLOW)
+    await expect(page).toHaveURL((u) => u.pathname === '/admin/access', SLOW)
     await expect(page.getByPlaceholder('Search org or collections…')).toBeVisible(SLOW)
     await expect(page.getByText(/Illuminate/)).toHaveCount(0)
     await expect(page.getByRole('button', { name: /Matrix/ })).toHaveCount(0)
@@ -53,7 +54,7 @@ test.describe('Phase 43 — dead-surface removal (deployed)', () => {
     await signInAs(context, 'siteAdmin')
 
     await page.goto('/admin/sops')
-    await expect(page).toHaveURL(/\/sops$/, SLOW)
+    await expect(page).toHaveURL((u) => u.pathname === '/' && u.search === '', SLOW)
 
     await page.goto('/admin/governance?filter=no_owner')
     await expect(page).toHaveURL(/\/governance(\?.*)?$/, SLOW)
@@ -65,7 +66,7 @@ test.describe('Phase 43 — dead-surface removal (deployed)', () => {
 
     await page.goto('/admin/governance')
     await expect(page).not.toHaveURL(/\/governance/, SLOW)
-    await expect(page).toHaveURL(/\/sops/, SLOW)
+    await expect(page).toHaveURL((u) => u.pathname === '/', SLOW)
     await expect(page.getByTestId('gov-inbox')).toHaveCount(0)
   })
 })

@@ -30,7 +30,7 @@ const OVEN_POLYGON = [
   [80, 420],
 ]
 
-test.describe('Phase 54 -- admin governance inbox + floor health (deployed)', () => {
+test.describe('Phase 54 -- admin governance inbox + machine detail (deployed)', () => {
   test.skip(!EVAL_ENV_READY, 'set EVAL_BASE_URL (+ Supabase keys in .env.local) -- run via `npm run eval`')
 
   let db: SupabaseClient
@@ -133,7 +133,7 @@ test.describe('Phase 54 -- admin governance inbox + floor health (deployed)', ()
   const press = (page: Page) => page.locator('[data-testid="plant-machine"][data-machine-name="EVAL Press"]')
   const fixtureGovRow = (page: Page) => page.getByTestId('gov-row').filter({ hasText: EVAL_PLANT_SOP_TITLE })
 
-  test('A -- inbox + floor: unowned fixture is a red row, EVAL Oven is a Machines row, EVAL Press pins bad, no real-org leak', async ({ page, context }) => {
+  test('A -- inbox: unowned fixture is a red row, EVAL Oven is a Machines row, no real-org leak', async ({ page, context }) => {
     const errors = watchConsole(page)
     await signInAs(context, 'siteAdmin')
     await page.goto('/governance')
@@ -156,18 +156,14 @@ test.describe('Phase 54 -- admin governance inbox + floor health (deployed)', ()
     const ovenAction = ovenRow.getByTestId('gov-action')
     await expect(ovenAction).toHaveAttribute('href', '/admin/sops/new')
 
-    await expect(page.getByTestId('floor-health')).toBeVisible(SLOW)
-    await expect(press(page)).toHaveAttribute('data-health', 'bad', SLOW)
-    await expect(page.locator('[data-testid="plant-health-pin"][data-health="bad"]')).toBeVisible()
-
     await expect(page.getByText(realOrgTitle)).toHaveCount(0)
     await shot(page, 'governance-inbox')
     expect(errors).toEqual([])
   })
 
-  test('B -- machine panel: NO OWNER badge, Open/Edit links, owner none', async ({ page, context }) => {
+  test('B -- machine detail on the one screen: NO OWNER badge, Open/Edit links, owner none', async ({ page, context }) => {
     await signInAs(context, 'siteAdmin')
-    await page.goto('/governance')
+    await page.goto('/')
     await expect(press(page)).toBeVisible(SLOW)
     await press(page).click()
 
@@ -176,7 +172,7 @@ test.describe('Phase 54 -- admin governance inbox + floor health (deployed)', ()
     const row = panel.getByTestId('admin-panel-row').filter({ hasText: EVAL_PLANT_SOP_TITLE })
     await expect(row).toBeVisible(SLOW)
     await expect(row.getByTestId('admin-panel-badge')).toHaveAttribute('data-badge', 'NO OWNER')
-    await expect(row.getByTestId('admin-panel-open')).toHaveAttribute('href', `/sops/${plantSopId}`)
+    await expect(row.getByRole('link', { name: EVAL_PLANT_SOP_TITLE })).toHaveAttribute('href', `/sops/${plantSopId}`)
     await expect(row.getByTestId('admin-panel-edit')).toHaveAttribute('href', `/admin/sops/builder/${plantSopId}`)
     await expect(row).toContainText('owner none')
     await shot(page, 'governance-panel')
@@ -210,16 +206,22 @@ test.describe('Phase 54 -- admin governance inbox + floor health (deployed)', ()
 
     await expect(async () => {
       await expect(fixtureGovRow(page).getByRole('button', { name: /Assign owner/ })).toHaveCount(0)
-      await expect(press(page)).not.toHaveAttribute('data-health', 'bad')
     }).toPass({ timeout: 25_000 })
     await shot(page, 'governance-after-assign')
+
+    // The red pin on the one screen clears too (wait for the data, then not-bad).
+    await page.goto('/')
+    await expect(press(page)).toHaveAttribute('data-health', /^(due|ok)$/, SLOW)
   })
 
-  test('E -- header Governance link opens the inbox', async ({ page, context }) => {
+  test('E -- the Office card opens the Office and its inbox link opens /governance', async ({ page, context }) => {
     await signInAs(context, 'siteAdmin')
-    await page.goto('/sops')
-    await page.locator('header').getByRole('link', { name: 'Governance', exact: true }).click()
-    await expect(page).toHaveURL(/\/governance$/)
+    await page.goto('/')
+    await page.getByTestId('shell-office-open').click()
+    const body = page.locator('[data-testid="room-body"][data-room-id="office"]')
+    await expect(body).toBeVisible(SLOW)
+    await body.getByTestId('room-office-inbox').click()
+    await expect(page).toHaveURL(/\/governance$/, SLOW)
     await expect(page.getByTestId('gov-inbox')).toBeVisible(SLOW)
   })
 })

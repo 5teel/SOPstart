@@ -27,8 +27,6 @@ const SELF = path.join('tests', 'phase55', 'deletion-sweep.spec.ts')
 const TEST_SCAN_EXCLUDED_PREFIXES = [
   path.join('tests', 'phase55') + path.sep,
   path.join('tests', 'evals', 'cut-features.eval.ts'),
-  // asserts the ask-bar microphone is absent, so it must name the test id
-  path.join('tests', 'evals', 'plant-home.eval.ts'),
 ]
 
 // Each deleting plan appends its feature key here when it flips the block live.

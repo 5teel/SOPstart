@@ -67,7 +67,7 @@ test.describe('Phase 55 — cut features (deployed)', () => {
     await page.setViewportSize({ width: 1440, height: 900 })
     const errors = watchConsole(page)
     await signInAs(context, 'siteWorker')
-    await page.goto('/sops')
+    await page.goto('/')
 
     await expect(page.getByTestId('plant-stage')).toBeVisible(SLOW)
     const press = page.locator('[data-testid="plant-machine"][data-machine-name="EVAL Press"]')
