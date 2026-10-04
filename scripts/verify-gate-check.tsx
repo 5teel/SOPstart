@@ -83,6 +83,11 @@ let currentOrgId = 'org1'
 const Module = require('module')
 const origLoad = Module._load
 Module._load = function (request: string, parent: unknown, isMain: boolean) {
+  // Phase 56: publish-core now records a ledger decision. The ledger writer is
+  // server-only (not loadable under tsx) and not what this harness proves.
+  if (request.includes('lib/decisions/record')) {
+    return { recordDecision: async () => ({ ok: true, id: 'decision-1' }) }
+  }
   if (request.includes('lib/supabase/server')) {
     return { createClient: async () => currentSupabase }
   }
