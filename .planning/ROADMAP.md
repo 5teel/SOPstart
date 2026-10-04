@@ -1853,7 +1853,7 @@ Plans:
   4. A worker sees how many SOPs are due at each place and a "next for you" card with Walk it and Show me; an admin sees where a SOP has no owner or an overdue review, a count on the Office and the Workshop, and a card saying how many things wait in the Office with a button that opens it; typing in the search box filters the list and lights the matching shapes (machine names and the titles of the SOPs on them)
   5. An admin can switch the site into edit mode from the map to add, rename, reshape or remove machines and departments and to drag each room's shape to a new place; there is no departments screen
 
-**Plans:** 9 plans
+**Plans:** 10 plans
 Plans:
 **Wave 1**
 
@@ -1866,15 +1866,15 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 57-04-PLAN.md — Worker + supervisor shell: bodies, rooms, Now/Office card, site summary, session-branching / page, /page bundle gate, pathways
+- [ ] 57-04-PLAN.md — Worker + supervisor shell: bodies, rooms, Now/Office card, site summary, session-branching / page, lazy AdminShell seam, /page bundle gate, pathways
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 57-05-PLAN.md — Admin shell (one lazy module): health pins, Office/Workshop/Noticeboard bodies, new SOP for this machine, edit mode with departments; floor card off /governance
+- [ ] 57-05-PLAN.md — Admin shell (fills the lazy seam): health pins, Office/Workshop/Noticeboard bodies, new SOP for this machine, edit mode with departments; floor card off /governance
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
-- [ ] 57-06-PLAN.md — No header anywhere: Back to the site bar, roleHome → /, /dashboard retired, /pending sign-out, dropped list
+- [ ] 57-06-PLAN.md — No header anywhere: Back to the site bar, roleHome → /, /dashboard retired (every redirect-literal guard repointed in the same commit), /pending sign-out, dropped list
 
 **Wave 6** *(blocked on Wave 5 completion)*
 
@@ -1882,11 +1882,15 @@ Plans:
 
 **Wave 7** *(blocked on Wave 6 completion)*
 
-- [ ] 57-08-PLAN.md — List page, plant home and library table deleted; /sops redirects in the proxy; links, bundle gate and ~25 guards repointed
+- [ ] 57-08-PLAN.md — List page and plant home retired: /sops redirects in the proxy, links repointed, surviving-behaviour guards moved onto the one screen, then page + worker surfaces deleted with the bundle gate swap and pathways in one commit
 
 **Wave 8** *(blocked on Wave 7 completion)*
 
-- [ ] 57-09-PLAN.md — Deployed eval for all five success criteria (three roles), full suite once, screenshots read, rooms tuned, validation signed off
+- [ ] 57-09-PLAN.md — Library table + library-only helpers deleted with their guards; access-view guards repointed; list-page dropped + swept; UAT links
+
+**Wave 9** *(blocked on Wave 8 completion)*
+
+- [ ] 57-10-PLAN.md — Deployed eval for all five success criteria (three roles, both pin kinds), full suite once, screenshots read, rooms tuned, validation signed off
 **UI hint**: yes
 
 ### Phase 58: The SOP Focus Screen — Walk & Edit
