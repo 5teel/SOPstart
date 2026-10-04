@@ -361,7 +361,7 @@ export async function recordSignature(
   // T-23-06-04 — service-role bypasses RLS so we must check manually)
   const { data: completion, error: fetchError } = await admin
     .from('sop_completions')
-    .select('id, organisation_id')
+    .select('id, organisation_id, sop_id')
     .eq('id', completionId)
     .single()
 
@@ -391,7 +391,7 @@ export async function recordSignature(
   await recordDecision({
     kind: role === 'supervisor' ? 'countersign' : 'sign_off',
     subject: { kind: 'completion', id: completionId },
-    sopId: null, // not in scope here; the completion id in subject resolves it
+    sopId: completion.sop_id,
     summary: role === 'supervisor' ? 'Counter-signed a completion' : 'Signed their completion',
     details: { role },
   })
