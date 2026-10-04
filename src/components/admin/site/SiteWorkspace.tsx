@@ -13,6 +13,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { SiteEditorLoader } from './SiteEditorLoader'
 import { deleteSiteMachine, setSopMachines, upsertSiteMachine } from '@/actions/site'
+import { createDepartment } from '@/actions/departments'
+import { DEPT_COLOURS } from '@/lib/site/departments'
 import type { Point, SiteData, SiteDepartment, SiteMachine, SiteSopOption, SopMachineLink } from '@/lib/validators/site'
 import type { SceneEditorMachine } from '@/lib/site/scene'
 
@@ -26,9 +28,11 @@ interface SiteWorkspaceProps {
   links: SopMachineLink[]
   departments: SiteDepartment[]
   sops: SiteSopOption[]
+  /** Phase 57: called after a department is created in place, so the parent can refetch. */
+  onDepartmentsChanged?: () => void
 }
 
-export function SiteWorkspace({ layout, machines: initialMachines, links: initialLinks, departments, sops }: SiteWorkspaceProps) {
+export function SiteWorkspace({ layout, machines: initialMachines, links: initialLinks, departments: departmentsProp, sops, onDepartmentsChanged }: SiteWorkspaceProps) {
   const [machines, setMachines] = useState<SiteMachine[]>(initialMachines)
   const [links, setLinks] = useState<SopMachineLink[]>(initialLinks)
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -36,6 +40,16 @@ export function SiteWorkspace({ layout, machines: initialMachines, links: initia
   const [saveState, setSaveState] = useState<SaveState>('idle')
   const [openSopsFor, setOpenSopsFor] = useState<string | null>(null)
   const [linkQuery, setLinkQuery] = useState('')
+  // Phase 57 (D-08): a department made from the machine form shows up in the
+  // options at once, before the parent has refetched.
+  const [createdDepartments, setCreatedDepartments] = useState<SiteDepartment[]>([])
+  const [newDeptFor, setNewDeptFor] = useState<string | null>(null)
+  const [newDeptName, setNewDeptName] = useState('')
+  const [newDeptError, setNewDeptError] = useState<string | null>(null)
+  const departments = [
+    ...departmentsProp,
+    ...createdDepartments.filter((c) => !departmentsProp.some((d) => d.id === c.id)),
+  ]
 
   // Rename is debounced per machine; the debounced save must read the LATEST
   // row (department/polygon may have changed since the keystroke), so it
@@ -120,6 +134,13 @@ export function SiteWorkspace({ layout, machines: initialMachines, links: initia
   }
 
   async function handleDepartmentChange(id: string, departmentId: string | null) {
+    // "New department…" only opens the inline create row; nothing is saved yet.
+    if (departmentId === '__new') {
+      setNewDeptFor(id)
+      setNewDeptError(null)
+      return
+    }
+    setNewDeptFor(null)
     setMachines((prev) => prev.map((m) => (m.id === id ? { ...m, department_id: departmentId } : m)))
     const machine = machines.find((m) => m.id === id)
     if (!machine) return
@@ -133,6 +154,23 @@ export function SiteWorkspace({ layout, machines: initialMachines, links: initia
       })
     )
     if (!('error' in result)) setMachines((prev) => prev.map((m) => (m.id === id ? result.machine : m)))
+  }
+
+  async function handleCreateDepartment(machineId: string) {
+    const name = newDeptName.trim()
+    if (!name) return
+    setNewDeptError(null)
+    const result = await save(() => createDepartment({ name, colour: DEPT_COLOURS[departments.length % DEPT_COLOURS.length] }))
+    if ('error' in result) {
+      setNewDeptError("Couldn't add the department - try again")
+      return
+    }
+    const created: SiteDepartment = { id: result.department.id, name: result.department.name, colour: result.department.colour }
+    setCreatedDepartments((prev) => [...prev, created])
+    setNewDeptFor(null)
+    setNewDeptName('')
+    await handleDepartmentChange(machineId, created.id)
+    onDepartmentsChanged?.()
   }
 
   const deleteSelected = useCallback(() => {
@@ -326,7 +364,7 @@ export function SiteWorkspace({ layout, machines: initialMachines, links: initia
                         <select
                           data-testid="site-machine-department"
                           aria-label="Department"
-                          value={machine.department_id ?? ''}
+                          value={newDeptFor === machine.id ? '__new' : (machine.department_id ?? '')}
                           onChange={(e) => void handleDepartmentChange(machine.id, e.target.value || null)}
                           className="min-h-tap w-full rounded-lg border border-ink-300 bg-paper px-3 text-ui text-ink-900"
                         >
@@ -336,7 +374,33 @@ export function SiteWorkspace({ layout, machines: initialMachines, links: initia
                               {d.name}
                             </option>
                           ))}
+                          <option value="__new">New department…</option>
                         </select>
+                        {newDeptFor === machine.id && (
+                          <div className="flex flex-col gap-1.5">
+                            <div className="flex items-center gap-2">
+                              <input
+                                data-testid="site-machine-new-dept"
+                                aria-label="New department name"
+                                value={newDeptName}
+                                maxLength={100}
+                                placeholder="Department name"
+                                onChange={(e) => setNewDeptName(e.target.value)}
+                                className="min-h-tap min-w-0 flex-1 rounded-lg border border-ink-300 bg-paper px-3 text-ui text-ink-900"
+                              />
+                              <button
+                                type="button"
+                                data-testid="site-machine-new-dept-add"
+                                disabled={newDeptName.trim().length === 0}
+                                onClick={() => void handleCreateDepartment(machine.id)}
+                                className="min-h-tap shrink-0 rounded-lg bg-ink-900 px-4 text-ui font-medium text-paper disabled:opacity-40"
+                              >
+                                Add
+                              </button>
+                            </div>
+                            {newDeptError && <p role="alert" className="text-meta text-accent-hazard">{newDeptError}</p>}
+                          </div>
+                        )}
                       </div>
                     )}
 

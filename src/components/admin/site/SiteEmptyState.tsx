@@ -13,7 +13,7 @@ import { createSceneUploadUrl, upsertSiteLayout } from '@/actions/site'
 import { SCENE_MAX_BYTES, SCENE_MIME_TYPES } from '@/lib/validators/site'
 import { extForMime } from '@/lib/site/scene'
 
-export function SiteEmptyState({ canGenerate }: { canGenerate: boolean }) {
+export function SiteEmptyState({ canGenerate, onDone }: { canGenerate: boolean; onDone?: () => void }) {
   const router = useRouter()
   const [description, setDescription] = useState('')
   const [generating, setGenerating] = useState(false)
@@ -38,7 +38,8 @@ export function SiteEmptyState({ canGenerate }: { canGenerate: boolean }) {
         setGenerating(false)
         return
       }
-      router.refresh()
+      if (onDone) onDone()
+      else router.refresh()
     } catch (err) {
       console.error('[SiteEmptyState] generate error', err)
       setGenerateError('Scene generation failed — try again or upload an image.')
@@ -94,7 +95,8 @@ export function SiteEmptyState({ canGenerate }: { canGenerate: boolean }) {
       return
     }
 
-    router.refresh()
+    if (onDone) onDone()
+    else router.refresh()
   }
 
   return (
