@@ -4,7 +4,7 @@
  * Phase 54 (D-09) — the category fix that lived in the retired list detail
  * pane (SopMillerBrowser's CategoryField), now beside "Pick machines for
  * this SOP" in the builder Tools menu so it does not get stranded when the
- * admin `/sops` table replaces the Miller frame. Writes through the exact
+ * admin table replaced the Miller frame (the table is itself gone, Phase 57). Writes through the exact
  * same setSopCategory() server action the old detail pane used (D-09).
  *
  * Shell copied from BuilderMachinesButton.tsx: Escape closes, backdrop click

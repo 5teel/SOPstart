@@ -32,13 +32,13 @@ const TEST_SCAN_EXCLUDED_PREFIXES = [
 ]
 
 // Each deleting plan appends its feature key here when it flips the block live.
-const LIVE_FEATURES: string[] = ['voice-capture', 'voice', 'phone-qr', 'shared-device', 'youtube', 'photo-scan', 'video-generation', 'offline', 'flow-diagram', 'annotation', 'version-compare', 'library', 'org-signup', 'header-nav', 'site-and-departments-pages']
+const LIVE_FEATURES: string[] = ['voice-capture', 'voice', 'phone-qr', 'shared-device', 'youtube', 'photo-scan', 'video-generation', 'offline', 'flow-diagram', 'annotation', 'version-compare', 'library', 'org-signup', 'header-nav', 'site-and-departments-pages', 'list-page']
 // 55-13 flips this once the eight packages are uninstalled.
 const PACKAGES_LIVE = true
 
 const FEATURES = [
   'voice-capture', 'voice', 'phone-qr', 'shared-device', 'youtube', 'photo-scan', 'video-generation',
-  'offline', 'flow-diagram', 'annotation', 'version-compare', 'library', 'org-signup', 'header-nav', 'site-and-departments-pages',
+  'offline', 'flow-diagram', 'annotation', 'version-compare', 'library', 'org-signup', 'header-nav', 'site-and-departments-pages', 'list-page',
 ]
 
 interface Entry {

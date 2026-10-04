@@ -11,7 +11,7 @@
  * 41-04's lens; neither is returned from here.
  *
  * `/admin/sops`'s page-level `redirect('/')` for non-admins goes
- * away once `/sops` is reachable by every role (RESEARCH Pitfall 4) — this
+ * away once the shared page is reachable by every role (RESEARCH Pitfall 4) — this
  * action is the ONLY gate in front of this data from that point on, so
  * `requireAdminContext()` is the first statement and every read uses the
  * session RLS client (`ctx.supabase`) — no service-role client is used here.

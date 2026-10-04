@@ -878,6 +878,66 @@
       "phase": 57,
       "kind": "file",
       "path": "src/components/admin/departments/DepartmentFormModal.tsx"
+    },
+    {
+      "feature": "list-page",
+      "phase": 57,
+      "kind": "file",
+      "path": "src/app/(protected)/sops/page.tsx"
+    },
+    {
+      "feature": "list-page",
+      "phase": 57,
+      "kind": "file",
+      "path": "src/app/(protected)/sops/loading.tsx"
+    },
+    {
+      "feature": "list-page",
+      "phase": 57,
+      "kind": "file",
+      "path": "src/components/sop/plant/PlantHome.tsx"
+    },
+    {
+      "feature": "list-page",
+      "phase": 57,
+      "kind": "file",
+      "path": "src/components/sop/plant/PlantAskBar.tsx"
+    },
+    {
+      "feature": "list-page",
+      "phase": 57,
+      "kind": "file",
+      "path": "src/components/sop/WorkerSimpleList.tsx"
+    },
+    {
+      "feature": "list-page",
+      "phase": 57,
+      "kind": "file",
+      "path": "src/components/sop/CategoryBottomSheet.tsx"
+    },
+    {
+      "feature": "list-page",
+      "phase": 57,
+      "kind": "file",
+      "path": "src/components/sop/SopLibraryCard.tsx"
+    },
+    {
+      "feature": "list-page",
+      "phase": 57,
+      "kind": "file",
+      "path": "src/components/admin/AdminLibraryTable.tsx"
+    },
+    {
+      "feature": "list-page",
+      "phase": 57,
+      "kind": "file",
+      "path": "src/components/admin/governance/AdminFloorHealth.tsx"
+    },
+    {
+      "feature": "list-page",
+      "phase": 57,
+      "kind": "symbol",
+      "pattern": "\b(PlantHome|PlantAskBar|WorkerSimpleList|CategoryBottomSheet|SopLibraryCard|AdminLibraryTable|AdminFloorHealth|libraryNavToUrl|resolveLibraryNav|deriveChecks)\b"
     }
   ],
   "allow": [

@@ -6,11 +6,11 @@
  * :141-382): the org tree, access grants, collections, per-collection SOP
  * drill-down, department-membership index and pinned `?sop=` new-SOP row
  * that feed `WiringPatchBayShell`. This is the heaviest of the three lenses
- * (SUR-02) — the access/wiring patch bay becomes a lens on `/sops` fed by
- * this one action.
+ * (SUR-02) — the access/wiring patch bay becomes a lens (now the /admin/access
+ * page) fed by this one action.
  *
  * `/admin/sops`'s page-level `redirect('/')` for non-admins goes
- * away once `/sops` is reachable by every role (RESEARCH Pitfall 4) — this
+ * away once the shared page is reachable by every role (RESEARCH Pitfall 4) — this
  * action is the ONLY gate in front of the org model / grants / collections
  * from that point on, so `requireAdminContext()` is the first statement,
  * before both the first `.from(` and the `ensureSopCollections` call. Every

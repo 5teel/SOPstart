@@ -92,9 +92,9 @@ export const UAT_TESTS: UatTest[] = [
     summary:
       'Links and tabs now acknowledge your tap straight away — you should see the page start changing (a grey placeholder or a small spinner) the moment you tap, even if the content takes a second to arrive.',
     tryIt: [
-      'Tap between SOPs and Sign-off in the top tabs (on a phone, open them from the menu button, top left).',
-      'If you are an admin, switch between Governance, Content, Team and Settings using the header links.',
-      'Open a SOP from the library, go back, and open another one.',
+      'Tap between the rooms on the site (Office, Workshop, Smoko room, Noticeboard) and open Sign-off from the Office.',
+      'If you are an admin, open the Office and switch between the inbox, Team and Settings.',
+      'Open a SOP from a machine or the Noticeboard, go back, and open another one.',
     ],
     questions: [
       { id: 'instant', text: 'Did something visibly happen the instant you tapped each link?' },
@@ -112,11 +112,11 @@ export const UAT_TESTS: UatTest[] = [
     title: 'Do the main menu names make sense?',
     status: 'active',
     summary:
-      'The old "Activity" tab is now called "Sign-off", and admins now see the sign-off queue when they tap it instead of being bounced to the SOP admin area.',
+      'The old "Activity" page is now called "Sign-off", reached from the Office, and admins see the sign-off queue there instead of being bounced to the SOP admin area.',
     tryIt: [
-      'Sign in and look at the two tabs at the top: SOPs and Sign-off.',
+      'Sign in and open the Office on the site: Sign-off is listed there.',
       'Tap Sign-off — you should see completed procedures waiting for review, not an editing screen.',
-      'If you are an admin: you should see Create New SOP, Team and Settings in the header next to Sign-off. Open Create New SOP — it should take you straight to the four ways of making a SOP.',
+      'If you are an admin: the Office shows Team and Settings, and the Workshop shows New SOP. Open New SOP — it should take you straight to the four ways of making a SOP.',
     ],
     questions: [
       { id: 'clear', text: 'Without anyone explaining it, could you guess what lives under "SOPs" and what lives under "Sign-off"?' },
@@ -124,7 +124,7 @@ export const UAT_TESTS: UatTest[] = [
       { id: 'lost', text: 'In your first five taps, did you ever land somewhere you did not expect?' },
     ],
     background:
-      'Nav clarity pass (2026-07-30): "Activity" renamed to "Sign-off" in the old header + BottomTabBar; /activity no longer redirects admins to the old admin SOP page (they see the supervisor sign-off queue).',
+      'Nav clarity pass (2026-07-30): "Activity" renamed to "Sign-off" (the header it was renamed in is gone since Phase 57); /activity no longer redirects admins to the old admin SOP page (they see the supervisor sign-off queue).',
   },
 
   // ===================== Design choices (pick A or B) =====================
@@ -458,7 +458,7 @@ export const UAT_TESTS: UatTest[] = [
       { id: 'badge-goes', text: 'Did the badge go away after you completed the new version?' },
     ],
     background:
-      'AFL-VER-04 / D-08 (updated-since indicator). Badge triggers when sop.published_at > worker\'s last completion. SopLibraryCard renders data-updated-badge when the showUpdatedBadge prop is true. The prop is derived server-side by comparing the SOP\'s current published_at against the most recent sop_completions.completed_at for that worker+SOP pair.',
+      'AFL-VER-04 / D-08 (updated-since indicator). Badge triggers when sop.published_at > worker\'s last completion. The Updated signal now rides the rel badge on the one screen (the old SOP card is gone, Phase 57). The prop is derived server-side by comparing the SOP\'s current published_at against the most recent sop_completions.completed_at for that worker+SOP pair.',
   },
   {
     id: 'p26-annotation-editor-feel',
@@ -602,22 +602,22 @@ export const UAT_TESTS: UatTest[] = [
     title: 'Is it clear who can see a SOP, and easy to wire up a new one?',
     status: 'active',
     summary:
-      'SOPs list now has an "Access" tab: a wiring diagram where you click an area, department or person to trace which library collections they can see, and click a new SOP to wire it up to the right parts of your org. The same view doubles as a library filter.',
+      'The Office now opens an "Access" screen: a wiring diagram where you click an area, department or person to trace which library collections they can see, and click a new SOP to wire it up to the right parts of your org. The same view doubles as a library filter.',
     tryIt: [
       'Publish a SOP and click the "Choose who sees it →" button that appears — you should land on the Access view with that SOP tagged "NEW".',
       'Click a department or person on the left to see the lines light up and a plain "N people can see this" banner.',
       'Click the new SOP, choose a department or two, and hit "✓ Save — done" — confirm the banner and the "Who can see this?" panel below update live.',
-      'With something focused, click "Open in the SOP list →" and confirm the SOP list filters down to just that department/collection with a count.',
+      'With something focused, click "Open in the SOP list →" and confirm the site opens on that department place.',
     ],
-    links: [{ label: 'SOPs — Access view', href: '/admin/access' }],
+    links: [{ label: 'Access (from the Office)', href: '/admin/access' }],
     questions: [
       { id: 'trace-clear', text: 'Was it clear which SOPs an area/department/person can see when you clicked it?' },
       { id: 'wireup-easy', text: 'Was wiring up a new SOP\'s access straightforward?' },
-      { id: 'filter-useful', text: 'Was jumping from the diagram to a filtered library list useful?' },
+      { id: 'filter-useful', text: 'Was jumping from the diagram to that department on the site useful?' },
       { id: 'blast-radius-trust', text: 'Did the "N people can see this" count feel trustworthy before you confirmed?' },
     ],
     background:
-      'D-09 (?view=access, third fold beside Needs attention), D-12 (wire-up entry from both the post-publish CTA and organically), D-11 (additive-only grants — no in-place revoke here), SC-4 (viz-as-library-filter deep-links). WiringPatchBay/SelectionStrip built in 32-08; the page arm, deep-links, and publish CTA land in 32-09; drill-down + plain-language copy + the answer panel land in 33-08/33-09 (see the Phase 33 — Access map entries below for current copy).',
+      'D-09 (the Access view, now the /admin/access page), D-12 (wire-up entry from both the post-publish CTA and organically), D-11 (additive-only grants — no in-place revoke here), SC-4 (viz-as-library-filter deep-links). WiringPatchBay/SelectionStrip built in 32-08; the page arm, deep-links, and publish CTA land in 32-09; drill-down + plain-language copy + the answer panel land in 33-08/33-09 (see the Phase 33 — Access map entries below for current copy).',
   },
 
   {
@@ -627,7 +627,7 @@ export const UAT_TESTS: UatTest[] = [
     title: 'Is the new builder header clear about where you are and what unlocks next?',
     status: 'active',
     summary:
-      'The dark bar at the top of the SOP builder is now a light bar with three parts: a "Back to SOP list" link, a "You\'re editing" tag with the SOP title, and a button showing the next stage — which tells you in plain words if it\'s locked and why. All the other tools (assign, versions, delete) are now in one "Tools for this SOP" menu.',
+      'The dark bar at the top of the SOP builder is now a light bar with three parts: a "Back to The site" link, a "You\'re editing" tag with the SOP title, and a button showing the next stage — which tells you in plain words if it\'s locked and why. All the other tools (assign, versions, delete) are now in one "Tools for this SOP" menu.',
     tryIt: [
       'Open any draft SOP in the builder and look at the header — check you can tell where you are and what SOP you\'re editing at a glance.',
       'With some steps still unchecked, look at the button on the right — read the sentence under it out loud; is it clear what\'s stopping you from sending this to workers?',
@@ -660,7 +660,7 @@ export const UAT_TESTS: UatTest[] = [
       'Click a person or team on the left instead — the same panel should flip to say what THEY can see.',
       'Look through the whole screen for the words "wire", "wiring", "grant" or "UNWIRED" — you shouldn\'t find any.',
     ],
-    links: [{ label: 'SOPs — Access view', href: '/admin/access' }],
+    links: [{ label: 'Access (from the Office)', href: '/admin/access' }],
     questions: [
       { id: 'drilldown-clear', text: 'Was it obvious you could open a collection and pick one of the SOPs inside it?' },
       { id: 'panel-plain', text: 'Did the "Who can see this?" / "What can they see?" panel read like plain English, not tech jargon?' },
@@ -684,7 +684,7 @@ export const UAT_TESTS: UatTest[] = [
       'Choose the department(s)/person(s) who should actually see this one SOP, then click "Save — done".',
       'Confirm the panel now says the SOP is "chosen by name" and no longer follows the wider collection.',
     ],
-    links: [{ label: 'SOPs — Access view', href: '/admin/access' }],
+    links: [{ label: 'Access (from the Office)', href: '/admin/access' }],
     questions: [
       { id: 'wr02-found', text: 'Could you find this SOP and see the plain-language explanation of who currently sees it?' },
       { id: 'wr02-narrowed', text: 'Were you able to choose the right people/department by name and save it?' },
@@ -828,13 +828,13 @@ export const UAT_TESTS: UatTest[] = [
       'Admins can set how often workers should re-walk a procedure (e.g. every 6 months). Once that time passes, workers see a friendly reminder — it never stops them opening or completing the procedure.',
     tryIt: [
       'Open a procedure\'s Version History page and set a refresher interval (e.g. 1 month, to see it trigger quickly for testing).',
-      'As a worker who\'s already completed that procedure, check your SOP list and the training matrix for a reminder.',
+      'As a worker who\'s already completed that procedure, check the "Next for you" card on the site and the training matrix for a reminder.',
       'Try opening and completing the procedure again — confirm nothing blocks you.',
     ],
     links: [{ label: 'Team & org model', href: '/admin/team' }],
     questions: [
       { id: 'cadence-clear', text: 'Was it clear how often workers need to re-walk this procedure?' },
-      { id: 'reminder-visible', text: 'Did the reminder appear where you\'d expect (your SOP list / the matrix)?' },
+      { id: 'reminder-visible', text: 'Did the reminder appear where you\'d expect (the site / the matrix)?' },
       { id: 'never-blocked', text: 'Did it ever stop anyone from opening or completing the SOP?' },
     ],
   },
@@ -977,7 +977,7 @@ export const UAT_TESTS: UatTest[] = [
     dateAdded: '2026-09-29',
     category: 'Admin home',
     title: 'Can you see at a glance which procedures need work?',
-    status: 'active',
+    status: 'archived',
     summary:
       'The admin SOPs page is now a table with a row of five circles per procedure — a quick health check without opening anything.',
     tryIt: [
@@ -993,7 +993,7 @@ export const UAT_TESTS: UatTest[] = [
       { id: 'edit-right-place', text: 'Does Edit take you to the right place?' },
     ],
     background:
-      'Phase 54 (D-07/D-08) — AdminLibraryTable.tsx, fed by listAdminSopRows; the five checks (owner/review/approved/assigned/converted) come from deriveChecks() in src/lib/sop/admin-health.ts, never re-derived in the component.',
+      'Archived 2026-10-05 (Phase 57, D-13): the admin table page was deleted. Drafts list in the Workshop and machine and site SOPs sit on the one screen; the health marks live on the machine pins and the Governance inbox.',
   },
   {
     id: 'plant-home-worker',
@@ -1002,7 +1002,7 @@ export const UAT_TESTS: UatTest[] = [
     title: 'Can a worker find their next job from the site map?',
     status: 'active',
     summary:
-      'On a computer, a worker\'s SOPs page now shows a picture of the site instead of a list. We want to know if it\'s obvious how to find a job from it.',
+      'On a computer, a worker\'s home screen shows a picture of the site instead of a list. We want to know if it\'s obvious how to find a job from it.',
     tryIt: [
       'Sign in as a worker on a computer (not a phone).',
       'Look at the drawing of the site.',
@@ -1016,7 +1016,7 @@ export const UAT_TESTS: UatTest[] = [
       { id: 'now-card-right-job', text: 'Did the "Next for you" card show the job you\'d actually do first?' },
     ],
     background:
-      'HOM-01..06 (Phase 52) — a desktop, non-admin worker whose org has a drawn site (>=1 machine) sees PlantHome instead of the Miller frame; pins/Now card/ask bar all derive from worker-signal.ts, never stored. Admins and phone widths are unaffected this phase (Phase 53/54).',
+      'HOM-01..06 (Phase 52) — a desktop, non-admin worker whose org has a drawn site (>=1 machine) saw the plant home (replaced by the one screen in Phase 57) instead of the Miller frame; pins/Now card/ask bar all derive from worker-signal.ts, never stored. Admins and phone widths are unaffected this phase (Phase 53/54).',
   },
   {
     id: 'phone-home-worker',
@@ -1025,10 +1025,10 @@ export const UAT_TESTS: UatTest[] = [
     title: 'Can a worker get to a machine\'s jobs from their phone?',
     status: 'archived',
     summary:
-      'On a phone, the SOPs page now starts with a search box, the next job, a picture of the site and a Scan button.',
+      'On a phone, the home screen now starts with a search box, the next job, a picture of the site and a Scan button.',
     tryIt: [
       'Sign in as a worker on your phone.',
-      'Look at the top of the SOPs page.',
+      'Look at the top of the home screen.',
       'Tap the picture of the site and pick a machine.',
       'Go back and tap Scan a machine plate — point it at a printed plate, or type the code under it.',
     ],

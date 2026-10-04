@@ -122,16 +122,14 @@ test.describe('retire sweep', () => {
   test('retire list: nothing in src links to, pushes to or revalidates the list address', () => {
     const link = /(href=|push\(|replace\(|redirect\(|revalidatePath\(|redirectTo=)\s*\{?\s*['"`]\/sops['"`?]/
     const offenders = walkSrc(path.join(ROOT, 'src'))
-      .filter((f) => !f.endsWith(path.join('lib', 'uat', 'tests.ts')))
       .filter((f) => link.test(stripComments(fs.readFileSync(f, 'utf-8'))))
       .map((f) => path.relative(ROOT, f))
     expect(offenders, offenders.join(', ')).toEqual([])
   })
 
   test('retire list: no source file still names a deleted list surface', () => {
-    const names = /PlantHome|PlantAskBar|WorkerSimpleList|CategoryBottomSheet|SopLibraryCard/
+    const names = /PlantHome|PlantAskBar|WorkerSimpleList|CategoryBottomSheet|SopLibraryCard|AdminLibraryTable|AdminFloorHealth|libraryNavToUrl|resolveLibraryNav|deriveChecks/
     const offenders = walkSrc(path.join(ROOT, 'src'))
-      .filter((f) => !f.endsWith(path.join('lib', 'uat', 'tests.ts'))) // 57-09 rewrites the feedback prose that names them
       .filter((f) => names.test(stripComments(fs.readFileSync(f, 'utf-8'))))
       .map((f) => path.relative(ROOT, f))
     expect(offenders, offenders.join(', ')).toEqual([])
@@ -170,5 +168,55 @@ test.describe('retire sweep', () => {
     }
     expect(shell).not.toContain('getUserSopAssignments')
   })
-  test.fixme('library table and its helpers are gone; dropped-features entries are live [57-09]', () => {})
+
+  test('retire list: the library table and its helpers are gone, the list address is quoted nowhere but the proxy, and the access view address is not spelled in src', () => {
+    for (const f of ['src/components/admin/AdminLibraryTable.tsx', 'src/components/admin/governance/AdminFloorHealth.tsx']) {
+      expect(fs.existsSync(path.join(ROOT, f)), f).toBe(false)
+    }
+    const rows = read('src/lib/sop-list/admin-rows.ts')
+    const health = read('src/lib/sop/admin-health.ts')
+    for (const name of ['libraryNavToUrl', 'resolveLibraryNav', 'DEFAULT_LIBRARY_NAV', 'deriveChecks', 'tableStatus', 'CHECK_ORDER']) {
+      expect(rows + health, name).not.toContain(name)
+    }
+    // what the one screen still reads stays
+    for (const name of ['adminSopBadge', 'machinePanelSops', 'noticeboardSops', 'healthPinCount', 'machineHealth']) {
+      expect(health, name).toContain(`export function ${name}(`)
+    }
+    // the quoted bare list address, with or without a query, outside the proxy
+    const bareList = /['"`]\/sops(?:['"`?]|$)/m
+    const accessView = /sops\?view=access|view=access/
+    const listHits: string[] = []
+    const accessHits: string[] = []
+    for (const f of walkSrc(path.join(ROOT, 'src'))) {
+      const rel = path.relative(ROOT, f).replace(/\\/g, '/')
+      const code = stripComments(fs.readFileSync(f, 'utf-8'))
+      if (rel !== 'src/lib/supabase/middleware.ts' && bareList.test(code)) listHits.push(rel)
+      if (accessView.test(code)) accessHits.push(rel)
+    }
+    expect(listHits, listHits.join(', ')).toEqual([])
+    expect(accessHits, accessHits.join(', ')).toEqual([])
+  })
+
+  test('retire list: the dropped list records the list-page feature and the phase55 sweep runs it live', () => {
+    const dropped = JSON.parse(read('scripts/dropped-features.json')) as { entries: Array<{ feature: string; kind: string; path?: string }> }
+    const mine = dropped.entries.filter((e) => e.feature === 'list-page')
+    const files = mine.filter((e) => e.kind === 'file').map((e) => e.path)
+    for (const f of [
+      'src/app/(protected)/sops/page.tsx',
+      'src/app/(protected)/sops/loading.tsx',
+      'src/components/sop/plant/PlantHome.tsx',
+      'src/components/sop/plant/PlantAskBar.tsx',
+      'src/components/sop/WorkerSimpleList.tsx',
+      'src/components/sop/CategoryBottomSheet.tsx',
+      'src/components/sop/SopLibraryCard.tsx',
+      'src/components/admin/AdminLibraryTable.tsx',
+      'src/components/admin/governance/AdminFloorHealth.tsx',
+    ]) {
+      expect(files, f).toContain(f)
+    }
+    // the dropped list holds no symbol for the bare list address: the redirect specs quote it
+    expect(mine.filter((e) => e.kind === 'symbol').length).toBe(1)
+    const sweep = read('tests/phase55/deletion-sweep.spec.ts')
+    expect(sweep.match(/'list-page'/g)?.length).toBe(2)
+  })
 })
