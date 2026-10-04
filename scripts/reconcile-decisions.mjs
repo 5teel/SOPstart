@@ -58,29 +58,31 @@ async function sql(query) {
 }
 
 // One row per source write: where, when, who, which SOP / subject, which kinds would log it.
+// `subj` is text: a uuid for most sources, the category for cadence rows (setReviewCadence logs
+// `subject.id = null` and keeps the category in details, so that is the only key to match on).
 const SOURCES = `
-  select 'sop_approvals' src, id, organisation_id org, created_at at, approver_user_id actor, sop_id, sop_id subj,
+  select 'sop_approvals' src, id, organisation_id org, created_at at, approver_user_id actor, sop_id, sop_id::text subj,
          array['approve','reject'] kinds, null::boolean timed from public.sop_approvals
-  union all select 'sop_completion_signatures', id, organisation_id, signed_at, roster_user_id, null, completion_id,
+  union all select 'sop_completion_signatures', id, organisation_id, signed_at, roster_user_id, null, completion_id::text,
          array['sign_off','countersign'], null from public.sop_completion_signatures
-  union all select 'sop_observations', id, organisation_id, created_at, observed_by, sop_id, observed_worker_id,
+  union all select 'sop_observations', id, organisation_id, created_at, observed_by, sop_id, observed_worker_id::text,
          array['observation'], null from public.sop_observations
-  union all select 'sop_review_events', id, organisation_id, created_at, reviewed_by, sop_id, sop_id,
+  union all select 'sop_review_events', id, organisation_id, created_at, reviewed_by, sop_id, sop_id::text,
          array['review'], null from public.sop_review_events
-  union all select 'sop_block_update_decisions', d.id, s.organisation_id, d.decided_at, d.decided_by, s.id, d.sop_section_block_id,
+  union all select 'sop_block_update_decisions', d.id, s.organisation_id, d.decided_at, d.decided_by, s.id, d.sop_section_block_id::text,
          array['approve','reject'], null
          from public.sop_block_update_decisions d
          join public.sop_section_blocks b on b.id = d.sop_section_block_id
          join public.sop_sections sec on sec.id = b.sop_section_id
          join public.sops s on s.id = sec.sop_id
-  union all select 'completion_sign_offs', id, organisation_id, created_at, supervisor_id, null, completion_id,
+  union all select 'completion_sign_offs', id, organisation_id, created_at, supervisor_id, null, completion_id::text,
          array['sign_off','reject'], null from public.completion_sign_offs
-  union all select 'sop_assignments', id, organisation_id, created_at, assigned_by, sop_id, id,
+  union all select 'sop_assignments', id, organisation_id, created_at, assigned_by, sop_id, id::text,
          array['assign'], null from public.sop_assignments
          where not (assignment_type::text = 'individual' and user_id = assigned_by)
-  union all select 'sop_review_cadences', null, organisation_id, updated_at, updated_by, null, null,
+  union all select 'sop_review_cadences', null, organisation_id, updated_at, updated_by, null, category,
          array['cadence_change'], null from public.sop_review_cadences
-  union all select 'ai_field_proposals', id, organisation_id, created_at, null, null, id,
+  union all select 'ai_field_proposals', id, organisation_id, created_at, null, null, id::text,
          array['approve','reject'], false from public.ai_field_proposals where status <> 'pending'
 `
 
@@ -104,7 +106,11 @@ async function main() {
         and d.organisation_id = src.org
         and d.kind = any (src.kinds)
         and (src.actor is null or d.actor_id = src.actor)
-        and (d.subject_id = src.subj or (src.sop_id is not null and d.sop_id = src.sop_id))
+        and (
+          d.subject_id::text = src.subj
+          or (src.src = 'sop_review_cadences' and d.details->>'category' = src.subj)
+          or (src.sop_id is not null and d.sop_id = src.sop_id)
+        )
         and (src.timed is false or abs(extract(epoch from (d.created_at - src.at))) <= 120)
     )
     order by src.at desc
