@@ -5,6 +5,7 @@ import { z } from 'zod'
 import type { SectionKind, Department } from '@/types/sop'
 import { listSectionKinds } from '@/actions/sections'
 import { createSopFromWizard } from '@/actions/sops'
+import { setSopMachines } from '@/actions/site'
 import { SopMetadataFields } from '@/components/admin/SopMetadataFields'
 import type { SopMetadataValue } from '@/components/admin/SopMetadataFields'
 
@@ -22,9 +23,11 @@ type TitleStepValues = z.infer<typeof TitleStepSchema>
 interface WizardClientProps {
   /** Phase 25: departments for the department multi-select field (localOnly create mode). */
   departments: Department[]
+  /** Phase 57 D-19: link the new SOP to this machine once it exists. */
+  machineId?: string | null
 }
 
-export function WizardClient({ departments }: WizardClientProps) {
+export function WizardClient({ departments, machineId = null }: WizardClientProps) {
   const router = useRouter()
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1)
   const [titleValues, setTitleValues] = useState<TitleStepValues | null>(null)
@@ -92,6 +95,10 @@ export function WizardClient({ departments }: WizardClientProps) {
       setStep(3)
       return
     }
+
+    // D-19: place the SOP on its machine. If the link fails the SOP still exists,
+    // so carry on to the builder, where the admin can place it by hand.
+    if (machineId) await setSopMachines({ sopId: result.sopId, machineIds: [machineId] })
 
     router.push(`/admin/sops/builder/${result.sopId}`)
   }

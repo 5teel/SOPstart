@@ -970,7 +970,7 @@ export const UAT_TESTS: UatTest[] = [
       { id: 'site-marks-make-sense', text: 'Did the red and orange marks on the site picture make sense?' },
     ],
     background:
-      'Phase 54 (D-01/D-02) — /governance server-renders listGovernanceQueue + listAdminSopRows + listSiteHealthForOrg, derived into InboxItem[] by deriveInbox() and rendered by GovernanceInbox.tsx; the floor is AdminFloorHealth reading the same site data.',
+      'Phase 54 (D-01/D-02) — /governance server-renders listGovernanceQueue + listAdminSopRows + listSiteHealthForOrg, derived into InboxItem[] by deriveInbox() and rendered by GovernanceInbox.tsx; since Phase 57 the site floor lives on the one screen, not here.',
   },
   {
     id: 'library-table',

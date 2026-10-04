@@ -9,7 +9,17 @@ export const metadata: Metadata = {
   title: 'New SOP',
 }
 
-export default async function NewBlankSopPage() {
+// Phase 57 D-19: ?machine=<id> from a machine's "New SOP for this machine".
+// Only a well-formed id gets through; setSopMachines re-checks it against the session org.
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+export default async function NewBlankSopPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ machine?: string | string[] }>
+}) {
+  const { machine } = await searchParams
+  const machineId = typeof machine === 'string' && UUID.test(machine) ? machine : null
   const { userId, role } = await getSessionContext()
   if (!userId) redirect('/login')
 
@@ -26,7 +36,7 @@ export default async function NewBlankSopPage() {
       title="New SOP"
       description="Start a SOP from scratch — pick the sections you want, then build them in the editor."
     >
-      <WizardClient departments={departments} />
+      <WizardClient departments={departments} machineId={machineId} />
     </AdminPageShell>
   )
 }

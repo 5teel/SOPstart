@@ -8,9 +8,9 @@
  *
  *   1. Per-symbol allow-list (converted 54-05 from a shared file list, now
  *      that the three Phase 41 lens files are deleted): `GovernanceQueueRow`,
- *      `WiringPatchBayShell`, `AdminFloorHealth` may each only be statically
- *      imported from their own named file below. `AdminLibraryTable` has an
- *      empty allow-list — it is only ever reached via `next/dynamic`
+ *      `WiringPatchBayShell` may each only be statically
+ *      imported from their own named file below. `AdminLibraryTable` and `AdminShell`
+ *      have an empty allow-list — it is only ever reached via `next/dynamic`
  *      (`src/app/(protected)/sops/page.tsx`), so ANY static import is a
  *      violation.
  *
@@ -34,7 +34,8 @@ const SRC_DIR = path.join(REPO_ROOT, 'src')
 const ALLOWED_IMPORTERS: Record<string, string[]> = {
   GovernanceQueueRow: [path.join('src', 'components', 'admin', 'governance', 'GovernanceInbox.tsx')],
   WiringPatchBayShell: [path.join('src', 'components', 'sop', 'lenses', 'AdminAccessLens.tsx')],
-  AdminFloorHealth: [path.join('src', 'app', '(protected)', 'governance', 'page.tsx')],
+  // Phase 57: reachable only through next/dynamic in OneScreen.
+  AdminShell: [],
   AdminLibraryTable: [],
 }
 

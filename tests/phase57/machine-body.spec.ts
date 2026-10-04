@@ -44,6 +44,62 @@ test.describe('PLC-02 machine body', () => {
     expect(ROOMS).toContain('Ask for a change')
   })
 
-  test.fixme('admin machine body offers Walk, Edit and new SOP for the machine [57-05]', () => {})
-  test.fixme('the blank wizard with a machine id links the new SOP to it after create [57-05]', () => {})
+})
+
+test.describe('PLC-02 admin machine body', () => {
+  const ADMIN = read('src/components/admin/governance/AdminMachinePanel.tsx')
+  const ROOMS = read('src/components/shell/AdminRoomBodies.tsx')
+  const WIZ = read('src/app/(protected)/admin/sops/new/blank/WizardClient.tsx')
+  const PAGE = read('src/app/(protected)/admin/sops/new/blank/page.tsx')
+
+  test('rows: badge, title link, Walk only when published, Edit, owner and review line', () => {
+    expect(ADMIN).toContain('export function AdminSopRows(')
+    expect(ADMIN).toContain('data-testid="admin-panel-row"')
+    expect(ADMIN).toContain('data-testid="admin-panel-badge"')
+    expect(ADMIN).toContain('href={`/sops/${sop.id}`}')
+    expect(ADMIN).toMatch(/sop\.status === 'published' && \(\s*<Link\s+href=\{`\/sops\/\$\{sop\.id\}\?tab=walk`\}\s+data-testid="admin-panel-walk"/)
+    expect(ADMIN).toContain('href={`/admin/sops/builder/${sop.id}`}')
+    expect(ADMIN).toContain('data-testid="admin-panel-edit"')
+    expect(ADMIN).toContain('owner {sop.ownerLabel ??')
+  })
+
+  test('machine body has no close button and starts a SOP for this machine', () => {
+    expect(ADMIN).toContain('export function AdminMachineBody(')
+    expect(ADMIN).toContain('data-testid="admin-panel"')
+    expect(ADMIN).not.toContain('onClose')
+    expect(ADMIN).toContain('href={`/admin/sops/new/blank?machine=${machine.id}`}')
+    expect(ADMIN).toContain('data-testid="admin-panel-new-sop"')
+    expect(ADMIN).toContain('No procedures for this machine yet.')
+    expect(ADMIN).not.toContain('@/components/sop/plant')
+  })
+
+  test('admin room bodies: Office, Workshop, Noticeboard', () => {
+    expect((ROOMS.match(/data-testid="room-body"/g) ?? []).length).toBe(3)
+    expect(ROOMS).toContain('href="/governance" data-testid="room-office-inbox"')
+    expect(ROOMS).toContain('href="/activity" data-testid="room-office-signoffs"')
+    expect(ROOMS).toContain('href="/admin/team"')
+    expect(ROOMS).toContain('href="/admin/settings"')
+    expect(ROOMS).toContain('data-testid="room-workshop-draft"')
+    expect(ROOMS).toContain('href={`/admin/sops/builder/${d.id}`}')
+    expect(ROOMS).toContain('href="/admin/sops/new" data-testid="room-workshop-new"')
+    expect(ROOMS).toContain('Write a new SOP')
+    expect(ROOMS).toContain('<AdminSopRows sops={sops} empty="No site-wide SOPs yet." />')
+  })
+
+  test('the blank page keeps ?machine= only when it is a UUID', () => {
+    expect(PAGE).toContain('await searchParams')
+    expect(PAGE).toMatch(/const UUID = \/\^\[0-9a-f\]\{8\}/)
+    expect(PAGE).toContain('UUID.test(machine)')
+    expect(PAGE).toContain('machineId={machineId}')
+  })
+
+  test('the wizard creates the SOP, then links it to the machine, then opens the builder', () => {
+    const create = WIZ.indexOf('await createSopFromWizard(')
+    const link = WIZ.indexOf('setSopMachines({ sopId: result.sopId, machineIds: [machineId] })')
+    const push = WIZ.indexOf('router.push(`/admin/sops/builder/${result.sopId}`)')
+    expect(create).toBeGreaterThan(-1)
+    expect(link).toBeGreaterThan(create)
+    expect(push).toBeGreaterThan(link)
+    expect(WIZ).toContain("from '@/actions/site'")
+  })
 })

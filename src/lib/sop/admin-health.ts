@@ -75,11 +75,27 @@ export interface AdminPanelSop {
   id: string
   title: string
   badge: AdminSopBadge
+  status: string
   ownerLabel: string | null
   reviewDueAt: string | null
 }
 
 const BADGE_RANK: Record<AdminSopBadge, number> = { 'NO OWNER': 0, 'REVIEW DUE': 1, DRAFT: 2, OK: 3 }
+
+function toPanelSop(r: HealthRow): AdminPanelSop {
+  return {
+    id: r.id,
+    title: r.title ?? 'Untitled SOP',
+    badge: adminSopBadge(r),
+    status: r.status,
+    ownerLabel: r.flags.includes('unowned') ? null : r.ownerLabel,
+    reviewDueAt: r.reviewDueAt,
+  }
+}
+
+function byBadgeThenTitle(a: AdminPanelSop, b: AdminPanelSop): number {
+  return BADGE_RANK[a.badge] - BADGE_RANK[b.badge] || a.title.localeCompare(b.title)
+}
 
 /** That machine's linked SOPs, NO OWNER -> REVIEW DUE -> DRAFT -> OK, then title. */
 export function machinePanelSops(
@@ -91,17 +107,27 @@ export function machinePanelSops(
     .filter((l) => l.machine_id === machineId)
     .map((l) => rowsById.get(l.sop_id))
     .filter((r): r is HealthRow => r !== undefined)
-    .map((r) => {
-      const badge = adminSopBadge(r)
-      return {
-        id: r.id,
-        title: r.title ?? 'Untitled SOP',
-        badge,
-        ownerLabel: r.flags.includes('unowned') ? null : r.ownerLabel,
-        reviewDueAt: r.reviewDueAt,
-      }
-    })
-    .sort((a, b) => BADGE_RANK[a.badge] - BADGE_RANK[b.badge] || a.title.localeCompare(b.title))
+    .map(toPanelSop)
+    .sort(byBadgeThenTitle)
+}
+
+/** The Noticeboard (D-20): site-wide SOPs, published first, the drafts as a tail;
+ *  each group in machinePanelSops order. */
+export function noticeboardSops(
+  siteSopIds: ReadonlyArray<string>,
+  rowsById: ReadonlyMap<string, HealthRow>
+): AdminPanelSop[] {
+  const all = siteSopIds
+    .map((id) => rowsById.get(id))
+    .filter((r): r is HealthRow => r !== undefined)
+    .map(toPanelSop)
+    .sort(byBadgeThenTitle)
+  return [...all.filter((s) => s.status === 'published'), ...all.filter((s) => s.status !== 'published')]
+}
+
+/** The Noticeboard pin: rows that need an admin (no owner, review due). */
+export function healthPinCount(sops: ReadonlyArray<AdminPanelSop>): number {
+  return sops.filter((s) => s.badge === 'NO OWNER' || s.badge === 'REVIEW DUE').length
 }
 
 // ---------------------------------------------------------------------------

@@ -4,6 +4,7 @@
  * Registration: playwright.config.ts `phase57` project.
  */
 import { test, expect } from '@playwright/test'
+import { noticeboardSops, healthPinCount, type HealthRow } from '@/lib/sop/admin-health'
 import fs from 'node:fs'
 import path from 'node:path'
 
@@ -20,5 +21,44 @@ test.describe('PLC-03 noticeboard', () => {
     expect(read('src/components/shell/RoomBodies.tsx')).toContain('No site-wide SOPs yet.')
   })
 
-  test.fixme('admin noticeboardSops includes draft and published site SOPs with status [57-05]', () => {})
+})
+
+const row = (id: string, title: string, status: string, flags: HealthRow['flags'] = []): HealthRow => ({
+  id,
+  title,
+  status,
+  flags,
+  ownerLabel: 'Sam',
+  reviewDueAt: null,
+})
+
+test.describe('PLC-03 admin noticeboard', () => {
+  const rows = new Map<string, HealthRow>([
+    ['a', row('a', 'Zulu', 'published')],
+    ['b', row('b', 'Alpha', 'draft')],
+    ['c', row('c', 'Mike', 'published', ['unowned'])],
+    ['d', row('d', 'Bravo', 'published', ['overdue'])],
+    ['x', row('x', 'Elsewhere', 'published')],
+  ])
+
+  test('published site SOPs first, drafts as a tail, each group in panel order', () => {
+    const out = noticeboardSops(['a', 'b', 'c', 'd', 'missing'], rows)
+    expect(out.map((s) => s.id)).toEqual(['c', 'd', 'a', 'b'])
+    expect(out.map((s) => s.status)).toEqual(['published', 'published', 'published', 'draft'])
+    expect(out[3].badge).toBe('DRAFT')
+  })
+
+  test('only the site SOP ids are listed', () => {
+    expect(noticeboardSops(['a'], rows).map((s) => s.id)).toEqual(['a'])
+    expect(noticeboardSops([], rows)).toEqual([])
+  })
+
+  test('healthPinCount counts NO OWNER and REVIEW DUE rows only', () => {
+    expect(healthPinCount(noticeboardSops(['a', 'b', 'c', 'd'], rows))).toBe(2)
+    expect(healthPinCount([])).toBe(0)
+  })
+
+  test('the admin noticeboard body states the draft tail through the shared rows', () => {
+    expect(read('src/components/shell/AdminRoomBodies.tsx')).toContain('export function AdminNoticeboardBody(')
+  })
 })
