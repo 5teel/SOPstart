@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { X } from 'lucide-react'
 import { listSopMachines, setSopMachines } from '@/actions/site'
 import type { SiteDepartment, SiteMachine } from '@/lib/validators/site'
+import { placementLabel, placementSummary } from '@/lib/sop/placement'
 
 /**
  * Phase 51 (51-06, D-12) — Tools-menu row + portaled modal for linking this
@@ -86,6 +87,30 @@ export function BuilderMachinesButton({ sopId }: { sopId: string }) {
     setSaveState('saved')
   }
 
+  // Same optimistic update + rollback as toggleMachine; empty list clears every link
+  // and the sop_machines trigger flips sops.placement to 'site' (D-09).
+  async function makeWholeSite() {
+    const previous = linkedIds
+    setLinkedIds([])
+    setSaveState('saving')
+    const result = await setSopMachines({ sopId, machineIds: [] })
+    if ('error' in result) {
+      setLinkedIds(previous)
+      setSaveState('error')
+      return
+    }
+    setLinkedIds(result.machineIds)
+    setSaveState('saved')
+  }
+
+  const deptName = new Map(departments.map((d) => [d.id, d.name]))
+  const placement = placementSummary(
+    linkedIds.length ? 'machine' : 'site',
+    machines
+      .filter((m) => linkedIds.includes(m.id))
+      .map((m) => ({ name: m.name, department: m.department_id ? (deptName.get(m.department_id) ?? null) : null })),
+  )
+
   const query = search.trim().toLowerCase()
   const sortedDepartments = [...departments].sort((a, b) => a.name.localeCompare(b.name))
   const groups: { key: string; label: string; colour: string | null; machines: SiteMachine[] }[] = [
@@ -160,6 +185,21 @@ export function BuilderMachinesButton({ sopId }: { sopId: string }) {
               {!loading && !loadError && machines.length > 0 && (
                 <div className="flex-1 min-h-0 flex flex-col">
                   <div className="px-4 py-3 border-b border-[var(--ink-100)]">
+                    <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                      <p data-testid="placement-line" className="text-ui text-[var(--ink-900)]">
+                        Lives on: <span className="font-semibold">{placementLabel(placement)}</span>
+                      </p>
+                      {linkedIds.length > 0 && (
+                        <button
+                          type="button"
+                          data-testid="placement-whole-site"
+                          onClick={() => void makeWholeSite()}
+                          className="min-h-tap rounded-lg border border-[var(--ink-300)] px-3 text-ui text-[var(--ink-900)] hover:bg-[var(--paper-2)]"
+                        >
+                          Whole site
+                        </button>
+                      )}
+                    </div>
                     <input
                       type="text"
                       aria-label="Find a machine"

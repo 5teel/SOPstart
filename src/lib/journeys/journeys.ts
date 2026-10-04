@@ -536,7 +536,7 @@ export const JOURNEYS: Journey[] = [
       { id: 'editor', type: 'screen', label: 'Site map editor', route: '/admin/site', detail: 'Scene at full size, drag to pan, scroll to zoom.' },
       { id: 'draw', type: 'action', label: 'Draw machine', detail: 'Click each corner, click the first to finish; name it, pick its department.' },
       { id: 'link', type: 'action', label: 'Show SOPs on a machine', detail: 'Link or unlink SOPs from the machine panel.' },
-      { id: 'builder', type: 'screen', label: 'Builder → Tools for this SOP → Pick machines for this SOP', route: '/admin/sops/builder/[sopId]', detail: 'The same links, edited from the SOP side. The same Tools menu also carries "Change category" (BuilderCategoryButton, D-09) — the category fix that used to live in the retired list detail pane.' },
+      { id: 'builder', type: 'screen', label: 'Builder → Tools for this SOP → Pick machines for this SOP', route: '/admin/sops/builder/[sopId]', detail: 'The same links, edited from the SOP side. The picker says where the SOP lives: its machines and their department, or Whole site. The Whole site button clears every machine, and a SOP with no machine is site-wide (Phase 56, D-09/D-10). The department shown comes from the machines; who can see the SOP is still the access wiring. The same Tools menu also carries "Change category" (BuilderCategoryButton, D-09) — the category fix that used to live in the retired list detail pane.' },
       { id: 'e', type: 'end', label: 'Site mapped' },
     ],
   },
