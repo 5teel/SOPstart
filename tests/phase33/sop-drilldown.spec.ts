@@ -67,7 +67,7 @@ test.describe('SC-2 — server assembly: sopsByCollection + ?sop= deep-link entr
     expect(rowsSrc).toContain("return { ...DEFAULT_LIBRARY_NAV, view: 'access', sop: params.get('sop') ?? undefined }")
     // ...and AdminAccessLens receives it as pinnedSopId.
     const tableSrc = read(LIBRARY_TABLE)
-    expect(tableSrc).toContain('<AdminAccessLens pinnedSopId={nav.sop} onBack={() => applyNav(DEFAULT_LIBRARY_NAV)} />')
+    expect(tableSrc).toContain('<AdminAccessLens pinnedSopId={nav.sop} />')
   })
 })
 

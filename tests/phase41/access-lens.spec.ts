@@ -127,9 +127,9 @@ test.describe('AdminAccessLens — client wrapper', () => {
     expect(code).toContain('WiringPatchBayShell')
   })
 
-  test('scope exit is a callback (onBack) — no router.push, no <Link, no href=', () => {
+  test('no scope exit of its own (Phase 57: the layout Back bar covers it) — no router.push, no <Link, no href=', () => {
     const code = stripComments(read(LENS))
-    expect(code).toContain('onBack')
+    expect(code).not.toContain('onBack')
     expect(code).not.toContain('router.push')
     expect(code).not.toContain('<Link')
     expect(code).not.toContain('href=')

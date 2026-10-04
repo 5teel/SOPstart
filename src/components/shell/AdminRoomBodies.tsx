@@ -45,6 +45,9 @@ export function AdminOfficeBody({
       <Link href="/activity" data-testid="room-office-signoffs" className={LINK}>
         {pendingSignOffs} {pendingSignOffs === 1 ? 'completion' : 'completions'} waiting for sign-off
       </Link>
+      <Link href="/admin/access" data-testid="room-office-access" className={LINK}>
+        Access — who sees which SOPs
+      </Link>
       <div className="flex gap-2">
         <Link href="/admin/team" className={`${LINK} flex-1`}>
           People &amp; roles

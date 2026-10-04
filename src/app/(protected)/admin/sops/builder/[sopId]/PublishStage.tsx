@@ -24,8 +24,8 @@
  *
  * Phase 32-09 — optional `wireUpHref` prop (D-12a). When set (the parent
  * shell supplies it once initialSop.status === 'published'), renders a
- * "Choose who sees it" CTA to /admin/sops?view=access&sop={sopId}, pinning
- * the SOP on the access map for organic wire-up (33-09 SC-5: plain
+ * "Choose who sees it" CTA to the Access bridge page (/admin/access, Phase 57)
+ * with the SOP id, pinning the SOP on the access map for organic wire-up (33-09 SC-5: plain
  * language, href unchanged).
  */
 

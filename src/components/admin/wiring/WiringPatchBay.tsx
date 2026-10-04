@@ -612,15 +612,14 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, sops
     return visibleRawEdges.length
   }, [focus, collectionById, sopById, grants, visibleRawEdges])
 
-  // 32-09 SC-4 (viz-as-library-filter): a focused department or collection is
-  // a valid /sops server-side filter target — org/area/person focus
-  // has no equivalent list-scope query param, so no link renders for those.
+  // 32-09 SC-4 / Phase 57 D-13: a focused department opens its place on the
+  // one screen; the library list is retired, so collections, org, area and
+  // person focus have no destination and render no link.
   const openInLibraryHref = useMemo(() => {
     if (connecting || !focus) return undefined
-    if (deptById.has(focus)) return `/sops?departments=${focus}`
-    if (collectionById.has(focus)) return `/sops?collection=${focus}`
+    if (deptById.has(focus)) return `/?place=dept:${focus}`
     return undefined
-  }, [connecting, focus, deptById, collectionById])
+  }, [connecting, focus, deptById])
 
   // ---- 33-09 SC-5: AccessAnswerPanel data — plain-language "Who can see
   // this?" / "What can they see?" sentences, derived entirely from the

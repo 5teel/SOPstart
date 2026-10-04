@@ -122,7 +122,7 @@ test.describe('UX-03 — governance lives at /governance', () => {
     const table = read(LIBRARY_TABLE)
     expect(table).toContain('data-testid="lib-access"')
     expect(table).toContain("applyNav({ ...DEFAULT_LIBRARY_NAV, view: 'access' })")
-    expect(table).toContain('<AdminAccessLens pinnedSopId={nav.sop} onBack={() => applyNav(DEFAULT_LIBRARY_NAV)} />')
+    expect(table).toContain('<AdminAccessLens pinnedSopId={nav.sop} />')
   })
 })
 

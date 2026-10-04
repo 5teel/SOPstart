@@ -151,7 +151,7 @@ export function AdminLibraryTable({ filter, onTakeoverChange }: AdminLibraryTabl
   }, [data, filter, nav])
 
   if (nav.view === 'access') {
-    return <AdminAccessLens pinnedSopId={nav.sop} onBack={() => applyNav(DEFAULT_LIBRARY_NAV)} />
+    return <AdminAccessLens pinnedSopId={nav.sop} />
   }
 
   if (isLoading || !data) {

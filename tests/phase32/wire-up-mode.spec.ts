@@ -174,10 +174,11 @@ test.describe('SC-5 — wire-up mode runtime (requires chromium + live app, 32-0
     expect(src).toContain("className={`jack${opts.nested ? ' child' : ''} newsop")
   })
 
-  test.fixme(
-    'PublishStage shows a "Choose who sees it" CTA linking to ?view=access&sop=<id> pinned NEW (32-09/33-09)',
-    async ({ page }) => {
-      void page
-    },
-  )
+  test('the builder hands PublishStage the Access bridge URL pinned to the SOP (Phase 57 D-14)', () => {
+    const shell = fs.readFileSync(
+      path.join(process.cwd(), 'src', 'app', '(protected)', 'admin', 'sops', 'builder', '[sopId]', 'BuilderStageShell.tsx'),
+      'utf-8',
+    )
+    expect(shell).toContain('`/admin/access?sop=${sopId}`')
+  })
 })

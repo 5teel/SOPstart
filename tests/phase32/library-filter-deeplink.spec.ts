@@ -75,10 +75,10 @@ test.describe('SC-4 — library filter deep-link', () => {
     expect(accessReturnLine).not.toContain('collection')
   })
 
-  test('WiringPatchBay exposes a focus-based Open in library deep-link to /sops?departments=/?collection=', () => {
+  test('WiringPatchBay exposes a focus-based Open link: a department opens its place; no collection link (list retired, D-13)', () => {
     const src = fs.readFileSync(WIRING_PATCH_BAY_PATH, 'utf-8')
-    expect(src).toContain('`/sops?departments=${focus}`')
-    expect(src).toContain('`/sops?collection=${focus}`')
+    expect(src).toContain('`/?place=dept:${focus}`')
+    expect(src).not.toContain('`/sops?collection=${focus}`')
     expect(src).toContain('openInLibraryHref')
   })
 
