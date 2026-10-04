@@ -183,7 +183,7 @@ export function askMatches(
   query: string,
   machines: ReadonlyArray<AskMachine>,
   links: ReadonlyArray<SopMachineLink>,
-  sopsById: ReadonlyMap<string, WorkerSop>
+  sopsById: ReadonlyMap<string, { title: string }>
 ): Set<string> {
   const q = query.trim().toLowerCase()
   const matches = new Set<string>()

@@ -1,10 +1,12 @@
 /**
- * Phase 57 -- SHL-04 search lights shapes (Wave 0 / 57-01).
- * roomMatches is pure and LIVE from 57-01; the frame half is filled by 57-02.
+ * Phase 57 -- SHL-04 search lights shapes (57-01 pure half, 57-02 frame half).
  * Registration: playwright.config.ts `phase57` project.
  */
 import { test, expect } from '@playwright/test'
+import fs from 'node:fs'
+import path from 'node:path'
 import { roomMatches } from '@/lib/site/rooms'
+import { askMatches } from '@/lib/sop/worker-signal'
 
 test.describe('SHL-04 rooms', () => {
   test('an empty query matches no room', () => {
@@ -31,6 +33,29 @@ test.describe('SHL-04 rooms', () => {
 })
 
 test.describe('SHL-04 frame', () => {
-  test.fixme('the search box lights machine and room shapes that match [57-02]', () => {})
-  test.fixme('askMatches accepts a map of id to { title } [57-02]', () => {})
+  const FRAME = fs
+    .readFileSync(path.resolve(__dirname, '..', '..', 'src', 'components', 'shell', 'ShellFrame.tsx'), 'utf-8')
+    .replace(/\r\n/g, '\n')
+
+  test('the search box filters the list and lights machine and room shapes through askMatches and roomMatches', () => {
+    expect(FRAME).toContain('askMatches(query, machines, links, sopsById)')
+    expect(FRAME).toContain('roomMatches(query, siteSopTitles)')
+    expect(FRAME).toContain('highlighted: machineHits.has(m.id)')
+    expect(FRAME).toContain('highlighted: roomHits.has(r.id)')
+    expect(FRAME).toContain('shownMachines = searching ? machines.filter((m) => machineHits.has(m.id))')
+    expect(FRAME).toContain('shownRooms = searching ? ROOMS.filter((r) => roomHits.has(r.id))')
+    expect(FRAME).toContain('Nothing matches')
+  })
+
+  test('askMatches accepts a map of id to { title }', () => {
+    const machines = [
+      { id: 'm1', name: 'Press' },
+      { id: 'm2', name: 'Oven' },
+    ]
+    const links = [{ sop_id: 's1', machine_id: 'm2' }]
+    const sops = new Map([['s1', { title: 'Lockout procedure' }]])
+    expect([...askMatches('lockout', machines, links, sops)]).toEqual(['m2'])
+    expect([...askMatches('press', machines, links, sops)]).toEqual(['m1'])
+    expect([...askMatches('', machines, links, sops)]).toEqual([])
+  })
 })

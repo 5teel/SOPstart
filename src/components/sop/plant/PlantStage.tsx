@@ -202,10 +202,11 @@ export function PlantStage({
   const fit = useCallback(() => {
     const el = containerRef.current
     if (!el) return
+    // The intent is recorded even while hidden (0x0): the observer replays it on show.
+    focusRef.current = { kind: 'fit' }
     // Re-measure on every call -- a stage built while hidden measures 0x0.
     const next = fitView(el.clientWidth, el.clientHeight, sceneWidth, sceneHeight)
     if (!next) return
-    focusRef.current = { kind: 'fit' }
     animateTo(next)
   }, [sceneWidth, sceneHeight, animateTo])
 
@@ -213,9 +214,9 @@ export function PlantStage({
     const el = containerRef.current
     const place = machines.find((m) => m.id === id) ?? rooms.find((r) => r.id === id)
     if (!el || !place) return
+    focusRef.current = { kind: 'fly', id }
     const next = flyToView(el.clientWidth, el.clientHeight, centroid(place.polygon), FLY_SCALE, flyInset)
     if (!next) return
-    focusRef.current = { kind: 'fly', id }
     animateTo(next)
   }, [machines, rooms, flyInset, animateTo])
 
@@ -255,7 +256,8 @@ export function PlantStage({
     const el = containerRef.current
     if (!el) return
     const ro = new ResizeObserver(() => {
-      if (viewRef.current === null) fit()
+      // A null view replays the default 'fit' intent; a hidden 0x0 stage never fits.
+      if (viewRef.current === null && focusRef.current.kind === 'free') fit()
       else replayRef.current()
     })
     ro.observe(el)

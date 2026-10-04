@@ -14,6 +14,8 @@ const ROOT = path.resolve(__dirname, '..', '..')
 const PAGE_PATH = 'src/app/(protected)/sops/page.tsx'
 const PLANT_HOME_PATH = 'src/components/sop/plant/PlantHome.tsx'
 const PLANT_DIR = 'src/components/sop/plant/'
+// Phase 57: the one screen is the plant's new home; the worker SOP route's isolation is held by the bundle gate.
+const SHELL_DIR = 'src/components/shell/'
 
 function read(rel: string): string {
   return fs.readFileSync(path.join(ROOT, rel), 'utf-8').replace(/\r\n/g, '\n')
@@ -63,7 +65,7 @@ test.describe('render seam', () => {
     const staticImport = /^\s*import\s+[^;]*from\s+'@\/components\/sop\/plant\//m
     const files = walk('src')
     const violations = files
-      .filter((f) => !f.startsWith(PLANT_DIR))
+      .filter((f) => !f.startsWith(PLANT_DIR) && !f.startsWith(SHELL_DIR))
       .filter((f) => staticImport.test(read(f)))
     expect(violations).toEqual([])
   })
