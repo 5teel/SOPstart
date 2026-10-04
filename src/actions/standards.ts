@@ -207,24 +207,19 @@ export async function getSopStandardsPanel(sopId: string): Promise<StandardsPane
   const sections = (secRows ?? []) as Array<{ id: string; title: string }>
   const steps = (stepRows ?? []) as Array<{ id: string; section_id: string; kind: string; text: string }>
 
+  // Read the org's attachments and pick this SOP's in memory: a filter listing every
+  // section and focus-step id would put hundreds of UUIDs in one GET URL on a large SOP.
   const { data: attRows, error: attErr } = await db
     .from('standard_attachments')
     .select('standard_id, sop_id, section_id, focus_step_id')
     .eq('organisation_id', orgId)
-    .or(
-      [
-        `sop_id.eq.${sopId}`,
-        sections.length > 0 ? `section_id.in.(${sections.map((s) => s.id).join(',')})` : null,
-        steps.length > 0 ? `focus_step_id.in.(${steps.map((s) => s.id).join(',')})` : null,
-      ]
-        .filter(Boolean)
-        .join(',')
-    )
   if (attErr) {
     console.error('[getSopStandardsPanel] attachments error', attErr)
     return { error: attErr.message }
   }
 
+  const sectionIds = new Set(sections.map((s) => s.id))
+  const stepIds = new Set(steps.map((s) => s.id))
   const bySop: string[] = []
   const bySection = new Map<string, string[]>()
   const byStep = new Map<string, string[]>()
@@ -235,9 +230,9 @@ export async function getSopStandardsPanel(sopId: string): Promise<StandardsPane
     section_id: string | null
     focus_step_id: string | null
   }>) {
-    if (a.sop_id) bySop.push(a.standard_id)
-    else if (a.section_id) push(bySection, a.section_id, a.standard_id)
-    else if (a.focus_step_id) push(byStep, a.focus_step_id, a.standard_id)
+    if (a.sop_id === sopId) bySop.push(a.standard_id)
+    else if (a.section_id && sectionIds.has(a.section_id)) push(bySection, a.section_id, a.standard_id)
+    else if (a.focus_step_id && stepIds.has(a.focus_step_id)) push(byStep, a.focus_step_id, a.standard_id)
   }
 
   return {
