@@ -64,6 +64,64 @@ test.describe('SHL-05 one inbox query', () => {
   })
 })
 
+function walk(dir: string, out: string[] = []): string[] {
+  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, e.name)
+    if (e.isDirectory()) walk(full, out)
+    else if (/\.tsx?$/.test(e.name)) out.push(full)
+  }
+  return out
+}
+
+test.describe('SHL-05 supervisor parity', () => {
+  const WORKER = strip(read('src', 'components', 'shell', 'WorkerShell.tsx'))
+
+  test('one identifier feeds the Office card count and the Office pin', () => {
+    expect(WORKER).toContain('count={pending}')
+    expect(WORKER).toMatch(/roomPins=\{isSupervisor \? \{ office: pending,/)
+    expect((WORKER.match(/const pending =/g) ?? []).length).toBe(1)
+  })
+
+  test('the sign-off count is fetched only for a supervisor and counts pending_sign_off', () => {
+    expect(WORKER).toContain("useSupervisorCompletions({ type: 'all' }, isSupervisor)")
+    expect(WORKER).toContain("c.status === 'pending_sign_off'")
+  })
+
+  test('the Office body shows the same number it is handed', () => {
+    expect(read('src', 'components', 'shell', 'RoomBodies.tsx')).toContain('pending: number')
+    expect(WORKER).toContain('pending={pending}')
+  })
+})
+
+test.describe('SHL-05 admin seam', () => {
+  const MODULE = '@/components/shell/AdminShell'
+
+  test('OneScreen reaches AdminShell only through next/dynamic with ssr off', () => {
+    const src = strip(read('src', 'components', 'shell', 'OneScreen.tsx'))
+    expect(src).toContain(`import('${MODULE}')`)
+    expect(src).toMatch(/dynamic\(\s*\(\) => import\('@\/components\/shell\/AdminShell'\)/)
+    expect(src).toContain('ssr: false')
+    expect(src).toContain('useIsAdmin()')
+    expect(src).toContain('data-testid="shell-loading"')
+    expect(src).not.toMatch(/^import .*AdminShell/m)
+  })
+
+  test('no other file under src references the AdminShell module', () => {
+    const hits = walk(path.join(ROOT, 'src'))
+      .filter((f) => !f.endsWith(path.join('shell', 'AdminShell.tsx')))
+      .filter((f) => fs.readFileSync(f, 'utf-8').includes(MODULE))
+      .map((f) => path.relative(ROOT, f).split(path.sep).join('/'))
+    expect(hits).toEqual(['src/components/shell/OneScreen.tsx'])
+  })
+
+  test('the worker shell imports nothing from the admin side', () => {
+    const src = read('src', 'components', 'shell', 'WorkerShell.tsx')
+    expect(src).not.toContain('@/actions/governance')
+    expect(src).not.toMatch(/components\/admin/)
+    expect(src).not.toMatch(/konva/i)
+  })
+})
+
 test.describe('PLC-04 office count parity', () => {
   test.fixme('Office pin and Office card read the same inbox count [57-05]', () => {})
 })

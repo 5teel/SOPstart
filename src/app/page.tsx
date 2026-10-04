@@ -1,7 +1,11 @@
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { PRODUCT_NAME, PRODUCT_DESCRIPTION } from '@/lib/constants'
+import { getSessionContext } from '@/lib/auth/session-context'
+import { ProtectedProviders, type AppRole } from '@/components/providers/ProtectedProviders'
+import { OneScreen } from '@/components/shell/OneScreen'
 
-export default function Home() {
+function Landing() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-paper p-8">
       <h1 className="text-4xl font-bold text-[var(--ink-900)] mb-4">{PRODUCT_NAME}</h1>
@@ -15,5 +19,31 @@ export default function Home() {
         </Link>
       </div>
     </main>
+  )
+}
+
+/**
+ * `/` is the landing for a visitor and the one screen for a signed-in member.
+ * The branch is decided here, on the server, from the session -- never by a
+ * client redirect (CLAUDE.md 2026-09-29).
+ */
+export default async function Home({ searchParams }: { searchParams: Promise<{ place?: string | string[] }> }) {
+  const { supabase, userId, userEmail, role, organisationId } = await getSessionContext()
+
+  if (!userId) return <Landing />
+  if (!role) redirect('/pending')
+
+  let siteName = 'Your site'
+  if (organisationId) {
+    const { data: org } = await supabase.from('organisations').select('name').eq('id', organisationId).maybeSingle()
+    if (org?.name) siteName = org.name
+  }
+
+  const { place } = await searchParams
+
+  return (
+    <ProtectedProviders role={role as AppRole}>
+      <OneScreen siteName={siteName} userEmail={userEmail} initialPlace={typeof place === 'string' ? place : null} />
+    </ProtectedProviders>
   )
 }

@@ -41,7 +41,7 @@ export function useWorkerSops(requestedIds?: ReadonlySet<string>) {
       const supabase = createClient()
       const { data, error } = await supabase
         .from('sops')
-        .select('id, title, sop_number, category_slug, department, published_at')
+        .select('id, title, sop_number, category_slug, department, published_at, placement')
         .eq('status', 'published')
         .order('title', { ascending: true }) as {
           data: WorkerSopRow[] | null

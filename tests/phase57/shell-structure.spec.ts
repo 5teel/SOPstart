@@ -131,7 +131,28 @@ test.describe('SHL-01 frame', () => {
 })
 
 test.describe('SHL-01 one screen structure', () => {
-  test.fixme('the root page renders the landing signed out and the one screen signed in [57-04]', () => {})
+  test('the root page renders the landing signed out and the one screen signed in', () => {
+    const page = read('src/app/page.tsx')
+    expect(page).toContain('getSessionContext(')
+    expect(page).toMatch(/if \(!userId\) return <Landing \/>/)
+    expect(page).toContain("redirect('/pending')")
+    expect(page).toContain('<ProtectedProviders')
+    expect(page).toContain('<OneScreen')
+    expect(page).not.toMatch(/QueryProvider|RoleProvider/)
+    expect(page).not.toContain('useEffect')
+    expect(page).not.toContain("'use client'")
+    expect(page).toContain(".eq('id', organisationId)")
+  })
+
+  test('/ stays a public route in the session proxy', () => {
+    expect(read('src/lib/supabase/middleware.ts')).toMatch(/isPublicRoute = path === '\/'/)
+  })
+
+  test('ProtectedProviders wraps the query and role providers', () => {
+    const src = read('src/components/providers/ProtectedProviders.tsx')
+    expect(src).toContain('<QueryProvider>')
+    expect(src).toContain('<RoleProvider role={role}>')
+  })
   test.fixme('the protected layout has no header; bridge pages carry the Back bar [57-06]', () => {})
   test.fixme('pathways map shows no unmapped screen for the new routes [57-04]', () => {})
 })

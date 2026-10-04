@@ -26,6 +26,8 @@ export type WorkerSopRow = {
   category_slug: string | null
   department: string | null
   published_at: string | null
+  /** 'site' = a site-wide SOP (Noticeboard); kept in sync by a trigger, never written by the UI. */
+  placement?: 'machine' | 'site' | null
 }
 
 export type WorkerSop = {

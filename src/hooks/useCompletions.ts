@@ -157,8 +157,9 @@ export function useWorkerCompletions() {
 // RLS handles scoping — supervisors see their assigned workers,
 // safety_managers see all org completions.
 // ---------------------------------------------------------------
-export function useSupervisorCompletions(filter: FilterState) {
+export function useSupervisorCompletions(filter: FilterState, enabled = true) {
   return useQuery<SupervisorCompletion[]>({
+    enabled,
     queryKey: ['completions', 'supervisor', filter.type, 'value' in filter ? filter.value : undefined],
     queryFn: async () => {
       const supabase = createClient()
