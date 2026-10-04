@@ -12,7 +12,7 @@
 // INTEGER on sops, never sop UUIDs.
 //
 // Consumers: src/lib/competency/matrix.ts, src/actions/competency.ts,
-// src/app/(protected)/sops/page.tsx.
+// src/hooks/useWorkerSops.ts.
 // ------------------------------------------------------------
 
 export function isOutdatedVersion(

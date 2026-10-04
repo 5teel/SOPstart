@@ -154,6 +154,8 @@ test.describe('D-09 deletion sweep -- Miller/scope-column admin surface is fully
     const src = read(path.join('scripts', 'check-bundle-size.ts'))
     expect(src).not.toContain('SopMillerBrowser')
     expect(src).not.toContain('Pick another scope on the left.')
-    expect(src).toContain('library table (AdminLibraryTable.tsx)')
+    // 57-08: the list page left the gate, and the library-table marker group with it.
+    expect(src).not.toContain('library table (AdminLibraryTable.tsx)')
+    expect(src).toContain("route: '/page'")
   })
 })

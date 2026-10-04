@@ -2,7 +2,7 @@
  * Phase 15 / Wave 0 — Capture pre-Phase-15 First Load JS baseline.
  * Phase 41 / Plan 41-01 — generalised to a route array (see
  * scripts/check-bundle-size.ts header for why: SB-LINE-06 now gates BOTH
- * `/sops/[sopId]/page` and `/sops/page`).
+ * `/sops/[sopId]/page` and, since 57-08, `/page`; the list page is gone).
  *
  * Reads Next.js 16 webpack build artifacts, sums the client chunk byte
  * sizes for each route in GATED_ROUTES, and MERGES the results into
@@ -15,7 +15,7 @@
  *
  * Usage (after `npm run build`):
  *   npx tsx scripts/capture-bundle-baseline.ts               # capture all routes
- *   npx tsx scripts/capture-bundle-baseline.ts --route=/sops/page   # capture one
+ *   npx tsx scripts/capture-bundle-baseline.ts --route=/page   # capture one
  *
  * Acceptance: `.bundle-baseline.json` contains a positive integer KB value
  * under `routes[<route>]` for every captured route.
@@ -46,10 +46,8 @@ const GATED_ROUTES: GatedRoute[] = [
     ),
   },
   {
-    route: '/sops/page',
-    rscManifestPath: path.join(
-      NEXT_DIR, 'server', 'app', '(protected)', 'sops', 'page_client-reference-manifest.js'
-    ),
+    route: '/page',
+    rscManifestPath: path.join(NEXT_DIR, 'server', 'app', 'page_client-reference-manifest.js'),
   },
 ]
 
@@ -137,7 +135,7 @@ if (onlyRoute && targets.length === 0) {
 }
 
 // Read the existing baseline so a partial (or full) re-capture MERGES into
-// it rather than replacing it — capturing /sops/page must not delete the
+// it rather than replacing it — capturing /page must not delete the
 // /sops/[sopId]/page floor, and vice versa.
 type PriorBaseline = {
   capturedAt?: string

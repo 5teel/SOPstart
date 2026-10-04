@@ -21,32 +21,32 @@ function read(relPath: string): string {
   return fs.readFileSync(path.join(ROOT, relPath), 'utf-8').replace(/\r\n/g, '\n')
 }
 
-test.describe('SB-LINE-06 — bundle gate (two worker routes, plus / from Phase 57)', () => {
-  test('check-bundle-size.ts is route-array shaped and gates /sops/page', () => {
+test.describe('SB-LINE-06 -- bundle gate (the worker SOP route, plus / from Phase 57)', () => {
+  test('check-bundle-size.ts is route-array shaped, gates the worker SOP route and no longer the list page', () => {
     const src = read('scripts/check-bundle-size.ts')
     expect(src).toContain('GATED_ROUTES')
-    expect(src).toContain("'/sops/page'")
     expect(src).toContain("'/sops/[sopId]/page'")
+    expect(src).not.toContain("route: '/sops/page'")
+    expect((src.match(/^\s*route: '/gm) ?? []).length).toBe(2)
   })
 
   test('capture-bundle-baseline.ts is route-array shaped and merges rather than replaces', () => {
     const src = read('scripts/capture-bundle-baseline.ts')
     expect(src).toContain('GATED_ROUTES')
-    expect(src).toContain("'/sops/page'")
+    expect(src).not.toContain("'/sops/page'")
     // Merge-not-replace: reads the prior baseline's routes before writing.
     expect(src).toContain('priorRoutes')
   })
 
-  test('.bundle-baseline.json carries every gated route key with positive values', () => {
+  test('.bundle-baseline.json carries exactly the two gated routes with positive values, the list route only in history', () => {
     const baseline = JSON.parse(read('.bundle-baseline.json')) as {
       routes: Record<string, number>
+      history: Array<{ route: string; note: string }>
     }
-    expect(Object.keys(baseline.routes).sort()).toEqual(
-      ['/page', '/sops/[sopId]/page', '/sops/page'].sort()
-    )
+    expect(Object.keys(baseline.routes).sort()).toEqual(['/page', '/sops/[sopId]/page'].sort())
     expect(baseline.routes['/page']).toBeGreaterThan(0)
     expect(baseline.routes['/sops/[sopId]/page']).toBeGreaterThan(0)
-    expect(baseline.routes['/sops/page']).toBeGreaterThan(0)
+    expect(baseline.history.some((h) => h.route === '/sops/page' && h.note.includes('Phase 57-08'))).toBe(true)
   })
 
   test('/page entry (the one screen) keeps the site editor and heavy engines out', () => {
@@ -59,16 +59,14 @@ test.describe('SB-LINE-06 — bundle gate (two worker routes, plus / from Phase 
     expect(src).toContain('page_client-reference-manifest.js')
   })
 
-  test('/sops/page entry declares at least one forbidden marker per admin surface', () => {
+  test('the worker SOP route still forbids the machine body and carries no library-table marker group', () => {
     const src = read('scripts/check-bundle-size.ts')
-    // One literal per surface, verified against source at plan time
-    // (AdminLibraryTable.tsx, GovernanceQueueRow.tsx, WiringPatchBay.tsx).
-    // Phase 54: the old status-lens marker ('Pick another scope on the
-    // left.') left the file with SopMillerBrowser/AdminStatusLens — the
-    // library table replaces it.
-    expect(src).not.toContain('Pick another scope on the left.')
-    expect(src).toContain('Reviewed within 12 months')
-    expect(src).toContain('Owner role gone')
-    expect(src).toContain('follows collection')
+      .split('\n')
+      .filter((l) => !/^\s*(\/\/|\/\*|\*\/|\*)/.test(l))
+      .join('\n')
+    expect(src).toContain('No procedures for this machine yet.')
+    expect(src).not.toContain('Reviewed within 12 months')
+    expect(src).not.toContain('Owner role gone')
+    expect(src).not.toContain('follows collection')
   })
 })

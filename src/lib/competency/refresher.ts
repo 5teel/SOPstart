@@ -20,7 +20,7 @@
 // unit-testable.
 //
 // Consumers: src/lib/competency/matrix.ts, src/actions/competency.ts,
-// src/app/(protected)/sops/page.tsx.
+// src/hooks/useWorkerSops.ts.
 // ------------------------------------------------------------
 
 import { computeReviewDueDate } from '@/lib/governance/cadences'

@@ -1,9 +1,10 @@
 /**
  * Phase 15 / Wave 4 — Bundle-isolation CI gate (LIVE / hard-fail mode).
- * Phase 41 / Plan 41-01 — generalised to a route array (SB-LINE-06 now
- * gates BOTH `/sops/[sopId]/page` and `/sops/page`; see Pitfall 1 in
+ * Phase 41 / Plan 41-01 — generalised to a route array (SB-LINE-06 gated
+ * BOTH `/sops/[sopId]/page` and the list page; see Pitfall 1 in
  * 41-RESEARCH.md — the single-route hardcode would have stayed green
- * after the surface merge while proving nothing about the list route).
+ * after the surface merge). Phase 57-08 retired the list page: the gate now
+ * covers `/sops/[sopId]/page` and `/page` (the one screen) only.
  *
  * Runs after `next build` (wired via `postbuild` script in package.json).
  *
@@ -64,8 +65,8 @@ type GatedRoute = {
   forbiddenMarkers: ForbiddenMarkerGroup[]
 }
 
-// Phase 41 note: `/sops/page`'s forbidden markers are STRING LITERALS taken
-// verbatim from the admin lens components, not component/identifier names —
+// Phase 41 note: forbidden markers are STRING LITERALS taken
+// verbatim from the source components, not component/identifier names —
 // production minification renames identifiers but preserves string literals.
 const GATED_ROUTES: GatedRoute[] = [
   {
@@ -81,37 +82,7 @@ const GATED_ROUTES: GatedRoute[] = [
       { label: 'pdfjs-dist (D-21-09)', markers: ['pdfjs-dist', 'PDFWorker', 'getDocument'] },
       { label: 'mammoth (D-21-09)', markers: ['mammoth', 'convertToHtml'] },
       { label: 'konva (26-05 D-03)', markers: ['react-konva', 'konva'] },
-      { label: 'plant home (52 D-01)', markers: ['No procedures for this machine yet.'] },
-      // Phase 54: /sops/[sopId]/page's chunk set includes /sops/page's own
-      // route chunk (SB-LINE-06 comment above), so the library table's
-      // markers are forbidden here too.
-      {
-        label: 'library table (AdminLibraryTable.tsx)',
-        markers: ['Reviewed within 12 months', 'No SOPs match these filters.'],
-      },
-    ],
-  },
-  {
-    route: '/sops/page',
-    rscManifestPath: path.join(
-      NEXT_DIR, 'server', 'app', '(protected)', 'sops', 'page_client-reference-manifest.js'
-    ),
-    pageBundlePath: path.join(NEXT_DIR, 'server', 'app', '(protected)', 'sops', 'page.js'),
-    forbiddenMarkers: [
-      {
-        label: 'library table (AdminLibraryTable.tsx)',
-        markers: ['Reviewed within 12 months', 'No SOPs match these filters.'],
-      },
-      {
-        label: 'governance inbox row (GovernanceQueueRow.tsx)',
-        markers: ['Owner role gone'],
-      },
-      {
-        label: 'access lens (WiringPatchBay.tsx)',
-        markers: ['Search org or collections…', 'follows collection'],
-      },
-      { label: 'konva (52 D-02)', markers: ['react-konva', 'konva'] },
-      { label: 'plant home (52 D-01)', markers: ['No procedures for this machine yet.'] },
+      { label: 'one screen machine body (MachineBody)', markers: ['No procedures for this machine yet.'] },
     ],
   },
   {
@@ -215,9 +186,8 @@ function resolveChunkSet(entry: GatedRoute): Set<string> {
 // moving /sops by +4 KB when only a new route was added. Segment chunks under
 // static/chunks/app/<dir>/ belong to a route only when <dir> is the route's
 // own dir or an ancestor. The ROOT `page-*` is never an ancestor's page. A
-// non-root ancestor page (the /sops list chunk on /sops/[sopId]) stays charged
-// on purpose: the Phase 54 baseline and markers were captured that way, and
-// dropping it would loosen the detail route's gate by 16 KB. Shared numbered
+// non-root ancestor page stays charged on purpose (the list page that once
+// made this matter is gone in 57-08, the rule is kept for any future one). Shared numbered
 // chunks are still counted: the manifest cannot say who loads them.
 function ownsSegmentChunk(file: string, routeDir: string[]): boolean {
   const m = /^static\/chunks\/app\/(.+)\/([^/]+)$/.exec(file) ?? /^static\/chunks\/app\/()([^/]+)$/.exec(file)

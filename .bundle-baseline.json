@@ -1,6 +1,6 @@
 {
-  "capturedAt": "2026-10-03T12:00:00.000Z",
-  "note": "Phase 55 D-07: moved DOWN by hand to the measured post-cut First Load JS (/sops/[sopId]/page 1048 -> 817 KB, /sops/page 940 -> 817 KB); never re-captured. Raising a value needs a signed-off decision recorded in ROADMAP. Phase 57-04 added /page (the one screen), recorded by hand once.",
+  "capturedAt": "2026-10-05T00:00:00.000Z",
+  "note": "Phase 55 D-07 moved the worker routes DOWN by hand to the measured post-cut First Load JS and they are never re-captured. Phase 57-04 added /page (the one screen), recorded by hand once. Phase 57-08 retired the list page: /sops/page left the gate (history) and /sops/[sopId]/page and /page moved DOWN by hand to their measured post-deletion values (nothing moved up). Raising a value needs a signed-off decision recorded in ROADMAP.",
   "previousBaseline": {
     "/sops/[sopId]/page": {
       "value": 1059,
@@ -26,11 +26,28 @@
       "value": 792,
       "capturedAt": "2026-10-05T00:00:00.000Z",
       "note": "Phase 57-04: first measurement of the one screen (worker shell split via next/dynamic, AdminShell lazy seam in place; 57-05 fills only the lazy chunk). Measured 792 KB once the gate stopped charging sibling routes' segment chunks (it read 805 KB before that fix). Recorded by hand once as a decision artefact; never re-captured. NOTE: the lazy WorkerShell chunk is not in the manifest, so this figure excludes it."
+    },
+    {
+      "route": "/sops/page",
+      "value": 817,
+      "capturedAt": "2026-10-03T12:00:00.000Z",
+      "note": "Phase 57-08: route deleted (the worker list page is retired; the one screen at / is the only list of places). Value is the Phase 55 D-07 floor it carried to the end."
+    },
+    {
+      "route": "/sops/[sopId]/page",
+      "value": 817,
+      "capturedAt": "2026-10-03T12:00:00.000Z",
+      "note": "Phase 55 D-07 floor, before 57-08. Moved DOWN by hand to 795 KB, the measured First Load JS once the list page's route chunks left the build (Phase 55 precedent: never up)."
+    },
+    {
+      "route": "/page",
+      "value": 792,
+      "capturedAt": "2026-10-05T00:00:00.000Z",
+      "note": "Phase 57-08: moved DOWN by hand to 565 KB, the measured First Load JS (worker shell still behind next/dynamic in OneScreen, so the lazy WorkerShell chunk is excluded). A trial build with the worker shell statically imported again measured /sops/[sopId]/page 795 KB (unchanged) and /page 831 KB; setting 831 would be an UP move from 792, which CLAUDE.md 2026-09-13 reserves for a signed-off decision, so the split stays and the choice is left to the owner -- see 57-08-SUMMARY."
     }
   ],
   "routes": {
-    "/sops/[sopId]/page": 817,
-    "/sops/page": 817,
-    "/page": 792
+    "/sops/[sopId]/page": 795,
+    "/page": 565
   }
 }

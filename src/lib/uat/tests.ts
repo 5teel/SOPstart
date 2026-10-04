@@ -231,7 +231,7 @@ export const UAT_TESTS: UatTest[] = [
       after: { image: '/uat/screens/rail-after.png', caption: 'After — one plain, numbered list' },
     },
     tryIt: ['Open any procedure to edit it.', 'Look at the list down the left side.'],
-    links: [{ label: 'Open a procedure', href: '/sops' }],
+    links: [{ label: 'Open a procedure', href: '/' }],
     questions: [
       { id: 'glance', text: 'Can you tell what the sections and steps are at a glance?' },
       { id: 'numbered', text: 'Are the steps clearly numbered (Step 1, Step 2…)?' },
@@ -256,7 +256,7 @@ export const UAT_TESTS: UatTest[] = [
       after: { image: '/uat/screens/addmenu-after.png', caption: 'After — grouped, plain names' },
     },
     tryIt: ['Open a procedure.', "Click '＋ Add step or block'.", 'Pick something from the menu.'],
-    links: [{ label: 'Open a procedure', href: '/sops' }],
+    links: [{ label: 'Open a procedure', href: '/' }],
     questions: [
       { id: 'findable', text: 'Was it easy to find how to add something?' },
       { id: 'labels', text: 'Were the choices in the menu easy to understand?' },
@@ -280,7 +280,7 @@ export const UAT_TESTS: UatTest[] = [
       after: { image: '/uat/screens/edit-after.png', caption: 'After — type right on the page' },
     },
     tryIt: ["Click on a step's text.", 'Type a change.', 'Wait a moment, then refresh the page.'],
-    links: [{ label: 'Open a procedure', href: '/sops' }],
+    links: [{ label: 'Open a procedure', href: '/' }],
     questions: [
       { id: 'click-edit', text: 'Could you edit the text just by clicking on it?' },
       { id: 'saved', text: 'Did it show that your change was saved?' },
@@ -304,7 +304,7 @@ export const UAT_TESTS: UatTest[] = [
       after: { image: '/uat/screens/struct-after.png', caption: 'After — opens beneath the block' },
     },
     tryIt: ['Click a measurement or decision block.', 'Try changing a value.', 'Press Escape to close it.'],
-    links: [{ label: 'Open a procedure', href: '/sops' }],
+    links: [{ label: 'Open a procedure', href: '/' }],
     questions: [
       { id: 'anchored', text: 'Did a panel open right next to the block you clicked?' },
       { id: 'clear', text: 'Was it clear what to fill in?' },
@@ -328,7 +328,7 @@ export const UAT_TESTS: UatTest[] = [
       after: { image: '/uat/screens/photo-after.png', caption: 'After' },
     },
     tryIt: ['Open a procedure that has a group of reference photos.', 'Look at the label on that group.'],
-    links: [{ label: 'Open a procedure', href: '/sops' }],
+    links: [{ label: 'Open a procedure', href: '/' }],
     questions: [
       { id: 'reference', text: "Does the photo group read as 'Reference images'?" },
       { id: 'no-jargon', text: 'Is the label clear and free of jargon?' },
@@ -351,7 +351,7 @@ export const UAT_TESTS: UatTest[] = [
       after: { image: '/uat/screens/reorder-after.png', caption: 'After — drag handles' },
     },
     tryIt: ['Drag a section up or down in the side list.', 'Refresh the page to check the order stuck.'],
-    links: [{ label: 'Open a procedure', href: '/sops' }],
+    links: [{ label: 'Open a procedure', href: '/' }],
     questions: [
       { id: 'drag', text: 'Could you drag a section into a new position?' },
       { id: 'stuck', text: 'Did the new order stay after refreshing?' },
@@ -374,7 +374,7 @@ export const UAT_TESTS: UatTest[] = [
       after: { image: '/uat/screens/publish-after.png', caption: 'After — clear checklist' },
     },
     tryIt: ['Try to publish a procedure that still has unchecked safety items.'],
-    links: [{ label: 'Open a procedure', href: '/sops' }],
+    links: [{ label: 'Open a procedure', href: '/' }],
     questions: [
       { id: 'blocked', text: 'Were you stopped from publishing while items were unchecked?' },
       { id: 'explained', text: 'Was the reason explained clearly?' },
@@ -422,7 +422,7 @@ export const UAT_TESTS: UatTest[] = [
       'Try accepting the proposal and confirm the new value is applied.',
       'On a different field, try rejecting a proposal and confirm the old value stays.',
     ],
-    links: [{ label: 'SOPs', href: '/sops' }],
+    links: [{ label: 'SOPs', href: '/' }],
     questions: [
       { id: 'visible-diff', text: 'Could you clearly see what the AI proposed to change?' },
       { id: 'accept-works', text: 'Did accepting the proposal apply the new value correctly?' },
@@ -449,8 +449,8 @@ export const UAT_TESTS: UatTest[] = [
       'Confirm the badge disappears after completing the updated version.',
     ],
     links: [
-      { label: 'SOPs (worker view)', href: '/sops' },
-      { label: 'SOPs (admin — publish new version)', href: '/sops' },
+      { label: 'SOPs (worker view)', href: '/' },
+      { label: 'SOPs (admin — publish new version)', href: '/' },
     ],
     questions: [
       { id: 'badge-appears', text: 'Did the badge appear on the SOP card after the new version was published?' },
@@ -476,7 +476,7 @@ export const UAT_TESTS: UatTest[] = [
       'Close and re-open the same diagram — confirm exactly what you drew comes back.',
     ],
     links: [
-      { label: 'SOPs (admin — builder)', href: '/sops' },
+      { label: 'SOPs (admin — builder)', href: '/' },
     ],
     questions: [
       { id: 'draw-feel', text: 'Did drawing shapes feel smooth and responsive?' },
@@ -503,8 +503,8 @@ export const UAT_TESTS: UatTest[] = [
       'Compare each block: the layout, colours, icons and spacing should match what you saw while editing.',
     ],
     links: [
-      { label: 'SOPs (admin — builder)', href: '/sops' },
-      { label: 'SOPs (worker view)', href: '/sops' },
+      { label: 'SOPs (admin — builder)', href: '/' },
+      { label: 'SOPs (worker view)', href: '/' },
     ],
     questions: [
       { id: 'match', text: 'Did each block look the same in the editor as in the worker view?' },
@@ -530,8 +530,8 @@ export const UAT_TESTS: UatTest[] = [
       'Confirm the annotations appear baked onto the image — flat, in the right places, with no draggable handles or edit controls.',
     ],
     links: [
-      { label: 'SOPs (admin — builder)', href: '/sops' },
-      { label: 'SOPs (worker view)', href: '/sops' },
+      { label: 'SOPs (admin — builder)', href: '/' },
+      { label: 'SOPs (worker view)', href: '/' },
     ],
     questions: [
       { id: 'baked', text: 'Did your annotations appear on the worker\'s diagram exactly where you drew them?' },
@@ -557,7 +557,7 @@ export const UAT_TESTS: UatTest[] = [
       'If there is a pending proposal, approve or decline it and confirm it leaves the queue.',
     ],
     links: [
-      { label: 'SOPs (admin — builder)', href: '/sops' },
+      { label: 'SOPs (admin — builder)', href: '/' },
       { label: 'Agent dashboard', href: '/admin/agent' },
     ],
     questions: [
@@ -609,7 +609,7 @@ export const UAT_TESTS: UatTest[] = [
       'Click the new SOP, choose a department or two, and hit "✓ Save — done" — confirm the banner and the "Who can see this?" panel below update live.',
       'With something focused, click "Open in the SOP list →" and confirm the SOP list filters down to just that department/collection with a count.',
     ],
-    links: [{ label: 'SOPs — Access view', href: '/sops?view=access' }],
+    links: [{ label: 'SOPs — Access view', href: '/admin/access' }],
     questions: [
       { id: 'trace-clear', text: 'Was it clear which SOPs an area/department/person can see when you clicked it?' },
       { id: 'wireup-easy', text: 'Was wiring up a new SOP\'s access straightforward?' },
@@ -634,7 +634,7 @@ export const UAT_TESTS: UatTest[] = [
       'Click "Tools for this SOP ▾" and confirm every item (assign, versions, delete draft) is there with a plain-English label.',
       'Check every step, then look at the same button again — it should turn green and say you\'re ready to send it to workers.',
     ],
-    links: [{ label: 'SOPs', href: '/sops' }],
+    links: [{ label: 'SOPs', href: '/' }],
     questions: [
       { id: 'orientation-clear', text: 'Could you tell where you were and what SOP you were editing at a glance?' },
       { id: 'lock-reason-clear', text: 'Was it clear why "Send to workers" was locked, and what to do about it?' },
@@ -660,7 +660,7 @@ export const UAT_TESTS: UatTest[] = [
       'Click a person or team on the left instead — the same panel should flip to say what THEY can see.',
       'Look through the whole screen for the words "wire", "wiring", "grant" or "UNWIRED" — you shouldn\'t find any.',
     ],
-    links: [{ label: 'SOPs — Access view', href: '/sops?view=access' }],
+    links: [{ label: 'SOPs — Access view', href: '/admin/access' }],
     questions: [
       { id: 'drilldown-clear', text: 'Was it obvious you could open a collection and pick one of the SOPs inside it?' },
       { id: 'panel-plain', text: 'Did the "Who can see this?" / "What can they see?" panel read like plain English, not tech jargon?' },
@@ -684,7 +684,7 @@ export const UAT_TESTS: UatTest[] = [
       'Choose the department(s)/person(s) who should actually see this one SOP, then click "Save — done".',
       'Confirm the panel now says the SOP is "chosen by name" and no longer follows the wider collection.',
     ],
-    links: [{ label: 'SOPs — Access view', href: '/sops?view=access' }],
+    links: [{ label: 'SOPs — Access view', href: '/admin/access' }],
     questions: [
       { id: 'wr02-found', text: 'Could you find this SOP and see the plain-language explanation of who currently sees it?' },
       { id: 'wr02-narrowed', text: 'Were you able to choose the right people/department by name and save it?' },
@@ -850,7 +850,7 @@ export const UAT_TESTS: UatTest[] = [
       'Open any procedure with more than one published version and go to its Version History page.',
       'Look at each version row and expand the worker list on one of them.',
     ],
-    links: [{ label: 'Version history', href: '/sops' }],
+    links: [{ label: 'Version history', href: '/' }],
     questions: [
       { id: 'breakdown-visible', text: 'Could you see how many people completed each version?' },
       { id: 'current-obvious', text: 'Was the current version obvious?' },
@@ -939,7 +939,7 @@ export const UAT_TESTS: UatTest[] = [
       'Click Needs attention — confirm the queue of SOPs that need a look appears.',
       'Click back (or pick another scope) — confirm you land back where you started, on the same page.',
     ],
-    links: [{ label: 'SOPs', href: '/sops' }],
+    links: [{ label: 'SOPs', href: '/' }],
     questions: [
       { id: 'extra-scopes-visible', text: 'Could you see the extra admin scopes (Drafts, Published, Needs attention, Access) without being told where to look?' },
       { id: 'queue-appears', text: 'Did clicking Needs attention show you the right queue?' },
@@ -986,7 +986,7 @@ export const UAT_TESTS: UatTest[] = [
       'Use the Status and Owner filters above the table.',
       'Click Edit on one procedure.',
     ],
-    links: [{ label: 'SOPs', href: '/sops' }],
+    links: [{ label: 'SOPs', href: '/' }],
     questions: [
       { id: 'circles-make-sense', text: 'Do the five circles make sense without an explanation?' },
       { id: 'filters-find-expected', text: 'Do the Status and Owner filters find what you expect?' },
@@ -1009,7 +1009,7 @@ export const UAT_TESTS: UatTest[] = [
       'Click a machine that has an orange number on it.',
       'Open a job from the list that slides in.',
     ],
-    links: [{ label: 'Open SOPs', href: '/sops' }],
+    links: [{ label: 'Open SOPs', href: '/' }],
     questions: [
       { id: 'pin-numbers-make-sense', text: 'Did the orange numbers on the machines make sense?' },
       { id: 'click-shows-right-jobs', text: 'Did clicking a machine show you the right jobs for it?' },

@@ -15,10 +15,11 @@ const SHELL_LOADING = () => (
   </div>
 )
 
-// The worker shell is split off the root page's own chunk too. The bundle
-// check charges every route for the client modules the root page pulls in, so
-// the shell rides in a chunk of its own (server-rendered, preloaded with the
-// page) instead of inflating the First Load of /sops and /sops/[sopId].
+// The worker shell is split off the root page's own chunk too. It was split
+// because inlining it hoisted shared modules onto /sops/[sopId] while the list
+// page still existed; with the list page gone (57-08) that no longer happens
+// (795 KB either way), but a static import raises the / gate to 831 KB, an up
+// move that needs the owner's sign-off, so the split stays for now.
 const WorkerShell = dynamic(() => import('@/components/shell/WorkerShell').then((m) => m.WorkerShell), {
   loading: SHELL_LOADING,
 })

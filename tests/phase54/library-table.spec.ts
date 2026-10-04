@@ -3,6 +3,8 @@
  * columns (SOP / Machine / Status / Owner / Checks / Review), five-circle
  * checks row, chips (Where/Status/Owner/Checks), deep-link resolution,
  * row click -> SOP page, Edit -> builder (one chain, SUR-04).
+ * 57-08: the list page and worker list are gone, so their seam assertions went with them;
+ * the table itself and its helpers go in 57-09.
  *
  * Registration: playwright.config.ts `phase54` project
  *   testDir: '.', testMatch: /tests\/phase54\/.*\.(spec|test)\.ts$/
@@ -20,8 +22,6 @@ import {
 
 const ROOT = path.resolve(__dirname, '..', '..')
 const TABLE_PATH = path.join(ROOT, 'src', 'components', 'admin', 'AdminLibraryTable.tsx')
-const SOPS_PAGE_PATH = path.join(ROOT, 'src', 'app', '(protected)', 'sops', 'page.tsx')
-const WORKER_LIST_PATH = path.join(ROOT, 'src', 'components', 'sop', 'WorkerSimpleList.tsx')
 const WORKER_SIGNAL_PATH = path.join(ROOT, 'src', 'lib', 'sop', 'worker-signal.ts')
 const CATEGORY_BUTTON_PATH = path.join(
   ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'builder', '[sopId]', 'BuilderCategoryButton.tsx'
@@ -175,27 +175,6 @@ test.describe('AdminLibraryTable wiring', () => {
 })
 
 test.describe('surviving affordances', () => {
-  test('WorkerSimpleList passes hasNewerVersion/isRefresherDue/isRefresherOverdue to SopLibraryCard', () => {
-    const code = read(WORKER_LIST_PATH)
-    expect(code).toContain('hasNewerVersion={sop.hasNewerVersion}')
-    expect(code).toContain('isRefresherDue={sop.isRefresherDue}')
-    expect(code).toContain('isRefresherOverdue={sop.isRefresherOverdue}')
-  })
-
-  test('WorkerSimpleList wires onAdd/onRemove to the real callbacks', () => {
-    const code = read(WORKER_LIST_PATH)
-    expect(code).toContain('onClick={() => onAdd(sop.id)}')
-    expect(code).toContain('onClick={() => onRemove(sop.id)}')
-  })
-
-  test('WorkerSimpleList carries worker-list / worker-list-row testids and no builder/walkthrough link', () => {
-    const code = read(WORKER_LIST_PATH)
-    expect(code).toContain('data-testid="worker-list"')
-    expect(code).toContain('data-testid="worker-list-row"')
-    expect(code).not.toContain('/admin/sops/builder')
-    expect(code).not.toContain('/walkthrough')
-  })
-
   test('worker-signal.ts exports WorkerScope', () => {
     expect(read(WORKER_SIGNAL_PATH)).toContain('export type WorkerScope')
   })
@@ -208,32 +187,5 @@ test.describe('surviving affordances', () => {
 
   test('BuilderStageShell renders <BuilderCategoryButton sopId={sopId}', () => {
     expect(read(STAGE_SHELL_PATH)).toContain('<BuilderCategoryButton sopId={sopId}')
-  })
-})
-
-test.describe('page seam (54-04 Task 3): /sops swaps onto the table and the simple list', () => {
-  test('page.tsx dynamic-binds WorkerSimpleList and AdminLibraryTable, both ssr: false', () => {
-    const code = stripComments(read(SOPS_PAGE_PATH))
-    expect(code).toMatch(/dynamic\(\s*\(\)\s*=>\s*import\('@\/components\/sop\/WorkerSimpleList'\)/)
-    expect(code).toMatch(/dynamic\(\s*\(\)\s*=>\s*import\('@\/components\/admin\/AdminLibraryTable'\)/)
-    const ssrFalseCount = (code.match(/\{\s*ssr:\s*false\b[^}]*\}/g) ?? []).length
-    expect(ssrFalseCount).toBeGreaterThanOrEqual(2)
-  })
-
-  test('AdminLibraryTable receives onTakeoverChange={setTakeover}', () => {
-    expect(read(SOPS_PAGE_PATH)).toContain('onTakeoverChange={setTakeover}')
-  })
-
-  test('<WorkerSimpleList receives onAdd={handleAdd} and onRemove={handleRemove}', () => {
-    const code = stripComments(read(SOPS_PAGE_PATH))
-    const idx = code.indexOf('<WorkerSimpleList')
-    expect(idx).toBeGreaterThan(-1)
-    const block = code.slice(idx, idx + 700)
-    expect(block).toContain('onAdd={handleAdd}')
-    expect(block).toContain('onRemove={handleRemove}')
-  })
-
-  test('page.tsx contains no lg:grid-cols-[176px (the retired Miller frame)', () => {
-    expect(read(SOPS_PAGE_PATH)).not.toContain('lg:grid-cols-[176px')
   })
 })

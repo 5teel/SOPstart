@@ -14,12 +14,12 @@ test.describe('PLC-02 machine body', () => {
   const PANEL = read('src/components/sop/plant/MachinePanel.tsx')
   const ROOMS = read('src/components/shell/RoomBodies.tsx')
   const NOW = read('src/components/sop/plant/NowCard.tsx')
-  const HOME = read('src/components/sop/plant/PlantHome.tsx')
 
-  test('MachineBody and SopRows are exports usable outside the overlay panel', () => {
+  test('MachineBody and SopRows are the exports the detail pane renders (the overlay panel is gone)', () => {
     expect(PANEL).toContain('export function MachineBody(')
     expect(PANEL).toContain('export function SopRows(')
-    expect(PANEL).toContain('<MachineBody machine={machine}')
+    expect(PANEL).not.toContain('export function MachinePanel(')
+    expect(PANEL).not.toContain('<aside')
     expect(PANEL).toContain('No procedures for this machine yet.')
   })
 
@@ -30,9 +30,8 @@ test.describe('PLC-02 machine body', () => {
     expect(PANEL).toContain('data-testid="plant-panel-walk"')
   })
 
-  test('the Now card is in-flow and PlantHome keeps the overlay position', () => {
+  test('the Now card is in-flow, never an overlay', () => {
     expect(NOW).not.toMatch(/\babsolute\b/)
-    expect(HOME).toContain('absolute bottom-4 left-4')
   })
 
   test('room bodies are worker-safe and re-use SopRows', () => {

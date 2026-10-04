@@ -2,7 +2,7 @@
 /**
  * The ONE place a worker's per-SOP list is built (CLAUDE.md 2026-09-27 -- a
  * classification/derivation living in two modules is a future disagreement).
- * `/sops` (SopsSection) calls this hook so there is exactly one derivation
+ * `WorkerShell` (the one screen) calls this hook so there is exactly one derivation
  * of a worker's badges. The classifier
  * that turns a WorkerSop into a label (topSignal / plantRelState) stays in
  * src/lib/sop/worker-signal.ts -- this hook only gathers and joins the raw

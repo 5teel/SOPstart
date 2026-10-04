@@ -97,7 +97,7 @@ export const INVENTORY: Row[] = [
   { file: 'tests/sb-builder-infrastructure.test.ts', disposition: 'repoint', plan: '57-08' }, // 06 edits the dashboard line first
   { file: 'tests/phase43/route-truth.spec.ts', disposition: 'repoint', plan: '57-08' }, // 06 edits the roleHome part; 08 the proxy attention-rule literal
   { file: 'tests/phase41/merged-surface.spec.ts', disposition: 'delete', plan: '57-08' },
-  { file: 'tests/phase52/plant-render-seam.spec.ts', disposition: 'repoint', plan: '57-09' }, // kept (survivors): 08 edits the list-page/plant parts first
+  { file: 'tests/phase52/plant-render-seam.spec.ts', disposition: 'delete', plan: '57-08' }, // survivors moved to phase57 retirement-sweep
   { file: 'tests/phase52/plant-ask-bar.spec.ts', disposition: 'delete', plan: '57-08' },
   { file: 'tests/phase54/library-table.spec.ts', disposition: 'repoint', plan: '57-09' }, // kept (survivors): 08 edits the list-page/plant parts first
   { file: 'tests/phase32/library-filter-deeplink.spec.ts', disposition: 'repoint', plan: '57-09' }, // kept (survivors): 08 edits the list-page/plant parts first
@@ -137,7 +137,7 @@ export const INVENTORY: Row[] = [
 ]
 
 // Each owning plan appends its id (e.g. '57-05') when its last commit lands.
-export const LIVE_PLANS: string[] = ['57-05', '57-06', '57-07']
+export const LIVE_PLANS: string[] = ['57-05', '57-06', '57-07', '57-08']
 
 function stripComments(src: string): string {
   return src

@@ -113,7 +113,7 @@ SafeStart is a multi-tenant Next.js 16 App Router SaaS web app that implements a
 
 ### Primary Request Path: Worker Walkthrough
 
-1. **Navigation** → Worker browses SOPs at `/sops` (list) or `/sops/[sopId]` (detail)
+1. **Navigation** → Worker browses SOPs on the one screen at `/` (the site, rooms and machines; there is no separate list page) or `/sops/[sopId]` (detail)
 2. **Server-side Fetch** (`useSopDetail` hook, `src/hooks/useSopDetail.ts:10`)
    - Fetch from Supabase with RLS (only SOPs visible to user's org/role)
 3. **React Query Caching** → Result stored in memory; stale time 5 min

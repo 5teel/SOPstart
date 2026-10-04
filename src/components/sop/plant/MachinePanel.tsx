@@ -1,9 +1,10 @@
 'use client'
 
 /**
- * The worker-variant machine panel (D-11) -- sprite, department, machine
+ * The worker-variant machine body (D-11) -- sprite, department, machine
  * name, then the machine's SOPs to-do first with the shared badge, a Walk
- * link and a plain Read link. Nothing here names who is responsible for a
+ * link and a plain Read link. The one screen's detail pane renders it; the
+ * old slide-over panel is gone (Phase 57). Nothing here names who is responsible for a
  * procedure or what revision it is on -- that governance view belongs to
  * the admin variant Phase 54 adds. Ordering comes from the caller
  * (worker-signal's machineSops/narrowForAsk) -- this component renders
@@ -13,12 +14,6 @@ import Link from 'next/link'
 import { X } from 'lucide-react'
 import { plantRelState, type WorkerSop } from '@/lib/sop/worker-signal'
 import { RelBadge } from '@/components/sop/plant/RelBadge'
-
-// w-95 below is 95 * 4px = 380px -- kept in step with scene.ts's
-// PLANT_PANEL_WIDTH by the source-contract spec, which imports the
-// constant and asserts the arithmetic relationship.
-const OVERLAY_CLASS_BASE =
-  'absolute inset-y-0 right-0 z-20 flex w-95 flex-col border-l border-[var(--ink-300)] bg-[var(--paper-1)] shadow-xl transition-transform duration-250 motion-reduce:transition-none'
 
 /** The rows: badge + Walk link per SOP. Renders what it is handed, never re-sorts. */
 export function SopRows({ sops, empty }: { sops: WorkerSop[]; empty: string }) {
@@ -103,31 +98,5 @@ export function MachineBody({
         <SopRows sops={sops} empty="No procedures for this machine yet." />
       </div>
     </>
-  )
-}
-
-export function MachinePanel({
-  open,
-  machine,
-  department,
-  sops,
-  onClose,
-}: {
-  open: boolean
-  machine: { id: string; name: string; spriteUrl: string | null } | null
-  department: { name: string; colour: string } | null
-  sops: WorkerSop[]
-  onClose?(): void
-}) {
-  return (
-    <aside
-      data-testid="plant-panel"
-      data-open={open ? 'true' : 'false'}
-      aria-label={machine?.name ?? 'Machine'}
-      inert={!open}
-      className={`${OVERLAY_CLASS_BASE} ${open ? 'translate-x-0' : 'translate-x-full'}`}
-    >
-      {machine && <MachineBody machine={machine} department={department} sops={sops} onClose={onClose} />}
-    </aside>
   )
 }

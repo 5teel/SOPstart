@@ -99,6 +99,76 @@ test.describe('retire sweep', () => {
     }
   })
 
-  test.fixme('list page and plant home are gone [57-08 task 3]', () => {})
+  test('retire list: the list page, its loading boundary and the plant home surfaces are gone', () => {
+    expect(fs.existsSync(path.join(ROOT, 'src/app/(protected)/sops/page.tsx'))).toBe(false)
+    expect(fs.existsSync(path.join(ROOT, 'src/app/(protected)/sops/loading.tsx'))).toBe(false)
+    expect(fs.existsSync(path.join(ROOT, 'src/app/(protected)/sops/[sopId]/page.tsx'))).toBe(true)
+    for (const f of [
+      'src/components/sop/plant/PlantHome.tsx',
+      'src/components/sop/plant/PlantAskBar.tsx',
+      'src/components/sop/WorkerSimpleList.tsx',
+      'src/components/sop/CategoryBottomSheet.tsx',
+      'src/components/sop/SopLibraryCard.tsx',
+    ]) {
+      expect(fs.existsSync(path.join(ROOT, f)), f).toBe(false)
+    }
+    // the overlay machine panel went; the body and rows the detail pane renders stayed
+    const panel = read('src/components/sop/plant/MachinePanel.tsx')
+    expect(panel).not.toContain('export function MachinePanel(')
+    expect(panel).toContain('export function MachineBody(')
+    expect(panel).toContain('No procedures for this machine yet.')
+  })
+
+  test('retire list: nothing in src links to, pushes to or revalidates the list address', () => {
+    const link = /(href=|push\(|replace\(|redirect\(|revalidatePath\(|redirectTo=)\s*\{?\s*['"`]\/sops['"`?]/
+    const offenders = walkSrc(path.join(ROOT, 'src'))
+      .filter((f) => !f.endsWith(path.join('lib', 'uat', 'tests.ts')))
+      .filter((f) => link.test(stripComments(fs.readFileSync(f, 'utf-8'))))
+      .map((f) => path.relative(ROOT, f))
+    expect(offenders, offenders.join(', ')).toEqual([])
+  })
+
+  test('retire list: no source file still names a deleted list surface', () => {
+    const names = /PlantHome|PlantAskBar|WorkerSimpleList|CategoryBottomSheet|SopLibraryCard/
+    const offenders = walkSrc(path.join(ROOT, 'src'))
+      .filter((f) => !f.endsWith(path.join('lib', 'uat', 'tests.ts'))) // 57-09 rewrites the feedback prose that names them
+      .filter((f) => names.test(stripComments(fs.readFileSync(f, 'utf-8'))))
+      .map((f) => path.relative(ROOT, f))
+    expect(offenders, offenders.join(', ')).toEqual([])
+  })
+
+  // Survivors moved here from the whole-subject specs deleted in 57-08.
+  test('retire list: the plant is reached only by the shell (survivor of plant-render-seam)', () => {
+    const staticImport = /^\s*import\s+[^;]*from\s+'@\/components\/sop\/plant\//m
+    const violations = walkSrc(path.join(ROOT, 'src'))
+      .map((f) => path.relative(ROOT, f).replace(/\\/g, '/'))
+      .filter((f) => !f.startsWith('src/components/sop/plant/') && !f.startsWith('src/components/shell/'))
+      .filter((f) => staticImport.test(read(f)))
+    expect(violations).toEqual([])
+  })
+
+  test('retire list: the site-worker query has no persister (survivor of plant-render-seam, T-52-02)', () => {
+    const src = read('src/components/shell/WorkerShell.tsx')
+    const idx = src.indexOf("queryKey: ['site-worker']")
+    expect(idx).toBeGreaterThan(-1)
+    expect(src.slice(idx, idx + 200)).not.toContain('persister')
+  })
+
+  test('retire list: the worker list is derived in exactly one place (survivor of merged-surface)', () => {
+    const owners = walkSrc(path.join(ROOT, 'src'))
+      .map((f) => path.relative(ROOT, f).replace(/\\/g, '/'))
+      .filter((f) => stripComments(read(f)).includes("queryKey: ['worker-last-completions']"))
+    expect(owners).toEqual(['src/hooks/useWorkerSops.ts'])
+    const hook = read('src/hooks/useWorkerSops.ts')
+    expect(hook).toContain(".eq('worker_id'")
+    expect(hook).toContain('getUserSopAssignments')
+    expect(hook).toContain('refresherDueDate')
+    expect(hook).toContain('library-sops')
+    const shell = stripComments(read('src/components/shell/WorkerShell.tsx'))
+    for (const key of ["queryKey: ['worker-last-completions']", "queryKey: ['sop-refresher-intervals']", "queryKey: ['library-sops']"]) {
+      expect(shell).not.toContain(key)
+    }
+    expect(shell).not.toContain('getUserSopAssignments')
+  })
   test.fixme('library table and its helpers are gone; dropped-features entries are live [57-09]', () => {})
 })
