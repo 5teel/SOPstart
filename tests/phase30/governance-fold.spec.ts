@@ -57,7 +57,8 @@ function read(p: string): string {
 test.describe('UX-03 — governance lives at /governance', () => {
   test('/governance reads listGovernanceQueue server-side and renders the inbox with the unmodified GovernanceQueueRow', () => {
     const page = read(GOV_PAGE)
-    expect(page).toContain('listGovernanceQueue()')
+    expect(page).toContain('await loadInbox(')
+    expect(read(path.join(ROOT, 'src', 'lib', 'governance', 'load-inbox.ts'))).toContain('listGovernanceQueue()')
     expect(page).toContain('<GovernanceInbox')
     // The inbox itself renders the derived queue via unmodified GovernanceQueueRow.
     const inbox = read(GOV_INBOX)

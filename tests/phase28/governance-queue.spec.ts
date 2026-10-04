@@ -64,10 +64,12 @@ test.describe('governance inbox — queue read + role guard', () => {
   test('the /governance page calls listGovernanceQueue() server-side, guarded by requireAdminContext()', () => {
     const src = read(GOV_PAGE)
     expect(src).toContain("import { requireAdminContext } from '@/lib/auth/guards'")
-    expect(src).toContain("import { listGovernanceQueue } from '@/actions/governance'")
+    expect(src).toContain("import { loadInbox } from '@/lib/governance/load-inbox'")
     expect(src).toContain('const ctx = await requireAdminContext()')
     expect(src).toContain("if ('error' in ctx) redirect('/dashboard')")
-    expect(src).toContain('listGovernanceQueue()')
+    expect(src).toContain('await loadInbox(')
+    // the queue read itself lives in loadInbox (Phase 57 D-16)
+    expect(read(path.join(ROOT, 'src', 'lib', 'governance', 'load-inbox.ts'))).toContain('listGovernanceQueue()')
   })
 
   test('legacy /admin/sops is a next.config.ts redirect to /sops (Phase 43 D-01)', () => {

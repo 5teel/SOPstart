@@ -21,6 +21,7 @@ import type { SopMachineLink } from '@/lib/validators/site'
 const ROOT = path.resolve(__dirname, '..', '..')
 const GOV_PAGE = path.join(ROOT, 'src', 'app', '(protected)', 'governance', 'page.tsx')
 const GOV_INBOX_COMPONENT = path.join(ROOT, 'src', 'components', 'admin', 'governance', 'GovernanceInbox.tsx')
+const LOAD_INBOX = path.join(ROOT, 'src', 'lib', 'governance', 'load-inbox.ts')
 const read = (p: string) => fs.readFileSync(p, 'utf-8')
 
 function govRow(id: string, overrides: Partial<GovernanceRow> = {}): GovernanceRow {
@@ -248,16 +249,14 @@ test.describe('page + component wiring (54-02 Task 2)', () => {
     expect(src).not.toContain("'use client'")
     const ctxIdx = src.indexOf('requireAdminContext(')
     expect(ctxIdx).toBeGreaterThan(-1)
-    for (const call of ['listGovernanceQueue(', 'listAdminSopRows(', 'listSiteHealthForOrg(']) {
-      const idx = src.indexOf(call)
-      expect(idx).toBeGreaterThan(-1)
-      expect(ctxIdx).toBeLessThan(idx)
-    }
+    const idx = src.indexOf('await loadInbox(')
+    expect(idx).toBeGreaterThan(-1)
+    expect(ctxIdx).toBeLessThan(idx)
     expect(src).toContain('redirect(')
   })
 
-  test('governance/page.tsx: one Promise.all(listGovernanceQueue, listAdminSopRows, listSiteHealthForOrg), deriveInbox called server-side', () => {
-    const src = read(PAGE)
+  test('load-inbox.ts: one Promise.all(listGovernanceQueue, listAdminSopRows, listSiteHealthForOrg), deriveInbox called server-side; the page calls loadInbox', () => {
+    const src = read(LOAD_INBOX).replace(/\r\n/g, '\n')
     expect(src.match(/Promise\.all\(/g)).toHaveLength(1)
     const allMatch = src.match(/Promise\.all\(\[([\s\S]*?)\]\)/)
     expect(allMatch).not.toBeNull()
@@ -265,11 +264,15 @@ test.describe('page + component wiring (54-02 Task 2)', () => {
     expect(allMatch![1]).toContain('listAdminSopRows(')
     expect(allMatch![1]).toContain('listSiteHealthForOrg()')
     expect(src).toContain('deriveInbox(')
+    const page = read(PAGE)
+    expect(page).toContain('await loadInbox(')
+    expect(page).not.toContain('deriveInbox(')
+    expect(page).not.toContain('Promise.all(')
   })
 
   test('governance/page.tsx: renders <GovernanceInbox items=', () => {
     const src = read(PAGE)
-    expect(src).toContain('<GovernanceInbox items={items}')
+    expect(src).toContain('<GovernanceInbox items={inbox.items}')
   })
 
   test('GovernanceInbox.tsx: use client, testids gov-inbox/gov-chip/gov-clear/gov-row/gov-action, uses INBOX_CHIPS/inboxCounts/chipMatches', () => {

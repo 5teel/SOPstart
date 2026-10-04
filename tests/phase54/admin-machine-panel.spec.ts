@@ -117,7 +117,7 @@ test.describe('/governance renders the floor column (54-03 Task 2)', () => {
   test('renders AdminFloorHealth after GovernanceInbox inside the grid, server component', () => {
     const src = read(GOV_PAGE_PATH)
     const inboxIdx = src.indexOf('<GovernanceInbox')
-    const floorIdx = src.indexOf('<AdminFloorHealth floor={floor} governance={gov.rows}')
+    const floorIdx = src.indexOf('<AdminFloorHealth floor={inbox.floor} governance={inbox.governance}')
     expect(inboxIdx).toBeGreaterThan(-1)
     expect(floorIdx).toBeGreaterThan(inboxIdx)
     expect(src).not.toContain("'use client'")
