@@ -49,7 +49,9 @@ test.describe('NowCard', () => {
     expect(SRC).not.toContain('networkMode')
   })
 
-  test('the card is 330px wide (w-82.5)', () => {
-    expect(SRC).toMatch(/\bw-82\.5\b/)
+  test('the card is in-flow; PlantHome positions it at 330px wide (w-82.5)', () => {
+    const HOME = fs.readFileSync(path.join(ROOT, 'src', 'components', 'sop', 'plant', 'PlantHome.tsx'), 'utf-8')
+    expect(SRC).not.toMatch(/\babsolute\b/)
+    expect(HOME).toMatch(/\bw-82\.5\b/)
   })
 })

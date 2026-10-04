@@ -165,7 +165,7 @@ test.describe('PlantHome wiring', () => {
   })
 
   test('the Now card is hidden while the site query is loading, never a flash of "Nothing due"', () => {
-    expect(read(PLANT_HOME_PATH)).toMatch(/!loading\s*&&\s*<NowCard/)
+    expect(read(PLANT_HOME_PATH)).toMatch(/!loading\s*&&\s*\(?\s*<div[^>]*>\s*<NowCard/)
   })
 
   test('no router, konva, isRefresher or hasNewerVersion anywhere in the file', () => {

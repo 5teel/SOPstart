@@ -58,7 +58,7 @@ export function NowCard({
       data-testid="plant-now-card"
       aria-label="Next for you"
       data-empty={now ? undefined : 'true'}
-      className="absolute bottom-4 left-4 z-10 w-82.5 rounded-lg border border-[var(--ink-900)] bg-white/97 p-3.5 shadow-xl"
+      className="w-full rounded-lg border border-[var(--ink-900)] bg-white p-3.5"
     >
       {!now ? (
         <p className="text-ui text-[var(--ink-700)]">Nothing due — browse your machines.</p>

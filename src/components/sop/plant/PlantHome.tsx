@@ -146,7 +146,11 @@ export function PlantHome({
         <PlantAskBar value={query} onChange={onQueryChange} />
       </div>
 
-      {!loading && <NowCard items={nowItems} onShowMe={open} />}
+      {!loading && (
+        <div className="absolute bottom-4 left-4 z-10 w-82.5 rounded-lg shadow-xl">
+          <NowCard items={nowItems} onShowMe={open} />
+        </div>
+      )}
 
       <MachinePanel
         open={selected !== null}
