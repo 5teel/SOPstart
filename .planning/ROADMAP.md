@@ -1853,7 +1853,7 @@ Plans:
   4. A worker sees how many SOPs are due at each place and a "next for you" card with Walk it and Show me; an admin sees where a SOP has no owner or an overdue review, a count on the Office and the Workshop, and a card saying how many things wait in the Office with a button that opens it; typing in the search box filters the list and lights the matching shapes (machine names and the titles of the SOPs on them)
   5. An admin can switch the site into edit mode from the map to add, rename, reshape or remove machines and departments and to drag each room's shape to a new place; there is no departments screen
 
-**Plans:** 4/10 plans executed
+**Plans:** 5/10 plans executed
 Plans:
 **Wave 1**
 
@@ -1870,7 +1870,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 57-05-PLAN.md — Admin shell (fills the lazy seam): health pins, Office/Workshop/Noticeboard bodies, new SOP for this machine, edit mode with departments; floor card off /governance
+- [x] 57-05-PLAN.md — Admin shell (fills the lazy seam): health pins, Office/Workshop/Noticeboard bodies, new SOP for this machine, edit mode with departments; floor card off /governance
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
