@@ -122,6 +122,32 @@ test.describe('SHL-05 admin seam', () => {
   })
 })
 
-test.describe('PLC-04 office count parity', () => {
-  test.fixme('Office pin and Office card read the same inbox count [57-05]', () => {})
+test.describe('SHL-05 admin parity', () => {
+  const ADMIN = strip(read('src', 'components', 'shell', 'AdminShell.tsx'))
+
+  test('one identifier feeds the Office card count and the Office pin', () => {
+    expect(ADMIN).toContain('count={inboxCount}')
+    expect(ADMIN).toContain('office: inboxCount')
+    expect(ADMIN).toContain('inboxCount={inboxCount}')
+    expect((ADMIN.match(/const inboxCount =/g) ?? []).length).toBe(1)
+    expect(ADMIN).toContain('data?.inboxCount')
+  })
+
+  test('there is one admin read, one sign-off read, and sign-offs stay out of the inbox number', () => {
+    expect((ADMIN.match(/\['shell-admin'\]/g) ?? []).length).toBe(1)
+    expect((ADMIN.match(/queryFn: \(\) => getAdminShell\(\)/g) ?? []).length).toBe(1)
+    expect(ADMIN).toContain("c.status === 'pending_sign_off'")
+    expect(ADMIN).toContain('pendingSignOffs={pendingSignOffs}')
+    expect(ADMIN).not.toMatch(/inboxCount\s*[+]/)
+  })
+
+  test('edit mode: Done refreshes both reads, the strip sits above the workspace', () => {
+    expect(ADMIN).toContain('data-testid="site-edit-done"')
+    expect(ADMIN).toContain('queryKey: SHELL_KEY')
+    expect(ADMIN).toContain('queryKey: SITE_KEY')
+    expect(ADMIN.indexOf('<DepartmentsStrip')).toBeGreaterThan(-1)
+    expect(ADMIN.indexOf('<DepartmentsStrip')).toBeLessThan(ADMIN.indexOf('<SiteWorkspace'))
+    expect(ADMIN).toContain('key={site.layout.id}')
+    expect(ADMIN).toMatch(/^\s+canEdit$/m)
+  })
 })

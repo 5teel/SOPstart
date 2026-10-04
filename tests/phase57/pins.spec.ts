@@ -24,6 +24,20 @@ test.describe('PLC-04 pins', () => {
     expect(shell).toContain('roomPins={isSupervisor ? { office: pending, noticeboard: noticeboardDue } : { noticeboard: noticeboardDue }}')
   })
 
-  test.fixme('admin machine pins come from machineHealth; Office pin equals the inbox count [57-05]', () => {})
-  test.fixme('healthPinCount counts bad and due machines only [57-05]', () => {})
+})
+
+test.describe('PLC-04 admin pins', () => {
+  const admin = read('src/components/shell/AdminShell.tsx')
+
+  test('machine pins come from machineHealth; room pins from the one admin read', () => {
+    expect(admin).toContain('machineHealth(site.machines, site.links, flagsBySop)')
+    expect(admin).toContain('machineHealth={health}')
+    expect(admin).toContain('workshop: drafts.length')
+    expect(admin).toContain('office: inboxCount')
+    expect(admin).toContain('noticeboard: healthPinCount(siteSops)')
+  })
+
+  test('the admin shell classifies nothing itself', () => {
+    expect(admin).not.toMatch(/\.flags\.includes\(|'unowned'|'overdue'/)
+  })
 })
