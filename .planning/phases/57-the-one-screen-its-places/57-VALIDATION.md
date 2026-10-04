@@ -1,9 +1,9 @@
 ---
 phase: 57
 slug: the-one-screen-its-places
-status: planned
+status: complete
 nyquist_compliant: true
-wave_0_complete: false
+wave_0_complete: true
 created: 2026-10-04
 ---
 
@@ -40,34 +40,34 @@ created: 2026-10-04
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 57-01-T1 | 01 | 1 | all (guard) | T-57-03 | inventory completeness: no unlisted reference to a retired file or retired redirect literal (any spelling — RegExp tokens + Test D) | source-contract | `npx playwright test --project=phase57 tests/phase57/repoint-inventory.spec.ts` | created in task | ⬜ pending |
-| 57-01-T2 | 01 | 1 | SHL-01..PLC-05 (eval) | T-57-02 | supervisor fixture refuses non-fixture accounts | eval list | `npx playwright test --list --project=evals tests/evals/one-screen.eval.ts` | created in task | ⬜ pending |
-| 57-01-T3 | 01 | 1 | PLC-01, SHL-02, SHL-04 | T-57-01 | `?place=` whitelist / UUID; bad token → overview; no room table/UI | unit | `npx playwright test --project=phase57 tests/phase57/rooms.spec.ts tests/phase57/place.spec.ts tests/phase57/search.spec.ts` | created in task (tdd) | ⬜ pending |
-| 57-02-T1 | 02 | 2 | PLC-01, SHL-02 | — | rooms above machines, signposts capped 2.4, flyInset, focus replay | source-contract | `npx playwright test --project=phase57 tests/phase57/stage.spec.ts` + `--project=phase52` | W0 stub | ⬜ pending |
-| 57-02-T2 | 02 | 2 | SHL-01, SHL-02, SHL-04 | T-57-04..07 | replaceState only in select(); no router; place resolves only to loaded rows | source-contract + unit | `npx playwright test --project=phase57` + `npm run build` | W0 stub | ⬜ pending |
-| 57-03-T1 | 03 | 2 | SHL-05, PLC-04 | T-57-08..10 | one `loadInbox()`; `getAdminShell()` admin-gated, no params, session org, no service role | source-contract | `npx playwright test --project=phase57 tests/phase57/one-query.spec.ts` + phase54/28/30/46 | W0 stub | ⬜ pending |
-| 57-03-T2 | 03 | 2 | PLC-05 | T-57-11..13 | remove refused with counts; session-org filters; colour enum | unit + source-contract + live (`PHASE57_LIVE=1`) | `npx playwright test --project=phase57 tests/phase57/departments.spec.ts` | W0 stub | ⬜ pending |
-| 57-03-T3 | 03 | 2 | PLC-05 | T-57-13 | strip handlers wired to actions; no literal hex | source-contract | `npx playwright test --project=phase57 tests/phase57/departments.spec.ts` + phase51 | W0 stub | ⬜ pending |
-| 57-04-T1 | 04 | 3 | PLC-02, PLC-03 | — | worker bodies import no admin code | source-contract | `npx playwright test --project=phase57 tests/phase57/machine-body.spec.ts` + phase52/55 | W0 stub | ⬜ pending |
-| 57-04-T2 | 04 | 3 | SHL-01, SHL-05, PLC-03, PLC-04 | T-57-14..18 | `/` branches on the session server-side; worker reads RLS-scoped; AdminShell seam reached only through `dynamic(` | source-contract | `npx playwright test --project=phase57` | W0 stub | ⬜ pending |
-| 57-04-T3 | 04 | 3 | SHL-01 | T-57-16 | `/page` gate forbids site editor / konva / pdfjs / mammoth; baseline recorded once WITH the AdminShell seam in place | build + source-contract | `npm run build` + `npx playwright test --project=phase57` | W0 stub | ⬜ pending |
-| 57-05-T1 | 05 | 4 | PLC-02, PLC-03 | T-57-20 | `?machine=` UUID-checked; setSopMachines re-validates org | unit + source-contract | `npx playwright test --project=phase57 tests/phase57/machine-body.spec.ts tests/phase57/noticeboard.spec.ts` | W0 stub | ⬜ pending |
-| 57-05-T2 | 05 | 4 | PLC-04, PLC-05, SHL-05 | T-57-19, T-57-21, T-57-22 | AdminShell seam filled (lazy chunk only; baseline untouched); one inboxCount for pin + card | source-contract + build | `npx playwright test --project=phase57` + `npm run build` + `git diff --quiet -- .bundle-baseline.json` | W0 stub | ⬜ pending |
-| 57-05-T3 | 05 | 4 | PLC-04 | — | /governance inbox only; inventory 57-05 live | source-contract | `npx playwright test --project=phase57` + phase54/46/28/30 | ✅ | ⬜ pending |
-| 57-06-T1 | 06 | 5 | SHL-01 | — | no header element anywhere; header-reading guards repointed in the same commit | source-contract | `npx playwright test --project=phase57 tests/phase57/shell-structure.spec.ts` + phase30/41/51/11-stubs | W0 stub | ⬜ pending |
-| 57-06-T2 | 06 | 5 | SHL-01 | T-57-25 | roleHome → `/`; roles map + log-in journey + roleHome-reading guards in the same commit | unit + source-contract | `npx playwright test --project=phase57 tests/phase57/retirement-sweep.spec.ts` + phase30/43/53 | W0 stub | ⬜ pending |
-| 57-06-T3 | 06 | 5 | SHL-01 | T-57-24, T-57-26, T-57-03 | `/dashboard` fixed redirect; every guard → `/`; dashboard-literal specs (any spelling) repointed in the same commit; header-nav dropped; inventory 57-06 live | source-contract + build | phase57/55/30/41/51/43/53/11-stubs/26.5/28/32/25-e2e + `npm run build` | ✅ | ⬜ pending |
-| 57-07-T1 | 07 | 6 | PLC-05 | T-57-28, T-57-29 | `/admin/access` server-gated, `?sop=` UUID-checked | source-contract | `npx playwright test --project=phase57` + phase32 | W0 stub | ⬜ pending |
-| 57-07-T2 | 07 | 6 | PLC-05 | T-57-30, T-57-31 | redirects fixed; member departments untouched | source-contract | `npx playwright test --project=phase57 tests/phase57/departments.spec.ts` | W0 stub | ⬜ pending |
-| 57-07-T3 | 07 | 6 | PLC-05, SHL-01 | T-57-03 | feature dropped + swept; pathways map `/admin/access` | source-contract | phase57/55/51/25-integration/46 + `npm run build` | ✅ | ⬜ pending |
-| 57-08-T1 | 08 | 7 | SHL-01 | T-57-32..34 | `/sops` proxy block fixed destinations + cookie copy; links repointed; proxy-rule + link-literal guards repointed in the same commit | source-contract + lint | `npx playwright test --project=phase57` + phase11-stubs/28/41/43/46/54 + no-dead-internal-hrefs | W0 stub | ⬜ pending |
-| 57-08-T2 | 08 | 7 | SHL-01, PLC-03 | T-57-35 | guards on surviving behaviour read the one-screen files (worker-surface lint contract on the shell files) | source-contract | phase57 + phase15-stubs lint/23-stubs/28/30/33/36/37/41/52/55 | ✅ | ⬜ pending |
-| 57-08-T3 | 08 | 7 | SHL-01, PLC-03 | T-57-35 | list page + worker surfaces deleted with gate swap, journeys, roles, matrix and whole-subject spec deletions in one commit; inventory 57-08 live | build + source-contract | `npm run build` + phase57/41/52/54/55/46 + lints | ✅ | ⬜ pending |
-| 57-09-T1 | 09 | 8 | SHL-01 | T-57-03 | library table + helpers deleted with every guard that read them in one commit; baseline untouched | build + source-contract | `npm run build` + phase57/28/30/33/41/54/46 + no-static-admin-lens-import | ✅ | ⬜ pending |
-| 57-09-T2 | 09 | 8 | SHL-01, PLC-03 | T-57-36, T-57-40 | access-view guards → `/admin/access`; list-page dropped + swept; no quoted list address in src; UAT links; inventory 57-09 live | source-contract | phase57/55/32/33 + no-dead-internal-hrefs + `npm run build` | W0 stub | ⬜ pending |
-| 57-10-T1 | 10 | 9 | all | T-57-37, T-57-38 | evals write only in the eval-site org; real org read-only; worker due pin + admin health pin asserted by name/testid | eval list | `npx playwright test --list --project=evals` | W0 skeleton | ⬜ pending |
-| 57-10-T2 | 10 | 9 | all | — | deployed proof + screenshots read | deployed eval | `npm run eval -- --phase 57` | ✅ | ⬜ pending |
-| 57-10-T3 | 10 | 9 | all | — | sign-off | doc check | `node -e` frontmatter check | ✅ | ⬜ pending |
+| 57-01-T1 | 01 | 1 | all (guard) | T-57-03 | inventory completeness: no unlisted reference to a retired file or retired redirect literal (any spelling — RegExp tokens + Test D) | source-contract | `npx playwright test --project=phase57 tests/phase57/repoint-inventory.spec.ts` | created in task | ✅ green |
+| 57-01-T2 | 01 | 1 | SHL-01..PLC-05 (eval) | T-57-02 | supervisor fixture refuses non-fixture accounts | eval list | `npx playwright test --list --project=evals tests/evals/one-screen.eval.ts` | created in task | ✅ green |
+| 57-01-T3 | 01 | 1 | PLC-01, SHL-02, SHL-04 | T-57-01 | `?place=` whitelist / UUID; bad token → overview; no room table/UI | unit | `npx playwright test --project=phase57 tests/phase57/rooms.spec.ts tests/phase57/place.spec.ts tests/phase57/search.spec.ts` | created in task (tdd) | ✅ green |
+| 57-02-T1 | 02 | 2 | PLC-01, SHL-02 | — | rooms above machines, signposts capped 2.4, flyInset, focus replay | source-contract | `npx playwright test --project=phase57 tests/phase57/stage.spec.ts` + `--project=phase52` | W0 stub | ✅ green |
+| 57-02-T2 | 02 | 2 | SHL-01, SHL-02, SHL-04 | T-57-04..07 | replaceState only in select(); no router; place resolves only to loaded rows | source-contract + unit | `npx playwright test --project=phase57` + `npm run build` | W0 stub | ✅ green |
+| 57-03-T1 | 03 | 2 | SHL-05, PLC-04 | T-57-08..10 | one `loadInbox()`; `getAdminShell()` admin-gated, no params, session org, no service role | source-contract | `npx playwright test --project=phase57 tests/phase57/one-query.spec.ts` + phase54/28/30/46 | W0 stub | ✅ green |
+| 57-03-T2 | 03 | 2 | PLC-05 | T-57-11..13 | remove refused with counts; session-org filters; colour enum | unit + source-contract + live (`PHASE57_LIVE=1`) | `npx playwright test --project=phase57 tests/phase57/departments.spec.ts` | W0 stub | ✅ green |
+| 57-03-T3 | 03 | 2 | PLC-05 | T-57-13 | strip handlers wired to actions; no literal hex | source-contract | `npx playwright test --project=phase57 tests/phase57/departments.spec.ts` + phase51 | W0 stub | ✅ green |
+| 57-04-T1 | 04 | 3 | PLC-02, PLC-03 | — | worker bodies import no admin code | source-contract | `npx playwright test --project=phase57 tests/phase57/machine-body.spec.ts` + phase52/55 | W0 stub | ✅ green |
+| 57-04-T2 | 04 | 3 | SHL-01, SHL-05, PLC-03, PLC-04 | T-57-14..18 | `/` branches on the session server-side; worker reads RLS-scoped; AdminShell seam reached only through `dynamic(` | source-contract | `npx playwright test --project=phase57` | W0 stub | ✅ green |
+| 57-04-T3 | 04 | 3 | SHL-01 | T-57-16 | `/page` gate forbids site editor / konva / pdfjs / mammoth; baseline recorded once WITH the AdminShell seam in place | build + source-contract | `npm run build` + `npx playwright test --project=phase57` | W0 stub | ✅ green |
+| 57-05-T1 | 05 | 4 | PLC-02, PLC-03 | T-57-20 | `?machine=` UUID-checked; setSopMachines re-validates org | unit + source-contract | `npx playwright test --project=phase57 tests/phase57/machine-body.spec.ts tests/phase57/noticeboard.spec.ts` | W0 stub | ✅ green |
+| 57-05-T2 | 05 | 4 | PLC-04, PLC-05, SHL-05 | T-57-19, T-57-21, T-57-22 | AdminShell seam filled (lazy chunk only; baseline untouched); one inboxCount for pin + card | source-contract + build | `npx playwright test --project=phase57` + `npm run build` + `git diff --quiet -- .bundle-baseline.json` | W0 stub | ✅ green |
+| 57-05-T3 | 05 | 4 | PLC-04 | — | /governance inbox only; inventory 57-05 live | source-contract | `npx playwright test --project=phase57` + phase54/46/28/30 | ✅ | ✅ green |
+| 57-06-T1 | 06 | 5 | SHL-01 | — | no header element anywhere; header-reading guards repointed in the same commit | source-contract | `npx playwright test --project=phase57 tests/phase57/shell-structure.spec.ts` + phase30/41/51/11-stubs | W0 stub | ✅ green |
+| 57-06-T2 | 06 | 5 | SHL-01 | T-57-25 | roleHome → `/`; roles map + log-in journey + roleHome-reading guards in the same commit | unit + source-contract | `npx playwright test --project=phase57 tests/phase57/retirement-sweep.spec.ts` + phase30/43/53 | W0 stub | ✅ green |
+| 57-06-T3 | 06 | 5 | SHL-01 | T-57-24, T-57-26, T-57-03 | `/dashboard` fixed redirect; every guard → `/`; dashboard-literal specs (any spelling) repointed in the same commit; header-nav dropped; inventory 57-06 live | source-contract + build | phase57/55/30/41/51/43/53/11-stubs/26.5/28/32/25-e2e + `npm run build` | ✅ | ✅ green |
+| 57-07-T1 | 07 | 6 | PLC-05 | T-57-28, T-57-29 | `/admin/access` server-gated, `?sop=` UUID-checked | source-contract | `npx playwright test --project=phase57` + phase32 | W0 stub | ✅ green |
+| 57-07-T2 | 07 | 6 | PLC-05 | T-57-30, T-57-31 | redirects fixed; member departments untouched | source-contract | `npx playwright test --project=phase57 tests/phase57/departments.spec.ts` | W0 stub | ✅ green |
+| 57-07-T3 | 07 | 6 | PLC-05, SHL-01 | T-57-03 | feature dropped + swept; pathways map `/admin/access` | source-contract | phase57/55/51/25-integration/46 + `npm run build` | ✅ | ✅ green |
+| 57-08-T1 | 08 | 7 | SHL-01 | T-57-32..34 | `/sops` proxy block fixed destinations + cookie copy; links repointed; proxy-rule + link-literal guards repointed in the same commit | source-contract + lint | `npx playwright test --project=phase57` + phase11-stubs/28/41/43/46/54 + no-dead-internal-hrefs | W0 stub | ✅ green |
+| 57-08-T2 | 08 | 7 | SHL-01, PLC-03 | T-57-35 | guards on surviving behaviour read the one-screen files (worker-surface lint contract on the shell files) | source-contract | phase57 + phase15-stubs lint/23-stubs/28/30/33/36/37/41/52/55 | ✅ | ✅ green |
+| 57-08-T3 | 08 | 7 | SHL-01, PLC-03 | T-57-35 | list page + worker surfaces deleted with gate swap, journeys, roles, matrix and whole-subject spec deletions in one commit; inventory 57-08 live | build + source-contract | `npm run build` + phase57/41/52/54/55/46 + lints | ✅ | ✅ green |
+| 57-09-T1 | 09 | 8 | SHL-01 | T-57-03 | library table + helpers deleted with every guard that read them in one commit; baseline untouched | build + source-contract | `npm run build` + phase57/28/30/33/41/54/46 + no-static-admin-lens-import | ✅ | ✅ green |
+| 57-09-T2 | 09 | 8 | SHL-01, PLC-03 | T-57-36, T-57-40 | access-view guards → `/admin/access`; list-page dropped + swept; no quoted list address in src; UAT links; inventory 57-09 live | source-contract | phase57/55/32/33 + no-dead-internal-hrefs + `npm run build` | W0 stub | ✅ green |
+| 57-10-T1 | 10 | 9 | all | T-57-37, T-57-38 | evals write only in the eval-site org; real org read-only; worker due pin + admin health pin asserted by name/testid | eval list | `npx playwright test --list --project=evals` | W0 skeleton | ✅ green |
+| 57-10-T2 | 10 | 9 | all | — | deployed proof + screenshots read | deployed eval | `npm run eval -- --phase 57` | ✅ | ✅ green |
+| 57-10-T3 | 10 | 9 | all | — | sign-off | doc check | `node -e` frontmatter check | ✅ | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -77,12 +77,12 @@ Requirement → spec file: SHL-01 `shell-structure.spec.ts`, `retirement-sweep.s
 
 ## Wave 0 Requirements (57-01)
 
-- [ ] `playwright.config.ts` — `phase57` project; verify with `npx playwright test --list --project=phase57`
-- [ ] `tests/phase57/repoint-inventory.spec.ts` — every stale guard (~48 spec/eval files) listed with disposition + owning plan; RETIRED carries RegExp tokens for the dashboard redirect literal (owner 57-06) and the list redirect literal (owner 57-08) in every spelling, proven by Test D; the spelling sweep is recorded in 57-01-SUMMARY; completeness live from 57-01; `LIVE_PLANS` flipped by 05/06/07/08/09/10
-- [ ] `tests/phase57/*.spec.ts` stubs per requirement (pure-module specs `place`, `rooms`, `search` rooms half live in 57-01)
-- [ ] `tests/evals/one-screen.eval.ts` skeleton + `siteSupervisor` fixture (eval-site org)
-- [ ] Bundle gate change is planned in the plans that need it: `/page` entry + baseline recorded once in 57-04 AFTER the next/dynamic AdminShell seam exists (decision artefact; 57-05 fills only the lazy chunk); `/sops/page` entry and the library-table marker group removed with the page in 57-08; baselines only ever move down by hand
-- [ ] Retired-URL assertions in `plant-home`, `governance`, `site-editor`, `sop-surface`, `dead-surface`, `cut-features` evals rewritten or folded in 57-10
+- [x] `playwright.config.ts` — `phase57` project; verify with `npx playwright test --list --project=phase57`
+- [x] `tests/phase57/repoint-inventory.spec.ts` — every stale guard (~48 spec/eval files) listed with disposition + owning plan; RETIRED carries RegExp tokens for the dashboard redirect literal (owner 57-06) and the list redirect literal (owner 57-08) in every spelling, proven by Test D; the spelling sweep is recorded in 57-01-SUMMARY; completeness live from 57-01; `LIVE_PLANS` flipped by 05/06/07/08/09/10
+- [x] `tests/phase57/*.spec.ts` stubs per requirement (pure-module specs `place`, `rooms`, `search` rooms half live in 57-01)
+- [x] `tests/evals/one-screen.eval.ts` skeleton + `siteSupervisor` fixture (eval-site org)
+- [x] Bundle gate change is planned in the plans that need it: `/page` entry + baseline recorded once in 57-04 AFTER the next/dynamic AdminShell seam exists (decision artefact; 57-05 fills only the lazy chunk); `/sops/page` entry and the library-table marker group removed with the page in 57-08; baselines only ever move down by hand
+- [x] Retired-URL assertions in `plant-home`, `governance`, `site-editor`, `sop-surface`, `dead-surface`, `cut-features` evals rewritten or folded in 57-10
 
 ---
 
@@ -92,7 +92,16 @@ Requirement → spec file: SHL-01 `shell-structure.spec.ts`, `retirement-sweep.s
 |----------|-------------|------------|-------------------|
 | Room hit-areas sit over sensible spots on the real org's 2752×1536 scene and the eval org's 1600×900 scene; signposts legible at overview and zoomed | PLC-01 | geometry is invisible to assertions (CLAUDE.md 2026-07-14) | Claude reads `57-worker-overview`, `57-worker-zoomed`, `57-admin-edit`, `57-real-org-overview` screenshots from the deployed eval (57-10 T2) and tunes `src/lib/site/rooms.ts` if needed |
 
+## Sign-off evidence (57-10)
+
+- Full suite, run once: 20 failures, all known or environmental. 8 phase11-stubs (Puck-era / wizard, baseline), 1 phase25-integration `wizard-sop-dept.spec.ts:61` (baseline), 6 phase46 live probes (`verifyOtp failed: Request rate limit reached`), 5 phase12.5-stubs (`ECONNREFUSED localhost:3000`, they need a running dev server). No phase-57 regression.
+- `npm run build` + bundle gate green (`/page` 831 KB, `/sops/[sopId]/page` 795 KB, both delta 0). `npx tsc --noEmit` clean.
+- `npm run eval -- --phase 57` against sopstart.com: 44 passed / 0 failed / 0 skipped (commit 5fe93d3). Every screenshot read; see `57-EVAL.md`.
+- Rooms: Smoko and Workshop moved onto the real scene's floor after the first eval's screenshot read (`5fe93d3`).
+
 ## Descoped by the owner (not a gap)
+
+Recorded at sign-off (57-10): the PLC-01 / SC5 clause "an admin can position each room's shape" is descoped by the owner (D-01) and is a Deferred Idea, not a gap. The deployed eval asserts the rooms are fixed hit-areas and that edit mode offers departments and machines only.
 
 - PLC-01 / SC5 "an admin can position / drag each room's shape in the site editor" — descoped by Simon (D-01, 2026-10-04); rooms are fixed hit-areas in `src/lib/site/rooms.ts`. Listed under Deferred Ideas in 57-CONTEXT.md.
 
@@ -107,4 +116,4 @@ Requirement → spec file: SHL-01 `shell-structure.spec.ts`, `retirement-sweep.s
 - [x] Feedback latency < 60s
 - [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending execution (57-10 T3 signs off)
+**Approval:** approved 2026-10-05 (57-10)

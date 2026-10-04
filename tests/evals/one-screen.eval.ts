@@ -482,6 +482,13 @@ test.describe('Phase 57 — the one screen (deployed)', () => {
     }
   })
 
+  test('CLAUDE.md pathways: the pathways map reports zero unmapped screens', async ({ page, context }) => {
+    await signInAs(context, 'admin')
+    await page.goto('/pathways')
+    await page.getByRole('button', { name: /All screens/ }).click()
+    await expect(page.getByText(/^0 not mapped yet$/)).toBeVisible(SLOW)
+  })
+
   // -------------------------------------------------------------- signed out
 
   test('D-10: signed-out root shows the landing page', async ({ page }) => {
