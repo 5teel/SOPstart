@@ -1892,6 +1892,8 @@ Plans:
 
 - [x] 57-10-PLAN.md — Deployed eval for all five success criteria (three roles, both pin kinds), full suite once, screenshots read, rooms tuned, validation signed off
 
+**Bundle-gate decisions (orchestrator, 2026-10-05)**: (1) `check-bundle-size.ts` was charging every route for the root `/page` segment chunk — fixed to charge a route only its own segment chunks; the 817 KB `/sops` baselines were never changed. (2) The `/sops` gate was retired with the list page and `/page` became the worker gate. Its first two recorded values (792, 565) were measured with `WorkerShell` in a lazy chunk the gate could not see; the recorded baseline is **831 KB** with the static import, so the gate measures the worker's real first download. Like-for-like the retired list page was 795 after the same fixes, so the one screen costs +36 KB (stage, rooms, frame, Now card). `/sops/[sopId]` stays gated at 795. Reverting to the lazy split is one import line in `OneScreen.tsx` plus the baseline entry.
+
 **UI hint**: yes
 
 ### Phase 58: The SOP Focus Screen — Walk & Edit
