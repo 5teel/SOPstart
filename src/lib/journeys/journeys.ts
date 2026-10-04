@@ -118,7 +118,7 @@ export const JOURNEYS: Journey[] = [
         { label: 'On a desktop, and the site has a map', to: 'plant' },
         { label: 'On a phone, or no map drawn yet', to: 'lib' },
       ] },
-      { id: 'plant', type: 'screen', label: 'Plant home — the site map', route: '/sops', detail: 'The site drawing with every machine clickable (Phase 52). An amber pin on a machine counts that worker\'s procedures there that are due, never done, or updated — worked out live from the worker\'s own list, never stored (D-05/D-06). The "Next for you" card shows the single next procedure with Walk it and Show me. Department chips move the view to that department\'s machines. The ask bar lights up matching machines as the worker types. Admins see the library table here instead; their floor is on Governance (Phase 54).' },
+      { id: 'plant', type: 'screen', label: 'Plant home — the site map', route: '/sops', detail: 'The site drawing with every machine clickable (Phase 52). An amber pin on a machine counts that worker\'s procedures there that are due, never done, or updated — worked out live from the worker\'s own list, never stored (D-05/D-06). The "Next for you" card shows the single next procedure with Walk it and Show me. Department chips move the view to that department\'s machines. The ask bar lights up matching machines as the worker types. Admins see the library table here instead; their floor is on the one screen (Phase 57).' },
       { id: 'pick', type: 'decision', label: 'How do they get there?', branches: [
         { label: 'Click a machine', to: 'panel' },
         { label: 'Now card → Walk it', to: 'walk' },
@@ -481,16 +481,6 @@ export const JOURNEYS: Journey[] = [
     steps: [
       { id: 's', type: 'start', label: 'SOPs are drifting out of date, ownerless, or awaiting approval' },
       { id: 'queue', type: 'screen', label: 'Governance inbox', route: '/governance', detail: 'One-action rows — no owner, review overdue, awaiting the caller\'s approval, stuck converting, machines with no procedures. Counted chips: All · No owner · Overdue · Approve · Stuck · Machines. One action per row: Assign owner · Approve · Confirm current · Fix assignment · Retry · Add. An empty inbox shows the All clear state. Computed on read — no jobs, no materialized state (D28-05).' },
-      { id: 'view', type: 'decision', label: 'Work the queue, or check the floor?', branches: [
-        { label: 'Work a row', to: 'action' },
-        { label: 'Check the floor', to: 'floor' },
-      ] },
-      { id: 'floor', type: 'screen', label: 'Floor health', route: '/governance', detail: 'The site drawing beside the inbox: a red ! where a procedure has no owner, an amber ↻ where a review is overdue, a green dot when a machine is all clear. A "Draw your site" card shows instead when the org has no site yet.', branches: [
-        { label: 'Click a machine with a mark', to: 'panel' },
-      ] },
-      { id: 'panel', type: 'screen', label: 'Machine panel (admin)', route: '/governance', detail: 'Slides in: each procedure linked to the machine with its NO OWNER / REVIEW DUE / DRAFT / OK badge, owner and review date, an Open link (worker view) and an Edit link (builder). "Add one" shows when the machine has no procedures yet.', branches: [
-        { label: 'Open or edit a procedure', to: 'e' },
-      ] },
       { id: 'action', type: 'decision', label: 'What does the row need?', branches: [
         { label: 'Approve (awaiting approval)', to: 'approve' },
         { label: 'Confirm current (overdue/due soon)', to: 'confirm' },
@@ -554,6 +544,39 @@ export const JOURNEYS: Journey[] = [
       { id: 'walk', type: 'action', label: 'Walk a SOP', detail: 'Walk beside a SOP row, or Walk it on the Now card.' },
       { id: 'sop', type: 'screen', label: 'Procedure', route: '/sops/[sopId]' },
       { id: 'smoko', type: 'screen', label: 'Smoko room - my record', route: '/activity', detail: 'The Smoko room and the Office both bridge to Activity.' },
+      { id: 'e', type: 'end', label: 'Back on the site' },
+    ],
+  },
+  {
+    id: 'one-screen-admin',
+    group: 'Library & team',
+    persona: 'SOP Admin',
+    title: 'Run the site from the one screen',
+    summary: 'An admin opens / and sees health marks on the site, the Office inbox count, the Workshop drafts and the Noticeboard, and can start a SOP for a machine or edit the site without leaving the screen.',
+    steps: [
+      { id: 's', type: 'start', label: 'Opens the site' },
+      { id: 'screen', type: 'screen', label: 'The one screen (admin)', route: '/', detail: 'Machines carry a red, amber or green mark from the SOPs linked to them. The Office pin and the Office card show the same inbox count. Selecting a machine lists its SOPs with a badge each (no owner, review due, draft, ok), Walk on published ones, Edit on any.', branches: [
+        { label: 'Open the Office', to: 'office' },
+        { label: 'Open the Workshop', to: 'workshop' },
+        { label: 'Select a machine', to: 'machine' },
+        { label: 'Edit site', to: 'edit' },
+      ] },
+      { id: 'office', type: 'screen', label: 'Office - inbox summary', route: '/governance', detail: 'Summarises the inbox and opens it. Completions waiting for sign-off are a separate line that opens Activity. People & roles and Settings are linked from here.', branches: [
+        { label: 'Done', to: 'e' },
+      ] },
+      { id: 'workshop', type: 'screen', label: 'Workshop - drafts', route: '/admin/sops/builder/[sopId]', detail: 'Every draft in the organisation with its state; Open goes to the builder.', branches: [
+        { label: 'Write a new SOP', to: 'new' },
+        { label: 'Done', to: 'e' },
+      ] },
+      { id: 'new', type: 'screen', label: 'New SOP', route: '/admin/sops/new', branches: [
+        { label: 'Done', to: 'e' },
+      ] },
+      { id: 'machine', type: 'screen', label: 'Machine - SOPs and New SOP for this machine', route: '/admin/sops/new/blank', detail: 'New SOP for this machine opens the blank wizard with the machine already chosen; the new SOP is linked to it when it is created.', branches: [
+        { label: 'Done', to: 'e' },
+      ] },
+      { id: 'edit', type: 'action', label: 'Edit site', detail: 'The site editor replaces the stage and detail panes, with the departments strip above it. Done returns to the overview with fresh marks.', branches: [
+        { label: 'Done', to: 'e' },
+      ] },
       { id: 'e', type: 'end', label: 'Back on the site' },
     ],
   },

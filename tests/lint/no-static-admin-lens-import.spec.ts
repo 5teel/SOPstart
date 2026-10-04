@@ -63,7 +63,7 @@ function findImports(symbol: string): Hit[] {
   const hits: Hit[] = []
   const files: string[] = []
   walk(SRC_DIR, files)
-  const importLine = new RegExp(`import\\s+[^;]*${symbol}[^;]*from`, 'i')
+  const importLine = new RegExp(`import\\s+[^;]*\\b${symbol}\\b[^;]*from`, 'i')
   for (const file of files) {
     const rel = path.relative(REPO_ROOT, file).replace(/\\/g, '/')
     const text = fs.readFileSync(file, 'utf-8')
