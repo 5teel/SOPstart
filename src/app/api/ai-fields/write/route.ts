@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
       { status: 400 },
     )
   }
-  const { fieldId, context, newValue } = parsed.data
+  const { fieldId, context, newValue, agentName } = parsed.data
 
   // ── 3. Registry allow-list check (T-23-04-05) ─────────────────────────────
   const descriptor = getField(fieldId)
@@ -108,6 +108,7 @@ export async function POST(req: NextRequest) {
     fieldId,
     context: enrichedContext,
     newValue,
+    agentName,
   })
 
   if (!result.success) {

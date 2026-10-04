@@ -30,6 +30,8 @@ import { AiWriteRequestSchema, AcceptProposalSchema, RejectProposalSchema } from
 import { gateWrite } from '@/lib/ai-fields/approval'
 import { getField } from '@/lib/ai-fields/registry'
 import type { WriteResult } from '@/lib/ai-fields/registry'
+import { recordDecision } from '@/lib/decisions/record'
+import { DEFAULT_AGENT_NAME } from '@/lib/decisions/shape'
 
 // ────────────────────────────────────────────────────────────────────────────
 // applyAiWrite
@@ -58,6 +60,7 @@ export async function applyAiWrite(
   // can pass sopIsPublished:false to force auto-apply on any low-stake field regardless of
   // actual SOP status. The action is the security boundary.
   let serverSopIsPublished: boolean | undefined = undefined
+  let serverSopId: string | null = null
   if (context.sopId) {
     const admin = createAdminClient()
     const { data: sopRow } = await admin
@@ -68,6 +71,7 @@ export async function applyAiWrite(
       .single()
     if (sopRow) {
       serverSopIsPublished = sopRow.status === 'published'
+      serverSopId = context.sopId
     }
     // If sopRow is null (SOP not found / cross-org), leave sopIsPublished undefined —
     // gateWrite's A6 fail-safe treats undefined-on-SOP-scoped as high-stake.
@@ -93,6 +97,17 @@ export async function applyAiWrite(
   // (T-23-04-02: applyAiWrite is the only write path; routes is write-only via this fn)
   try {
     const result = await gateWrite(descriptor, safeContext, newValue, currentValue)
+    // A pending proposal is a request, not a decision -- only an applied write is logged.
+    if (result.outcome === 'applied') {
+      await recordDecision({
+        kind: 'ai_field_write',
+        agent: parsed.data.agentName ?? DEFAULT_AGENT_NAME,
+        subject: { kind: 'field', id: context.sectionId ?? context.sopId ?? null },
+        sopId: serverSopId,
+        summary: `Changed ${descriptor.label}`,
+        details: { field_id: fieldId },
+      })
+    }
     return { success: true, result }
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Write failed'
@@ -197,6 +212,14 @@ export async function acceptProposal(
     .eq('id', proposalId)
     .eq('organisation_id', organisationId)
 
+  await recordDecision({
+    kind: 'approve',
+    subject: { kind: 'ai_proposal', id: proposalId },
+    sopId: (ctx['sopId'] as string | undefined) ?? null,
+    summary: 'Approved an AI suggestion',
+    details: { field_id: proposal.field_id },
+  })
+
   // ── 8. Revalidate the relevant path ───────────────────────────────────────
   // Revalidate the SOP builder + admin SOPs list. More granular revalidation
   // would require the sopId from context — revalidate the admin SOPs root for now.
@@ -242,7 +265,7 @@ export async function rejectProposal(
     .eq('id', proposalId)
     .eq('organisation_id', organisationId)
     .eq('status', 'pending')
-    .select('id')
+    .select('id, field_id, context')
 
   if (error) {
     return { success: false, error: 'Failed to reject proposal.' }
@@ -251,6 +274,15 @@ export async function rejectProposal(
   if (!rejected || rejected.length === 0) {
     return { success: false, error: 'Proposal not found or already resolved.' }
   }
+  const rejectedSopId = ((rejected[0].context as Record<string, unknown> | null)?.['sopId'] as string | undefined) ?? null
+  await recordDecision({
+    kind: 'reject',
+    subject: { kind: 'ai_proposal', id: proposalId },
+    sopId: rejectedSopId,
+    summary: 'Rejected an AI suggestion',
+    details: { field_id: rejected[0].field_id },
+  })
+
   // ── 4. Revalidate ─────────────────────────────────────────────────────────
   revalidatePath('/sops')
 

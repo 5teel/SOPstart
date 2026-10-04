@@ -12,6 +12,7 @@
  *   - 23-PATTERNS.md § validators/ai-fields.ts
  */
 import { z } from 'zod'
+import { AGENT_NAMES } from '@/lib/decisions/shape'
 
 // ---------------------------------------------------------------------------
 // Stake level (D-01/D-02)
@@ -56,6 +57,8 @@ export const AiWriteRequestSchema = z.object({
   fieldId: z.string().min(1),
   context: FieldContextSchema,
   newValue: z.unknown(),
+  /** Names the agent on the decision ledger (DEC-04). Unknown names fail validation. */
+  agentName: z.enum(AGENT_NAMES).optional(),
 })
 export type AiWriteRequest = z.infer<typeof AiWriteRequestSchema>
 

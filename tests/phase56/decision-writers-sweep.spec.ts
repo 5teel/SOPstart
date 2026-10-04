@@ -47,6 +47,9 @@ const LIVE_WRITERS: string[] = [
   'src/actions/observations.ts#recordObservation',
   'src/actions/sop-section-blocks.ts#verifyBlock',
   'src/actions/sop-section-blocks.ts#unverifyBlock',
+  'src/actions/ai-fields.ts#acceptProposal',
+  'src/actions/ai-fields.ts#rejectProposal',
+  'src/actions/ai-fields.ts#applyAiWrite',
 ]
 // performPublish is hooked outside the gate body (56-05).
 const PUBLISH_GUARD_LIVE = true
@@ -227,6 +230,31 @@ test.describe('recordDecision wiring', () => {
       expect(body.lastIndexOf('await recordDecision(')).toBeGreaterThan(body.indexOf(x.anchor))
     })
   }
+})
+
+test.describe('every hook is live', () => {
+  test('LIVE_WRITERS covers every entry and extra hook (nothing left fixme)', () => {
+    const all = [...W.entries, ...W.extraHooks].map((e) => `${e.file}#${e.function}`)
+    expect(all.filter((k) => !LIVE_WRITERS.includes(k))).toEqual([])
+  })
+
+  test('applyAiWrite names the agent on its decision', () => {
+    const body = functionBody(fileText('src/actions/ai-fields.ts'), 'applyAiWrite')
+    expect(body).toMatch(/await recordDecision\(\{[\s\S]*?agent:/)
+    expect(body).toContain("outcome === 'applied'")
+  })
+
+  test('the AI write request validates agentName against AGENT_NAMES', () => {
+    const v = fileText('src/lib/validators/ai-fields.ts')
+    expect(v).toContain('AGENT_NAMES')
+    expect(v).toMatch(/agentName:\s*z\.enum\(AGENT_NAMES\)\.optional\(\)/)
+  })
+
+  test('verifyBlock / unverifyBlock take only blockId (SOP is resolved server-side)', () => {
+    const t = fileText('src/actions/sop-section-blocks.ts')
+    expect(t).toMatch(/export async function verifyBlock\(\s*blockId: string\s*\)/)
+    expect(t).toMatch(/export async function unverifyBlock\(\s*blockId: string\s*\)/)
+  })
 })
 
 test.describe('publish gate stays clean', () => {
