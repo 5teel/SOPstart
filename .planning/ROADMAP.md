@@ -1853,7 +1853,7 @@ Plans:
   4. A worker sees how many SOPs are due at each place and a "next for you" card with Walk it and Show me; an admin sees where a SOP has no owner or an overdue review, a count on the Office and the Workshop, and a card saying how many things wait in the Office with a button that opens it; typing in the search box filters the list and lights the matching shapes (machine names and the titles of the SOPs on them)
   5. An admin can switch the site into edit mode from the map to add, rename, reshape or remove machines and departments and to drag each room's shape to a new place; there is no departments screen
 
-**Plans:** 5/10 plans executed
+**Plans:** 6/10 plans executed
 Plans:
 **Wave 1**
 
@@ -1874,7 +1874,7 @@ Plans:
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
-- [ ] 57-06-PLAN.md — No header anywhere: Back to the site bar, roleHome → /, /dashboard retired (every redirect-literal guard repointed in the same commit), /pending sign-out, dropped list
+- [x] 57-06-PLAN.md — No header anywhere: Back to the site bar, roleHome → /, /dashboard retired (every redirect-literal guard repointed in the same commit), /pending sign-out, dropped list
 
 **Wave 6** *(blocked on Wave 5 completion)*
 
