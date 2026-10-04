@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { signOut } from '@/actions/auth'
 
 export const metadata: Metadata = {
   title: 'Account pending',
@@ -18,6 +19,15 @@ export default function PendingPage() {
         <p className="text-sm text-[var(--ink-700)]">
           Your account is being set up. Ask your admin if you have access issues.
         </p>
+        <form action={signOut} className="mt-4">
+          <button
+            type="submit"
+            data-testid="pending-sign-out"
+            className="min-h-tap rounded-lg border border-ink-200 px-4 text-ui text-ink-700"
+          >
+            Sign out
+          </button>
+        </form>
       </div>
     </div>
   )

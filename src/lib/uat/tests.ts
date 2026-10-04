@@ -102,7 +102,7 @@ export const UAT_TESTS: UatTest[] = [
       { id: 'no-dead-taps', text: 'Did you avoid any "did my tap register?" moments?' },
     ],
     background:
-      'Navigation-responsiveness pass (2026-07-13): route-level loading.tsx skeletons so the App Router paints instantly on navigation; useLinkStatus pending spinners on BottomTabBar/TopHeader/AdminNav; middleware getUser()→getClaims() (local ES256 JWT verify, no per-request Supabase Auth round-trip); per-request cached getSessionContext deduplicating auth+role queries; Promise.all on independent server-page fetches.',
+      'Navigation-responsiveness pass (2026-07-13): route-level loading.tsx skeletons so the App Router paints instantly on navigation; useLinkStatus pending spinners on BottomTabBar/the old header/AdminNav; middleware getUser()→getClaims() (local ES256 JWT verify, no per-request Supabase Auth round-trip); per-request cached getSessionContext deduplicating auth+role queries; Promise.all on independent server-page fetches.',
   },
 
   {
@@ -124,7 +124,7 @@ export const UAT_TESTS: UatTest[] = [
       { id: 'lost', text: 'In your first five taps, did you ever land somewhere you did not expect?' },
     ],
     background:
-      'Nav clarity pass (2026-07-30): "Activity" renamed to "Sign-off" in TopHeader + BottomTabBar; /activity no longer redirects admins to the old admin SOP page (they see the supervisor sign-off queue).',
+      'Nav clarity pass (2026-07-30): "Activity" renamed to "Sign-off" in the old header + BottomTabBar; /activity no longer redirects admins to the old admin SOP page (they see the supervisor sign-off queue).',
   },
 
   // ===================== Design choices (pick A or B) =====================

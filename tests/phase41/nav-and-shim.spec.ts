@@ -12,7 +12,6 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 const ROOT = process.cwd()
-const TOP_HEADER = path.join(ROOT, 'src', 'components', 'layout', 'TopHeader.tsx')
 const NEXT_CONFIG = path.join(ROOT, 'next.config.ts')
 const LIBRARY_TABLE = path.join(ROOT, 'src', 'components', 'admin', 'AdminLibraryTable.tsx')
 const WORKER_LIST = path.join(ROOT, 'src', 'components', 'sop', 'WorkerSimpleList.tsx')
@@ -21,22 +20,6 @@ const SOP_DETAIL_PAGE = path.join(ROOT, 'src', 'app', '(protected)', 'sops', '[s
 function read(p: string): string {
   return fs.readFileSync(p, 'utf-8').replace(/\r\n/g, '\n')
 }
-
-test.describe('SUR-03 — one top-level "SOPs" entry', () => {
-  test('SUR-03: ADMIN_LINKS drops Manage SOPs / the /admin/sops href; BASE_LINKS keeps exactly one /sops entry', () => {
-    const header = read(TOP_HEADER)
-    expect(header).not.toContain("label: 'Manage SOPs'")
-    expect(header).not.toContain("href: '/admin/sops'")
-    const sopsMatches = header.match(/href:\s*'\/sops'/g) ?? []
-    expect(sopsMatches.length).toBe(1)
-  })
-
-  test('SUR-03/Phase 54: the Governance entry points at /governance', () => {
-    const header = read(TOP_HEADER)
-    expect(header).toContain("label: 'Governance', href: '/governance'")
-    expect(header).not.toContain("'/sops?view=attention'")
-  })
-})
 
 test.describe('legacy /admin/sops — static next.config.ts redirect (Phase 43 D-01)', () => {
   test('redirects to /sops as a fixed same-origin destination (open-redirect hygiene, T-41-03/T-43-02)', () => {

@@ -11,7 +11,7 @@
  *     `user_role` via shared parseJwtPayload — never raw atob, 2026-06-26).
  *   - /dashboard survives ONLY as a redirect shim (role → home); the
  *     AdminDashboard/PendingDashboard UI is deleted; pending UI lives at /pending.
- *   - TopHeader/BottomTabBar nav repoints are 30-04 scope (that test stays fixme).
+ *   - Phase 57: the header is gone, so its nav repoint test went with it.
  *
  * Source-contract idiom mirrors tests/phase28/governance-queue.spec.ts.
  */
@@ -23,7 +23,6 @@ const ROOT = process.cwd()
 const ROLE_HOME = path.join(ROOT, 'src', 'lib', 'auth', 'role-home.ts')
 const MIDDLEWARE = path.join(ROOT, 'src', 'lib', 'supabase', 'middleware.ts')
 const AUTH_ACTIONS = path.join(ROOT, 'src', 'actions', 'auth.ts')
-const TOP_HEADER = path.join(ROOT, 'src', 'components', 'layout', 'TopHeader.tsx')
 
 function read(p: string): string {
   return fs.readFileSync(p, 'utf-8')
@@ -61,13 +60,6 @@ test.describe('UX-01 — one home per role', () => {
     const src = read(AUTH_ACTIONS)
     expect(src).toContain('roleHome')
     expect(src).not.toContain("redirect('/dashboard')")
-  })
-
-  // Flipped live in 30-04 (TopHeader/BottomTabBar nav repoint).
-  test('TopHeader has zero /dashboard hrefs (brand + BASE_LINKS repointed)', () => {
-    const src = read(TOP_HEADER)
-    expect(src).not.toContain("'/dashboard'")
-    expect(src).not.toContain('"/dashboard"')
   })
 
   test('/dashboard page is a redirect-only shim (no AdminDashboard/PendingDashboard UI)', () => {

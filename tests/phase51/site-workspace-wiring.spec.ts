@@ -22,7 +22,6 @@ function read(rel: string): string {
 const WORKSPACE_PATH = 'src/components/admin/site/SiteWorkspace.tsx'
 const EMPTY_STATE_PATH = 'src/components/admin/site/SiteEmptyState.tsx'
 const PAGE_PATH = 'src/app/(protected)/admin/site/page.tsx'
-const HEADER_PATH = 'src/components/layout/TopHeader.tsx'
 const JOURNEYS_PATH = 'src/lib/journeys/journeys.ts'
 
 /** Returns the [start, end) character span of a top-level `function <name>(` body. */
@@ -136,17 +135,6 @@ test.describe('route', () => {
     expect(src).toContain('<SiteWorkspace')
     expect(src).toContain('<SiteEmptyState')
     expect(src).toContain('canGenerate')
-  })
-
-  test('TopHeader ADMIN_LINKS includes a Site entry pointing at /admin/site', () => {
-    const src = read(HEADER_PATH)
-    const adminLinksBlock = src.match(/const ADMIN_LINKS[\s\S]*?\n\]/)?.[0] ?? ''
-    expect(adminLinksBlock).toContain("label: 'Site', href: '/admin/site'")
-    const teamIdx = adminLinksBlock.indexOf("'/admin/team'")
-    const siteIdx = adminLinksBlock.indexOf("'/admin/site'")
-    const settingsIdx = adminLinksBlock.indexOf("'/admin/settings'")
-    expect(teamIdx).toBeLessThan(siteIdx)
-    expect(siteIdx).toBeLessThan(settingsIdx)
   })
 
   test('journeys.ts maps a journey step with route /admin/site', () => {

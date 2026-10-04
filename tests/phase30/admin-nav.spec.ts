@@ -14,7 +14,7 @@
  *     editor relocates here in 30-08, NOT in this plan.
  *   - T-30-03-01: consolidation must not weaken any check — every admin
  *     page keeps its own ['admin','safety_manager'] guard verbatim.
- *   - Account menu (TopHeader) collapse is 30-04 scope — stays fixme here.
+ *   - Phase 57: the header is gone; the admin links it carried live in the one screen.
  *
  * Source-contract idiom mirrors tests/phase28/governance-queue.spec.ts.
  */
@@ -27,7 +27,6 @@ const ADMIN_NAV = path.join(ROOT, 'src', 'components', 'admin', 'AdminNav.tsx')
 const SETTINGS_PAGE = path.join(
   ROOT, 'src', 'app', '(protected)', 'admin', 'settings', 'page.tsx',
 )
-const TOP_HEADER = path.join(ROOT, 'src', 'components', 'layout', 'TopHeader.tsx')
 
 // Phase 43 (D-01): the /admin/governance and /admin/sops page-level shims
 // are deleted; both legacy URLs are now static next.config.ts redirects
@@ -47,23 +46,8 @@ test.describe('UX-02 — one shared admin nav', () => {
   // 2026-07-30 (sketch 004 variant A): AdminNav is DELETED — the app header
   // is the only admin nav tier. The /admin/sops rail carries the in-page
   // views (status tabs · Needs attention · Access).
-  test('AdminNav component is deleted; header carries the admin links', () => {
+  test('AdminNav component is deleted; the attention deep link still maps to governance', () => {
     expect(fs.existsSync(ADMIN_NAV)).toBe(false)
-    const header = read(TOP_HEADER)
-    for (const item of ['Governance', 'Create New SOP', 'Team', 'Settings']) {
-      expect(header).toContain(item)
-    }
-    // SUR-03: "Manage SOPs" must never come back as a second SOPs nav entry
-    // (comments referencing the old name for context are fine).
-    expect(header).not.toContain("label: 'Manage SOPs'")
-    for (const href of [
-      "'/governance'",
-      "'/admin/sops/new'",
-      "'/admin/team'",
-      "'/admin/settings'",
-    ]) {
-      expect(header).toContain(href)
-    }
     // The attention view stays reachable — resolveLibraryNav maps the legacy
     // ?view=attention deep link onto the governance route (Phase 54, D-01).
     const rows = read(ADMIN_ROWS)
@@ -92,16 +76,5 @@ test.describe('UX-02 — one shared admin nav', () => {
   test('journeys.ts maps the /admin/settings screen', () => {
     const journeys = read(path.join(ROOT, 'src', 'lib', 'journeys', 'journeys.ts'))
     expect(journeys).toContain("route: '/admin/settings'")
-  })
-
-  // 2026-07-30: account-menu Admin door removed — admin links (Create New
-  // SOP · Team · Settings) live in the primary header, gated on isAdmin.
-  test('primary header carries Create New SOP / Team / Settings; no account-menu Admin link', () => {
-    const src = read(TOP_HEADER)
-    expect(src).toContain("'/admin/sops/new'")
-    expect(src).toContain("'/admin/team'")
-    expect(src).toContain("'/admin/settings'")
-    expect(src).not.toContain('ADMIN_LINK.href')
-    expect(src).not.toContain("'/admin/ai-settings'")
   })
 })

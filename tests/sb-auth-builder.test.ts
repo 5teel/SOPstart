@@ -118,17 +118,17 @@ test.describe('SOP Builder authoring entry points (SB-AUTH)', () => {
     // Repointed AGAIN 2026-09-13 (Phase 41, SUR-01/02/04): admin/sops/page.tsx
     // is now a redirect shim — the library's SOP_SELECT column list (which
     // carries source_type) moved to listAdminSopRows (admin-sop-list.ts), and
-    // the one create entry moved onto TopHeader's ADMIN_LINKS.
+    // the one create entry moved onto the Workshop room (Phase 57).
     const listAction = await fs.readFile(
       'src/actions/admin-sop-list.ts',
       'utf8'
     )
     expect(listAction).toContain('source_type')
-    const topHeader = await fs.readFile(
-      'src/components/layout/TopHeader.tsx',
+    const workshop = await fs.readFile(
+      'src/components/shell/AdminRoomBodies.tsx',
       'utf8'
     )
-    expect(topHeader).toContain("{ label: 'Create New SOP', href: '/admin/sops/new' }")
+    expect(workshop).toContain('room-workshop-new')
 
     // 3. Existing publish route file exists at the canonical location.
     const publishRoute = await fs

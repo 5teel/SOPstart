@@ -5,8 +5,7 @@
  *   - Deleted: ModelTab.tsx + tab entry, /sops/[sopId]/walkthrough route
  *     (page.tsx + layout.tsx — hrefs become ?tab=walk), WalkthroughTab.tsx
  *     shim, BuilderWithSourceViewer.tsx (this plan, 30-01), fake
- *     notifications bell (TopHeader — NotificationBadge itself stays for
- *     BottomTabBar), AdminDashboard/PendingDashboard UI (UX-01).
+ *     notifications bell (the whole header went in Phase 57), AdminDashboard/PendingDashboard UI (UX-01).
  *   - No-op worker department filter fixed or removed (decision #3 —
  *     executor checks the sop_departments SELECT policy at edit time).
  *   - /pathways + /uat links move from primary nav to the account menu.
@@ -47,15 +46,8 @@ test.describe('UX-08 — dead-weight sweep', () => {
     expect(fs.existsSync(routeDir)).toBe(false)
   })
 
-  // 2026-07-30: BottomTabBar deleted (redundant with TopHeader); its
-  // NotificationBadge moved onto the TopHeader SOPs link. The fake bell
-  // (aria-label="Notifications", linked to /sops) stays gone.
-  test('BottomTabBar deleted; NotificationBadge lives on the TopHeader SOPs link', () => {
-    const header = fs.readFileSync(
-      path.join(ROOT, 'src', 'components', 'layout', 'TopHeader.tsx'), 'utf-8',
-    )
-    expect(header).toContain('NotificationBadge')
-    expect(header).not.toContain('aria-label="Notifications"')
+  // Phase 57: the whole header is deleted, so its badge and fake bell went with it.
+  test('BottomTabBar stays deleted', () => {
     expect(
       fs.existsSync(path.join(ROOT, 'src', 'components', 'layout', 'BottomTabBar.tsx')),
     ).toBe(false)
@@ -76,45 +68,6 @@ test.describe('UX-08 — dead-weight sweep', () => {
     expect(src).toContain('deptMatches(s.id)')
     // UX-04: no worker-side Create SOP tab either.
     expect(src).not.toContain('Create SOP')
-  })
-
-  // LIVE from 30-04 Task 1: header consolidated (UX-01/02/08 slice).
-  test('/pathways + /uat links live in the account menu, not primary nav', () => {
-    const header = fs.readFileSync(
-      path.join(ROOT, 'src', 'components', 'layout', 'TopHeader.tsx'), 'utf-8',
-    )
-    // BASE_LINKS (primary nav) no longer carries them — the account-menu
-    // TOOLING_LINKS block does, and it is actually rendered (wiring, not
-    // token presence — CLAUDE.md 2026-06-05).
-    const baseLinks = header.match(/const BASE_LINKS[\s\S]*?\n\]/)?.[0] ?? ''
-    expect(baseLinks.length).toBeGreaterThan(0)
-    expect(baseLinks).not.toContain('/pathways')
-    expect(baseLinks).not.toContain('/uat')
-    const tooling = header.match(/const TOOLING_LINKS[\s\S]*?\n\]/)?.[0] ?? ''
-    expect(tooling).toContain('/pathways')
-    expect(tooling).toContain('/uat')
-    expect(header).toContain('TOOLING_LINKS.map')
-  })
-
-  // 2026-07-30 direction: admin links promoted into the primary header
-  // (Create New SOP · Team · Settings), supersedes UX-02's account-menu door.
-  test('TopHeader has no /dashboard, brand resolves via roleHome, ADMIN_LINKS wired behind isAdmin', () => {
-    const header = fs.readFileSync(
-      path.join(ROOT, 'src', 'components', 'layout', 'TopHeader.tsx'), 'utf-8',
-    )
-    expect(header).not.toContain('/dashboard')
-    // Brand link WIRED to the role-home dispatcher, not a hardcoded route.
-    expect(header).toContain("from '@/lib/auth/role-home'")
-    expect(header).toContain('href={roleHome(role)}')
-    // ADMIN_LINKS carries exactly the three promoted surfaces.
-    const adminLinks = header.match(/const ADMIN_LINKS[\s\S]*?\n\]/)?.[0] ?? ''
-    expect(adminLinks).toContain("'/admin/sops/new'")
-    expect(adminLinks).toContain("'/admin/team'")
-    expect(adminLinks).toContain("'/admin/settings'")
-    expect(adminLinks).toContain('Create New SOP')
-    // Wiring, not token presence: links render only for admin roles.
-    expect(header).toMatch(/isAdmin \? \[\.\.\.BASE_LINKS, \.\.\.ADMIN_LINKS\] : BASE_LINKS/)
-    expect(header).toContain('isAdminRole(role)')
   })
 
   // LIVE from 30-06: walkthrough journeys repointed to /sops/[sopId] Walk tab.

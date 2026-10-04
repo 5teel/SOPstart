@@ -78,7 +78,7 @@ test.describe('UX-04 — one create entry', () => {
     expect(src).not.toContain('<AdminNav')
   })
 
-  test('/sops has no duplicate create entry (the header Create New SOP link is the one entry)', () => {
+  test('/sops has no duplicate create entry (the Workshop Write a new SOP link is the one entry)', () => {
     // Repointed 2026-09-30 (Phase 43, D-01): admin/sops/page.tsx is deleted
     // (the legacy URL is now a next.config.ts redirect, no page to read) —
     // the merged surface (/sops) is the only remaining place to check.
@@ -87,8 +87,9 @@ test.describe('UX-04 — one create entry', () => {
       ...(mergedSrc.match(/href="\/admin\/sops\/new"/g) ?? []),
     ]
     expect(pickerLinks).toHaveLength(0)
-    const header = read(path.join(ROOT, 'src', 'components', 'layout', 'TopHeader.tsx'))
-    expect(header).toContain("{ label: 'Create New SOP', href: '/admin/sops/new' }")
+    // Phase 57: the header is gone; the one create entry is the Workshop's "Write a new SOP".
+    const workshop = read(path.join(ROOT, 'src', 'components', 'shell', 'AdminRoomBodies.tsx'))
+    expect(workshop).toContain('room-workshop-new')
     for (const src of [mergedSrc]) {
       expect(src).not.toContain('href="/admin/sops/upload"')
       expect(src).not.toContain('href="/admin/sops/new/ai"')

@@ -39,7 +39,6 @@ const NEXT_CONFIG = 'next.config.ts'
 const LIBRARY_LABEL_RE = /\b(?:label|route|href)\s*:\s*(['"`])(?:(?!\1).)*Library(?:(?!\1).)*\1/g
 
 const SUR06_CHECKED_FILES = [
-  path.join('src', 'components', 'layout', 'TopHeader.tsx'),
   path.join('src', 'lib', 'journeys', 'roles.ts'),
   path.join('src', 'lib', 'uat', 'tests.ts'),
 ]
@@ -112,11 +111,11 @@ test.describe('SUR-03/SUR-04/SUR-06 reference sweep — /admin/sops list route i
     const libraryTable = read(path.join('src', 'components', 'admin', 'AdminLibraryTable.tsx'))
     expect(libraryTable).toContain('/admin/sops/builder/')
 
-    const topHeader = read(path.join('src', 'components', 'layout', 'TopHeader.tsx'))
-    expect(topHeader).toContain('/admin/sops/new')
+    const workshop = read(path.join('src', 'components', 'shell', 'AdminRoomBodies.tsx'))
+    expect(workshop).toContain('/admin/sops/new')
   })
 
-  test('SUR-06: "Library" names no destination label in TopHeader, roles.ts or uat/tests.ts', () => {
+  test('SUR-06: "Library" names no destination label in roles.ts or uat/tests.ts', () => {
     const offenders: string[] = []
     for (const rel of SUR06_CHECKED_FILES) {
       const stripped = stripComments(read(rel))

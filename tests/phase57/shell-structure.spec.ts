@@ -153,7 +153,25 @@ test.describe('SHL-01 one screen structure', () => {
     expect(src).toContain('<QueryProvider>')
     expect(src).toContain('<RoleProvider role={role}>')
   })
-  test.fixme('the protected layout has no header; bridge pages carry the Back bar [57-06]', () => {})
+  test('the protected layout has no header; bridge pages carry the Back bar', () => {
+    const layout = read('src/app/(protected)/layout.tsx')
+    expect(layout).toContain("import { BackToSite }")
+    expect(layout).toContain("import { ProtectedProviders")
+    expect(layout).not.toContain('TopHeader')
+    const shellDir = path.join(ROOT, 'src/components/shell')
+    const files = ['src/app/(protected)/layout.tsx', 'src/app/page.tsx', ...fs.readdirSync(shellDir).map((f) => `src/components/shell/${f}`)]
+    for (const f of files) expect(read(f), f).not.toMatch(/<header|role="banner"|<nav/)
+    const back = read('src/components/layout/BackToSite.tsx')
+    expect(back).toContain('placeForPath(')
+    expect(back).toContain('data-testid="back-to-site"')
+    expect(back).not.toMatch(/<header|<nav/)
+    for (const f of ['TopHeader', 'NotificationBadge', 'NavPendingSpinner']) {
+      expect(fs.existsSync(path.join(ROOT, `src/components/layout/${f}.tsx`)), f).toBe(false)
+    }
+    const pending = read('src/app/(protected)/pending/page.tsx')
+    expect(pending).toContain('action={signOut}')
+    expect(pending).toContain('data-testid="pending-sign-out"')
+  })
   test('pathways map covers every page route, including /', () => {
     // routes.ts imports server-only (Playwright cannot load it), so the walk is replicated here.
     const found = new Set<string>()
