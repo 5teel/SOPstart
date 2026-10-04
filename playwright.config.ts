@@ -696,5 +696,29 @@ export default defineConfig({
       testMatch: /tests\/phase56\/.*\.(spec|test)\.ts$/,
       use: { browserName: 'chromium' },
     },
+    {
+      // Phase 57 -- the one screen & its places.
+      // Nyquist harness (Wave 0 / Plan 57-01).
+      //
+      // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
+      // DELIBERATELY BROAD testMatch (tests/phase57/**) so later plans drop
+      // specs in with NO further config edit. Unit specs for pure modules
+      // (rooms, place) live here with static `@/` imports. Live-DB specs
+      // self-skip unless PHASE57_LIVE=1, so quick runs never spend the shared
+      // OTP budget (CLAUDE.md 2026-09-28).
+      //
+      // Verify registration: `npx playwright test --list --project=phase57`
+      //
+      // Files registered here:
+      //   repoint-inventory (retire; stale-guard inventory, LIVE from 57-01)
+      //   rooms, place (PLC-01 / SHL-02 unit specs, LIVE from 57-01)
+      //   search (SHL-04; roomMatches LIVE from 57-01, frame fixme until 57-02)
+      //   shell-structure, stage, one-query, departments, machine-body,
+      //   noticeboard, pins, retirement-sweep (fixme stubs, filled by 57-02..09)
+      name: 'phase57',
+      testDir: '.',
+      testMatch: /tests\/phase57\/.*\.(spec|test)\.ts$/,
+      use: { browserName: 'chromium' },
+    },
   ],
 })
