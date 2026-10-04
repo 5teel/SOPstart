@@ -109,15 +109,17 @@ test.describe('D-03/T-25-03 — colour validation source-contract', () => {
     const src = read(DEPARTMENTS_ACTIONS)
     // Must use z.enum to restrict colour values (not z.string() free-form)
     expect(src).toMatch(/colour:\s*z\.enum/)
-    // The allow-list must contain the 8 UI-SPEC hex values
-    expect(src).toContain('#f97316') // orange
-    expect(src).toContain('#3b82f6') // blue
-    expect(src).toContain('#06b6d4') // cyan
-    expect(src).toContain('#10b981') // green
-    expect(src).toContain('#ec4899') // pink
-    expect(src).toContain('#ef4444') // red
-    expect(src).toContain('#fbbf24') // amber
-    expect(src).toContain('#8b5cf6') // violet
+    // The allow-list (Phase 57: now the plain module the action imports) must contain the 8 UI-SPEC hex values
+    const colours = fs.readFileSync(path.join(ROOT, 'src', 'lib', 'site', 'departments.ts'), 'utf-8')
+    expect(src).toContain("from '@/lib/site/departments'")
+    expect(colours).toContain('#f97316') // orange
+    expect(colours).toContain('#3b82f6') // blue
+    expect(colours).toContain('#06b6d4') // cyan
+    expect(colours).toContain('#10b981') // green
+    expect(colours).toContain('#ec4899') // pink
+    expect(colours).toContain('#ef4444') // red
+    expect(colours).toContain('#fbbf24') // amber
+    expect(colours).toContain('#8b5cf6') // violet
   })
 })
 

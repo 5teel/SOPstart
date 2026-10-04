@@ -26,6 +26,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireAdminContext } from '@/lib/auth/guards'
 import { materializeSopAccess } from '@/actions/grants'
+import { DEPT_COLOURS, deriveDepartmentCode } from '@/lib/site/departments'
 import type { Department, DepartmentWithCounts } from '@/types/sop'
 
 // ---------------------------------------------------------------------------
@@ -50,24 +51,9 @@ async function requireAdmin(): Promise<AdminCtx | { error: string }> {
 // Input schemas
 // ---------------------------------------------------------------------------
 
-/**
- * Allowed department colours (V5 — z.enum prevents CSS injection).
- * Exactly the 8 hex values from 25-UI-SPEC.md colour table.
- */
-const DEPT_COLOURS = [
-  '#f97316', // orange  — slot 1
-  '#3b82f6', // blue    — slot 2
-  '#06b6d4', // cyan    — slot 3
-  '#10b981', // green   — slot 4
-  '#ec4899', // pink    — slot 5
-  '#ef4444', // red     — slot 6
-  '#fbbf24', // amber   — slot 7
-  '#8b5cf6', // violet  — slot 8
-] as const
-
 const CreateDepartmentInput = z.object({
   name:        z.string().min(1).max(100),
-  code:        z.string().min(1).max(6).transform(v => v.toUpperCase()),
+  code:        z.string().min(1).max(6).transform(v => v.toUpperCase()).optional(),
   colour:      z.enum(DEPT_COLOURS),
   icon:        z.string().max(4).optional(),
   ownerUserId: z.string().uuid().nullable().optional(),
@@ -199,12 +185,26 @@ export async function createDepartment(
   if ('error' in ctx) return { error: ctx.error }
   if (!ctx.organisationId) return { error: 'No organisation' }
 
+  // D-22: a department needs only a name -- derive the code from the org's
+  // existing codes (archived rows too: the unique constraint covers them).
+  let code = parsed.data.code
+  if (!code) {
+    const { data: existing } = await ctx.supabase
+      .from('departments')
+      .select('code')
+      .eq('organisation_id', ctx.organisationId)
+    code = deriveDepartmentCode(
+      parsed.data.name,
+      ((existing ?? []) as Array<{ code: string }>).map((r) => r.code),
+    )
+  }
+
   const { data, error } = await ctx.supabase
     .from('departments')
     .insert({
       organisation_id: ctx.organisationId,
       name:            parsed.data.name,
-      code:            parsed.data.code,
+      code,
       colour:          parsed.data.colour,
       icon:            parsed.data.icon ?? null,
       owner_user_id:   parsed.data.ownerUserId ?? null,
@@ -231,6 +231,7 @@ export async function updateDepartment(
 
   const ctx = await requireAdmin()
   if ('error' in ctx) return { error: ctx.error }
+  if (!ctx.organisationId) return { error: 'No organisation' }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const updates: Record<string, any> = { updated_at: new Date().toISOString() }
@@ -244,6 +245,7 @@ export async function updateDepartment(
     .from('departments')
     .update(updates)
     .eq('id', parsed.data.id)
+    .eq('organisation_id', ctx.organisationId)
     .select('*')
     .single()
 
@@ -260,16 +262,41 @@ export async function updateDepartment(
 
 export async function archiveDepartment(
   departmentId: string
-): Promise<{ success: true } | { error: string }> {
+): Promise<{ success: true } | { error: string; machines?: number; sops?: number }> {
   if (!departmentId) return { error: 'departmentId required' }
 
   const ctx = await requireAdmin()
   if ('error' in ctx) return { error: ctx.error }
+  if (!ctx.organisationId) return { error: 'No organisation' }
+
+  // The department must be in the SESSION org (a foreign id reads as absent).
+  const { data: dept } = await ctx.supabase
+    .from('departments')
+    .select('id')
+    .eq('id', departmentId)
+    .eq('organisation_id', ctx.organisationId)
+    .maybeSingle()
+  if (!dept) return { error: 'Department not found' }
+
+  // D-08 / D-22: refuse while anything on the drawing or in a visibility rule uses it.
+  const { count: machineCount } = await ctx.supabase
+    .from('site_machines')
+    .select('id', { count: 'exact', head: true })
+    .eq('department_id', departmentId)
+    .eq('organisation_id', ctx.organisationId)
+  const { count: sopCount } = await ctx.supabase
+    .from('sop_departments')
+    .select('sop_id', { count: 'exact', head: true })
+    .eq('department_id', departmentId)
+  const machines = machineCount ?? 0
+  const sops = sopCount ?? 0
+  if (machines > 0 || sops > 0) return { error: 'Still in use', machines, sops }
 
   const { error } = await ctx.supabase
     .from('departments')
     .update({ archived: true, updated_at: new Date().toISOString() })
     .eq('id', departmentId)
+    .eq('organisation_id', ctx.organisationId)
 
   if (error) {
     console.error('[archiveDepartment] update error', error)
