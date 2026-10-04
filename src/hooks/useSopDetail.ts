@@ -14,8 +14,11 @@ export function useSopDetail(sopId: string) {
         .from('sops')
         .select(`
           *,
+          standard_attachments ( standards ( id, name ) ),
+          sop_machines ( site_machines ( name, departments ( name ) ) ),
           sop_sections (
             *,
+            standard_attachments ( standards ( id, name ) ),
             section_kind:section_kinds!section_kind_id ( * ),
             sop_steps ( * ),
             sop_images ( * )

@@ -83,7 +83,11 @@ export interface Sop {
   review_due_at?: string | null
   last_reviewed_at?: string | null
   last_reviewed_by?: string | null
+  // Phase 56 D-09: synced from sop_machines by trigger. Optional so partial fixtures compile.
+  placement?: 'machine' | 'site'
 }
+
+export type StandardAttachmentEmbed = { standards: { id: string; name: string } | null }
 
 export interface SopSection {
   id: string
@@ -201,9 +205,13 @@ export interface VideoGenerationJob {
 
 // SOP with nested sections for review page
 export interface SopWithSections extends Sop {
+  // Phase 56: embedded by useSopDetail (placement + standards labels)
+  standard_attachments?: StandardAttachmentEmbed[]
+  sop_machines?: { site_machines: { name: string; departments: { name: string } | null } | null }[]
   sop_sections: (SopSection & {
     sop_steps: SopStep[]
     sop_images: SopImage[]
+    standard_attachments?: StandardAttachmentEmbed[]
   })[]
 }
 
