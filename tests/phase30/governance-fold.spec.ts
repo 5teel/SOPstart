@@ -35,8 +35,8 @@ const GOV_INBOX = path.join(
 const INBOX = path.join(
   ROOT, 'src', 'lib', 'governance', 'inbox.ts',
 )
-const LIBRARY_TABLE = path.join(
-  ROOT, 'src', 'components', 'admin', 'AdminLibraryTable.tsx',
+const ACCESS_PAGE = path.join(
+  ROOT, 'src', 'app', '(protected)', 'admin', 'access', 'page.tsx',
 )
 const QUEUE_ROW = path.join(
   ROOT, 'src', 'components', 'admin', 'governance', 'GovernanceQueueRow.tsx',
@@ -111,18 +111,17 @@ test.describe('UX-03 — governance lives at /governance', () => {
     ).toBe(false)
   })
 
-  test('stuck conversions reach the inbox (Retry -> builder) and the Access lens stays reachable from the library table', () => {
+  test('stuck conversions reach the inbox (Retry -> builder) and the Access lens stays reachable from its own admin page', () => {
     // Phase 54: the tab rail / Miller scope column is gone. Stuck/failed
     // conversions surface as inbox rows with a Retry link into the builder;
-    // the Access lens is a lazy takeover mounted from AdminLibraryTable.tsx's
-    // own Access map button (history.replaceState), not a navigable href.
+    // the Access lens is mounted by its own admin-gated page, /admin/access
+    // (57-07; the library table that used to host it is gone, 57-09).
     const inbox = read(INBOX)
     expect(inbox).toContain("if (!lib.stuck && !lib.parseFailed) continue")
     expect(inbox).toContain("action: { label: 'Retry', href: `/admin/sops/builder/${lib.id}` }")
-    const table = read(LIBRARY_TABLE)
-    expect(table).toContain('data-testid="lib-access"')
-    expect(table).toContain("applyNav({ ...DEFAULT_LIBRARY_NAV, view: 'access' })")
-    expect(table).toContain('<AdminAccessLens pinnedSopId={nav.sop} />')
+    const access = read(ACCESS_PAGE)
+    expect(access).toContain('await requireAdminContext()')
+    expect(access).toContain('<AdminAccessLens pinnedSopId={pinnedSopId} />')
   })
 })
 

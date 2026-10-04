@@ -13,7 +13,8 @@ import path from 'node:path'
 
 const ROOT = process.cwd()
 const NEXT_CONFIG = path.join(ROOT, 'next.config.ts')
-const LIBRARY_TABLE = path.join(ROOT, 'src', 'components', 'admin', 'AdminLibraryTable.tsx')
+// 57-09: the library table is gone; the Workshop's draft rows are the admin list -> builder chain.
+const WORKSHOP = path.join(ROOT, 'src', 'components', 'shell', 'AdminRoomBodies.tsx')
 // 57-08: the worker list is gone; the worker half of the one screen is the shell.
 const WORKER_SHELL = ['OneScreen.tsx', 'WorkerShell.tsx', 'RoomBodies.tsx', 'SiteSummary.tsx', 'OfficeCard.tsx'].map(
   (f) => path.join(ROOT, 'src', 'components', 'shell', f),
@@ -41,15 +42,15 @@ test.describe('legacy /admin/sops — static next.config.ts redirect (Phase 43 D
 })
 
 test.describe('SUR-04 — one path from a SOP to its builder', () => {
-  test('SUR-04: AdminLibraryTable contains /admin/sops/builder/; the worker shell does not', () => {
-    const table = read(LIBRARY_TABLE)
-    expect(table).toContain('/admin/sops/builder/')
+  test('SUR-04: the Workshop (AdminRoomBodies) links /admin/sops/builder/; the worker shell does not', () => {
+    const workshop = read(WORKSHOP)
+    expect(workshop).toContain('/admin/sops/builder/')
     for (const f of WORKER_SHELL) expect(read(f), f).not.toContain('/admin/sops/builder')
   })
 
   test('SUR-04: the worker SOP detail page keeps its own "Edit in builder" DESTINATION (not a second list→builder chain)', () => {
-    // AdminLibraryTable is the only component reachable from a SOP LIST that
-    // links directly into the builder. The detail page's own Edit link is a
+    // The Workshop's draft rows are the only admin list that links directly
+    // into the builder. The detail page's own Edit link is a
     // documented second destination (D-06), not a second chain.
     const detail = read(SOP_DETAIL_PAGE)
     expect(detail).toContain('/admin/sops/builder/')

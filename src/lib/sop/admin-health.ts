@@ -1,7 +1,6 @@
 /**
  * The ONE place an admin's view of SOP health is classified (CLAUDE.md
- * 2026-09-27) -- floor pins, machine-panel badges, library checks and table
- * status all read from here; it READS the governance flags
+ * 2026-09-27) -- floor pins and machine-panel badges all read from here; it READS the governance flags
  * `classifyGovernanceRow` produced and never re-derives unowned/overdue; no
  * I/O, no module-scope clock.
  *
@@ -128,66 +127,4 @@ export function noticeboardSops(
 /** The Noticeboard pin: rows that need an admin (no owner, review due). */
 export function healthPinCount(sops: ReadonlyArray<AdminPanelSop>): number {
   return sops.filter((s) => s.badge === 'NO OWNER' || s.badge === 'REVIEW DUE').length
-}
-
-// ---------------------------------------------------------------------------
-// Library table checks (D-07)
-// ---------------------------------------------------------------------------
-
-export type CheckKey = 'owner' | 'review' | 'approved' | 'assigned' | 'converted'
-export type CheckState = 'ok' | 'warn' | 'bad'
-
-export const CHECK_ORDER: readonly CheckKey[] = ['owner', 'review', 'approved', 'assigned', 'converted']
-
-export interface CheckInput {
-  flags: ReadonlyArray<GovernanceFlag>
-  status: string
-  lastReviewedAt: string | null
-  chainRequired: boolean
-  allDepartments: boolean
-  departments: ReadonlyArray<string>
-  hasPersonGrant: boolean
-  stuck: boolean
-  parseFailed: boolean
-}
-
-/** More than a calendar year before `now` (13 months -> stale, 11 -> not). */
-function isReviewStale(lastReviewedAt: string | null, now: Date): boolean {
-  if (!lastReviewedAt) return true
-  const cut = new Date(now)
-  cut.setUTCFullYear(cut.getUTCFullYear() - 1)
-  return new Date(lastReviewedAt) < cut
-}
-
-export function deriveChecks(sop: CheckInput, now: Date = new Date()): Record<CheckKey, CheckState> {
-  const owner: CheckState = sop.flags.includes('unowned') ? 'bad' : 'ok'
-
-  let review: CheckState
-  if (sop.flags.includes('overdue') || isReviewStale(sop.lastReviewedAt, now)) review = 'bad'
-  else if (sop.flags.includes('due_soon')) review = 'warn'
-  else review = 'ok'
-
-  let approved: CheckState
-  if (sop.status === 'published') approved = 'ok'
-  else if (sop.flags.includes('awaiting_approval')) approved = 'warn'
-  else if (!sop.chainRequired) approved = 'ok'
-  else approved = 'bad'
-
-  const assigned: CheckState =
-    sop.allDepartments || sop.departments.length > 0 || sop.hasPersonGrant ? 'ok' : 'bad'
-
-  let converted: CheckState
-  if (sop.stuck || sop.parseFailed) converted = 'bad'
-  else if (sop.status === 'uploading' || sop.status === 'parsing') converted = 'warn'
-  else converted = 'ok'
-
-  return { owner, review, approved, assigned, converted }
-}
-
-export type TableStatus = 'LIVE' | 'DRAFT' | 'STUCK'
-
-export function tableStatus(sop: { status: string; stuck: boolean; parseFailed: boolean }): TableStatus {
-  if (sop.stuck || sop.parseFailed) return 'STUCK'
-  if (sop.status === 'published') return 'LIVE'
-  return 'DRAFT'
 }

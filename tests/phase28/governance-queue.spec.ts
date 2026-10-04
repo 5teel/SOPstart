@@ -18,9 +18,8 @@
  * Verifies (source-contract, no live DB required):
  *   GQ-01: the /governance page calls listGovernanceQueue() server-side
  *     after requireAdminContext(); GovernanceInbox renders <GovernanceQueueRow
- *     and not <GovernanceFilterChips; and the /sops redirect shim maps legacy
- *     ?view=attention onto /governance (resolveLibraryNav returns the
- *     'governance' sentinel, asserted in tests/phase30/admin-nav.spec.ts).
+ *     and not <GovernanceFilterChips; and the session proxy maps legacy
+ *     ?view=attention onto /governance (asserted in tests/phase28/library-and-worker.spec.ts).
  *   GQ-02: GovernanceQueueRow WIRES a real confirmSopCurrent( call — not a
  *     bare prop-name reference (CLAUDE.md 2026-06-05 dead-feature learning) —
  *     and renders exactly one primary action per row via if/else-if branching

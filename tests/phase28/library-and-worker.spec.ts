@@ -9,15 +9,10 @@
  * Repointed AGAIN in 41-08 (SUR-01/02/04): the admin library rows moved to
  * `listAdminSopRows` (src/actions/admin-sop-list.ts).
  *
- * Repointed a third time in 54-05 (D-07/D-08): the Miller frame and its
- * lenses are gone — the admin `/sops` route now mounts AdminLibraryTable.tsx,
- * whose nav state (owner=me, status, departments, collection, ?view=access)
- * is resolved by the pure `resolveLibraryNav` in src/lib/sop-list/admin-rows.ts
- * and applied via `window.history.replaceState` (CLAUDE.md 2026-05-13
- * URL-state rule), never a <Link> href. The governance queue moved to its own
- * route, /governance, rendered by GovernanceInbox.tsx and derived by
- * src/lib/governance/inbox.ts. the retired admin SOP page is now a thin redirect
- * shim and no longer carries any of this behaviour.
+ * Repointed a third time in 54-05, and again in 57-09 (D-13): the admin library
+ * table is deleted -- there is no admin list page. The governance queue lives
+ * at /governance (GovernanceInbox.tsx, src/lib/governance/inbox.ts) and the
+ * legacy ?view=attention address is redirected by the session proxy.
  *
  * Verifies (source-contract, no live DB required):
  *   OWN-04/D28-08: listAdminSopRows handles ?owner=me with a REAL
@@ -27,8 +22,7 @@
  *     row flag chip; Confirm current stays a real wired call on
  *     GovernanceQueueRow (the merged surface).
  *   GQ-04/D28-09: listAdminSopRows counts from listGovernanceQueue, and the
- *     table's resolveLibraryNav sentinel + the governance inbox's chips
- *     deep-link the flags.
+ *     session proxy + the governance inbox's chips deep-link the flags.
  *   REV-03/D28-07: ReadTab (Phase 30 merged Overview+Tools+Hazards) contains
  *     the "Current as of" caption and contains NO review_due_at
  *     conditional/gate anywhere (hard rule).
@@ -47,8 +41,6 @@ import path from 'node:path'
 
 const ROOT = process.cwd()
 const ADMIN_SOP_LIST = path.join(ROOT, 'src', 'actions', 'admin-sop-list.ts')
-const ADMIN_ROWS = path.join(ROOT, 'src', 'lib', 'sop-list', 'admin-rows.ts')
-const LIBRARY_TABLE = path.join(ROOT, 'src', 'components', 'admin', 'AdminLibraryTable.tsx')
 const INBOX = path.join(ROOT, 'src', 'lib', 'governance', 'inbox.ts')
 const FLAG_DISPLAY = path.join(ROOT, 'src', 'lib', 'governance', 'flag-display.ts')
 const QUEUE_ROW = path.join(ROOT, 'src', 'components', 'admin', 'governance', 'GovernanceQueueRow.tsx')
@@ -65,10 +57,10 @@ function read(p: string): string {
 const GATE_PATTERN = /review_due_at\s*[<>]|owner_user_id\s*[=!]==?\s*null|if\s*\([^)]*(review_due_at|owner_user_id)/
 
 // ---------------------------------------------------------------------------
-// listAdminSopRows / AdminLibraryTable — OWN-04/D28-08 (repointed 2026-09-29)
+// listAdminSopRows — OWN-04/D28-08 (repointed 2026-09-29; table retired 57-09)
 // ---------------------------------------------------------------------------
 
-test.describe('admin library — owner=me filter + owner/flag columns', () => {
+test.describe('admin rows — owner=me filter + owner/flag columns', () => {
   test('listAdminSopRows handles ?owner=me with a real .eq owner_user_id filter', () => {
     const src = read(ADMIN_SOP_LIST)
     expect(src).toContain("params.owner === 'me'")
@@ -79,16 +71,6 @@ test.describe('admin library — owner=me filter + owner/flag columns', () => {
     const src = read(ADMIN_SOP_LIST)
     expect(src).toContain('owner_user_id')
     expect(src).toContain('review_due_at')
-  })
-
-  test('AdminLibraryTable renders an owner filter that writes ?owner=me via history state (no <Link> href)', () => {
-    // CLAUDE.md 2026-05-13: scope/filter changes are history.replaceState, not
-    // router.push/<Link> — libraryNavToUrl composes the URL, applyNav drives state.
-    const src = read(LIBRARY_TABLE)
-    expect(src).toContain('applyNav(')
-    expect(src).toContain('window.history.replaceState(null, \'\', libraryNavToUrl(next))')
-    const rowsSrc = read(ADMIN_ROWS)
-    expect(rowsSrc).toContain("if (nav.owner === 'me') qp.set('owner', 'me')")
   })
 
   test('renders the owner label on each one-line row (UX-06)', () => {
@@ -123,7 +105,7 @@ test.describe('merged surface — wired confirm-current + queue-derived overdue 
 
 // ---------------------------------------------------------------------------
 // Header/scope chips — GQ-04/D28-09 (was GovernanceWidget, deleted in 30-08;
-// repointed 2026-09-29 onto AdminLibraryTable.tsx + the governance inbox)
+// repointed 2026-09-29, 57-09 onto the proxy + the governance inbox)
 // ---------------------------------------------------------------------------
 
 test.describe('admin scope counts — counts from listGovernanceQueue + deep links', () => {
@@ -133,15 +115,10 @@ test.describe('admin scope counts — counts from listGovernanceQueue + deep lin
     expect(src).toContain('listGovernanceQueue()')
   })
 
-  test('resolveLibraryNav resolves ?view=attention to the governance sentinel; the session proxy owns the redirect', () => {
-    const rowsSrc = read(ADMIN_ROWS)
-    expect(rowsSrc).toContain("if (params.get('view') === 'attention') return 'governance'")
-    const tableSrc = read(LIBRARY_TABLE)
-    expect(tableSrc).toContain("if (resolved === 'governance') return")
+  test('the session proxy owns the ?view=attention redirect; no client copy', () => {
     // 2026-09-29: a mount-effect router.replace raced the page's mount-time
     // server actions (Next 16.2.1 action queue) and never landed — the one
     // redirect is server-side, and no client copy may come back.
-    expect(tableSrc).not.toContain("router.replace('/governance')")
     const proxySrc = read(path.join(ROOT, 'src', 'lib', 'supabase', 'middleware.ts'))
     expect(proxySrc).toContain("path === '/sops'")
     expect(proxySrc).toContain("view === 'attention'")

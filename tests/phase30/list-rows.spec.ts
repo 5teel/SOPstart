@@ -18,13 +18,10 @@
  * rendering; the department scope column + "No department" link moved onto
  * AdminSopSurface.tsx.
  *
- * Repointed a second time in 54-05 (Phase 54, D-07/D-08): the Miller frame
- * and its lenses are gone. The admin `/sops` route now mounts
- * AdminLibraryTable.tsx: one row per SOP (SOP · Machine · Status · Owner ·
- * Checks · Review), the row title links directly to /sops/[sopId] (the
- * worker view), and a separate Edit link goes to the builder — there is no
- * detail pane. The category fix (previously the SopMillerBrowser detail
- * pane) now lives in the builder Tools menu's BuilderCategoryButton.tsx.
+ * Repointed a second time in 54-05 (Phase 54, D-07/D-08) onto the admin library table,
+ * and a third time in 57-09 (D-13): the table is deleted, so every assertion that
+ * read it went with it. What survives: the builder Tools menu, the category fix,
+ * and the row data listAdminSopRows still builds for the Workshop and the inbox.
  */
 import { test, expect } from '@playwright/test'
 import fs from 'node:fs'
@@ -33,9 +30,6 @@ import path from 'node:path'
 const ROOT = process.cwd()
 const STAGE_SHELL = path.join(
   ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'builder', '[sopId]', 'BuilderStageShell.tsx',
-)
-const LIBRARY_TABLE = path.join(
-  ROOT, 'src', 'components', 'admin', 'AdminLibraryTable.tsx',
 )
 const CATEGORY_BUTTON = path.join(
   ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'builder', '[sopId]', 'BuilderCategoryButton.tsx',
@@ -48,13 +42,6 @@ function read(p: string): string {
 }
 
 test.describe('UX-06 — one-line admin rows + builder action menu', () => {
-  test('admin rows contain no SopDepartmentEditor / LibraryReviewCell / icon-only actions', () => {
-    const src = read(LIBRARY_TABLE)
-    expect(src).not.toContain('SopDepartmentEditor')
-    expect(src).not.toContain('LibraryReviewCell')
-    expect(src).not.toContain('DeleteSopButton')
-  })
-
   test('builder shell owns a labelled action menu wired to the 3 destinations', () => {
     const shell = read(STAGE_SHELL)
     // Href WIRING (CLAUDE.md 2026-06-05): the menu links interpolate the real
@@ -88,46 +75,15 @@ test.describe('UX-06 — one-line admin rows + builder action menu', () => {
     expect(shell).toMatch(/aria-expanded=\{open\}/)
   })
 
-  test('row is one line: title, status, owner, checks and review — and reaches the builder via a separate Edit link', () => {
-    // Repointed 2026-09-29 (Phase 54): the row moved to AdminLibraryTable.tsx,
-    // fed by listAdminSopRows.
-    const table = read(LIBRARY_TABLE)
+  test('listAdminSopRows builds the flag label and the owner label each row carries', () => {
     const listAction = read(ADMIN_SOP_LIST)
-
-    // The row title opens the SOP as a worker sees it; Edit is the one
-    // list→builder chain (WIRING: interpolated sop id).
-    expect(table).toMatch(/href=\{`\/sops\/\$\{sop\.id\}`\}/)
-    expect(table).toMatch(/href=\{`\/admin\/sops\/builder\/\$\{sop\.id\}`\}/)
-    expect(table).toContain('data-testid="lib-status"')
-    expect(table).toContain('tableStatus(')
-    expect(table).toContain('data-testid="lib-check"')
-
     expect(listAction).toContain('FLAG_PRIORITY.find((f) => r.flags.includes(f))')
     expect(listAction).toContain('flagLabel: flag ? FLAG_LABEL[flag] : null')
     expect(listAction).toContain('ownerLabelById[sop.owner_user_id]')
     expect(listAction).toContain("flag === 'unowned' ? null : shortOwner(owner)")
   })
 
-  test('chip changes are client state, not a URL push (hot-path latency)', () => {
-    const table = read(LIBRARY_TABLE)
-    expect(table).toContain("'use client'")
-    expect(table).toContain('useState')
-    expect(table).toContain('window.history.replaceState(null')
-    // A router PUSH would cost an RSC round-trip through the service worker on
-    // every filter change — the exact regression [2026-05-13] records.
-    expect(table).not.toContain('router.push(')
-
-    // The table must render from the data the query already carries; a
-    // fetch or a supabase client in the row-render path would reintroduce a
-    // per-click round-trip by another route.
-    expect(table).not.toContain('createClient')
-    // `fetch(` used only by the dynamic() lazy-import of AdminAccessLens's
-    // module is fine — the row render path itself never calls fetch.
-    const rowsRegion = table.slice(table.indexOf('rows.map('))
-    expect(rowsRegion).not.toContain('fetch(')
-  })
-
-  test('the category fix lives in the builder Tools menu; departments are granted through the Access map', () => {
+  test('the category fix lives in the builder Tools menu', () => {
     // Noticing a missing category used to mean opening the retired detail
     // pane; it now lives beside "Pick machines for this SOP" in the builder
     // Tools menu (D-09) so it never gets stranded by the table replacing the
@@ -135,11 +91,6 @@ test.describe('UX-06 — one-line admin rows + builder action menu', () => {
     const categoryButton = read(CATEGORY_BUTTON)
     expect(categoryButton).toContain('setSopCategory(sopId, next)')
     expect(categoryButton).toContain('data-testid="builder-category-select"')
-
-    // Department assignment happens through the Access map (D-11), never a
-    // direct sop_departments insert from the row.
-    const table = read(LIBRARY_TABLE)
-    expect(table).not.toContain("from('sop_departments')")
 
     // The category action self-enforces org scope from the SESSION, never
     // from the fetched row, and filters the write on it too (CLAUDE.md
@@ -152,15 +103,8 @@ test.describe('UX-06 — one-line admin rows + builder action menu', () => {
     expect(fn).toContain('isValidCategorySlug(categorySlug)')
   })
 
-  test('"No department" is a reachable scope, not a dead label', () => {
-    // Repointed 2026-09-29 (Phase 54): the Where chip on AdminLibraryTable
-    // offers a "No department (N)" option once listAdminSopRows reports
-    // noAudienceCount > 0.
-    const table = read(LIBRARY_TABLE)
-    expect(table).toContain("data.noAudienceCount > 0 && <option value=\"none\">No department ({data.noAudienceCount})</option>")
-    expect(table).toContain("nav.owner === 'none' && !sop.flags.includes('unowned')")
-    const listAction = read(ADMIN_SOP_LIST)
-    expect(listAction).toContain('noAudienceCount')
+  test('"No department" count is still reported by listAdminSopRows', () => {
+    expect(read(ADMIN_SOP_LIST)).toContain('noAudienceCount')
   })
 
   test('"No department" means no AUDIENCE — all_departments does not count as unassigned', () => {

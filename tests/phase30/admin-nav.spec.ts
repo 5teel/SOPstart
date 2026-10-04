@@ -34,9 +34,7 @@ const SETTINGS_PAGE = path.join(
 const ADMIN_PAGES = ['team'].map(
   (dir) => path.join(ROOT, 'src', 'app', '(protected)', 'admin', dir, 'page.tsx'),
 )
-const ADMIN_ROWS = path.join(
-  ROOT, 'src', 'lib', 'sop-list', 'admin-rows.ts',
-)
+const PROXY = path.join(ROOT, 'src', 'lib', 'supabase', 'middleware.ts')
 
 function read(p: string): string {
   return fs.readFileSync(p, 'utf-8')
@@ -48,10 +46,11 @@ test.describe('UX-02 — one shared admin nav', () => {
   // views (status tabs · Needs attention · Access).
   test('AdminNav component is deleted; the attention deep link still maps to governance', () => {
     expect(fs.existsSync(ADMIN_NAV)).toBe(false)
-    // The attention view stays reachable — resolveLibraryNav maps the legacy
-    // ?view=attention deep link onto the governance route (Phase 54, D-01).
-    const rows = read(ADMIN_ROWS)
-    expect(rows).toContain("if (params.get('view') === 'attention') return 'governance'")
+    // The attention view stays reachable — the session proxy maps the legacy
+    // ?view=attention deep link onto the governance route (Phase 57).
+    const proxy = read(PROXY)
+    expect(proxy).toContain("view === 'attention'")
+    expect(proxy).toContain("destination = '/governance'")
   })
 
   test('no admin page mounts AdminNav or an inline "Admin sections" sub-nav; guards survive', () => {

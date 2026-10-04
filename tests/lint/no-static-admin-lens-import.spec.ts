@@ -9,8 +9,8 @@
  *   1. Per-symbol allow-list (converted 54-05 from a shared file list, now
  *      that the three Phase 41 lens files are deleted): `GovernanceQueueRow`,
  *      `WiringPatchBayShell` may each only be statically
- *      imported from their own named file below. `AdminLibraryTable` and `AdminShell`
- *      have an empty allow-list — it is only ever reached via `next/dynamic`
+ *      imported from their own named file below. `AdminShell`
+ *      has an empty allow-list — it is only ever reached via `next/dynamic`
  *      (`OneScreen.tsx`), so ANY static import is a violation.
  *
  *   2. The worker shell files (the one screen's worker half, Phase 57) must
@@ -36,7 +36,6 @@ const ALLOWED_IMPORTERS: Record<string, string[]> = {
   WiringPatchBayShell: [path.join('src', 'components', 'sop', 'lenses', 'AdminAccessLens.tsx')],
   // Phase 57: reachable only through next/dynamic in OneScreen.
   AdminShell: [],
-  AdminLibraryTable: [],
 }
 
 const WORKER_SHELL_FILES = [
