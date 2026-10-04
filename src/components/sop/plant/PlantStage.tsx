@@ -17,6 +17,8 @@ import { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'r
 import type { Point } from '@/lib/validators/site'
 import {
   CAMERA_MS,
+  FLY_SCALE,
+  PLANT_PANEL_WIDTH,
   ZOOM_MIN,
   ZOOM_MAX,
   centroid,
@@ -41,9 +43,28 @@ export interface PlantStageMachine {
   health?: 'bad' | 'due' | 'ok'
 }
 
+/** Phase 57 (D-01): a fixed room hit-area, drawn above the machines. */
+export interface PlantStageRoom {
+  id: string
+  name: string
+  polygon: Point[]
+  /** To-do count shown on the signpost; 0 hides it. */
+  pin: number
+  selected: boolean
+  highlighted: boolean
+}
+
+/** What the camera was last asked to frame -- replayed when the stage resizes. */
+type Focus =
+  | { kind: 'fit' }
+  | { kind: 'fly'; id: string }
+  | { kind: 'box'; ids: string[] }
+  | { kind: 'free' }
+
 export interface PlantStageHandle {
   fit(): void
-  flyTo(machineId: string): void
+  /** Fly to a machine or a room by id. */
+  flyTo(id: string): void
   fitMachines(machineIds: string[]): void
 }
 
@@ -100,6 +121,30 @@ function polygonPaint(m: PlantStageMachine, hovered: boolean): React.CSSProperti
   return { fill: 'transparent', stroke: 'transparent' }
 }
 
+/** Rooms are navigation: a faint dashed outline even at rest. */
+function roomPaint(r: PlantStageRoom, hovered: boolean): React.CSSProperties {
+  if (r.selected) {
+    return {
+      fill: 'color-mix(in srgb, var(--ink-900) 10%, transparent)',
+      stroke: 'var(--ink-900)',
+      strokeWidth: 3,
+    }
+  }
+  if (hovered || r.highlighted) {
+    return {
+      fill: 'color-mix(in srgb, var(--accent-step) 14%, transparent)',
+      stroke: 'var(--accent-step)',
+      strokeWidth: 2,
+    }
+  }
+  return {
+    fill: 'transparent',
+    stroke: 'color-mix(in srgb, var(--ink-900) 40%, transparent)',
+    strokeWidth: 2,
+    strokeDasharray: '2 5',
+  }
+}
+
 export function PlantStage({
   ref,
   sceneUrl,
@@ -107,6 +152,9 @@ export function PlantStage({
   sceneHeight,
   machines,
   onMachineClick,
+  rooms = [],
+  onRoomClick,
+  flyInset = PLANT_PANEL_WIDTH,
 }: {
   ref?: React.Ref<PlantStageHandle>
   sceneUrl: string
@@ -114,6 +162,10 @@ export function PlantStage({
   sceneHeight: number
   machines: PlantStageMachine[]
   onMachineClick(id: string): void
+  rooms?: PlantStageRoom[]
+  onRoomClick?(id: string): void
+  /** Width of any overlay panel the camera must clear; the one-screen shell has none. */
+  flyInset?: number
 }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [view, setView] = useState<View | null>(null)
@@ -121,7 +173,8 @@ export function PlantStage({
   const [flying, setFlying] = useState(false)
   const [hoverId, setHoverId] = useState<string | null>(null)
   const [worldHover, setWorldHover] = useState(false)
-  const followFitRef = useRef(true)
+  const focusRef = useRef<Focus>({ kind: 'fit' })
+  const replayRef = useRef<() => void>(() => {})
   const dragRef = useRef<{ x: number; y: number; vx: number; vy: number } | null>(null)
   const flyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -152,24 +205,24 @@ export function PlantStage({
     // Re-measure on every call -- a stage built while hidden measures 0x0.
     const next = fitView(el.clientWidth, el.clientHeight, sceneWidth, sceneHeight)
     if (!next) return
-    followFitRef.current = true
+    focusRef.current = { kind: 'fit' }
     animateTo(next)
   }, [sceneWidth, sceneHeight, animateTo])
 
-  const flyTo = useCallback((machineId: string) => {
+  const flyTo = useCallback((id: string) => {
     const el = containerRef.current
-    const machine = machines.find((m) => m.id === machineId)
-    if (!el || !machine) return
-    const next = flyToView(el.clientWidth, el.clientHeight, centroid(machine.polygon))
+    const place = machines.find((m) => m.id === id) ?? rooms.find((r) => r.id === id)
+    if (!el || !place) return
+    const next = flyToView(el.clientWidth, el.clientHeight, centroid(place.polygon), FLY_SCALE, flyInset)
     if (!next) return
-    followFitRef.current = false
+    focusRef.current = { kind: 'fly', id }
     animateTo(next)
-  }, [machines, animateTo])
+  }, [machines, rooms, flyInset, animateTo])
 
   const fitMachines = useCallback((machineIds: string[]) => {
     const el = containerRef.current
     if (!el) return
-    followFitRef.current = false
+    focusRef.current = { kind: 'box', ids: machineIds }
     const polygons = machines.filter((m) => machineIds.includes(m.id)).map((m) => m.polygon)
     const next = fitBoxView(el.clientWidth, el.clientHeight, polygons)
     if (!next) {
@@ -180,6 +233,16 @@ export function PlantStage({
   }, [machines, animateTo, fit])
 
   useImperativeHandle(ref, () => ({ fit, flyTo, fitMachines }), [fit, flyTo, fitMachines])
+
+  // Replays the last camera intent after a resize (wide <-> narrow detail pane).
+  useEffect(() => {
+    replayRef.current = () => {
+      const f = focusRef.current
+      if (f.kind === 'fit') fit()
+      else if (f.kind === 'fly') flyTo(f.id)
+      else if (f.kind === 'box') fitMachines(f.ids)
+    }
+  })
 
   // Mount neutral, fit after mount (D-09) -- and again whenever the scene changes.
   useEffect(() => {
@@ -192,7 +255,8 @@ export function PlantStage({
     const el = containerRef.current
     if (!el) return
     const ro = new ResizeObserver(() => {
-      if (viewRef.current === null || followFitRef.current) fit()
+      if (viewRef.current === null) fit()
+      else replayRef.current()
     })
     ro.observe(el)
     return () => ro.disconnect()
@@ -206,7 +270,7 @@ export function PlantStage({
       e.preventDefault()
       const rect = el.getBoundingClientRect()
       const pointer = { x: e.clientX - rect.left, y: e.clientY - rect.top }
-      followFitRef.current = false
+      focusRef.current = { kind: 'free' }
       setView((v) => (v ? zoomAt(v, pointer, e.deltaY, ZOOM_MIN, ZOOM_MAX) : v))
     }
     el.addEventListener('wheel', onWheel, { passive: false })
@@ -218,7 +282,7 @@ export function PlantStage({
     if ((e.target as Element).tagName === 'polygon') return
     if (!view) return
     dragRef.current = { x: e.clientX, y: e.clientY, vx: view.x, vy: view.y }
-    followFitRef.current = false
+    focusRef.current = { kind: 'free' }
     e.currentTarget.setPointerCapture(e.pointerId)
   }
 
@@ -308,6 +372,31 @@ export function PlantStage({
               onPointerLeave={() => setHoverId((id) => (id === m.id ? null : id))}
             />
           ))}
+          {rooms.map((r) => (
+            <polygon
+              key={r.id}
+              data-testid="plant-room"
+              data-room-id={r.id}
+              data-pin={r.pin}
+              data-highlighted={r.highlighted}
+              data-selected={r.selected}
+              points={r.polygon.map((p) => p.join(',')).join(' ')}
+              role="button"
+              tabIndex={0}
+              aria-label={r.pin > 0 ? `${r.name}, ${r.pin} to do` : r.name}
+              className="pointer-events-auto cursor-pointer"
+              style={roomPaint(r, hoverId === `room:${r.id}`)}
+              onClick={() => onRoomClick?.(r.id)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  onRoomClick?.(r.id)
+                }
+              }}
+              onPointerEnter={() => setHoverId(`room:${r.id}`)}
+              onPointerLeave={() => setHoverId((id) => (id === `room:${r.id}` ? null : id))}
+            />
+          ))}
         </svg>
         {machines.map((m) => {
           const [cx] = centroid(m.polygon)
@@ -362,6 +451,38 @@ export function PlantStage({
                 )
               )}
               <span className="h-3.5 w-0.5 bg-[var(--ink-900)] opacity-60" />
+            </div>
+          )
+        })}
+        {rooms.map((r) => {
+          const [cx] = centroid(r.polygon)
+          const top = Math.min(...r.polygon.map((p) => p[1]))
+          const sign = view ? Math.min(2.4, 1 / view.s) : 1
+          return (
+            <div
+              key={r.id}
+              className="pointer-events-none absolute flex items-center gap-1"
+              style={{
+                left: cx,
+                top: top - 6,
+                transform: `translate(-50%, -100%) scale(${sign})`,
+                transformOrigin: 'bottom center',
+              }}
+            >
+              <span
+                data-testid="plant-room-sign"
+                className="mono whitespace-nowrap rounded bg-[var(--ink-900)] px-2.5 py-1 text-xs font-bold text-white"
+              >
+                {r.name}
+              </span>
+              {r.pin > 0 && (
+                <span
+                  data-testid="plant-room-pin"
+                  className="mono grid h-6 min-w-6 place-items-center rounded-full bg-accent-decision px-1 text-xs font-extrabold text-white"
+                >
+                  {r.pin}
+                </span>
+              )}
             </div>
           )
         })}
