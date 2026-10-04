@@ -85,7 +85,14 @@ function SiteEditSurface({ exit }: { exit(): void }) {
 }
 
 export function AdminShell({ siteName, userEmail, initialPlace }: ShellProps) {
-  const { data: shell, isLoading, isError } = useQuery({ queryKey: SHELL_KEY, queryFn: () => getAdminShell() })
+  // Same staleTime as the worker's site read: the signed scene URL rotates on
+  // every refetch and must not swap on a window-focus refetch every minute.
+  // Edits invalidate SHELL_KEY explicitly (SiteEditSurface.refresh).
+  const { data: shell, isLoading, isError } = useQuery({
+    queryKey: SHELL_KEY,
+    queryFn: () => getAdminShell(),
+    staleTime: 30 * 60 * 1000,
+  })
   const pendingSignOffs = usePendingSignOffCount().data ?? 0
 
   const data = shell && !('error' in shell) ? shell : null

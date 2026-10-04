@@ -245,11 +245,13 @@ export function PlantStage({
     }
   })
 
-  // Mount neutral, fit after mount (D-09) -- and again whenever the scene changes.
+  // Mount neutral, fit after mount (D-09) -- and again when the scene's size
+  // changes. Not on sceneUrl: it is a signed URL that rotates on every refetch,
+  // and a refit would throw the camera off the selected place (57 review WR-04).
   useEffect(() => {
     fit()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sceneUrl, sceneWidth, sceneHeight])
+  }, [sceneWidth, sceneHeight])
 
   // A stage built while hidden measures 0x0 -- retry via ResizeObserver.
   useEffect(() => {
