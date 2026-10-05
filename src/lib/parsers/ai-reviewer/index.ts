@@ -14,5 +14,6 @@ export type {
 } from './types'
 
 export { NotImplementedError, OrgSpendCapExceededError } from './types'
-export { runReviewerJobs } from './orchestrator'
+export { runReviewerJobs, runReviewerForSop, NothingToReviewError } from './orchestrator'
+export { pickSourceText } from './source-content'
 export { assertOrgCapNotExceeded, recordOrgSpend } from './cost-guard'

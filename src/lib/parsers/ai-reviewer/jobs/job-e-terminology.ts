@@ -21,7 +21,7 @@ import type { ReviewerFlag } from '../types'
 import type { ReviewerJob } from './types'
 
 /**
- * Naive top-50 distinct-terms fetcher. Pulls every published SOP for the
+ * Naive top-50 distinct-terms fetcher. Pulls every focus step of the
  * organisation, splits step text on whitespace + punctuation, lower-cases,
  * counts frequencies, returns the top 50. Stop-words filtered out via a
  * conservative English stop-list.
@@ -31,7 +31,7 @@ import type { ReviewerJob } from './types'
  * vocabulary signal proves noisy.
  *
  * RLS is enforced server-side via admin client; org isolation comes from
- * the explicit `eq('organisation_id', orgId)` filter on `sops`.
+ * the explicit `eq('organisation_id', orgId)` filter on the steps.
  */
 const STOP_WORDS = new Set([
   'the',
@@ -106,31 +106,12 @@ export async function fetchOrgVocabulary(orgId: string): Promise<string[]> {
   if (!orgId) return []
   const admin = createAdminClient()
 
-  // Pull steps from the org's SOPs in one shot. We avoid joining at the SQL
-  // level to keep this resilient to RLS / schema drift; the in-memory pass
-  // is small (top 50 of typical 50-500-SOP org corpora).
-  const { data: sopRows, error: sopErr } = await admin
-    .from('sops')
-    .select('id')
-    .eq('organisation_id', orgId)
-    .limit(500)
-  if (sopErr || !sopRows || sopRows.length === 0) return []
-
-  const sopIds = sopRows.map((r) => r.id as string)
-
-  const { data: sections, error: secErr } = await admin
-    .from('sop_sections')
-    .select('id, sop_id')
-    .in('sop_id', sopIds)
-    .limit(5000)
-  if (secErr || !sections || sections.length === 0) return []
-
-  const sectionIds = sections.map((s) => s.id as string)
-
+  // Phase 58: the org's focus steps are the vocabulary. ponytail: includes
+  // draft SOPs' steps too (sop_focus_steps has no status); fine for a top-50.
   const { data: steps, error: stepsErr } = await admin
-    .from('sop_steps')
+    .from('sop_focus_steps')
     .select('text')
-    .in('section_id', sectionIds)
+    .eq('organisation_id', orgId)
     .limit(20000)
   if (stepsErr || !steps) return []
 
@@ -182,7 +163,7 @@ Each element: {
   "source_term": "the term as it appears in the source",
   "draft_term": "the term the draft used instead",
   "suggested_term": "the canonical term the draft should use",
-  "block_id": "draft block id if identifiable, else null",
+  "step_id": "the draft step's step_id copied exactly from DRAFT STEPS, or null for a SOP-level finding",
   "source_location_hint": "page or section",
   "description": "what differs (≤100 chars)"
 }
@@ -218,7 +199,7 @@ function safeParseFlags(raw: string): ReviewerFlag[] {
         | 'critical'
         | 'warning',
       kind: 'terminology',
-      block_id: typeof p.block_id === 'string' ? p.block_id : undefined,
+      step_id: typeof p.step_id === 'string' ? p.step_id : undefined,
       source_location_hint:
         typeof p.source_location_hint === 'string'
           ? p.source_location_hint

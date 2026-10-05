@@ -65,7 +65,7 @@ function safeParseFlags(raw: string): ReviewerFlag[] {
         | 'critical'
         | 'warning',
       kind: 'omission',
-      block_id: typeof p.block_id === 'string' ? p.block_id : undefined,
+      step_id: typeof p.step_id === 'string' ? p.step_id : undefined,
       source_location_hint:
         typeof p.source_location_hint === 'string'
           ? p.source_location_hint

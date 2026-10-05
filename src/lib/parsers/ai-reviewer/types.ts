@@ -26,8 +26,8 @@ export type ReviewerFlag = {
   job: ReviewerJobId
   severity: 'critical' | 'warning'
   kind: ReviewerFlagKind
-  /** null => SOP-level flag (no specific block) */
-  block_id?: string
+  /** a step of the draft (sop_focus_steps.id); absent => SOP-level flag */
+  step_id?: string
   /** free-form hint like "page 3 step 7" or "section 2.1" */
   source_location_hint?: string
   description: string
@@ -44,7 +44,10 @@ export type ReviewerUsage = {
 }
 
 export type ReviewerRunEnvelope = {
-  parse_job_id: string
+  /** null when the SOP has no parse job (blank SOP, draft-only run) */
+  parse_job_id: string | null
+  /** groups the sop_ai_findings rows this run wrote */
+  run_id?: string
   ran_at: string // ISO
   model: string
   jobs_run: ReviewerJobId[]

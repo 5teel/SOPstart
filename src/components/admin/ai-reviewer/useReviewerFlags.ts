@@ -129,7 +129,7 @@ export function useReviewerFlags(sopId: string): UseReviewerFlagsResult {
   const byBlockId = useMemo<Map<string, ReviewerFlag[]>>(() => {
     const m = new Map<string, ReviewerFlag[]>()
     for (const f of flags) {
-      const key = f.block_id ?? '__sop__'
+      const key = f.step_id ?? '__sop__'
       const arr = m.get(key) ?? []
       arr.push(f)
       m.set(key, arr)

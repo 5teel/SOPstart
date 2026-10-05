@@ -153,7 +153,7 @@ test.describe('JOB_D — table fidelity', () => {
         kind: 'table_fidelity',
         source_quote: 'Torque: 45 Nm',
         draft_quote: 'Torque: 4.5 Nm',
-        block_id: 'block-torque-1',
+        step_id: 'step-torque-1',
         description: 'Draft torque 10× lower than source (4.5 vs 45 Nm)',
       },
     ])
@@ -161,7 +161,7 @@ test.describe('JOB_D — table fidelity', () => {
     expect(flags[0].job).toBe('D')
     expect(flags[0].kind).toBe('table_fidelity')
     expect(flags[0].severity).toBe('critical')
-    expect(flags[0].block_id).toBe('block-torque-1')
+    expect(flags[0].step_id).toBe('step-torque-1')
     expect(flags[0].extras?.source_quote).toBe('Torque: 45 Nm')
     expect(flags[0].extras?.draft_quote).toBe('Torque: 4.5 Nm')
   })
@@ -187,7 +187,7 @@ test.describe('JOB_E — terminology consistency', () => {
         source_term: 'lockout switch',
         draft_term: 'isolation switch',
         suggested_term: 'lockout switch',
-        block_id: 'block-step-1',
+        step_id: 'step-1',
         description: 'Draft uses isolation; source + org vocab use lockout',
       },
     ])
@@ -198,5 +198,13 @@ test.describe('JOB_E — terminology consistency', () => {
     expect(flags[0].extras?.source_term).toBe('lockout switch')
     expect(flags[0].extras?.draft_term).toBe('isolation switch')
     expect(flags[0].extras?.suggested_term).toBe('lockout switch')
+    expect(flags[0].step_id).toBe('step-1')
+  })
+
+  test('parseResponse leaves step_id undefined for a SOP-level finding (null)', () => {
+    const flags = JOB_E.parseResponse(
+      JSON.stringify([{ severity: 'warning', kind: 'terminology', step_id: null, description: 'x' }]),
+    )
+    expect(flags[0].step_id).toBeUndefined()
   })
 })

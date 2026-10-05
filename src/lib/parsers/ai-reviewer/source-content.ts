@@ -31,6 +31,14 @@
 
 import { createAdminClient } from '@/lib/supabase/admin'
 
+/** The one place that decides what a parse job's source text is. */
+export function pickSourceText(row: {
+  transcript_text?: string | null
+  prompt_text?: string | null
+}): string {
+  return row.transcript_text ?? row.prompt_text ?? ''
+}
+
 export type SourceContentBlock = {
   /** Plain-text source content ready to be sent to Anthropic. */
   text: string
@@ -68,10 +76,9 @@ export async function buildSourceContentBlock(
     }
   }
 
-  const sourceText =
-    (data.transcript_text as string | null) ??
-    (data.prompt_text as string | null) ??
-    ''
+  const sourceText = pickSourceText(
+    data as { transcript_text: string | null; prompt_text: string | null },
+  )
   const sourceType = (data.file_type as string | null) ?? 'unknown'
 
   // Best-effort page count: every `[Page N]` marker is one boundary. The

@@ -26,7 +26,7 @@ function safeParseFlags(raw: string): ReviewerFlag[] {
       job: 'A',
       severity: (p.severity === 'critical' ? 'critical' : 'warning') as 'critical' | 'warning',
       kind: 'hallucination',
-      block_id: typeof p.block_id === 'string' ? p.block_id : undefined,
+      step_id: typeof p.step_id === 'string' ? p.step_id : undefined,
       source_location_hint:
         typeof p.section_title === 'string'
           ? `${p.section_title}${p.step_number != null ? ` step ${p.step_number}` : ''}`

@@ -49,7 +49,7 @@ Each element: {
   "source_quote": "exact numeric phrase from source (≤120 chars)",
   "draft_quote": "exact numeric phrase from draft (≤120 chars)",
   "source_location_hint": "page or section",
-  "block_id": "draft block id if identifiable, else null",
+  "step_id": "the draft step's step_id copied exactly from DRAFT STEPS, or null for a SOP-level finding",
   "description": "what differs (≤100 chars)"
 }
 If every numeric value matches the source within tolerance, respond with exactly: []`
@@ -72,7 +72,7 @@ function safeParseFlags(raw: string): ReviewerFlag[] {
         | 'critical'
         | 'warning',
       kind: 'table_fidelity',
-      block_id: typeof p.block_id === 'string' ? p.block_id : undefined,
+      step_id: typeof p.step_id === 'string' ? p.step_id : undefined,
       source_location_hint:
         typeof p.source_location_hint === 'string'
           ? p.source_location_hint

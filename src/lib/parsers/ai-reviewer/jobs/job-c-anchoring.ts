@@ -76,10 +76,14 @@ function safeParseFlags(raw: string): ReviewerFlag[] {
         | 'critical'
         | 'warning',
       kind: 'anchoring',
-      // Anchoring flags reference a photo block when block_id exists in the
-      // raw output; the orchestrator caller decides if the source pane jump
-      // uses photo_id or block_id.
-      block_id: typeof p.block_id === 'string' ? p.block_id : undefined,
+      // The step the photo sits on (the model may answer step_id or the
+      // older current_step_id); the orchestrator drops ids not in the draft.
+      step_id:
+        typeof p.step_id === 'string'
+          ? p.step_id
+          : typeof p.current_step_id === 'string'
+            ? p.current_step_id
+            : undefined,
       source_location_hint:
         typeof p.current_step_text_snippet === 'string'
           ? p.current_step_text_snippet.slice(0, 120)
