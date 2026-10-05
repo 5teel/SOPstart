@@ -1979,7 +1979,63 @@ Plans:
   4. The decisions tab lists the ledger newest first and can be narrowed by kind of decision; opening it, people and roles, or access widens the detail panel while the site stays visible and re-centres on the Office
   5. An admin invites a person, sets their role, sees their department, and opens the existing access wiring screen, unchanged, to decide who sees which SOPs
 
-**Plans**: TBD
+**Plans:** 16 plans
+Plans:
+**Wave 1**
+
+- [ ] 59-01-PLAN.md — Wave 0: phase59 project, repoint inventory + retirement sweep, requirement spec stubs, office eval skeleton, eval fixtures (supervisor assignment, idle supervisor, unsupervised worker), invited-person check, validation map
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 59-02-PLAN.md — Migration 00073 (three ledger kinds, no policy change) [BLOCKING] live apply, DECISION_KINDS + types, decisions read module (groups, words, cursor)
+- [ ] 59-03-PLAN.md — Office tab on the place address, tabsForRole, wide detail pane, Esc guard, page threads tab + UUID-gated sop
+- [ ] 59-04-PLAN.md — Sign-offs and the owner's own due reviews join the one inbox derivation, one action per row, member labels by email, getOfficeInbox, drafts carry owner + review
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 59-05-PLAN.md — People actions guarded and logged (admin-only invite with role, admin-only role change, service-role remove in a plain module), writer registry, matrix
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 59-06-PLAN.md — Sign-off refuses own walk + server counter-sign, getCompletionForReview (session read, then sign), rejected never counts as done, approvals report logged, chains name only admins / safety managers
+
+**Wave 5** *(blocked on Wave 4 completion)*
+
+- [ ] 59-07-PLAN.md — Owner can mark reviewed (plain-module owner path); owner + review line under every admin SOP row; This SOP Owner and Review rows
+- [ ] 59-08-PLAN.md — Sign off and Approve panels with every old gate, lightbox (Esc stays in the layer), reason dialog
+
+**Wave 6** *(blocked on Wave 5 completion)*
+
+- [ ] 59-09-PLAN.md — Office pane: tabs, receipt slot, inbox rows with one button, owner Mark reviewed rows, accordion, empty goal state, shell-cache patch; admin, supervisor, owner, approve and reject eval legs
+
+**Wave 7** *(blocked on Wave 6 completion)*
+
+- [ ] 59-10-PLAN.md — Decisions tab (listDecisions, kind chips, Show older) and cleared-today
+
+**Wave 8** *(blocked on Wave 7 completion)*
+
+- [ ] 59-11-PLAN.md — People & roles tab and Access tab (lens unchanged) in the wide pane; invite, role change and remove eval
+
+**Wave 9** *(blocked on Wave 8 completion)*
+
+- [ ] 59-12-PLAN.md — Mount the pane behind next/dynamic in both shells, supervisor pin on the pane's read, bundle marker, lint allow-list
+
+**Wave 10** *(blocked on Wave 9 completion)*
+
+- [ ] 59-13-PLAN.md — Server redirects for the old addresses, /admin/training bridge, journeys / UAT / matrix for the Office, legacy-address and supervisor eval cases
+
+**Wave 11** *(blocked on Wave 10 completion)*
+
+- [ ] 59-14-PLAN.md — Delete governance, team and access pages, org-chart views, old role table, org-model write exports; spec repoints; office-pages dropped feature
+
+**Wave 12** *(blocked on Wave 11 completion)*
+
+- [ ] 59-15-PLAN.md — Delete the supervisor activity view and supervisor half of the completion page; spec repoints; non-owners land on the Office; supervisor-review dropped feature
+
+**Wave 13** *(blocked on Wave 12 completion)*
+
+- [ ] 59-16-PLAN.md — Deployed eval with every screenshot read, build + full suite once, validation sign-off, requirements ticked, Learnings
+
 **UI hint**: yes
 
 ### Phase 60: Requests, Notifications & Objectives
