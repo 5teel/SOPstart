@@ -27,7 +27,13 @@ function Landing() {
  * The branch is decided here, on the server, from the session -- never by a
  * client redirect (CLAUDE.md 2026-09-29).
  */
-export default async function Home({ searchParams }: { searchParams: Promise<{ place?: string | string[] }> }) {
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ place?: string | string[]; tab?: string | string[]; sop?: string | string[] }>
+}) {
   const { supabase, userId, userEmail, role, organisationId } = await getSessionContext()
 
   if (!userId) return <Landing />
@@ -39,11 +45,17 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ p
     if (org?.name) siteName = org.name
   }
 
-  const { place } = await searchParams
+  const { place, tab, sop } = await searchParams
 
   return (
     <ProtectedProviders role={role as AppRole}>
-      <OneScreen siteName={siteName} userEmail={userEmail} initialPlace={typeof place === 'string' ? place : null} />
+      <OneScreen
+        siteName={siteName}
+        userEmail={userEmail}
+        initialPlace={typeof place === 'string' ? place : null}
+        initialTab={typeof tab === 'string' ? tab : null}
+        initialSop={typeof sop === 'string' && UUID.test(sop) ? sop : null}
+      />
     </ProtectedProviders>
   )
 }

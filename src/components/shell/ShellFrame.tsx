@@ -20,6 +20,7 @@ import { ROOMS, ROOM_IDS, roomMatches, roomPolygon, type RoomId } from '@/lib/si
 import { zoneColour } from '@/lib/site/scene'
 import { askMatches } from '@/lib/sop/worker-signal'
 import { formatPlace, parsePlace, type Place } from '@/lib/shell/place'
+import { isWidePlace, type OfficeTab } from '@/lib/shell/office-tabs'
 import type { SiteDepartment, SopMachineLink, WorkerSiteLayout, WorkerSiteMachine } from '@/lib/validators/site'
 
 export interface ShellSite {
@@ -33,6 +34,10 @@ export interface ShellFrameProps {
   site: ShellSite
   loading: boolean
   initialPlace: string | null
+  /** `?tab=` of the Office place; whitelisted by parsePlace. */
+  initialTab?: string | null
+  /** Tabs the signed-in role may open; any other tab renders as the Inbox. */
+  officeTabs: ReadonlyArray<OfficeTab>
   canEdit: boolean
   sopsById: ReadonlyMap<string, { title: string }>
   /** Titles of site-wide SOPs -- a search hit on one lights the Noticeboard. */
@@ -57,12 +62,22 @@ const HEALTH_DOT = {
   ok: 'bg-accent-ok',
 } as const
 
-/** An unknown id, or edit without rights, is the overview (T-57-04/07). Pure. */
+/**
+ * An unknown id, or edit without rights, is the overview (T-57-04/07); an Office
+ * tab the role may not open is the Inbox (T-59-11). Pure -- never a redirect.
+ */
 function resolvePlace(
   place: Place,
-  ctx: { canEdit: boolean; loading: boolean; machines: WorkerSiteMachine[]; departments: SiteDepartment[] }
+  ctx: {
+    canEdit: boolean
+    loading: boolean
+    machines: WorkerSiteMachine[]
+    departments: SiteDepartment[]
+    officeTabs: ReadonlyArray<OfficeTab>
+  }
 ): Place {
   if (place.kind === 'edit') return ctx.canEdit ? place : OVERVIEW
+  if (place.kind === 'room' && place.tab && !ctx.officeTabs.includes(place.tab)) return { kind: 'room', id: 'office' }
   if (ctx.loading) return place
   if (place.kind === 'machine') return ctx.machines.some((m) => m.id === place.id) ? place : OVERVIEW
   if (place.kind === 'dept') return ctx.departments.some((d) => d.id === place.id) ? place : OVERVIEW
@@ -78,6 +93,8 @@ export function ShellFrame({
   site,
   loading,
   initialPlace,
+  initialTab,
+  officeTabs,
   canEdit,
   sopsById,
   siteSopTitles,
@@ -89,16 +106,17 @@ export function ShellFrame({
   renderEdit,
   account,
 }: ShellFrameProps) {
-  const [place, setPlace] = useState<Place>(() => parsePlace(initialPlace))
+  const [place, setPlace] = useState<Place>(() => parsePlace(initialPlace, initialTab))
   const [query, setQuery] = useState('')
   const stageRef = useRef<PlantStageHandle>(null)
   const { layout, machines, links, departments } = site
 
   // The place actually shown. An unknown id, or edit without rights, is the
   // overview -- resolved here in render, never by redirecting (T-57-04/07).
-  const effective = resolvePlace(place, { canEdit, loading, machines, departments })
+  const effective = resolvePlace(place, { canEdit, loading, machines, departments, officeTabs })
   const editing = effective.kind === 'edit' && renderEdit !== undefined
   const placeKey = formatPlace(effective)
+  const wide = isWidePlace(effective)
 
   // The one writer of the place: state plus the address bar, from user events only.
   function select(p: Place) {
@@ -106,7 +124,8 @@ export function ShellFrame({
     window.history.replaceState(null, '', formatPlace(p))
   }
 
-  // Esc returns to the overview (not while typing, not in edit mode).
+  // Esc returns to the overview (not while typing, not in edit mode, and not when
+  // a dialog, lightbox or other layer already took it -- A-12).
   const selectRef = useRef(select)
   useEffect(() => {
     selectRef.current = select
@@ -115,6 +134,7 @@ export function ShellFrame({
     if (editing) return
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape' || isTypingTarget(e.target)) return
+      if (e.defaultPrevented || document.querySelector('[aria-modal="true"]')) return
       selectRef.current(OVERVIEW)
     }
     window.addEventListener('keydown', onKey)
@@ -345,7 +365,10 @@ export function ShellFrame({
       <div
         data-testid="shell-detail"
         data-place={placeKey}
-        className="relative w-full shrink-0 overflow-y-auto border-ink-200 bg-paper lg:h-full lg:w-100 lg:border-l"
+        data-wide={wide}
+        className={`relative w-full shrink-0 overflow-y-auto border-ink-200 bg-paper lg:h-full lg:border-l ${
+          wide ? 'lg:w-[58%] lg:min-w-140' : 'lg:w-100'
+        }`}
       >
         {effective.kind !== 'overview' && (
           <button
@@ -353,7 +376,7 @@ export function ShellFrame({
             data-testid="shell-detail-close"
             onClick={() => select(OVERVIEW)}
             aria-label="Back to the site overview"
-            className="absolute right-3 top-3 z-10 flex h-tap w-tap items-center justify-center rounded-lg text-ink-500 hover:text-ink-900"
+            className="absolute right-3 top-3 z-20 flex h-tap w-tap items-center justify-center rounded-lg text-ink-500 hover:text-ink-900"
           >
             <X size={18} />
           </button>

@@ -61,7 +61,7 @@ test.describe('SHL-01 frame', () => {
   })
 
   test('place state is seeded by parsePlace and written only by select(), which also replaces the URL', () => {
-    expect(FRAME).toMatch(/useState<Place>\(\(\) => parsePlace\(initialPlace\)\)/)
+    expect(FRAME).toMatch(/useState<Place>\(\(\) => parsePlace\(initialPlace, initialTab\)\)/)
     expect((FRAME.match(/replaceState/g) ?? []).length).toBe(1)
     const select = functionBody(FRAME, 'select')
     expect(select).toContain('setPlace(p)')

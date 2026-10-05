@@ -26,6 +26,7 @@ import { usePendingSignOffCount } from '@/hooks/useCompletions'
 import { useWorkerSops } from '@/hooks/useWorkerSops'
 import { zoneColour } from '@/lib/site/scene'
 import type { Place } from '@/lib/shell/place'
+import { tabsForRole } from '@/lib/shell/office-tabs'
 import {
   compareToDoFirst,
   derivePlantPins,
@@ -38,11 +39,14 @@ export interface ShellProps {
   siteName: string
   userEmail: string | null
   initialPlace: string | null
+  initialTab: string | null
+  /** UUID-gated `?sop=` (the Access tab pins one SOP); null when absent or not a UUID. */
+  initialSop: string | null
 }
 
 const EMPTY_SITE: ShellSite = { layout: null, machines: [], links: [], departments: [] }
 
-export function WorkerShell({ siteName, userEmail, initialPlace }: ShellProps) {
+export function WorkerShell({ siteName, userEmail, initialPlace, initialTab }: ShellProps) {
   const role = useRole()
   const isSupervisor = role === 'supervisor'
 
@@ -123,6 +127,8 @@ export function WorkerShell({ siteName, userEmail, initialPlace }: ShellProps) {
       site={site}
       loading={siteLoading}
       initialPlace={initialPlace}
+      initialTab={initialTab}
+      officeTabs={tabsForRole(role)}
       canEdit={false}
       sopsById={sopsById}
       siteSopTitles={siteSops.map((s) => s.title)}

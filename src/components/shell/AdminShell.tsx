@@ -25,10 +25,12 @@ import { usePendingSignOffCount } from '@/hooks/useCompletions'
 import type { ShellProps } from '@/components/shell/WorkerShell'
 import { healthPinCount, machineHealth, machinePanelSops, noticeboardSops } from '@/lib/sop/admin-health'
 import type { Place } from '@/lib/shell/place'
+import { tabsForRole } from '@/lib/shell/office-tabs'
+import { SHELL_KEY } from '@/lib/shell/query-keys'
+import { useRole } from '@/components/providers/RoleProvider'
 import { zoneColour } from '@/lib/site/scene'
 
 const EMPTY_SITE: ShellSite = { layout: null, machines: [], links: [], departments: [] }
-const SHELL_KEY = ['shell-admin']
 const SITE_KEY = ['site-org']
 
 /** Edit mode: the departments strip over the site editor (or the empty state). */
@@ -84,7 +86,8 @@ function SiteEditSurface({ exit }: { exit(): void }) {
   )
 }
 
-export function AdminShell({ siteName, userEmail, initialPlace }: ShellProps) {
+export function AdminShell({ siteName, userEmail, initialPlace, initialTab }: ShellProps) {
+  const role = useRole()
   // Same staleTime as the worker's site read: the signed scene URL rotates on
   // every refetch and must not swap on a window-focus refetch every minute.
   // Edits invalidate SHELL_KEY explicitly (SiteEditSurface.refresh).
@@ -160,6 +163,8 @@ export function AdminShell({ siteName, userEmail, initialPlace }: ShellProps) {
       // offering "Draw the site" over a site that exists (57 review WR-03).
       loading={isLoading || loadError !== null}
       initialPlace={initialPlace}
+      initialTab={initialTab}
+      officeTabs={tabsForRole(role)}
       canEdit
       sopsById={sopsById}
       siteSopTitles={siteSops.map((s) => s.title)}

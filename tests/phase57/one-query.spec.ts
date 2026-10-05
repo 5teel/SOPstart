@@ -146,7 +146,10 @@ test.describe('SHL-05 admin parity', () => {
   })
 
   test('there is one admin read, one sign-off read, and sign-offs stay out of the inbox number', () => {
-    expect((ADMIN.match(/\['shell-admin'\]/g) ?? []).length).toBe(1)
+    // Phase 59-03: the key moved to the shared module; the shell imports it, never re-spells it.
+    expect((read('src', 'lib', 'shell', 'query-keys.ts').match(/\['shell-admin'\]/g) ?? []).length).toBe(1)
+    expect(ADMIN).toContain("import { SHELL_KEY } from '@/lib/shell/query-keys'")
+    expect((ADMIN.match(/\['shell-admin'\]/g) ?? []).length).toBe(0)
     expect((ADMIN.match(/queryFn: \(\) => getAdminShell\(\)/g) ?? []).length).toBe(1)
     expect(ADMIN).toContain('const pendingSignOffs = usePendingSignOffCount().data ?? 0')
     expect(ADMIN).toContain('pendingSignOffs={pendingSignOffs}')
