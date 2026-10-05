@@ -40,6 +40,21 @@ export function formatPlace(place: Place): string {
   }
 }
 
+/** Inverse of parsePlace: the `?place=` token for a place (null = overview, no token). */
+export function placeToken(place: Place): string | null {
+  switch (place.kind) {
+    case 'overview':
+      return null
+    case 'edit':
+      return 'edit'
+    case 'room':
+    case 'machine':
+      return place.id
+    case 'dept':
+      return `dept:${place.id}`
+  }
+}
+
 /**
  * Where a bridged page's "Back to the site" goes (D-15a). null = no Back bar
  * (a role-less user on /pending has no site to go back to).
