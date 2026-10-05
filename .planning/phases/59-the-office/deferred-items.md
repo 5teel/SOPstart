@@ -1,0 +1,4 @@
+# Phase 59 deferred items
+
+- **[59-14 gate, pre-existing from 59-07]** `tests/phase40/dat01-category-column.spec.ts` "every sops-table write under src/ either carries category_slug or is a justified CATEGORY_EXEMPT entry" is red: `src/lib/governance/owner-review.ts` (59-07, `.update` keys `last_reviewed_at, last_reviewed_by, review_due_at, updated_at`) is neither carrying `category_slug` nor listed in `CATEGORY_EXEMPT`, and the expected write-site count has not moved. Not caused by 59-14. Fix: add a justified exempt entry (a review stamp changes no category) and bump `EXPECTED_SOPS_WRITE_SITE_COUNT`.
+- **[59-14]** `materializeOrgAccess()` in `src/actions/grants.ts` has no caller now that the org-model write actions are gone. It is an admin-guarded server action, left in place (not in the plan's delete list); decide in 59-16 or a later cleanup whether to remove it with its spec pins.
