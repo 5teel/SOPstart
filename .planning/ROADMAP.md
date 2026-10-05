@@ -2052,11 +2052,11 @@ Plans:
   4. The bell in the list shows a count, and a person is notified when they are next to approve a SOP, when a SOP they own is due for review, when a completion waits for their sign-off, when a request they raised is answered and when a SOP they do has a new version; opening a notification goes to the place it is about
   5. An admin sets, changes and removes an objective on the site, a department, a machine, a SOP or a person, and it shows as quiet metadata saying who set it; an AI agent's request appears in the Office marked as from an agent, and an objective an agent set stays marked until a person confirms it
 
-**Plans:** 18 plans
+**Plans:** 1/18 plans executed
 Plans:
 **Wave 1**
 
-- [ ] 60-01-PLAN.md — Wave 0: phase60 project, repoint inventory + retirement sweep, requirement spec stubs, requests eval skeleton, zero-SOP machine + safety-manager fixtures, cleanup helper, validation map
+- [x] 60-01-PLAN.md — Wave 0: phase60 project, repoint inventory + retirement sweep, requirement spec stubs, requests eval skeleton, zero-SOP machine + safety-manager fixtures, cleanup helper, validation map
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
