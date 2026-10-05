@@ -58,9 +58,7 @@ const read = (p: string) => strip(fs.readFileSync(path.join(process.cwd(), p), '
 
 const WORKER_FILES = [
   'src/components/focus/BrowseDocument.tsx', // Phase 58-11: the SOP page is the focus screen; its summary card carries the placement line
-  'src/components/sop/tabs/ReadTab.tsx',
-  'src/components/sop/walkthrough/DesktopWalkthrough.tsx',
-  'src/components/sop/walkthrough/ImmersiveStepCard.tsx',
+  'src/components/focus/WalkStep.tsx', // 58-16: the old Read tab and walkthrough cards are deleted; the walk step carries the labels
 ]
 
 test.describe('worker surfaces render placement + labels', () => {

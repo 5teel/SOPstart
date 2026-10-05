@@ -115,6 +115,9 @@ export function useFocusAutosave(sopId: string) {
   const queryClient = useQueryClient()
 
   useEffect(() => {
+    // One store serves every SOP the editor opens: a different SOP starts from a blank pill, never
+    // the last SOP's saved / error state.
+    useFocusSaveStatus.setState({ state: 'idle', gaveUp: false })
     const refresh = () => {
       void queryClient.invalidateQueries({ queryKey: ['focus-sop', sopId] })
       void queryClient.invalidateQueries({ queryKey: ['focus-gate', sopId] })

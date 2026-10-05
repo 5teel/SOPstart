@@ -2,7 +2,6 @@
 import { useContext, useState } from 'react'
 import { z } from 'zod'
 import { SopBlockContext } from '@/components/sop/SopBlockContext'
-import { useWalkthroughStore } from '@/stores/walkthrough'
 import { dispatchEscalationAlert, lockStep, submitEscalationReport } from '@/actions/escalation'
 import { EscalationFormModal } from '@/components/sop/EscalationFormModal'
 
@@ -23,7 +22,6 @@ export function EscalateBlock({
   recipients,
 }: EscalateBlockProps) {
   const ctx = useContext(SopBlockContext)
-  const lockStepInStore = useWalkthroughStore((s) => s.lockStep)
   const [modalOpen, setModalOpen] = useState(false)
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
 
@@ -48,7 +46,6 @@ export function EscalateBlock({
           stepId: ctx.stepId,
           completionId: ctx.completionId,
         })
-        if (ctx.stepId) lockStepInStore(ctx.stepId)
         setStatus('sent')
       } else {
         // form mode — open modal

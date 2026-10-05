@@ -50,6 +50,13 @@ test.describe('retire: the tabbed SOP page (58-11)', () => {
     const PAGE = stripComments(read('src/app/(protected)/sops/[sopId]/page.tsx'))
     for (const gone of ['SopTabNav', 'ReadTab', 'WalkthroughSwitcher', 'WorkerPreviewToggle', 'useActiveTab']) expect(PAGE, gone).not.toContain(gone)
   })
+
+  // Moved here from the deleted phase30 tab-merge spec (58-16): the bundle baseline still covers the worker route.
+  test('the bundle baseline covers the worker route (moved by hand with a history note, never recaptured)', () => {
+    const baseline = JSON.parse(read('.bundle-baseline.json'))
+    expect(typeof baseline.routes['/sops/[sopId]/page']).toBe('number')
+    expect(baseline.routes['/sops/[sopId]/page']).toBeGreaterThan(0)
+  })
 })
 
 test.describe('retire: builder and versions addresses (58-14)', () => {

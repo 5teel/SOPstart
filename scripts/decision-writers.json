@@ -43,7 +43,7 @@
     { "file": "src/actions/ai-fields.ts", "function": "applyAiWrite", "status": "hook", "anchor": "gateWrite(", "kind": "ai_field_write", "actor": "agent", "plan": 8 }
   ],
   "delegatedHooks": [
-    { "file": "src/actions/completions.ts", "function": "submitWalkCompletion", "calls": "recordSignature(", "after": "submitCompletion(", "kind": "sign_off", "note": "Send for sign-off (D-22): the worker's signature row and its ledger row are written by recordSignature, after the completion insert" }
+    { "file": "src/actions/completions.ts", "function": "submitCompletion", "calls": "recordSignature(", "after": ".from('sop_completions')", "kind": "sign_off", "note": "Send for sign-off (D-22): the worker's signature row and its ledger row are written by recordSignature, after the completion insert" }
   ],
   "allow": [
     { "file": "src/actions/assignments.ts", "function": "selfAddSop", "key": "sop_assignments", "reason": "A worker bookmarking a SOP on their own list is not a governance decision (RESEARCH A7); logging it would be noise." },

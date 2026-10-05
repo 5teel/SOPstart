@@ -938,6 +938,78 @@
       "phase": 57,
       "kind": "symbol",
       "pattern": "\b(PlantHome|PlantAskBar|WorkerSimpleList|CategoryBottomSheet|SopLibraryCard|AdminLibraryTable|AdminFloorHealth|libraryNavToUrl|resolveLibraryNav|deriveChecks)\b"
+    },
+    {
+      "feature": "tabbed-sop-page",
+      "phase": 58,
+      "kind": "dir",
+      "path": "src/components/sop/tabs"
+    },
+    {
+      "feature": "tabbed-sop-page",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/components/sop/SopTabNav.tsx"
+    },
+    {
+      "feature": "tabbed-sop-page",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/components/sop/WorkerPreviewToggle.tsx"
+    },
+    {
+      "feature": "tabbed-sop-page",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/components/sop/SopSectionTabs.tsx"
+    },
+    {
+      "feature": "tabbed-sop-page",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/hooks/useSopDetail.ts"
+    },
+    {
+      "feature": "tabbed-sop-page",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/stores/preview.ts"
+    },
+    {
+      "feature": "old-walkthrough",
+      "phase": 58,
+      "kind": "dir",
+      "path": "src/components/sop/walkthrough"
+    },
+    {
+      "feature": "old-walkthrough",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/components/sop/SafetyAcknowledgement.tsx"
+    },
+    {
+      "feature": "old-walkthrough",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/components/sop/StepProgress.tsx"
+    },
+    {
+      "feature": "old-walkthrough",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/stores/walkthrough.ts"
+    },
+    {
+      "feature": "old-walkthrough",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/stores/walkthroughMode.ts"
+    },
+    {
+      "feature": "old-walkthrough",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/stores/completionStore.ts"
     }
   ],
   "allow": [

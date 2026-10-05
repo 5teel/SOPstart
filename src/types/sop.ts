@@ -94,7 +94,7 @@ export interface SopSection {
   sop_id: string
   section_type: string                // legacy free-text, still populated
   section_kind_id: string | null      // v3.0 advisory FK (nullable)
-  section_kind?: SectionKind | null   // optional join, populated by useSopDetail
+  section_kind?: SectionKind | null   // optional join, populated by the section read
   title: string
   content: string | null
   sort_order: number
@@ -205,7 +205,7 @@ export interface VideoGenerationJob {
 
 // SOP with nested sections for review page
 export interface SopWithSections extends Sop {
-  // Phase 56: embedded by useSopDetail (placement + standards labels)
+  // Phase 56: embedded by the SOP read (placement + standards labels)
   standard_attachments?: StandardAttachmentEmbed[]
   sop_machines?: { site_machines: { name: string; departments: { name: string } | null } | null }[]
   sop_sections: (SopSection & {

@@ -115,20 +115,20 @@ test.describe('FOC-04 walk actions', () => {
   })
 
   test('submitCompletion recomputes from the walk row and refuses a missing ack or photo (D-10, D-15, D-22)', () => {
-    const b = body(completions, 'submitWalkCompletion')
+    const b = body(completions, 'submitCompletion')
     // loaded by id + session org + session worker, never by client step data
     expect(b).toMatch(/\.from\('sop_walks'\)[\s\S]*?\.eq\('organisation_id', organisationId\)[\s\S]*?\.eq\('worker_id', userId\)/)
     expect(b).toContain('reviewMissing(')
     expect(b).toContain("row.status === 'submitted'")
     // the missing check runs before anything is inserted, and not conditional on allow_forward_jump
-    expect(b.indexOf('reviewMissing(')).toBeLessThan(b.indexOf('submitCompletion({'))
+    expect(b.indexOf('reviewMissing(')).toBeLessThan(b.indexOf(".from('sop_completions')"))
     expect(b).not.toContain('allow_forward_jump')
     // hash and ids come from the server's own order and the walk id
     expect(b).toContain('hashInput(sop.order)')
-    expect(b).toContain('localId: walk.id')
-    expect(b).toContain('photoStoragePaths: walk.photos')
+    expect(b).toContain('const localId = walk.id')
+    expect(b).toContain('const photoStoragePaths = walk.photos')
     // walk marked submitted only after the completion insert, then the worker's signature
-    const sent = b.indexOf('submitCompletion({')
+    const sent = b.indexOf(".from('sop_completions')")
     const marked = b.indexOf("status: 'submitted'")
     const signed = b.indexOf('await recordSignature(')
     expect(sent).toBeGreaterThan(-1)
@@ -137,9 +137,10 @@ test.describe('FOC-04 walk actions', () => {
     expect(b).toContain("role: 'worker'")
   })
 
-  test('submitCompletion dispatches { walkId } to the walk branch; the legacy input keeps its retry-safe photo guard', () => {
+  test('submitCompletion takes only { walkId }: no client step data, no ack trace, no hash, no photo list (T-58-walk)', () => {
     const b = body(completions, 'submitCompletion')
-    expect(b).toMatch(/'walkId' in rawInput\) return submitWalkCompletion\(rawInput\)/)
+    expect(b).toContain("z.object({ walkId: z.string().uuid() }).strict().safeParse(rawInput)")
+    expect(b).not.toContain('rawInput.')
     expect(b).toContain('`${organisationId}/completions/${localId}/`')
     expect(b).toContain("insertError?.code === '23505'")
   })

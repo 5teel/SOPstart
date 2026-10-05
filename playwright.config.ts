@@ -37,7 +37,7 @@ export default defineConfig({
     {
       name: 'phase15-stubs',
       testMatch:
-        /(desktop-walkthrough-layout|sequential-ack|sub-trade-rls-backward-compat|sub-trade-assignment|no-static-desktop-import|no-static-admin-lens-import|version-route-public|no-bulk-verify-ui|no-undefined-css-tokens|design-tokens|sops-select-policies-org-scoped|rls-org-scope|use-viewport|walkthrough-store-ack|no-dead-internal-hrefs)\.spec\.ts$/,
+        /(sub-trade-rls-backward-compat|sub-trade-assignment|no-static-admin-lens-import|version-route-public|no-bulk-verify-ui|no-undefined-css-tokens|design-tokens|sops-select-policies-org-scoped|rls-org-scope|use-viewport|no-dead-internal-hrefs)\.spec\.ts$/,
       use: { browserName: 'chromium' },
     },
     {
@@ -117,7 +117,6 @@ export default defineConfig({
       // (should list all 6 tests/phase22/*.spec.ts files — zero discovered = FAIL)
       //
       // Files registered here:
-      //   tests/phase22/visual-layer.spec.ts        — VDW-LIT-01/02 icon+image layer (Plan 04)
       name: 'phase22-stubs',
       testDir: '.',
       testMatch: /tests\/phase22\/.*\.(spec|test)\.ts$/,

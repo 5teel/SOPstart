@@ -30,13 +30,13 @@ const TEST_SCAN_EXCLUDED_PREFIXES = [
 ]
 
 // Each deleting plan appends its feature key here when it flips the block live.
-const LIVE_FEATURES: string[] = ['voice-capture', 'voice', 'phone-qr', 'shared-device', 'youtube', 'photo-scan', 'video-generation', 'offline', 'flow-diagram', 'annotation', 'version-compare', 'library', 'org-signup', 'header-nav', 'site-and-departments-pages', 'list-page']
+const LIVE_FEATURES: string[] = ['voice-capture', 'voice', 'phone-qr', 'shared-device', 'youtube', 'photo-scan', 'video-generation', 'offline', 'flow-diagram', 'annotation', 'version-compare', 'library', 'org-signup', 'header-nav', 'site-and-departments-pages', 'list-page', 'tabbed-sop-page', 'old-walkthrough']
 // 55-13 flips this once the eight packages are uninstalled.
 const PACKAGES_LIVE = true
 
 const FEATURES = [
   'voice-capture', 'voice', 'phone-qr', 'shared-device', 'youtube', 'photo-scan', 'video-generation',
-  'offline', 'flow-diagram', 'annotation', 'version-compare', 'library', 'org-signup', 'header-nav', 'site-and-departments-pages', 'list-page',
+  'offline', 'flow-diagram', 'annotation', 'version-compare', 'library', 'org-signup', 'header-nav', 'site-and-departments-pages', 'list-page', 'tabbed-sop-page', 'old-walkthrough',
 ]
 
 interface Entry {
@@ -234,7 +234,7 @@ test.describe('dropped list is not vacuous', () => {
     expect(dropped.version).toBe(1)
     expect(dropped.entries.length).toBeGreaterThanOrEqual(100)
     for (const e of dropped.entries) {
-      expect([55, 57]).toContain(e.phase)
+      expect([55, 57, 58]).toContain(e.phase)
       expect(FEATURES, `unknown feature ${e.feature}`).toContain(e.feature)
       for (const src of [e.ref, e.pattern]) if (src) expect(() => new RegExp(src), src).not.toThrow()
     }

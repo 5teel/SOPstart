@@ -172,3 +172,12 @@ test.describe('no bulk tick, nothing in the worker path', () => {
     }
   })
 })
+
+test('the save pill store resets when the editor opens a different SOP (58-15 flag)', () => {
+  const hook = read('src/hooks/useFocusAutosave.ts')
+  const effect = hook.slice(hook.indexOf('export function useFocusAutosave'))
+  // the reset is the first thing the per-SOP effect does, and the effect re-runs on sopId
+  expect(effect.indexOf("useFocusSaveStatus.setState({ state: 'idle', gaveUp: false })")).toBeGreaterThan(-1)
+  expect(effect.indexOf("useFocusSaveStatus.setState({ state: 'idle'")).toBeLessThan(effect.indexOf('const refresh'))
+  expect(effect).toContain('[queryClient, sopId]')
+})

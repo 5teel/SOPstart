@@ -58,35 +58,6 @@
   }
 }
 
-/* ─────────────────────────────────────────────────────────────
-   Walkthrough step grid
-   Stable layout regions so the action bar's position doesn't
-   shift between steps with different content. Empty regions
-   collapse to zero (auto rows) but the order is locked.
-   ───────────────────────────────────────────────────────────── */
-
-.walkthrough-step-grid {
-  display: grid;
-  grid-template-areas:
-    "meta"
-    "title"
-    "callouts"
-    "context"
-    "spacer"
-    "hint"
-    "action";
-  grid-template-rows: auto auto auto auto 1fr auto auto;
-  row-gap: 1rem;
-  min-height: 60vh;
-}
-
-.walkthrough-step-grid > [data-region="meta"]     { grid-area: meta; }
-.walkthrough-step-grid > [data-region="title"]    { grid-area: title; }
-.walkthrough-step-grid > [data-region="callouts"] { grid-area: callouts; }
-.walkthrough-step-grid > [data-region="context"]  { grid-area: context; }
-.walkthrough-step-grid > [data-region="hint"]     { grid-area: hint; }
-.walkthrough-step-grid > [data-region="action"]   { grid-area: action; }
-
 /* Tree-rail navigation feedback: a brief highlight on the block/step the user
    clicked in the left pane, so navigation is confirmed even when the target is
    already fully visible (short sections that need no scroll). */

@@ -6,7 +6,6 @@ import { getSessionContext } from '@/lib/auth/session-context'
 import { createAdminClient } from '@/lib/supabase/admin'
 import type { Json } from '@/types/database.types'
 import {
-  SubmitCompletionSchema as submitCompletionSchema,
   SignOffSchema as signOffSchema,
   RecordSignatureSchema as recordSignatureSchema,
 } from '@/lib/validators/completions'
@@ -17,17 +16,18 @@ import { hashInput, reviewMissing } from '@/lib/sop/focus'
 import { loadWalkSop, toWalkState, WALK_COLUMNS } from '@/lib/sop/walk-read'
 
 // ---------------------------------------------------------------
-// submitWalkCompletion -- Send for sign-off
+// submitCompletion -- Send for sign-off
 //
 // submitCompletion({ walkId }) submits from the server's own sop_walks row (Phase 58, D-10/D-15/D-22):
-// nothing the client says about steps, hash or photos is read. The legacy input
-// (localId + client step data) stays only until the old walkthrough is deleted
-// in 58-16.
+// nothing the client says about steps, hash or photos is read. The completion id is the
+// walk id, which makes the insert its own idempotency key.
+// submitted_at is deliberately OMITTED -- the DB DEFAULT now() is the authoritative server timestamp.
+// On conflict (23505 duplicate key): idempotent retry -- missing photo rows are added, then success.
 // ---------------------------------------------------------------
-async function submitWalkCompletion(
+export async function submitCompletion(
   rawInput: unknown
 ): Promise<{ success: true; completionId: string } | { success: false; error: string }> {
-  const parsed = z.object({ walkId: z.string().uuid() }).safeParse(rawInput)
+  const parsed = z.object({ walkId: z.string().uuid() }).strict().safeParse(rawInput)
   if (!parsed.success) return { success: false, error: 'Invalid input' }
 
   const { userId, organisationId } = await getSessionContext()
@@ -62,71 +62,17 @@ async function submitWalkCompletion(
     return { success: false, error: `${missing.length} ${missing.length === 1 ? 'thing' : 'things'} still to do: ${missing.join(', ')}` }
   }
 
-  // Recomputed here from the walk row; submitCompletion's legacy input re-checks every
-  // photo path against {org}/completions/{walk.id}/ and keeps the 23505 retry path.
-  // The completion is inserted with id: walk.id (localId below).
+  // Recomputed here from the walk row, never from the client.
+  const localId = walk.id
+  const photoStoragePaths = walk.photos
   const stepData: Record<string, number> = {}
   for (const { step } of sop.order) stepData[step.id] = Date.parse(walk.done[step.id])
-  const stepAckTrace = sop.order.flatMap(({ step }) =>
+  const ackTrace = sop.order.flatMap(({ step }) =>
     walk.acks[step.id] ? [{ stepId: step.id, timestamp: Date.parse(walk.acks[step.id]) }] : []
   )
-  const sent = await submitCompletion({
-    localId: walk.id,
-    sopId: walk.sop_id,
-    sopVersion: walk.sop_version,
-    contentHash: createHash('sha256').update(hashInput(sop.order)).digest('hex'),
-    stepData,
-    photoStoragePaths: walk.photos,
-    stepAckTrace,
-  })
-  if (!sent.success) return sent
-
-  const { error: walkError } = await admin
-    .from('sop_walks')
-    .update({ status: 'submitted', submitted_at: new Date().toISOString(), updated_at: new Date().toISOString() })
-    .eq('id', walk.id)
-    .eq('organisation_id', organisationId)
-    .eq('worker_id', userId)
-  if (walkError) {
-    // The completion exists; a retry finds it (23505 path) and finishes the walk.
-    console.error('submitCompletion walk update error:', walkError)
-    return { success: false, error: 'Failed to submit completion.' }
-  }
-
-  // The worker's own ledger row (D-22). Its failure never undoes the completion.
-  const signed = await recordSignature({ completionId: walk.id, role: 'worker' })
-  if (!signed.success) console.error('submitCompletion signature error:', signed.error)
-  return { success: true, completionId: walk.id }
-}
-
-// ---------------------------------------------------------------
-// submitCompletion
-//
-// Inserts a completion record into sop_completions using the
-// client-generated UUID as the primary key (idempotency key).
-// submitted_at is deliberately OMITTED — uses DB DEFAULT now() (COMP-01).
-// On conflict (23505 duplicate key): idempotent retry -- missing photo rows are added, then success.
-// ---------------------------------------------------------------
-export async function submitCompletion(
-  rawInput: unknown
-): Promise<{ success: true; completionId: string } | { success: false; error: string }> {
-  // Phase 58: { walkId } sends from the server's own walk row (below).
-  if (rawInput && typeof rawInput === 'object' && 'walkId' in rawInput) return submitWalkCompletion(rawInput)
-
-  const parsed = submitCompletionSchema.safeParse(rawInput)
-  if (!parsed.success) {
-    return { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
-  }
-
-  const { userId, organisationId } = await getSessionContext()
-  if (!userId) return { success: false, error: 'Not authenticated' }
-  if (!organisationId) return { success: false, error: 'No organisation found' }
-
-  const admin = createAdminClient()
-  const { localId, sopId, sopVersion, contentHash, stepData, photoStoragePaths, stepAckTrace } = parsed.data
 
   // Photo paths must be exactly what getPhotoUploadUrl signs for this org and
-  // completion: no extra segments, no `..`, a UUID file name and a known extension.
+  // walk: no extra segments, no `..`, a UUID file name and a known extension.
   const photoPrefix = `${organisationId}/completions/${localId}/`
   const validPhotoPath = (p: { localId: string; storagePath: string }) =>
     p.storagePath === `${photoPrefix}${p.localId}.jpg` || p.storagePath === `${photoPrefix}${p.localId}.png`
@@ -134,25 +80,18 @@ export async function submitCompletion(
     return { success: false, error: 'Invalid photo path.' }
   }
 
-  // Insert into sop_completions — client UUID as PK for idempotent retry
-  // submitted_at intentionally omitted: DB DEFAULT now() is the authoritative server timestamp
-  // step_ack_trace (Phase 15 D-21): append-only evidence of sequential reading.
-  // Server treats client-supplied trace as informational — D-20 / threat model
-  // T-15-02-01: it's evidence, not a gate.
   const { error: insertError } = await admin
     .from('sop_completions')
     .insert({
       id: localId,
       organisation_id: organisationId,
-      sop_id: sopId,
+      sop_id: walk.sop_id,
       worker_id: userId,               // the signed-in worker (RLS key)
-      sop_version: sopVersion,
-      content_hash: contentHash,
-      step_data: stepData as Record<string, number>,
-      // Cast through unknown: ack-trace is jsonb on the DB side; the
-      // generated Json type union doesn't admit typed object arrays
-      // directly.
-      step_ack_trace: (stepAckTrace ?? []) as unknown as Json,
+      sop_version: walk.sop_version,
+      content_hash: createHash('sha256').update(hashInput(sop.order)).digest('hex'),
+      step_data: stepData,
+      // jsonb on the DB side; the generated Json union does not admit typed object arrays.
+      step_ack_trace: ackTrace as unknown as Json,
     })
 
   // 23505 = unique_violation: the completion row was already written by an
@@ -205,7 +144,22 @@ export async function submitCompletion(
     }
   }
 
-  return { success: true, completionId: localId }
+  const { error: walkError } = await admin
+    .from('sop_walks')
+    .update({ status: 'submitted', submitted_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+    .eq('id', walk.id)
+    .eq('organisation_id', organisationId)
+    .eq('worker_id', userId)
+  if (walkError) {
+    // The completion exists; a retry finds it (23505 path) and finishes the walk.
+    console.error('submitCompletion walk update error:', walkError)
+    return { success: false, error: 'Failed to submit completion.' }
+  }
+
+  // The worker's own ledger row (D-22). Its failure never undoes the completion.
+  const signed = await recordSignature({ completionId: walk.id, role: 'worker' })
+  if (!signed.success) console.error('submitCompletion signature error:', signed.error)
+  return { success: true, completionId: walk.id }
 }
 
 // ---------------------------------------------------------------
