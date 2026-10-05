@@ -698,5 +698,28 @@ export default defineConfig({
       testMatch: /tests\/phase58\/.*\.(spec|test)\.ts$/,
       use: { browserName: 'chromium' },
     },
+    {
+      // Phase 59 -- the Office (inbox, sign-offs, approvals, decisions, people, access).
+      // Nyquist harness (Wave 0 / Plan 59-01).
+      //
+      // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
+      // DELIBERATELY BROAD testMatch (tests/phase59/**) so later plans drop
+      // specs in with NO further config edit. The live-DB spec (ledger-rls-live)
+      // self-skips unless PHASE59_LIVE=1, so quick runs never spend the shared
+      // OTP budget (CLAUDE.md 2026-09-28).
+      //
+      // Verify registration: `npx playwright test --list --project=phase59`
+      //
+      // Files registered here (fixme stubs until the owning plan lands):
+      //   repoint-inventory (stale-guard inventory, LIVE from 59-01),
+      //   retirement-sweep, place-tab, shell-wide, ledger-read, ledger-rls-live,
+      //   inbox-model, people-actions, signoff-actions, approve-actions,
+      //   owner-review-meta, signoff-panel, office-pane-structure, people-tab,
+      //   access-mount, legacy-redirects, capability-matrix
+      name: 'phase59',
+      testDir: '.',
+      testMatch: /tests\/phase59\/.*\.(spec|test)\.ts$/,
+      use: { browserName: 'chromium' },
+    },
   ],
 })
