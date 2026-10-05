@@ -60,6 +60,57 @@ test.describe('approve actions', () => {
     expect(APPROVALS).toContain('performPublish(supabase, {')
   })
 
-  test.fixme('requestChanges has a caller in src/components/office and requires a note (59-08)', () => {})
-  test.fixme('the approve panel links to the browse state with focusHref from office (59-08)', () => {})
+  // ---- 59-08: the panel half --------------------------------------------------
+  const PANEL = strip(read('src/components/office/ApprovePanel.tsx'))
+  function panelFn(name: string): string {
+    const start = PANEL.indexOf(`async function ${name}(`)
+    expect(start, `${name} exists`).toBeGreaterThan(-1)
+    const next = PANEL.indexOf('\n  async function ', start + 1)
+    return PANEL.slice(start, next === -1 ? start + 1200 : next)
+  }
+
+  test('requestChanges has a caller in src/components/office and it sends the dialog note (59-08)', () => {
+    expect(panelFn('sendBack')).toContain('requestChanges(sopId, note)')
+    expect(PANEL).toContain('onConfirm={(note) => void sendBack(note)}')
+    expect(PANEL).toContain('title={`Send v${version} back?`}')
+    expect(PANEL).toContain('It goes back to the draft with your note, and its owner will see it.')
+    expect(PANEL).toContain('confirmLabel="Send back"')
+    // The 10-character rule lives in the shared dialog the note comes from.
+    expect(strip(read('src/components/office/ReasonDialog.tsx'))).toContain('trimmed.length >= MIN')
+  })
+
+  test('the approve button calls approveStep and the receipt follows what the server says was published (59-08)', () => {
+    const a = panelFn('approve')
+    expect(a).toContain('approveStep(sopId)')
+    expect(a).toContain('result.published ?')
+    expect(a).toContain('`Approved and published v${version}`')
+    expect(PANEL).toMatch(/data-testid="approve-commit"[\s\S]*?onClick=\{\(\) => void approve\(\)\}/)
+    expect(PANEL).toContain('`Approve and publish v${version}`')
+    expect(PANEL).toContain('`Approve v${version}`')
+    expect(PANEL).toContain('Approving publishes v{version} to workers.')
+  })
+
+  test('a publish refusal shows the plain reason and the row stays (59-08)', () => {
+    const a = panelFn('approve')
+    expect(a).toContain("can't be published yet:")
+    expect(a).toContain('Open it to fix that.')
+    // onDone is only reached on success: the refusal path sets an error and returns nothing to the inbox.
+    expect(a.indexOf('onDone(')).toBeLessThan(a.lastIndexOf('setError('))
+    expect(PANEL).toContain('role="alert"')
+  })
+
+  test('the panel never publishes by itself: only approveStep runs the publish path (59-08)', () => {
+    expect(PANEL).not.toMatch(/performPublish|assertPublishGates/)
+    expect(PANEL).not.toContain("from '@/lib/governance/publish-core'")
+  })
+
+  test('the approve panel links to the browse state with focusHref from office (59-08)', () => {
+    expect(PANEL).toContain("focusHref(sopId, { from: 'office' })")
+    expect(PANEL).toContain('Open it to read it')
+  })
+
+  test('the panel is keyed by the SOP so a second row never shows the first (59-08)', () => {
+    expect(PANEL).toContain("queryKey: ['office-approval', sopId]")
+    expect(PANEL).toContain('<ApproveBody key={sopId}')
+  })
 })
