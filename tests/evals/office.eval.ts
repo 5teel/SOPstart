@@ -73,13 +73,18 @@ const officeRow = (page: Page, title: string | RegExp) => page.getByTestId('offi
 const photosRow = (page: Page, n: number) =>
   officeRow(page, EVAL_WALK_SOP_TITLE).filter({ hasText: new RegExp(`\\b${n} photo`) }) // no trailing \b: the row text runs on into the button ("photoSign off")
 
-/** The Office room pin text and the Inbox tab count text ('' when either is absent, i.e. nothing waiting). */
+/**
+ * The Office room pin text, the Inbox tab count text and the Requests tab count text ('' when absent, i.e.
+ * nothing waiting). `total` is what the pin must read: Inbox rows plus open requests (60-05, D-03); the
+ * Requests tab itself lands in 60-11, so until then its count is simply absent.
+ */
 async function pinAndTab(page: Page) {
   const read = async (l: Locator) => ((await l.count()) ? ((await l.first().textContent()) ?? '').trim() : '')
-  return {
-    pin: await read(page.locator('[data-testid="shell-room-row"][data-room-id="office"] .mono')),
-    tab: await read(page.getByTestId('office-tab-inbox').locator('.mono')),
-  }
+  const pin = await read(page.locator('[data-testid="shell-room-row"][data-room-id="office"] .mono'))
+  const tab = await read(page.getByTestId('office-tab-inbox').locator('.mono'))
+  const requests = await read(page.getByTestId('office-tab-requests').locator('.mono'))
+  const sum = (Number(tab) || 0) + (Number(requests) || 0)
+  return { pin, tab, requests, total: sum ? String(sum) : '' }
 }
 
 async function openOffice(page: Page) {
@@ -376,7 +381,7 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       await expect(async () => {
         const c = await pinAndTab(page)
         expect(c.tab).not.toBe('')
-        expect(c.pin).toBe(c.tab)
+        expect(c.pin).toBe(c.total)
       }).toPass(SLOW)
       await shot(page, '59-inbox')
 
@@ -393,14 +398,14 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       await expect(row.getByTestId('office-row-action')).toHaveText('Mark reviewed', SLOW)
       await expect(async () => {
         const c = await pinAndTab(page)
-        expect(c.pin).toBe(c.tab)
+        expect(c.pin).toBe(c.total)
       }).toPass(SLOW)
       await shot(page, '59-receipt')
       expect(errors).toEqual([])
       await page.close()
     })
 
-    test('inbox: a machine with no SOPs is a Machines row with a Write a SOP link, the Machines chip narrows to those rows, no real-org title leaks (moved from the governance eval, 59-14)', async () => {
+    test('inbox: a machine with no SOPs is no longer an inbox row (no Machines chip, no machines-kind row); it reaches the Office as an agent request (60-05, D-05; proved in requests.eval), no real-org title leaks', async () => {
       assertEvalOrg()
       const OVEN = 'EVAL Oven'
       // Fixture: a second machine on the eval-site layout with zero linked SOPs (upsert by name, eval-site org only).
@@ -440,17 +445,11 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       const page = await adminCtx.newPage()
       const errors = watchConsole(page)
       await openOffice(page)
-      const ovenRow = page.locator('[data-testid="office-row"][data-kind="machines"]').filter({ hasText: OVEN })
-      await expect(ovenRow).toHaveCount(1, SLOW)
-      await expect(ovenRow.getByTestId('office-row-action')).toHaveAttribute('href', /^\/admin\/sops\/new\/blank\?machine=[0-9a-f-]{36}$/)
-
-      await page.locator('[data-testid="office-chip"][data-chip="machines"]').click()
-      await expect(async () => {
-        const kinds = await page.getByTestId('office-row').evaluateAll((els) => els.map((e) => e.getAttribute('data-kind')))
-        expect(kinds.length).toBeGreaterThan(0)
-        expect(kinds.every((k) => k === 'machines')).toBe(true)
-      }).toPass(SLOW)
-      await page.locator('[data-testid="office-chip"][data-chip="all"]').click()
+      // The Inbox is up (its tab is there) while the zero-SOP machine exists: it contributes no row and no chip.
+      await expect(page.getByTestId('office-tab-inbox')).toHaveCount(1, SLOW)
+      await expect(page.locator('[data-testid="office-chip"][data-chip="machines"]')).toHaveCount(0)
+      await expect(page.locator('[data-testid="office-row"][data-kind="machines"]')).toHaveCount(0)
+      await expect(officeRow(page, OVEN)).toHaveCount(0)
 
       if (realTitle) await expect(page.getByText(realTitle, { exact: true })).toHaveCount(0)
       expect(errors).toEqual([])
@@ -469,7 +468,7 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       await expect(row).toHaveCount(0, SLOW)
       await expect(async () => {
         const c = await pinAndTab(page)
-        expect(c.pin).toBe(c.tab)
+        expect(c.pin).toBe(c.total)
       }).toPass(SLOW)
       await page.close()
     })
@@ -526,7 +525,7 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       await expect.poll(() => statusOf(first), SLOW).toBe('signed_off')
       await expect(async () => {
         const c = await pinAndTab(page)
-        expect(c.pin).toBe(c.tab)
+        expect(c.pin).toBe(c.total)
       }).toPass(SLOW)
 
       // Second walk in the same pane session: its own photos, no stale panel.

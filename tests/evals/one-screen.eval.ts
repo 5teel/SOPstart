@@ -39,6 +39,12 @@ const room = (page: Page, id: string) => page.locator(`[data-testid="plant-room"
 const roomBody = (page: Page, id: string) => page.locator(`[data-testid="room-body"][data-room-id="${id}"]`)
 const detail = (page: Page) => page.getByTestId('shell-detail')
 
+/** The open-request count on the Office Requests tab (0 when the tab is absent, i.e. before 60-11). */
+async function requestsInTab(page: Page): Promise<number> {
+  const l = page.getByTestId('office-tab-requests').locator('.mono')
+  return (await l.count()) ? Number(((await l.first().textContent()) ?? '').trim()) || 0 : 0
+}
+
 async function readScale(page: Page) {
   return parseFloat((await page.getByTestId('plant-world').getAttribute('data-scale')) ?? '0')
 }
@@ -307,7 +313,7 @@ test.describe('Phase 57 — the one screen (deployed)', () => {
 
   // -------------------------------------------------------------- supervisor
 
-  test('D-06: the supervisor sees the Office card, and its pin equals the pane Inbox list (59-12)', async ({ page, context }) => {
+  test('D-06: the supervisor sees the Office card, and its pin equals the pane Inbox list plus open requests (59-12, 60-05)', async ({ page, context }) => {
     test.setTimeout(180_000)
     await signInAs(context, 'siteSupervisor')
     await page.goto('/')
@@ -325,7 +331,8 @@ test.describe('Phase 57 — the one screen (deployed)', () => {
     // The Office is the tabbed pane; a supervisor has the Inbox only, one row per pinned item.
     await expect(page.getByTestId('office-pane')).toBeVisible(SLOW)
     await expect(page.getByTestId('office-tab-decisions')).toHaveCount(0)
-    await expect(page.getByTestId('office-row')).toHaveCount(pinned, SLOW)
+    // The pin is Inbox rows plus open requests (60-05, D-03); the Requests tab count is absent until 60-11.
+    await expect(page.getByTestId('office-row')).toHaveCount(pinned - (await requestsInTab(page)), SLOW)
   })
 
   // ------------------------------------------------------------------ admin
@@ -344,7 +351,7 @@ test.describe('Phase 57 — the one screen (deployed)', () => {
     await shot(page, '57-admin-overview')
   })
 
-  test('D-16 PLC-04: admin Office pin equals the pane Inbox tab count (59-12)', async ({ page, context }) => {
+  test('D-16 PLC-04: admin Office pin equals the pane Inbox tab count plus the Requests count (59-12, 60-05)', async ({ page, context }) => {
     test.setTimeout(180_000)
     await db.from('sops').update({ owner_user_id: null }).eq('id', plantSopId)
     await signInAs(context, 'siteAdmin')
@@ -359,7 +366,9 @@ test.describe('Phase 57 — the one screen (deployed)', () => {
     await page.getByTestId('shell-office-open').click()
     await expect(detail(page)).toHaveAttribute('data-place', '/?place=office', SLOW)
     await expect(page.getByTestId('office-pane')).toBeVisible(SLOW)
-    await expect(page.getByTestId('office-tab-inbox')).toHaveText(new RegExp(`Inbox\\s*${count}`), SLOW)
+    // pin = Inbox count + Requests count (60-05, D-03)
+    const inInbox = count - (await requestsInTab(page))
+    await expect(page.getByTestId('office-tab-inbox')).toHaveText(new RegExp(`Inbox\\s*${inInbox}`), SLOW)
     await shot(page, '57-admin-office')
   })
 
