@@ -153,6 +153,15 @@ test.describe('FOC-04 walk actions', () => {
     expect(b).toContain("role: 'worker'")
   })
 
+  test('review WR-07: a retake removes the earlier object, only after the row is saved and only under this walk\'s folder', () => {
+    const b = body(walk, 'recordWalkStep')
+    const rm = b.indexOf(".storage.from('completion-photos').remove([prev.storagePath])")
+    expect(rm).toBeGreaterThan(-1)
+    expect(rm).toBeGreaterThan(b.indexOf('Could not save that step.'))
+    expect(b).toContain('prev.storagePath.startsWith(`${organisationId}/completions/${walkId}/`)')
+    expect(b).toContain('prev.storagePath !== photo!.storagePath')
+  })
+
   test('review CR-02: a worker signature is refused unless the completion is the caller\'s own', () => {
     const b = body(completions, 'recordSignature')
     expect(b).toMatch(/\.select\('[^']*worker_id[^']*'\)/)

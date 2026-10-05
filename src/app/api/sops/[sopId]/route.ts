@@ -97,6 +97,16 @@ export async function DELETE(
         .from('sop-images')
         .remove(imgFiles.map((f: { name: string }) => `${sop.organisation_id}/${sopId}/images/${f.name}`))
     }
+    // Remove editor-uploaded step photos and baked annotation copies (review WR-07):
+    // {org}/{sop}/steps/{stepId}/{file}, one folder per step.
+    const stepsDir = `${sop.organisation_id}/${sopId}/steps`
+    const { data: stepDirs } = await admin.storage.from('sop-images').list(stepsDir)
+    const stepFiles: string[] = []
+    for (const d of stepDirs ?? []) {
+      const { data: files } = await admin.storage.from('sop-images').list(`${stepsDir}/${d.name}`)
+      for (const f of files ?? []) stepFiles.push(`${stepsDir}/${d.name}/${f.name}`)
+    }
+    if (stepFiles.length > 0) await admin.storage.from('sop-images').remove(stepFiles)
   } catch (storageErr) {
     console.error('Storage cleanup error (non-fatal):', storageErr)
   }

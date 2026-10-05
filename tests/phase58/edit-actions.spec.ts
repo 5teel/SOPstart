@@ -212,6 +212,17 @@ test.describe('FOC-02/WRK-04 edit actions', () => {
     expect(body(steps, 'getStepImageUploadUrl')).toContain("z.enum(['image/jpeg', 'image/png'])")
   })
 
+  test('review WR-07: deleting a draft sweeps its editor-uploaded step photos, best effort', () => {
+    const route = read('src/app/api/sops/[sopId]/route.ts')
+    const del = route.slice(route.indexOf('export async function DELETE'))
+    const sweep = del.indexOf('/steps`')
+    expect(sweep).toBeGreaterThan(-1)
+    // one list per step folder, then one remove; inside the non-fatal try so a storage error never fails the delete
+    expect(del.slice(sweep)).toMatch(/\.list\(`\$\{stepsDir\}\/\$\{d\.name\}`\)[\s\S]*\.remove\(stepFiles\)/)
+    expect(sweep).toBeGreaterThan(del.indexOf('try {'))
+    expect(sweep).toBeLessThan(del.indexOf('catch (storageErr)'))
+  })
+
   test('the plain read loader has no directive and no service role', () => {
     const raw = readRaw('src/lib/sop/focus-read.ts')
     expect(raw.trimStart().startsWith("'use")).toBe(false)

@@ -164,6 +164,14 @@ export async function recordWalkStep(rawInput: unknown): Promise<{ walk: WalkSta
     console.error('recordWalkStep update error:', error)
     return { error: 'Could not save that step. Please try again.' }
   }
+  // A retake replaced the step's photo: the earlier object is unreferenced now (review WR-07).
+  // Best effort, after the row is saved; a storage error never fails the step.
+  const prev = action === 'photo' ? walk.photos.find((p) => p.stepId === stepId) : undefined
+  if (prev && prev.storagePath !== photo!.storagePath && prev.storagePath.startsWith(`${organisationId}/completions/${walkId}/`)) {
+    // Awaited: a fire-and-forget promise is cut off when the action returns (sops.ts note).
+    const { error: rmErr } = await admin.storage.from('completion-photos').remove([prev.storagePath])
+    if (rmErr) console.error('recordWalkStep previous photo remove error:', rmErr)
+  }
   return { walk: toWalkState(saved) }
 }
 
