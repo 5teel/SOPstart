@@ -25,6 +25,7 @@ function body(src: string, name: string): string {
 
 const COMPLETIONS = strip(read('src/actions/completions.ts'))
 const SIGN_OFF = body(COMPLETIONS, 'signOffCompletion')
+const OFFICE = strip(read('src/actions/office.ts'))
 
 test.describe('signoff actions', () => {
   test('signOffCompletion refuses the caller own walk (A-03)', () => {
@@ -66,8 +67,37 @@ test.describe('signoff actions', () => {
     expect(SIGN_OFF).toContain('You are not assigned to supervise this worker.')
   })
 
-  test.fixme('getCompletionForReview reads through the session client first, then signs storage paths (A-09)', () => {})
-  test.fixme('getCompletionForReview refuses a non-visible completion and takes only a UUID completion id', () => {})
-  test.fixme('the review reads exclude the caller own walk', () => {})
+  test('getCompletionForReview reads through the session client first, then signs storage paths (A-09)', () => {
+    const b = body(OFFICE, 'getCompletionForReview')
+    expect(b.indexOf(".from('sop_completions')")).toBeGreaterThan(-1)
+    expect(b.indexOf(".from('sop_completions')")).toBeLessThan(b.indexOf('signCompletionPhotos('))
+    expect(b).toContain(".eq('organisation_id', organisationId)")
+    expect(OFFICE).not.toContain('createAdminClient')
+    const review = read('src/lib/completions/review.ts')
+    expect(review).not.toContain("'use server'")
+    expect(review).not.toContain('server-only')
+    expect(review).toContain('`${organisationId}/completions/`')
+    expect(review.indexOf('startsWith(prefix)')).toBeLessThan(review.indexOf('createSignedUrl(p.storage_path, 3600)'))
+    for (const name of ['signCompletionPhotos', 'orderedReviewSteps', 'assessorFor']) {
+      expect(review).toContain(`export async function ${name}(`)
+    }
+    expect(review).toMatch(/isSignedOffAssessor\(userId, sopId, createAdminClient\(\), organisationId\)/)
+  })
+  test('getCompletionForReview refuses a non-visible completion and takes only a UUID completion id', () => {
+    const b = body(OFFICE, 'getCompletionForReview')
+    expect(b).toContain('completionIdSchema.safeParse(completionId)')
+    expect(OFFICE).toContain('z.string().uuid()')
+    expect(b).toContain("{ error: 'Completion not found' }")
+    expect(b).toContain("role !== 'supervisor' && role !== 'safety_manager' && role !== 'admin'")
+    // org, role and actor are the session's; no other parameter exists
+    expect(b.split('\n')[0]).toMatch(/getCompletionForReview\(completionId: string\)/)
+    expect(b).toContain('canOverride: role ===')
+    expect(b).toContain('isAssessor')
+  })
+  test('the review reads exclude the caller own walk', () => {
+    expect(body(OFFICE, 'getCompletionForReview')).toContain('row.worker_id === userId')
+    expect(body(OFFICE, 'getCompletionForReview')).toContain("'You cannot sign off your own walk'")
+    expect(strip(read('src/lib/governance/load-inbox.ts'))).toContain(".neq('worker_id', userId)")
+  })
   test.fixme('rejected not done: the worker completion read skips rejected rows (A-06)', () => {})
 })
