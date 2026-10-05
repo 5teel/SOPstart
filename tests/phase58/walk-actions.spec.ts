@@ -96,6 +96,22 @@ test.describe('FOC-04 walk actions', () => {
     expect(b).toContain('Invalid photo path.')
   })
 
+  test('review CR-01: every sop_walks write is service-role, and a photo is recorded only once its object exists', () => {
+    // 00072 dropped the authenticated insert/update policies; the session client would be a silent zero-row deny.
+    expect(walk).toContain("import { createAdminClient } from '@/lib/supabase/admin'")
+    expect(walk).not.toMatch(/supabase\s*\.from\('sop_walks'\)/)
+    expect(walk).not.toMatch(/supabase\s*\n\s*\.from\('sop_walks'\)/)
+    expect((walk.match(/admin\s*\n?\s*\.from\('sop_walks'\)/g) ?? []).length).toBeGreaterThanOrEqual(5)
+    const b = body(walk, 'recordWalkStep')
+    const listed = b.indexOf(".storage.from('completion-photos').list(")
+    expect(listed).toBeGreaterThan(-1)
+    expect(b).toContain('That photo did not finish uploading.')
+    expect(listed).toBeLessThan(b.indexOf('photos = ['))
+    expect(fs.readFileSync(path.join(ROOT, 'supabase/migrations/00072_sop_walks_server_written.sql'), 'utf-8')).toMatch(
+      /drop policy if exists "workers_can_start_own_sop_walks"[\s\S]*drop policy if exists "workers_can_update_own_sop_walks"/
+    )
+  })
+
   test('start over abandons the walk then opens a fresh one on the latest published version (D-12)', () => {
     const b = body(walk, 'startOverWalk')
     expect(b).toContain('latestPublishedOf(')

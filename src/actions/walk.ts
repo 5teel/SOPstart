@@ -11,12 +11,15 @@
  * step ahead of the current one is refused unless the SOP allows forward jumps.
  *
  * No schema takes an organisation, user or role field (CLAUDE.md 2026-09-30,
- * 2026-10-03). sop_walks is touched with the session client (own-row RLS) and every
- * query still carries organisation_id + worker_id. Async exports only.
+ * 2026-10-03). sop_walks has no authenticated write policy (00072): every write
+ * here goes through the service client and self-enforces the scope with
+ * organisation_id + worker_id filters from the session, so nothing a client sends
+ * straight to PostgREST can forge a step, ack or photo. Async exports only.
  */
 import { z } from 'zod'
 import type { Json } from '@/types/database.types'
 import { getSessionContext } from '@/lib/auth/session-context'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { currentIndex, isReachable } from '@/lib/sop/focus'
 import { latestPublishedOf, type LineageRow } from '@/lib/sop/lineage-current'
 import { loadWalkSop, toWalkState, WALK_COLUMNS, type WalkPhoto, type WalkState } from '@/lib/sop/walk-read'
@@ -54,8 +57,9 @@ async function openWalk(
     .maybeSingle()
   if (!sop || sop.status !== 'published') return { error: 'This SOP is not available to walk.' }
 
+  const admin = createAdminClient()
   const existing = () =>
-    supabase
+    admin
       .from('sop_walks')
       .select(WALK_COLUMNS)
       .eq('organisation_id', organisationId)
@@ -67,7 +71,7 @@ async function openWalk(
   const found = await existing()
   if (found.data) return { walk: toWalkState(found.data) }
 
-  const { data: inserted, error } = await supabase
+  const { data: inserted, error } = await admin
     .from('sop_walks')
     .insert({ organisation_id: organisationId, worker_id: userId, sop_id: sopId, sop_version: sop.version ?? 1 })
     .select(WALK_COLUMNS)
@@ -100,8 +104,9 @@ export async function recordWalkStep(rawInput: unknown): Promise<{ walk: WalkSta
   const ctx = await sessionOrFail()
   if ('error' in ctx) return ctx
   const { supabase, userId, organisationId } = ctx
+  const admin = createAdminClient()
 
-  const { data: row } = await supabase
+  const { data: row } = await admin
     .from('sop_walks')
     .select(WALK_COLUMNS)
     .eq('id', walkId)
@@ -129,6 +134,10 @@ export async function recordWalkStep(rawInput: unknown): Promise<{ walk: WalkSta
     const prefix = `${organisationId}/completions/${walkId}/${photo!.localId}`
     const ext = photo!.storagePath === `${prefix}.png` ? 'png' : photo!.storagePath === `${prefix}.jpg` ? 'jpg' : null
     if (!ext) return { error: 'Invalid photo path.' }
+    // The object must have landed in the bucket: a path alone proves nothing.
+    const file = `${photo!.localId}.${ext}`
+    const { data: listed } = await admin.storage.from('completion-photos').list(`${organisationId}/completions/${walkId}`, { search: file })
+    if (!(listed ?? []).some((o) => o.name === file)) return { error: 'That photo did not finish uploading.' }
     photos = [
       ...walk.photos.filter((p) => p.stepId !== stepId),
       { localId: photo!.localId, stepId, storagePath: photo!.storagePath, contentType: ext === 'png' ? 'image/png' : 'image/jpeg' },
@@ -142,7 +151,7 @@ export async function recordWalkStep(rawInput: unknown): Promise<{ walk: WalkSta
 
   const next = sop.order[currentIndex(sop.order, new Set(Object.keys(done)))]
   // ponytail: read-modify-write on jsonb; two simultaneous taps could drop one, the worker taps again.
-  const { data: saved, error } = await supabase
+  const { data: saved, error } = await admin
     .from('sop_walks')
     .update({ acks, done, photos: photos as unknown as Json, current_step_id: next?.step.id ?? null, updated_at: now })
     .eq('id', walkId)
@@ -164,8 +173,9 @@ export async function startOverWalk(rawInput: unknown): Promise<{ walk: WalkStat
   const ctx = await sessionOrFail()
   if ('error' in ctx) return ctx
   const { supabase, userId, organisationId } = ctx
+  const admin = createAdminClient()
 
-  const { data: old } = await supabase
+  const { data: old } = await admin
     .from('sop_walks')
     .select('id, sop_id')
     .eq('id', parsed.data.walkId)
@@ -192,7 +202,7 @@ export async function startOverWalk(rawInput: unknown): Promise<{ walk: WalkStat
   const latest = latestPublishedOf((family ?? []) as LineageRow[], old.sop_id)
   if (!latest) return { error: 'This SOP is not available to walk.' }
 
-  const { error: abandonError } = await supabase
+  const { error: abandonError } = await admin
     .from('sop_walks')
     .update({ status: 'abandoned', updated_at: new Date().toISOString() })
     .eq('id', old.id)

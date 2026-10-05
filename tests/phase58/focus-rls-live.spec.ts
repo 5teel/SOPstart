@@ -204,26 +204,37 @@ test.describe('Phase 58 schema -- live RLS and trigger matrix (00071)', () => {
     expect((data ?? []).map((r) => r.id)).toEqual([fx.walkA])
   })
 
-  test('2. worker cannot insert or move a walk for another worker, or for a foreign SOP', async () => {
-    // for the peer (WITH CHECK worker_id = auth.uid())
+  test('2. no authenticated write reaches sop_walks, not even the worker\'s own row (00072); the service role can', async () => {
+    // 00072 dropped the insert and update policies (review CR-01): the server gate in
+    // src/actions/walk.ts is the only writer, through the service client.
+    const own = await fx.workerA.client
+      .from('sop_walks')
+      .insert({ organisation_id: fx.orgA, sop_id: fx.sopB, sop_version: 1, worker_id: fx.workerA.userId })
+    expect(own.error).not.toBeNull()
     const peer = await fx.workerA.client
       .from('sop_walks')
       .insert({ organisation_id: fx.orgA, sop_id: fx.sopA, sop_version: 1, worker_id: fx.peerA.userId, status: 'submitted' })
     expect(peer.error).not.toBeNull()
-    // own id, but pointing at org B's SOP (WITH CHECK sop in caller's org)
-    const foreign = await fx.workerA.client
-      .from('sop_walks')
-      .insert({ organisation_id: fx.orgA, sop_id: fx.sopB, sop_version: 1, worker_id: fx.workerA.userId, status: 'submitted' })
-    expect(foreign.error).not.toBeNull()
-    // an UPDATE of the peer's row is a silent zero-row deny: re-read with the service client
+    // an UPDATE is a silent zero-row deny: re-read with the service client. A forged
+    // done map on the worker's OWN row is exactly the bypass 00072 closes.
+    await fx.workerA.client.from('sop_walks').update({ done: { forged: 'x' }, status: 'submitted' }).eq('id', fx.walkA)
+    const { data: ownRow } = await fx.admin.from('sop_walks').select('status, done').eq('id', fx.walkA).single()
+    expect(ownRow?.status).toBe('in_progress')
+    expect(ownRow?.done).toEqual({})
     await fx.workerA.client.from('sop_walks').update({ status: 'abandoned' }).eq('id', fx.walkPeer)
     const { data } = await fx.admin.from('sop_walks').select('status').eq('id', fx.walkPeer).single()
     expect(data?.status).toBe('in_progress')
-    // moving an own row to the peer is refused by WITH CHECK
-    const steal = await fx.workerA.client.from('sop_walks').update({ worker_id: fx.peerA.userId }).eq('id', fx.walkA)
-    expect(steal.error).not.toBeNull()
-    const { data: still } = await fx.admin.from('sop_walks').select('worker_id').eq('id', fx.walkA).single()
-    expect(still?.worker_id).toBe(fx.workerA.userId)
+    // the action's channel (service role, self-scoped by org + worker) still writes
+    const viaAction = await fx.admin
+      .from('sop_walks')
+      .update({ done: { ok: 'y' } })
+      .eq('id', fx.walkA)
+      .eq('organisation_id', fx.orgA)
+      .eq('worker_id', fx.workerA.userId)
+      .select('done')
+      .single()
+    expect(viaAction.error, viaAction.error?.message).toBeNull()
+    expect(viaAction.data?.done).toEqual({ ok: 'y' })
   })
 
   test('3. one in_progress walk per worker and SOP', async () => {

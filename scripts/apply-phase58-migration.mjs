@@ -27,7 +27,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
 const MIGRATION_FILES = [
   path.join(ROOT, 'supabase/migrations/00071_focus_editor_walk.sql'),
-  // A later corrective migration is appended here, in apply order (CLAUDE.md 2026-07-28).
+  // Corrective migrations, in apply order (CLAUDE.md 2026-07-28): 00072 drops the
+  // two authenticated write policies 00071 created on sop_walks (review CR-01).
+  path.join(ROOT, 'supabase/migrations/00072_sop_walks_server_written.sql'),
 ]
 
 for (const f of ['.env.local', '.env']) {
@@ -217,31 +219,18 @@ await assertSql(
 )
 
 // -- policies ------------------------------------------------------------------
+// 00072 (review CR-01): the only policy left on sop_walks is the own-row SELECT;
+// every write is service-role from src/actions/walk.ts.
 await assertSql(
-  'sop_walks carries exactly 3 policies (select, insert, update; no delete)',
-  `SELECT cmd FROM pg_policies WHERE schemaname='public' AND tablename='sop_walks' ORDER BY cmd`,
+  'sop_walks carries exactly 1 policy: the own-row SELECT (no insert, update or delete policy after 00072)',
+  `SELECT policyname, cmd, roles::text AS roles, qual, with_check FROM pg_policies WHERE schemaname='public' AND tablename='sop_walks'`,
   (rows) => {
-    const cmds = (rows ?? []).map((r) => r.cmd).sort().join(',')
-    return { ok: cmds === 'INSERT,SELECT,UPDATE', detail: cmds }
-  }
-)
-await assertSql(
-  'every sop_walks policy: authenticated only, qual/with_check carry current_organisation_id AND auth.uid()',
-  `SELECT policyname, cmd, roles::text AS roles, qual, with_check FROM pg_policies WHERE schemaname='public' AND tablename='sop_walks' ORDER BY policyname`,
-  (rows) => {
-    const lines = []
-    let ok = (rows ?? []).length === 3
-    for (const r of rows ?? []) {
-      const roleOk = r.roles.includes('authenticated') && !r.roles.includes('anon')
-      const has = (s) => s.includes('current_organisation_id') && s.includes('auth.uid()')
-      // SELECT has only a qual; INSERT only a with_check; UPDATE both (the WITH CHECK restates the USING)
-      const qualOk = r.cmd === 'INSERT' ? true : has(r.qual ?? '')
-      const checkOk = r.cmd === 'SELECT' ? true : has(r.with_check ?? '')
-      const sopOk = r.cmd === 'SELECT' ? true : (r.with_check ?? '').includes('sop_walks.sop_id')
-      lines.push(`${r.policyname} cmd=${r.cmd} role=${roleOk} qual=${qualOk} check=${checkOk} sop=${sopOk}`)
-      if (!(roleOk && qualOk && checkOk && sopOk)) ok = false
-    }
-    return { ok, detail: '\n        ' + lines.join('\n        ') }
+    const r = rows?.[0]
+    const ok =
+      (rows ?? []).length === 1 && r.cmd === 'SELECT' && r.policyname === 'workers_can_view_own_sop_walks' &&
+      r.roles.includes('authenticated') && !r.roles.includes('anon') &&
+      (r.qual ?? '').includes('current_organisation_id') && (r.qual ?? '').includes('auth.uid()')
+    return { ok, detail: JSON.stringify((rows ?? []).map((p) => `${p.policyname} ${p.cmd}`)) }
   }
 )
 await assertSql(
