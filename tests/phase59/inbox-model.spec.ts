@@ -189,4 +189,21 @@ test.describe('inbox model', () => {
     expect(reviewSegment('2026-10-05T10:00:00Z', NOW)).toEqual({ state: 'due', text: 'review due today' })
     expect(reviewSegment('2026-10-03T00:00:00Z', NOW)).toEqual({ state: 'overdue', lead: 'review was due ', date: '3 Oct' })
   })
+
+  test('memberLabel falls back to an email, never "role (uuid8)" (A-07)', () => {
+    expect(memberLabel({ email: 'a@x.co', fullName: 'Ann' })).toBe('Ann')
+    expect(memberLabel({ email: 'a@x.co', fullName: null })).toBe('a@x.co')
+    expect(memberLabel(null)).toBe('someone who has left')
+    expect(read('src', 'actions', 'assignments.ts')).not.toContain('full_name: null')
+  })
+
+  test('the inbox read: both new reads use the session client, never the service role', () => {
+    const src = read('src', 'lib', 'governance', 'load-inbox.ts')
+    expect(src).not.toMatch(/createAdminClient|server-only/)
+    expect(src).toContain(".neq('worker_id'")
+    expect(src).toContain(".eq('owner_user_id', userId)")
+    expect(src).toContain('ownedReviews')
+    expect(read('src', 'lib', 'members', 'labels.ts')).not.toContain('server-only')
+    expect(read('src', 'actions', 'shell.ts')).toContain('inboxCount: inbox.items.length')
+  })
 })

@@ -4,7 +4,8 @@
  * Phase 57 (D-12, D-13, D-16, D-20): the admin read behind the one screen.
  * Admin-gated, ZERO parameters (org and role come from the session only),
  * session client only -- no service-role client. The Office count is
- * `items.length` from the same loadInbox() that /governance renders.
+ * `items.length` from the same loadInbox() the Office pane reads, so it now
+ * includes sign-offs waiting and the caller's own due reviews (Phase 59).
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { requireAdminContext } from '@/lib/auth/guards'
@@ -20,7 +21,15 @@ export interface AdminShellData {
   governance: GovernanceRow[]
   inboxCount: number
   inboxChips: Record<'all' | InboxChip, number>
-  drafts: Array<{ id: string; title: string; status: string; stuck: boolean }>
+  drafts: Array<{
+    id: string
+    title: string
+    status: string
+    stuck: boolean
+    /** null when the row is flagged unowned (the flag already says so). */
+    ownerLabel: string | null
+    reviewDueAt: string | null
+  }>
   siteSopIds: string[]
 }
 
@@ -47,6 +56,7 @@ export async function getAdminShell(): Promise<AdminShellData | { error: string 
   const floor: AdminSiteFloor =
     'error' in inbox.floor ? { layout: null, machines: [], links: [], departments: [] } : inbox.floor
 
+  const govById = new Map(inbox.governance.map((g) => [g.id, g]))
   return {
     floor,
     floorError,
@@ -56,7 +66,17 @@ export async function getAdminShell(): Promise<AdminShellData | { error: string 
     // D-13: the Workshop list is every non-published SOP in the org.
     drafts: inbox.library
       .filter((s) => s.status !== 'published')
-      .map((s) => ({ id: s.id, title: s.displayTitle, status: s.status, stuck: s.stuck })),
+      .map((s) => {
+        const gov = govById.get(s.id)
+        return {
+          id: s.id,
+          title: s.displayTitle,
+          status: s.status,
+          stuck: s.stuck,
+          ownerLabel: gov?.flags.includes('unowned') ? null : (gov?.ownerLabel ?? s.ownerLabel),
+          reviewDueAt: gov?.reviewDueAt ?? null,
+        }
+      }),
     siteSopIds: ((siteRows ?? []) as Array<{ id: string }>).map((r) => r.id),
   }
 }

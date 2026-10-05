@@ -6,6 +6,7 @@ import { z } from 'zod'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { AppRole } from '@/types/auth'
 import { recordDecision } from '@/lib/decisions/record'
+import { userLabels } from '@/lib/members/labels'
 
 // ─── Schemas ────────────────────────────────────────────────────────────────
 
@@ -192,8 +193,8 @@ export async function getOrgMembers(): Promise<
   if ('error' in ctx) return { success: false, error: ctx.error }
   const { supabase, organisationId } = ctx
 
-  // organisation_members stores user_id + role; no user_profiles table in schema
-  // We use the user_id as the display key; full_name not available without a profiles table
+  // organisation_members stores user_id + role; names and emails come from the
+  // auth users via userLabels, for the member ids read below only (A-07).
   const { data, error } = await supabase
     .from('organisation_members')
     .select('user_id, role')
@@ -205,13 +206,14 @@ export async function getOrgMembers(): Promise<
     return { success: false, error: 'Failed to load org members.' }
   }
 
+  const labels = await userLabels((data ?? []).map(m => m.user_id))
   return {
     success: true,
     members: (data ?? []).map(m => ({
       user_id: m.user_id,
       role: m.role as AppRole,
-      full_name: null,
-      email: null,
+      full_name: labels.get(m.user_id)?.fullName ?? null,
+      email: labels.get(m.user_id)?.email ?? null,
     })),
   }
 }

@@ -53,10 +53,11 @@ test.describe('SHL-05 one inbox query', () => {
     expect(exports).toBeNull()
   })
 
-  test('completions awaiting sign-off are not inside the inbox count', () => {
-    for (const src of [strip(LOAD), strip(SHELL)]) {
-      expect(src).not.toMatch(/completion/i)
-    }
+  test('completions awaiting sign-off ARE inside the inbox count (Phase 59 D-05), read once in loadInbox', () => {
+    expect(strip(LOAD)).toContain('listPendingSignOffs()')
+    expect(strip(LOAD)).toContain('signOffs,')
+    // the shell action only counts the one list; it reads no completion table itself
+    expect(strip(SHELL)).not.toMatch(/completion/i)
   })
 
   test('the Workshop list is every non-published SOP in the org', () => {
