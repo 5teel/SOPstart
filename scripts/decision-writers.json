@@ -43,7 +43,10 @@
   "extraHooks": [
     { "file": "src/actions/ai-fields.ts", "function": "applyAiWrite", "status": "hook", "anchor": "gateWrite(", "kind": "ai_field_write", "actor": "agent", "plan": 8 },
     { "file": "src/actions/auth.ts", "function": "removeMember", "status": "hook", "anchor": "deleteOrgMember(", "kind": "member_removed", "plan": 59 },
-    { "file": "src/actions/requests.ts", "function": "answerRequest", "status": "hook", "anchor": "claimOpenRequest(", "kind": "request_accepted/request_declined", "plan": 60 }
+    { "file": "src/actions/requests.ts", "function": "answerRequest", "status": "hook", "anchor": "claimOpenRequest(", "kind": "request_accepted/request_declined", "plan": 60 },
+    { "file": "src/actions/asks.ts", "function": "askToDoSop", "status": "hook", "anchor": "askToDoSopCore(", "kind": "request_accepted", "plan": 60 },
+    { "file": "src/actions/asks.ts", "function": "declineAsk", "status": "hook", "anchor": "declineAskCore(", "kind": "request_declined", "plan": 60 },
+    { "file": "src/actions/asks.ts", "function": "stopAsking", "status": "hook", "anchor": "stopAskingCore(", "kind": "request_declined", "plan": 60 }
   ],
   "delegatedHooks": [
     { "file": "src/actions/completions.ts", "function": "submitCompletion", "calls": "recordSignature(", "after": ".from('sop_completions')", "kind": "sign_off", "note": "Send for sign-off (D-22): the worker's signature row and its ledger row are written by recordSignature, after the completion insert" },
@@ -64,6 +67,11 @@
     { "file": "src/lib/requests/core.ts", "function": "insertRequest", "key": "requests", "reason": "Raising a request is a request, not a decision (D-01); its answer is logged in answerRequest." },
     { "file": "src/lib/requests/core.ts", "function": "claimOpenRequest", "key": "requests", "reason": "The claim behind answerRequest, which records the decision after it returns." },
     { "file": "src/lib/requests/core.ts", "function": "withdrawOwnRequest", "key": "requests", "reason": "Withdrawing your own open request is not a decision; nobody answered it." },
-    { "file": "src/lib/requests/agent.ts", "function": "raiseRequestAsAgent", "key": "requests", "reason": "An agent raising a request is a request, not a decision (D-01, D-05); it has no session to record under." }
+    { "file": "src/lib/requests/agent.ts", "function": "raiseRequestAsAgent", "key": "requests", "reason": "An agent raising a request is a request, not a decision (D-01, D-05); it has no session to record under." },
+    { "file": "src/lib/requests/ask-core.ts", "function": "askToDoSopCore", "key": "sop_assignments", "reason": "The service-role write behind askToDoSop, which records the decision after it returns." },
+    { "file": "src/lib/requests/ask-core.ts", "function": "askToDoSopCore", "key": "requests", "reason": "The service-role write behind askToDoSop, which records the decision after it returns." },
+    { "file": "src/lib/requests/ask-core.ts", "function": "dropAskedAssignments", "key": "sop_assignments", "reason": "The service-role write behind declineAsk and stopAsking, which records the decision after it returns." },
+    { "file": "src/lib/requests/ask-core.ts", "function": "declineAskCore", "key": "requests", "reason": "The service-role write behind declineAsk, which records the decision after it returns." },
+    { "file": "src/lib/requests/ask-core.ts", "function": "stopAskingCore", "key": "requests", "reason": "The service-role write behind stopAsking, which records the decision after it returns." }
   ]
 }

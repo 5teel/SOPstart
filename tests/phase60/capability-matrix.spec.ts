@@ -38,7 +38,21 @@ test.describe("Capability matrix rows (60-02 / 60-04 / 60-06 / 60-09 / 60-11 / 6
     expect(cells(agent)).toEqual(['—', '—', '—', '—', '—']) // no client path in any role
     for (const name of ['raiseRequestAsAgent()', 'CRON_SECRET']) expect(agent).toContain(name)
   })
-  test.fixme("60-06: askToDoSop, declineAsk, stopAsking and listAskTargets rows", () => {})
+  test('60-06: ask, decline, stop asking and list-targets rows', () => {
+    const cells = (l: string) => l.split('|').map((c) => c.trim()).slice(2, 7)
+    const ask = row('Ask someone to do a SOP')
+    expect(cells(ask)).toEqual(['—', '✅', '✅', '✅', '—']) // a worker never asks
+    for (const name of ['askToDoSop()', 'src/lib/requests/ask-core.ts', 'service role', 'request_accepted', 'assignSopToRole']) expect(ask).toContain(name)
+    const decline = row('Decline a SOP you were asked to do')
+    expect(cells(decline)).toEqual(['✅', '✅', '✅', '✅', '—'])
+    for (const name of ['declineAsk()', 'target_user_id', 'role ask cannot be declined', 'request_declined']) expect(decline).toContain(name)
+    const stop = row('Stop asking')
+    expect(cells(stop)).toEqual(['—', '✅ (own asks)', '✅ (any ask)', '✅ (any ask)', '—'])
+    for (const name of ['stopAsking()', 'raised_by_user', 'request_declined']) expect(stop).toContain(name)
+    const targets = row('List people and roles to ask')
+    expect(cells(targets)).toEqual(['—', '✅', '✅', '✅', '—'])
+    for (const name of ['listAskTargets()', 'getOrgMembers']) expect(targets).toContain(name)
+  })
   test.fixme("60-09: setObjective, clearObjective, confirmObjective and listObjectives rows", () => {})
   test.fixme("60-11: Office Requests tab rows (existing labels are never renamed, phase46 pins them)", () => {})
   test.fixme("60-17: the four removed assign rows are gone and the reassignment path is described as a request", () => {})
