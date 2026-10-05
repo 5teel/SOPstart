@@ -21,7 +21,8 @@ test('D-06: signals.ts reads all four signal sources', () => {
   expect(src).toContain('sop_completions')
   expect(src).toMatch(/ai_review|reviewer/)
   expect(src).toContain('sop_voice_qa_log')
-  expect(src).toContain('sop_section_blocks')
+  expect(src).toContain('sop_focus_steps')
+  expect(src).not.toContain('sop_section_blocks')
 })
 
 test('D-06: exports the four readers + SignalBundle', () => {

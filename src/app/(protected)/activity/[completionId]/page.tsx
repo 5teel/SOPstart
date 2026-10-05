@@ -99,7 +99,7 @@ export default async function CompletionDetailPage({ params }: CompletionDetailP
   // steps, and compute derived assessor state IN PARALLEL — no serial
   // waterfall on this hot page (CLAUDE.md 2026-07-13).
   const photos = data.completion_photos ?? []
-  const [photosWithUrls, { data: sections }, isAssessor] = await Promise.all([
+  const [photosWithUrls, { data: sections }, { data: focusRows }, isAssessor] = await Promise.all([
     Promise.all(
       photos.map(async (photo) => {
         const { data: urlData } = await admin.storage
@@ -117,6 +117,14 @@ export default async function CompletionDetailPage({ params }: CompletionDetailP
     supabase
       .from('sop_sections')
       .select('id, sort_order, sop_steps ( id, step_number, text )')
+      .eq('sop_id', data.sop_id)
+      .order('sort_order', { ascending: true }),
+    // Phase 58: walks recorded after the cutover key step_data by focus step id.
+    // Filtered by the SESSION organisation (T-58-17), never the row's own.
+    supabase
+      .from('sop_focus_steps')
+      .select('id, section_id, sort_order, text')
+      .eq('organisation_id', organisationId)
       .eq('sop_id', data.sop_id)
       .order('sort_order', { ascending: true }),
     // Phase 37 ASR-01: server-computed so the client's disabled Approve
@@ -140,9 +148,22 @@ export default async function CompletionDetailPage({ params }: CompletionDetailP
   // Section order, then step order within the section; numbered sequentially.
   // step_number restarts at 1 in every section, so a global sort by it
   // interleaved the procedures and printed "1" four times in a row.
-  const allSteps = ((sections ?? []) as unknown as RawSection[])
-    .flatMap((sec) => [...(sec.sop_steps ?? [])].sort((a, b) => a.step_number - b.step_number))
-    .map((s, i) => ({ ...s, step_number: i + 1 }))
+  const rawSections = (sections ?? []) as unknown as RawSection[]
+  const oldSteps = rawSections.flatMap((sec) => [...(sec.sop_steps ?? [])].sort((a, b) => a.step_number - b.step_number))
+
+  // Focus steps first (new walks); the old step table only for keys that are not
+  // focus steps, i.e. completions recorded before the cutover.
+  const sectionOrder = new Map(rawSections.map((sec) => [sec.id, sec.sort_order]))
+  const focusSteps = [...((focusRows ?? []) as Array<{ id: string; section_id: string; sort_order: number; text: string }>)]
+    .sort((a, b) => (sectionOrder.get(a.section_id) ?? 0) - (sectionOrder.get(b.section_id) ?? 0) || a.sort_order - b.sort_order)
+    .map((f) => ({ id: f.id, text: f.text }))
+  const keys = Object.keys((data.step_data ?? {}) as Record<string, unknown>)
+  const focusIds = new Set(focusSteps.map((f) => f.id))
+  const walkedOnFocusSteps = focusSteps.length > 0 && (keys.length === 0 || keys.some((k) => focusIds.has(k)))
+  const allSteps = (walkedOnFocusSteps
+    ? [...focusSteps, ...oldSteps.filter((o) => keys.includes(o.id) && !focusIds.has(o.id)).map((o) => ({ id: o.id, text: o.text }))]
+    : oldSteps.map((o) => ({ id: o.id, text: o.text }))
+  ).map((st, i) => ({ ...st, step_number: i + 1 }))
 
   const signOffs = data.completion_sign_offs ?? []
   const signOff = signOffs.length > 0 ? signOffs[0] : null

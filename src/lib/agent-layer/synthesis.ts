@@ -14,7 +14,7 @@
  * never blanks the whole run. Every write uses createAdminClient() with
  * organisation_id set explicitly (self-enforced — CLAUDE.md
  * 2026-06-15/2026-06-26). NEVER touches the editor's layout/autosave column
- * or path (D-01/D-04) — this pipeline only reads sections/steps/blocks to
+ * or path (D-01/D-04) — this pipeline only reads sections and focus steps to
  * build plain text and only writes to the agent_* tables.
  *
  * Pitfall 5 (2026-06-02 VERIFY_MODEL incident, same shape): a fire-and-forget
@@ -27,10 +27,9 @@ import { getVoyageClient } from './voyage-client'
 import { EMBED_MODEL, SYNTHESIS_MODEL } from './model-constants'
 import { getAnthropic } from '@/lib/parsers/verify-sop'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { packSopForPrompt } from '@/lib/agent-layer/sop-pack'
+import { packSopForPrompt, type PackStep } from '@/lib/agent-layer/sop-pack'
 import { readAllSignals, type SignalBundle } from './signals'
 import { createLearningProposal, appendMemory, type EvidenceRow } from '@/lib/ai-fields/agent-proposals'
-import type { SopWithSections } from '@/types/sop'
 import type { Json } from '@/types/database.types'
 
 // Per-run cost guardrail (discretion, tunable): caps the number of evidence-
@@ -47,15 +46,16 @@ type SynthesisSopRow = {
     title: string
     content: string | null
     section_type: string
-    sop_steps: { step_number: number; text: string; warning: string | null; caution: string | null }[]
-    sop_section_blocks: { id: string; snapshot_content: unknown }[]
+    focus_steps: PackStep[]
   }[]
 }
 
+type SectionRow = { id: string; title: string; content: string | null; section_type: string; sort_order: number }
+
 /**
- * Load the published SOP's plain content (sections/steps/blocks) for one org.
- * Deliberately omits the editor's layout/autosave column — the synthesis
- * pipeline never reads or writes it (D-01/D-04).
+ * Load the published SOP's plain content (sections and their focus steps) for
+ * one org. Deliberately omits the editor's layout/autosave column -- the
+ * synthesis pipeline never reads or writes it (D-01/D-04).
  */
 async function loadPublishedSop(
   sopId: string,
@@ -64,19 +64,39 @@ async function loadPublishedSop(
   const admin = createAdminClient()
   const { data, error } = await admin
     .from('sops')
-    .select(`
-      id, title, version,
-      sop_sections(
-        id, title, content, section_type,
-        sop_steps(step_number, text, warning, caution),
-        sop_section_blocks(id, snapshot_content)
-      )
-    `)
+    .select('id, title, version, sop_sections(id, title, content, section_type, sort_order)')
     .eq('id', sopId)
     .eq('organisation_id', organisationId)
     .maybeSingle()
   if (error || !data) return null
-  return data as unknown as SynthesisSopRow
+  const { data: steps, error: stepsError } = await admin
+    .from('sop_focus_steps')
+    .select('section_id, kind, text, tip')
+    .eq('organisation_id', organisationId)
+    .eq('sop_id', sopId)
+    .order('sort_order', { ascending: true })
+  if (stepsError) return null
+
+  const bySection = new Map<string, PackStep[]>()
+  for (const st of steps ?? []) {
+    const list = bySection.get(st.section_id) ?? []
+    list.push({ kind: st.kind, text: st.text, tip: st.tip })
+    bySection.set(st.section_id, list)
+  }
+  const sections = [...((data as unknown as { sop_sections: SectionRow[] | null }).sop_sections ?? [])]
+    .sort((a, b) => a.sort_order - b.sort_order)
+  return {
+    id: data.id,
+    title: data.title ?? '',
+    version: data.version,
+    sop_sections: sections.map((sec) => ({
+      id: sec.id,
+      title: sec.title,
+      content: sec.content,
+      section_type: sec.section_type,
+      focus_steps: bySection.get(sec.id) ?? [],
+    })),
+  }
 }
 
 /**
@@ -86,7 +106,7 @@ async function loadPublishedSop(
 export function deriveAssessment(bundle: SignalBundle): 'fresh' | 'drifting' | 'needs-review' {
   const criticalFlags = bundle.reviewer.flagCountsBySeverity.critical
   const unverifiedRatio =
-    bundle.verify.totalBlocks > 0 ? bundle.verify.unverifiedCount / bundle.verify.totalBlocks : 0
+    bundle.verify.totalSteps > 0 ? bundle.verify.unverifiedCount / bundle.verify.totalSteps : 0
 
   if (criticalFlags > 0 || bundle.reviewer.allRunsErrored) return 'needs-review'
   if (unverifiedRatio > 0.3 || bundle.reviewer.flagCountsBySeverity.warning > 3) return 'drifting'
@@ -147,47 +167,6 @@ async function extractTagsAndEntities(
   }
 }
 
-/**
- * Embed each block's text into block_agent_metadata, keyed by the
- * sop_section_blocks junction id (D-02). Best-effort per plan — one bad
- * block never stops the run.
- */
-async function embedBlocks(
-  organisationId: string,
-  sopId: string,
-  sections: SynthesisSopRow['sop_sections'],
-): Promise<void> {
-  const admin = createAdminClient()
-  for (const section of sections) {
-    for (const block of section.sop_section_blocks ?? []) {
-      try {
-        const text = JSON.stringify(block.snapshot_content)
-        if (!text.trim()) continue
-        const result = await getVoyageClient().embed({
-          input: text,
-          model: EMBED_MODEL,
-          inputType: 'document',
-        })
-        const embedding = result.data?.[0]?.embedding
-        if (!embedding) continue
-        const { error } = await admin.from('block_agent_metadata').upsert(
-          {
-            organisation_id: organisationId,
-            block_id: block.id,
-            sop_id: sopId,
-            embedding: JSON.stringify(embedding),
-            regenerated_at: new Date().toISOString(),
-          },
-          { onConflict: 'block_id' },
-        )
-        if (error) console.error('[agent-layer] block embed upsert failed:', error.message)
-      } catch (err) {
-        console.error('[agent-layer] block embed failed:', err instanceof Error ? err.message : err)
-      }
-    }
-  }
-}
-
 /** D-05/D-08: append-only memory observations derived from the signal bundle. */
 async function writeMemoryFromSignals(
   organisationId: string,
@@ -204,15 +183,15 @@ async function writeMemoryFromSignals(
         metadata: { flagCounts: bundle.reviewer.flagCountsBySeverity },
       })
     }
-    if (bundle.verify.totalBlocks > 0 && bundle.verify.unverifiedCount > 0) {
+    if (bundle.verify.totalSteps > 0 && bundle.verify.unverifiedCount > 0) {
       await appendMemory(organisationId, {
         sopId,
         scope: 'sop',
-        observation: `${bundle.verify.unverifiedCount}/${bundle.verify.totalBlocks} blocks remain unverified.`,
+        observation: `${bundle.verify.unverifiedCount}/${bundle.verify.totalSteps} steps remain unticked.`,
         signalSource: 'verify',
         metadata: {
           unverifiedCount: bundle.verify.unverifiedCount,
-          totalBlocks: bundle.verify.totalBlocks,
+          totalSteps: bundle.verify.totalSteps,
         },
       })
     }
@@ -266,20 +245,20 @@ async function raiseProposalsFromSignals(
       raised++
     }
     if (
-      bundle.verify.totalBlocks > 0 &&
-      bundle.verify.unverifiedCount / bundle.verify.totalBlocks > 0.5 &&
+      bundle.verify.totalSteps > 0 &&
+      bundle.verify.unverifiedCount / bundle.verify.totalSteps > 0.5 &&
       raised < MAX_PROPOSALS_PER_RUN
     ) {
       const evidence: EvidenceRow[] = [
         {
           source: 'verify',
           count: bundle.verify.unverifiedCount,
-          detail: `${bundle.verify.unverifiedCount}/${bundle.verify.totalBlocks} blocks unverified`,
+          detail: `${bundle.verify.unverifiedCount}/${bundle.verify.totalSteps} steps unticked`,
         },
       ]
       await createLearningProposal(organisationId, sopId, {
-        kind: 'majority-unverified-blocks',
-        description: 'Over half of this SOP\'s blocks are unverified — recommend a verify pass.',
+        kind: 'majority-unverified-steps',
+        description: 'Over half of this SOP\'s steps are unticked — recommend a check pass.',
         evidence,
       })
       raised++
@@ -312,7 +291,7 @@ export async function synthesizeSop(sopId: string, organisationId: string): Prom
       return { ok: false, error }
     }
 
-    const fullText = packSopForPrompt(sop as unknown as SopWithSections)
+    const fullText = packSopForPrompt(sop)
 
     const [embedding, tagResult, bundle] = await Promise.all([
       embedSop(fullText),
@@ -320,7 +299,6 @@ export async function synthesizeSop(sopId: string, organisationId: string): Prom
       readAllSignals(organisationId, sopId),
     ])
 
-    await embedBlocks(organisationId, sopId, sop.sop_sections)
     await writeMemoryFromSignals(organisationId, sopId, bundle)
     await raiseProposalsFromSignals(organisationId, sopId, bundle)
 

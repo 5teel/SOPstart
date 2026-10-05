@@ -4,8 +4,8 @@ import { describeSopSchema } from '@/actions/introspection'
 /**
  * GET /api/schema — canonical SOP data-model description for AI agents.
  *
- * Returns block types + their props schemas, string enums, layout_data
- * envelope schema, completion schema, storage conventions, and RLS notes.
+ * Returns the step model (sections and the four step kinds), string enums,
+ * completion schema, storage conventions, and RLS notes.
  * No auth required (returns schema metadata only, not tenant data).
  * Cached at the edge for 5 minutes since the shape changes only on code
  * deploys.

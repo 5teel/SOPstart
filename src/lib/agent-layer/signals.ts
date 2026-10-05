@@ -6,9 +6,9 @@
  * source returns a neutral/empty result and never blanks the whole
  * synthesis run. Every query uses createAdminClient() (service role) and
  * self-enforces org-scope explicitly — either via a direct
- * `organisation_id` column (sop_completions, parse_jobs) or, where the
- * table has no such column (sop_section_blocks), by first confirming the
- * SOP belongs to the caller's org (CLAUDE.md 2026-06-15/2026-06-26).
+ * `organisation_id` column (sop_completions, parse_jobs, sop_focus_steps) or,
+ * where a table has no such column, by first confirming the SOP belongs to the
+ * caller's org (CLAUDE.md 2026-06-15/2026-06-26).
  */
 import { createAdminClient } from '@/lib/supabase/admin'
 import type { AckTraceEntry } from '@/types/sop'
@@ -30,9 +30,10 @@ export type ReviewerSignals = {
 }
 
 export type VerifySignals = {
-  totalBlocks: number
+  /** Focus steps on the SOP and how many an admin has not ticked (Phase 58). */
+  totalSteps: number
   unverifiedCount: number
-  recentlyOverriddenCount: number
+  needsRecheckCount: number
   error?: string
 }
 
@@ -141,31 +142,24 @@ export async function readVerifySignals(
   organisationId: string,
   sopId: string,
 ): Promise<VerifySignals> {
-  const empty: VerifySignals = { totalBlocks: 0, unverifiedCount: 0, recentlyOverriddenCount: 0 }
+  const empty: VerifySignals = { totalSteps: 0, unverifiedCount: 0, needsRecheckCount: 0 }
   try {
     const admin = createAdminClient()
     if (!(await sopBelongsToOrg(admin, organisationId, sopId))) {
       return { ...empty, error: 'sop not found in organisation' }
     }
-    const { data: sections, error: sectionsErr } = await admin
-      .from('sop_sections')
-      .select('id')
+    const { data, error } = await admin
+      .from('sop_focus_steps')
+      .select('verified_at, needs_recheck')
+      .eq('organisation_id', organisationId)
       .eq('sop_id', sopId)
-    if (sectionsErr) return { ...empty, error: sectionsErr.message }
-    const sectionIds = (sections ?? []).map((s) => s.id)
-    if (sectionIds.length === 0) return empty
+    if (error) return { ...empty, error: error.message }
 
-    const { data: blocks, error: blocksErr } = await admin
-      .from('sop_section_blocks')
-      .select('verified_at, overridden_at')
-      .in('sop_section_id', sectionIds)
-    if (blocksErr) return { ...empty, error: blocksErr.message }
-
-    const rows = blocks ?? []
+    const rows = data ?? []
     return {
-      totalBlocks: rows.length,
-      unverifiedCount: rows.filter((b) => !b.verified_at).length,
-      recentlyOverriddenCount: rows.filter((b) => !!b.overridden_at).length,
+      totalSteps: rows.length,
+      unverifiedCount: rows.filter((r) => !r.verified_at).length,
+      needsRecheckCount: rows.filter((r) => r.needs_recheck).length,
     }
   } catch (err) {
     return { ...empty, error: err instanceof Error ? err.message : 'unknown' }

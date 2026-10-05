@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
-// GET /api/sops/[sopId] — fetch SOP with all sections, steps, and images
+// GET /api/sops/[sopId] — fetch SOP with all sections, their focus steps (hazard / ppe / step / check), and images
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ sopId: string }> }
@@ -15,7 +15,7 @@ export async function GET(
       *,
       sop_sections (
         *,
-        sop_steps ( * ),
+        sop_focus_steps ( * ),
         sop_images ( * )
       )
     `)
@@ -30,10 +30,10 @@ export async function GET(
   // Sort steps within each section
   if (sop.sop_sections) {
     for (const section of sop.sop_sections) {
-      if (section.sop_steps) {
-        section.sop_steps.sort(
-          (a: { step_number: number }, b: { step_number: number }) =>
-            a.step_number - b.step_number
+      if (section.sop_focus_steps) {
+        section.sop_focus_steps.sort(
+          (a: { sort_order: number }, b: { sort_order: number }) =>
+            a.sort_order - b.sort_order
         )
       }
     }

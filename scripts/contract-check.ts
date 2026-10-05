@@ -20,6 +20,11 @@
  *     BlockContentSchema — it only lives in layout_data, never in
  *     sop_section_blocks.
  *
+ * Phase 58 (58-08): /api/schema now describes the step model, so
+ * src/actions/introspection.ts no longer holds BLOCK_REGISTRY. Place (2) is
+ * skipped when the registry is absent; the gate is places (1) and (3) until the
+ * block machinery itself is deleted (58-16).
+ *
  * On success: exits 0 with a brief OK summary.
  * On mismatch: exits 1 with the three sets and the delta printed.
  */
@@ -184,8 +189,9 @@ function main(): void {
 
   const errors: string[] = []
 
-  // Every key in puckKeys (minus EXCLUDED) must exist in regKeys
-  for (const k of puckKeys) {
+  // Every key in puckKeys (minus EXCLUDED) must exist in regKeys (place 2 retired in 58-08)
+  const placeTwoLive = /BLOCK_REGISTRY[^=]+=\s*\{/.test(introSrc)
+  for (const k of placeTwoLive ? puckKeys : []) {
     if (EXCLUDED_FROM_REGISTRY.has(k)) continue
     if (!regKeys.has(k)) {
       errors.push(

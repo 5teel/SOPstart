@@ -43,7 +43,7 @@ export type SopAgentMetadataView = {
   regeneratedAt: string | null
 }
 
-/** One row per block, keyed by junctionId (sop_section_blocks.id — D-02). */
+/** One row per block, keyed by junctionId (the old block junction id — D-02). Synthesis stopped writing these in Phase 58; the builder panel that reads them goes with the builder. */
 export type BlockAgentMetadataView = {
   junctionId: string
   tags: string[]

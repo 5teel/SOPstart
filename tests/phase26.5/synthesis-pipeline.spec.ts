@@ -93,6 +93,13 @@ test('T-26.5-04-01: every DB write in synthesis.ts sets organisation_id; layout_
   expect(orgIdCount).toBeGreaterThanOrEqual(writeCount)
 })
 
+test('58-08: synthesis reads focus steps, not the old step or block tables', () => {
+  const src = readSynthesisSource()
+  expect(src).toContain("from('sop_focus_steps')")
+  expect(src).toMatch(/\.eq\('organisation_id', organisationId\)\s*\.eq\('sop_id', sopId\)/)
+  expect(src).not.toMatch(/sop_steps|sop_section_blocks|block_agent_metadata|embedBlocks/)
+})
+
 test.fixme('D-03: publish generates embedding via mocked Voyage client (injectable seam)', () => {
   // Behavioral test with fake embed/tag seams — deferred; would require
   // adding an injectable client seam to synthesis.ts (not required by

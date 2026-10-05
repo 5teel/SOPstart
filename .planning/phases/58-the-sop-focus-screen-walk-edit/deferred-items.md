@@ -10,3 +10,8 @@ Found while executing 58-07; not caused by it, so not fixed there.
 
 - **`tests/phase26/ai-overlay.spec.ts` is red** ("reused ReviewerFlagsPanel should render for the flagged block"). Its harness feeds the old block-keyed flags; `useReviewerFlags` groups by `step_id` since 58-06 (`554a856e`). The spec is a 58-16 delete in the repoint inventory; leave it red until then or delete it earlier.
 - **`tests/integration/wizard-sop-dept.spec.ts` A4 ("sopId sentinel __new__") is red.** `src/components/admin/SopMetadataFields.tsx` no longer contains the literal `__new__` (predates Phase 58; the file was last touched by `c21b7e73`). Owner: whoever next edits the wizard metadata step.
+
+Found while executing 58-08; caused by it, left for the owning plan.
+
+- **`tests/phase26/visual-block.spec.ts` ("medium enum + a medium-tagged example are on the /api/schema surface") is red.** `src/actions/introspection.ts` describes the step model now and no longer registers `VisualBlock`. The spec is a 58-16 delete in the repoint inventory; leave it red until then.
+- **`src/actions/agent-layer.ts#getBlockAgentMetadata`** still reads `block_agent_metadata`, but synthesis stopped writing it (no `embedBlocks`), so it returns stale rows. Its only consumers are the builder files (`BuilderClient.tsx`, `AgentBlockMeta.tsx`) that 58-16 deletes; delete the action and view type with them.

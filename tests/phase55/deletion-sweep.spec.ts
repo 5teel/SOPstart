@@ -213,7 +213,7 @@ test.describe('survivors', () => {
     ['src/actions/auth.ts', 'inviteUserByEmail'], // D-02
     ['src/components/admin/site/SiteEditor.tsx', 'react-konva'],
     ['src/lib/builder/block-registry.tsx', 'VoiceNoteBlock'],
-    ['src/actions/introspection.ts', 'VoiceNoteBlock'],
+    // 58-08: introspection describes the step model now, not the block registry.
     ['src/lib/validators/blocks.ts', 'voice-note'],
     ['src/styles/blueprint-theme.css', '--accent-voice:'],
     ['src/lib/builder/sanitize-layout.ts', 'export function UnsupportedBlockPlaceholder'],
