@@ -14,9 +14,14 @@ import Link from 'next/link'
 import { X } from 'lucide-react'
 import { plantRelState, type WorkerSop } from '@/lib/sop/worker-signal'
 import { RelBadge } from '@/components/sop/plant/RelBadge'
+import { focusHref } from '@/lib/sop/focus-path'
 
-/** The rows: badge + Walk link per SOP. Renders what it is handed, never re-sorts. */
-export function SopRows({ sops, empty }: { sops: WorkerSop[]; empty: string }) {
+/**
+ * The rows: badge + Walk link per SOP. Renders what it is handed, never re-sorts.
+ * `from` is the place token the row was opened from (machine id or room name),
+ * so the focus screen's Back returns to it.
+ */
+export function SopRows({ sops, empty, from }: { sops: WorkerSop[]; empty: string; from: string | null }) {
   if (sops.length === 0) {
     return (
       <div
@@ -37,12 +42,12 @@ export function SopRows({ sops, empty }: { sops: WorkerSop[]; empty: string }) {
             data-testid="plant-panel-row"
             className="mb-1.5 flex min-h-13 items-center gap-2.5 rounded-lg border border-[var(--ink-200)] bg-[var(--paper-1)] px-3 py-2.5 hover:border-[var(--ink-900)]"
           >
-            <Link href={`/sops/${sop.id}`} className="min-w-0 flex-1 text-sm font-semibold leading-snug">
+            <Link href={focusHref(sop.id, { from })} className="min-w-0 flex-1 text-sm font-semibold leading-snug">
               {sop.title}
             </Link>
             {rel && <RelBadge rel={rel} />}
             <Link
-              href={`/sops/${sop.id}?tab=walk`}
+              href={focusHref(sop.id, { from })}
               data-testid="plant-panel-walk"
               className="mono text-meta text-[var(--ink-500)]"
             >
@@ -95,7 +100,7 @@ export function MachineBody({
           </span>
         )}
         <h2 className="mb-2.5 text-xl font-semibold leading-tight text-[var(--ink-900)]">{machine.name}</h2>
-        <SopRows sops={sops} empty="No procedures for this machine yet." />
+        <SopRows sops={sops} empty="No procedures for this machine yet." from={machine.id} />
       </div>
     </>
   )

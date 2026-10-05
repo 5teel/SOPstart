@@ -128,7 +128,7 @@ export const JOURNEYS: Journey[] = [
         { label: 'Yes — walk it', to: 'walk' },
         { label: 'Just reading', to: 'e' },
       ] },
-      { id: 'walk', type: 'screen', label: 'Step-by-step walkthrough (Walk it tab)', route: '/sops/[sopId]', detail: 'Walk it tab (?tab=walk).' },
+      { id: 'walk', type: 'screen', label: 'Step-by-step walkthrough (Walk it tab)', route: '/sops/[sopId]', detail: 'Walk ›, Walk it and Show me all open /sops/<id>?from=<the machine or room it came from>, so Back returns there (Phase 58-10; the focus screen replaces the tabs in 58-11).' },
       { id: 'e', type: 'end', label: 'Procedure open' },
     ],
   },

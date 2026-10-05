@@ -114,7 +114,8 @@ test.describe('Phase 57 — the one screen (deployed)', () => {
     expect(listPlace).toMatch(/^\/\?place=[0-9a-f-]{36}$/)
     const panelRow = detail(page).getByTestId('plant-panel-row').filter({ hasText: EVAL_PLANT_SOP_TITLE })
     await expect(panelRow).toBeVisible(SLOW)
-    await expect(panelRow.getByTestId('plant-panel-walk')).toHaveAttribute('href', `/sops/${plantSopId}?tab=walk`)
+    const listMachineId = listPlace!.split('=')[1]
+    await expect(panelRow.getByTestId('plant-panel-walk')).toHaveAttribute('href', `/sops/${plantSopId}?from=${listMachineId}`)
 
     // Esc returns.
     await page.keyboard.press('Escape')
@@ -199,13 +200,13 @@ test.describe('Phase 57 — the one screen (deployed)', () => {
     const now = page.getByTestId('plant-now-card')
     await expect(now).toBeVisible(SLOW)
     await expect(now).toContainText(EVAL_PLANT_SOP_TITLE, SLOW)
-    await expect(page.getByTestId('plant-now-walk')).toHaveAttribute('href', `/sops/${plantSopId}?tab=walk`)
+    const nowHref = new RegExp(`^/sops/${plantSopId}\\?from=[0-9a-f-]{36}$`)
+    await expect(page.getByTestId('plant-now-walk')).toHaveAttribute('href', nowHref)
 
+    // D-21: Show me opens the same browse address (it no longer locates the machine on the map).
+    await expect(page.getByTestId('plant-now-show')).toHaveAttribute('href', nowHref)
     await page.getByTestId('plant-now-show').click()
-    await expect(press(page)).toHaveAttribute('data-selected', 'true', SLOW)
-    await expect(detail(page).getByTestId('plant-panel-row').filter({ hasText: EVAL_PLANT_SOP_TITLE })).toBeVisible(SLOW)
-
-    await page.goto(`/sops/${plantSopId}?tab=walk`)
+    await expect(page).toHaveURL(new RegExp(`/sops/${plantSopId}\\?from=`), SLOW)
     await expect(page.locator('main').first()).toBeVisible(SLOW)
     await expect(page.getByText(NOT_FOUND)).toHaveCount(0)
   })
@@ -221,7 +222,7 @@ test.describe('Phase 57 — the one screen (deployed)', () => {
     const machineRow = detail(page).getByTestId('plant-panel-row').filter({ hasText: EVAL_PLANT_SOP_TITLE })
     await expect(machineRow).toBeVisible(SLOW)
     await machineRow.getByTestId('plant-panel-walk').click()
-    await expect(page).toHaveURL(new RegExp(`/sops/${plantSopId}\\?tab=walk`), SLOW)
+    await expect(page).toHaveURL(new RegExp(`/sops/${plantSopId}\\?from=[0-9a-f-]{36}`), SLOW)
     await expect(page.getByText(NOT_FOUND)).toHaveCount(0)
     await expect(page.getByTestId('back-to-site')).toBeVisible(SLOW)
 
@@ -231,7 +232,7 @@ test.describe('Phase 57 — the one screen (deployed)', () => {
     await expect(boardRow).toBeVisible(SLOW)
     await shot(page, '57-worker-noticeboard')
     await boardRow.getByTestId('plant-panel-walk').click()
-    await expect(page).toHaveURL(new RegExp(`/sops/${convertSopId}\\?tab=walk`), SLOW)
+    await expect(page).toHaveURL(new RegExp(`/sops/${convertSopId}\\?from=noticeboard`), SLOW)
     await expect(page.getByText(NOT_FOUND)).toHaveCount(0)
     await expect(page.getByTestId('back-to-site')).toBeVisible(SLOW)
   })
@@ -376,7 +377,7 @@ test.describe('Phase 57 — the one screen (deployed)', () => {
     const row = panel.getByTestId('admin-panel-row').filter({ hasText: EVAL_PLANT_SOP_TITLE })
     await expect(row).toBeVisible(SLOW)
     await expect(row.getByTestId('admin-panel-badge')).toBeVisible()
-    await expect(row.getByTestId('admin-panel-walk')).toHaveAttribute('href', `/sops/${plantSopId}?tab=walk`)
+    await expect(row.getByTestId('admin-panel-walk')).toHaveAttribute('href', new RegExp(`^/sops/${plantSopId}\\?from=[0-9a-f-]{36}$`))
     await expect(row.getByTestId('admin-panel-edit')).toHaveAttribute('href', `/admin/sops/builder/${plantSopId}`)
     const newSop = panel.getByTestId('admin-panel-new-sop')
     await expect(newSop).toHaveAttribute('href', /\/admin\/sops\/new\/blank\?machine=[0-9a-f-]{36}$/)

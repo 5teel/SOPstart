@@ -8,6 +8,7 @@
  */
 import Link from 'next/link'
 import type { AdminPanelSop, AdminSopBadge } from '@/lib/sop/admin-health'
+import { focusHref } from '@/lib/sop/focus-path'
 
 const BADGE_CLASS: Record<AdminSopBadge, string> = {
   'NO OWNER': 'bg-accent-escalate/12 text-accent-escalate',
@@ -26,7 +27,7 @@ function reviewLabel(reviewDueAt: string | null): string {
 }
 
 /** One row per SOP: badge, Walk (published only), Edit, owner and review line. */
-export function AdminSopRows({ sops, empty }: { sops: AdminPanelSop[]; empty: string }) {
+export function AdminSopRows({ sops, empty, from }: { sops: AdminPanelSop[]; empty: string; from: string | null }) {
   if (sops.length === 0) {
     return (
       <div
@@ -46,7 +47,7 @@ export function AdminSopRows({ sops, empty }: { sops: AdminPanelSop[]; empty: st
           className="mb-1.5 rounded-lg border border-[var(--ink-200)] bg-[var(--paper-1)] px-3 py-2.5 hover:border-[var(--ink-900)]"
         >
           <div className="flex min-h-9 items-center gap-2.5">
-            <Link href={`/sops/${sop.id}`} className="min-w-0 flex-1 text-sm font-semibold leading-snug">
+            <Link href={focusHref(sop.id, { from })} className="min-w-0 flex-1 text-sm font-semibold leading-snug">
               {sop.title}
             </Link>
             <span
@@ -58,7 +59,7 @@ export function AdminSopRows({ sops, empty }: { sops: AdminPanelSop[]; empty: st
             </span>
             {sop.status === 'published' && (
               <Link
-                href={`/sops/${sop.id}?tab=walk`}
+                href={focusHref(sop.id, { from })}
                 data-testid="admin-panel-walk"
                 className="mono text-meta text-[var(--ink-500)]"
               >
@@ -108,7 +109,7 @@ export function AdminMachineBody({
           </span>
         )}
         <h2 className="mb-2.5 text-xl font-semibold leading-tight text-[var(--ink-900)]">{machine.name}</h2>
-        <AdminSopRows sops={sops} empty="No procedures for this machine yet." />
+        <AdminSopRows sops={sops} empty="No procedures for this machine yet." from={machine.id} />
         <Link
           href={`/admin/sops/new/blank?machine=${machine.id}`}
           data-testid="admin-panel-new-sop"

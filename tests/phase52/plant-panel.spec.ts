@@ -33,14 +33,17 @@ test.describe('MachineBody / SopRows (worker variant)', () => {
     expect(SRC).toMatch(/<RelBadge\s+rel=\{rel\}/)
   })
 
-  test('the Walk › link points to /sops/<id>?tab=walk', () => {
+  test('the Walk › link opens the SOP in browse state, carrying where it came from (58-10, D-27)', () => {
     expect(SRC).toContain('data-testid="plant-panel-walk"')
-    expect(SRC).toMatch(/href=\{`\/sops\/\$\{sop\.id\}\?tab=walk`\}/)
+    expect(SRC).toMatch(/data-testid="plant-panel-walk"/)
+    expect(SRC).toMatch(/href=\{focusHref\(sop\.id, \{ from \}\)\}\s+data-testid="plant-panel-walk"/)
     expect(SRC).not.toContain('/walkthrough')
+    expect(SRC).not.toContain('?tab=')
   })
 
-  test('the plain Read link points to /sops/<id>', () => {
-    expect(SRC).toMatch(/href=\{`\/sops\/\$\{sop\.id\}`\}/)
+  test('the title link goes to the same browse address', () => {
+    expect(SRC).toMatch(/<Link href=\{focusHref\(sop\.id, \{ from \}\)\} className/)
+    expect(SRC).toMatch(/from: string \| null/)
   })
 
   test('a machine with no sprite_path shows "no photo yet"', () => {

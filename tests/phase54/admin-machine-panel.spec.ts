@@ -49,7 +49,7 @@ test.describe('AdminMachineBody / AdminSopRows (54-03, repointed 57-05)', () => 
   test('renders owner/review badges, Edit link, no photo yet, and a new-SOP link', () => {
     const src = read(ADMIN_PANEL_PATH)
     expect(src).toContain('admin-panel-badge')
-    expect(src).toContain('/sops/${sop.id}')
+    expect(src).toContain('focusHref(sop.id, { from })')
     expect(src).toContain('/admin/sops/builder/${sop.id}')
     expect(src).toContain('/admin/sops/new/blank?machine=')
     expect(src).toContain('no photo yet')

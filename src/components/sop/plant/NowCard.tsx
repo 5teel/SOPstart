@@ -11,6 +11,7 @@ import { useQuery } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
 import { PLANT_REL_LABEL, type NowItem } from '@/lib/sop/worker-signal'
 import { RelBadge } from '@/components/sop/plant/RelBadge'
+import { focusHref } from '@/lib/sop/focus-path'
 
 function formatDay(iso: string | null): string | null {
   if (!iso) return null
@@ -21,25 +22,13 @@ function formatDay(iso: string | null): string | null {
 
 async function sopMinutes(sopId: string): Promise<number> {
   const { data } = (await createClient()
-    .from('sop_sections')
-    .select('sop_steps(time_estimate_minutes)')
-    .eq('sop_id', sopId)) as {
-    data: Array<{ sop_steps: Array<{ time_estimate_minutes: number | null }> | null }> | null
-  }
-  const total = (data ?? []).reduce(
-    (sum, sec) => sum + (sec.sop_steps ?? []).reduce((s, st) => s + (st.time_estimate_minutes ?? 0), 0),
-    0,
-  )
-  return Math.round(total)
+    .from('sop_focus_steps')
+    .select('time_estimate_minutes')
+    .eq('sop_id', sopId)) as { data: Array<{ time_estimate_minutes: number | null }> | null }
+  return Math.round((data ?? []).reduce((sum, st) => sum + (st.time_estimate_minutes ?? 0), 0))
 }
 
-export function NowCard({
-  items,
-  onShowMe,
-}: {
-  items: NowItem[]
-  onShowMe?: (machineId: string) => void
-}) {
+export function NowCard({ items }: { items: NowItem[] }) {
   const now = items[0] ?? null
   const nowId = now?.sop.id
 
@@ -50,6 +39,8 @@ export function NowCard({
     staleTime: 1000 * 60 * 5,
   })
 
+  // Both buttons open the SOP in browse state; Back returns to where it came from.
+  const href = now ? focusHref(now.sop.id, { from: now.machine?.id ?? 'noticeboard' }) : null
   const lastDoneDay = now ? formatDay(now.sop.lastCompletedAt) : null
   const lastDone = lastDoneDay ? `last done ${lastDoneDay}` : 'never done'
 
@@ -78,22 +69,19 @@ export function NowCard({
           </div>
           <div className="flex gap-1.5">
             <Link
-              href={`/sops/${now.sop.id}?tab=walk`}
+              href={href as string}
               data-testid="plant-now-walk"
               className="flex min-h-tap flex-1 items-center justify-center rounded-lg bg-[var(--ink-900)] px-4 text-sm font-semibold text-white"
             >
               Walk it
             </Link>
-            {onShowMe && now.machine && (
-              <button
-                type="button"
-                data-testid="plant-now-show"
-                onClick={() => onShowMe(now.machine!.id)}
-                className="flex min-h-tap items-center justify-center rounded-lg border border-[var(--ink-300)] bg-white px-4 text-sm font-semibold text-[var(--ink-900)]"
-              >
-                Show me
-              </button>
-            )}
+            <Link
+              href={href as string}
+              data-testid="plant-now-show"
+              className="flex min-h-tap items-center justify-center rounded-lg border border-[var(--ink-300)] bg-white px-4 text-sm font-semibold text-[var(--ink-900)]"
+            >
+              Show me
+            </Link>
           </div>
           {items.length > 1 && (
             <div className="mt-2.5 border-t border-[var(--ink-100)] pt-2 text-xs text-[var(--ink-600)]">

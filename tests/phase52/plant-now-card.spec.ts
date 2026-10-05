@@ -13,16 +13,17 @@ const ROOT = path.resolve(__dirname, '..', '..')
 const SRC = fs.readFileSync(path.join(ROOT, 'src', 'components', 'sop', 'plant', 'NowCard.tsx'), 'utf-8')
 
 test.describe('NowCard', () => {
-  test('the Walk it control links to /sops/<id>?tab=walk for the top queue item', () => {
+  test('Walk it opens the top queue item in browse state, from its machine or the Noticeboard (58-10, D-27)', () => {
     expect(SRC).toContain('data-testid="plant-now-walk"')
-    expect(SRC).toMatch(/href=\{`\/sops\/\$\{now\.sop\.id\}\?tab=walk`\}/)
+    expect(SRC).toContain("focusHref(now.sop.id, { from: now.machine?.id ?? 'noticeboard' })")
+    expect(SRC).toMatch(/href=\{href as string\}\s+data-testid="plant-now-walk"/)
     expect(SRC).not.toContain('/walkthrough')
+    expect(SRC).not.toContain('?tab=')
   })
 
-  test("the Show me control calls onShowMe with the top item's machine id, and only renders when a machine exists", () => {
-    expect(SRC).toContain('data-testid="plant-now-show"')
-    expect(SRC).toMatch(/onClick=\{\(\)\s*=>\s*onShowMe\(now\.machine!?\.id\)\}/)
-    expect(SRC).toMatch(/now\.machine\s*&&/)
+  test('Show me links to the same browse address -- it no longer locates the machine on the map (D-21)', () => {
+    expect(SRC).toMatch(/href=\{href as string\}\s+data-testid="plant-now-show"/)
+    expect(SRC).not.toContain('onShowMe')
   })
 
   test('up to two more queue items render under "Then:"', () => {
@@ -45,7 +46,7 @@ test.describe('NowCard', () => {
 
   test('the card reads step minutes from Supabase', () => {
     expect(SRC).toMatch(/useQuery\(/)
-    expect(SRC).toContain("from('sop_sections')")
+    expect(SRC).toContain("from('sop_focus_steps')")
     expect(SRC).not.toContain('networkMode')
   })
 

@@ -93,7 +93,7 @@ export function NoticeboardWorkerBody({ sops }: { sops: WorkerSop[] }) {
   return (
     <div data-testid="room-body" data-room-id="noticeboard" className="flex flex-col gap-3 p-4 pr-16">
       <h2 className={TITLE}>Noticeboard</h2>
-      <SopRows sops={sops} empty="No site-wide SOPs yet." />
+      <SopRows sops={sops} empty="No site-wide SOPs yet." from="noticeboard" />
     </div>
   )
 }

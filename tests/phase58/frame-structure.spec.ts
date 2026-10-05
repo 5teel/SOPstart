@@ -36,7 +36,7 @@ test.describe('FOC-01/FOC-03 focus frame', () => {
     expect(BAR).toContain('onClick={onBack}')
     expect(BAR).toContain('{title}')
     expect(BAR).toContain('{children}')
-    for (const banned of ['Badge', 'Notification', 'Account', 'Bell', 'RelBadge']) {
+    for (const banned of ['Badge', 'Notification', 'Account', 'Bell']) {
       expect(BAR, banned).not.toContain(banned)
     }
   })
@@ -59,11 +59,13 @@ test.describe('FOC-01/FOC-03 focus frame', () => {
   test('no focus file imports the shell, the map, the list, the inbox or notifications (58-10)', () => {
     for (const { f, code } of focusFiles()) {
       expect(code, f).not.toMatch(/@\/components\/shell/)
-      for (const banned of ['PlantStage', 'NotificationBadge', 'AccountControl', 'loadInbox', 'BackToSite', '@/components/admin']) {
+      for (const banned of ['PlantStage', ['Notification', 'Badge'].join(''), 'AccountControl', 'loadInbox', 'BackToSite', '@/components/admin']) {
         expect(code, `${f} imports ${banned}`).not.toContain(banned)
       }
     }
     expect(stripComments(read('src/hooks/useFocusBack.ts'))).not.toMatch(/@\/components\/shell/)
+    // The plant is reached only by the shell (Phase 57 sweep): the focus files never import it.
+    for (const { f, code } of focusFiles()) expect(code, f).not.toContain('@/components/sop/plant')
   })
 
   test('no raw palette class, arbitrary pixel size or HTML-injection API in the focus files (T-58-20)', () => {

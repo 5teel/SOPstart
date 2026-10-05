@@ -142,7 +142,7 @@ export function WorkerShell({ siteName, userEmail, initialPlace }: ShellProps) {
         if (libraryError) return loadError
         return (
           <div className="m-3">
-            <NowCard items={nowItems} onShowMe={(machineId) => select({ kind: 'machine', id: machineId })} />
+            <NowCard items={nowItems} />
           </div>
         )
       }}

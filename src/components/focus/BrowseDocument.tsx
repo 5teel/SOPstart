@@ -12,7 +12,6 @@ import type { WalkEntry } from '@/lib/sop/focus'
 import type { FocusSop, FocusStepRow } from '@/lib/sop/focus-read'
 import { focusHref } from '@/lib/sop/focus-path'
 import { KindChip, KIND_EDGE } from '@/components/focus/KindChip'
-import { RelBadge } from '@/components/sop/plant/RelBadge'
 import { StandardLabels } from '@/components/sop/StandardLabels'
 
 export interface BrowseDocumentProps {
@@ -60,7 +59,9 @@ export function BrowseDocument({ data, order, from, supersededBy, updatedSinceLa
           {sop.objective && <p className="text-reading text-ink-700">{sop.objective}</p>}
           {updatedSinceLastWalk && (
             <p data-testid="focus-updated" className="flex items-center gap-2 text-ui text-ink-700">
-              <RelBadge rel="new" />
+              <span className="mono rounded bg-accent-measure/14 px-1.5 py-0.5 text-micro font-semibold uppercase tracking-wide text-accent-measure">
+                Updated
+              </span>
               Updated since you last walked it
             </p>
           )}

@@ -26,7 +26,7 @@ test.describe('PLC-02 machine body', () => {
   test('rows carry the shared badge and a Walk link', () => {
     expect(PANEL).toContain("import { RelBadge } from '@/components/sop/plant/RelBadge'")
     expect(PANEL).toContain('<RelBadge rel={rel} />')
-    expect(PANEL).toContain('href={`/sops/${sop.id}?tab=walk`}')
+    expect(PANEL).toContain('href={focusHref(sop.id, { from })}')
     expect(PANEL).toContain('data-testid="plant-panel-walk"')
   })
 
@@ -36,7 +36,7 @@ test.describe('PLC-02 machine body', () => {
 
   test('room bodies are worker-safe and re-use SopRows', () => {
     expect((ROOMS.match(/data-testid="room-body"/g) ?? []).length).toBe(4)
-    expect(ROOMS).toContain('<SopRows sops={sops} empty="No site-wide SOPs yet." />')
+    expect(ROOMS).toContain('<SopRows sops={sops} empty="No site-wide SOPs yet." from="noticeboard" />')
     expect(ROOMS).not.toContain('@/actions/governance')
     expect(ROOMS).not.toMatch(/components\/admin/)
     expect(ROOMS).toContain('href="/activity"')
@@ -55,8 +55,8 @@ test.describe('PLC-02 admin machine body', () => {
     expect(ADMIN).toContain('export function AdminSopRows(')
     expect(ADMIN).toContain('data-testid="admin-panel-row"')
     expect(ADMIN).toContain('data-testid="admin-panel-badge"')
-    expect(ADMIN).toContain('href={`/sops/${sop.id}`}')
-    expect(ADMIN).toMatch(/sop\.status === 'published' && \(\s*<Link\s+href=\{`\/sops\/\$\{sop\.id\}\?tab=walk`\}\s+data-testid="admin-panel-walk"/)
+    expect(ADMIN).toContain('<Link href={focusHref(sop.id, { from })} className')
+    expect(ADMIN).toMatch(/sop\.status === 'published' && \(\s*<Link\s+href=\{focusHref\(sop\.id, \{ from \}\)\}\s+data-testid="admin-panel-walk"/)
     expect(ADMIN).toContain('href={`/admin/sops/builder/${sop.id}`}')
     expect(ADMIN).toContain('data-testid="admin-panel-edit"')
     expect(ADMIN).toContain('owner {sop.ownerLabel ??')
@@ -82,7 +82,7 @@ test.describe('PLC-02 admin machine body', () => {
     expect(ROOMS).toContain('href={`/admin/sops/builder/${d.id}`}')
     expect(ROOMS).toContain('href="/admin/sops/new" data-testid="room-workshop-new"')
     expect(ROOMS).toContain('Write a new SOP')
-    expect(ROOMS).toContain('<AdminSopRows sops={sops} empty="No site-wide SOPs yet." />')
+    expect(ROOMS).toContain('<AdminSopRows sops={sops} empty="No site-wide SOPs yet." from="noticeboard" />')
   })
 
   test('the blank page keeps ?machine= only when it is a UUID', () => {
