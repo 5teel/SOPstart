@@ -1979,7 +1979,7 @@ Plans:
   4. The decisions tab lists the ledger newest first and can be narrowed by kind of decision; opening it, people and roles, or access widens the detail panel while the site stays visible and re-centres on the Office
   5. An admin invites a person, sets their role, sees their department, and opens the existing access wiring screen, unchanged, to decide who sees which SOPs
 
-**Plans:** 5/16 plans executed
+**Plans:** 6/16 plans executed
 Plans:
 **Wave 1**
 
@@ -1997,7 +1997,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 59-06-PLAN.md — Sign-off refuses own walk + server counter-sign, getCompletionForReview (session read, then sign), rejected never counts as done, approvals report logged, chains name only admins / safety managers
+- [x] 59-06-PLAN.md — Sign-off refuses own walk + server counter-sign, getCompletionForReview (session read, then sign), rejected never counts as done, approvals report logged, chains name only admins / safety managers
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
