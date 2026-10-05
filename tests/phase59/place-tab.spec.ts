@@ -1,15 +1,48 @@
 /**
- * Phase 59 -- place tab (stub; Wave 0 / 59-01). Requirement SHL-06; decisions D-01, D-03, A-04.
+ * Phase 59 -- place tab. Requirement SHL-06; decisions D-01, D-03, A-04.
  * Owner: 59-03 (room tab on Place, office-tabs module). Registration: playwright.config.ts `phase59`.
  */
-import { test } from '@playwright/test'
+import { test, expect } from '@playwright/test'
+import { formatPlace, parsePlace, placeToken } from '@/lib/shell/place'
+import { isWidePlace, tabsForRole } from '@/lib/shell/office-tabs'
+import { backHref } from '@/lib/sop/focus-path'
 
 test.describe('place tab', () => {
-  test.fixme(true, 'flips live in 59-03')
-  test('parsePlace reads a tab for the office place and drops an unknown tab', () => {})
-  test('formatPlace writes the tab for non-default tabs and omits it for the inbox', () => {})
-  test('placeToken stays "office" whatever the tab', () => {})
-  test('tabsForRole: admin and safety manager get all four; supervisor gets the inbox only (A-04); worker gets none', () => {})
-  test('isWidePlace is true only for decisions, people and access', () => {})
-  test('a tab the role may not see falls back to the inbox in render, never by redirect', () => {})
+  test('parsePlace reads a tab for the office place and drops an unknown tab', () => {
+    expect(parsePlace('office', 'people')).toEqual({ kind: 'room', id: 'office', tab: 'people' })
+    expect(parsePlace('office', 'inbox')).toEqual({ kind: 'room', id: 'office' })
+    expect(parsePlace('office', 'bogus')).toEqual({ kind: 'room', id: 'office' })
+    expect('tab' in parsePlace('office', 'bogus')).toBe(false)
+    expect(parsePlace('smoko', 'people')).toEqual({ kind: 'room', id: 'smoko' })
+    expect(parsePlace('office')).toEqual({ kind: 'room', id: 'office' })
+  })
+
+  test('formatPlace writes the tab for non-default tabs and omits it for the inbox', () => {
+    expect(formatPlace({ kind: 'room', id: 'office', tab: 'access' })).toBe('/?place=office&tab=access')
+    expect(formatPlace({ kind: 'room', id: 'office' })).toBe('/?place=office')
+  })
+
+  test('placeToken stays "office" whatever the tab', () => {
+    expect(placeToken({ kind: 'room', id: 'office', tab: 'decisions' })).toBe('office')
+    expect(backHref('office')).toBe('/?place=office')
+  })
+
+  test('tabsForRole: admin and safety manager get all four; supervisor gets the inbox only (A-04); worker gets none', () => {
+    const all = ['inbox', 'decisions', 'people', 'access']
+    expect(tabsForRole('admin')).toEqual(all)
+    expect(tabsForRole('safety_manager')).toEqual(all)
+    expect(tabsForRole('supervisor')).toEqual(['inbox'])
+    expect(tabsForRole('worker')).toEqual([])
+    expect(tabsForRole(null)).toEqual([])
+  })
+
+  test('isWidePlace is true only for decisions, people and access', () => {
+    for (const tab of ['decisions', 'people', 'access'] as const) {
+      expect(isWidePlace({ kind: 'room', id: 'office', tab })).toBe(true)
+    }
+    expect(isWidePlace({ kind: 'room', id: 'office' })).toBe(false)
+    expect(isWidePlace({ kind: 'room', id: 'smoko' })).toBe(false)
+    expect(isWidePlace({ kind: 'overview' })).toBe(false)
+  })
+
 })

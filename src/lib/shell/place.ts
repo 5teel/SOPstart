@@ -6,21 +6,26 @@
  * token is never carried into the result (T-57-01).
  */
 import { ROOM_IDS, type RoomId } from '@/lib/site/rooms'
+import { OFFICE_TABS, type OfficeTab } from '@/lib/shell/office-tabs'
 
 export type Place =
   | { kind: 'overview' }
   | { kind: 'edit' }
-  | { kind: 'room'; id: RoomId }
+  | { kind: 'room'; id: RoomId; tab?: Exclude<OfficeTab, 'inbox'> }
   | { kind: 'machine'; id: string }
   | { kind: 'dept'; id: string }
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
-export function parsePlace(token: string | null | undefined): Place {
+/** The tab is whitelisted and only the office room carries one; the inbox is the default and never written. */
+export function parsePlace(token: string | null | undefined, tab?: string | null): Place {
   if (!token) return { kind: 'overview' }
   if (token === 'edit') return { kind: 'edit' }
   const room = ROOM_IDS.find((r) => r === token)
-  if (room) return { kind: 'room', id: room }
+  if (room) {
+    const t = room === 'office' ? OFFICE_TABS.find((x) => x === tab) : undefined
+    return t && t !== 'inbox' ? { kind: 'room', id: room, tab: t } : { kind: 'room', id: room }
+  }
   if (token.startsWith('dept:') && UUID.test(token.slice(5))) return { kind: 'dept', id: token.slice(5) }
   if (UUID.test(token)) return { kind: 'machine', id: token }
   return { kind: 'overview' }
@@ -33,6 +38,7 @@ export function formatPlace(place: Place): string {
     case 'edit':
       return '/?place=edit'
     case 'room':
+      return place.tab ? `/?place=${place.id}&tab=${place.tab}` : `/?place=${place.id}`
     case 'machine':
       return `/?place=${place.id}`
     case 'dept':
