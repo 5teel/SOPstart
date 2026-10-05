@@ -114,7 +114,7 @@ export function OfficePane({
                     tabIndex={i === rove ? 0 : -1}
                     onFocus={() => setRove(i)}
                     onClick={() => select({ kind: 'room', id: 'office', ...(t === 'inbox' ? {} : { tab: t }) })}
-                    className={`inline-flex min-h-tap shrink-0 items-center gap-2 rounded px-3 text-ui font-semibold focus-visible:outline-2 focus-visible:outline-accent-step ${
+                    className={`inline-flex min-h-tap shrink-0 items-center gap-2 rounded px-2 text-ui font-semibold focus-visible:outline-2 focus-visible:outline-accent-step ${
                       active ? 'bg-ink-900 text-paper' : 'text-ink-700 hover:text-ink-900'
                     }`}
                   >
