@@ -59,6 +59,7 @@ const PUBLISH_GUARD_LIVE = true
 
 interface Entry { file: string; function: string; key: string; kind: string; plan: number; status: 'hook' }
 interface ExtraHook { file: string; function: string; anchor: string; kind: string; plan: number }
+interface DelegatedHook { file: string; function: string; calls: string; after: string; kind: string; note: string }
 interface Allow { file: string; function: string; key: string; reason: string }
 interface Writers {
   version: number
@@ -66,6 +67,7 @@ interface Writers {
   columnKeys: Array<{ table: string; token: string }>
   entries: Entry[]
   extraHooks: ExtraHook[]
+  delegatedHooks: DelegatedHook[]
   allow: Allow[]
 }
 
@@ -231,6 +233,23 @@ test.describe('recordDecision wiring', () => {
       expect(text).toMatch(/import\s*\{[^}]*\brecordDecision\b[^}]*\}\s*from\s*'@\/lib\/decisions\/record'/)
       const body = functionBody(text, x.function)
       expect(body.lastIndexOf('await recordDecision(')).toBeGreaterThan(body.indexOf(x.anchor))
+    })
+  }
+})
+
+// A writer whose ledger row is written by a registered callee (Phase 58, Send for sign-off).
+test.describe('delegated hooks', () => {
+  test('is not vacuous', () => expect(W.delegatedHooks.length).toBeGreaterThan(0))
+  for (const d of W.delegatedHooks) {
+    test(`${d.file}#${d.function} awaits ${d.calls} after ${d.after}`, () => {
+      const body = functionBody(fileText(d.file), d.function)
+      const anchor = body.indexOf(d.after)
+      expect(anchor, `${d.after} not found`).toBeGreaterThan(-1)
+      expect(body.indexOf(`await ${d.calls}`), `await ${d.calls} must come after ${d.after}`).toBeGreaterThan(anchor)
+      const callee = d.calls.replace('(', '')
+      expect(W.entries.map((e) => `${e.file}#${e.function}`), `${callee} must itself be a registered writer`).toContain(
+        `${d.file}#${callee}`
+      )
     })
   }
 })

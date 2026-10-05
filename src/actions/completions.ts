@@ -12,6 +12,92 @@ import {
 } from '@/lib/validators/completions'
 import { isSignedOffAssessor } from '@/lib/competency/assessor'
 import { recordDecision } from '@/lib/decisions/record'
+import { createHash } from 'node:crypto'
+import { hashInput, reviewMissing } from '@/lib/sop/focus'
+import { loadWalkSop, toWalkState, WALK_COLUMNS } from '@/lib/sop/walk-read'
+
+// ---------------------------------------------------------------
+// submitWalkCompletion -- Send for sign-off
+//
+// submitCompletion({ walkId }) submits from the server's own sop_walks row (Phase 58, D-10/D-15/D-22):
+// nothing the client says about steps, hash or photos is read. The legacy input
+// (localId + client step data) stays only until the old walkthrough is deleted
+// in 58-16.
+// ---------------------------------------------------------------
+async function submitWalkCompletion(
+  rawInput: unknown
+): Promise<{ success: true; completionId: string } | { success: false; error: string }> {
+  const parsed = z.object({ walkId: z.string().uuid() }).safeParse(rawInput)
+  if (!parsed.success) return { success: false, error: 'Invalid input' }
+
+  const { userId, organisationId } = await getSessionContext()
+  if (!userId) return { success: false, error: 'Not authenticated' }
+  if (!organisationId) return { success: false, error: 'No organisation found' }
+
+  const admin = createAdminClient()
+  const { data: row } = await admin
+    .from('sop_walks')
+    .select(WALK_COLUMNS)
+    .eq('id', parsed.data.walkId)
+    .eq('organisation_id', organisationId)
+    .eq('worker_id', userId)
+    .maybeSingle()
+  if (!row) return { success: false, error: 'Start the walk again.' }
+  const walk = toWalkState(row)
+  if (row.status === 'submitted') return { success: true, completionId: walk.id }
+  if (row.status !== 'in_progress') return { success: false, error: 'Start the walk again.' }
+
+  const sop = await loadWalkSop(admin, organisationId, walk.sop_id)
+  if (!sop || sop.order.length === 0) return { success: false, error: 'This SOP has no steps to send.' }
+
+  // Whatever the jump-ahead setting: every acknowledgement, required photo and step.
+  const missing = [
+    ...reviewMissing(sop.order, {
+      acked: new Set(Object.keys(walk.acks)),
+      photos: new Set(walk.photos.map((p) => p.stepId)),
+    }).map((m) => m.text),
+    ...sop.order.filter((e) => !walk.done[e.step.id]).map((e) => `finish step ${e.index}`),
+  ]
+  if (missing.length > 0) {
+    return { success: false, error: `${missing.length} ${missing.length === 1 ? 'thing' : 'things'} still to do: ${missing.join(', ')}` }
+  }
+
+  // Recomputed here from the walk row; submitCompletion's legacy input re-checks every
+  // photo path against {org}/completions/{walk.id}/ and keeps the 23505 retry path.
+  // The completion is inserted with id: walk.id (localId below).
+  const stepData: Record<string, number> = {}
+  for (const { step } of sop.order) stepData[step.id] = Date.parse(walk.done[step.id])
+  const stepAckTrace = sop.order.flatMap(({ step }) =>
+    walk.acks[step.id] ? [{ stepId: step.id, timestamp: Date.parse(walk.acks[step.id]) }] : []
+  )
+  const sent = await submitCompletion({
+    localId: walk.id,
+    sopId: walk.sop_id,
+    sopVersion: walk.sop_version,
+    contentHash: createHash('sha256').update(hashInput(sop.order)).digest('hex'),
+    stepData,
+    photoStoragePaths: walk.photos,
+    stepAckTrace,
+  })
+  if (!sent.success) return sent
+
+  const { error: walkError } = await admin
+    .from('sop_walks')
+    .update({ status: 'submitted', submitted_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+    .eq('id', walk.id)
+    .eq('organisation_id', organisationId)
+    .eq('worker_id', userId)
+  if (walkError) {
+    // The completion exists; a retry finds it (23505 path) and finishes the walk.
+    console.error('submitCompletion walk update error:', walkError)
+    return { success: false, error: 'Failed to submit completion.' }
+  }
+
+  // The worker's own ledger row (D-22). Its failure never undoes the completion.
+  const signed = await recordSignature({ completionId: walk.id, role: 'worker' })
+  if (!signed.success) console.error('submitCompletion signature error:', signed.error)
+  return { success: true, completionId: walk.id }
+}
 
 // ---------------------------------------------------------------
 // submitCompletion
@@ -24,6 +110,9 @@ import { recordDecision } from '@/lib/decisions/record'
 export async function submitCompletion(
   rawInput: unknown
 ): Promise<{ success: true; completionId: string } | { success: false; error: string }> {
+  // Phase 58: { walkId } sends from the server's own walk row (below).
+  if (rawInput && typeof rawInput === 'object' && 'walkId' in rawInput) return submitWalkCompletion(rawInput)
+
   const parsed = submitCompletionSchema.safeParse(rawInput)
   if (!parsed.success) {
     return { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
@@ -305,9 +394,20 @@ export async function getPhotoUploadUrl(input: {
     .safeParse(input)
   if (!parsed.success) return { error: 'Invalid upload request.' }
 
-  const { userId, organisationId } = await getSessionContext()
+  const { supabase, userId, organisationId } = await getSessionContext()
   if (!userId) return { error: 'Not authenticated' }
   if (!organisationId) return { error: 'No organisation found' }
+
+  // Only the session worker's own in-progress walk may take a photo upload URL.
+  const { data: walk } = await supabase
+    .from('sop_walks')
+    .select('id')
+    .eq('id', parsed.data.completionLocalId)
+    .eq('organisation_id', organisationId)
+    .eq('worker_id', userId)
+    .eq('status', 'in_progress')
+    .maybeSingle()
+  if (!walk) return { error: 'Start the walk again.' }
 
   // Determine file extension from content type
   const ext = parsed.data.contentType === 'image/png' ? 'png' : 'jpg'
