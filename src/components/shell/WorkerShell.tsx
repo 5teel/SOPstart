@@ -49,11 +49,7 @@ export interface ShellProps {
 // The supervisor's Office is the lazy pane; a worker never loads it (59 A-11).
 const OfficePane = dynamic(() => import('@/components/office/OfficePane').then((m) => m.OfficePane), {
   ssr: false,
-  loading: () => (
-    <div data-testid="office-loading" className="p-4 text-ui text-ink-500">
-      Opening the Office…
-    </div>
-  ),
+  loading: () => <p className="p-4 text-ui text-ink-500">Opening the Office…</p>,
 })
 
 const EMPTY_SITE: ShellSite = { layout: null, machines: [], links: [], departments: [] }

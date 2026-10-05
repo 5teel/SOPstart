@@ -104,6 +104,10 @@ const GATED_ROUTES: GatedRoute[] = [
         label: 'site editor (SiteWorkspace.tsx -- admin module must stay lazy)',
         markers: ['Draw machine'],
       },
+      // Phase 59 A-11: the Office pane (inbox empty state, decisions footer) is one lazy chunk
+      // reached by next/dynamic from both shells; either literal in the home route's own chunk
+      // set means a static import slipped in.
+      { label: 'office pane (lazy, 59 A-11)', markers: ['Nothing needs you', 'Nothing here can be edited or deleted'] },
     ],
   },
 ]

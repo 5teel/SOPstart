@@ -307,7 +307,7 @@ test.describe('Phase 57 — the one screen (deployed)', () => {
 
   // -------------------------------------------------------------- supervisor
 
-  test('D-06: the supervisor sees the Office card with the sign-off count', async ({ page, context }) => {
+  test('D-06: the supervisor sees the Office card, and its pin equals the pane Inbox list (59-12)', async ({ page, context }) => {
     test.setTimeout(180_000)
     await signInAs(context, 'siteSupervisor')
     await page.goto('/')
@@ -319,9 +319,13 @@ test.describe('Phase 57 — the one screen (deployed)', () => {
     await expect(room(page, 'office')).toHaveAttribute('data-pin', (await count.innerText()).trim(), SLOW)
     await shot(page, '57-supervisor-overview')
 
+    const pinned = Number((await count.innerText()).trim())
     await page.getByTestId('shell-office-open').click()
     await expect(roomBody(page, 'office')).toBeVisible(SLOW)
-    await expect(roomBody(page, 'office').locator('a[href="/activity"]')).toBeVisible(SLOW)
+    // The Office is the tabbed pane; a supervisor has the Inbox only, one row per pinned item.
+    await expect(page.getByTestId('office-pane')).toBeVisible(SLOW)
+    await expect(page.getByTestId('office-tab-decisions')).toHaveCount(0)
+    await expect(page.getByTestId('office-row')).toHaveCount(pinned, SLOW)
   })
 
   // ------------------------------------------------------------------ admin
@@ -340,7 +344,7 @@ test.describe('Phase 57 — the one screen (deployed)', () => {
     await shot(page, '57-admin-overview')
   })
 
-  test('D-16 PLC-04: admin Office count equals the governance page open count', async ({ page, context }) => {
+  test('D-16 PLC-04: admin Office pin equals the pane Inbox tab count (59-12)', async ({ page, context }) => {
     test.setTimeout(180_000)
     await db.from('sops').update({ owner_user_id: null }).eq('id', plantSopId)
     await signInAs(context, 'siteAdmin')
@@ -352,20 +356,10 @@ test.describe('Phase 57 — the one screen (deployed)', () => {
     expect(count).toBeGreaterThanOrEqual(1)
     await expect(room(page, 'office')).toHaveAttribute('data-pin', String(count))
 
-    await page.goto('/governance')
-    await expect(page.getByTestId('gov-inbox')).toBeVisible(SLOW)
-    await expect(page.getByText(/^\d+ open$/)).toBeVisible(SLOW)
-    const open = Number((await page.getByText(/^\d+ open$/).innerText()).match(/\d+/)![0])
-    expect(open).toBe(count)
-
-    // The bridge page returns to the Office room.
-    await expect(page.getByRole('banner')).toHaveCount(0)
-    const back = page.getByTestId('back-to-site')
-    await expect(back).toBeVisible(SLOW)
-    await shot(page, '57-bridge-governance')
-    await back.locator('a').click()
+    await page.getByTestId('shell-office-open').click()
     await expect(detail(page)).toHaveAttribute('data-place', '/?place=office', SLOW)
-    await expect(roomBody(page, 'office')).toBeVisible(SLOW)
+    await expect(page.getByTestId('office-pane')).toBeVisible(SLOW)
+    await expect(page.getByTestId('office-tab-inbox')).toHaveText(new RegExp(`Inbox\\s*${count}`), SLOW)
     await shot(page, '57-admin-office')
   })
 
@@ -450,13 +444,14 @@ test.describe('Phase 57 — the one screen (deployed)', () => {
       await expect(page.getByTestId('shell'), from).toBeVisible(SLOW)
     }
 
+    // 59-13 adds these server-side redirects; they land on the Office places and the tabbed pane.
     await page.goto(`${legacyList}?view=attention`)
-    await expect(page).toHaveURL(at('/governance'), SLOW)
-    await expect(page.getByTestId('gov-inbox')).toBeVisible(SLOW)
+    await expect(detail(page)).toHaveAttribute('data-place', '/?place=office', SLOW)
+    await expect(page.getByTestId('office-pane')).toBeVisible(SLOW)
 
     await page.goto(`${legacyList}?view=access`)
-    await expect(page).toHaveURL(at('/admin/access'), SLOW)
-    await expect(page.getByPlaceholder('Search org or collections…')).toBeVisible(SLOW)
+    await expect(detail(page)).toHaveAttribute('data-place', '/?place=office&tab=access', SLOW)
+    await expect(page.getByTestId('office-tab-access')).toHaveAttribute('aria-selected', 'true', SLOW)
 
     for (const from of ['/admin/departments', '/admin/site']) {
       await page.goto(from)

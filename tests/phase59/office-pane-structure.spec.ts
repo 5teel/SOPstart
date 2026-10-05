@@ -1,6 +1,6 @@
 /**
  * Phase 59 -- Office pane structure. Requirement OFF-01; decisions D-01, D-04, D-05, A-11.
- * Owners: 59-09 (pane, inbox row, inbox tab -- live), 59-12 (mount -- still stubs).
+ * Owners: 59-09 (pane, inbox row, inbox tab), 59-12 (mount seams) -- all live.
  * Registration: playwright.config.ts `phase59`.
  * Source contract, but every case pins WIRING (a handler calls the action, a branch renders
  * the panel), not that a string appears (CLAUDE.md 2026-06-05).
@@ -140,7 +140,7 @@ test.describe('office pane and inbox tab (59-09)', () => {
     }
   })
 
-  test('the pane is a module nothing imports statically yet (59-12 mounts it lazily)', () => {
+  test('the pane is a module nothing imports statically (both shells mount it lazily)', () => {
     const importers: string[] = []
     const walk = (dir: string) => {
       for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -160,10 +160,51 @@ test.describe('office pane and inbox tab (59-09)', () => {
   })
 })
 
-test.describe('office pane structure (stubs for later plans)', () => {
-  test.fixme(true, 'flips live in 59-12')
-  test('the pane is one lazy module imported by next/dynamic from both shells (59-12)', () => {})
-  test('worker and supervisor shell files carry no static admin import (59-12)', () => {})
-  test('the bundle script has a forbidden marker for the pane and it validates itself (59-12)', () => {})
-  test('the supervisor pin and card read the same inbox data the pane does (59-12)', () => {})
+test.describe('office pane mount seams (59-12)', () => {
+  const ADMIN = strip(read('src/components/shell/AdminShell.tsx'))
+  const WORKER = strip(read('src/components/shell/WorkerShell.tsx'))
+  const DYNAMIC = /const OfficePane = dynamic\(\(\) => import\('@\/components\/office\/OfficePane'\)\.then\(\(m\) => m\.OfficePane\), \{\s*ssr: false/
+
+  test('the pane is one lazy module imported by next/dynamic from both shells', () => {
+    expect(ADMIN).toMatch(DYNAMIC)
+    expect(WORKER).toMatch(DYNAMIC)
+    expect(ADMIN).toContain('<OfficePane place={place} select={ctx.select} initialSop={initialSop} />')
+    expect(WORKER).toMatch(/isSupervisor \? \(\s*<OfficePane place=\{place\} select=\{ctx\.select\} initialSop=\{initialSop\} \/>\s*\) : \(\s*<OfficeWorkerBody \/>/)
+  })
+
+  test('the old Office card body and the pending-count hook are gone', () => {
+    const rooms = read('src/components/shell/AdminRoomBodies.tsx')
+    expect(rooms).not.toContain('AdminOfficeBody')
+    expect(rooms).not.toContain('CHIP_WORDS')
+    expect(read('src/hooks/useCompletions.ts')).not.toContain('usePendingSignOffCount')
+    expect(ADMIN).not.toContain('usePendingSignOffCount')
+    expect(WORKER).not.toContain('usePendingSignOffCount')
+  })
+
+  test('worker and supervisor shell files carry no static pane or admin import', () => {
+    for (const src of [ADMIN, WORKER]) expect(src).not.toMatch(/^import[^\n]*components\/office\//m)
+    expect(WORKER).not.toMatch(/components\/admin/)
+  })
+
+  test('the bundle script has a forbidden marker for the pane and its literals live in the pane module', () => {
+    const script = read('scripts/check-bundle-size.ts')
+    expect(script).toContain("label: 'office pane (lazy, 59 A-11)'")
+    for (const marker of ['Nothing needs you', 'Nothing here can be edited or deleted']) {
+      expect(script).toContain(marker)
+      const sources = ['InboxTab.tsx', 'DecisionsTab.tsx'].map((f) => read('src/components/office/' + f)).join('\n')
+      expect(sources.replace(/&apos;/g, "'")).toContain(marker)
+    }
+    // Neither literal may appear in either shell or the worker room bodies.
+    for (const src of [ADMIN, WORKER, strip(read('src/components/shell/RoomBodies.tsx'))]) {
+      expect(src).not.toContain('Nothing needs you')
+    }
+    expect(read('tests/lint/no-static-admin-lens-import.spec.ts')).toContain('OfficePane: []')
+  })
+
+  test('the supervisor pin and card read the same inbox query the pane does', () => {
+    expect(WORKER).toContain('queryKey: OFFICE_INBOX_KEY')
+    expect(WORKER).toContain('count={pending}')
+    expect(WORKER).toMatch(/office: pending,/)
+    expect(strip(read('src/components/office/InboxTab.tsx'))).toContain('queryKey: OFFICE_INBOX_KEY')
+  })
 })

@@ -36,6 +36,8 @@ const ALLOWED_IMPORTERS: Record<string, string[]> = {
   WiringPatchBayShell: [path.join('src', 'components', 'sop', 'lenses', 'AdminAccessLens.tsx')],
   // Phase 57: reachable only through next/dynamic in OneScreen.
   AdminShell: [],
+  // Phase 59: the Office pane is only ever reached through next/dynamic (A-11).
+  OfficePane: [],
 }
 
 const WORKER_SHELL_FILES = [
