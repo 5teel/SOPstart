@@ -76,7 +76,21 @@ test.describe('signoff actions', () => {
 
   test('signOffCompletion returns whether the ledger row was written', () => {
     expect(SIGN_OFF).toMatch(/const rec = await recordDecision\(/)
-    expect(SIGN_OFF).toContain('logged: rec.ok')
+    expect(SIGN_OFF).toContain('logged = rec.ok')
+    expect(SIGN_OFF).toContain('logged = countersigned.success && countersigned.logged')
+    expect(SIGN_OFF).toContain('return { success: true, logged }')
+  })
+
+  test('review WR-02: one ledger row per decision -- reject here, the approval through its counter-signature', () => {
+    expect(SIGN_OFF.match(/await recordDecision\(/g)?.length).toBe(1)
+    const rec = SIGN_OFF.indexOf('await recordDecision(')
+    expect(SIGN_OFF.lastIndexOf("if (decision === 'rejected')", rec)).toBeGreaterThan(-1)
+    expect(SIGN_OFF.slice(rec, rec + 80)).toContain("kind: 'reject'")
+    expect(SIGN_OFF).not.toContain("kind: decision === 'approved' ? 'sign_off'")
+    const sig = COMPLETIONS.slice(COMPLETIONS.indexOf('async function recordSignature('))
+    expect(sig.match(/await recordDecision\(/g)?.length).toBe(1)
+    expect(sig).toContain("kind: role === 'supervisor' ? 'countersign' : 'sign_off'")
+    expect(sig).toContain('details: { role, ...details }')
   })
 
   test('signOffCompletion keeps the assessor gate with the admin override reason (A-08)', () => {

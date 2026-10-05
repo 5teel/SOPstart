@@ -29,8 +29,9 @@ test.describe('ledger read', () => {
     expect(Object.keys(KIND_WORDS).sort()).toEqual([...DECISION_KINDS].sort())
     expect(KIND_WORDS.approve).toBe('Approved')
     expect(KIND_WORDS.reject).toBe('Rejected')
-    expect(KIND_WORDS.sign_off).toBe('Signed off')
-    expect(KIND_WORDS.countersign).toBe('Counter-signed')
+    // 59 review WR-02: sign_off is the worker's submit row, countersign the supervisor's approval
+    expect(KIND_WORDS.sign_off).toBe('Sent for sign-off')
+    expect(KIND_WORDS.countersign).toBe('Signed off')
     expect(KIND_WORDS.review).toBe('Marked reviewed')
     expect(KIND_WORDS.role_change).toBe('Changed a role')
     expect(KIND_WORDS.member_invited).toBe('Invited someone')

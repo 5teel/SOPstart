@@ -36,8 +36,10 @@ export const KIND_GROUPS: Record<Exclude<DecisionGroupKey, 'all'>, ReadonlyArray
 export const KIND_WORDS: Record<DecisionKind, string> = {
   approve: 'Approved',
   reject: 'Rejected',
-  sign_off: 'Signed off',
-  countersign: 'Counter-signed',
+  // sign_off is the worker's own row on submit; countersign is the supervisor's
+  // approval (59 review WR-02), so the words follow who did what.
+  sign_off: 'Sent for sign-off',
+  countersign: 'Signed off',
   assign: 'Assigned',
   unassign: 'Unassigned',
   publish: 'Published',
@@ -55,9 +57,9 @@ export const KIND_WORDS: Record<DecisionKind, string> = {
 }
 
 /**
- * The kinds that count as "cleared today" on the inbox. A sign-off is counted
- * through its counter-signature (written on every approval), so the worker's own
- * sign_off row on submit is never counted.
+ * The kinds that count as "cleared today" on the inbox. An approval writes one
+ * ledger row, its counter-signature (countersign), so that is what is counted;
+ * the worker's own sign_off row on submit never is.
  * ponytail: an AI proposal accepted or rejected also writes approve / reject and
  * is counted; split by actor_kind if that ever matters.
  */

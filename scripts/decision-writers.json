@@ -25,7 +25,7 @@
     { "file": "src/actions/governance.ts", "function": "setSopOwner", "status": "hook", "key": "owner_user_id:", "kind": "owner_change", "plan": 5 },
     { "file": "src/actions/governance.ts", "function": "confirmSopCurrent", "status": "hook", "key": "sop_review_events", "kind": "review", "plan": 5 },
     { "file": "src/actions/governance.ts", "function": "setReviewCadence", "status": "hook", "key": "sop_review_cadences", "kind": "cadence_change", "plan": 5 },
-    { "file": "src/actions/completions.ts", "function": "signOffCompletion", "status": "hook", "key": "completion_sign_offs", "kind": "sign_off/reject", "plan": 5 },
+    { "file": "src/actions/completions.ts", "function": "signOffCompletion", "status": "hook", "key": "completion_sign_offs", "kind": "reject", "plan": 5, "note": "An approval is logged once, as countersign, by recordSignature (59 review WR-02)" },
     { "file": "src/actions/completions.ts", "function": "recordSignature", "status": "hook", "key": "sop_completion_signatures", "kind": "sign_off/countersign", "plan": 5, "note": "Internal helper, not exported (59 review CR-01); takes { completionId, sopId, role }" },
     { "file": "src/actions/assignments.ts", "function": "assignSopToRole", "status": "hook", "key": "sop_assignments", "kind": "assign", "plan": 8 },
     { "file": "src/actions/assignments.ts", "function": "assignSopToUser", "status": "hook", "key": "sop_assignments", "kind": "assign", "plan": 8 },
@@ -45,7 +45,7 @@
   ],
   "delegatedHooks": [
     { "file": "src/actions/completions.ts", "function": "submitCompletion", "calls": "recordSignature(", "after": ".from('sop_completions')", "kind": "sign_off", "note": "Send for sign-off (D-22): the worker's signature row and its ledger row are written by recordSignature, after the completion insert" },
-    { "file": "src/actions/completions.ts", "function": "signOffCompletion", "calls": "recordSignature(", "after": ".update({ status: newStatus })", "kind": "countersign", "note": "Office sign-off (59): the supervisor counter-signature and its ledger row are written by recordSignature after the status change" }
+    { "file": "src/actions/completions.ts", "function": "signOffCompletion", "calls": "recordSignature(", "after": ".update({ status: newStatus })", "kind": "countersign", "note": "Office sign-off (59): the supervisor counter-signature and the approval's one ledger row are written by recordSignature after the status change" }
   ],
   "allow": [
     { "file": "src/lib/governance/owner-review.ts", "function": "markReviewedAsOwner", "key": "sop_review_events", "reason": "The owner path's sop_review_events insert; confirmSopCurrent records the review decision after it returns." },

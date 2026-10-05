@@ -304,24 +304,33 @@ export async function signOffCompletion(
     return { success: false, error: 'Failed to record sign-off.' }
   }
 
-  const rec = await recordDecision({
-    kind: decision === 'approved' ? 'sign_off' : 'reject',
-    subject: { kind: 'completion', id: completionId },
-    sopId: completion.sop_id,
-    summary: decision === 'approved' ? 'Signed off a completion' : 'Rejected a completion',
-    details: {
-      worker_id: completion.worker_id,
-      reason: reason ?? null,
-      is_assessor_override: isOverride,
-      override_reason: isOverride ? parsed.data.overrideReason : null,
-    },
-  })
+  // One ledger row per decision (59 review WR-02): a rejection is logged here; an
+  // approval is logged by its counter-signature below (kind countersign, the row
+  // the inbox counts as cleared). The worker's own sign_off row is written on submit.
+  const details = {
+    worker_id: completion.worker_id,
+    reason: reason ?? null,
+    is_assessor_override: isOverride,
+    override_reason: isOverride ? parsed.data.overrideReason : null,
+  }
+  let logged = false
+  if (decision === 'rejected') {
+    const rec = await recordDecision({
+      kind: 'reject',
+      subject: { kind: 'completion', id: completionId },
+      sopId: completion.sop_id,
+      summary: 'Rejected a completion',
+      details,
+    })
+    logged = rec.ok
+  }
 
   // The supervisor counter-signature is written here, after the status change, so no
   // client can skip it (59 F-04). Its failure never undoes the sign-off.
   if (decision === 'approved') {
-    const countersigned = await recordSignature({ completionId, sopId: completion.sop_id, role: 'supervisor' })
+    const countersigned = await recordSignature({ completionId, sopId: completion.sop_id, role: 'supervisor', details })
     if (!countersigned.success) console.error('signOffCompletion counter-signature error:', countersigned.error)
+    logged = countersigned.success && countersigned.logged
   }
 
   // On rejection: notify the worker
@@ -343,7 +352,7 @@ export async function signOffCompletion(
   }
 
   revalidatePath('/activity')
-  return { success: true, logged: rec.ok }
+  return { success: true, logged }
 }
 
 // ---------------------------------------------------------------
@@ -420,8 +429,9 @@ async function recordSignature(input: {
   completionId: string
   sopId: string
   role: 'worker' | 'supervisor'
-}): Promise<{ success: true } | { success: false; error: string }> {
-  const { completionId, sopId, role } = input
+  details?: Record<string, unknown>
+}): Promise<{ success: true; logged: boolean } | { success: false; error: string }> {
+  const { completionId, sopId, role, details } = input
   const { userId, organisationId } = await getSessionContext()
   if (!userId || !organisationId) return { success: false, error: 'Not authenticated' }
 
@@ -442,13 +452,15 @@ async function recordSignature(input: {
     return { success: false, error: 'Failed to record signature.' }
   }
 
-  await recordDecision({
+  // The one ledger row for this signature (59 review WR-02): the worker's submit is
+  // sign_off ("Sent for sign-off"), the supervisor's approval is countersign ("Signed off").
+  const rec = await recordDecision({
     kind: role === 'supervisor' ? 'countersign' : 'sign_off',
     subject: { kind: 'completion', id: completionId },
     sopId,
-    summary: role === 'supervisor' ? 'Counter-signed a completion' : 'Signed their completion',
-    details: { role },
+    summary: role === 'supervisor' ? 'Signed off a completion' : 'Sent a walk for sign-off',
+    details: { role, ...details },
   })
 
-  return { success: true }
+  return { success: true, logged: rec.ok }
 }
