@@ -984,7 +984,7 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 - [ ] **SHL-03**: With nothing selected, the detail panel shows the site overview: objectives, the user's notifications and open requests
 - [x] **SHL-04**: A user can type in the list's search box and see matching rooms and machines filtered in the list and highlighted on the site; the search matches machine names and the titles of the SOPs on them
 - [x] **SHL-05**: The list shows one "next for you" card: for a worker, the single next SOP due with Walk it and Show me; for an admin or supervisor, how many things are waiting in the Office with a button that opens it
-- [ ] **SHL-06**: When the detail panel shows a table (decision ledger, people and roles, access, training matrix) it widens, and the site stays visible and re-centres on the selected place
+- [x] **SHL-06**: When the detail panel shows a table (decision ledger, people and roles, access, training matrix) it widens, and the site stays visible and re-centres on the selected place
 - [ ] **SHL-07**: Every place and every tab inside a room has its own address, so a link or a browser refresh returns to the same place, and every address from the old app (SOP list, governance, activity, profile, team, site, settings, content, builder, upload) redirects to the matching place on the one screen
 
 ### Places on the Site (PLC) — Phase 57
@@ -1021,17 +1021,17 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 
 ### Office — Governance (OFF) — Phase 59
 
-- [ ] **OFF-01**: The Office opens on an inbox in which every row is one thing to do with one button that clears it — assign an owner, mark reviewed, sign off, approve — and an empty inbox is shown as the goal
-- [ ] **OFF-02**: A supervisor can sign off or reject a worker's completion, with its photos, straight from the inbox
-- [ ] **OFF-03**: A person named in an approval chain can approve or send back a SOP waiting for them from the inbox
-- [ ] **OFF-04**: Every SOP has an owner and a review date, visible wherever the SOP is listed for an admin, and the owner can mark it reviewed
-- [ ] **OFF-05**: An admin can invite people, set each person's role (Worker, Supervisor, SOP Admin, Safety Manager) and see their department from the Office
-- [ ] **OFF-06**: An admin can open the existing access wiring screen from the Office, unchanged, to decide who sees which SOPs
+- [x] **OFF-01**: The Office opens on an inbox in which every row is one thing to do with one button that clears it — assign an owner, mark reviewed, sign off, approve — and an empty inbox is shown as the goal
+- [x] **OFF-02**: A supervisor can sign off or reject a worker's completion, with its photos, straight from the inbox
+- [x] **OFF-03**: A person named in an approval chain can approve or send back a SOP waiting for them from the inbox
+- [x] **OFF-04**: Every SOP has an owner and a review date, visible wherever the SOP is listed for an admin, and the owner can mark it reviewed
+- [x] **OFF-05**: An admin can invite people, set each person's role (Worker, Supervisor, SOP Admin, Safety Manager) and see their department from the Office
+- [x] **OFF-06**: An admin can open the existing access wiring screen from the Office, unchanged, to decide who sees which SOPs
 
 ### Decision Ledger (DEC) — Phases 56, 59
 
 - [x] **DEC-01**: Every approval, rejection, sign-off, assignment, publish, change of owner, recorded observation and cleared AI finding is written as one decision: who, when, what was decided and what it was about
-- [ ] **DEC-02**: An admin can read the ledger in the Office, newest first, and narrow it by kind of decision
+- [x] **DEC-02**: An admin can read the ledger in the Office, newest first, and narrow it by kind of decision
 - [x] **DEC-03**: No one, in any role, can change or delete a decision once it is written, and that is enforced by the database rather than by the screen
 - [x] **DEC-04**: A decision made by an AI agent is recorded with the agent named as who made it
 
@@ -1090,7 +1090,7 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 | SHL-01..02 (2) | Phase 57 | Pending |
 | SHL-03 | Phase 60 | Pending |
 | SHL-04..05 (2) | Phase 57 | Pending |
-| SHL-06 | Phase 59 | Pending |
+| SHL-06 | Phase 59 | Complete |
 | SHL-07 | Phase 62 | Pending |
 | PLC-01..05 (5) | Phase 57 | Pending |
 | FOC-01..04 (4) | Phase 58 | Complete |
@@ -1099,9 +1099,9 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 | WRK-01..02 (2) | Phase 61 | Pending |
 | WRK-03..04 (2) | Phase 58 | Complete |
 | WRK-05..07 (3) | Phase 61 | Pending |
-| OFF-01..06 (6) | Phase 59 | Pending |
+| OFF-01..06 (6) | Phase 59 | Complete |
 | DEC-01 | Phase 56 | Complete |
-| DEC-02 | Phase 59 | Pending |
+| DEC-02 | Phase 59 | Complete |
 | DEC-03..04 (2) | Phase 56 | Complete |
 | RQS-01..04 (4) | Phase 60 | Pending |
 | NTF-01..02 (2) | Phase 60 | Pending |
