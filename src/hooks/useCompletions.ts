@@ -36,18 +36,6 @@ export interface WorkerCompletion {
   sign_off: CompletionSignOff | null
 }
 
-export interface SupervisorCompletion {
-  id: string
-  sop_id: string
-  worker_id: string
-  sop_version: number
-  status: CompletionStatus
-  submitted_at: string
-  sop_title: string | null
-  photo_count: number
-  sign_off: CompletionSignOff | null
-}
-
 export interface CompletionDetail {
   id: string
   sop_id: string
@@ -60,11 +48,6 @@ export interface CompletionDetail {
   photos: CompletionPhoto[]
   sign_off: CompletionSignOff | null
 }
-
-export type FilterState =
-  | { type: 'all' }
-  | { type: 'by_sop'; value: string }
-  | { type: 'by_worker'; value: string }
 
 // Raw row shape returned by Supabase select with joins
 interface RawCompletionRow {
@@ -146,68 +129,6 @@ export function useWorkerCompletions() {
         submitted_at: row.submitted_at,
         content_hash: row.content_hash ?? '',
         step_data: (row.step_data ?? {}) as Record<string, number>,
-        sop_title: extractSopTitle(row.sops),
-        photo_count: row.completion_photos?.length ?? 0,
-        sign_off: extractFirstSignOff(row.completion_sign_offs),
-      }))
-    },
-    refetchOnWindowFocus: true,
-  })
-}
-
-// ---------------------------------------------------------------
-// useSupervisorCompletions
-//
-// Fetches completions for workers supervised by the current user.
-// RLS handles scoping — supervisors see their assigned workers,
-// safety_managers see all org completions.
-// ---------------------------------------------------------------
-export function useSupervisorCompletions(filter: FilterState, enabled = true) {
-  return useQuery<SupervisorCompletion[]>({
-    enabled,
-    queryKey: ['completions', 'supervisor', filter.type, 'value' in filter ? filter.value : undefined],
-    queryFn: async () => {
-      const supabase = createClient()
-
-      let query = supabase
-        .from('sop_completions')
-        .select(`
-          id,
-          sop_id,
-          worker_id,
-          sop_version,
-          status,
-          submitted_at,
-          sops ( title ),
-          completion_photos ( id ),
-          completion_sign_offs ( id, supervisor_id, decision, reason, created_at )
-        `)
-        .order('submitted_at', { ascending: false })
-        .limit(100)
-
-      if (filter.type === 'by_sop' && 'value' in filter && filter.value) {
-        query = query.eq('sop_id', filter.value)
-      }
-      if (filter.type === 'by_worker' && 'value' in filter && filter.value) {
-        query = query.eq('worker_id', filter.value)
-      }
-
-      const { data, error } = await query
-
-      if (error) {
-        console.error('useSupervisorCompletions error:', error)
-        return []
-      }
-
-      const rows = (data ?? []) as unknown as RawCompletionRow[]
-
-      return rows.map((row) => ({
-        id: row.id,
-        sop_id: row.sop_id,
-        worker_id: row.worker_id ?? '',
-        sop_version: row.sop_version,
-        status: row.status as CompletionStatus,
-        submitted_at: row.submitted_at,
         sop_title: extractSopTitle(row.sops),
         photo_count: row.completion_photos?.length ?? 0,
         sign_off: extractFirstSignOff(row.completion_sign_offs),

@@ -13,7 +13,6 @@ const Lightbox = dynamic<LightboxExternalProps>(
 
 interface Photo {
   id: string
-  storagePath: string
   signedUrl: string
   contentType: string
 }
