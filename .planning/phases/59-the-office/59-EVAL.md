@@ -125,3 +125,10 @@ Screenshots (inspect these — CSS/sizing bugs are invisible to assertions): `.p
 | `59-real-org-office` | ok after the fix. Real org, read only: Inbox 16 with Sign-off 3, Stuck 9, Machines 4; all four tabs fit at 400 px (before the fix "Access" was clipped); the Office pin on the map and the room list read 16 as well. |
 
 No screenshot shows a raw palette colour, a missing tint (pink and amber chips, green check and blue dots all render) or a layout overflow beyond the items marked minor above.
+
+## Re-run after the code-review fixes — 2026-10-06, commit `b66b200d` (orchestrator)
+
+`npm run eval -- --phase 59` at the deployed `b66b200d` (CR-01/02, WR-01..05 from `59-REVIEW-FIX.md`): **67 passed / 1 failed / 6 skipped** (the 6 skips are the dependents of the failed case).
+
+- The one failure is `people: wide pane, invite with a role …` at the first invite: `office-receipt` stayed empty. Diagnosed with a direct `auth.admin.inviteUserByEmail` probe from the service key: **`429 email rate limit exceeded`** — Supabase's built-in email sender was at its hourly cap after the 59-16 runs. Environmental, not the product; the CR-02 change is on the pending-invitee branch, which this case never reached. Re-run of that single case once the window reset: see below.
+- Screenshots re-read: `59-decisions` / `59-decisions-hover` show the WR-02 wording live — one ledger row per decision, `SIGNED OFF` for approvals and `REJECTED` for rejections, `MARKED REVIEWED`, `CHANGED OWNER`, `PUBLISHED`, `APPROVED`; `59-signoff-open` / `59-signoff-supervisor` / `59-reject-dialog` unchanged in layout after the claim-first sign-off (WR-01); `59-real-org-office` still fits the four tabs at 400 px with the two-digit count.
