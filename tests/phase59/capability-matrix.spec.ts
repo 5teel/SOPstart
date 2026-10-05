@@ -55,7 +55,13 @@ test.describe('capability matrix', () => {
       expect(r).toContain(name)
     }
   })
-  test.fixme('Decisions tab row: admin and safety manager only (59-10)', () => {})
+  test('Decisions tab row: admin and safety manager only (59-10)', () => {
+    const r = row('Read decision ledger')
+    expect(r.split('|').map((c) => c.trim()).slice(2, 6)).toEqual(['—', '—', '✅', '✅'])
+    for (const name of ['listDecisions()', 'countClearedToday()', 'src/actions/office.ts', 'admins_can_read_decisions']) {
+      expect(r).toContain(name)
+    }
+  })
   test.fixme('legacy addresses row: the governance, team and access addresses redirect (59-13)', () => {})
   test.fixme('Activity row: a non-owner completion address redirects to the Office (59-15)', () => {})
 })

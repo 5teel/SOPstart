@@ -20,6 +20,20 @@ function nzDayDiff(a: Date, b: Date): number {
   return Math.round((Date.UTC(y.y, y.m - 1, y.day) - Date.UTC(x.y, x.m - 1, x.day)) / DAY_MS)
 }
 
+/** The instant NZ midnight began for the NZ calendar day `now` falls in, as an ISO string. */
+export function nzStartOfDayIso(now: Date = new Date()): string {
+  const { y, m, day } = nzYmd(now)
+  const utcMidnight = Date.UTC(y, m - 1, day)
+  // NZ is UTC+12 or +13; midnight is never inside a DST gap, so exactly one candidate reads 00:00 on that day.
+  for (const hours of [13, 12]) {
+    const c = new Date(utcMidnight - hours * 3_600_000)
+    const wall = new Intl.DateTimeFormat('en-NZ', { timeZone: TZ, hourCycle: 'h23', hour: 'numeric', minute: 'numeric' }).format(c)
+    const w = nzYmd(c)
+    if (wall === '00:00' && w.y === y && w.m === m && w.day === day) return c.toISOString()
+  }
+  return new Date(utcMidnight - 12 * 3_600_000).toISOString()
+}
+
 /** "12 Nov"; the year is added only when it is not the current NZ year. */
 export function nzDay(iso: string, now: Date = new Date()): string {
   const d = new Date(iso)
