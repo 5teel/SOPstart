@@ -1979,7 +1979,7 @@ Plans:
   4. The decisions tab lists the ledger newest first and can be narrowed by kind of decision; opening it, people and roles, or access widens the detail panel while the site stays visible and re-centres on the Office
   5. An admin invites a person, sets their role, sees their department, and opens the existing access wiring screen, unchanged, to decide who sees which SOPs
 
-**Plans:** 14/16 plans executed
+**Plans:** 15/16 plans executed
 Plans:
 **Wave 1**
 
@@ -2030,7 +2030,7 @@ Plans:
 
 **Wave 12** *(blocked on Wave 11 completion)*
 
-- [ ] 59-15-PLAN.md — Delete the supervisor activity view and supervisor half of the completion page; spec repoints; non-owners land on the Office; supervisor-review dropped feature
+- [x] 59-15-PLAN.md — Delete the supervisor activity view and supervisor half of the completion page; spec repoints; non-owners land on the Office; supervisor-review dropped feature
 
 **Wave 13** *(blocked on Wave 12 completion)*
 
