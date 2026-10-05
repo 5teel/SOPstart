@@ -1714,7 +1714,7 @@ Executes 55 → 56 → 57 → 58 → 59 → 60 → 61 → 62, strictly sequentia
 - [x] **Phase 55: Cut the Dropped Features & One Organisation** - Offline, voice, phone/QR, shared-device login, video generation, flow diagram, annotation, YouTube and photo-scan on-ramps, library pages and version compare/restore deleted; sign-up no longer creates an organisation; the worker path keeps working online (completed 2026-10-03)
 - [x] **Phase 56: A Simpler SOP & the Decision Ledger** - Every SOP converted to sections and steps (hazard and PPE as kinds of step), standards as labels, machine-or-site placement; one append-only decision ledger written by every existing approve / sign-off / assign / publish path (completed 2026-10-04)
 - [x] **Phase 57: The One Screen & Its Places** - List · isometric site · detail panel as the landing screen, four signposted rooms, search, "next for you" card, pins, site edit mode; no header navigation (completed 2026-10-04)
-- [ ] **Phase 58: The SOP Focus Screen — Walk & Edit** - Opening a SOP removes the map and the list; walk one step at a time to a sign-off, or edit with the AI check and tick-each-step before publish; new versions
+- [x] **Phase 58: The SOP Focus Screen — Walk & Edit** - Opening a SOP removes the map and the list; walk one step at a time to a sign-off, or edit with the AI check and tick-each-step before publish; new versions (completed 2026-10-05)
 - [ ] **Phase 59: The Office** - Inbox that drains, sign-off and approvals, decision ledger, people and roles, the existing access wiring — one room, with the detail panel widening for tables
 - [ ] **Phase 60: Requests, Notifications & Objectives** - People and agents raise requests the Office answers; notifications with a bell; objectives as quiet metadata; the site overview fills in
 - [ ] **Phase 61: The Workshop & the Smoko Room** - Four ways to start a SOP, in-progress list, AI model choice, worker change requests; training matrix, simple observations, my record
@@ -1910,7 +1910,7 @@ Plans:
   4. A SOP still being read from a document or a video opens in the editor saying what is happening and roughly how long it will take, never as an empty page, and getting there does not reload the whole app
   5. Publishing a new version means workers always get the latest published one while earlier versions stay on record; Back or Esc from any open SOP returns to the one screen with the place the user came from still selected
 
-**Plans:** 17/18 plans executed
+**Plans:** 18/18 plans complete
 Plans:
 **Wave 1**
 
@@ -1961,7 +1961,7 @@ Plans:
 
 **Wave 11** *(blocked on Wave 9; runs after the optional Wave 10)*
 
-- [ ] 58-18-PLAN.md — --missing sweep, deployed eval with every screenshot read, build + full suite once, validation sign-off
+- [x] 58-18-PLAN.md — --missing sweep, deployed eval with every screenshot read, build + full suite once, validation sign-off
 
 **UI hint**: yes
 
