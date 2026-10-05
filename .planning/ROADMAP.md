@@ -1910,7 +1910,7 @@ Plans:
   4. A SOP still being read from a document or a video opens in the editor saying what is happening and roughly how long it will take, never as an empty page, and getting there does not reload the whole app
   5. Publishing a new version means workers always get the latest published one while earlier versions stay on record; Back or Esc from any open SOP returns to the one screen with the place the user came from still selected
 
-**Plans:** 15/18 plans executed
+**Plans:** 16/18 plans executed
 Plans:
 **Wave 1**
 
@@ -1953,7 +1953,7 @@ Plans:
 
 **Wave 9** *(blocked on Wave 8 completion)*
 
-- [ ] 58-16-PLAN.md — Delete tabbed page, old walkthroughs, builder, versions page and block machinery by consumer graph; dropped list, sweeps, map, matrix, bundle
+- [x] 58-16-PLAN.md — Delete tabbed page, old walkthroughs, builder, versions page and block machinery by consumer graph; dropped list, sweeps, map, matrix, bundle
 
 **Wave 10** *(blocked on Wave 9 completion — OPTIONAL, nothing depends on it)*
 
