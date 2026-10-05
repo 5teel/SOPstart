@@ -21,10 +21,7 @@
  *      `baseline + TOLERANCE_KB` of `.bundle-baseline.json`.
  *
  *   2. **Forbidden-marker gate.** None of the route's `forbiddenMarkers`
- *      string literals may appear in that route's own chunk set. Route A
- *      additionally keeps its POSITIVE chunk-existence assertion
- *      (`DesktopWalkthrough` must exist somewhere in the build) — that
- *      check is scoped to route A only.
+ *      string literals may appear in that route's own chunk set.
  *
  *   3. **Marker self-validation (new in 41-01).** Every forbidden marker,
  *      across every route, must be found SOMEWHERE in the overall build
@@ -261,65 +258,15 @@ for (const entry of GATED_ROUTES) {
 }
 
 // ---------------------------------------------------------------------------
-// Route-A-only positive chunk-existence assertions (Wave 4 — LIVE, no
-// carve-out). DesktopWalkthrough must exist as its own dynamic chunk
-// somewhere in the build. If it is absent, somebody statically imported it
-// outside of WalkthroughSwitcher.tsx —
-// which would silently inflate the mobile First Load JS even if delta
-// hasn't tripped yet.
+// Phase 58-11: the Route-A positive assertion ("DesktopWalkthrough must exist
+// as its own lazy chunk") is retired. The SOP route is now the server-resolved
+// focus screen and mounts no old walkthrough, so that chunk is no longer in the
+// build -- and its absence from the route is exactly what the marker gate above
+// proves. 58-13 adds the lazy FocusEditor seam and its own positive marker.
 // ---------------------------------------------------------------------------
-function findSymbolInBuildOutput(symbol: string, pageBundlePath: string): { found: boolean; locations: string[] } {
-  const locations: string[] = []
-
-  if (fs.existsSync(pageBundlePath)) {
-    const body = fs.readFileSync(pageBundlePath, 'utf-8')
-    if (body.includes(symbol)) locations.push(pageBundlePath)
-  }
-
-  const loadableManifest = path.join(NEXT_DIR, 'server', 'middleware-react-loadable-manifest.js')
-  if (fs.existsSync(loadableManifest)) {
-    const body = fs.readFileSync(loadableManifest, 'utf-8')
-    if (body.includes(symbol)) locations.push(loadableManifest)
-  }
-
-  const staticChunksDir = path.join(NEXT_DIR, 'static', 'chunks')
-  if (fs.existsSync(staticChunksDir)) {
-    for (const entry of fs.readdirSync(staticChunksDir)) {
-      const full = path.join(staticChunksDir, entry)
-      const stat = fs.statSync(full)
-      if (!stat.isFile() || !entry.endsWith('.js')) continue
-      if (
-        entry.startsWith('webpack-') ||
-        entry.startsWith('polyfills-') ||
-        entry.startsWith('main-app-') ||
-        entry.startsWith('framework-')
-      ) {
-        continue
-      }
-      if (stat.size > 2 * 1024 * 1024) continue
-      const body = fs.readFileSync(full, 'utf-8')
-      if (body.includes(symbol)) {
-        locations.push(full)
-        break
-      }
-    }
-  }
-
-  return { found: locations.length > 0, locations }
-}
-
 const routeA = GATED_ROUTES[0]
-const desktopFound = findSymbolInBuildOutput('DesktopWalkthrough', routeA.pageBundlePath)
 
-if (!desktopFound.found) {
-  fail(
-    'DesktopWalkthrough chunk not found in any build manifest or chunk — was the component statically imported instead of via next/dynamic({ ssr: false })?'
-  )
-}
-
-console.log(
-  `check-bundle-size: ✓ Bundle isolation OK (chunks present, delta within tolerance) — DesktopWalkthrough at ${desktopFound.locations[0]}`
-)
+console.log('check-bundle-size: ✓ Bundle isolation OK (delta within tolerance, no forbidden marker in a gated route)')
 console.log(
   `check-bundle-size: ✓ Source-viewer isolation OK — pdfjs + mammoth not in ${routeA.route} bundle (D-21-09).`
 )

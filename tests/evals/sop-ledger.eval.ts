@@ -98,11 +98,11 @@ test.describe.serial('Phase 56 -- simpler SOP + decision ledger (deployed)', () 
     await workerCtx?.close()
   })
 
-  /** Worker opens the SOP and returns the standard labels in the meta row. */
+  /** Worker opens the SOP (browse state of the focus screen) and returns the standard labels in its summary card. */
   const workerLabels = async (page: Page, sopId: string) => {
     await page.goto(`/sops/${sopId}`)
-    await expect(page.getByTestId('sop-meta')).toBeVisible(SLOW)
-    return page.getByTestId('sop-meta').getByTestId('standard-label').allInnerTexts()
+    await expect(page.getByTestId('focus-summary')).toBeVisible(SLOW)
+    return page.getByTestId('focus-summary').getByTestId('standard-label').allInnerTexts()
   }
 
   test('A -- every SOP has an ok conversion run; convert fixture counts match the known answer; library-linked SOPs converted', async () => {
@@ -168,26 +168,22 @@ test.describe.serial('Phase 56 -- simpler SOP + decision ledger (deployed)', () 
     console.log(`A: ${linkedSops.size} library-linked SOPs, all converted`)
   })
 
-  test('B -- old SOP page and builder render the converted fixture exactly as before', async () => {
+  test('B -- the focus screen (browse) and the builder render the converted fixture', async () => {
     const page = await workerCtx.newPage()
     const errors = watchConsole(page)
     await page.goto(`/sops/${sopIds.convert}`)
-    const main = page.locator('main')
-    await expect(main.getByText('Pinch point at the rollers.')).toBeVisible(SLOW)
-    await expect(main.getByText('Hot surface on the oven door.')).toBeVisible(SLOW)
-    await expect(main.getByText('Safety glasses').first()).toBeVisible(SLOW)
-    await expect(main.getByText('Cut-resistant gloves').first()).toBeVisible(SLOW)
-    const steps = page.getByTestId('job-steps')
-    await expect(steps.getByText('Isolate the press.')).toHaveCount(1, SLOW)
-    await expect(steps.getByText('Photograph the isolation lock.')).toHaveCount(1)
-    await expect(main.getByText('Isolate the press.')).toHaveCount(1)
-    await shot(page, 'ledger-b-read')
-
-    const ack = page.getByTestId('safety-acknowledge')
-    if (await ack.count()) await ack.click()
-    await page.getByTestId('walk-it').click()
-    await expect(page.getByTestId('step-counter')).toContainText(/of 2\b/, SLOW)
-    await shot(page, 'ledger-b-walk')
+    const browse = page.getByTestId('focus-browse')
+    await expect(browse).toBeVisible(SLOW)
+    await expect(browse.getByText('Pinch point at the rollers.')).toHaveCount(1, SLOW)
+    await expect(browse.getByText('Hot surface on the oven door.')).toHaveCount(1)
+    await expect(browse.getByText('Safety glasses').first()).toBeVisible(SLOW)
+    await expect(browse.getByText('Cut-resistant gloves').first()).toBeVisible(SLOW)
+    await expect(browse.getByText('Isolate the press.')).toHaveCount(1)
+    await expect(browse.getByText('Photograph the isolation lock.')).toHaveCount(1)
+    // Hazards and PPE come first in walking order (D-07).
+    const kinds = await browse.getByTestId('focus-browse-step').evaluateAll((els) => els.map((e) => e.getAttribute('data-kind')))
+    expect(kinds.slice(0, 5)).toEqual(['hazard', 'hazard', 'hazard', 'hazard', 'ppe'])
+    await shot(page, 'ledger-b-browse')
     expect(errors, errors.join('\n')).toEqual([])
     await page.close()
 
@@ -234,21 +230,14 @@ test.describe.serial('Phase 56 -- simpler SOP + decision ledger (deployed)', () 
     await expect(panel.getByText('Saved ✓')).toBeVisible(SLOW)
     await shot(admin, 'ledger-c-panel')
 
-    // Worker sees it on the SOP, on the Read section heading and on the walk.
+    // Worker sees it on the SOP summary and on the section heading of the focus screen's browse state.
     await expect(async () => {
       expect(await workerLabels(worker, sopIds.convert)).toContain(STD)
     }).toPass(SLOW)
-    const main = worker.locator('main')
     await expect(
-      main.locator('p').filter({ hasText: 'Procedure' }).filter({ has: worker.getByTestId('standard-label') }).first()
+      worker.locator('h2').filter({ hasText: 'Procedure' }).filter({ has: worker.getByTestId('standard-label') }).first()
     ).toBeVisible(SLOW)
     await shot(worker, 'ledger-c-worker-read')
-    const ack = worker.getByTestId('safety-acknowledge')
-    if (await ack.count()) await ack.click()
-    await worker.getByTestId('walk-it').click()
-    await expect(worker.getByTestId('step-counter')).toBeVisible(SLOW)
-    await expect(worker.locator('[data-region="meta"]').getByTestId('standard-label').filter({ hasText: STD })).toBeVisible(SLOW)
-    await shot(worker, 'ledger-c-worker-walk')
 
     // Rename.
     await row(STD).getByRole('button', { name: 'Rename', exact: true }).click()

@@ -14,6 +14,10 @@ export async function deleteEvalCompletions(db: SupabaseClient, sopId: string): 
   const orgId = sop.organisation_id as string
   if (orgId === REAL_SOPSTART_ORG_ID) throw new Error('refusing to delete completions in the real SOPstart org')
 
+  // Phase 58: a walk (in progress, abandoned or submitted) is its own row; clear them with the completions.
+  const walks = await db.from('sop_walks').delete().eq('sop_id', sopId).eq('organisation_id', orgId)
+  if (walks.error) throw new Error(`sop_walks delete failed: ${walks.error.message}`)
+
   const { data: rows, error: rowsErr } = await db.from('sop_completions').select('id').eq('sop_id', sopId)
   if (rowsErr) throw new Error(`completions lookup failed: ${rowsErr.message}`)
   const ids = (rows ?? []).map((r) => r.id as string)

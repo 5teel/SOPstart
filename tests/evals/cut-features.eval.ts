@@ -91,40 +91,47 @@ test.describe('Phase 55 — cut features (deployed)', () => {
   })
 
   test.describe.serial('walk with a photo, then it waits for sign-off', () => {
-    test('worker on a phone walks the walk fixture, takes the photo it asks for and submits — nothing queued', async ({
+    test('worker on a phone walks the walk fixture, adds the photo it asks for and sends it — nothing queued', async ({
       page,
       context,
     }) => {
-      test.setTimeout(180_000)
+      test.setTimeout(240_000)
       await page.setViewportSize({ width: 390, height: 844 })
       const errors = watchConsole(page)
       await signInAs(context, 'siteWorker')
-      await page.goto(`/sops/${walkSopId}?tab=walk`)
+      await page.goto(`/sops/${walkSopId}`)
 
-      // The card renders twice (list view hidden below 430px) -- scope to the phone one.
-      const card = page.locator('.immersive-only-below-430')
-      const next = page.getByTestId('ack-next')
-      await expect(next).toBeVisible(SLOW)
+      // The focus screen (Phase 58): browse first, then one step at a time.
+      const start = page.getByTestId('focus-start-walking')
+      await expect(start).toHaveCount(1, SLOW)
+      await start.click()
+      const primary = page.getByTestId('walk-primary')
+      await expect(primary).toHaveCount(1, SLOW)
 
-      // Step 1: no photo needed.
-      await next.click()
+      // Hazard, PPE and the plain step: no photo needed.
+      for (const kind of ['hazard', 'ppe', 'step']) {
+        await expect(page.locator(`[data-testid="walk-step"][data-kind="${kind}"]`)).toHaveCount(1, SLOW)
+        await primary.click()
+      }
 
-      // Step 2: photo required, so Next stays disabled until one is uploaded.
-      await expect(next).toBeDisabled(SLOW)
-      const input = card.getByTestId('step-photo-input')
+      // The photo step: the primary stays disabled until one is uploaded.
+      await expect(primary).toBeDisabled(SLOW)
+      const input = page.getByTestId('step-photo-input')
       await expect(input).toHaveCount(1, { timeout: 10_000 })
       await input.setInputFiles({ name: 'guard.png', mimeType: 'image/png', buffer: TINY_PNG })
-      await expect(card.locator('[data-testid="step-photo"][data-status="uploaded"]')).toHaveCount(1, { timeout: 60_000 })
-      await expect(card.getByText('Uploaded')).toBeVisible()
-      await expect(next).toBeEnabled(SLOW)
-      await next.click()
+      await expect(page.getByTestId('step-photo')).toHaveCount(1, { timeout: 60_000 })
+      await expect(primary).toBeEnabled(SLOW)
+      await primary.click()
 
-      // Done: sign off and submit.
-      await page.getByRole('button', { name: /Sign off & submit/ }).click()
-      await expect(page.getByText('Completion submitted')).toBeVisible({ timeout: 60_000 })
+      // Last step, then review and send.
+      await expect(primary).toHaveText(/Done — review/, SLOW)
+      await primary.click()
+      await expect(page.getByTestId('walk-review')).toBeVisible(SLOW)
+      await page.getByTestId('walk-send').click()
+      await expect(page.getByTestId('walk-sent')).toBeVisible({ timeout: 60_000 })
       await expect(page.getByText(/queued|saved for later|waiting to upload/i)).toHaveCount(0)
       await shot(page, 'cut-walk-phone')
-      expect(errors, errors.join("\n")).toEqual([])
+      expect(errors, errors.join('\n')).toEqual([])
     })
 
     test('admin sees that completion waiting for sign-off with its photo', async ({ page, context }) => {

@@ -224,7 +224,9 @@ test.describe('Phase 57 — the one screen (deployed)', () => {
     await machineRow.getByTestId('plant-panel-walk').click()
     await expect(page).toHaveURL(new RegExp(`/sops/${plantSopId}\\?from=[0-9a-f-]{36}`), SLOW)
     await expect(page.getByText(NOT_FOUND)).toHaveCount(0)
-    await expect(page.getByTestId('back-to-site')).toBeVisible(SLOW)
+    // Phase 58: the SOP owns the screen -- the focus frame's own Back replaces the site's Back bar.
+    await expect(page.getByTestId('focus-screen')).toBeVisible(SLOW)
+    await expect(page.getByTestId('back-to-site')).toHaveCount(0)
 
     // From the Noticeboard (a published SOP on no machine).
     await page.goto('/?place=noticeboard')
@@ -234,7 +236,9 @@ test.describe('Phase 57 — the one screen (deployed)', () => {
     await boardRow.getByTestId('plant-panel-walk').click()
     await expect(page).toHaveURL(new RegExp(`/sops/${convertSopId}\\?from=noticeboard`), SLOW)
     await expect(page.getByText(NOT_FOUND)).toHaveCount(0)
-    await expect(page.getByTestId('back-to-site')).toBeVisible(SLOW)
+    // Phase 58: the SOP owns the screen -- the focus frame's own Back replaces the site's Back bar.
+    await expect(page.getByTestId('focus-screen')).toBeVisible(SLOW)
+    await expect(page.getByTestId('back-to-site')).toHaveCount(0)
   })
 
   test('D-11: a place deep link selects on load; a worker edit-mode link falls back to the overview', async ({ page, context }) => {

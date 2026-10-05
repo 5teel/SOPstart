@@ -50,10 +50,16 @@
       "value": 565,
       "capturedAt": "2026-10-05T00:00:00.000Z",
       "note": "Phase 57-08 follow-up: baseline is now 831 KB (measured). The previous 792/565 values were measured with the worker shell in a lazy chunk the gate could not see; this 831 entry is the first measurement of the worker's actual first download on /. Like-for-like, the retired /sops list page measured 795 KB after the 57-04 gate fix and the 57-06 header deletion, so the one screen costs +36 KB (stage, rooms, frame, Now card). Decision by the phase-57 orchestrator on 2026-10-05; WorkerShell is a static import again, AdminShell stays the lazy seam."
+    },
+    {
+      "route": "/sops/[sopId]/page",
+      "value": 795,
+      "capturedAt": "2026-10-05T00:00:00.000Z",
+      "note": "Phase 58-11: tabbed page replaced by the focus frame (server-resolved page + FocusWalker); measured 794 KB, moved DOWN by hand from 795. The gate sums shared chunks only: the route's own page chunk (about 37 KB raw, URL-encoded path) is the known uncounted blind spot, so the old tabs leaving and the walk arriving are both invisible to this number."
     }
   ],
   "routes": {
-    "/sops/[sopId]/page": 795,
+    "/sops/[sopId]/page": 794,
     "/page": 831
   }
 }

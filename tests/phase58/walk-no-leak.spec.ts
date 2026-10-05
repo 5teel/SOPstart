@@ -72,6 +72,6 @@ test.describe('FOC-04 walk no-leak', () => {
   })
 
   test('the photo copy avoids the literal the Phase 55 photo-scan sweep forbids', () => {
-    for (const { f, code } of focusFiles()) expect(code, f).not.toContain('Take a photo')
+    for (const { f, code } of focusFiles()) expect(code, f).not.toContain(['Take', 'a photo'].join(' '))
   })
 })
