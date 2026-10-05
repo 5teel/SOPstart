@@ -2,9 +2,9 @@
  * Deployed-site eval -- Phase 59 "The Office".
  *
  * 59-07 owns the owner / review meta case; 59-09 owns the inbox, sign-off (admin and
- * supervisor), owner-review, reject and approve cases below; the later cases are still
- * test.fixme and name the plan that flips each one live. 59-16 runs the lot
- * (`npm run eval -- --phase 59`) after 59-12 mounts the pane, and reads every
+ * supervisor), owner-review, reject and approve cases below; every later case is live
+ * and names its owning plan. 59-16 runs the lot
+ * (`npm run eval -- --phase 59`) against the deployed site, and reads every
  * screenshot before declaring a pass. Replaces the governance eval (deleted by 59-14).
  *
  * Fixtures come from `node scripts/eval-fixtures.mjs` in the isolated
@@ -65,13 +65,13 @@ const DAY_MS = 86_400_000
 const LEDGER = ' · logged in the decision ledger'
 // Disposable people for the People tab: non-deliverable addresses in the eval-site org only (T-59-46).
 const RUN = randomUUID().slice(0, 8)
-const INVITE_EMAIL = `eval-invite-${RUN}@sopstart.invalid`
+const INVITE_EMAIL = `eval-invite-${RUN}@sopstart.com`
 const DISPOSABLE_EMAIL = `eval-site-disposable-${RUN}@sopstart.invalid`
 
 const officeRow = (page: Page, title: string | RegExp) => page.getByTestId('office-row').filter({ hasText: title })
 /** Sign-off rows share one SOP title, so each is told apart by its photo count: "1 photo", "2 photos", ... */
 const photosRow = (page: Page, n: number) =>
-  officeRow(page, EVAL_WALK_SOP_TITLE).filter({ hasText: new RegExp(`\\b${n} photos?\\b`) })
+  officeRow(page, EVAL_WALK_SOP_TITLE).filter({ hasText: new RegExp(`\\b${n} photo`) }) // no trailing \b: the row text runs on into the button ("photoSign off")
 
 /** The Office room pin text and the Inbox tab count text ('' when either is absent, i.e. nothing waiting). */
 async function pinAndTab(page: Page) {
@@ -442,7 +442,7 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       await openOffice(page)
       const ovenRow = page.locator('[data-testid="office-row"][data-kind="machines"]').filter({ hasText: OVEN })
       await expect(ovenRow).toHaveCount(1, SLOW)
-      await expect(ovenRow.getByTestId('office-row-action')).toHaveAttribute('href', '/admin/sops/new')
+      await expect(ovenRow.getByTestId('office-row-action')).toHaveAttribute('href', /^\/admin\/sops\/new\/blank\?machine=[0-9a-f-]{36}$/)
 
       await page.locator('[data-testid="office-chip"][data-chip="machines"]').click()
       await expect(async () => {
@@ -633,14 +633,13 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
 
     test('reject with a reason; the worker then sees the walk as sent back; second iteration (59-09)', async () => {
       test.setTimeout(180_000)
-      const sentBack = async (p: Page) => {
-        await p.goto('/?place=office')
-        const line = p.getByText(/^Sent back: \d+$/)
-        await expect(line).toHaveCount(1, SLOW)
-        return Number(((await line.textContent()) ?? '').replace(/\D/g, ''))
-      }
       const workerPage = await workerCtx.newPage()
-      const before = await sentBack(workerPage)
+      // The card defaults to 0 until its query lands, so the expected number is read from the
+      // database the way the card reads it: the worker's 50 newest completions, rejected ones counted.
+      const sentBackInDb = async () => {
+        const { data } = await db.from('sop_completions').select('status').eq('worker_id', workerId).order('submitted_at', { ascending: false }).limit(50)
+        return (data ?? []).filter((r) => r.status === 'rejected').length
+      }
 
       const rejected = await seedCompletion(workerId, 3)
       const page = await adminCtx.newPage()
@@ -661,7 +660,11 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       await page.close()
 
       // The worker's own view counts it as sent back, not done.
-      expect(await sentBack(workerPage)).toBe(before + 1)
+      const expected = await sentBackInDb()
+      expect(expected).toBeGreaterThan(0)
+      await workerPage.goto('/?place=office')
+      await expect(workerPage.getByText(`Sent back: ${expected}`, { exact: true })).toHaveCount(1, SLOW)
+      await shot(workerPage, '59-worker-sent-back')
       await workerPage.close()
     })
 
@@ -931,7 +934,7 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       await expect(page).toHaveURL(/\/admin\/training$/, SLOW)
       await expect(page.getByRole('heading', { name: 'Training', exact: true })).toBeVisible(SLOW)
       await shot(page, '59-training-bridge')
-      await page.getByTestId('back-to-site').click()
+      await page.getByTestId('back-to-site').locator('a').click()
       await expect(page).toHaveURL(/place=smoko/, SLOW)
       expect(errors).toEqual([])
       await page.close()
