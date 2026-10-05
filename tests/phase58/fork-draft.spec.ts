@@ -45,6 +45,54 @@ function sopKeyedTables(): Set<string> {
   return tables
 }
 
+/** Columns of public.sops, walking create/add/drop/rename in migration order (review WR-01). */
+function sopsColumns(): Set<string> {
+  const cols = new Set<string>()
+  for (const file of fs.readdirSync(MIGRATIONS).filter((f) => f.endsWith('.sql')).sort()) {
+    const sql = fs
+      .readFileSync(path.join(MIGRATIONS, file), 'utf8')
+      .split('\n')
+      .filter((l) => !l.trimStart().startsWith('--'))
+      .join('\n')
+    const ct = /create\s+table\s+(?:if\s+not\s+exists\s+)?(?:public\.)?sops\s*\(([\s\S]*?)\n\);/i.exec(sql)
+    if (ct) {
+      for (const l of ct[1].split('\n')) {
+        const m = l.match(/^\s*"?([a-z_]+)"?\s+\S/)
+        if (m && !/^(constraint|unique|primary|check|foreign)$/.test(m[1])) cols.add(m[1])
+      }
+    }
+    for (const m of sql.matchAll(/alter\s+table\s+(?:only\s+)?(?:public\.)?sops\b([\s\S]*?);/gi)) {
+      for (const c of m[1].matchAll(/add\s+column\s+(?:if\s+not\s+exists\s+)?"?([a-z_]+)"?/gi)) cols.add(c[1])
+      for (const c of m[1].matchAll(/drop\s+column\s+(?:if\s+exists\s+)?"?([a-z_]+)"?/gi)) cols.delete(c[1])
+      for (const c of m[1].matchAll(/rename\s+column\s+"?([a-z_]+)"?\s+to\s+"?([a-z_]+)"?/gi)) {
+        cols.delete(c[1])
+        cols.add(c[2])
+      }
+    }
+  }
+  return cols
+}
+
+/** sops columns a fork must NOT carry over, each with its reason. */
+const SOPS_COLUMNS_NOT_COPIED: Record<string, string> = {
+  id: 'the new version has its own id',
+  created_at: 'db default',
+  updated_at: 'db default',
+  published_at: 'a draft is not published',
+  status: "set to 'draft'",
+  version: 'computed by computeNextVersionLineage',
+  parent_sop_id: 'computed by computeNextVersionLineage',
+  superseded_by: 'written by publish, never by a fork',
+  uploaded_by: 'the forking admin',
+  placement: 'trigger-synced from sop_machines',
+  approval_state: 'the fork runs its own approval chain at publish',
+  approval_snapshot: 'the fork runs its own approval chain at publish',
+  review_due_at: 'review cadence restarts when the new version publishes',
+  last_reviewed_at: 'review history belongs to the version that was reviewed',
+  last_reviewed_by: 'review history belongs to the version that was reviewed',
+  fts: 'generated search column',
+}
+
 const COPIED = [
   'sops',
   'sop_sections',
@@ -99,6 +147,23 @@ test.describe('SOP-04 forkDraft', () => {
     // Entries that no longer exist rot the list.
     const stale = [...COPIED, ...Object.keys(NOT_COPIED)].filter((t) => !found.includes(t))
     expect(stale, `classified but not in the migrations: ${stale.join(', ')}`).toEqual([])
+  })
+
+  test('column census: every sops column is copied by the fork or on an explicit skip-list (review WR-01)', () => {
+    const body = strip(forkBody())
+    const cols = [...sopsColumns()]
+    expect(cols.length).toBeGreaterThan(30) // a parser that finds nothing passes vacuously
+    const insertStart = body.search(/from\('sops'\)\s*\.insert\(\{/)
+    expect(insertStart).toBeGreaterThan(-1)
+    const insert = body.slice(insertStart, body.indexOf('})', insertStart))
+    const keys = new Set([...insert.matchAll(/^\s*([a-z_]+):/gm)].map((m) => m[1]))
+
+    const missing = cols.filter((c) => !keys.has(c) && !(c in SOPS_COLUMNS_NOT_COPIED))
+    expect(missing, `sops columns dropped by forkDraft: ${missing.join(', ')}`).toEqual([])
+    const stale = Object.keys(SOPS_COLUMNS_NOT_COPIED).filter((c) => !cols.includes(c))
+    expect(stale, `skip-listed but not a sops column: ${stale.join(', ')}`).toEqual([])
+    const contradicted = Object.keys(SOPS_COLUMNS_NOT_COPIED).filter((c) => keys.has(c) && !['status', 'version', 'parent_sop_id', 'uploaded_by'].includes(c))
+    expect(contradicted, `skip-listed yet written: ${contradicted.join(', ')}`).toEqual([])
   })
 
   test('forkDraft guards, scopes to the session org and reuses an open draft (D-18)', () => {

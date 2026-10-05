@@ -69,7 +69,15 @@ export async function forkDraft({ sopId }: { sopId: string }): Promise<{ draftId
   })
 
   // placement is trigger-synced from sop_machines; superseded_by is never written.
-  const { data: created, error: insertError } = await admin
+  // Columns the hand-maintained types do not carry (review WR-01); the column
+  // census in tests/phase58/fork-draft.spec.ts fails when a sops column is
+  // neither copied here nor on its skip-list.
+  const extra = source as unknown as {
+    source_type: string | null
+    all_departments: boolean | null
+    all_departments_pre_override: boolean | null
+  }
+  const { data: created, error: insertError } = await db
     .from('sops')
     .insert({
       organisation_id: orgId,
@@ -81,7 +89,13 @@ export async function forkDraft({ sopId }: { sopId: string }): Promise<{ draftId
       source_file_name: source.source_file_name,
       source_file_type: source.source_file_type,
       source_file_path: source.source_file_path,
+      source_type: extra.source_type,
       is_ocr: source.is_ocr,
+      overall_confidence: source.overall_confidence,
+      parse_notes: source.parse_notes,
+      pipeline_run_id: source.pipeline_run_id,
+      all_departments: extra.all_departments,
+      all_departments_pre_override: extra.all_departments_pre_override,
       category: source.category,
       category_slug: source.category_slug ?? null,
       category_tag: source.category_tag,
