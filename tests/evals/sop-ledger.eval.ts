@@ -291,18 +291,21 @@ test.describe.serial('Phase 56 -- simpler SOP + decision ledger (deployed)', () 
       return data ?? []
     }
 
-    // (1) owner change through /governance
+    // (1) owner change through the Office inbox
     const { error: resetErr } = await db.from('sops').update({ owner_user_id: null }).eq('id', sopIds.plant)
     expect(resetErr).toBeNull()
     const { data: readBack } = await db.from('sops').select('owner_user_id').eq('id', sopIds.plant).single()
     expect(readBack?.owner_user_id).toBeNull()
 
     const admin = await adminCtx.newPage()
-    await admin.goto('/governance')
-    const fixtureRow = admin.getByTestId('gov-row').filter({ hasText: EVAL_PLANT_SOP_TITLE })
-    await expect(fixtureRow).toBeVisible(SLOW)
-    await fixtureRow.getByRole('button', { name: /Assign owner/ }).click()
-    await fixtureRow.getByRole('button', { name: /^admin \(/ }).click()
+    await admin.goto('/?place=office')
+    const fixtureRow = admin.getByTestId('office-row').filter({ hasText: EVAL_PLANT_SOP_TITLE })
+    await expect(fixtureRow).toHaveCount(1, SLOW)
+    await fixtureRow.getByTestId('office-row-action').click()
+    // The popover labels people by name or by role, so pick the first member option (the plant SOP is unowned).
+    const options = fixtureRow.locator('ul button')
+    await expect(options.nth(1)).toBeVisible(SLOW)
+    await options.nth(1).click()
     await expect(async () => {
       const rows = await since({ kind: 'owner_change', sop_id: sopIds.plant })
       expect(rows.length).toBe(1)

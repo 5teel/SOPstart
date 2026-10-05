@@ -8,7 +8,7 @@
  *
  * Flipped LIVE in Plan 37-05 as source-contract assertions over
  * VerdictButtons.tsx, RecordObservationModal.tsx, AssessmentRequestsPanel.tsx
- * and admin/team/page.tsx -- checks wiring (a control's own markup window
+ * and the /admin/training bridge page -- checks wiring (a control's own markup window
  * actually references the state/handler), not mere token presence
  * (2026-06-05 dead-feature blind spot; tests/phase37/assessor-ui-signoff.spec.ts
  * idiom).
@@ -36,8 +36,8 @@ const PANEL = readFileSync(
   'utf8'
 ).replace(/\r\n/g, '\n')
 
-const TEAM_PAGE = readFileSync(
-  path.join(process.cwd(), 'src/app/(protected)/admin/team/page.tsx'),
+const TRAINING_PAGE = readFileSync(
+  path.join(process.cwd(), 'src/app/(protected)/admin/training/page.tsx'),
   'utf8'
 ).replace(/\r\n/g, '\n')
 
@@ -130,13 +130,13 @@ test.describe('ASR-01 -- AssessmentRequestsPanel content + wiring (Pitfall 1 act
   })
 })
 
-test.describe('ASR-01 -- AssessmentRequestsPanel mounted on exactly one page, above TeamViewShell', () => {
-  test('admin/team/page.tsx imports and renders AssessmentRequestsPanel before TeamViewShell', () => {
-    expect(TEAM_PAGE).toContain(
+test.describe('ASR-01 -- AssessmentRequestsPanel mounted on exactly one page, above the training bridge (59-14)', () => {
+  test('admin/training/page.tsx imports and renders AssessmentRequestsPanel before TrainingBridge', () => {
+    expect(TRAINING_PAGE).toContain(
       "import { AssessmentRequestsPanel } from '@/components/observations/AssessmentRequestsPanel'"
     )
-    const panelIdx = TEAM_PAGE.indexOf('<AssessmentRequestsPanel')
-    const shellIdx = TEAM_PAGE.indexOf('<TeamViewShell')
+    const panelIdx = TRAINING_PAGE.indexOf('<AssessmentRequestsPanel')
+    const shellIdx = TRAINING_PAGE.indexOf('<TrainingBridge')
     expect(panelIdx).toBeGreaterThan(-1)
     expect(shellIdx).toBeGreaterThan(-1)
     expect(panelIdx).toBeLessThan(shellIdx)

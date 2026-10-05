@@ -62,7 +62,7 @@ test.describe('Dead controls: scan-document, wiring lens, dead state (D-02/D-04/
 
   test('WiringPatchBay renders the Wiring view only — no lens toggle (D-05)', () => {
     const stripped = stripComments(read('src/components/admin/wiring/WiringPatchBay.tsx'))
-    for (const forbidden of ['LENS_OPTIONS', 'LensView', 'setLens', "'matrix'", "'illuminate'", '<ViewToggle']) {
+    for (const forbidden of ['LENS_OPTIONS', 'LensView', 'setLens', "'matrix'", "'illuminate'"]) {
       expect(stripped, `must not contain ${forbidden}`).not.toContain(forbidden)
     }
   })

@@ -84,7 +84,7 @@ export const INVENTORY: Row[] = [
   { file: 'tests/sb-auth-builder.test.ts', disposition: 'repoint', plan: '57-06' },
   { file: 'tests/phase53/login-next-redirect.spec.ts', disposition: 'repoint', plan: '57-06' },
   { file: 'tests/phase26.5/agent-dashboard.spec.ts', disposition: 'repoint', plan: '57-06' },
-  { file: 'tests/phase32/org-chart-build.spec.ts', disposition: 'repoint', plan: '57-06' },
+  { file: 'tests/phase32/org-chart-build.spec.ts', disposition: 'delete', plan: '57-06' }, // deleted in 59-14 with the org-chart views
   // 57-07 (owner 07)
   { file: 'tests/phase51/site-workspace-wiring.spec.ts', disposition: 'repoint', plan: '57-07' }, // 06 edits the header part first
   { file: 'tests/e2e/admin-departments.spec.ts', disposition: 'delete', plan: '57-07' }, // 06 repoints its dashboard assertion first
@@ -127,7 +127,7 @@ export const INVENTORY: Row[] = [
   { file: 'tests/evals/plant-home.eval.ts', disposition: 'delete', plan: '57-10' },
   { file: 'tests/evals/sop-surface.eval.ts', disposition: 'delete', plan: '57-10' },
   { file: 'tests/evals/dead-surface.eval.ts', disposition: 'repoint', plan: '57-10' },
-  { file: 'tests/evals/governance.eval.ts', disposition: 'repoint', plan: '57-10' },
+  { file: 'tests/evals/governance.eval.ts', disposition: 'delete', plan: '57-10' }, // deleted in 59-14; cases live in tests/evals/office.eval.ts
   { file: 'tests/evals/site-editor.eval.ts', disposition: 'repoint', plan: '57-10' },
   { file: 'tests/evals/cut-features.eval.ts', disposition: 'repoint', plan: '57-10' },
   // Informational (no retired token today; the owning plan still edits them)

@@ -47,6 +47,7 @@ import {
 } from './lib/session'
 import { ensurePlantFixture, REAL_SOPSTART_ORG_ID, shot, watchConsole } from './lib/plant-fixture'
 import { deleteEvalCompletions } from './lib/completion-cleanup'
+import { newMachineCode } from '@/lib/site/scene'
 
 export const SLOW = { timeout: 30_000 }
 const SHORT = { timeout: 10_000 }
@@ -395,6 +396,63 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
         expect(c.pin).toBe(c.tab)
       }).toPass(SLOW)
       await shot(page, '59-receipt')
+      expect(errors).toEqual([])
+      await page.close()
+    })
+
+    test('inbox: a machine with no SOPs is a Machines row with a Write a SOP link, the Machines chip narrows to those rows, no real-org title leaks (moved from the governance eval, 59-14)', async () => {
+      assertEvalOrg()
+      const OVEN = 'EVAL Oven'
+      // Fixture: a second machine on the eval-site layout with zero linked SOPs (upsert by name, eval-site org only).
+      const { data: dept } = await db.from('departments').select('id').eq('organisation_id', siteOrgId).eq('name', 'Forming').maybeSingle()
+      const { data: layout } = await db
+        .from('site_layouts')
+        .select('id')
+        .eq('organisation_id', siteOrgId)
+        .not('scene_path', 'is', null)
+        .order('created_at', { ascending: true })
+        .limit(1)
+        .maybeSingle()
+      if (!dept || !layout) throw new Error('eval-site department or layout missing -- run node scripts/eval-fixtures.mjs')
+      let { data: oven } = await db.from('site_machines').select('id').eq('site_layout_id', layout.id).eq('organisation_id', siteOrgId).eq('name', OVEN).maybeSingle()
+      if (!oven) {
+        const made = await db
+          .from('site_machines')
+          .insert({
+            site_layout_id: layout.id,
+            organisation_id: siteOrgId,
+            name: OVEN,
+            department_id: dept.id,
+            polygon: [[80, 180], [280, 180], [280, 420], [80, 420]],
+            code: newMachineCode(),
+            sort: 1,
+          })
+          .select('id')
+          .single()
+        if (made.error || !made.data) throw new Error(`oven seed failed: ${made.error?.message}`)
+        oven = made.data
+      }
+      const unlink = await db.from('sop_machines').delete().eq('machine_id', oven.id)
+      expect(unlink.error).toBeNull()
+      const real = await db.from('sops').select('title').eq('organisation_id', REAL_SOPSTART_ORG_ID).not('title', 'is', null).limit(1).maybeSingle()
+      const realTitle = (real.data as { title: string } | null)?.title
+
+      const page = await adminCtx.newPage()
+      const errors = watchConsole(page)
+      await openOffice(page)
+      const ovenRow = page.locator('[data-testid="office-row"][data-kind="machines"]').filter({ hasText: OVEN })
+      await expect(ovenRow).toHaveCount(1, SLOW)
+      await expect(ovenRow.getByTestId('office-row-action')).toHaveAttribute('href', '/admin/sops/new')
+
+      await page.locator('[data-testid="office-chip"][data-chip="machines"]').click()
+      await expect(async () => {
+        const kinds = await page.getByTestId('office-row').evaluateAll((els) => els.map((e) => e.getAttribute('data-kind')))
+        expect(kinds.length).toBeGreaterThan(0)
+        expect(kinds.every((k) => k === 'machines')).toBe(true)
+      }).toPass(SLOW)
+      await page.locator('[data-testid="office-chip"][data-chip="all"]').click()
+
+      if (realTitle) await expect(page.getByText(realTitle, { exact: true })).toHaveCount(0)
       expect(errors).toEqual([])
       await page.close()
     })

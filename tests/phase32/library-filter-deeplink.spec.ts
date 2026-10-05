@@ -68,7 +68,7 @@ test.describe('SC-4 — library filter deep-link', () => {
        * magic-link session cookie for an admin user.
        *
        * Steps:
-       * 1. Navigate to /admin/access.
+       * 1. Navigate to /?place=office&tab=access.
        * 2. Click a department jack; confirm the SelectionStrip shows an
        *    "Open in the SOP list" link and its href is /?place=dept:<id>.
        * 3. Follow the link; confirm the one screen opens that department's place.

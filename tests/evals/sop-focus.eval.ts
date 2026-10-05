@@ -208,7 +208,7 @@ test.describe('Phase 58 — the SOP focus screen (deployed)', () => {
       await expect(page.getByTestId('focus-screen')).toBeVisible(SLOW)
       await expect(page.getByTestId('focus-screen')).toHaveAttribute('data-mode', 'browse')
       await expect(page.getByTestId('focus-start-walking')).toBeVisible(SLOW)
-      for (const id of ['shell', 'shell-stage', 'shell-summary', 'plant-stage', 'back-to-site', 'gov-inbox']) {
+      for (const id of ['shell', 'shell-stage', 'shell-summary', 'plant-stage', 'back-to-site', 'office-pane']) {
         await expect(page.getByTestId(id), id).toHaveCount(0)
       }
       await expect(page.locator('[data-testid*="inbox"], [data-testid*="notification"]')).toHaveCount(0)

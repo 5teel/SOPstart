@@ -29,7 +29,7 @@
  *
  * Repointed a second time in 54-05 (Phase 54, D-07/D-08): the Miller frame
  * and its lenses are gone. The ?sop= deep-link entry point (URL -> pinnedSopId)
- * is now the /admin/access page (57-07; the library table is gone, 57-09),
+ * is now the Office Access tab (59-11; the /admin/access page was deleted in 59-14),
  * which validates it as a UUID. Every WiringPatchBay.tsx test below is
  * unchanged (that file did not move).
  *
@@ -44,7 +44,8 @@ import path from 'node:path'
 const ROOT = process.cwd()
 const BAY = path.join(ROOT, 'src', 'components', 'admin', 'wiring', 'WiringPatchBay.tsx')
 const ADMIN_ACCESS_VIEW = path.join(ROOT, 'src', 'actions', 'admin-access-view.ts')
-const ACCESS_PAGE = path.join(ROOT, 'src', 'app', '(protected)', 'admin', 'access', 'page.tsx')
+const PLACE = path.join(ROOT, 'src', 'lib', 'shell', 'place.ts')
+const OFFICE_PANE = path.join(ROOT, 'src', 'components', 'office', 'OfficePane.tsx')
 
 function read(p: string): string {
   return fs.readFileSync(p, 'utf-8')
@@ -60,10 +61,9 @@ test.describe('SC-2 — server assembly: sopsByCollection + ?sop= deep-link entr
     expect(src).toContain('return { tree, collections, sopsByCollection, grants, newSop, deptMembers }')
   })
 
-  test('the access page resolves ?sop= into pinnedSopId (UUID-checked) for AdminAccessLens (deep-link entry point)', () => {
-    const pageSrc = read(ACCESS_PAGE)
-    expect(pageSrc).toContain('const pinnedSopId = sop && UUID.test(sop) ? sop : undefined')
-    expect(pageSrc).toContain('<AdminAccessLens pinnedSopId={pinnedSopId} />')
+  test('the proxy helper keeps ?sop= only when it is a UUID and the Office Access tab hands it to AdminAccessLens (deep-link entry point, 59-14)', () => {
+    expect(read(PLACE)).toContain("sop && UUID.test(sop) ? `&sop=${sop}`")
+    expect(read(OFFICE_PANE)).toContain('<AdminAccessLens pinnedSopId={initialSop ?? undefined} />')
   })
 })
 
@@ -144,7 +144,7 @@ test.describe('SC-2 — drill-down runtime (requires chromium + live app)', () =
     async ({ page }) => {
       /**
        * Steps:
-       * 1. Navigate to /admin/access (no ?sop= param).
+       * 1. Navigate to /?place=office&tab=access (no ?sop= param).
        * 2. Click a collection row; confirm its SOP rows render nested
        *    beneath it (title + status).
        * 3. Click any nested SOP row; confirm it enters choose-mode

@@ -1,10 +1,11 @@
 /**
- * Phase 54 / Plan 54-02 -- ADM-01 `/governance` inbox contracts.
+ * Phase 54 / Plan 54-02 -- ADM-01 inbox contracts.
  *
  * `deriveInbox` describe: pure unit tests over the row derivation (severity
  * ordering, chip assignment, All-clear empty state).
- * `page + component wiring` describe: source-contract fixme placeholders for
- * the server page + GovernanceInbox client component, activated in Task 2.
+ * `loadInbox` describe: the one parallel read behind every inbox consumer. The
+ * governance page and its client wrapper were deleted in 59-14; the Office rows
+ * are pinned in tests/phase59/office-pane-structure.spec.ts.
  *
  * Registration: playwright.config.ts `phase54` project
  *   testDir: '.', testMatch: /tests\/phase54\/.*\.(spec|test)\.ts$/
@@ -19,8 +20,6 @@ import type { MillerSop } from '@/lib/sop-list/admin-rows'
 import type { SopMachineLink } from '@/lib/validators/site'
 
 const ROOT = path.resolve(__dirname, '..', '..')
-const GOV_PAGE = path.join(ROOT, 'src', 'app', '(protected)', 'governance', 'page.tsx')
-const GOV_INBOX_COMPONENT = path.join(ROOT, 'src', 'components', 'admin', 'governance', 'GovernanceInbox.tsx')
 const LOAD_INBOX = path.join(ROOT, 'src', 'lib', 'governance', 'load-inbox.ts')
 const read = (p: string) => fs.readFileSync(p, 'utf-8')
 
@@ -243,22 +242,8 @@ test.describe('deriveInbox', () => {
   })
 })
 
-test.describe('page + component wiring (54-02 Task 2)', () => {
-  const PAGE = GOV_PAGE
-  const INBOX = GOV_INBOX_COMPONENT
-
-  test('governance/page.tsx: no use client, requireAdminContext before data reads, redirect on error', () => {
-    const src = read(PAGE)
-    expect(src).not.toContain("'use client'")
-    const ctxIdx = src.indexOf('requireAdminContext(')
-    expect(ctxIdx).toBeGreaterThan(-1)
-    const idx = src.indexOf('await loadInbox(')
-    expect(idx).toBeGreaterThan(-1)
-    expect(ctxIdx).toBeLessThan(idx)
-    expect(src).toContain('redirect(')
-  })
-
-  test('load-inbox.ts: one Promise.all(listGovernanceQueue, listAdminSopRows, listSiteHealthForOrg), deriveInbox called server-side; the page calls loadInbox', () => {
+test.describe('loadInbox wiring (54-02 Task 2, repointed 59-14)', () => {
+  test('load-inbox.ts: one Promise.all(listGovernanceQueue, listAdminSopRows, listSiteHealthForOrg), deriveInbox called server-side', () => {
     const src = read(LOAD_INBOX).replace(/\r\n/g, '\n')
     expect(src.match(/Promise\.all\(/g)).toHaveLength(1)
     const allMatch = src.match(/Promise\.all\(\[([\s\S]*?)\]\)/)
@@ -267,39 +252,5 @@ test.describe('page + component wiring (54-02 Task 2)', () => {
     expect(allMatch![1]).toContain('listAdminSopRows(')
     expect(allMatch![1]).toContain('listSiteHealthForOrg()')
     expect(src).toContain('deriveInbox(')
-    const page = read(PAGE)
-    expect(page).toContain('await loadInbox(')
-    expect(page).not.toContain('deriveInbox(')
-    expect(page).not.toContain('Promise.all(')
-  })
-
-  test('governance/page.tsx: renders <GovernanceInbox items=', () => {
-    const src = read(PAGE)
-    expect(src).toContain('<GovernanceInbox items={inbox.items}')
-  })
-
-  test('GovernanceInbox.tsx: use client, testids gov-inbox/gov-chip/gov-clear/gov-row/gov-action, uses INBOX_CHIPS/inboxCounts/chipMatches', () => {
-    const src = read(INBOX)
-    expect(src).toContain("'use client'")
-    for (const testid of ['gov-inbox', 'gov-chip', 'gov-clear', 'gov-row', 'gov-action']) {
-      expect(src).toContain(`data-testid="${testid}"`)
-    }
-    expect(src).toContain('INBOX_CHIPS')
-    expect(src).toContain('inboxCounts(')
-    expect(src).toContain('chipMatches(')
-  })
-
-  test('GovernanceInbox.tsx: no useQuery, router.push, or createClient', () => {
-    const src = read(INBOX)
-    for (const forbidden of ['useQuery', 'router.push', 'createClient']) {
-      expect(src).not.toContain(forbidden)
-    }
-  })
-
-  test('GovernanceInbox.tsx: carries the three CLEAR strings verbatim', () => {
-    const src = read(INBOX)
-    expect(src).toContain('CLEAR')
-    expect(src).toContain('Nothing needs attention')
-    expect(src).toContain('Every SOP is owned, current, and correctly assigned.')
   })
 })

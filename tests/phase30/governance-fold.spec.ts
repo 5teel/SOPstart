@@ -2,17 +2,16 @@
  * UX-03 — One governance surface (flipped live in 30-08; repointed in 41-06
  * when /admin/sops became a redirect shim and the fold moved onto /sops;
  * repointed again in 54-05 when the queue moved off /sops?view=attention
- * onto its own route, /governance).
+ * onto its own route, /governance; repointed in 59-14 when the page, the inbox
+ * wrapper and the queue row were deleted -- the Office Inbox tab replaces them).
  *
  * Contract (30-RESEARCH § Test Map + orchestrator decisions #1/#4):
- *   - Governance now lives at /governance, a server page that reads
- *     listGovernanceQueue and renders the EXISTING GovernanceQueueRow (moved
- *     VERBATIM — reuse, not rewrite, preserves the HARD constraint) via
- *     GovernanceInbox.tsx / src/lib/governance/inbox.ts.
- *   - /admin/governance is a redirect() shim to /governance (GQ-04 —
- *     legacy ?filter=X bookmarks land on the whole inbox), with the admin
- *     guard IN FRONT of the redirect.
- *   - APR-03/APR-04 preserved: approveStep( wired in GovernanceQueueRow; the focus
+ *   - Governance now lives in the Office Inbox tab; the inbox is read through
+ *     loadInbox (listGovernanceQueue) and derived by src/lib/governance/inbox.ts.
+ *   - /admin/governance is a next.config.ts redirect to /governance, which the
+ *     proxy sends on into the Office (GQ-04 -- legacy ?filter=X bookmarks land
+ *     on the whole inbox).
+ *   - APR-03/APR-04 preserved: approveStep( wired in the Office ApprovePanel; the focus
  *     editor's PublishBar withholds Publish while a chain is pending and names the
  *     approver (58-15: the old builder's publish stage and its own Approve button are
  *     gone; approving happens from the governance inbox).
@@ -28,21 +27,11 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 const ROOT = process.cwd()
-const GOV_PAGE = path.join(
-  ROOT, 'src', 'app', '(protected)', 'governance', 'page.tsx',
-)
-const GOV_INBOX = path.join(
-  ROOT, 'src', 'components', 'admin', 'governance', 'GovernanceInbox.tsx',
-)
 const INBOX = path.join(
   ROOT, 'src', 'lib', 'governance', 'inbox.ts',
 )
-const ACCESS_PAGE = path.join(
-  ROOT, 'src', 'app', '(protected)', 'admin', 'access', 'page.tsx',
-)
-const QUEUE_ROW = path.join(
-  ROOT, 'src', 'components', 'admin', 'governance', 'GovernanceQueueRow.tsx',
-)
+const OFFICE_PANE = path.join(ROOT, 'src', 'components', 'office', 'OfficePane.tsx')
+const APPROVE_PANEL = path.join(ROOT, 'src', 'components', 'office', 'ApprovePanel.tsx')
 const FLAG_DISPLAY = path.join(
   ROOT, 'src', 'lib', 'governance', 'flag-display.ts',
 )
@@ -54,37 +43,22 @@ function read(p: string): string {
   return fs.readFileSync(p, 'utf-8')
 }
 
-test.describe('UX-03 — governance lives at /governance', () => {
-  test('/governance reads listGovernanceQueue server-side and renders the inbox with the unmodified GovernanceQueueRow', () => {
-    const page = read(GOV_PAGE)
-    expect(page).toContain('await loadInbox(')
+test.describe('UX-03 — governance lives in the Office Inbox tab', () => {
+  test('the governance page is gone; the inbox is read through loadInbox and the Office pane', () => {
+    expect(fs.existsSync(path.join(ROOT, 'src', 'app', '(protected)', 'governance'))).toBe(false)
     expect(read(path.join(ROOT, 'src', 'lib', 'governance', 'load-inbox.ts'))).toContain('listGovernanceQueue()')
-    expect(page).toContain('<GovernanceInbox')
-    // The inbox itself renders the derived queue via unmodified GovernanceQueueRow.
-    const inbox = read(GOV_INBOX)
-    expect(inbox).toContain('<GovernanceQueueRow')
-    expect(inbox).toContain("from '@/lib/governance/inbox'")
+    expect(read(OFFICE_PANE)).toContain('InboxTab')
   })
 
-  test('/admin/governance is a next.config.ts redirect and /governance guards itself (Phase 43 D-01)', () => {
+  test('/admin/governance is still a next.config.ts redirect to /governance (Phase 43 D-01)', () => {
     const config = read(NEXT_CONFIG)
     expect(config).toContain("source: '/admin/governance',")
     expect(config).toContain("destination: '/governance',")
-    const page = read(GOV_PAGE)
-    expect(page).toContain('requireAdminContext()')
-    expect(page).toContain("redirect('/')")
-    // No unrelated governance surface renders here.
-    expect(page).not.toContain('ApprovalChainEditor')
-    expect(page).not.toContain('GovernanceQueueRow')
   })
 
-  test('approveStep stays wired in GovernanceQueueRow AND the focus PublishBar defers to the chain (APR-03/04 hard constraint)', () => {
-    const row = read(QUEUE_ROW)
-    // Verbatim move: the gate AND the wired call site survive (2026-06-05:
-    // assert handler wiring, not token presence).
-    expect(row).toContain("row.flags.includes('awaiting_approval') && row.isCallerNextApprover")
-    expect(row).toContain('await approveStep(row.id)')
-    expect(row).toContain('onClick={handleApprove}')
+  test('approveStep stays wired in the Office ApprovePanel AND the focus PublishBar defers to the chain (APR-03/04 hard constraint)', () => {
+    // 2026-06-05: assert handler wiring, not token presence.
+    expect(read(APPROVE_PANEL)).toContain('await approveStep(sopId)')
     // The editor never publishes around a pending chain: it reads the approval status,
     // withholds the Publish button while pending, and the dialog reports pending approval.
     const bar = read(PUBLISH_BAR)
@@ -117,17 +91,16 @@ test.describe('UX-03 — governance lives at /governance', () => {
     ).toBe(false)
   })
 
-  test('stuck conversions reach the inbox (Try again -> re-queue, Open -> focus editor) and the Access lens stays reachable from its own admin page', () => {
+  test('stuck conversions reach the inbox (Try again -> re-queue, Open -> focus editor) and the Access lens stays reachable from the Office Access tab', () => {
     // Phase 54: the tab rail / Miller scope column is gone. Stuck/failed
     // conversions surface as inbox rows with a Retry link into the focus editor;
-    // the Access lens is mounted by its own admin-gated page, /admin/access
-    // (57-07; the library table that used to host it is gone, 57-09).
+    // the Access lens is mounted by the Office Access tab (59-11; the
+    // /admin/access bridge page was deleted in 59-14).
     const inbox = read(INBOX)
     expect(inbox).toContain("if (!lib.stuck && !lib.parseFailed) continue")
     expect(inbox).toContain("{ label: 'Try again', href, retry: { sopId: lib.id, isVideo: pr.isVideo } }")
-    const access = read(ACCESS_PAGE)
-    expect(access).toContain('await requireAdminContext()')
-    expect(access).toContain('<AdminAccessLens pinnedSopId={pinnedSopId} />')
+    expect(read(OFFICE_PANE)).toContain('<AdminAccessLens')
+    expect(fs.existsSync(path.join(ROOT, 'src', 'app', '(protected)', 'admin', 'access'))).toBe(false)
   })
 })
 
@@ -151,9 +124,7 @@ test.describe('pathways coverage — 0 not-mapped (CLAUDE.md pathways rule)', ()
     }
     walk(appDir, [])
     const journeys = read(JOURNEYS)
-    // Phase 59: the governance, team and access pages only redirect to the Office; 59-14 deletes them.
-    const REDIRECT_ONLY = ['/governance', '/admin/team', '/admin/access']
-    const unmapped = found.filter((r) => !REDIRECT_ONLY.includes(r) && !journeys.includes(`route: '${r}'`))
+    const unmapped = found.filter((r) => !journeys.includes(`route: '${r}'`))
     expect(unmapped).toEqual([])
   })
 })

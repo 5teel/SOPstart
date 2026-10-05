@@ -108,7 +108,7 @@ test.describe('SC-3 — wiring at scale runtime (requires chromium + live app)',
   test.fixme(
     'WiringPatchBay renders grouped/focused at 15 org-units × 20 collections with no wires until interaction',
     async ({ page }) => {
-      await page.goto('/admin/access')
+      await page.goto('/?place=office&tab=access')
       await expect(page.locator('.bay-svg path')).toHaveCount(0)
       await page.locator('.jack.group-jack').first().click()
       await expect(page.locator('.bay-svg path').first()).toBeVisible()

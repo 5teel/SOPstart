@@ -218,4 +218,12 @@ test.describe('inbox model', () => {
     expect(src).toMatch(/governance: \[\], library: \[\], machines: \[\], links: \[\], signOffs, ownedReviews/)
     expect(src).toContain("'Office access required'")
   })
+
+  test('the inbox model never calls the row actions itself (moved from the phase54 gating spec in 59-14)', () => {
+    // The precedence lives in InboxRow.tsx (office-pane-structure); the pure
+    // derivation must not reach for the write actions.
+    const stripped = read('src', 'lib', 'governance', 'inbox.ts').replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '')
+    const present = ['approveStep', 'OwnerPicker', 'setSopOwner', 'confirmSopCurrent'].filter((t) => stripped.includes(t))
+    expect(present).toEqual([])
+  })
 })

@@ -11,7 +11,7 @@ import path from 'node:path'
  *   - ApprovalChainEditor.tsx imports @dnd-kit and calls setApprovalChain(
  *   - role/member pickers are restricted to admin/safety_manager (Pitfall 3)
  *   - admin/settings/page.tsx mounts <ApprovalChainEditor and calls getApprovalChains(
- *   - no new route was added (D29-05); the /governance page does not mount it
+ *   - no new route was added (D29-05); the governance page is gone (59-14)
  *
  * Registration: playwright.config.ts `phase29` project
  *   testDir: '.', testMatch: /tests\/phase29\/.*\.(spec|test)\.ts$/
@@ -20,7 +20,6 @@ import path from 'node:path'
 const ROOT = process.cwd()
 const EDITOR = path.join(ROOT, 'src', 'components', 'admin', 'governance', 'ApprovalChainEditor.tsx')
 const SETTINGS_PAGE = path.join(ROOT, 'src', 'app', '(protected)', 'admin', 'settings', 'page.tsx')
-const GOV_PAGE = path.join(ROOT, 'src', 'app', '(protected)', 'governance', 'page.tsx')
 
 function read(p: string): string {
   return fs.readFileSync(p, 'utf-8')
@@ -76,7 +75,8 @@ test.describe('admin/settings/page.tsx — mounts ApprovalChainEditor (relocated
     expect(fs.existsSync(newRoutePath)).toBe(false)
   })
 
-  test('the /governance page does not mount the editor', () => {
-    expect(read(GOV_PAGE)).not.toContain('ApprovalChainEditor')
+  test('the governance page is gone, so the editor has one mount: /admin/settings (59-14)', () => {
+    expect(fs.existsSync(path.join(ROOT, 'src', 'app', '(protected)', 'governance'))).toBe(false)
+    expect(read(SETTINGS_PAGE)).toContain('ApprovalChainEditor')
   })
 })

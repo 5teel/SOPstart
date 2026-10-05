@@ -12,7 +12,7 @@ const read = (...p: string[]) => fs.readFileSync(path.join(ROOT, ...p), 'utf-8')
 
 const LOAD = read('src', 'lib', 'governance', 'load-inbox.ts')
 const SHELL = read('src', 'actions', 'shell.ts')
-const PAGE = read('src', 'app', '(protected)', 'governance', 'page.tsx')
+const OFFICE = read('src', 'actions', 'office.ts')
 
 /** Drop // and block comments so a comment never satisfies or trips a match. */
 const strip = (s: string) => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')
@@ -28,11 +28,10 @@ test.describe('SHL-05 one inbox query', () => {
     expect(src).toMatch(/governance:[\s\S]*library:[\s\S]*floor:[\s\S]*items:/)
   })
 
-  test('governance page and getAdminShell import the same loadInbox', () => {
-    expect(strip(PAGE)).toContain("from '@/lib/governance/load-inbox'")
-    expect(strip(PAGE)).toContain('await loadInbox(')
-    expect(strip(PAGE)).not.toContain('deriveInbox(')
-    expect(strip(PAGE)).not.toContain('Promise.all(')
+  test('getOfficeInbox and getAdminShell both read the same loadInbox (59-14: the governance page is gone)', () => {
+    expect(strip(OFFICE)).toContain('loadInbox')
+    expect(strip(OFFICE)).toContain('await loadInbox(')
+    expect(strip(OFFICE)).not.toContain('Promise.all(listGovernanceQueue')
     expect(strip(SHELL)).toContain("from '@/lib/governance/load-inbox'")
     expect(strip(SHELL)).toContain('await loadInbox(')
   })

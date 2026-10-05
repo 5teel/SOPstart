@@ -7,11 +7,11 @@
  * Two contracts:
  *
  *   1. Per-symbol allow-list (converted 54-05 from a shared file list, now
- *      that the three Phase 41 lens files are deleted): `GovernanceQueueRow`,
- *      `WiringPatchBayShell` may each only be statically
- *      imported from their own named file below. `AdminShell`
- *      has an empty allow-list — it is only ever reached via `next/dynamic`
- *      (`OneScreen.tsx`), so ANY static import is a violation.
+ *      that the three Phase 41 lens files are deleted): `WiringPatchBayShell`
+ *      may only be statically imported from its own named file below. The
+ *      retired governance queue row left the list when it was deleted in 59-14.
+ *      `AdminShell` and `OfficePane` have empty allow-lists: each is only ever
+ *      reached via `next/dynamic`, so ANY static import is a violation.
  *
  *   2. The worker shell files (the one screen's worker half, Phase 57) must
  *      not import any admin table/lens component, nor `DepartmentPicker`, nor
@@ -32,7 +32,6 @@ const SRC_DIR = path.join(REPO_ROOT, 'src')
 // symbol. An empty array means the symbol must never be statically imported
 // anywhere — only via next/dynamic.
 const ALLOWED_IMPORTERS: Record<string, string[]> = {
-  GovernanceQueueRow: [path.join('src', 'components', 'admin', 'governance', 'GovernanceInbox.tsx')],
   WiringPatchBayShell: [path.join('src', 'components', 'sop', 'lenses', 'AdminAccessLens.tsx')],
   // Phase 57: reachable only through next/dynamic in OneScreen.
   AdminShell: [],
@@ -107,7 +106,6 @@ test.describe('T-41-02 — admin lens components cannot leak into the worker imp
 
   test('the worker shell files do not import any admin lens/table code (live guard, no fixme)', () => {
     const forbidden = [
-      'GovernanceQueueRow',
       'WiringPatchBayShell',
       'DepartmentPicker',
       'setSopCategory',

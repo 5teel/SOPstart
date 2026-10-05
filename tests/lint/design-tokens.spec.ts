@@ -28,7 +28,6 @@ const HEX_ALLOW = [
   'src/components/admin/departments/',
   'src/components/admin/source-viewer/',
   'src/components/sop/blocks/ModelBlock.tsx',
-  'src/components/admin/org-model/',
   'src/app/manifest.ts', // PWA manifest theme/background colours must be literal
 ]
 

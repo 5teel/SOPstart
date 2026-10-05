@@ -50,20 +50,11 @@ test.describe('retire sweep', () => {
     expect(stripComments(read('src/lib/journeys/journeys.ts'))).not.toContain("'/dashboard'")
   })
 
-  test('retire header: /governance survives as the Office bridge, not a redirect (D-17)', () => {
-    expect(fs.existsSync(path.join(ROOT, 'src/app/(protected)/governance/page.tsx'))).toBe(true)
-    expect(read('next.config.ts')).not.toMatch(/source: '\/governance'/)
-  })
-
-  test('retire access: the bridge page is admin-gated, UUID-pins the SOP and mounts the lens', () => {
-    const page = stripComments(read('src/app/(protected)/admin/access/page.tsx'))
-    expect(page.indexOf('requireAdminContext()')).toBeGreaterThan(-1)
-    expect(page.indexOf('requireAdminContext()')).toBeLessThan(page.indexOf('<AdminAccessLens'))
-    expect(page).toMatch(/UUID\.test\(sop\)/)
-    expect(page).toContain('<AdminAccessLens pinnedSopId={pinnedSopId} />')
+  // 59-14: the governance page and the access bridge page are deleted; the redirects are proved by
+  // tests/phase59/legacy-redirects.spec.ts and the 59-14 retirement sweep.
+  test('retire access: the lens has no back handler and the room bodies never link the old access address', () => {
     expect(read('src/components/sop/lenses/AdminAccessLens.tsx')).not.toContain('onBack')
     expect(read('src/components/shell/AdminRoomBodies.tsx')).not.toContain('/admin/access')
-    // Phase 59: the access address redirects on the server; the page is reached only by the redirect's Office tab.
   })
 
   test('retire list: the proxy redirects every list address to a fixed destination, server-side (Phase 59: the Office places)', () => {

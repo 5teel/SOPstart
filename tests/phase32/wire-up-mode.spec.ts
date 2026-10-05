@@ -138,14 +138,14 @@ test.describe('SC-5 — ✓ Done writes grants via createGrant', () => {
 // ---------------------------------------------------------------------------
 // Runtime smoke — requires chromium + live app + a published NEW SOP
 // (Rule-3 fallback documented above). The post-publish "Choose who sees it"
-// CTA (a link to /admin/access?sop=<id>) is 32-09/33-09 scope.
+// CTA (a link to /?place=office&tab=access&sop=<id>) is 32-09/33-09 scope.
 // ---------------------------------------------------------------------------
 
 test.describe('SC-5 — wire-up mode runtime (requires chromium + live app, 32-09 page arm)', () => {
   test.fixme(
     'connect mode toggles live wires, blast-radius counts people, Done writes grants via createGrant',
     async ({ page }) => {
-      await page.goto('/admin/access')
+      await page.goto('/?place=office&tab=access')
       await page.locator('.jack.newsop').click()
       await expect(page.locator('.strip-slot.wiring')).toBeVisible()
       await page.locator('.col.left .jack').first().click()
@@ -177,7 +177,7 @@ test.describe('SC-5 — wire-up mode runtime (requires chromium + live app, 32-0
   // Dropped in 58-15: "the builder hands the publish stage the Access bridge URL pinned
   // to the SOP" (Phase 57 D-14). Its subject -- the old builder's post-publish
   // stage -- is gone and the focus editor's PublishBar has no equivalent link.
-  // The receiving end survives: the access page's pinnedSopId (pinned in phase30/governance-fold)
+  // The receiving end survives: the Office Access tab's initialSop (pinned in phase33/sop-drilldown)
   // and WiringPatchBay's saved-grants state above; the proxy still maps legacy
-  // addresses to /admin/access?sop=<id>.
+  // addresses to the Office Access tab with ?sop=<id>.
 })

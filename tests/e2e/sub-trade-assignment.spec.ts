@@ -10,7 +10,7 @@
  * (chromium binary not installed locally). The structural assertions catch
  * any future regression in:
  *   - SubTradePicker component shape (multi-select pills, 5 seed slugs)
- *   - admin/team page integration (per-worker SubTradePicker)
+ *   - People & roles tab integration (per-worker department picker; the team page was deleted in 59-14)
  *   - admin/sops/[sopId]/assign page integration (sop-level SubTradePicker)
  *   - server actions surface (listSubTrades, assign{User,Sop}SubTrades)
  *
@@ -23,7 +23,7 @@ import path from 'node:path'
 
 const ROOT = process.cwd()
 const PICKER = path.join(ROOT, 'src', 'components', 'admin', 'SubTradePicker.tsx')
-const TEAM_PAGE = path.join(ROOT, 'src', 'app', '(protected)', 'admin', 'team', 'page.tsx')
+const PEOPLE_TAB = path.join(ROOT, 'src', 'components', 'office', 'PeopleTab.tsx')
 const ASSIGN_PAGE = path.join(
   ROOT,
   'src',
@@ -53,69 +53,16 @@ function stripComments(src: string): string {
     .replace(/(^|[^:])\/\/.*$/gm, '$1')
 }
 
-test.describe('SB-LINE-05 — SubTradePicker component contract', () => {
-  test('SubTradePicker imports server actions + uses aria-pressed pills', () => {
-    const src = read(PICKER)
-    expect(src).toContain("'use client'")
-    expect(src).toContain("from '@/actions/sub-trades'")
-    expect(src).toContain('listSubTrades')
-    expect(src).toContain('assignUserSubTrades')
-    expect(src).toContain('assignSopSubTrades')
-    expect(src).toContain('getUserSubTrades')
-    expect(src).toContain('getSopSubTrades')
-    expect(src).toContain('aria-pressed')
-    // Real <button> (not div) for the pill so aria-pressed is valid.
-    // Use multiline/dotall match since JSX attributes wrap across lines.
-    expect(src).toMatch(/<button[\s\S]*?aria-pressed/)
-  })
-
-  test('SubTradePicker exposes both modes in a discriminated union', () => {
-    const src = read(PICKER)
-    expect(src).toMatch(/mode:\s*'user'/)
-    expect(src).toMatch(/mode:\s*'sop'/)
-    expect(src).toContain('userId: string')
-    expect(src).toContain('sopId: string')
-  })
-
-  test('SubTradePicker reverts optimistic update on server error', () => {
-    const src = read(PICKER)
-    // Pattern: capture prev, set next, on error rollback to prev
-    expect(src).toContain('setSelectedIds(prev)')
-    expect(src).toMatch(/error/)
-  })
-
-  test('SubTradePicker reads vocab once per target', () => {
-    const src = read(PICKER)
-    expect(src).toContain('Promise.all')
-    expect(src).toContain('listSubTrades()')
-    expect(src).toContain('useEffect')
-  })
-})
-
-test.describe('SB-LINE-05 — admin/team page integration', () => {
-  // Phase 25 (REQ-4) + Phase 32-07 org-model rewrite: /admin/team's per-worker
-  // SubTradePicker (mode="user") was superseded by RoleAssignmentTable's
-  // member-mode DepartmentPicker (organisation department, not SOP sub-trade).
-  // SubTradePicker mode="user" is now dead code — SubTradePicker survives only
-  // for SOP-level trade assignment (mode="sop" on the assign page, still
-  // covered below). Guard the replacement behaviour instead of the removed one.
-  const ROLE_ASSIGNMENT_TABLE = path.join(ROOT, 'src', 'components', 'admin', 'RoleAssignmentTable.tsx')
-
-  test('team page renders RoleAssignmentTable (via TeamViewShell/OrgColumnsBoard)', () => {
-    const src = read(TEAM_PAGE)
-    expect(src).toContain('TeamViewShell')
-  })
-
-  test('RoleAssignmentTable renders member-mode DepartmentPicker per worker row', () => {
-    const src = read(ROLE_ASSIGNMENT_TABLE)
+test.describe('SB-LINE-05 — People & roles tab integration (59-14)', () => {
+  // Phase 25 (REQ-4): the per-worker SubTradePicker (mode="user") was superseded
+  // by a member-mode DepartmentPicker (organisation department, not SOP
+  // sub-trade); the Office People tab (59-11) now carries it after the team page
+  // and RoleAssignmentTable were deleted. SubTradePicker survives only for
+  // SOP-level trade assignment (mode="sop" on the assign page, covered below).
+  test('the People tab renders a member-mode DepartmentPicker per person row', () => {
+    const src = read(PEOPLE_TAB)
     expect(src).toContain("from '@/components/admin/departments/DepartmentPicker'")
     expect(src).toMatch(/<DepartmentPicker\s*\n?\s*mode="member"/)
-  })
-
-  test('team page preserves existing RoleAssignmentTable', () => {
-    const src = read(ROLE_ASSIGNMENT_TABLE)
-    expect(fs.existsSync(ROLE_ASSIGNMENT_TABLE)).toBe(true)
-    expect(src).toContain('export default function RoleAssignmentTable')
   })
 })
 

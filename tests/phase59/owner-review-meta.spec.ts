@@ -82,7 +82,8 @@ test.describe('owner review meta -- surfaces', () => {
     expect(PICKER).toContain('onDone?.(')
     expect(PICKER).toMatch(/e\.key !== 'Escape'[\s\S]*e\.preventDefault\(\)/)
     expect(PICKER).toContain("addEventListener('keydown', onKey, true)")
-    expect(read('src/components/admin/governance/GovernanceQueueRow.tsx')).toContain('onDone={() => router.refresh()}')
+    // the retired governance queue row used to refresh the router here; the Office row hands onDone to the pane (59-14)
+    expect(read('src/components/office/InboxRow.tsx')).toMatch(/<OwnerPicker[\s\S]*?onDone=/)
   })
 })
 

@@ -31,7 +31,8 @@ const SETTINGS_PAGE = path.join(
 // Phase 43 (D-01): the /admin/governance and /admin/sops page-level shims
 // are deleted; both legacy URLs are now static next.config.ts redirects
 // with no page of their own to read here.
-const ADMIN_PAGES = ['team'].map(
+// 59-14: the team page is deleted; /admin/settings is the remaining plain admin page here.
+const ADMIN_PAGES = ['settings'].map(
   (dir) => path.join(ROOT, 'src', 'app', '(protected)', 'admin', dir, 'page.tsx'),
 )
 const PROXY = path.join(ROOT, 'src', 'lib', 'supabase', 'middleware.ts')

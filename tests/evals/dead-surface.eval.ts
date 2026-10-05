@@ -5,10 +5,10 @@
  * live in production, not just source-contract-pinned:
  *   C — the Access map shows the Wiring view only, no Matrix/Illuminate
  *       lens toggle (D-05); the legacy list address's access view lands on
- *       its new page (Phase 57 D-14)
+ *       the Office Access tab (Phase 59)
  *   D1/D2 — the legacy admin list and governance URLs still land on real
- *       routes for an admin (the one screen), and never leak the governance
- *       inbox to a worker (D-01)
+ *       places for an admin (the one screen, the Office), and never open the
+ *       Office inbox for a worker (D-01)
  *
  * C reads the real org (read-only, as `admin`) because the Access map needs
  * a populated org tree to render meaningfully. The pathways 0-not-mapped
@@ -42,7 +42,7 @@ test.describe('Phase 43 — dead-surface removal (deployed)', () => {
     const legacyList = '/sops'
     await page.goto(`${legacyList}?view=access`)
 
-    await expect(page).toHaveURL((u) => u.pathname === '/admin/access', SLOW)
+    await expect(page).toHaveURL((u) => u.pathname === '/' && u.searchParams.get('tab') === 'access', SLOW)
     await expect(page.getByPlaceholder('Search org or collections…')).toBeVisible(SLOW)
     await expect(page.getByText(/Illuminate/)).toHaveCount(0)
     await expect(page.getByRole('button', { name: /Matrix/ })).toHaveCount(0)
@@ -57,8 +57,8 @@ test.describe('Phase 43 — dead-surface removal (deployed)', () => {
     await expect(page).toHaveURL((u) => u.pathname === '/' && u.search === '', SLOW)
 
     await page.goto('/admin/governance?filter=no_owner')
-    await expect(page).toHaveURL(/\/governance(\?.*)?$/, SLOW)
-    await expect(page.getByTestId('gov-inbox')).toBeVisible(SLOW)
+    await expect(page).toHaveURL((u) => u.pathname === '/' && u.searchParams.get('place') === 'office', SLOW)
+    await expect(page.getByTestId('office-pane')).toBeVisible(SLOW)
   })
 
   test('D2 — a worker following a legacy governance link never reaches the inbox', async ({ page, context }) => {
@@ -67,6 +67,7 @@ test.describe('Phase 43 — dead-surface removal (deployed)', () => {
     await page.goto('/admin/governance')
     await expect(page).not.toHaveURL(/\/governance/, SLOW)
     await expect(page).toHaveURL((u) => u.pathname === '/', SLOW)
-    await expect(page.getByTestId('gov-inbox')).toHaveCount(0)
+    await expect(page.getByTestId('office-pane')).toHaveCount(0)
+    await expect(page.getByTestId('office-row')).toHaveCount(0)
   })
 })

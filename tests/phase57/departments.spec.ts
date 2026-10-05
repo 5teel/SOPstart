@@ -195,9 +195,9 @@ test.describe('PLC-05 departments: the retired screen (57-07)', () => {
     }
   })
 
-  test('per-person membership still uses the same picker and action on /admin/team (D-09)', () => {
-    const table = read('src', 'components', 'admin', 'RoleAssignmentTable.tsx')
+  test('per-person membership still uses the same picker on the Office People tab (D-09, 59-14)', () => {
+    const table = read('src', 'components', 'office', 'PeopleTab.tsx')
     expect(table).toMatch(/<DepartmentPicker[^>]*mode="member"/)
-    expect(fs.existsSync(path.join(ROOT, 'src', 'app', '(protected)', 'admin', 'team', 'page.tsx'))).toBe(true)
+    expect(fs.existsSync(path.join(ROOT, 'src', 'app', '(protected)', 'admin', 'team'))).toBe(false)
   })
 })

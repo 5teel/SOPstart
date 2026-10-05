@@ -3,15 +3,15 @@
  * currency caption. Repointed in 30-08 (UX-03/UX-06): LibraryReviewCell and
  * GovernanceWidget were deleted as separate surfaces — the owner label + flag
  * chip live on the one-line library rows, the counts + deep-links live on the
- * /admin/sops header chips, and Confirm current lives on GovernanceQueueRow
- * in the folded needs-attention view.
+ * /admin/sops header chips, and Confirm current lives on the Office inbox row
+ * (InboxRow.tsx, Phase 59).
  *
  * Repointed AGAIN in 41-08 (SUR-01/02/04): the admin library rows moved to
  * `listAdminSopRows` (src/actions/admin-sop-list.ts).
  *
  * Repointed a third time in 54-05, and again in 57-09 (D-13): the admin library
  * table is deleted -- there is no admin list page. The governance queue lives
- * at /governance (GovernanceInbox.tsx, src/lib/governance/inbox.ts) and the
+ * in the Office Inbox tab (src/lib/governance/inbox.ts, Phase 59) and the
  * legacy ?view=attention address is redirected by the session proxy.
  *
  * Verifies (source-contract, no live DB required):
@@ -20,7 +20,7 @@
  *   REV-02/REV-04: the overdue signal derives from the org-scoped governance
  *     queue (classifyGovernanceRow's review_due_at < now), rendered as the
  *     row flag chip; Confirm current stays a real wired call on
- *     GovernanceQueueRow (the merged surface).
+ *     the Office InboxRow.
  *   GQ-04/D28-09: listAdminSopRows counts from listGovernanceQueue, and the
  *     session proxy + the governance inbox's chips deep-link the flags.
  *   REV-03/D28-07: every worker focus file (58-15; the tabbed read page is
@@ -42,7 +42,7 @@ const ROOT = process.cwd()
 const ADMIN_SOP_LIST = path.join(ROOT, 'src', 'actions', 'admin-sop-list.ts')
 const INBOX = path.join(ROOT, 'src', 'lib', 'governance', 'inbox.ts')
 const FLAG_DISPLAY = path.join(ROOT, 'src', 'lib', 'governance', 'flag-display.ts')
-const QUEUE_ROW = path.join(ROOT, 'src', 'components', 'admin', 'governance', 'GovernanceQueueRow.tsx')
+const QUEUE_ROW = path.join(ROOT, 'src', 'components', 'office', 'InboxRow.tsx')
 const CLASSIFY = path.join(ROOT, 'src', 'lib', 'governance', 'classify.ts')
 const WORKER_SOP_DETAIL = path.join(ROOT, 'src', 'app', '(protected)', 'sops', '[sopId]', 'page.tsx')
 // 58-15: the worker's read/walk surface is the focus screen -- its frame, browse
@@ -91,10 +91,10 @@ test.describe('admin rows — owner=me filter + owner/flag columns', () => {
 // ---------------------------------------------------------------------------
 
 test.describe('merged surface — wired confirm-current + queue-derived overdue signal', () => {
-  test('GovernanceQueueRow wires the real confirmSopCurrent( call', () => {
+  test('the Office InboxRow wires the real confirmSopCurrent( call', () => {
     const src = read(QUEUE_ROW)
     expect(src).toContain("import { confirmSopCurrent } from '@/actions/governance'")
-    expect(src).toContain('confirmSopCurrent(row.id)')
+    expect(src).toContain('await confirmSopCurrent(sopId)')
   })
 
   test('overdue derives from the review_due_at < now classification (server-side, admin surfaces only)', () => {
@@ -135,7 +135,7 @@ test.describe('admin scope counts — counts from listGovernanceQueue + deep lin
   test('the governance inbox groups by chip; every flag from classify.ts is still represented', () => {
     // 2026-07-30/2026-09-29: per-flag filter chips replaced by the derived
     // inbox — INBOX_CHIPS covers the actionable subset (owner/overdue/approve),
-    // and flag-display.ts still names every GovernanceFlag for GovernanceQueueRow.
+    // and flag-display.ts still names every GovernanceFlag.
     const inboxSrc = read(INBOX)
     expect(inboxSrc).toContain("{ key: 'owner', label: 'No owner' }")
     expect(inboxSrc).toContain("{ key: 'overdue', label: 'Overdue' }")
