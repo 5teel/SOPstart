@@ -31,7 +31,7 @@ const PAGE = readFileSync(
 ).replace(/\r\n/g, '\n')
 
 const CLIENT = readFileSync(
-  path.join(process.cwd(), 'src/app/(protected)/activity/[completionId]/CompletionDetailClient.tsx'),
+  path.join(process.cwd(), 'src/components/office/SignOffPanel.tsx'),
   'utf8'
 ).replace(/\r\n/g, '\n')
 
@@ -93,24 +93,17 @@ test.describe('ASR-01 -- signOffCompletion role array + gate position (source-co
   })
 })
 
-test.describe('ASR-01 -- page.tsx server-computed assessor props', () => {
-  test("isSupervisor widens to include 'admin' (D-06) and isSignedOffAssessor is called exactly once, server-side", () => {
-    const isSupervisorLine = PAGE.split('\n').find((l) => l.includes('const isSupervisor ='))
-    expect(isSupervisorLine).toBeTruthy()
-    expect(isSupervisorLine).toContain("'admin'")
-    expect((PAGE.match(/isSignedOffAssessor\(/g) ?? []).length).toBe(1)
-  })
-
-  test('isAssessor and canOverride are passed down to CompletionDetailClient', () => {
-    const clientCallIdx = PAGE.indexOf('<CompletionDetailClient')
-    expect(clientCallIdx).toBeGreaterThan(-1)
-    const propsSlice = PAGE.slice(clientCallIdx, clientCallIdx + 700)
-    expect(propsSlice).toContain('isAssessor={isAssessor}')
-    expect(propsSlice).toContain('canOverride={canOverride}')
+test.describe('ASR-01 -- the completion page no longer carries a sign-off surface (59-15)', () => {
+  test('the owner-only page neither signs off nor computes assessor state; the panel is the one place that does', () => {
+    expect(PAGE).not.toContain('isSignedOffAssessor(')
+    expect(PAGE).not.toContain('signOffCompletion')
+    expect(PAGE).not.toContain('<SignOffPanel')
+    expect(CLIENT).toContain('review.canOverride')
+    expect(CLIENT).toContain('review.isAssessor')
   })
 })
 
-test.describe('ASR-01 -- CompletionDetailClient blocked/override UI wiring (source-contract)', () => {
+test.describe('ASR-01 -- SignOffPanel blocked/override UI wiring (source-contract)', () => {
   test('contains the exact blocked-supervisor teaching copy and the override disclosure copy', () => {
     expect(CLIENT).toContain('You need to be signed off on this SOP yourself before you can assess others on it')
     expect(CLIENT).toContain('This will be recorded as an assessor override with your reason, visible in the audit trail.')
@@ -125,28 +118,29 @@ test.describe('ASR-01 -- CompletionDetailClient blocked/override UI wiring (sour
     expect(signOffCallSlice).toContain('overrideReason:')
   })
 
-  test("the Reject control's own disabled prop does not reference blockedFromApproving or isAssessor -- rejection stays ungated", () => {
+  test("the Reject control's own disabled prop does not reference signOffBlocked or isAssessor -- rejection stays ungated", () => {
     // Inspect the Reject button's OWN disabled={...} expression specifically
     // (not a wide file window, which would bleed into the adjacent Approve
     // button's disabled expression in the same flex row).
-    const onClickIdx = CLIENT.indexOf('setRejectSheetOpen(true)')
-    expect(onClickIdx).toBeGreaterThan(-1)
-    const disabledIdx = CLIENT.indexOf('disabled={', onClickIdx)
+    const rejectIdx = CLIENT.indexOf('data-testid="signoff-reject"')
+    expect(rejectIdx).toBeGreaterThan(-1)
+    const disabledIdx = CLIENT.indexOf('disabled={', rejectIdx)
     const disabledEnd = CLIENT.indexOf('}', disabledIdx)
     const disabledExpr = CLIENT.slice(disabledIdx, disabledEnd)
-    expect(disabledExpr).toContain('isApproving')
-    expect(disabledExpr).not.toContain('blockedFromApproving')
+    expect(disabledExpr).toContain('busy')
+    expect(disabledExpr).not.toContain('signOffBlocked')
+    expect(disabledExpr).not.toContain('teaching')
     expect(disabledExpr).not.toContain('isAssessor')
   })
 
   test('the Approve control markup window DOES reference the blocked/override state -- proves the affordance is wired, not merely present elsewhere in the file', () => {
-    // If handleApproveClick's disabled/onClick wiring were computed but never
+    // If the Approve button's disabled/onClick wiring were computed but never
     // attached to the button (the exact 2026-06-05 dead-AddMenu-button
-    // class), this window would NOT contain blockedFromApproving even though
+    // class), this window would NOT contain signOffBlocked even though
     // the token exists elsewhere in the file -- the whole-file toContain
     // checks above would still pass, which is why this scoped assertion is
     // required in addition to them.
-    const window = sliceAroundOccurrences(CLIENT, 'handleApproveClick', 400)
-    expect(window).toContain('blockedFromApproving')
+    const window = sliceAroundOccurrences(CLIENT, 'data-testid="signoff-approve"', 400)
+    expect(window).toContain('signOffBlocked')
   })
 })

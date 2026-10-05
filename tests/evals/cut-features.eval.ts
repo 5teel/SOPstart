@@ -134,7 +134,7 @@ test.describe('Phase 55 — cut features (deployed)', () => {
       expect(errors, errors.join('\n')).toEqual([])
     })
 
-    test('admin sees that completion waiting for sign-off with its photo', async ({ page, context }) => {
+    test('admin sees that completion waiting for sign-off in the Office inbox with its photo', async ({ page, context }) => {
       test.setTimeout(180_000)
       const { data: rows, error } = await db
         .from('sop_completions')
@@ -152,12 +152,13 @@ test.describe('Phase 55 — cut features (deployed)', () => {
       await page.setViewportSize({ width: 1280, height: 900 })
       const errors = watchConsole(page)
       await signInAs(context, 'siteAdmin')
-      await page.goto('/activity')
-      const link = page.locator(`a[href="/activity/${completionId}"]`)
-      await expect(link.first()).toBeVisible(SLOW)
-      await link.first().click()
-      await page.waitForURL(`**/activity/${completionId}`, { timeout: 30_000 })
-      const img = page.locator('img[alt^="Step"]').first()
+      await page.goto('/?place=office')
+      const row = page.locator(`[data-testid="office-row"][data-key="signoff-${completionId}"]`)
+      await expect(row).toHaveCount(1, SLOW)
+      await row.getByTestId('office-row-action').click()
+      await expect(row.getByTestId('signoff-panel')).toBeVisible(SLOW)
+      const img = row.getByTestId('signoff-photo').first().locator('img')
+      await expect(img).toHaveCount(1, SLOW)
       await expect(img).toBeVisible(SLOW)
       await expect
         .poll(async () => img.evaluate((el: HTMLImageElement) => el.naturalWidth), SLOW)
@@ -167,7 +168,7 @@ test.describe('Phase 55 — cut features (deployed)', () => {
     })
   })
 
-  test('existing SOPs, completions and photos still open', async ({ page, context }) => {
+  test('existing SOPs open, and an old completion address lands on the Office', async ({ page, context }) => {
     test.setTimeout(180_000)
     await page.setViewportSize({ width: 1440, height: 900 })
     const errors = watchConsole(page)
@@ -186,14 +187,11 @@ test.describe('Phase 55 — cut features (deployed)', () => {
     const q = db.from('sop_completions').select('id').eq('organisation_id', REAL_SOPSTART_ORG_ID)
     const { data: rows } = await (ids.length ? q.in('id', ids) : q).order('submitted_at', { ascending: false }).limit(1)
     test.skip(!rows?.length, 'no real-org completion exists')
+    // 59-15: a completion belongs to its walker. An admin who is not the walker opening the old address
+    // is sent to the Office inbox by the server page -- content asserted, never the status code.
     await page.goto(`/activity/${rows![0].id}`)
-    await expect(page.locator('main').first()).toBeVisible(SLOW)
+    await expect(page.getByTestId('office-pane')).toHaveCount(1, SLOW)
     await expect(page.getByText(NOT_FOUND)).toHaveCount(0)
-    if (ids.length) {
-      const img = page.locator('img[alt^="Step"]').first()
-      await expect(img).toBeVisible(SLOW)
-      await expect.poll(async () => img.evaluate((el: HTMLImageElement) => el.naturalWidth), SLOW).toBeGreaterThan(0)
-    }
     await shot(page, 'cut-existing-completion')
     expect(errors, errors.join('\n')).toEqual([])
   })

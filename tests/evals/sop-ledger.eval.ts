@@ -314,7 +314,7 @@ test.describe.serial('Phase 56 -- simpler SOP + decision ledger (deployed)', () 
     }).toPass(SLOW)
     await shot(admin, 'ledger-e-owner')
 
-    // (2) completion rejection through /activity/<id>
+    // (2) completion rejection through the Office inbox sign-off row (59-15: no page of its own)
     const completionId = randomUUID()
     const { error: insErr } = await db.from('sop_completions').insert({
       id: completionId,
@@ -327,12 +327,15 @@ test.describe.serial('Phase 56 -- simpler SOP + decision ledger (deployed)', () 
       step_data: {},
     })
     expect(insErr).toBeNull()
-    await admin.goto(`/activity/${completionId}`)
-    const reject = admin.getByRole('button', { name: 'Reject', exact: true })
-    await expect(reject).toHaveCount(1, { timeout: 40_000 })
-    await reject.click()
-    await admin.getByLabel('Reason for rejection').fill('Eval: the guard was not closed in the photo.')
-    await admin.getByRole('button', { name: 'Confirm Rejection' }).click()
+    await admin.goto('/?place=office')
+    const signOffRow = admin.locator(`[data-testid="office-row"][data-key="signoff-${completionId}"]`)
+    await expect(signOffRow).toHaveCount(1, { timeout: 40_000 })
+    await signOffRow.getByTestId('office-row-action').click()
+    await signOffRow.getByTestId('signoff-reject').click()
+    const dialog = admin.getByTestId('reason-dialog')
+    await expect(dialog).toBeVisible(SLOW)
+    await dialog.getByTestId('reason-dialog-field').fill('Eval: the guard was not closed in the photo.')
+    await dialog.getByTestId('reason-dialog-confirm').click()
     await expect(async () => {
       const rows = await since({ kind: 'reject', subject_kind: 'completion', subject_id: completionId })
       expect(rows.length).toBe(1)

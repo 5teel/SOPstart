@@ -23,7 +23,7 @@ function readSrc(relPath: string): string {
 const COMPLETION_PAGE = readSrc('src/app/(protected)/activity/[completionId]/page.tsx')
 const OBS_ACTIONS = readSrc('src/actions/observations.ts')
 
-test.describe('CR-01 -- completion detail page org-scope guard', () => {
+test.describe('CR-01 -- completion detail page org-scope guard (59-15: session-client read, owner-only)', () => {
   test('organisationId is destructured from getSessionContext', () => {
     expect(COMPLETION_PAGE).toContain('getSessionContext()')
     const destructureLine = COMPLETION_PAGE.slice(
@@ -33,24 +33,25 @@ test.describe('CR-01 -- completion detail page org-scope guard', () => {
     expect(destructureLine).toContain('organisationId')
   })
 
-  test('the org guard is present exactly once and runs BEFORE the signed-URL mint and the assessor predicate', () => {
-    const guard = "data.organisation_id !== organisationId"
-    expect((COMPLETION_PAGE.match(new RegExp(guard.replace(/[.]/g, '\\.'), 'g')) ?? []).length).toBe(1)
-    const guardIndex = COMPLETION_PAGE.indexOf(guard)
-    const signedUrlIndex = COMPLETION_PAGE.indexOf('createSignedUrl')
-    const predicateIndex = COMPLETION_PAGE.indexOf('isSignedOffAssessor(')
-    expect(guardIndex).toBeGreaterThan(-1)
-    expect(signedUrlIndex).toBeGreaterThan(-1)
-    expect(predicateIndex).toBeGreaterThan(-1)
-    expect(guardIndex).toBeLessThan(signedUrlIndex)
-    expect(guardIndex).toBeLessThan(predicateIndex)
+  test('the read is filtered by the SESSION org through the session client, and no service-role read by id remains (F-05)', () => {
+    expect(COMPLETION_PAGE).not.toContain('createAdminClient')
+    expect(COMPLETION_PAGE).toContain(".eq('organisation_id', organisationId)")
+    // the row's own organisation_id is never consumed
+    expect(COMPLETION_PAGE).not.toMatch(/data.organisation_id/)
   })
 
-  test('the assessor predicate is called with the session organisationId, not the row org', () => {
-    expect(COMPLETION_PAGE).toContain('isSignedOffAssessor(userId, data.sop_id, admin, organisationId)')
-    // Only one remaining reference to the row's own org field -- the guard
-    // itself -- proving the predicate no longer consumes it (CR-01 T-37-07-02).
-    expect((COMPLETION_PAGE.match(/data\.organisation_id/g) ?? []).length).toBe(1)
+  test('the owner check runs BEFORE any photo is signed, and photos are signed against the session org', () => {
+    const ownerIdx = COMPLETION_PAGE.indexOf('data.worker_id !== userId')
+    const signIdx = COMPLETION_PAGE.indexOf('signCompletionPhotos(')
+    expect(ownerIdx).toBeGreaterThan(-1)
+    expect(signIdx).toBeGreaterThan(-1)
+    expect(ownerIdx).toBeLessThan(signIdx)
+    expect(COMPLETION_PAGE).toContain('signCompletionPhotos(data.completion_photos ?? [], organisationId)')
+    expect(COMPLETION_PAGE).not.toContain('createSignedUrl')
+  })
+
+  test('the assessor predicate is gone from the page (sign-off lives in the Office, 59-06 getCompletionForReview)', () => {
+    expect(COMPLETION_PAGE).not.toContain('isSignedOffAssessor(')
   })
 })
 

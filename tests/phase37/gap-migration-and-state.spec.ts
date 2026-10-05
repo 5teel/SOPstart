@@ -26,7 +26,8 @@ const APPLIER = read('scripts/apply-phase37-migration.mjs')
 const MIGRATION_00057 = read('supabase/migrations/00057_restore_sop_observations_cross_org_guard.sql')
 const ASSESSOR = read('src/lib/competency/assessor.ts')
 const MODAL = read('src/components/observations/RecordObservationModal.tsx')
-const CLIENT = read('src/app/(protected)/activity/[completionId]/CompletionDetailClient.tsx')
+// Phase 59 (D-13): the override sheet moved from the completion page to the Office inbox sign-off panel.
+const CLIENT = read('src/components/office/SignOffPanel.tsx')
 
 test.describe('CR-02 -- applier applies 00056+00057 in order and pins the restored conjunct', () => {
   test('MIGRATION_FILES exists; the old single-file MIGRATION_FILE const is gone (word-boundary, not substring)', () => {
@@ -96,21 +97,20 @@ test.describe('WR-03 -- per-SOP state reset scoped to the [sopId] effect', () =>
   })
 })
 
-test.describe('WR-04 -- server override demand opens the override sheet', () => {
-  test('the ASSESSOR_OVERRIDE_REQUIRED branch inside handleApprove calls setOverrideSheetOpen(true)', () => {
+test.describe('WR-04 -- server override demand opens the override reason field', () => {
+  test('the ASSESSOR_OVERRIDE_REQUIRED branch inside approve calls setForceOverride(true)', () => {
     // Scoped to the occurrence of ASSESSOR_OVERRIDE_REQUIRED inside
     // handleApprove specifically -- a file-global search would also match
-    // the mapSignOffError copy-mapping branch (a different, unrelated
-    // occurrence of the same string), and setOverrideSheetOpen(true) exists
-    // elsewhere in the file (handleApproveClick's pre-emptive open) even on
-    // the broken pre-fix version. The 2026-06-05 dead-feature trap in
+    // the mapError copy-mapping branch (a different, unrelated
+    // occurrence of the same string), and setForceOverride is declared
+    // elsewhere in the file even on the broken pre-fix version. The 2026-06-05 dead-feature trap in
     // miniature: presence anywhere in the file proves nothing about whether
     // THIS branch is wired.
-    const fnIdx = CLIENT.indexOf('async function handleApprove')
+    const fnIdx = CLIENT.indexOf('async function approve')
     expect(fnIdx).toBeGreaterThan(-1)
     const errorIdx = CLIENT.indexOf('ASSESSOR_OVERRIDE_REQUIRED', fnIdx)
     expect(errorIdx).toBeGreaterThan(-1)
     const window = CLIENT.slice(errorIdx, errorIdx + 400)
-    expect(window).toContain('setOverrideSheetOpen(true)')
+    expect(window).toContain('setForceOverride(true)')
   })
 })
