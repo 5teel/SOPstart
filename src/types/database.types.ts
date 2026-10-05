@@ -1158,6 +1158,8 @@ export type Database = {
       }
       sops: {
         Row: {
+          allow_forward_jump: boolean
+          objective: string | null
           applicable_equipment: string[] | null
           approval_snapshot: Json | null
           approval_state: string | null
@@ -1198,6 +1200,8 @@ export type Database = {
           version: number
         }
         Insert: {
+          allow_forward_jump?: boolean
+          objective?: string | null
           applicable_equipment?: string[] | null
           approval_snapshot?: Json | null
           approval_state?: string | null
@@ -1237,6 +1241,8 @@ export type Database = {
           version?: number
         }
         Update: {
+          allow_forward_jump?: boolean
+          objective?: string | null
           applicable_equipment?: string[] | null
           approval_snapshot?: Json | null
           approval_state?: string | null
@@ -1930,58 +1936,67 @@ export type Database = {
       // Plan 56-03: manually extended (type regen unavailable)
       sop_focus_steps: {
         Row: {
+          created_at: string
           id: string
-          organisation_id: string
-          sop_id: string
-          section_id: string
-          kind: 'hazard' | 'ppe' | 'step' | 'check'
-          text: string
-          tip: string | null
-          photo_required: boolean
           image_paths: string[]
+          kind: 'hazard' | 'ppe' | 'step' | 'check'
+          needs_recheck: boolean
+          organisation_id: string
+          photo_required: boolean
           required_tools: string[] | null
-          time_estimate_minutes: number | null
+          run_id: string | null
+          section_id: string
+          sop_id: string
           sort_order: number
           source_key: string
-          run_id: string
-          created_at: string
+          text: string
+          time_estimate_minutes: number | null
+          tip: string | null
           updated_at: string
+          verified_at: string | null
+          verified_by_admin_id: string | null
         }
         Insert: {
-          id?: string
-          organisation_id: string
-          sop_id: string
-          section_id: string
-          kind: 'hazard' | 'ppe' | 'step' | 'check'
-          text: string
-          tip?: string | null
-          photo_required?: boolean
-          image_paths?: string[]
-          required_tools?: string[] | null
-          time_estimate_minutes?: number | null
-          sort_order: number
-          source_key: string
-          run_id: string
           created_at?: string
+          id?: string
+          image_paths?: string[]
+          kind: 'hazard' | 'ppe' | 'step' | 'check'
+          needs_recheck?: boolean
+          organisation_id: string
+          photo_required?: boolean
+          required_tools?: string[] | null
+          run_id?: string | null
+          section_id: string
+          sop_id: string
+          sort_order: number
+          source_key?: string
+          text: string
+          time_estimate_minutes?: number | null
+          tip?: string | null
           updated_at?: string
+          verified_at?: string | null
+          verified_by_admin_id?: string | null
         }
         Update: {
+          created_at?: string
           id?: string
-          organisation_id?: string
-          sop_id?: string
-          section_id?: string
-          kind?: 'hazard' | 'ppe' | 'step' | 'check'
-          text?: string
-          tip?: string | null
-          photo_required?: boolean
           image_paths?: string[]
+          kind?: 'hazard' | 'ppe' | 'step' | 'check'
+          needs_recheck?: boolean
+          organisation_id?: string
+          photo_required?: boolean
           required_tools?: string[] | null
-          time_estimate_minutes?: number | null
+          run_id?: string | null
+          section_id?: string
+          sop_id?: string
           sort_order?: number
           source_key?: string
-          run_id?: string
-          created_at?: string
+          text?: string
+          time_estimate_minutes?: number | null
+          tip?: string | null
           updated_at?: string
+          verified_at?: string | null
+          verified_by_admin_id?: string | null
         }
         Relationships: [
           {
@@ -1992,17 +2007,151 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "sop_focus_steps_section_id_fkey"
+            columns: ["section_id"]
+            isOneToOne: false
+            referencedRelation: "sop_sections"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "sop_focus_steps_sop_id_fkey"
             columns: ["sop_id"]
             isOneToOne: false
             referencedRelation: "sops"
             referencedColumns: ["id"]
           },
+        ]
+      }
+      // Plan 58-03: from supabase gen types after 00071
+      sop_ai_findings: {
+        Row: {
+          cleared_at: string | null
+          cleared_by: string | null
+          created_at: string
+          description: string
+          extras: Json
+          id: string
+          job: string
+          kind: string
+          organisation_id: string
+          run_id: string | null
+          severity: string
+          sop_id: string
+          step_id: string | null
+        }
+        Insert: {
+          cleared_at?: string | null
+          cleared_by?: string | null
+          created_at?: string
+          description: string
+          extras?: Json
+          id?: string
+          job: string
+          kind: string
+          organisation_id: string
+          run_id?: string | null
+          severity: string
+          sop_id: string
+          step_id?: string | null
+        }
+        Update: {
+          cleared_at?: string | null
+          cleared_by?: string | null
+          created_at?: string
+          description?: string
+          extras?: Json
+          id?: string
+          job?: string
+          kind?: string
+          organisation_id?: string
+          run_id?: string | null
+          severity?: string
+          sop_id?: string
+          step_id?: string | null
+        }
+        Relationships: [
           {
-            foreignKeyName: "sop_focus_steps_section_id_fkey"
-            columns: ["section_id"]
+            foreignKeyName: "sop_ai_findings_organisation_id_fkey"
+            columns: ["organisation_id"]
             isOneToOne: false
-            referencedRelation: "sop_sections"
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sop_ai_findings_sop_id_fkey"
+            columns: ["sop_id"]
+            isOneToOne: false
+            referencedRelation: "sops"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sop_ai_findings_step_id_fkey"
+            columns: ["step_id"]
+            isOneToOne: false
+            referencedRelation: "sop_focus_steps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sop_walks: {
+        Row: {
+          acks: Json
+          current_step_id: string | null
+          done: Json
+          id: string
+          organisation_id: string
+          photos: Json
+          sop_id: string
+          sop_version: number
+          started_at: string
+          status: string
+          submitted_at: string | null
+          updated_at: string
+          worker_id: string
+        }
+        Insert: {
+          acks?: Json
+          current_step_id?: string | null
+          done?: Json
+          id?: string
+          organisation_id: string
+          photos?: Json
+          sop_id: string
+          sop_version: number
+          started_at?: string
+          status?: string
+          submitted_at?: string | null
+          updated_at?: string
+          worker_id: string
+        }
+        Update: {
+          acks?: Json
+          current_step_id?: string | null
+          done?: Json
+          id?: string
+          organisation_id?: string
+          photos?: Json
+          sop_id?: string
+          sop_version?: number
+          started_at?: string
+          status?: string
+          submitted_at?: string | null
+          updated_at?: string
+          worker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sop_walks_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sop_walks_sop_id_fkey"
+            columns: ["sop_id"]
+            isOneToOne: false
+            referencedRelation: "sops"
             referencedColumns: ["id"]
           },
         ]
