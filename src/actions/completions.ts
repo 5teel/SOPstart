@@ -162,9 +162,9 @@ export async function submitCompletion(
 // ---------------------------------------------------------------
 // signOffCompletion
 //
-// Creates a second immutable completion_sign_offs record (D-17).
-// Then updates sop_completions.status via admin client (bypasses RLS).
-// On rejection: inserts a worker_notifications record.
+// Claims sop_completions.status via admin client (bypasses RLS; conditional on
+// the walk still being pending), then creates the immutable completion_sign_offs
+// record (D-17). On rejection: inserts a worker_notifications record.
 // ---------------------------------------------------------------
 export async function signOffCompletion(
   rawInput: unknown
@@ -265,6 +265,27 @@ export async function signOffCompletion(
     }
   }
 
+  // Claim the walk first (59 review WR-01): the status read above is only a fast
+  // path, so two in-flight submits could both pass it. The conditional update is
+  // the real guard -- whichever request flips the status writes the records, the
+  // other sees zero rows and stops before any sign-off or ledger row.
+  const newStatus = decision === 'approved' ? 'signed_off' : 'rejected'
+  const { data: claimed, error: updateError } = await admin
+    .from('sop_completions')
+    .update({ status: newStatus })
+    .eq('id', completionId)
+    .eq('organisation_id', organisationId)
+    .eq('status', 'pending_sign_off')
+    .select('id')
+
+  if (updateError) {
+    console.error('signOffCompletion status update error:', updateError)
+    return { success: false, error: 'Failed to record sign-off.' }
+  }
+  if (!claimed?.length) {
+    return { success: false, error: 'This walk has already been decided.' }
+  }
+
   // INSERT into completion_sign_offs (second immutable record, D-17)
   const { error: signOffError } = await admin
     .from('completion_sign_offs')
@@ -295,19 +316,6 @@ export async function signOffCompletion(
       override_reason: isOverride ? parsed.data.overrideReason : null,
     },
   })
-
-  // UPDATE sop_completions.status via admin client (bypasses RLS — only status field)
-  const newStatus = decision === 'approved' ? 'signed_off' : 'rejected'
-  const { error: updateError } = await admin
-    .from('sop_completions')
-    .update({ status: newStatus })
-    .eq('id', completionId)
-    .eq('organisation_id', organisationId)
-
-  if (updateError) {
-    console.error('signOffCompletion status update error:', updateError)
-    return { success: false, error: 'Sign-off recorded but status update failed.' }
-  }
 
   // The supervisor counter-signature is written here, after the status change, so no
   // client can skip it (59 F-04). Its failure never undoes the sign-off.

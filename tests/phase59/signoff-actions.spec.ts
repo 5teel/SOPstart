@@ -41,6 +41,16 @@ test.describe('signoff actions', () => {
     expect(refuse).toBeGreaterThan(-1)
     expect(SIGN_OFF).toContain("completion.status !== 'pending_sign_off'")
     expect(refuse).toBeLessThan(SIGN_OFF.indexOf("from('completion_sign_offs')"))
+    // review WR-01: the status is claimed conditionally, and zero rows stops the
+    // write, before the sign-off row and the ledger row
+    const claim = SIGN_OFF.indexOf('.update({ status: newStatus })')
+    expect(claim).toBeGreaterThan(-1)
+    expect(SIGN_OFF.slice(claim, claim + 240)).toContain(".eq('status', 'pending_sign_off')")
+    expect(SIGN_OFF.slice(claim, claim + 240)).toContain(".select('id')")
+    const bail = SIGN_OFF.indexOf('if (!claimed?.length)')
+    expect(bail).toBeGreaterThan(claim)
+    expect(bail).toBeLessThan(SIGN_OFF.indexOf("from('completion_sign_offs')"))
+    expect(bail).toBeLessThan(SIGN_OFF.indexOf('await recordDecision('))
   })
 
   test('the counter-signature is still written after approval, on the server (A-08)', () => {
