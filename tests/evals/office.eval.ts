@@ -936,6 +936,27 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       expect(errors).toEqual([])
       await page.close()
     })
-    test.fixme('a non-owner completion address lands on the Office (59-15)', async () => {})
+    test('a non-owner completion address lands on the Office; the walker still sees their own (59-15)', async () => {
+      test.setTimeout(180_000)
+      const completionId = await seedCompletion(workerId, 1)
+      // The supervisor is not the walker: the server page sends them to the Office inbox (content, not status).
+      const page = await supervisorCtx.newPage()
+      const errors = watchConsole(page)
+      await page.goto(`/activity/${completionId}`)
+      await expect(page.getByTestId('office-pane')).toHaveCount(1, SLOW)
+      await expect(page).toHaveURL(/place=office/, SLOW)
+      await expect(page.getByText('Completion Detail')).toHaveCount(0)
+      await shot(page, '59-completion-non-owner')
+      expect(errors).toEqual([])
+      await page.close()
+
+      // The walker opens their own completion: steps and status, no sign-off controls.
+      const workerPage = await workerCtx.newPage()
+      await workerPage.goto(`/activity/${completionId}`)
+      await expect(workerPage.getByText('Completion Detail')).toBeVisible(SLOW)
+      await expect(workerPage.getByTestId('signoff-approve')).toHaveCount(0)
+      await shot(workerPage, '59-completion-owner')
+      await workerPage.close()
+    })
   })
 })

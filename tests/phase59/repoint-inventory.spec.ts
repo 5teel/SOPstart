@@ -127,7 +127,7 @@ export const INVENTORY: Row[] = [
 ]
 
 // Each owning plan appends its id (e.g. '59-05') when its last commit lands.
-export const LIVE_PLANS: string[] = ['59-05', '59-12', '59-14']
+export const LIVE_PLANS: string[] = ['59-05', '59-12', '59-14', '59-15']
 
 function stripComments(src: string): string {
   return src

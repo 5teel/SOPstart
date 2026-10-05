@@ -79,5 +79,11 @@ test.describe('capability matrix', () => {
     expect(row('Manage departments')).toContain('People & roles tab')
     for (const address of ['/?place=office&tab=people', '/?place=office&tab=access']) expect(MATRIX).toContain(address)
   })
-  test.fixme('Activity row: a non-owner completion address redirects to the Office (59-15)', () => {})
+  test('Activity row: a non-owner completion address redirects to the Office, with no service-role read by id (59-15)', () => {
+    const r = row('Activity -- own completion record')
+    expect(r.split('|').map((c) => c.trim()).slice(2, 6)).toEqual(['✅', '✅', '✅', '✅'])
+    for (const name of ['/?place=office', 'worker_id', 'signCompletionPhotos', 'no service-role read by id']) expect(r).toContain(name)
+    expect(row('Record observation')).toContain('/admin/training')
+    expect(row('Record observation')).toContain('Phase 61')
+  })
 })

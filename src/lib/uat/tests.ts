@@ -114,8 +114,8 @@ export const UAT_TESTS: UatTest[] = [
     summary:
       'The old "Activity" page is now called "Sign-off", reached from the Office, and admins see the sign-off queue there instead of being bounced to the SOP admin area.',
     tryIt: [
-      'Sign in and open the Office on the site: Sign-off is listed there.',
-      'Tap Sign-off — you should see completed procedures waiting for review, not an editing screen.',
+      'Sign in and open the Office on the site: walks waiting for review are listed in the Inbox.',
+      'Open a sign-off row — you should see the steps and photos in place, with Sign off and Reject, not an editing screen.',
       'If you are an admin: the Office shows Team and Settings, and the Workshop shows New SOP. Open New SOP — it should take you straight to the four ways of making a SOP.',
     ],
     questions: [
@@ -124,7 +124,7 @@ export const UAT_TESTS: UatTest[] = [
       { id: 'lost', text: 'In your first five taps, did you ever land somewhere you did not expect?' },
     ],
     background:
-      'Nav clarity pass (2026-07-30): "Activity" renamed to "Sign-off" (the header it was renamed in is gone since Phase 57); /activity no longer redirects admins to the old admin SOP page (they see the supervisor sign-off queue).',
+      'Nav clarity pass (2026-07-30): "Activity" renamed to "Sign-off" (the header it was renamed in is gone since Phase 57); Phase 59: sign-off now happens on the Office inbox row, and /activity is the record of your own walks.',
   },
 
   {
@@ -311,15 +311,14 @@ export const UAT_TESTS: UatTest[] = [
     title: 'Can you record an observation of a worker doing a SOP right?',
     status: 'active',
     summary:
-      'Supervisors can now record that they personally watched a worker perform a SOP — a verdict (performed to SOP / needs support) plus an optional note. You can start this from a person\'s panel in Team, or straight from a completion in Activity.',
+      'Supervisors can now record that they personally watched a worker perform a SOP — a verdict (performed to SOP / needs support) plus an optional note. You can start this from a person\'s panel in Team, or (admins) from the Training matrix. Supervisors lose the old Activity entry point until Phase 61.',
     tryIt: [
       'Open the Training matrix from the Smoko room, click a cell to open the panel for that person, then click "Record observation".',
       'Pick a SOP, choose a verdict, add a short note, and save — check it appears in their observation history.',
-      'Now try the other way in: open Activity, find a completion, and use the "I observed this" row action instead — confirm it pre-fills the worker and SOP.',
     ],
-    links: [{ label: 'Training matrix', href: '/admin/training' }, { label: 'Activity', href: '/activity' }],
+    links: [{ label: 'Training matrix', href: '/admin/training' }],
     questions: [
-      { id: 'entry-found', text: 'Was it easy to find "Record observation" from both Team and Activity?' },
+      { id: 'entry-found', text: 'Was it easy to find "Record observation" from the Training matrix?' },
       { id: 'save-clear', text: 'Was it clear the record is permanent once saved (can\'t be edited or deleted)?' },
       { id: 'appears-history', text: 'Did the new observation show up straight away in that worker\'s history?' },
     ],
@@ -454,12 +453,12 @@ export const UAT_TESTS: UatTest[] = [
     summary:
       'Only someone who has themselves been checked off on a procedure can vouch for someone else doing it right. If you haven\'t been signed off yet, that one option is turned off for you — everything else about recording what you saw still works.',
     tryIt: [
-      'As a supervisor, open a worker\'s panel in Team (or a completion in Activity) and start recording an observation for a procedure you\'ve never been signed off on yourself.',
+      'As a supervisor, open a worker\'s panel in the Training matrix and start recording an observation for a procedure you\'ve never been signed off on yourself.',
       'Try to pick "performed to SOP" (done correctly) and see what happens.',
       'Check the coaching option ("needs support") still works normally.',
       'Look for a way to ask someone to sign you off, and try it.',
     ],
-    links: [{ label: 'Training matrix', href: '/admin/training' }, { label: 'Activity', href: '/activity' }],
+    links: [{ label: 'Training matrix', href: '/admin/training' }],
     questions: [
       { id: 'option-unavailable', text: 'Was it clear that "done correctly" wasn\'t available to you yet?' },
       { id: 'explanation-clear', text: 'Did the on-screen message explain why, in a way that made sense?' },

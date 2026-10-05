@@ -126,7 +126,35 @@ test.describe('retire: governance, team and access pages (59-14)', () => {
 })
 
 test.describe('retire: supervisor activity view and completion supervisor half (59-15)', () => {
-  test.fixme(true, 'flips live in 59-15')
-  test('the supervisor activity view and its filter, summary card and reject sheet are gone', () => {})
-  test('a non-owner opening a completion address is sent to the Office by the server page, never a client effect', () => {})
+  test('the supervisor activity view and its filter, summary card and reject sheet are gone', () => {
+    for (const f of [
+      'src/app/(protected)/activity/SupervisorActivityView.tsx',
+      'src/components/activity/ActivityFilter.tsx',
+      'src/components/activity/CompletionSummaryCard.tsx',
+      'src/components/activity/RejectReasonSheet.tsx',
+    ]) expect(fs.existsSync(path.join(ROOT, f)), f).toBe(false)
+    // references, not only files (CLAUDE.md 2026-08-04)
+    const symbols = /\b(SupervisorActivityView|useSupervisorCompletions|SupervisorCompletion|CompletionSummaryCard|RejectReasonSheet|ActivityFilter)\b/
+    const offenders = walkSrc(path.join(ROOT, 'src'))
+      .filter((f) => symbols.test(stripComments(fs.readFileSync(f, 'utf-8'))))
+      .map((f) => path.relative(ROOT, f))
+    expect(offenders, offenders.join('\n')).toEqual([])
+    // the worker's own record survives until Phase 61, for every role
+    expect(fs.existsSync(path.join(ROOT, 'src/app/(protected)/activity/WorkerActivityView.tsx'))).toBe(true)
+    const page = stripComments(read('src/app/(protected)/activity/page.tsx'))
+    expect(page).toContain('<WorkerActivityView />')
+    expect(page).not.toContain('SupervisorActivityView')
+    // the dropped list keeps it out and the Phase 55 sweep runs it live
+    expect(read('scripts/dropped-features.json')).toContain('"feature": "supervisor-review"')
+    expect(read('tests/phase55/deletion-sweep.spec.ts')).toContain("'supervisor-review'")
+  })
+  test('a non-owner opening a completion address is sent to the Office by the server page, never a client effect', () => {
+    const page = stripComments(read('src/app/(protected)/activity/[completionId]/page.tsx'))
+    const client = stripComments(read('src/app/(protected)/activity/[completionId]/CompletionDetailClient.tsx'))
+    expect(page).toContain("'/?place=office'")
+    expect(page).toContain('redirect(away)')
+    expect(page).not.toContain('createAdminClient')
+    expect(client).not.toMatch(/signOffCompletion|overrideReason|RejectReasonSheet|requestAssessorReview|router\.(push|replace)/)
+    expect(client).not.toContain('useEffect')
+  })
 })

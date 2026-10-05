@@ -155,7 +155,7 @@ export const JOURNEYS: Journey[] = [
         { label: 'Yes → supervisor counter-signs', to: 'sup' },
         { label: 'No', to: 'e' },
       ] },
-      { id: 'sup', type: 'screen', label: 'Supervisor review + counter-sign', route: '/activity/[completionId]', detail: 'Supervisor counter-signs — second immutable record (D-10 / AFL-VER-05).' },
+      { id: 'sup', type: 'screen', label: 'Office inbox - sign-off row', route: '/', detail: 'The supervisor opens the sign-off row in the Office inbox, reads the steps and photos in place, and signs off or rejects. The server writes the counter-signature - second immutable record (D-10 / AFL-VER-05).' },
       { id: 'e', type: 'end', label: 'Job recorded' },
     ],
   },
@@ -169,8 +169,8 @@ export const JOURNEYS: Journey[] = [
     summary: 'A supervisor checks a worker’s completed procedure and signs it off, creating a second immutable record.',
     steps: [
       { id: 's', type: 'start', label: 'Completion submitted' },
-      { id: 'activity', type: 'screen', label: 'Sign-off records', route: '/activity', detail: 'All completions for the org. Admins see the same sign-off queue.' },
-      { id: 'one', type: 'screen', label: 'Completion detail', route: '/activity/[completionId]', detail: 'Steps, photos, measurements, who/when.' },
+      { id: 'activity', type: 'screen', label: 'Office inbox - sign-off row', route: '/', detail: 'Walks waiting for review sit in the Office inbox for the supervisor (their own workers) and the admin (everyone). Open a row and the steps, photos and who/when expand in place; a walker never signs off their own walk.' },
+      { id: 'one', type: 'screen', label: 'My completion', route: '/activity/[completionId]', detail: 'The walker sees their own completion here - steps, photos, status and any reason it was sent back (listed under My sign-offs, /activity, for every role until Phase 61 moves it to the Smoko room). Anyone else who opens the address is sent to the Office.' },
       { id: 'ok', type: 'decision', label: 'Done correctly?', branches: [
         { label: 'Yes — sign off', to: 'sign' },
         { label: 'No — follow up', to: 'e' },
@@ -190,10 +190,10 @@ export const JOURNEYS: Journey[] = [
       { id: 's', type: 'start', label: 'Watched a worker perform a SOP' },
       { id: 'entry', type: 'decision', label: 'Where from?', branches: [
         { label: 'Walking the floor — training matrix', to: 'team' },
-        { label: 'Just watched a completion', to: 'activity' },
+        { label: 'Just watched a completion (admins only until Phase 61)', to: 'activity' },
       ] },
       { id: 'team', type: 'screen', label: 'Training matrix — person panel', route: '/admin/training', detail: 'Reached from the Smoko room. Click a matrix cell to open the PersonPanel on that person and SOP; "Record observation" pre-fills the worker.' },
-      { id: 'activity', type: 'screen', label: 'Sign-off — record button / row action', route: '/activity', detail: '"Record observation" button, or a per-completion "I observed this" row action pre-filling worker + SOP + completion_id.' },
+      { id: 'activity', type: 'screen', label: 'Training matrix bridge (admins)', route: '/admin/training', detail: 'The old Sign-off page entry is gone: supervisors have no Record observation button until Phase 61 puts it in the Smoko room. Admins record from the training matrix bridge.' },
       { id: 'modal', type: 'screen', label: 'Record observation modal', detail: 'Shared modal: worker chip, SOP picker (assigned-first), verdict buttons, optional note. "Permanent record — cannot be edited or deleted after saving" (D-08).' },
       { id: 'assessor-check', type: 'decision', label: 'Recording "performed to SOP"? Is the recorder a signed-off assessor on this SOP? (ASR-01 gate — "needs support" is never gated, D-04)', branches: [
         { label: 'Signed off — proceed as normal', to: 'save' },
@@ -549,7 +549,7 @@ export const JOURNEYS: Journey[] = [
       { id: 'screen', type: 'screen', label: 'The one screen - list, site, detail', route: '/', detail: 'Rooms are always signposted on the site. Selecting a machine or the Noticeboard lists its SOPs with Walk. Searching lights the matching shapes. Esc returns to the overview. Every place has an address, /?place=... A visitor who is not signed in sees the landing with Log In instead; a member with no role goes to the holding screen.' },
       { id: 'walk', type: 'action', label: 'Walk a SOP', detail: 'Walk beside a SOP row, or Walk it on the Now card.' },
       { id: 'sop', type: 'screen', label: 'Procedure', route: '/sops/[sopId]' },
-      { id: 'smoko', type: 'screen', label: 'Smoko room - my record', route: '/activity', detail: 'The Smoko room and the Office both bridge to Activity.' },
+      { id: 'smoko', type: 'screen', label: 'Smoko room - my record', route: '/activity', detail: 'The Smoko room bridges to My sign-offs: every role sees their own record.' },
       { id: 'e', type: 'end', label: 'Back on the site' },
     ],
   },

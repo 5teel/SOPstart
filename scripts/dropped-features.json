@@ -1378,6 +1378,36 @@
       "phase": 59,
       "kind": "file",
       "path": "src/lib/org-model/__tests__/auto-layout.test.ts"
+    },
+    {
+      "feature": "supervisor-review",
+      "phase": 59,
+      "kind": "file",
+      "path": "src/app/(protected)/activity/SupervisorActivityView.tsx"
+    },
+    {
+      "feature": "supervisor-review",
+      "phase": 59,
+      "kind": "file",
+      "path": "src/components/activity/ActivityFilter.tsx"
+    },
+    {
+      "feature": "supervisor-review",
+      "phase": 59,
+      "kind": "file",
+      "path": "src/components/activity/CompletionSummaryCard.tsx"
+    },
+    {
+      "feature": "supervisor-review",
+      "phase": 59,
+      "kind": "file",
+      "path": "src/components/activity/RejectReasonSheet.tsx"
+    },
+    {
+      "feature": "supervisor-review",
+      "phase": 59,
+      "kind": "symbol",
+      "pattern": "\b(SupervisorActivityView|useSupervisorCompletions|CompletionSummaryCard|RejectReasonSheet|ActivityFilter)\b"
     }
   ],
   "allow": [

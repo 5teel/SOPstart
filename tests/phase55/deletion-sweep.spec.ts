@@ -32,13 +32,13 @@ const TEST_SCAN_EXCLUDED_PREFIXES = [
 // Image annotation was dropped in 55-10 and returned on step photos in Phase 58-17 (D-03): its entries left
 // scripts/dropped-features.json and this list together, and the Konva isolation spec now allow-lists annotate/.
 // Each deleting plan appends its feature key here when it flips the block live.
-const LIVE_FEATURES: string[] = ['voice-capture', 'voice', 'phone-qr', 'shared-device', 'youtube', 'photo-scan', 'video-generation', 'offline', 'flow-diagram', 'version-compare', 'library', 'org-signup', 'header-nav', 'site-and-departments-pages', 'list-page', 'tabbed-sop-page', 'old-walkthrough', 'block-builder', 'versions-page', 'office-pages']
+const LIVE_FEATURES: string[] = ['voice-capture', 'voice', 'phone-qr', 'shared-device', 'youtube', 'photo-scan', 'video-generation', 'offline', 'flow-diagram', 'version-compare', 'library', 'org-signup', 'header-nav', 'site-and-departments-pages', 'list-page', 'tabbed-sop-page', 'old-walkthrough', 'block-builder', 'versions-page', 'office-pages', 'supervisor-review']
 // 55-13 flips this once the eight packages are uninstalled.
 const PACKAGES_LIVE = true
 
 const FEATURES = [
   'voice-capture', 'voice', 'phone-qr', 'shared-device', 'youtube', 'photo-scan', 'video-generation',
-  'offline', 'flow-diagram', 'version-compare', 'library', 'org-signup', 'header-nav', 'site-and-departments-pages', 'list-page', 'tabbed-sop-page', 'old-walkthrough', 'block-builder', 'versions-page', 'office-pages',
+  'offline', 'flow-diagram', 'version-compare', 'library', 'org-signup', 'header-nav', 'site-and-departments-pages', 'list-page', 'tabbed-sop-page', 'old-walkthrough', 'block-builder', 'versions-page', 'office-pages', 'supervisor-review',
 ]
 
 interface Entry {
