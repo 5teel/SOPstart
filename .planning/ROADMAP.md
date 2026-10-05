@@ -2052,7 +2052,62 @@ Plans:
   4. The bell in the list shows a count, and a person is notified when they are next to approve a SOP, when a SOP they own is due for review, when a completion waits for their sign-off, when a request they raised is answered and when a SOP they do has a new version; opening a notification goes to the place it is about
   5. An admin sets, changes and removes an objective on the site, a department, a machine, a SOP or a person, and it shows as quiet metadata saying who set it; an AI agent's request appears in the Office marked as from an agent, and an objective an agent set stays marked until a person confirms it
 
-**Plans**: TBD
+**Plans:** 18 plans
+Plans:
+**Wave 1**
+
+- [ ] 60-01-PLAN.md — Wave 0: phase60 project, repoint inventory + retirement sweep, requirement spec stubs, requests eval skeleton, zero-SOP machine + safety-manager fixtures, cleanup helper, validation map
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 60-02-PLAN.md — Migration 00074 (requests, notifications, objectives, five ledger kinds, sops.objective copied) [BLOCKING] live apply + per-role RLS probe; kinds, Requests chip, words, types; read rows in the matrix
+- [ ] 60-03-PLAN.md — Pure models: request kinds / states / pin helper / My-requests grouping, notification titles / dedupe / safe places, objective line; query keys
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 60-04-PLAN.md — Requests server: notify writer, service-role request core, agent helper, raise / withdraw / answer / list actions; registry; matrix
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 60-05-PLAN.md — Office data: open requests as the second list, one pin helper everywhere, Machines inbox kind retired, stale-department row opens the SOP
+- [ ] 60-06-PLAN.md — Asks server: ask core (assignment first, request second, undo on failure), ask / decline / stop / targets actions; registry; matrix
+- [ ] 60-07-PLAN.md — In-flow notification triggers (next approver at the divert and after a non-final approval, sign-off waiting, new version) + gate-harness stub
+- [ ] 60-08-PLAN.md — Cron routes: review-due and machines-without-SOPs (agent producer), shared bearer check, CRON_PATHS proxy exemption
+
+**Wave 5** *(blocked on Wave 4 completion)*
+
+- [ ] 60-09-PLAN.md — Objectives server: one session-gated core, set / clear / confirm / list actions, deleteSop clean-up; registry; matrix
+
+**Wave 6** *(blocked on Wave 5 completion)*
+
+- [ ] 60-10-PLAN.md — Agent objectives through the AI field interface (subjectId / agentName, objective.* and objectives.all descriptors), objective signals
+- [ ] 60-11-PLAN.md — Office Requests tab (row, Accept / Decline, receipt link), Decisions about-line, Office matrix and journeys, eval cases (cron 401 first, fail fast on a secret mismatch)
+
+**Wave 7** *(blocked on Wave 6 completion)*
+
+- [ ] 60-12-PLAN.md — Lazy request composer + ask picker + shared dialog shell; triggers on both machine panels and This SOP (Assign → Ask); markers; ask journey
+
+**Wave 8** *(blocked on Wave 7 completion)*
+
+- [ ] 60-13-PLAN.md — Objective line (static) + lazy editor on machine panels, department panel and People row
+
+**Wave 9** *(blocked on Wave 8 completion)*
+
+- [ ] 60-14-PLAN.md — SOP objective from objectives (lineage root) in browse and This SOP; setSopObjective deleted; browse "Make a request"
+- [ ] 60-15-PLAN.md — Site overview body (Objectives · Notifications · My requests · Office line), browser-client notification reads
+
+**Wave 10** *(blocked on Wave 9 completion)*
+
+- [ ] 60-16-PLAN.md — Bell in the list header, overview mounted in both shells (bundle fallback rule), pathways / UAT, eval cases for the loop and every NTF-02 trigger
+
+**Wave 11** *(blocked on Wave 10 completion)*
+
+- [ ] 60-17-PLAN.md — Delete the assign screen, its writers and the old notifications hook; assign address 307s to the SOP; assign-page dropped feature
+
+**Wave 12** *(blocked on Wave 11 completion)*
+
+- [ ] 60-18-PLAN.md — Deployed eval with every screenshot read and every trigger proven, Railway cron schedules (human action, same CRON_SECRET), build + full suite once, sign-off, requirements, Learnings
+
 **UI hint**: yes
 
 ### Phase 61: The Workshop & the Smoko Room
