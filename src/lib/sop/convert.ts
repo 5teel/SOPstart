@@ -360,6 +360,56 @@ export function convertSop(input: { sopId: string; sections: Section[]; sopImage
   }
 }
 
+/** Stable key: the item's own props.id; duplicates get #2, #3; a missing id falls back to position. */
+function layoutItemKey(p: Props, sectionId: string, index: number, used: Set<string>): { key: string; flawed: boolean } {
+  let key = str(p.id)
+  let flawed = false
+  if (!key) {
+    key = `pos:${sectionId}:${index}`
+    flawed = true
+  } else if (used.has(key)) {
+    let n = 2
+    while (used.has(`${key}#${n}`)) n++
+    key = `${key}#${n}`
+    flawed = true
+  }
+  used.add(key)
+  return { key, flawed }
+}
+
+export interface TickCarry { sectionId: string; sourceKey: string; by: string; at: string | null }
+
+/**
+ * Phase 58 cutover (D-23): a draft SOP's layout item whose block junction is verified
+ * carries that tick onto every step it produced (its own key and the ':w' warning
+ * hazard). Pure: the caller supplies the verified junctions.
+ */
+export function ticksToCarry(
+  sections: Section[],
+  steps: FocusStepDraft[],
+  verified: Map<string, { by: string; at: string | null }>,
+): TickCarry[] {
+  const out = new Map<string, TickCarry>()
+  for (const section of sections) {
+    const layout = (section.layout_data as { content?: unknown } | null)?.content
+    if (!Array.isArray(layout) || layout.length === 0) continue
+    const used = new Set<string>()
+    layout.forEach((raw, index) => {
+      const p = rec(rec(raw).props)
+      const { key } = layoutItemKey(p, section.id, index, used)
+      const junctionId = str(p.junctionId)
+      const tick = junctionId ? verified.get(junctionId) : undefined
+      if (!tick) return
+      for (const s of steps) {
+        if (s.sectionId === section.id && (s.sourceKey === key || s.sourceKey.startsWith(`${key}:`))) {
+          out.set(`${s.sectionId}|${s.sourceKey}`, { sectionId: s.sectionId, sourceKey: s.sourceKey, by: tick.by, at: tick.at })
+        }
+      }
+    })
+  }
+  return [...out.values()]
+}
+
 function fromLayout(section: Section, content: unknown[], before: SourceCounts): Slot[] {
   const out: Slot[] = []
   const used = new Set<string>()
@@ -371,18 +421,8 @@ function fromLayout(section: Section, content: unknown[], before: SourceCounts):
     const p = rec(item.props)
     before.byType[type || '(none)'] = (before.byType[type || '(none)'] ?? 0) + 1
 
-    // Stable key: the item's own props.id; duplicates get #2, #3; a missing id falls back to position.
-    let key = str(p.id)
-    if (!key) {
-      key = `pos:${section.id}:${index}`
-      before.missingIds++
-    } else if (used.has(key)) {
-      let n = 2
-      while (used.has(`${key}#${n}`)) n++
-      key = `${key}#${n}`
-      before.missingIds++
-    }
-    used.add(key)
+    const { key, flawed } = layoutItemKey(p, section.id, index, used)
+    if (flawed) before.missingIds++
 
     const role = type === 'CalloutBlock' ? calloutRole(p) : 'other'
     if (type === 'HazardCardBlock' || role === 'warning' || role === 'caution') before.hazardSources++
