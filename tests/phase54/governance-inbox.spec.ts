@@ -24,6 +24,8 @@ const GOV_INBOX_COMPONENT = path.join(ROOT, 'src', 'components', 'admin', 'gover
 const LOAD_INBOX = path.join(ROOT, 'src', 'lib', 'governance', 'load-inbox.ts')
 const read = (p: string) => fs.readFileSync(p, 'utf-8')
 
+const SOP_ID = '0b0e0d6a-1c2d-4e5f-8a9b-0c1d2e3f4a5b'
+
 function govRow(id: string, overrides: Partial<GovernanceRow> = {}): GovernanceRow {
   return {
     id,
@@ -131,19 +133,19 @@ test.describe('deriveInbox', () => {
   })
 
   test('library row stuck -> kind stuck, chips [stuck], severity bad, meta + Retry action', () => {
-    const items = deriveInbox({ governance: [], library: [libRow('s1', { stuck: true })], machines: [], links: [] })
+    const items = deriveInbox({ governance: [], library: [libRow(SOP_ID, { stuck: true })], machines: [], links: [] })
     expect(items).toHaveLength(1)
     expect(items[0].kind).toBe('stuck')
     expect(items[0].chips).toEqual(['stuck'])
     expect(items[0].severity).toBe('bad')
     expect(items[0].meta).toContain('stopped while converting')
-    expect(items[0].action).toEqual({ label: 'Retry', href: '/admin/sops/builder/s1' })
+    expect(items[0].action).toEqual({ label: 'Retry', href: `/sops/${SOP_ID}?mode=edit&from=office` })
   })
 
   test('library row parseFailed -> meta contains conversion failed, same action shape', () => {
-    const items = deriveInbox({ governance: [], library: [libRow('s1', { parseFailed: true })], machines: [], links: [] })
+    const items = deriveInbox({ governance: [], library: [libRow(SOP_ID, { parseFailed: true })], machines: [], links: [] })
     expect(items[0].meta).toContain('conversion failed')
-    expect(items[0].action).toEqual({ label: 'Retry', href: '/admin/sops/builder/s1' })
+    expect(items[0].action).toEqual({ label: 'Retry', href: `/sops/${SOP_ID}?mode=edit&from=office` })
   })
 
   test('machine with no links -> kind machines, chips [machines], severity grey, Add action', () => {

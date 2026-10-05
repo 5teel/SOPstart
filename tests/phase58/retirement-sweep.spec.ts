@@ -53,10 +53,37 @@ test.describe('retire: the tabbed SOP page (58-11)', () => {
 })
 
 test.describe('retire: builder and versions addresses (58-14)', () => {
-  test.fixme(true, 'flips live in 58-14')
-  test('the proxy redirects the builder address and the versions address to the SOP edit address', () => {})
-  test('the review-route redirect in next.config targets the edit address (or chains through the proxy)', () => {})
-  test('the converter refuses --apply and tells the caller it is retired', () => {})
+  test('the proxy redirects the builder address and the versions address to the SOP edit address', () => {
+    const MW = stripComments(read('src/lib/supabase/middleware.ts'))
+    expect(MW).toContain("path.startsWith('/admin/sops/')")
+    expect(MW).toContain('legacyRedirectFor(path, request.nextUrl.search)')
+    const FP = stripComments(read('src/lib/sop/focus-path.ts'))
+    expect(FP).toContain("focusHref(id, { mode: 'edit' })")
+  })
+
+  test('the review-route redirect in next.config targets the edit address', () => {
+    const cfg = stripComments(read('next.config.ts'))
+    expect(cfg).toContain("destination: '/sops/:sopId?mode=edit'")
+    expect(cfg).not.toContain("destination: '/admin/sops/builder/:sopId'")
+  })
+
+  test('the converter refuses --apply and tells the caller it is retired', () => {
+    const SRC = stripComments(read('scripts/convert-sops-to-steps.ts'))
+    expect(SRC).toContain("args.includes('--apply')")
+    expect(SRC).toContain('converter retired in Phase 58')
+  })
+
+  test('no src file links the old builder or versions address (references, not just files)', () => {
+    const offenders: string[] = []
+    // The two directories that are deleted in 58-16 may still link each other.
+    const skip = ['/admin/sops/builder/', '/admin/sops/[sopId]/versions/']
+    for (const f of walkSrc(path.join(ROOT, 'src'))) {
+      if (skip.some((d) => f.split(path.sep).join('/').includes(d))) continue
+      const code = stripComments(fs.readFileSync(f, 'utf-8'))
+      if (/\/admin\/sops\/builder\/\$\{/.test(code) || /\/admin\/sops\/\$\{[^}]*\}\/versions/.test(code)) offenders.push(path.relative(ROOT, f))
+    }
+    expect(offenders).toEqual([])
+  })
 })
 
 test.describe('retire: deleted components, routes and modules (58-16)', () => {

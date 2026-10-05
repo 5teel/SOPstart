@@ -9,6 +9,7 @@ import type { GovernanceRow } from '@/actions/governance'
 import type { MillerSop } from '@/lib/sop-list/admin-rows'
 import type { SopMachineLink } from '@/lib/validators/site'
 import { machinesWithoutSops } from '@/lib/sop/admin-health'
+import { focusHref } from '@/lib/sop/focus-path'
 
 export type InboxChip = 'owner' | 'overdue' | 'approve' | 'stuck' | 'machines'
 export type InboxSeverity = 'bad' | 'warn' | 'info' | 'grey'
@@ -114,7 +115,7 @@ export function deriveInbox(input: {
       meta,
       age: lib.age,
       gov: null,
-      action: { label: 'Retry', href: `/admin/sops/builder/${lib.id}` },
+      action: { label: 'Retry', href: focusHref(lib.id, { mode: 'edit', from: 'office' }) },
     })
   }
 

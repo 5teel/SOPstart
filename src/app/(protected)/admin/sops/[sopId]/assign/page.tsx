@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { ArrowLeft, Users, History } from 'lucide-react'
+import { ArrowLeft, Users } from 'lucide-react'
 import Link from 'next/link'
 import { AssignmentRow } from '@/components/admin/AssignmentRow'
 import { SubTradePicker } from '@/components/admin/SubTradePicker'
@@ -16,6 +16,7 @@ import {
   type OrgMemberWithProfile,
 } from '@/actions/assignments'
 import { createClient } from '@/lib/supabase/client'
+import { focusHref } from '@/lib/sop/focus-path'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -213,20 +214,12 @@ export default function AssignSopPage() {
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-4">
           <Link
-            href={`/admin/sops/builder/${sopId}`}
+            href={focusHref(sopId, { mode: 'edit' })}
             className="flex items-center gap-2 text-[var(--ink-500)] hover:text-[var(--ink-900)] transition-colors"
-            aria-label="Back to SOP builder"
+            aria-label="Back to the SOP"
           >
             <ArrowLeft size={18} />
-            <span className="text-sm font-medium">Back to Review</span>
-          </Link>
-          <div className="flex-1" />
-          <Link
-            href={`/admin/sops/${sopId}/versions`}
-            className="w-8 h-8 rounded-lg bg-white border border-[var(--ink-100)] hover:bg-[var(--paper-2)] hover:border-[var(--ink-300)] text-[var(--ink-500)] hover:text-[var(--ink-900)] transition-colors flex items-center justify-center"
-            title="Version history"
-          >
-            <History size={16} />
+            <span className="text-sm font-medium">Back to the SOP</span>
           </Link>
         </div>
 

@@ -84,11 +84,12 @@ export async function updateSession(request: NextRequest) {
   }
 
   // Old tabbed SOP addresses (/sops/<uuid>?tab=read|walk) land on the bare focus
-  // address. Server-side on purpose, same reason as the block above (CLAUDE.md
+  // address; the old builder and versions addresses land on the edit address.
+  // Server-side on purpose, same reason as the block above (CLAUDE.md
   // 2026-09-29). legacyRedirectFor is UUID-gated and builds fixed templates, so
   // the destination cannot be steered offsite; the refreshed session cookies
-  // ride along. Builder and versions addresses join this block in 58-14.
-  if (path.startsWith('/sops/')) {
+  // ride along.
+  if (path.startsWith('/sops/') || path.startsWith('/admin/sops/')) {
     const legacy = legacyRedirectFor(path, request.nextUrl.search)
     if (legacy) {
       const redirect = NextResponse.redirect(new URL(legacy, request.url), 307)

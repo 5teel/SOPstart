@@ -7,6 +7,7 @@
  */
 import Link from 'next/link'
 import { AdminSopRows } from '@/components/admin/governance/AdminMachinePanel'
+import { focusHref } from '@/lib/sop/focus-path'
 import type { AdminPanelSop } from '@/lib/sop/admin-health'
 
 const TITLE = 'text-lg font-semibold text-ink-900'
@@ -80,7 +81,7 @@ export function AdminWorkshopBody({
             >
               <span className="min-w-0 flex-1 truncate font-semibold">{d.title}</span>
               <span className="mono text-meta text-ink-500">{d.stuck ? 'stuck' : d.status}</span>
-              <Link href={`/admin/sops/builder/${d.id}`} className="mono text-meta text-ink-500">
+              <Link href={focusHref(d.id, { mode: 'edit', from: 'workshop' })} className="mono text-meta text-ink-500">
                 Open
               </Link>
             </li>

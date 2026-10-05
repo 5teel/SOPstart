@@ -35,8 +35,8 @@ test.describe('SCP-PARSE — Phase 20 contract integration (Phase 21)', () => {
     // Legacy redirect installed by Wave 2.
     const next = read('next.config.ts')
     expect(next).toContain("source: '/admin/sops/:sopId/review'")
-    expect(next).toContain("destination: '/admin/sops/builder/:sopId'")
-    expect(next).toContain('permanent: true')
+    // Phase 58-14 (D-23): the review address now lands on the focus editor.
+    expect(next).toContain("destination: '/sops/:sopId?mode=edit'")
 
     // Builder route exists + mounts the SOP via BuilderStageShell
     // (Phase 26 superseded the legacy shell — 30-01 repoint).

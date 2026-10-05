@@ -84,6 +84,6 @@ test.describe('inbox reuses governance gating, does not re-derive it (54-02)', (
   test('gov-row testid and the builder link survive', () => {
     const src = read(QUEUE_ROW)
     expect(src).toContain('data-testid="gov-row"')
-    expect(src).toContain('/admin/sops/builder/')
+    expect(src).toContain("focusHref(row.id, { mode: 'edit', from: 'office' })")
   })
 })

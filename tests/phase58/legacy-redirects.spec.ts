@@ -52,6 +52,29 @@ test.describe('FOC-03 legacy redirects', () => {
     for (const f of files) expect(fs.readFileSync(f, 'utf-8'), f).not.toMatch(/router\.replace\(/)
   })
 
-  test.fixme('builder and versions addresses are redirected in the proxy too (58-14)', () => {})
-  test.fixme('the next.config review-route redirect is retargeted at the edit address (58-14)', () => {})
+  test('builder and versions addresses map to the edit address; nothing else under /admin/sops does (58-14)', () => {
+    const edit = `/sops/${ID}?mode=edit`
+    expect(legacyRedirectFor(`/admin/sops/builder/${ID}`, '')).toBe(edit)
+    expect(legacyRedirectFor(`/admin/sops/${ID}/versions`, '?x=1')).toBe(edit)
+    expect(legacyRedirectFor('/admin/sops/builder/not-a-uuid', '')).toBeNull()
+    expect(legacyRedirectFor('/admin/sops/builder', '')).toBeNull()
+    expect(legacyRedirectFor(`/admin/sops/${ID}/assign`, '')).toBeNull()
+    expect(legacyRedirectFor('/admin/sops/new', '')).toBeNull()
+    expect(legacyRedirectFor(`/admin/sops/${ID}/versions/diff`, '')).toBeNull()
+  })
+
+  test('the proxy runs the same redirect for /admin/sops/ paths, server-side, with cookies copied (58-14)', () => {
+    const MW = read('src/lib/supabase/middleware.ts')
+    const at = MW.indexOf("path.startsWith('/sops/')")
+    expect(MW.slice(at, at + 160)).toContain("path.startsWith('/admin/sops/')")
+    expect(MW.slice(at, at + 700)).toContain('legacyRedirectFor(path, request.nextUrl.search)')
+    expect(at).toBeGreaterThan(MW.indexOf('if (!isPublicRoute && !claims)'))
+  })
+
+  test('the next.config review-route redirect is retargeted at the edit address (58-14)', () => {
+    const cfg = read('next.config.ts')
+    const at = cfg.indexOf("source: '/admin/sops/:sopId/review'")
+    expect(at).toBeGreaterThan(-1)
+    expect(cfg.slice(at, at + 160)).toContain("destination: '/sops/:sopId?mode=edit'")
+  })
 })

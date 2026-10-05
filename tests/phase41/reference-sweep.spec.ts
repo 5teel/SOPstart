@@ -107,7 +107,7 @@ test.describe('SUR-03/SUR-04/SUR-06 reference sweep — /admin/sops list route i
     expect(uploadDropzone).toContain('focusHref(')
 
     const workshop = read(path.join('src', 'components', 'shell', 'AdminRoomBodies.tsx'))
-    expect(workshop).toContain('/admin/sops/builder/')
+    expect(workshop).toContain("focusHref(d.id, { mode: 'edit', from: 'workshop' })")
     expect(workshop).toContain('/admin/sops/new')
   })
 

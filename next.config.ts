@@ -29,11 +29,12 @@ const nextConfig: NextConfig = {
     return config
   },
   /**
-   * Phase 21 D-21-12 — Legacy `/admin/sops/[sopId]/review` route is retired
-   * and replaced by the full Phase 12 builder + Phase 21 source viewer at
-   * `/admin/sops/builder/[sopId]`. Server-side 308 keeps bookmarks alive
-   * AND preserves any `?from=pipeline&pipelineId=...` search params (Next
-   * 308 redirects forward the query string by default).
+   * Phase 21 D-21-12 — Legacy `/admin/sops/[sopId]/review` route is retired.
+   * Phase 58 (D-14, D-23) retargets it at the focus editor, `/sops/[sopId]?mode=edit`
+   * (the old builder address redirects there too, in the proxy). Server-side
+   * redirect keeps bookmarks alive; Next forwards the query string, and the
+   * fixed `mode=edit` is merged ahead of it. Not permanent: the address is a
+   * legacy mapping, never cached by a browser.
    *
    * Phase 43 (D-01) — the two page-level legacy shims (`/admin/governance`,
    * `/admin/sops`) are deleted; these two entries take over bookmark
@@ -51,8 +52,8 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/admin/sops/:sopId/review',
-        destination: '/admin/sops/builder/:sopId',
-        permanent: true,
+        destination: '/sops/:sopId?mode=edit',
+        permanent: false,
       },
       {
         source: '/admin/governance',

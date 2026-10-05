@@ -111,14 +111,14 @@ test.describe('UX-03 — governance lives at /governance', () => {
     ).toBe(false)
   })
 
-  test('stuck conversions reach the inbox (Retry -> builder) and the Access lens stays reachable from its own admin page', () => {
+  test('stuck conversions reach the inbox (Retry -> focus editor) and the Access lens stays reachable from its own admin page', () => {
     // Phase 54: the tab rail / Miller scope column is gone. Stuck/failed
-    // conversions surface as inbox rows with a Retry link into the builder;
+    // conversions surface as inbox rows with a Retry link into the focus editor;
     // the Access lens is mounted by its own admin-gated page, /admin/access
     // (57-07; the library table that used to host it is gone, 57-09).
     const inbox = read(INBOX)
     expect(inbox).toContain("if (!lib.stuck && !lib.parseFailed) continue")
-    expect(inbox).toContain("action: { label: 'Retry', href: `/admin/sops/builder/${lib.id}` }")
+    expect(inbox).toContain("action: { label: 'Retry', href: focusHref(lib.id, { mode: 'edit', from: 'office' }) }")
     const access = read(ACCESS_PAGE)
     expect(access).toContain('await requireAdminContext()')
     expect(access).toContain('<AdminAccessLens pinnedSopId={pinnedSopId} />')
@@ -145,7 +145,10 @@ test.describe('pathways coverage — 0 not-mapped (CLAUDE.md pathways rule)', ()
     }
     walk(appDir, [])
     const journeys = read(JOURNEYS)
-    const unmapped = found.filter((r) => !journeys.includes(`route: '${r}'`))
+    // Phase 58-14: these two pages are redirect-only (the proxy 307s their addresses to the focus
+    // editor before they render), so no pathway names them; 58-16 deletes the directories and this exemption.
+    const redirectOnly = ['/admin/sops/builder/[sopId]', '/admin/sops/[sopId]/versions']
+    const unmapped = found.filter((r) => !redirectOnly.includes(r) && !journeys.includes(`route: '${r}'`))
     expect(unmapped).toEqual([])
   })
 })

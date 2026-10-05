@@ -191,6 +191,9 @@ test.describe('SHL-01 one screen structure', () => {
     const journeys = read('src/lib/journeys/journeys.ts').replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')
     const mapped = new Set([...journeys.matchAll(/route: '([^']+)'/g)].map((m) => m[1].split('?')[0]))
     expect(found.has('/')).toBe(true)
-    expect([...found].filter((r) => !mapped.has(r)).sort()).toEqual([])
+    // Phase 58-14: these two pages are redirect-only (the proxy 307s their addresses to the focus
+    // editor before they render), so no pathway names them; 58-16 deletes the directories and this exemption.
+    const redirectOnly = ['/admin/sops/builder/[sopId]', '/admin/sops/[sopId]/versions']
+    expect([...found].filter((r) => !redirectOnly.includes(r) && !mapped.has(r)).sort()).toEqual([])
   })
 })

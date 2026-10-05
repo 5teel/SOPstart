@@ -226,7 +226,7 @@ export async function acceptProposal(
   const sopId = (proposal.context as Record<string, unknown>)['sopId'] as string | undefined
   if (sopId) {
     revalidatePath(`/admin/sops/${sopId}`)
-    revalidatePath(`/admin/sops/builder/${sopId}`)
+    revalidatePath(`/sops/${sopId}`)
   }
   revalidatePath('/')
 

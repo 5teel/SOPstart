@@ -7,6 +7,7 @@ import { confirmSopCurrent } from '@/actions/governance'
 import type { GovernanceRow } from '@/actions/governance'
 import { approveStep } from '@/actions/approvals'
 import { OwnerPicker } from './OwnerPicker'
+import { focusHref } from '@/lib/sop/focus-path'
 
 const FLAG_STYLE: Record<GovernanceRow['flags'][number], string> = {
   overdue: 'bg-accent-escalate/20 text-accent-escalate',
@@ -92,7 +93,7 @@ export function GovernanceQueueRow({
 
       <div className="min-w-0">
         <Link
-          href={`/admin/sops/builder/${row.id}`}
+          href={focusHref(row.id, { mode: 'edit', from: 'office' })}
           className="text-base font-semibold text-[var(--ink-900)] truncate hover:underline"
         >
           {title ?? row.title ?? 'Untitled SOP'}

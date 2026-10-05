@@ -50,7 +50,7 @@ test.describe('AdminMachineBody / AdminSopRows (54-03, repointed 57-05)', () => 
     const src = read(ADMIN_PANEL_PATH)
     expect(src).toContain('admin-panel-badge')
     expect(src).toContain('focusHref(sop.id, { from })')
-    expect(src).toContain('/admin/sops/builder/${sop.id}')
+    expect(src).toContain("focusHref(sop.id, { mode: 'edit', from })")
     expect(src).toContain('/admin/sops/new/blank?machine=')
     expect(src).toContain('no photo yet')
   })

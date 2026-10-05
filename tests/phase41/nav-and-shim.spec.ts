@@ -42,9 +42,9 @@ test.describe('legacy /admin/sops — static next.config.ts redirect (Phase 43 D
 })
 
 test.describe('SUR-04 — one path from a SOP to its builder', () => {
-  test('SUR-04: the Workshop (AdminRoomBodies) links /admin/sops/builder/; the worker shell does not', () => {
+  test('SUR-04: the Workshop (AdminRoomBodies) links the focus editor; the worker shell links no builder', () => {
     const workshop = read(WORKSHOP)
-    expect(workshop).toContain('/admin/sops/builder/')
+    expect(workshop).toContain("focusHref(d.id, { mode: 'edit', from: 'workshop' })")
     for (const f of WORKER_SHELL) expect(read(f), f).not.toContain('/admin/sops/builder')
   })
 

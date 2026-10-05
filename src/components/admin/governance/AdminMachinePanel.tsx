@@ -67,7 +67,7 @@ export function AdminSopRows({ sops, empty, from }: { sops: AdminPanelSop[]; emp
               </Link>
             )}
             <Link
-              href={`/admin/sops/builder/${sop.id}`}
+              href={focusHref(sop.id, { mode: 'edit', from })}
               data-testid="admin-panel-edit"
               className="mono text-meta text-[var(--ink-500)]"
             >

@@ -150,12 +150,12 @@ test.describe('Phase 51 — site editor (deployed)', () => {
     fixtureSopId = sop.id
   })
 
-  test('admin uploads a scene, draws two machines (one after zoom+pan), names them, tags a department, moves a corner, links a SOP from the builder, and reloads', async ({
+  test('admin uploads a scene, draws two machines (one after zoom+pan), names them, tags a department, moves a corner, links a SOP from the editor, and reloads', async ({
     page,
     context,
   }) => {
     // Generous: several save-triggering actions (machine create x2,
-    // rename/department, vertex drag, builder link, unlink/relink) each
+    // rename/department, vertex drag, editor link, unlink/relink) each
     // occasionally take tens of seconds server-side on production.
     test.setTimeout(600_000)
     await page.setViewportSize({ width: 1440, height: 900 })
@@ -250,16 +250,17 @@ test.describe('Phase 51 — site editor (deployed)', () => {
     await page.mouse.up()
     await expect(page.getByTestId('site-save-status')).toHaveText('Saved ✓', CREATE_SLOW)
 
-    // 6. Link the fixture SOP from the builder Tools menu (D-12 — the same
-    // setSopMachines() action the editor panel uses).
-    await page.goto(`/admin/sops/builder/${fixtureSopId}`)
-    await page.getByTestId('tools-menu-trigger').click()
-    await page.getByRole('menuitem', { name: 'Pick machines for this SOP' }).click()
+    // 6. Link the fixture SOP from This SOP -> Machine in the focus editor (D-12 — the
+    // same setSopMachines() action the site edit panel uses).
+    await page.goto(`/sops/${fixtureSopId}?mode=edit`)
+    const thisSop = page.getByTestId('this-sop')
+    await expect(thisSop).toBeVisible(SLOW)
+    await thisSop.getByText('Machine', { exact: true }).locator('xpath=..').getByRole('button').click()
     const picker = page.getByTestId('machines-picker')
     await expect(picker).toBeVisible(SLOW)
     await picker.getByRole('checkbox', { name: 'EVAL Press' }).check()
     await expect(picker.getByText('Saved ✓')).toBeVisible(CREATE_SLOW)
-    await shot(page, 'builder-machines')
+    await shot(page, 'editor-machines')
     await page.keyboard.press('Escape')
     await expect(picker).toBeHidden()
 
