@@ -1979,7 +1979,7 @@ Plans:
   4. The decisions tab lists the ledger newest first and can be narrowed by kind of decision; opening it, people and roles, or access widens the detail panel while the site stays visible and re-centres on the Office
   5. An admin invites a person, sets their role, sees their department, and opens the existing access wiring screen, unchanged, to decide who sees which SOPs
 
-**Plans:** 9/16 plans executed
+**Plans:** 10/16 plans executed
 Plans:
 **Wave 1**
 
@@ -2010,7 +2010,7 @@ Plans:
 
 **Wave 7** *(blocked on Wave 6 completion)*
 
-- [ ] 59-10-PLAN.md — Decisions tab (listDecisions, kind chips, Show older) and cleared-today
+- [x] 59-10-PLAN.md — Decisions tab (listDecisions, kind chips, Show older) and cleared-today
 
 **Wave 8** *(blocked on Wave 7 completion)*
 
