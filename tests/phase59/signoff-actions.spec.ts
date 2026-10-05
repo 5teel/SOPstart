@@ -99,5 +99,22 @@ test.describe('signoff actions', () => {
     expect(body(OFFICE, 'getCompletionForReview')).toContain("'You cannot sign off your own walk'")
     expect(strip(read('src/lib/governance/load-inbox.ts'))).toContain(".neq('worker_id', userId)")
   })
-  test.fixme('rejected not done: the worker completion read skips rejected rows (A-06)', () => {})
+  test('rejected not done: the worker completion read skips rejected rows (A-06)', () => {
+    const hook = strip(read('src/hooks/useWorkerSops.ts'))
+    expect(hook).toContain(".neq('status', 'rejected')")
+    // the filter sits in the queryFn, on the sop_completions read itself
+    const q = hook.slice(hook.indexOf(".from('sop_completions')"), hook.indexOf(".from('sop_completions')") + 200)
+    expect(q).toContain(".neq('status', 'rejected')")
+  })
+
+  test('competency reads never count a rejected walk (A-06)', () => {
+    const src = strip(read('src/actions/competency.ts'))
+    const reads = src.match(/\.from\('sop_completions'\)/g) ?? []
+    expect(reads.length).toBe(5)
+    let at = src.indexOf(".from('sop_completions')")
+    while (at !== -1) {
+      expect(src.slice(at, at + 160), 'each completion read carries the filter').toContain(".neq('status', 'rejected')")
+      at = src.indexOf(".from('sop_completions')", at + 1)
+    }
+  })
 })

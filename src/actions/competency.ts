@@ -202,6 +202,7 @@ export async function getTrainingMatrix(
   const { data: completionRows } = await admin
     .from('sop_completions')
     .select('id, worker_id, sop_id, sop_version, submitted_at')
+    .neq('status', 'rejected')
     .eq('organisation_id', orgId)
     .in('worker_id', personIds)
     .in('sop_id', lineage.allSopIds)
@@ -364,6 +365,7 @@ export async function getTrainingRecordForPerson(personId: string): Promise<{ re
   const { data: completionRows } = await admin
     .from('sop_completions')
     .select('id, sop_id, sop_version, submitted_at')
+    .neq('status', 'rejected')
     .eq('organisation_id', orgId)
     .eq('worker_id', personId)
     .order('submitted_at', { ascending: false })
@@ -575,6 +577,7 @@ export async function getMyCompetencyStates(): Promise<MyCompetencyState[]> {
   const { data: completionRows } = await supabase
     .from('sop_completions')
     .select('id, sop_id, sop_version, submitted_at')
+    .neq('status', 'rejected')
     .eq('worker_id', userId)
     .in('sop_id', lineage.allSopIds)
   const completions = ((completionRows ?? []) as Array<{ id: string; sop_id: string; sop_version: number; submitted_at: string }>).map(c => ({
@@ -702,6 +705,7 @@ export async function getVersionCompletionBreakdown(
   const { data: completionRows } = await admin
     .from('sop_completions')
     .select('worker_id, sop_id, submitted_at')
+    .neq('status', 'rejected')
     .eq('organisation_id', orgId)
     .in('sop_id', lineage.allSopIds)
   const completions = (completionRows ?? []) as Array<{ worker_id: string; sop_id: string; submitted_at: string }>
@@ -781,6 +785,7 @@ export async function exportTrainingCsv(rawFilters: unknown): Promise<{ csv: str
   let query = admin
     .from('sop_completions')
     .select('id, worker_id, sop_id, sop_version, submitted_at')
+    .neq('status', 'rejected')
     .eq('organisation_id', orgId)
     .order('submitted_at', { ascending: false })
   if (workerIds) query = query.in('worker_id', workerIds)

@@ -77,6 +77,7 @@ export function useWorkerSops(requestedIds?: ReadonlySet<string>) {
       const { data } = await supabase
         .from('sop_completions')
         .select('sop_id, submitted_at')
+        .neq('status', 'rejected')
         .eq('worker_id', user?.id ?? '')
         .order('submitted_at', { ascending: false }) as {
           data: Array<{ sop_id: string; submitted_at: string }> | null
