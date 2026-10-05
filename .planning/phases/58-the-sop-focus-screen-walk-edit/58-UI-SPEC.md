@@ -1,11 +1,14 @@
 ---
 phase: 58
 slug: the-sop-focus-screen-walk-edit
-status: draft
+status: approved
+reviewed_at: 2026-10-05
 shadcn_initialized: false
 preset: none
 created: 2026-10-05
 ---
+
+> **Checker notes for the planner (non-blocking):** label the first publish "Publish SOP" and the AI action "Clear finding"; the AI banner tints must use the real utility form or `style={{ background: 'var(--tint-ai-bg)' }}` — not `bg-[--tint-ai-bg]` arbitrary syntax, which trips `tests/lint/design-tokens.spec.ts`; confirm `w-75` / `max-w-205` / `size-18` and the new `text-step` utility appear in compiled CSS; `--text-step: 28px` must be added to the `@theme` block in `blueprint-theme.css` and pinned by the lint spec.
 
 # Phase 58 — UI Design Contract
 
