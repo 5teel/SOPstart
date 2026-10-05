@@ -54,7 +54,7 @@ test('E3: bespoke BLOCK_COMPONENTS render place exists; puck-config.tsx is remov
 // E4: bespoke inline editing uses contentEditable (InlineText.tsx).
 // ---------------------------------------------------------------------------
 test('E4: bespoke InlineText uses contentEditable for in-place text editing', () => {
-  const src = readSrc('src/components/admin/builder-v2/InlineText.tsx')
+  const src = readSrc('src/components/focus/admin/InlineText.tsx')
   expect(src, 'InlineText must use contentEditable').toContain('contentEditable')
 })
 

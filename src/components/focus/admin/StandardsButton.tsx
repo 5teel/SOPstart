@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import {
@@ -16,7 +16,9 @@ import type { StandardRow, StandardTarget, StandardsPanel } from '@/lib/validato
 /**
  * Phase 56 (56-06, D-12, SOP-02) -- Tools-menu row + portaled modal to manage the
  * organisation's standards and put them on this SOP, a section or a step.
- * Standalone so Phase 61 can mount the same panel in the Workshop.
+ * Standalone so Phase 61 can mount the same panel in the Workshop. Moved to the
+ * focus editor in 58-12: the rail, a section menu and a step card each pass a
+ * `target`.
  *
  * Portaled modal shell: Escape closes, backdrop click closes.
  */
@@ -25,7 +27,23 @@ type SaveState = 'idle' | 'saving' | 'saved' | 'error'
 
 const KIND_WORD: Record<string, string> = { hazard: 'Hazard', ppe: 'PPE', step: 'Step', check: 'Check' }
 
-export function BuilderStandardsButton({ sopId }: { sopId: string }) {
+export function StandardsButton({
+  sopId,
+  target,
+  trigger,
+  onChanged,
+}: {
+  sopId: string
+  /**
+   * What the popover attaches to. Omitted / `sop` = the whole panel (SOP, every
+   * section, every step). `section` and `step` show only that one place's toggles.
+   */
+  target?: StandardTarget
+  /** Replaces the default menu row. Receives the opener. */
+  trigger?: (open: () => void) => ReactNode
+  /** Called after an attach / detach / remove lands, so the editor re-reads its labels. */
+  onChanged?: () => void
+}) {
   const [open, setOpen] = useState(false)
   useEffect(() => {
     if (!open) return
@@ -118,6 +136,7 @@ export function BuilderStandardsButton({ sopId }: { sopId: string }) {
         : p
     )
     setConfirmRemoveId(null)
+    onChanged?.()
   }
 
   function patchAttached(target: StandardTarget, standardId: string, on: boolean) {
@@ -154,6 +173,7 @@ export function BuilderStandardsButton({ sopId }: { sopId: string }) {
       return
     }
     setSaveState('saved')
+    onChanged?.()
   }
 
   function renderToggles(target: StandardTarget, attached: string[]) {
@@ -186,15 +206,19 @@ export function BuilderStandardsButton({ sopId }: { sopId: string }) {
 
   return (
     <>
-      <button
-        type="button"
-        role="menuitem"
-        onClick={() => setOpen(true)}
-        className="flex w-full flex-col items-start gap-0.5 rounded px-3 py-2 text-left hover:bg-[var(--paper-2)] transition-colors"
-      >
-        <span className="text-ui text-[var(--ink-900)]">Standards</span>
-        <span className="text-micro text-[var(--ink-500)]">labels such as LOTO on this SOP, a section or a step</span>
-      </button>
+      {trigger ? (
+        trigger(() => setOpen(true))
+      ) : (
+        <button
+          type="button"
+          role="menuitem"
+          onClick={() => setOpen(true)}
+          className="flex w-full flex-col items-start gap-0.5 rounded px-3 py-2 text-left hover:bg-[var(--paper-2)] transition-colors"
+        >
+          <span className="text-ui text-[var(--ink-900)]">Standards</span>
+          <span className="text-micro text-[var(--ink-500)]">labels such as LOTO on this SOP, a section or a step</span>
+        </button>
+      )}
 
       {open &&
         createPortal(
@@ -333,6 +357,20 @@ export function BuilderStandardsButton({ sopId }: { sopId: string }) {
                     </div>
                   </section>
 
+                  {target && target.kind !== 'sop' && (
+                    <section className="flex flex-col gap-3">
+                      <h3 className="text-meta font-medium text-[var(--ink-700)]">
+                        {target.kind === 'section' ? 'On this section' : 'On this step'}
+                      </h3>
+                      {renderToggles(
+                        target,
+                        (target.kind === 'section'
+                          ? panel.sections.find((s) => s.id === target.id)?.attached
+                          : panel.sections.flatMap((s) => s.steps).find((st) => st.id === target.id)?.attached) ?? []
+                      )}
+                    </section>
+                  )}
+                  {(!target || target.kind === 'sop') && (
                   <section className="flex flex-col gap-3">
                     <h3 className="text-meta font-medium text-[var(--ink-700)]">On this SOP</h3>
                     <div className="flex flex-col gap-1.5">
@@ -362,6 +400,7 @@ export function BuilderStandardsButton({ sopId }: { sopId: string }) {
                       </div>
                     ))}
                   </section>
+                  )}
                 </div>
               )}
             </div>

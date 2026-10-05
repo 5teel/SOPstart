@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { X } from 'lucide-react'
@@ -9,7 +9,8 @@ import type { SiteDepartment, SiteMachine } from '@/lib/validators/site'
 import { placementLabel, placementSummary } from '@/lib/sop/placement'
 
 /**
- * Phase 51 (51-06, D-12) — Tools-menu row + portaled modal for linking this
+ * Phase 51 (51-06, D-12), moved to the focus editor in 58-12 — a Tools-menu row
+ * (or the caller's own `trigger`) + portaled modal for linking this
  * SOP to the site-map machines it belongs to. Writes through the exact same
  * setSopMachines() action the site edit mode uses (D-12), so the two
  * surfaces can never drift.
@@ -20,7 +21,14 @@ import { placementLabel, placementSummary } from '@/lib/sop/placement'
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'error'
 
-export function BuilderMachinesButton({ sopId }: { sopId: string }) {
+export function MachinesButton({
+  sopId,
+  trigger,
+}: {
+  sopId: string
+  /** Replaces the default menu row (e.g. a rail row). Receives the opener. */
+  trigger?: (open: () => void) => ReactNode
+}) {
   const [open, setOpen] = useState(false)
   // ponytail: no separate `mounted` gate — `open` itself starts false and can
   // only flip true from a click (post-hydration), so the portal below never
@@ -136,15 +144,19 @@ export function BuilderMachinesButton({ sopId }: { sopId: string }) {
 
   return (
     <>
-      <button
-        type="button"
-        role="menuitem"
-        onClick={() => setOpen(true)}
-        className="flex w-full flex-col items-start gap-0.5 rounded px-3 py-2 text-left hover:bg-[var(--paper-2)] transition-colors"
-      >
-        <span className="text-ui text-[var(--ink-900)]">Pick machines for this SOP</span>
-        <span className="text-micro text-[var(--ink-500)]">which machines on the site map this SOP belongs to</span>
-      </button>
+      {trigger ? (
+        trigger(() => setOpen(true))
+      ) : (
+        <button
+          type="button"
+          role="menuitem"
+          onClick={() => setOpen(true)}
+          className="flex w-full flex-col items-start gap-0.5 rounded px-3 py-2 text-left hover:bg-[var(--paper-2)] transition-colors"
+        >
+          <span className="text-ui text-[var(--ink-900)]">Pick machines for this SOP</span>
+          <span className="text-micro text-[var(--ink-500)]">which machines on the site map this SOP belongs to</span>
+        </button>
+      )}
 
       {open &&
         createPortal(

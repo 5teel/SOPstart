@@ -32,7 +32,7 @@ const STAGE_SHELL = path.join(
   ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'builder', '[sopId]', 'BuilderStageShell.tsx',
 )
 const CATEGORY_BUTTON = path.join(
-  ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'builder', '[sopId]', 'BuilderCategoryButton.tsx',
+  ROOT, 'src', 'components', 'focus', 'admin', 'CategoryButton.tsx',
 )
 const ADMIN_SOP_LIST = path.join(ROOT, 'src', 'actions', 'admin-sop-list.ts')
 const SOPS_ACTIONS = path.join(ROOT, 'src', 'actions', 'sops.ts')

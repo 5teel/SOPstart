@@ -14,7 +14,7 @@ import path from 'node:path'
 const ROOT = path.resolve(__dirname, '..', '..')
 const WORKER_SIGNAL_PATH = path.join(ROOT, 'src', 'lib', 'sop', 'worker-signal.ts')
 const CATEGORY_BUTTON_PATH = path.join(
-  ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'builder', '[sopId]', 'BuilderCategoryButton.tsx'
+  ROOT, 'src', 'components', 'focus', 'admin', 'CategoryButton.tsx'
 )
 const STAGE_SHELL_PATH = path.join(
   ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'builder', '[sopId]', 'BuilderStageShell.tsx'
@@ -29,13 +29,13 @@ test.describe('surviving affordances', () => {
     expect(read(WORKER_SIGNAL_PATH)).toContain('export type WorkerScope')
   })
 
-  test('BuilderCategoryButton calls setSopCategory(sopId, next) and imports SOP_CATEGORIES', () => {
+  test('CategoryButton calls setSopCategory(sopId, next) and imports SOP_CATEGORIES', () => {
     const code = read(CATEGORY_BUTTON_PATH)
     expect(code).toContain('setSopCategory(sopId, next)')
     expect(code).toContain('SOP_CATEGORIES')
   })
 
-  test('BuilderStageShell renders <BuilderCategoryButton sopId={sopId}', () => {
-    expect(read(STAGE_SHELL_PATH)).toContain('<BuilderCategoryButton sopId={sopId}')
+  test('BuilderStageShell renders <CategoryButton sopId={sopId}', () => {
+    expect(read(STAGE_SHELL_PATH)).toContain('<CategoryButton sopId={sopId}')
   })
 })

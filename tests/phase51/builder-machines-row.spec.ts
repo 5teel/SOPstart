@@ -1,6 +1,7 @@
 /**
  * Phase 51 -- SIT-04. Source-contract assertions for the builder's
- * "Pick machines for this SOP" ToolsMenu row + BuilderMachinesButton modal.
+ * "Pick machines for this SOP" ToolsMenu row + MachinesButton modal (moved to
+ * src/components/focus/admin in 58-12).
  *
  * Activated by Plan 51-06.
  *
@@ -18,7 +19,7 @@ function read(rel: string): string {
   return fs.readFileSync(path.join(ROOT, rel), 'utf-8').replace(/\r\n/g, '\n')
 }
 
-const BUTTON_PATH = "src/app/(protected)/admin/sops/builder/[sopId]/BuilderMachinesButton.tsx"
+const BUTTON_PATH = "src/components/focus/admin/MachinesButton.tsx"
 const SHELL_PATH = "src/app/(protected)/admin/sops/builder/[sopId]/BuilderStageShell.tsx"
 
 /** Returns the [start, end) character span of a top-level `function <name>(` body. */
@@ -79,16 +80,16 @@ test.describe('modal', () => {
 test.describe('tools menu', () => {
   test('BuilderStageShell ToolsMenu renders a "Pick machines" row inside the tools menu', () => {
     const src = read(SHELL_PATH)
-    expect(src).toContain("import { BuilderMachinesButton } from './BuilderMachinesButton'")
-    expect(src).toContain('<BuilderMachinesButton sopId={sopId} />')
+    expect(src).toContain("import { MachinesButton } from '@/components/focus/admin/MachinesButton'")
+    expect(src).toContain('<MachinesButton sopId={sopId} />')
   })
 
-  test('the row opens BuilderMachinesButton, not a route navigation, and sits after the tool links, before DeleteSopButton', () => {
+  test('the row opens MachinesButton, not a route navigation, and sits after the tool links, before DeleteSopButton', () => {
     const src = read(SHELL_PATH)
     // JSX usages (not the import lines) — each of these tags is used exactly
     // once as JSX in the whole file, inside ToolsMenu.
     const editIdx = src.indexOf('items.map(')
-    const machinesIdx = src.indexOf('<BuilderMachinesButton sopId={sopId} />')
+    const machinesIdx = src.indexOf('<MachinesButton sopId={sopId} />')
     const deleteIdx = src.indexOf('<DeleteSopButton')
     expect(editIdx).toBeGreaterThan(-1)
     expect(machinesIdx).toBeGreaterThan(editIdx)

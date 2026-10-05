@@ -7,11 +7,11 @@
  * admin table replaced the Miller frame (the table is itself gone, Phase 57). Writes through the exact
  * same setSopCategory() server action the old detail pane used (D-09).
  *
- * Shell copied from BuilderMachinesButton.tsx: Escape closes, backdrop click
+ * Shell copied from MachinesButton.tsx: Escape closes, backdrop click
  * closes, createPortal to document.body.
  */
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
 import { X } from 'lucide-react'
@@ -20,12 +20,15 @@ import { SOP_CATEGORIES } from '@/lib/sop-categories'
 
 const SORTED_CATEGORIES = [...SOP_CATEGORIES].sort((a, b) => a.sort - b.sort)
 
-export function BuilderCategoryButton({
+export function CategoryButton({
   sopId,
   categorySlug,
+  trigger,
 }: {
   sopId: string
   categorySlug: string | null
+  /** Replaces the default menu row. Receives the opener (which also resets the draft). */
+  trigger?: (open: () => void) => ReactNode
 }) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
@@ -59,21 +62,27 @@ export function BuilderCategoryButton({
     router.refresh()
   }
 
+  function openModal() {
+    setValue(categorySlug ?? '')
+    setError(null)
+    setOpen(true)
+  }
+
   return (
     <>
-      <button
-        type="button"
-        role="menuitem"
-        onClick={() => {
-          setValue(categorySlug ?? '')
-          setError(null)
-          setOpen(true)
-        }}
-        className="flex w-full flex-col items-start gap-0.5 rounded px-3 py-2 text-left hover:bg-[var(--paper-2)] transition-colors"
-      >
-        <span className="text-ui text-[var(--ink-900)]">Change category</span>
-        <span className="text-micro text-[var(--ink-500)]">currently: {currentLabel}</span>
-      </button>
+      {trigger ? (
+        trigger(openModal)
+      ) : (
+        <button
+          type="button"
+          role="menuitem"
+          onClick={openModal}
+          className="flex w-full flex-col items-start gap-0.5 rounded px-3 py-2 text-left hover:bg-[var(--paper-2)] transition-colors"
+        >
+          <span className="text-ui text-[var(--ink-900)]">Change category</span>
+          <span className="text-micro text-[var(--ink-500)]">currently: {currentLabel}</span>
+        </button>
+      )}
 
       {open &&
         createPortal(

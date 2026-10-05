@@ -38,9 +38,9 @@ import { ChevronDown } from 'lucide-react'
 import { DeleteSopButton } from '@/components/admin/DeleteSopButton'
 import { BuilderClient } from './BuilderClient'
 import { BuilderStageStepper } from './BuilderStageStepper'
-import { BuilderMachinesButton } from './BuilderMachinesButton'
-import { BuilderStandardsButton } from './BuilderStandardsButton'
-import { BuilderCategoryButton } from './BuilderCategoryButton'
+import { MachinesButton } from '@/components/focus/admin/MachinesButton'
+import { StandardsButton } from '@/components/focus/admin/StandardsButton'
+import { CategoryButton } from '@/components/focus/admin/CategoryButton'
 import type { BuilderStage } from './BuilderStageStepper'
 import { OrientationStrip } from './OrientationStrip'
 import { ReviewStation } from './ReviewStation'
@@ -137,9 +137,9 @@ function ToolsMenu({
               </Link>
             ))}
             <div className="my-1 h-px bg-[var(--ink-100)]" />
-            <BuilderMachinesButton sopId={sopId} />
-            <BuilderStandardsButton sopId={sopId} />
-            <BuilderCategoryButton sopId={sopId} categorySlug={sop.category_slug ?? null} />
+            <MachinesButton sopId={sopId} />
+            <StandardsButton sopId={sopId} />
+            <CategoryButton sopId={sopId} categorySlug={sop.category_slug ?? null} />
             {isDraft && (
               <>
                 <div className="my-1 h-px bg-[var(--ink-100)]" />

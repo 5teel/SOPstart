@@ -66,14 +66,14 @@ test.describe('standards actions', () => {
   })
 })
 
-const PANEL = 'src/app/(protected)/admin/sops/builder/[sopId]/BuilderStandardsButton.tsx'
+const PANEL = 'src/components/focus/admin/StandardsButton.tsx'
 const SHELL = 'src/app/(protected)/admin/sops/builder/[sopId]/BuilderStageShell.tsx'
 
 test.describe('standards panel wiring', () => {
   test('the Tools menu renders the panel button after the machines button', () => {
     const shell = read(SHELL)
-    const machines = shell.indexOf('<BuilderMachinesButton')
-    const standards = shell.indexOf('<BuilderStandardsButton')
+    const machines = shell.indexOf('<MachinesButton')
+    const standards = shell.indexOf('<StandardsButton')
     expect(machines).toBeGreaterThan(-1)
     expect(standards).toBeGreaterThan(machines)
   })
@@ -110,7 +110,7 @@ test.describe('standards panel wiring', () => {
         e.isDirectory() ? walk(path.join(d, e.name)) : /\.tsx?$/.test(e.name) ? [path.join(d, e.name)] : []
       )
     for (const f of walk(path.join(root, 'src/app/(protected)/sops'))) {
-      expect(fs.readFileSync(f, 'utf8'), f).not.toContain('BuilderStandardsButton')
+      expect(fs.readFileSync(f, 'utf8'), f).not.toContain('StandardsButton')
     }
   })
 })
