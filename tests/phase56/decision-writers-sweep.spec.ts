@@ -54,6 +54,7 @@ const LIVE_WRITERS: string[] = [
   'src/actions/auth.ts#inviteWorker',
   'src/actions/auth.ts#updateMemberRoleSafe',
   'src/actions/auth.ts#removeMember',
+  'src/actions/requests.ts#answerRequest',
 ]
 // performPublish is hooked outside the gate body (56-05).
 const PUBLISH_GUARD_LIVE = true

@@ -23,7 +23,21 @@ test.describe("Capability matrix rows (60-02 / 60-04 / 60-06 / 60-09 / 60-11 / 6
     expect(n.split('|').map((c) => c.trim()).slice(2, 6)).toEqual(['✅', '✅', '✅', '✅'])
     expect(o.split('|').map((c) => c.trim()).slice(2, 6)).toEqual(['✅', '✅', '✅', '✅'])
   })
-  test.fixme("60-04: raiseRequest, withdrawRequest, answerRequest and listMyRequests rows", () => {})
+  test('60-04: raise, withdraw, answer and agent rows', () => {
+    const cells = (l: string) => l.split('|').map((c) => c.trim()).slice(2, 7)
+    const raise = row('Raise a request (change a SOP, new SOP, observe me)')
+    expect(cells(raise)).toEqual(['✅', '✅', '✅', '✅', '✅'])
+    for (const name of ['raiseRequest()', 'src/lib/requests/core.ts', 'No ledger row']) expect(raise).toContain(name)
+    const withdraw = row('Withdraw your own open request')
+    expect(cells(withdraw)).toEqual(['✅', '✅', '✅', '✅', '✅'])
+    expect(withdraw).toContain('withdrawOwnRequest()')
+    const answer = row('Answer a request')
+    expect(cells(answer)).toEqual(['—', '✅', '✅', '✅', '—']) // a worker never answers
+    for (const name of ['answerRequest()', "state = 'open'", 'request_accepted', 'request_declined']) expect(answer).toContain(name)
+    const agent = row('Agent raises a request')
+    expect(cells(agent)).toEqual(['—', '—', '—', '—', '—']) // no client path in any role
+    for (const name of ['raiseRequestAsAgent()', 'CRON_SECRET']) expect(agent).toContain(name)
+  })
   test.fixme("60-06: askToDoSop, declineAsk, stopAsking and listAskTargets rows", () => {})
   test.fixme("60-09: setObjective, clearObjective, confirmObjective and listObjectives rows", () => {})
   test.fixme("60-11: Office Requests tab rows (existing labels are never renamed, phase46 pins them)", () => {})
