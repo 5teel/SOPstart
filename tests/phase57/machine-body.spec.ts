@@ -72,12 +72,9 @@ test.describe('PLC-02 admin machine body', () => {
     expect(ADMIN).not.toContain('@/components/sop/plant')
   })
 
-  test('admin room bodies: Office, Workshop, Noticeboard', () => {
-    expect((ROOMS.match(/data-testid="room-body"/g) ?? []).length).toBe(3)
-    expect(ROOMS).toContain('href="/governance" data-testid="room-office-inbox"')
-    expect(ROOMS).toContain('href="/activity" data-testid="room-office-signoffs"')
-    expect(ROOMS).toContain('href="/admin/team"')
-    expect(ROOMS).toContain('href="/admin/settings"')
+  test('admin room bodies: Workshop, Noticeboard (the Office is the lazy pane since 59-12)', () => {
+    expect((ROOMS.match(/data-testid="room-body"/g) ?? []).length).toBe(2)
+    expect(ROOMS).not.toContain('data-room-id="office"')
     expect(ROOMS).toContain('data-testid="room-workshop-draft"')
     expect(ROOMS).toContain("href={focusHref(d.id, { mode: 'edit', from: 'workshop' })}")
     expect(ROOMS).toContain('href="/admin/sops/new" data-testid="room-workshop-new"')

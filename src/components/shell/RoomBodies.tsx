@@ -26,7 +26,7 @@ function day(iso: string): string {
   return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
-export function OfficeWorkerBody({ role, pending }: { role: 'worker' | 'supervisor'; pending: number }) {
+export function OfficeWorkerBody() {
   const { data: completions = [] } = useWorkerCompletions()
   const counts = (Object.keys(STATUS_WORDS) as CompletionStatus[]).map((s) => ({
     status: s,
@@ -36,19 +36,13 @@ export function OfficeWorkerBody({ role, pending }: { role: 'worker' | 'supervis
     <div data-testid="room-body" data-room-id="office" className="flex flex-col gap-3 p-4 pr-16">
       <h2 className={TITLE}>Office</h2>
       <p className="text-ui text-ink-500">Your requests will show here in a later update.</p>
-      {role === 'supervisor' ? (
-        <p className="text-ui text-ink-900">
-          {pending} {pending === 1 ? 'walk is' : 'walks are'} waiting for your sign-off.
-        </p>
-      ) : (
-        <ul className="flex flex-col gap-1 text-ui text-ink-900">
-          {counts.map((c) => (
-            <li key={c.status}>
-              {STATUS_WORDS[c.status]}: {c.n}
-            </li>
-          ))}
-        </ul>
-      )}
+      <ul className="flex flex-col gap-1 text-ui text-ink-900">
+        {counts.map((c) => (
+          <li key={c.status}>
+            {STATUS_WORDS[c.status]}: {c.n}
+          </li>
+        ))}
+      </ul>
       <Link href="/activity" className={LINK}>
         Open sign-offs
       </Link>
@@ -56,7 +50,7 @@ export function OfficeWorkerBody({ role, pending }: { role: 'worker' | 'supervis
   )
 }
 
-export function SmokoBody() {
+export function SmokoBody({ children }: { children?: React.ReactNode }) {
   const { data: completions = [] } = useWorkerCompletions()
   const latest = completions[0]
   return (
@@ -75,6 +69,7 @@ export function SmokoBody() {
       <Link href="/activity" className={LINK}>
         Open my record
       </Link>
+      {children}
     </div>
   )
 }

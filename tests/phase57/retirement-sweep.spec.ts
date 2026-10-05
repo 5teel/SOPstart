@@ -63,7 +63,7 @@ test.describe('retire sweep', () => {
     expect(page).toMatch(/UUID\.test\(sop\)/)
     expect(page).toContain('<AdminAccessLens pinnedSopId={pinnedSopId} />')
     expect(read('src/components/sop/lenses/AdminAccessLens.tsx')).not.toContain('onBack')
-    expect(read('src/components/shell/AdminRoomBodies.tsx')).toMatch(/href="\/admin\/access"[^>]*room-office-access/)
+    expect(read('src/components/shell/AdminRoomBodies.tsx')).not.toContain('/admin/access')
     expect(placeForPath('/admin/access')).toBe('/?place=office')
   })
 

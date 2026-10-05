@@ -83,20 +83,14 @@ test.describe('SHL-05 supervisor parity', () => {
     expect((WORKER.match(/const pending =/g) ?? []).length).toBe(1)
   })
 
-  test('the sign-off count is fetched only for a supervisor and is a server-side count of pending_sign_off', () => {
-    expect(WORKER).toContain('usePendingSignOffCount(isSupervisor)')
-    // WR-02: a count query, never a filter over a row-limited list
+  test('the pin and card read the pane own inbox query, only for a supervisor (59-12, A-11)', () => {
+    expect(WORKER).toContain('queryKey: OFFICE_INBOX_KEY')
+    expect(WORKER).toContain('queryFn: () => getOfficeInbox()')
+    expect(WORKER).toContain('enabled: isSupervisor')
+    expect(WORKER).toContain('const pending = inboxItems.length')
     expect(WORKER).not.toContain("c.status === 'pending_sign_off'")
-    const hook = strip(read('src', 'hooks', 'useCompletions.ts'))
-    const body = hook.slice(hook.indexOf('export function usePendingSignOffCount'))
-    expect(body).toContain("{ count: 'exact', head: true }")
-    expect(body).toContain(".eq('status', 'pending_sign_off')")
-    expect(body).not.toContain('.limit(')
-  })
-
-  test('the Office body shows the same number it is handed', () => {
-    expect(read('src', 'components', 'shell', 'RoomBodies.tsx')).toContain('pending: number')
-    expect(WORKER).toContain('pending={pending}')
+    expect(fs.existsSync(path.join(ROOT, 'src', 'hooks', 'useCompletions.ts'))).toBe(true)
+    expect(strip(read('src', 'hooks', 'useCompletions.ts'))).not.toContain('pending-count')
   })
 })
 
@@ -141,7 +135,6 @@ test.describe('SHL-05 admin parity', () => {
   test('one identifier feeds the Office card count and the Office pin', () => {
     expect(ADMIN).toContain('count={inboxCount}')
     expect(ADMIN).toContain('office: inboxCount')
-    expect(ADMIN).toContain('inboxCount={inboxCount}')
     expect((ADMIN.match(/const inboxCount =/g) ?? []).length).toBe(1)
     expect(ADMIN).toContain('data?.inboxCount')
   })
@@ -152,8 +145,7 @@ test.describe('SHL-05 admin parity', () => {
     expect(ADMIN).toContain("import { SHELL_KEY } from '@/lib/shell/query-keys'")
     expect((ADMIN.match(/\['shell-admin'\]/g) ?? []).length).toBe(0)
     expect((ADMIN.match(/queryFn: \(\) => getAdminShell\(\)/g) ?? []).length).toBe(1)
-    expect(ADMIN).toContain('const pendingSignOffs = usePendingSignOffCount().data ?? 0')
-    expect(ADMIN).toContain('pendingSignOffs={pendingSignOffs}')
+    expect(ADMIN).toContain('inboxChips.signoff')
     expect(ADMIN).not.toMatch(/inboxCount\s*[+]/)
   })
 

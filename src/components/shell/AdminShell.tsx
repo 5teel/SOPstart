@@ -8,6 +8,7 @@
  * card can never disagree (D-16). Every badge and count comes from admin-health
  * and the action payload; this file only composes them.
  */
+import dynamic from 'next/dynamic'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { getAdminShell } from '@/actions/shell'
 import { listSiteForOrg } from '@/actions/site'
@@ -16,12 +17,11 @@ import { DepartmentsStrip } from '@/components/admin/site/DepartmentsStrip'
 import { SiteEmptyState } from '@/components/admin/site/SiteEmptyState'
 import { SiteWorkspace } from '@/components/admin/site/SiteWorkspace'
 import { AccountControl } from '@/components/shell/AccountControl'
-import { AdminNoticeboardBody, AdminOfficeBody, AdminWorkshopBody } from '@/components/shell/AdminRoomBodies'
+import { AdminNoticeboardBody, AdminWorkshopBody } from '@/components/shell/AdminRoomBodies'
 import { OfficeCard } from '@/components/shell/OfficeCard'
 import { ShellFrame, type ShellSite } from '@/components/shell/ShellFrame'
 import { SmokoBody } from '@/components/shell/RoomBodies'
 import { SiteSummary } from '@/components/shell/SiteSummary'
-import { usePendingSignOffCount } from '@/hooks/useCompletions'
 import type { ShellProps } from '@/components/shell/WorkerShell'
 import { healthPinCount, machineHealth, machinePanelSops, noticeboardSops } from '@/lib/sop/admin-health'
 import type { Place } from '@/lib/shell/place'
@@ -29,6 +29,16 @@ import { tabsForRole } from '@/lib/shell/office-tabs'
 import { SHELL_KEY } from '@/lib/shell/query-keys'
 import { useRole } from '@/components/providers/RoleProvider'
 import { zoneColour } from '@/lib/site/scene'
+
+// The Office pane is its own chunk, reached only here and in WorkerShell (59 A-11).
+const OfficePane = dynamic(() => import('@/components/office/OfficePane').then((m) => m.OfficePane), {
+  ssr: false,
+  loading: () => (
+    <div data-testid="office-loading" className="p-4 text-ui text-ink-500">
+      Opening the Office…
+    </div>
+  ),
+})
 
 const EMPTY_SITE: ShellSite = { layout: null, machines: [], links: [], departments: [] }
 const SITE_KEY = ['site-org']
@@ -86,7 +96,7 @@ function SiteEditSurface({ exit }: { exit(): void }) {
   )
 }
 
-export function AdminShell({ siteName, userEmail, initialPlace, initialTab }: ShellProps) {
+export function AdminShell({ siteName, userEmail, initialPlace, initialTab, initialSop }: ShellProps) {
   const role = useRole()
   // Same staleTime as the worker's site read: the signed scene URL rotates on
   // every refetch and must not swap on a window-focus refetch every minute.
@@ -96,7 +106,6 @@ export function AdminShell({ siteName, userEmail, initialPlace, initialTab }: Sh
     queryFn: () => getAdminShell(),
     staleTime: 30 * 60 * 1000,
   })
-  const pendingSignOffs = usePendingSignOffCount().data ?? 0
 
   const data = shell && !('error' in shell) ? shell : null
   const loadError = isError
@@ -132,13 +141,7 @@ export function AdminShell({ siteName, userEmail, initialPlace, initialTab }: Sh
     }
     if (place.kind === 'room') {
       if (place.id === 'office') {
-        return (
-          <AdminOfficeBody
-            inboxCount={inboxCount}
-            inboxChips={data?.inboxChips ?? {}}
-            pendingSignOffs={pendingSignOffs}
-          />
-        )
+        return <OfficePane place={place} select={ctx.select} initialSop={initialSop} />
       }
       if (place.id === 'smoko') return <SmokoBody />
       if (place.id === 'workshop') return <AdminWorkshopBody drafts={drafts} />
@@ -151,7 +154,7 @@ export function AdminShell({ siteName, userEmail, initialPlace, initialTab }: Sh
         machines={site.machines.length}
         published={published}
         drafts={drafts.length}
-        roleLine={`${data?.inboxChips.owner ?? 0} no owner · ${data?.inboxChips.overdue ?? 0} review overdue · ${pendingSignOffs} waiting for sign-off`}
+        roleLine={`${data?.inboxChips.owner ?? 0} no owner · ${data?.inboxChips.overdue ?? 0} review overdue · ${data?.inboxChips.signoff ?? 0} waiting for sign-off`}
       />
     )
   }

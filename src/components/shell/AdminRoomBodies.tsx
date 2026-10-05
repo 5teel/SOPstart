@@ -15,53 +15,6 @@ const TITLE = 'text-lg font-semibold text-ink-900'
 const LINK =
   'flex min-h-tap items-center justify-center rounded-lg border border-ink-300 bg-white px-4 text-ui font-semibold text-ink-900'
 
-const CHIP_WORDS = [
-  ['owner', 'No owner'],
-  ['overdue', 'Overdue'],
-  ['approve', 'Approve'],
-  ['stuck', 'Stuck'],
-  ['machines', 'Machines'],
-] as const
-
-export function AdminOfficeBody({
-  inboxCount,
-  inboxChips,
-  pendingSignOffs,
-}: {
-  inboxCount: number
-  inboxChips: Record<string, number>
-  pendingSignOffs: number
-}) {
-  return (
-    <div data-testid="room-body" data-room-id="office" className="flex flex-col gap-3 p-4 pr-16">
-      <h2 className={TITLE}>Office</h2>
-      <p className="text-ui text-ink-900">
-        <span className="mono text-lg font-semibold">{inboxCount}</span> {inboxCount === 1 ? 'thing needs' : 'things need'} you.
-      </p>
-      <p data-testid="room-office-chips" className="text-ui text-ink-500">
-        {CHIP_WORDS.map(([key, word]) => `${word} ${inboxChips[key] ?? 0}`).join(' · ')}
-      </p>
-      <Link href="/governance" data-testid="room-office-inbox" className={LINK}>
-        Open the Office inbox
-      </Link>
-      <Link href="/activity" data-testid="room-office-signoffs" className={LINK}>
-        {pendingSignOffs} {pendingSignOffs === 1 ? 'completion' : 'completions'} waiting for sign-off
-      </Link>
-      <Link href="/admin/access" data-testid="room-office-access" className={LINK}>
-        Access — who sees which SOPs
-      </Link>
-      <div className="flex gap-2">
-        <Link href="/admin/team" className={`${LINK} flex-1`}>
-          People &amp; roles
-        </Link>
-        <Link href="/admin/settings" className={`${LINK} flex-1`}>
-          Settings
-        </Link>
-      </div>
-    </div>
-  )
-}
-
 export function AdminWorkshopBody({
   drafts,
 }: {

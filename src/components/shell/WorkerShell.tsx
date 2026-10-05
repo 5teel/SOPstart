@@ -7,7 +7,9 @@
  * Admin-only modules are never imported here -- the admin view is the lazy
  * AdminShell seam in OneScreen.
  */
+import dynamic from 'next/dynamic'
 import { useQuery } from '@tanstack/react-query'
+import { getOfficeInbox } from '@/actions/office'
 import { listSiteForWorker } from '@/actions/site-worker'
 import { AccountControl } from '@/components/shell/AccountControl'
 import { OfficeCard } from '@/components/shell/OfficeCard'
@@ -22,11 +24,11 @@ import { SiteSummary } from '@/components/shell/SiteSummary'
 import { MachineBody } from '@/components/sop/plant/MachinePanel'
 import { NowCard } from '@/components/sop/plant/NowCard'
 import { useRole } from '@/components/providers/RoleProvider'
-import { usePendingSignOffCount } from '@/hooks/useCompletions'
 import { useWorkerSops } from '@/hooks/useWorkerSops'
 import { zoneColour } from '@/lib/site/scene'
 import type { Place } from '@/lib/shell/place'
 import { tabsForRole } from '@/lib/shell/office-tabs'
+import { OFFICE_INBOX_KEY } from '@/lib/shell/query-keys'
 import {
   compareToDoFirst,
   derivePlantPins,
@@ -44,9 +46,19 @@ export interface ShellProps {
   initialSop: string | null
 }
 
+// The supervisor's Office is the lazy pane; a worker never loads it (59 A-11).
+const OfficePane = dynamic(() => import('@/components/office/OfficePane').then((m) => m.OfficePane), {
+  ssr: false,
+  loading: () => (
+    <div data-testid="office-loading" className="p-4 text-ui text-ink-500">
+      Opening the Office…
+    </div>
+  ),
+})
+
 const EMPTY_SITE: ShellSite = { layout: null, machines: [], links: [], departments: [] }
 
-export function WorkerShell({ siteName, userEmail, initialPlace, initialTab }: ShellProps) {
+export function WorkerShell({ siteName, userEmail, initialPlace, initialTab, initialSop }: ShellProps) {
   const role = useRole()
   const isSupervisor = role === 'supervisor'
 
@@ -60,7 +72,15 @@ export function WorkerShell({ siteName, userEmail, initialPlace, initialTab }: S
   const site: ShellSite = siteResult && !('error' in siteResult) ? siteResult : EMPTY_SITE
 
   const { workerSops, libraryLoading, assignmentsLoading, libraryError, refetchLibrary } = useWorkerSops()
-  const pending = usePendingSignOffCount(isSupervisor).data ?? 0
+  // The pane's own read (same key), so the pin always equals the Inbox list (A-11).
+  const { data: inbox } = useQuery({
+    queryKey: OFFICE_INBOX_KEY,
+    queryFn: () => getOfficeInbox(),
+    enabled: isSupervisor,
+  })
+  const inboxItems = inbox && !('error' in inbox) ? inbox.items : []
+  const pending = inboxItems.length
+  const signOffs = inboxItems.filter((i) => i.kind === 'signoff').length
 
   const sopsById = new Map(workerSops.map((s) => [s.id, s]))
   const machinePins = derivePlantPins(site.machines, site.links, sopsById)
@@ -103,7 +123,13 @@ export function WorkerShell({ siteName, userEmail, initialPlace, initialTab }: S
       }
     }
     if (place.kind === 'room') {
-      if (place.id === 'office') return <OfficeWorkerBody role={isSupervisor ? 'supervisor' : 'worker'} pending={pending} />
+      if (place.id === 'office') {
+        return isSupervisor ? (
+          <OfficePane place={place} select={ctx.select} initialSop={initialSop} />
+        ) : (
+          <OfficeWorkerBody />
+        )
+      }
       if (place.id === 'smoko') return <SmokoBody />
       if (place.id === 'workshop') return <WorkshopWorkerBody />
       return libraryError ? loadError : <NoticeboardWorkerBody sops={siteSops} />
@@ -115,7 +141,7 @@ export function WorkerShell({ siteName, userEmail, initialPlace, initialTab }: S
         published={workerSops.length}
         roleLine={
           isSupervisor
-            ? `${pending} ${pending === 1 ? 'walk is' : 'walks are'} waiting for your sign-off.`
+            ? `${signOffs} ${signOffs === 1 ? 'walk is' : 'walks are'} waiting for your sign-off.`
             : `${dueTotal} ${dueTotal === 1 ? 'SOP is' : 'SOPs are'} due for you.`
         }
       />
@@ -139,7 +165,7 @@ export function WorkerShell({ siteName, userEmail, initialPlace, initialTab }: S
           return (
             <OfficeCard
               count={pending}
-              label="waiting for your sign-off"
+              label="waiting for you in the Office"
               onOpen={() => select({ kind: 'room', id: 'office' })}
             />
           )
