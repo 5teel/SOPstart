@@ -1,31 +1,47 @@
 /**
- * Phase 21 (Plan 21-03 Task 2) — AI reviewer manual re-run + read endpoint.
+ * AI reviewer manual re-run + read endpoint.
+ *
+ * Phase 58 (58-06, D-02 / D-17): the check runs for ANY SOP of the caller's
+ * organisation (a SOP with no source runs only the draft-only jobs) and its
+ * findings are sop_ai_findings rows.
  *
  * POST /api/sops/[sopId]/ai-reviewer
  *   Body: { jobs?: ReviewerJobId[] } — defaults to all five.
+ *   Admin / safety_manager only (each run spends money).
  *   Returns: ReviewerRunEnvelope
  *   Errors:
  *     401 unauthenticated
- *     403 forbidden (not admin / safety_manager for the SOP's org)
- *     404 sop not found OR no parse-job for sop
+ *     403 forbidden (not admin / safety_manager)
+ *     404 sop not found in the session organisation
+ *     422 nothing_to_review (no steps and no source)
  *     429 per-day cap exhausted (`error: per_day_cap`)
  *     429 per-org Anthropic spend cap exhausted (`error: per_org_cap`)
  *     500 reviewer error
  *
  * GET /api/sops/[sopId]/ai-reviewer
- *   Returns: latest `parse_jobs.ai_review_results` envelope (read-only).
+ *   Anyone with edit access to the SOP (admin, safety manager, or a sign-off
+ *   approver) — resolved by requireSopEditAccess.
+ *   Returns: { findings, lastRunAt, hasSource, flags }
+ *     findings   rows of the latest run plus every still-open row
+ *     lastRunAt  null means the check has never run
+ *     hasSource  false => "wording and clarity only" (D-17)
+ *     flags      the latest parse job's envelope flags; read only by the old
+ *                builder's flag panel until 58-16 deletes it
  *
- * Trust boundary: admin user → reviewer orchestrator. We Zod-validate the
- * `jobs` payload against the ReviewerJobId enum (T-21-03-02 mitigation).
+ * Trust boundary: every admin-client query below carries the SESSION
+ * organisation, never a value read off a fetched row (CLAUDE.md 2026-07-28).
  */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getSessionContext } from '@/lib/auth/session-context'
+import { requireSopEditAccess } from '@/lib/auth/guards'
 import { createAdminClient } from '@/lib/supabase/admin'
 import {
-  runReviewerJobs,
+  runReviewerForSop,
+  NothingToReviewError,
   OrgSpendCapExceededError,
+  pickSourceText,
   type ReviewerJobId,
   type ReviewerRunEnvelope,
 } from '@/lib/parsers/ai-reviewer'
@@ -43,28 +59,20 @@ const PostBodySchema = z.object({
 const ALL_JOBS: ReviewerJobId[] = ['A', 'B', 'C', 'D', 'E']
 
 async function assertAdminAuth(): Promise<
-  { kind: 'ok'; userId: string } | { kind: 'err'; status: number; body: { error: string } }
+  | { kind: 'ok'; userId: string; organisationId: string }
+  | { kind: 'err'; status: number; body: { error: string } }
 > {
-  const { userId, role } = await getSessionContext()
+  const { userId, role, organisationId } = await getSessionContext()
   if (!userId) {
     return { kind: 'err', status: 401, body: { error: 'unauthenticated' } }
   }
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { kind: 'err', status: 403, body: { error: 'forbidden' } }
   }
-  return { kind: 'ok', userId }
-}
-
-async function loadLatestParseJobId(sopId: string): Promise<string | null> {
-  const admin = createAdminClient()
-  const { data } = await admin
-    .from('parse_jobs')
-    .select('id')
-    .eq('sop_id', sopId)
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle()
-  return (data?.id as string | null) ?? null
+  if (!organisationId) {
+    return { kind: 'err', status: 403, body: { error: 'forbidden' } }
+  }
+  return { kind: 'ok', userId, organisationId }
 }
 
 export async function POST(
@@ -92,13 +100,20 @@ export async function POST(
     )
   }
 
-  // Locate the parse-job to review.
-  const parseJobId = await loadLatestParseJobId(sopId)
-  if (!parseJobId) {
-    return NextResponse.json({ error: 'no_parse_job' }, { status: 404 })
+  // T-58-11: the SOP must be in the SESSION organisation.
+  const admin = createAdminClient()
+  const { data: sop } = await admin
+    .from('sops')
+    .select('id')
+    .eq('id', sopId)
+    .eq('organisation_id', auth.organisationId)
+    .maybeSingle()
+  if (!sop) {
+    return NextResponse.json({ error: 'sop_not_found' }, { status: 404 })
   }
 
-  // Per-day cap (CONV-09 / D-21-13). Throws PerDayRunCapExceededError.
+  // Per-day cap (CONV-09 / D-21-13), keyed on sop_id so a blank SOP is capped
+  // the same as a parsed one. Throws PerDayRunCapExceededError.
   try {
     await assertWithinPerDayRunCap(sopId)
   } catch (err) {
@@ -118,7 +133,11 @@ export async function POST(
   // Dispatch. OrgSpendCapExceededError → 429 per_org_cap.
   let envelope: ReviewerRunEnvelope
   try {
-    envelope = await runReviewerJobs(parseJobId, jobs)
+    envelope = await runReviewerForSop({
+      sopId,
+      organisationId: auth.organisationId,
+      jobs,
+    })
   } catch (err) {
     if (err instanceof OrgSpendCapExceededError) {
       return NextResponse.json(
@@ -129,6 +148,9 @@ export async function POST(
         },
         { status: 429 },
       )
+    }
+    if (err instanceof NothingToReviewError) {
+      return NextResponse.json({ error: 'nothing_to_review' }, { status: 422 })
     }
     console.error('[ai-reviewer POST] orchestrator error', err)
     return NextResponse.json(
@@ -143,7 +165,7 @@ export async function POST(
     await incrementPerDayRunCounter(sopId)
   } catch (err) {
     console.error('[ai-reviewer POST] counter increment error', err)
-    // Non-fatal — envelope is already persisted.
+    // Non-fatal — findings are already persisted.
   }
 
   return NextResponse.json(envelope, { status: 200 })
@@ -158,33 +180,54 @@ export async function GET(
     return NextResponse.json({ error: 'sopId required' }, { status: 400 })
   }
 
-  const auth = await assertAdminAuth()
-  if (auth.kind === 'err') return NextResponse.json(auth.body, { status: auth.status })
+  const ctx = await requireSopEditAccess({ sopId })
+  if ('error' in ctx) {
+    const status = ctx.error === 'Not authenticated' ? 401 : /not found/i.test(ctx.error) ? 404 : 403
+    return NextResponse.json({ error: ctx.error }, { status })
+  }
+  const orgId = ctx.organisationId
 
   const admin = createAdminClient()
-  const { data, error } = await admin
-    .from('parse_jobs')
-    .select('id, ai_review_results')
+
+  const { data: latest } = await admin
+    .from('sop_ai_findings')
+    .select('run_id, created_at')
     .eq('sop_id', sopId)
+    .eq('organisation_id', orgId)
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle()
+  const lastRunAt = (latest?.created_at as string | null) ?? null
+  const lastRunId = (latest?.run_id as string | null) ?? null
 
-  if (error || !data) {
-    return NextResponse.json({ error: 'no_parse_job' }, { status: 404 })
+  let q = admin
+    .from('sop_ai_findings')
+    .select('id, run_id, job, kind, severity, step_id, description, extras, cleared_by, cleared_at, created_at')
+    .eq('sop_id', sopId)
+    .eq('organisation_id', orgId)
+    .order('created_at', { ascending: true })
+  // Latest run's rows plus every row still open (an open row always belongs to
+  // the latest run, except rows older than run ids).
+  q = lastRunId ? q.or(`run_id.eq.${lastRunId},cleared_at.is.null`) : q.is('cleared_at', null)
+  const { data: findings, error } = await q
+  if (error) {
+    console.error('[ai-reviewer GET] findings read error', error)
+    return NextResponse.json({ error: 'read_failed' }, { status: 500 })
   }
 
-  // ai_review_results defaults to '{}' in the DB; treat empty object as
-  // "never run" so the client can render the empty-state CTA.
-  const envelope = data.ai_review_results
-  if (
-    !envelope ||
-    (typeof envelope === 'object' &&
-      !Array.isArray(envelope) &&
-      Object.keys(envelope as object).length === 0)
-  ) {
-    return NextResponse.json({ error: 'never_run' }, { status: 404 })
-  }
+  const { data: job } = await admin
+    .from('parse_jobs')
+    .select('transcript_text, prompt_text, ai_review_results')
+    .eq('sop_id', sopId)
+    .eq('organisation_id', orgId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  const hasSource = job ? pickSourceText(job as { transcript_text: string | null; prompt_text: string | null }).trim().length > 0 : false
+  const envelope = (job?.ai_review_results ?? null) as { flags?: unknown[] } | null
 
-  return NextResponse.json(envelope, { status: 200 })
+  return NextResponse.json(
+    { findings: findings ?? [], lastRunAt, hasSource, flags: envelope?.flags ?? [] },
+    { status: 200 },
+  )
 }
