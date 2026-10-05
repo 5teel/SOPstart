@@ -14,7 +14,9 @@
   "columnKeys": [
     { "table": "sops", "token": "owner_user_id:", "what": "owner change" },
     { "table": "sops", "token": "status: 'published'", "what": "publish" },
-    { "table": "sop_section_blocks", "token": "verified_by_admin_id:", "what": "verify / AI finding cleared" }
+    { "table": "sop_section_blocks", "token": "verified_by_admin_id:", "what": "verify / AI finding cleared" },
+    { "table": "sop_focus_steps", "token": "verified_by_admin_id:", "what": "step check" },
+    { "table": "sop_ai_findings", "token": "cleared_by:", "what": "AI finding cleared" }
   ],
   "entries": [
     { "file": "src/actions/approvals.ts", "function": "approveStep", "status": "hook", "key": "sop_approvals", "kind": "approve", "plan": 5 },
@@ -31,6 +33,9 @@
     { "file": "src/actions/observations.ts", "function": "recordObservation", "status": "hook", "key": "sop_observations", "kind": "observation", "plan": 8 },
     { "file": "src/actions/sop-section-blocks.ts", "function": "verifyBlock", "status": "hook", "key": "verified_by_admin_id:", "kind": "verify/ai_finding_cleared", "plan": 8 },
     { "file": "src/actions/sop-section-blocks.ts", "function": "unverifyBlock", "status": "hook", "key": "verified_by_admin_id:", "kind": "verify_withdrawn", "plan": 8 },
+    { "file": "src/actions/focus-steps.ts", "function": "tickFocusStep", "status": "hook", "key": "verified_by_admin_id:", "kind": "verify", "plan": 8 },
+    { "file": "src/actions/focus-steps.ts", "function": "untickFocusStep", "status": "hook", "key": "verified_by_admin_id:", "kind": "verify_withdrawn", "plan": 8 },
+    { "file": "src/actions/findings.ts", "function": "clearFinding", "status": "hook", "key": "cleared_by:", "kind": "ai_finding_cleared", "plan": 8 },
     { "file": "src/actions/ai-fields.ts", "function": "acceptProposal", "status": "hook", "key": "ai_field_proposals", "kind": "approve", "plan": 8 },
     { "file": "src/actions/ai-fields.ts", "function": "rejectProposal", "status": "hook", "key": "ai_field_proposals", "kind": "reject", "plan": 8 }
   ],
