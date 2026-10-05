@@ -78,11 +78,11 @@ test.describe('UX-05 — worker tab merge (6 → 3)', () => {
     expect(readTab).toContain('Current as of')
   })
 
-  test('bundle trap: ReadTab has no static walkthrough import; page mounts walkthrough only via WalkthroughSwitcher', () => {
+  test('bundle trap: ReadTab has no static walkthrough import; the SOP page mounts no old walkthrough (Phase 58: the focus screen replaced the tabs)', () => {
     const readTab = read(path.join(TABS_DIR, 'ReadTab.tsx'))
     expect(readTab).not.toContain('components/sop/walkthrough')
     const page = read(DETAIL_PAGE)
-    expect(page).toContain("=== 'walk' && <WalkthroughSwitcher")
+    expect(page).not.toContain('WalkthroughSwitcher')
     // No direct Desktop/Mobile walkthrough mount on the worker detail page.
     expect(page).not.toContain('DesktopWalkthrough')
     expect(page).not.toContain('MobileWalkthrough')

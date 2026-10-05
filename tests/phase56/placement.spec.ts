@@ -57,14 +57,14 @@ const strip = (s: string) => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'
 const read = (p: string) => strip(fs.readFileSync(path.join(process.cwd(), p), 'utf8').replace(/\r\n/g, '\n'))
 
 const WORKER_FILES = [
-  'src/app/(protected)/sops/[sopId]/page.tsx',
+  'src/components/focus/BrowseDocument.tsx', // Phase 58-11: the SOP page is the focus screen; its summary card carries the placement line
   'src/components/sop/tabs/ReadTab.tsx',
   'src/components/sop/walkthrough/DesktopWalkthrough.tsx',
   'src/components/sop/walkthrough/ImmersiveStepCard.tsx',
 ]
 
 test.describe('worker surfaces render placement + labels', () => {
-  test('page shows placement line and labels', () => {
+  test('the focus browse summary shows the placement line and labels', () => {
     const src = read(WORKER_FILES[0])
     expect(src).toContain('placementLabel(')
     expect(src).toContain('<StandardLabels')

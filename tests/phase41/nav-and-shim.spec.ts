@@ -48,11 +48,10 @@ test.describe('SUR-04 — one path from a SOP to its builder', () => {
     for (const f of WORKER_SHELL) expect(read(f), f).not.toContain('/admin/sops/builder')
   })
 
-  test('SUR-04: the worker SOP detail page keeps its own "Edit in builder" DESTINATION (not a second list→builder chain)', () => {
+  test('SUR-04: the SOP focus page is not a second list-to-builder chain (Phase 58: its edit entry arrives with the Walk / Edit switch)', () => {
     // The Workshop's draft rows are the only admin list that links directly
-    // into the builder. The detail page's own Edit link is a
-    // documented second destination (D-06), not a second chain.
+    // into the builder; the focus page adds no second one.
     const detail = read(SOP_DETAIL_PAGE)
-    expect(detail).toContain('/admin/sops/builder/')
+    expect(detail).not.toContain('/admin/sops/builder')
   })
 })

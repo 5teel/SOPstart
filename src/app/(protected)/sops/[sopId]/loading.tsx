@@ -1,24 +1,26 @@
 /**
- * Route-level skeleton for the SOP detail surface. Byte-matches the client
- * component's own isLoading skeleton (page.tsx) so the handoff from
- * RSC-navigation fallback → query-loading state is visually seamless.
+ * Route-level skeleton for the SOP focus screen: the frame's own shape (top bar,
+ * 300 px rail, reading column) so the handoff to the real screen does not shift.
+ * Static under reduced motion.
  */
-export default function SopDetailLoading() {
+export default function SopFocusLoading() {
   return (
-    <div className="min-h-screen bg-[var(--paper)]" aria-busy="true">
-      <div className="sticky top-0 z-10 bg-[var(--paper)]/95 border-b border-[var(--ink-100)] px-4 flex items-center gap-3 h-14">
-        <div className="w-16 h-4 rounded bg-[var(--ink-100)] animate-pulse" />
-        <div className="flex-1 h-4 rounded bg-[var(--ink-100)] animate-pulse max-w-50" />
+    <div className="flex h-dvh flex-col bg-paper" aria-busy="true">
+      <div className="flex min-h-tap items-center gap-2 border-b border-ink-200 px-4">
+        <div className="h-4 w-16 rounded bg-ink-100 animate-pulse motion-reduce:animate-none" />
+        <div className="h-4 w-48 rounded bg-ink-100 animate-pulse motion-reduce:animate-none" />
       </div>
-      <div className="h-12 bg-[var(--paper)] border-b border-[var(--ink-100)] flex items-center px-4 gap-4">
-        {[...Array(3)].map((_, i) => (
-          <div key={i} className="w-16 h-3 rounded bg-[var(--ink-100)] animate-pulse" />
-        ))}
-      </div>
-      <div className="p-8 flex flex-col gap-4">
-        {[...Array(3)].map((_, i) => (
-          <div key={i} className="h-20 rounded-lg bg-[var(--ink-50)] animate-pulse" />
-        ))}
+      <div className="flex min-h-0 flex-1">
+        <div className="hidden w-75 shrink-0 flex-col gap-2 border-r border-ink-200 bg-paper-2 p-4 lg:flex">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="h-11 rounded-lg bg-ink-100 animate-pulse motion-reduce:animate-none" />
+          ))}
+        </div>
+        <div className="mx-auto flex w-full max-w-205 flex-col gap-4 px-4 py-8 lg:px-8">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="h-24 rounded-lg bg-ink-100 animate-pulse motion-reduce:animate-none" />
+          ))}
+        </div>
       </div>
     </div>
   )

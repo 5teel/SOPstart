@@ -70,7 +70,11 @@ test.describe('SHL-02 place address', () => {
   })
 
   test('placeForPath sends every other page to the site, and /pending nowhere', () => {
-    for (const p of ['/sops/abc', '/admin/sops/builder/abc', '/profile']) expect(placeForPath(p), p).toBe('/')
+    for (const p of ['/admin/sops/builder/abc', '/profile']) expect(placeForPath(p), p).toBe('/')
     expect(placeForPath('/pending')).toBeNull()
+  })
+
+  test('placeForPath gives the SOP focus screen no Back bar: it owns its own top bar (Phase 58)', () => {
+    for (const p of ['/sops/abc', '/sops/0b0e0d6a-1c2d-4e5f-8a9b-0c1d2e3f4a5b']) expect(placeForPath(p), p).toBeNull()
   })
 })

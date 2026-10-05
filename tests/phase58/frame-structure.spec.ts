@@ -54,7 +54,34 @@ test.describe('FOC-01/FOC-03 focus frame', () => {
     expect(read('src/components/focus/FocusFrame.tsx')).not.toMatch(/useViewport|matchMedia/)
   })
 
-  test.fixme('placeForPath returns null for every /sops/* path so the focus frame owns the top bar (58-11)', () => {})
+  test('placeForPath returns null for every /sops/* path so the focus frame owns the top bar (58-11)', () => {
+    const PLACE = stripComments(read('src/lib/shell/place.ts'))
+    expect(PLACE).toContain("pathname.startsWith('/sops/')) return null")
+    // BackToSite renders nothing when placeForPath is null (the layout stays unchanged).
+    expect(read('src/components/layout/BackToSite.tsx')).toContain('if (!href) return null')
+  })
+
+  test('the SOP page is a server component that resolves the version and renders only the focus frame (58-11)', () => {
+    const PAGE = read('src/app/(protected)/sops/[sopId]/page.tsx')
+    expect(PAGE.split('\n').slice(0, 3).join('\n')).not.toContain('use client')
+    const code = stripComments(PAGE)
+    expect(code).toContain('resolveFocusTarget(')
+    expect(code).toContain('notFound()')
+    expect(code).toContain('redirect(focusHref(target.id, { from }))')
+    expect(code).toContain('<FocusWalker')
+    expect(code).not.toMatch(/useEffect|useRouter|router\./)
+    for (const banned of ['BackToSite', 'PlantStage', '@/components/shell', '@/components/admin', 'SopTabNav', 'WalkthroughSwitcher', 'ReadTab', 'useSopDetail']) {
+      expect(code, banned).not.toContain(banned)
+    }
+    // A draft is never offered to a worker: the resolver decides, not RLS.
+    expect(stripComments(read('src/lib/sop/lineage-current.ts'))).toContain('ADMIN_ROLES.includes(role)')
+  })
+
+  test('the focus walker makes no router call and mounts browse, walk, review, sent and resume in one frame (58-11)', () => {
+    const W = stripComments(read('src/components/focus/FocusWalker.tsx'))
+    for (const c of ['<BrowseDocument', '<WalkStep', '<ReviewAndSend', '<SentPanel', '<ResumeCard', '<FocusFrame']) expect(W, c).toContain(c)
+    expect(W).not.toMatch(/router\./)
+  })
 
   test('no focus file imports the shell, the map, the list, the inbox or notifications (58-10)', () => {
     for (const { f, code } of focusFiles()) {

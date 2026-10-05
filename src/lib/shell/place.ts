@@ -60,7 +60,8 @@ export function placeToken(place: Place): string | null {
  * (a role-less user on /pending has no site to go back to).
  */
 export function placeForPath(pathname: string): string | null {
-  if (pathname === '/pending') return null
+  // The SOP focus screen (Phase 58) owns its own top bar with Back; /pending has no site to go back to.
+  if (pathname === '/pending' || pathname.startsWith('/sops/')) return null
   if (['/governance', '/admin/team', '/admin/access', '/admin/settings'].includes(pathname)) return '/?place=office'
   if (pathname === '/activity' || pathname.startsWith('/activity/')) return '/?place=smoko'
   if (pathname === '/admin/sops/new' || pathname.startsWith('/admin/sops/new/') || pathname === '/admin/sops/upload') {

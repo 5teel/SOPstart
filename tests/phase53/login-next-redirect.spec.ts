@@ -32,7 +32,7 @@ function stripComments(src: string): string {
 test.describe('safeNextPath', () => {
   test('accepts a plain relative path, with query and/or hash', () => {
     expect(safeNextPath('/m/AB12CD')).toBe('/m/AB12CD')
-    expect(safeNextPath('/sops?tab=walk')).toBe('/sops?tab=walk')
+    expect(safeNextPath('/sops/AB12?from=office')).toBe('/sops/AB12?from=office')
     expect(safeNextPath('/m/AB12CD#top')).toBe('/m/AB12CD#top')
   })
 

@@ -113,22 +113,20 @@ export const JOURNEYS: Journey[] = [
       { id: 'pick', type: 'decision', label: 'How do they get there?', branches: [
         { label: 'Click a machine', to: 'panel' },
         { label: 'Open the Noticeboard', to: 'board' },
-        { label: 'Now card → Walk it', to: 'walk' },
+        { label: 'Now card → Walk it', to: 'detail' },
       ] },
-      { id: 'panel', type: 'screen', label: 'Machine in the detail pane', route: '/', detail: 'The machine\'s photo (or "no photo yet"), its department named in that department\'s colour, then its procedures to-do first with the shared badge (Due, Updated, Never done, Done — "Updated" marks any SOP published after the worker\'s last completion, AFL-VER-04), a Walk › link and a plain Read link. A refresher chip never blocks opening the card (Phase 36).', branches: [
-        { label: 'Walk ›', to: 'walk' },
-        { label: 'Read', to: 'detail' },
+      { id: 'panel', type: 'screen', label: 'Machine in the detail pane', route: '/', detail: 'The machine\'s photo (or "no photo yet"), its department named in that department\'s colour, then its procedures to-do first with the shared badge (Due, Updated, Never done, Done — "Updated" marks any SOP published after the worker\'s last completion, AFL-VER-04), a Walk › link and the SOP title, both opening the focus screen. A refresher chip never blocks opening the card (Phase 36).', branches: [
+        { label: 'Walk › or the SOP title', to: 'detail' },
       ] },
-      { id: 'board', type: 'screen', label: 'Noticeboard room', route: '/', detail: 'The site-wide SOPs in the detail pane, each with the same shared badge, Walk › and Read links.', branches: [
-        { label: 'Walk ›', to: 'walk' },
-        { label: 'Read', to: 'detail' },
+      { id: 'board', type: 'screen', label: 'Noticeboard room', route: '/', detail: 'The site-wide SOPs in the detail pane, each with the same shared badge and a Walk › link.', branches: [
+        { label: 'Walk › or the SOP title', to: 'detail' },
       ] },
-      { id: 'detail', type: 'screen', label: 'Procedure detail', route: '/sops/[sopId]', detail: 'Read is the SOP as one document (2026-09-27): Orient → Prepare → Do. A SOP holding several procedures shows a "Which job are you doing?" chooser (?job=); Prepare lists tools and parts for that job and lets the worker acknowledge the safety requirements inline; Do lists the job\'s steps in full with a "Walk it step by step" button. Walk it walks the chosen job only (Step 1 of 6, not 1 of 40) and skips the "Before you start" screen when already acknowledged or when there is nothing to acknowledge. Workers see Read + Walk it; the Desktop/Mobile preview toggle is admin-only. Legacy ?tab= params still map onto the tabs. Admins/safety managers see an "Edit in builder" link here.' },
+      { id: 'detail', type: 'screen', label: 'The SOP, with the whole screen to itself', route: '/sops/[sopId]', detail: 'The focus screen (Phase 58): a slim bar with Back and the title, a step rail and one reading column, and nothing from the site (no map, list, inbox or notifications). A worker always lands on the latest published version, or on the version of a walk they have in progress; a draft or unknown address is not found and an older version redirects to the current one. Browse shows every step in walking order (hazards and PPE first), Start walking, and "Updated since you last walked it" when a newer version was published. Back returns to the machine or room it was opened from (?from=).' },
       { id: 'go', type: 'decision', label: 'Ready to start?', branches: [
-        { label: 'Yes — walk it', to: 'walk' },
+        { label: 'Start walking', to: 'walk' },
         { label: 'Just reading', to: 'e' },
       ] },
-      { id: 'walk', type: 'screen', label: 'Step-by-step walkthrough (Walk it tab)', route: '/sops/[sopId]', detail: 'Walk ›, Walk it and Show me all open /sops/<id>?from=<the machine or room it came from>, so Back returns there (Phase 58-10; the focus screen replaces the tabs in 58-11).' },
+      { id: 'walk', type: 'screen', label: 'Walking the SOP — one step at a time', route: '/sops/[sopId]', detail: 'Start walking (or Resume where you left off) opens the first step alone on the screen. Walk ›, Walk it and Show me all open /sops/<id>?from=<the machine or room it came from>, so Back returns there.' },
       { id: 'e', type: 'end', label: 'Procedure open' },
     ],
   },
@@ -139,22 +137,20 @@ export const JOURNEYS: Journey[] = [
     title: 'Follow a procedure & complete it',
     summary: 'A worker walks each step on their phone, captures evidence, and completes the job with a tamper-proof record.',
     steps: [
-      { id: 's', type: 'start', label: 'In the walkthrough (Walk it tab)', route: '/sops/[sopId]' },
-      { id: 'read', type: 'action', label: 'Read & acknowledge the step', detail: 'Must acknowledge to advance (safety).' },
+      { id: 's', type: 'start', label: 'Start walking', route: '/sops/[sopId]' },
+      { id: 'read', type: 'action', label: 'Do the step, then press the one button', detail: 'Each press is saved on the server before the screen moves, so closing the page loses nothing. Hazard and PPE steps cannot be passed without "I understand — continue" / "I\'m wearing it — continue". The rail goes back only by default; an SOP can allow jumping ahead.' },
       { id: 'kind', type: 'decision', label: 'What does the step need?', branches: [
-        { label: 'Just read it', to: 'next' },
+        { label: 'Just do it', to: 'next' },
+        { label: 'Acknowledge a hazard or PPE', to: 'next' },
         { label: 'Add a photo', to: 'photo' },
-        { label: 'Enter a measurement', to: 'meas' },
-        { label: 'Make a yes/no decision', to: 'decide' },
       ] },
-      { id: 'photo', type: 'action', label: 'Capture photo', detail: "Compressed and uploaded straight away; the step can't be finished until the photo shows Uploaded." },
-      { id: 'meas', type: 'action', label: 'Enter reading', detail: 'Flagged if out of range.' },
-      { id: 'decide', type: 'action', label: 'Choose path', detail: 'May branch or escalate.' },
+      { id: 'photo', type: 'action', label: 'Add the photo the step asks for', detail: 'Compressed and uploaded straight away to the walk; the step cannot be finished until the photo is there. Retake replaces it.' },
       { id: 'next', type: 'decision', label: 'More steps?', branches: [
         { label: 'Yes', to: 'read' },
-        { label: 'Last step done', to: 'complete' },
+        { label: 'Last step done', to: 'review' },
       ] },
-      { id: 'complete', type: 'action', label: 'Complete + worker self-sign', detail: 'Creates an append-only completion record. Completing IS the worker signature (D-09). The worker who is signed in is the one recorded (AFL-VER-05).' },
+      { id: 'review', type: 'screen', label: 'Review — Ready to send?', route: '/sops/[sopId]', detail: 'Every step with its acknowledgement and photo. Nothing is written until Send for sign-off; a missing acknowledgement or photo lists what is still to do and blocks Send.' },
+      { id: 'complete', type: 'action', label: 'Send for sign-off', detail: 'Creates the append-only completion record and the worker\'s ledger row from the server walk. Completing IS the worker signature (D-09). Then one line, "Sent for sign-off", and Back to the site returns to the place the worker came from.' },
       { id: 'signoff', type: 'decision', label: 'Supervisor counter-sign required?', branches: [
         { label: 'Yes → supervisor counter-signs', to: 'sup' },
         { label: 'No', to: 'e' },

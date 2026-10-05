@@ -2,6 +2,7 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
 import { roleHome } from '@/lib/auth/role-home'
 import { safeNextPath } from '@/lib/auth/next-redirect'
+import { legacyRedirectFor } from '@/lib/sop/focus-path'
 
 const SOP_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
@@ -80,6 +81,20 @@ export async function updateSession(request: NextRequest) {
     const redirect = NextResponse.redirect(new URL(destination, request.url))
     response.cookies.getAll().forEach((c) => redirect.cookies.set(c))
     return redirect
+  }
+
+  // Old tabbed SOP addresses (/sops/<uuid>?tab=read|walk) land on the bare focus
+  // address. Server-side on purpose, same reason as the block above (CLAUDE.md
+  // 2026-09-29). legacyRedirectFor is UUID-gated and builds fixed templates, so
+  // the destination cannot be steered offsite; the refreshed session cookies
+  // ride along. Builder and versions addresses join this block in 58-14.
+  if (path.startsWith('/sops/')) {
+    const legacy = legacyRedirectFor(path, request.nextUrl.search)
+    if (legacy) {
+      const redirect = NextResponse.redirect(new URL(legacy, request.url), 307)
+      response.cookies.getAll().forEach((c) => redirect.cookies.set(c))
+      return redirect
+    }
   }
 
   if (isAuthRoute && claims) {

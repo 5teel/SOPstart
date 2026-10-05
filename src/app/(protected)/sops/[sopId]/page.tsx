@@ -1,151 +1,103 @@
-'use client'
-import { Suspense, useState } from 'react'
-import Link from 'next/link'
-import { useParams, useSearchParams } from 'next/navigation'
-import { useSopDetail } from '@/hooks/useSopDetail'
-import { useIsAdmin } from '@/components/providers/RoleProvider'
-import { SopTabNav, useActiveTab } from '@/components/sop/SopTabNav'
-import { WorkerPreviewToggle, WorkerPreviewClamp } from '@/components/sop/WorkerPreviewToggle'
-import { ReadTab } from '@/components/sop/tabs'
-import { WalkthroughSwitcher } from '@/components/sop/walkthrough/WalkthroughSwitcher'
-import { procedureSections, scopeSopToJob } from '@/lib/sop/sections'
-import { placementLabel, placementSummary, standardNames } from '@/lib/sop/placement'
-import { StandardLabels } from '@/components/sop/StandardLabels'
+import { notFound, redirect } from 'next/navigation'
+import { getSessionContext } from '@/lib/auth/session-context'
+import { loadFocusSop } from '@/lib/sop/focus-read'
+import { focusHref } from '@/lib/sop/focus-path'
+import { latestPublishedOf, resolveFocusTarget, type LineageRow } from '@/lib/sop/lineage-current'
+import { toWalkState, WALK_COLUMNS } from '@/lib/sop/walk-read'
+import { FocusWalker } from '@/components/focus/FocusWalker'
 
-function SopDetailInner() {
-  const params = useParams<{ sopId: string }>()
-  const sopId = params?.sopId ?? ''
-  const { data: sop, isLoading, isError } = useSopDetail(sopId)
-  const active = useActiveTab()
-  const isAdmin = useIsAdmin()
-  const search = useSearchParams()
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
-  // Which job inside the SOP. A document like OTG Probe Maintenance holds four
-  // independent procedures; the worker was sent to do ONE. The choice rides in
-  // ?job= (so Read → Walk it keeps it, and a link can point at a job) but is
-  // driven from local state and synced with replaceState — a router.push on a
-  // search-param change costs an RSC fetch through the service worker
-  // (CLAUDE.md 2026-05-13).
-  // Back/forward or a router-driven ?job= change re-seeds the choice — derived
-  // during render (React's "adjust state on prop change" pattern), not in an
-  // effect, so there is no extra render and no set-state-in-effect.
-  const urlJob = search.get('job')
-  const [jobId, setJobId] = useState<string | null>(urlJob)
-  const [seenUrlJob, setSeenUrlJob] = useState<string | null>(urlJob)
-  if (urlJob !== seenUrlJob) {
-    setSeenUrlJob(urlJob)
-    if (urlJob) setJobId(urlJob)
-  }
-  function handleJobChange(id: string) {
-    setJobId(id)
-    const params = new URLSearchParams(window.location.search)
-    params.set('job', id)
-    window.history.replaceState(window.history.state, '', `${window.location.pathname}?${params}`)
-  }
+/**
+ * The SOP focus screen (Phase 58, FOC-01/FOC-03). A server component: which
+ * version this person may open is decided here, from the session, and any
+ * redirect is a server redirect -- never a mount effect (CLAUDE.md 2026-09-29).
+ * Nothing is written on load.
+ */
+export default async function SopFocusPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ sopId: string }>
+  searchParams: Promise<{ from?: string | string[] }>
+}) {
+  const { sopId } = await params
+  const { from: rawFrom } = await searchParams
+  // Raw; every consumer (Back, the superseded link) passes it through the place whitelist.
+  const from = typeof rawFrom === 'string' ? rawFrom : null
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-[var(--paper)]">
-        {/* Skeleton header */}
-        <div className="sticky top-0 z-10 bg-[var(--paper)]/95 border-b border-[var(--ink-100)] px-4 flex items-center gap-3 h-14">
-          <div className="w-16 h-4 rounded bg-[var(--ink-100)] animate-pulse" />
-          <div className="flex-1 h-4 rounded bg-[var(--ink-100)] animate-pulse max-w-50" />
-        </div>
-        {/* Skeleton tab bar */}
-        <div className="h-12 bg-[var(--paper)] border-b border-[var(--ink-100)] flex items-center px-4 gap-4">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="w-16 h-3 rounded bg-[var(--ink-100)] animate-pulse" />
-          ))}
-        </div>
-        {/* Skeleton content */}
-        <div className="p-8 flex flex-col gap-4">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-20 rounded-lg bg-[var(--ink-50)] animate-pulse" />
-          ))}
-        </div>
-      </div>
-    )
-  }
+  const { supabase, userId, role, organisationId } = await getSessionContext()
+  if (!userId) redirect('/login')
+  if (!organisationId || !UUID.test(sopId)) notFound()
 
-  if (isError || !sop) {
-    return (
-      <div className="min-h-screen bg-[var(--paper)] flex flex-col items-center justify-center p-8 gap-4 text-center">
-        <p className="text-lg font-semibold text-[var(--ink-900)]">SOP not found</p>
-        <p className="text-sm text-[var(--ink-500)] max-w-xs">
-          This SOP may have been deleted or you may not have access to it.
-        </p>
-        <Link
-          href="/"
-          className="mt-2 inline-flex items-center gap-2 px-4 h-tap border border-[var(--ink-300)] rounded-lg text-sm font-medium text-[var(--ink-700)] hover:border-[var(--ink-900)] transition-colors"
-        >
-          ← Back to the site
-        </Link>
-      </div>
-    )
-  }
+  const { data: requested } = await supabase
+    .from('sops')
+    .select('id, parent_sop_id')
+    .eq('id', sopId)
+    .eq('organisation_id', organisationId)
+    .maybeSingle()
+  if (!requested) notFound()
 
-  const jobs = procedureSections(sop)
-  const job = jobs.find((s) => s.id === jobId) ?? jobs[0] ?? null
-  // Walk it walks the chosen job only — "Step 1 of 6", not "Step 1 of 40".
-  const walkSop = job && jobs.length > 1 ? scopeSopToJob(sop, job.id) : sop
+  // The lineage is flat: every version points at the original row.
+  const root = requested.parent_sop_id ?? requested.id
+  const { data: family } = await supabase
+    .from('sops')
+    .select('id, version, parent_sop_id, status')
+    .eq('organisation_id', organisationId)
+    .or(`id.eq.${root},parent_sop_id.eq.${root}`)
+  const lineage = (family ?? []) as LineageRow[]
+  const lineageIds = lineage.map((r) => r.id)
+
+  const [walksRes, completionsRes] = await Promise.all([
+    supabase
+      .from('sop_walks')
+      .select(WALK_COLUMNS)
+      .eq('organisation_id', organisationId)
+      .eq('worker_id', userId)
+      .eq('status', 'in_progress')
+      .in('sop_id', lineageIds),
+    supabase.from('sop_completions').select('sop_id').eq('worker_id', userId).in('sop_id', lineageIds),
+  ])
+  const walks = walksRes.data ?? []
+
+  const target = resolveFocusTarget({
+    role: role ?? 'worker',
+    requestedId: sopId,
+    lineage,
+    inProgressSopId: walks[0]?.sop_id ?? null,
+  })
+  if (target.kind === 'not_found') notFound()
+  if (target.kind === 'redirect') redirect(focusHref(target.id, { from }))
+
+  const data = await loadFocusSop(supabase, target.id)
+  if (!data) notFound()
+
+  const walkRow = walks.find((w) => w.sop_id === target.id)
+  const walk = walkRow ? toWalkState(walkRow) : null
+
+  // A walk in progress finishes on the version it started on (D-12): it is live for that worker.
+  const published = data.sop.status === 'published'
+  const latest = latestPublishedOf(lineage, target.id)
+  const superseded = published && target.superseded && !walk
+  const versionState = !published ? 'draft' : superseded ? 'superseded' : 'live'
+
+  // D-12: the worker has finished an earlier version of this SOP and not this one.
+  const doneOn = new Set((completionsRes.data ?? []).map((c) => c.sop_id as string))
+  const thisVersion = data.sop.version
+  const updatedSinceLastWalk =
+    published &&
+    !doneOn.has(target.id) &&
+    lineage.some((r) => doneOn.has(r.id) && (r.version ?? 0) < thisVersion)
 
   return (
-    <div className="min-h-screen bg-[var(--paper)] text-[var(--ink-900)]">
-      <header className="sticky top-0 z-10 bg-[var(--paper)]/95 backdrop-blur border-b border-[var(--ink-100)]">
-        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3 min-w-0">
-            <Link href="/" className="text-sm text-[var(--ink-500)] hover:text-[var(--ink-900)] flex-shrink-0">
-              ← Back to the site
-            </Link>
-            <div className="min-w-0">
-              <p className="text-base font-semibold truncate">{sop.title ?? 'Untitled SOP'}</p>
-              <p data-testid="sop-meta" className="flex items-center gap-1.5 text-meta text-[var(--ink-500)] truncate">
-                {placementLabel(
-                  placementSummary(
-                    sop.placement,
-                    (sop.sop_machines ?? []).flatMap((m) =>
-                      m.site_machines ? [{ name: m.site_machines.name, department: m.site_machines.departments?.name ?? null }] : [],
-                    ),
-                  ),
-                )}
-                <StandardLabels names={standardNames(sop.standard_attachments)} />
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 flex-shrink-0">
-            {isAdmin && (
-              <Link
-                href={`/admin/sops/builder/${sopId}`}
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 h-9 rounded-lg border border-[var(--ink-300)] text-sm font-medium text-[var(--ink-700)] hover:border-[var(--ink-900)] hover:text-[var(--ink-900)] transition-colors"
-                title="Open this SOP in the admin builder"
-              >
-                Edit in builder
-              </Link>
-            )}
-            {/* Admin preview tool — not worker chrome. */}
-            {isAdmin && <WorkerPreviewToggle />}
-          </div>
-        </div>
-        <div className="max-w-5xl mx-auto px-4">
-          <SopTabNav />
-        </div>
-      </header>
-
-      <main>
-        <WorkerPreviewClamp>
-          {active === 'read' && <ReadTab sop={sop} jobId={job?.id ?? null} onJobChange={handleJobChange} />}
-          {active === 'walk' && <WalkthroughSwitcher sop={walkSop} />}
-        </WorkerPreviewClamp>
-      </main>
-
-    </div>
-  )
-}
-
-export default function SopDetailPage() {
-  return (
-    <Suspense fallback={<div className="p-8 text-sm text-[var(--ink-500)]">Loading SOP…</div>}>
-      <SopDetailInner />
-    </Suspense>
+    <FocusWalker
+      key={`${target.id}:${walk?.id ?? 'none'}`}
+      data={data}
+      initialWalk={walk}
+      from={from}
+      versionState={versionState}
+      supersededBy={superseded && latest ? { id: latest.id, version: latest.version ?? 0 } : null}
+      updatedSinceLastWalk={updatedSinceLastWalk}
+    />
   )
 }

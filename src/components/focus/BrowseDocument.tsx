@@ -13,6 +13,7 @@ import type { FocusSop, FocusStepRow } from '@/lib/sop/focus-read'
 import { focusHref } from '@/lib/sop/focus-path'
 import { KindChip, KIND_EDGE } from '@/components/focus/KindChip'
 import { StandardLabels } from '@/components/sop/StandardLabels'
+import { placementLabel, placementSummary } from '@/lib/sop/placement'
 
 export interface BrowseDocumentProps {
   data: FocusSop
@@ -56,6 +57,9 @@ export function BrowseDocument({ data, order, from, supersededBy, updatedSinceLa
 
         <div data-testid="focus-summary" className="mb-6 flex flex-col gap-2 rounded-lg border border-ink-200 bg-paper-1 p-4">
           <p className="mono text-meta uppercase text-ink-500">{summary}</p>
+          <p data-testid="sop-meta" className="text-ui text-ink-500">
+            {placementLabel(placementSummary(sop.placement, data.machines.map((m) => ({ name: m.name, department: null }))))}
+          </p>
           {sop.objective && <p className="text-reading text-ink-700">{sop.objective}</p>}
           {updatedSinceLastWalk && (
             <p data-testid="focus-updated" className="flex items-center gap-2 text-ui text-ink-700">

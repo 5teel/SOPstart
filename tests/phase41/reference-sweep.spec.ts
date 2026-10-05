@@ -105,9 +105,6 @@ test.describe('SUR-03/SUR-04/SUR-06 reference sweep — /admin/sops list route i
     const uploadDropzone = read(path.join('src', 'components', 'admin', 'UploadDropzone.tsx'))
     expect(uploadDropzone).toContain('/admin/sops/builder/')
 
-    const sopDetail = read(path.join('src', 'app', '(protected)', 'sops', '[sopId]', 'page.tsx'))
-    expect(sopDetail).toContain('/admin/sops/builder/')
-
     const workshop = read(path.join('src', 'components', 'shell', 'AdminRoomBodies.tsx'))
     expect(workshop).toContain('/admin/sops/builder/')
     expect(workshop).toContain('/admin/sops/new')

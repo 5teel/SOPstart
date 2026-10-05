@@ -5,7 +5,7 @@
  * (the repoint inventory walk excludes this folder).
  * Registration: playwright.config.ts `phase58` project.
  */
-import { test } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 import fs from 'node:fs'
 import path from 'node:path'
 
@@ -30,9 +30,26 @@ export function walkSrc(dir: string, out: string[] = []): string[] {
 }
 
 test.describe('retire: the tabbed SOP page (58-11)', () => {
-  test.fixme(true, 'flips live in 58-11')
-  test('the proxy redirects a SOP address carrying the tab query to the bare SOP address (UUID-gated, fixed destination, cookies copied)', () => {})
-  test('no client effect redirects a tab address (no router.replace of it anywhere in src)', () => {})
+  test('the proxy redirects a SOP address carrying the tab query to the bare SOP address (UUID-gated, fixed destination, cookies copied)', () => {
+    const MW = stripComments(read('src/lib/supabase/middleware.ts'))
+    expect(MW).toContain("path.startsWith('/sops/')")
+    expect(MW).toContain('legacyRedirectFor(path, request.nextUrl.search)')
+    expect(MW).toContain('response.cookies.getAll().forEach((c) => redirect.cookies.set(c))')
+  })
+
+  test('no client effect redirects a tab address (no router.replace or push of it anywhere in src)', () => {
+    const offenders: string[] = []
+    for (const f of walkSrc(path.join(ROOT, 'src'))) {
+      const code = stripComments(fs.readFileSync(f, 'utf-8'))
+      if (/router\.(replace|push)\([^)]*[?&]tab=/.test(code)) offenders.push(path.relative(ROOT, f))
+    }
+    expect(offenders).toEqual([])
+  })
+
+  test('the SOP route no longer mounts the tabs or the old walkthrough', () => {
+    const PAGE = stripComments(read('src/app/(protected)/sops/[sopId]/page.tsx'))
+    for (const gone of ['SopTabNav', 'ReadTab', 'WalkthroughSwitcher', 'WorkerPreviewToggle', 'useActiveTab']) expect(PAGE, gone).not.toContain(gone)
+  })
 })
 
 test.describe('retire: builder and versions addresses (58-14)', () => {
