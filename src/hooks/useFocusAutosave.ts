@@ -16,6 +16,9 @@ import { updateFocusStep } from '@/actions/focus-steps'
  *
  * State is module-level on purpose: one editor is on screen at a time, and
  * `flush` must be callable from the frame's Back, which is not under the editor.
+ * Every entry is tagged with the SOP it belongs to (review WR-06): the pill and
+ * the retry queue only ever reflect the SOP on screen, so a save that failed on
+ * one SOP never shows as "didn't save" on the next (CLAUDE.md 2026-10-03).
  */
 
 const DEBOUNCE_MS = 750
@@ -33,11 +36,18 @@ export const useFocusSaveStatus = create<{ state: FocusSaveState; gaveUp: boolea
   gaveUp: false,
 }))
 
-const pending = new Map<string, Patch>()
-const failures = new Map<string, number>()
+let activeSopId: string | null = null
+const pending = new Map<string, { sopId: string; patch: Patch }>()
+const failures = new Map<string, { sopId: string; n: number }>()
 const inflight = new Set<Promise<void>>()
 const afterSave = new Set<() => void>()
 let timer: ReturnType<typeof setTimeout> | null = null
+
+/** Drop every queued or failed entry that belongs to a SOP no longer on screen. */
+function dropOtherSops() {
+  for (const [id, e] of pending) if (e.sopId !== activeSopId) pending.delete(id)
+  for (const [id, e] of failures) if (e.sopId !== activeSopId) failures.delete(id)
+}
 
 function schedule(ms: number) {
   if (timer) clearTimeout(timer)
@@ -48,8 +58,10 @@ function schedule(ms: number) {
 }
 
 function settle() {
-  if (failures.size > 0) {
-    useFocusSaveStatus.setState({ state: 'error', gaveUp: [...failures.values()].some((n) => n > MAX_RETRIES) })
+  // Only the SOP on screen: a failure left by another SOP never paints this pill.
+  const own = [...failures.values()].filter((f) => f.sopId === activeSopId)
+  if (own.length > 0) {
+    useFocusSaveStatus.setState({ state: 'error', gaveUp: own.some((f) => f.n > MAX_RETRIES) })
     return
   }
   if (pending.size === 0 && inflight.size === 0) {
@@ -68,7 +80,7 @@ function send(): Promise<void> {
   if (batch.length === 0) return Promise.resolve()
 
   const run = Promise.all(
-    batch.map(async ([stepId, patch]) => {
+    batch.map(async ([stepId, { sopId, patch }]) => {
       let ok = false
       try {
         ok = !('error' in (await updateFocusStep({ stepId, patch })))
@@ -79,10 +91,13 @@ function send(): Promise<void> {
         failures.delete(stepId)
         return
       }
-      const n = (failures.get(stepId) ?? 0) + 1
-      failures.set(stepId, n)
+      // A SOP that left the screen had its final flush; its failed patch is not
+      // carried into the next SOP's queue.
+      if (sopId !== activeSopId) return
+      const n = (failures.get(stepId)?.n ?? 0) + 1
+      failures.set(stepId, { sopId, n })
       // A newer edit to the same step wins; the failed patch fills in what it lacks.
-      pending.set(stepId, { ...patch, ...pending.get(stepId) })
+      pending.set(stepId, { sopId, patch: { ...patch, ...pending.get(stepId)?.patch } })
       if (n <= MAX_RETRIES) schedule(RETRY_MS)
     })
   ).then(() => {
@@ -95,7 +110,8 @@ function send(): Promise<void> {
 
 /** Merge `patch` into the step's pending edit and (re)start the 750 ms gap. */
 function queue(stepId: string, patch: Patch) {
-  pending.set(stepId, { ...pending.get(stepId), ...patch })
+  if (!activeSopId) return
+  pending.set(stepId, { sopId: activeSopId, patch: { ...pending.get(stepId)?.patch, ...patch } })
   useFocusSaveStatus.setState({ state: 'saving' })
   schedule(DEBOUNCE_MS)
 }
@@ -116,8 +132,11 @@ export function useFocusAutosave(sopId: string) {
 
   useEffect(() => {
     // One store serves every SOP the editor opens: a different SOP starts from a blank pill, never
-    // the last SOP's saved / error state.
+    // the last SOP's saved / error state, and never its queue (the previous SOP already had its
+    // unmount flush).
     useFocusSaveStatus.setState({ state: 'idle', gaveUp: false })
+    activeSopId = sopId
+    dropOtherSops()
     const refresh = () => {
       void queryClient.invalidateQueries({ queryKey: ['focus-sop', sopId] })
       void queryClient.invalidateQueries({ queryKey: ['focus-gate', sopId] })

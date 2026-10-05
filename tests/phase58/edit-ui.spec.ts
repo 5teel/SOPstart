@@ -181,3 +181,19 @@ test('the save pill store resets when the editor opens a different SOP (58-15 fl
   expect(effect.indexOf("useFocusSaveStatus.setState({ state: 'idle'")).toBeLessThan(effect.indexOf('const refresh'))
   expect(effect).toContain('[queryClient, sopId]')
 })
+
+test('review WR-06: the autosave queue and failures are keyed by SOP; another SOP\'s failure never paints this pill', () => {
+  const hook = read('src/hooks/useFocusAutosave.ts')
+  expect(hook).toContain('const pending = new Map<string, { sopId: string; patch: Patch }>()')
+  expect(hook).toContain('const failures = new Map<string, { sopId: string; n: number }>()')
+  // the mount effect pins the SOP on screen and drops every other SOP's entries
+  const effect = hook.slice(hook.indexOf('export function useFocusAutosave'))
+  expect(effect.indexOf('activeSopId = sopId')).toBeLessThan(effect.indexOf('dropOtherSops()'))
+  expect(effect.indexOf('dropOtherSops()')).toBeLessThan(effect.indexOf('const refresh'))
+  // settle reads only the active SOP's failures; a failed send for another SOP is not requeued
+  const settle = hook.slice(hook.indexOf('function settle()'), hook.indexOf('function send()'))
+  expect(settle).toContain('.filter((f) => f.sopId === activeSopId)')
+  const send = hook.slice(hook.indexOf('function send()'), hook.indexOf('function queue('))
+  expect(send).toContain('if (sopId !== activeSopId) return')
+  expect(hook).toMatch(/pending\.set\(stepId, \{ sopId: activeSopId, patch:/)
+})
