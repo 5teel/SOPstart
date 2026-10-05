@@ -114,10 +114,12 @@ simple observations · my record · team, invites, roles · the map editor.
 
 **Dropped — do not build, do not preserve UI for:** offline use · voice (Q&A, read-aloud,
 voice-driven walkthrough, voice drafting) · phone and QR plates · video generation · flow
-diagram and image annotation · refresher cadence · CSV export · version compare/restore ·
+diagram · refresher cadence · CSV export · version compare/restore ·
 YouTube and photo-scan on-ramps · the reusable-content library as a surface · the
 departments screen and org-chart views · shared-device login · multiple organisations ·
 every header nav entry.
+
+**Returned:** image annotation came back on step photos in Phase 58 (D-03, Simon 2026-10-05); flow diagrams stay dropped.
 
 **Rebuild after the simplification build:** the pathways map and the UAT feedback page.
 

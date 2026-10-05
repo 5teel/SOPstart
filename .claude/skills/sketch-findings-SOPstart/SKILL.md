@@ -51,7 +51,7 @@ on the site (Office / Smoko room / Workshop), a Noticeboard for site-wide SOPs, 
 carrying their SOPs. Opening a SOP removes the map and the list — the SOP owns the screen.
 The data model is re-founded on eight types (decisions · objectives · requests ·
 notifications · SOP · steps · standards · users). A long list of features is dropped
-(offline, voice, phone/QR, video generation, flow diagram, annotation, refresher cadence,
+(offline, voice, phone/QR, video generation, flow diagram, refresher cadence,
 reuse library, org chart, multi-org). **NOT shipped. `references/one-screen-site.md` is the
 governing contract and overrides older references where they conflict** — it carries the
 supersession table.

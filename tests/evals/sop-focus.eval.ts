@@ -28,6 +28,7 @@
  */
 import { test, expect, type BrowserContext, type Page } from '@playwright/test'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import path from 'node:path'
 import {
   EVAL_BASE_URL,
   EVAL_ENV_READY,
@@ -647,6 +648,60 @@ test.describe('Phase 58 — the SOP focus screen (deployed)', () => {
       await page.goto(editUrl(v2Id))
       await expect(page.getByTestId('this-sop')).toContainText('1 earlier version', SLOW)
       expect(errors, errors.join('\n')).toEqual([])
+      await page.close()
+    })
+
+    // ---- D-03 (58-17): mark up a step photo; Save bakes it, the tick clears, Esc leaves it alone
+    test('D-03 58-annotate: add a photo, Annotate, draw one shape, Save -- the photo changes and the tick clears; Esc on a second open saves nothing', async () => {
+      test.setTimeout(300_000)
+      const page = await adminCtx.newPage()
+      const errors = watchConsole(page)
+      await page.goto(editUrl(ids.draft))
+      await expect(page.getByTestId('edit-step')).toHaveCount(4, SLOW)
+
+      // An unticked step, so ticking it and annotating returns the draft to the "Checked 2 of 4" the other cases expect.
+      const open = page.getByTestId('edit-step').filter({ has: page.getByRole('checkbox', { name: /I have checked this/ }) }).first()
+      await expect(open).toBeVisible(SLOW)
+      const stepDomId = await open.getAttribute('id')
+      const card = page.locator(`#${stepDomId}`)
+
+      await card.locator('input[type="file"]').setInputFiles(path.join(process.cwd(), 'tests', 'evals', 'fixtures', 'site-scene.png'))
+      await expect(card.getByTestId('annotate-photo')).toHaveCount(1, SLOW)
+      const photoPath = async () => new URL((await card.locator('img').first().getAttribute('src'))!).pathname
+      const before = await photoPath()
+
+      await card.getByRole('checkbox', { name: /I have checked this/ }).click()
+      await expect(card.getByText('Checked', { exact: true })).toBeVisible(SLOW)
+
+      await card.getByTestId('annotate-photo').click()
+      const overlay = page.getByTestId('annotate-overlay')
+      await expect(overlay).toHaveCount(1, SLOW)
+      await page.getByTestId('annotate-tool-rect').click()
+      const canvas = overlay.locator('canvas').last()
+      await expect(canvas).toBeVisible(SLOW)
+      const box = (await canvas.boundingBox())!
+      await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2)
+      await shot(page, '58-annotate')
+      await page.getByTestId('annotate-save').click()
+      await expect(overlay).toHaveCount(0, SLOW)
+
+      await expect.poll(photoPath, SLOW).not.toBe(before)
+      await expect(card.getByRole('checkbox', { name: /I have checked this/ })).toHaveCount(1, SLOW)
+      const baked = await photoPath()
+
+      // Esc on a second open closes without saving.
+      await card.getByTestId('annotate-photo').click()
+      await expect(overlay).toHaveCount(1, SLOW)
+      await page.keyboard.press('Escape')
+      await expect(overlay).toHaveCount(0, SLOW)
+      expect(await photoPath(), 'Esc saved nothing').toBe(baked)
+
+      // A marked photo asks before it goes; clean up so the fixture is left as found.
+      await card.getByRole('button', { name: 'Remove photo' }).first().click()
+      await expect(page.getByRole('alertdialog', { name: 'Remove this photo?' })).toContainText('Its marks are lost too.', SLOW)
+      await page.getByRole('alertdialog', { name: 'Remove this photo?' }).getByRole('button', { name: 'Remove photo' }).click()
+      await expect(card.getByTestId('annotate-photo')).toHaveCount(0, SLOW)
+      expect(errors, errors.join(String.fromCharCode(10))).toEqual([])
       await page.close()
     })
   })
