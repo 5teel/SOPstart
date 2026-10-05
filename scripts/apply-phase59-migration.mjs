@@ -189,10 +189,10 @@ await assertSql(
 
 // -- append-only triggers ------------------------------------------------------
 await assertSql(
-  'append-only triggers decisions_no_update_delete and decisions_no_truncate exist and are enabled',
+  'append-only triggers decisions_no_update_delete and decisions_no_truncate exist and are enabled (O, or A = always, as 00070 sets)',
   `SELECT tgname, tgenabled FROM pg_trigger WHERE tgrelid='public.decisions'::regclass AND NOT tgisinternal
       AND tgname IN ('decisions_no_update_delete','decisions_no_truncate')`,
-  (rows) => ({ ok: (rows ?? []).length === 2 && rows.every((r) => r.tgenabled === 'O'), detail: JSON.stringify(rows) })
+  (rows) => ({ ok: (rows ?? []).length === 2 && rows.every((r) => r.tgenabled === 'O' || r.tgenabled === 'A'), detail: JSON.stringify(rows) })
 )
 
 // -- cache reload --------------------------------------------------------------
