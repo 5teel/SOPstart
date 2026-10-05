@@ -20,6 +20,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { RecordObservationSchema, ObservationLabelsSchema } from '@/lib/validators/observations'
 import { isSignedOffAssessor } from '@/lib/competency/assessor'
 import { recordDecision } from '@/lib/decisions/record'
+import { latestPublished } from '@/lib/sop/lineage-current'
 
 const DEFAULT_LABELS = {
   performed_to_sop: 'Performed to SOP',
@@ -310,13 +311,15 @@ export async function listWorkerSopsForPicker(workerId: string): Promise<WorkerS
   if (!userId || !organisationId) return []
   if (!role || !RECORDER_ROLES.includes(role)) return []
 
-  const { data: sops, error: sopsError } = await supabase
+  const { data: sopRows, error: sopsError } = await supabase
     .from('sops')
-    .select('id, title, sop_number')
+    .select('id, title, sop_number, version, parent_sop_id, status')
     .eq('organisation_id', organisationId)
     .eq('status', 'published')
 
-  if (sopsError || !sops) return []
+  if (sopsError || !sopRows) return []
+  // One row per SOP: the latest published version (D-13, D-18).
+  const sops = latestPublished(sopRows)
 
   // org_members_can_view_own_org already permits any org member to read
   // this row — unlike sop_assignments below, this query is not the

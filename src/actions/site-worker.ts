@@ -17,6 +17,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { getSessionContext } from '@/lib/auth/session-context'
 import type { SopMachineLink, SiteDepartment, WorkerSiteData, WorkerSiteMachine } from '@/lib/validators/site'
 import { SCENE_BUCKET, SCENE_SIGNED_TTL_SEC } from '@/lib/site/scene'
+import { latestPublished, type LineageRow } from '@/lib/sop/lineage-current'
 
 export async function listSiteForWorker(): Promise<WorkerSiteData | { error: string }> {
   const ctx = await getSessionContext()
@@ -109,14 +110,15 @@ export async function listSiteForWorker(): Promise<WorkerSiteData | { error: str
 
   const { data: visibleSopRows, error: sopErr } = await db
     .from('sops')
-    .select('id')
+    .select('id, version, parent_sop_id, status')
     .eq('organisation_id', orgId)
     .eq('status', 'published')
   if (sopErr) {
     console.error('[listSiteForWorker] sops error', sopErr)
     return { error: sopErr.message }
   }
-  const visibleSopIds = new Set(((visibleSopRows ?? []) as Array<{ id: string }>).map((r) => r.id))
+  // One row per SOP: only the latest published version is visible (D-13, D-18).
+  const visibleSopIds = new Set(latestPublished((visibleSopRows ?? []) as LineageRow[]).map((r) => r.id))
   const links = rawLinks.filter((l) => visibleSopIds.has(l.sop_id))
 
   // 6. Departments (for chip labels + zone colours).

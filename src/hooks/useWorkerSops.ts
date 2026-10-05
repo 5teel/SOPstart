@@ -19,6 +19,7 @@ import {
 } from '@/lib/competency/refresher'
 import { categoryLabel } from '@/lib/sop-categories'
 import type { WorkerSop, WorkerSopRow } from '@/lib/sop/worker-signal'
+import { latestPublished, type LineageRow } from '@/lib/sop/lineage-current'
 
 export function useWorkerSops(requestedIds?: ReadonlySet<string>) {
   const { data: assignments = [], isLoading: assignmentsLoading } = useQuery({
@@ -41,15 +42,18 @@ export function useWorkerSops(requestedIds?: ReadonlySet<string>) {
       const supabase = createClient()
       const { data, error } = await supabase
         .from('sops')
-        .select('id, title, sop_number, category_slug, department, published_at, placement')
+        .select('id, title, sop_number, category_slug, department, published_at, placement, version, parent_sop_id, status')
         .eq('status', 'published')
         .order('title', { ascending: true }) as {
-          data: WorkerSopRow[] | null
+          data: Array<WorkerSopRow & LineageRow> | null
           error: { message: string } | null
         }
       // A failed read must not look like an empty library.
       if (error) throw new Error(error.message)
-      return data ?? []
+      // One row per SOP: the latest published version (D-13, D-18), keeping the title order.
+      const rows = data ?? []
+      const keep = new Set(latestPublished(rows).map((r) => r.id))
+      return rows.filter((r) => keep.has(r.id))
     },
     staleTime: 1000 * 60 * 2,
   })

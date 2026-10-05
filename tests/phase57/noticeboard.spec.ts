@@ -13,7 +13,7 @@ const read = (rel: string) => fs.readFileSync(path.join(ROOT, rel), 'utf-8').rep
 
 test.describe('PLC-03 noticeboard', () => {
   test('worker noticeboard lists site-wide SOPs only', () => {
-    expect(read('src/hooks/useWorkerSops.ts')).toMatch(/\.select\('[^']*, placement'\)/)
+    expect(read('src/hooks/useWorkerSops.ts')).toMatch(/\.select\('[^']*, placement[^']*'\)/)
     expect(read('src/lib/sop/worker-signal.ts')).toContain("placement?: 'machine' | 'site' | null")
     const shell = read('src/components/shell/WorkerShell.tsx')
     expect(shell).toContain("s.raw.placement === 'site'")
