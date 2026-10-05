@@ -364,4 +364,244 @@ for (const step of [
 }
 console.log(`convert fixture ${EVAL_CONVERT_SOP_TITLE} → ${convertSop.id}`)
 
+// --- Phase 58 (58-03): focus-screen fixtures, ALL in the eval-site org (siteOrg is already
+// refused above if it collides with the real org). Idempotent: select by name (+ version for
+// lineage members), insert only when missing, update only when a value differs, so a second
+// run changes nothing. The sop_focus_steps tick trigger (00071) clears a tick on any text/kind/
+// tip/photo/image change, so a step is only written when it differs from the spec.
+const FOCUS = {}
+const focusSopPatch = (s) => ({
+  status: s.status,
+  version: s.version ?? 1,
+  parent_sop_id: s.parentId ?? null,
+  objective: s.objective ?? null,
+  allow_forward_jump: s.allowJump ?? false,
+  source_file_type: s.sourceFileType ?? 'docx',
+})
+async function ensureFocusSop(title, s) {
+  const patch = focusSopPatch(s)
+  let q = sb.from('sops').select('id, status, objective, allow_forward_jump, parent_sop_id, superseded_by').eq('organisation_id', siteOrg.id).eq('title', title).eq('version', patch.version)
+  q = patch.parent_sop_id ? q.eq('parent_sop_id', patch.parent_sop_id) : q.is('parent_sop_id', null)
+  const { data: existing, error } = await q.maybeSingle()
+  if (error) throw error
+  if (!existing) {
+    const { data, error: inErr } = await sb
+      .from('sops')
+      .insert({
+        organisation_id: siteOrg.id,
+        title,
+        source_file_name: title,
+        source_file_path: '',
+        uploaded_by: siteAdmin.id,
+        source_type: 'blank',
+        published_at: patch.status === 'published' ? new Date().toISOString() : null,
+        ...patch,
+      })
+      .select('id')
+      .single()
+    if (inErr) throw inErr
+    console.log('created fixture SOP', title, 'v' + patch.version, data.id)
+    return data.id
+  }
+  const drift = existing.status !== patch.status || existing.objective !== patch.objective || existing.allow_forward_jump !== patch.allow_forward_jump || existing.superseded_by !== null
+  if (drift) {
+    const { error: upErr } = await sb
+      .from('sops')
+      .update({
+        status: patch.status,
+        objective: patch.objective,
+        allow_forward_jump: patch.allow_forward_jump,
+        superseded_by: null,
+        ...(patch.status === 'published' ? { published_at: new Date().toISOString() } : {}),
+      })
+      .eq('id', existing.id)
+    if (upErr) throw upErr
+    console.log('reset fixture SOP', title, 'v' + patch.version, existing.id)
+  }
+  return existing.id
+}
+async function ensureFocusSection(sopId) {
+  const { data, error } = await sb.from('sop_sections').select('id').eq('sop_id', sopId).order('sort_order').limit(1).maybeSingle()
+  if (error) throw error
+  if (data) return data.id
+  const { data: made, error: inErr } = await sb
+    .from('sop_sections')
+    .insert({ sop_id: sopId, section_type: 'procedure', title: 'Procedure', sort_order: 0, approved: true })
+    .select('id')
+    .single()
+  if (inErr) throw inErr
+  return made.id
+}
+// specs: [{ key, kind, text, tip?, photo?, ticked? }] -- source_key is 'new:eval-<key>'
+async function ensureFocusSteps(sopId, sectionId, specs) {
+  const ids = {}
+  for (const [i, sp] of specs.entries()) {
+    const source_key = 'new:eval-' + sp.key
+    const want = { kind: sp.kind, text: sp.text, tip: sp.tip ?? null, photo_required: sp.photo ?? false, sort_order: i }
+    const { data: ex, error } = await sb
+      .from('sop_focus_steps')
+      .select('id, kind, text, tip, photo_required, sort_order, verified_by_admin_id')
+      .eq('section_id', sectionId)
+      .eq('source_key', source_key)
+      .maybeSingle()
+    if (error) throw error
+    const tick = sp.ticked ? { verified_by_admin_id: siteAdmin.id, verified_at: new Date().toISOString() } : { verified_by_admin_id: null, verified_at: null }
+    if (!ex) {
+      const { data, error: inErr } = await sb
+        .from('sop_focus_steps')
+        .insert({ organisation_id: siteOrg.id, sop_id: sopId, section_id: sectionId, source_key, ...want, ...tick })
+        .select('id')
+        .single()
+      if (inErr) throw inErr
+      ids[sp.key] = data.id
+      continue
+    }
+    ids[sp.key] = ex.id
+    const content = Object.keys(want).some((k) => ex[k] !== want[k])
+    const tickDrift = Boolean(ex.verified_by_admin_id) !== Boolean(sp.ticked)
+    if (content || tickDrift) {
+      // content first (the trigger clears the tick), tick second (the tick action itself is left alone)
+      if (content) {
+        const { error: upErr } = await sb.from('sop_focus_steps').update(want).eq('id', ex.id)
+        if (upErr) throw upErr
+      }
+      const { error: tErr } = await sb.from('sop_focus_steps').update(tick).eq('id', ex.id)
+      if (tErr) throw tErr
+    }
+  }
+  return ids
+}
+async function ensureFinding(sopId, stepId, description, severity, kind) {
+  const { data: ex, error } = await sb.from('sop_ai_findings').select('id, cleared_at, step_id').eq('sop_id', sopId).eq('description', description).maybeSingle()
+  if (error) throw error
+  if (!ex) {
+    const { error: inErr } = await sb.from('sop_ai_findings').insert({ organisation_id: siteOrg.id, sop_id: sopId, job: 'A', kind, severity, step_id: stepId, description })
+    if (inErr) throw inErr
+  } else if (ex.cleared_at !== null || ex.step_id !== stepId) {
+    const { error: upErr } = await sb.from('sop_ai_findings').update({ cleared_at: null, cleared_by: null, step_id: stepId }).eq('id', ex.id)
+    if (upErr) throw upErr
+  }
+}
+async function ensureParseJob(sopId, job) {
+  const { data: ex, error } = await sb.from('parse_jobs').select('id, status, error_message, input_type, file_type, current_stage').eq('sop_id', sopId).limit(1).maybeSingle()
+  if (error) throw error
+  const row = { status: job.status, error_message: job.error ?? null, input_type: job.inputType, file_type: job.fileType, current_stage: job.stage ?? null }
+  if (!ex) {
+    const { error: inErr } = await sb
+      .from('parse_jobs')
+      .insert({ organisation_id: siteOrg.id, sop_id: sopId, file_path: '', started_at: new Date(Date.now() - (job.ageMs ?? 0)).toISOString(), ...row })
+    if (inErr) throw inErr
+  } else if (Object.keys(row).some((k) => ex[k] !== row[k])) {
+    const { error: upErr } = await sb.from('parse_jobs').update(row).eq('id', ex.id)
+    if (upErr) throw upErr
+  }
+}
+
+// walk fixture: the converted-rows shape (hazard, ppe, step, photo step, check), only when none exist yet
+{
+  const { count, error } = await sb.from('sop_focus_steps').select('id', { count: 'exact', head: true }).eq('sop_id', walkSop.id)
+  if (error) throw error
+  if (!count) {
+    await ensureFocusSteps(walkSop.id, walkSection.id, [
+      { key: 'walk-hazard', kind: 'hazard', text: 'Stored energy in the hydraulic line.' },
+      { key: 'walk-ppe', kind: 'ppe', text: 'Safety glasses' },
+      { key: 'walk-step1', kind: 'step', text: 'Check the guard is closed.' },
+      { key: 'walk-step2', kind: 'step', text: 'Photograph the closed guard.', photo: true },
+      { key: 'walk-check', kind: 'check', text: 'The guard is latched.' },
+    ])
+    console.log('created walk fixture focus steps')
+  }
+  FOCUS['EVAL walk focus steps'] = walkSop.id
+}
+
+const FOUR = (ticked) => [
+  { key: 'a', kind: 'step', text: 'Isolate the press.', ticked: ticked[0] },
+  { key: 'b', kind: 'step', text: 'Fit your own lock.', tip: 'Use a red lock.', ticked: ticked[1] },
+  { key: 'c', kind: 'step', text: 'Photograph the lock.', photo: true, ticked: ticked[2] },
+  { key: 'd', kind: 'check', text: 'The press cannot start.', ticked: ticked[3] },
+]
+
+// EVAL focus jump: published, forward jump allowed
+{
+  const id = await ensureFocusSop('EVAL focus jump', { status: 'published', allowJump: true })
+  const sec = await ensureFocusSection(id)
+  await ensureFocusSteps(id, sec, [
+    { key: 'j-hazard', kind: 'hazard', text: 'Pinch point at the rollers.', ticked: true },
+    { key: 'j-photo', kind: 'step', text: 'Photograph the guard.', photo: true, ticked: true },
+    { key: 'j-1', kind: 'step', text: 'Close the guard.', ticked: true },
+    { key: 'j-2', kind: 'step', text: 'Start the press.', ticked: true },
+  ])
+  FOCUS['EVAL focus jump'] = id
+}
+
+// EVAL focus draft: draft, four steps (two ticked), one open step-level and one open SOP-level finding
+{
+  const id = await ensureFocusSop('EVAL focus draft', { status: 'draft', objective: 'Isolate and lock out the press.' })
+  const sec = await ensureFocusSection(id)
+  const ids = await ensureFocusSteps(id, sec, FOUR([true, true, false, false]))
+  await ensureFinding(id, ids.c, 'EVAL focus finding: the photo step has no instruction on what to show.', 'warning', 'omission')
+  await ensureFinding(id, null, 'EVAL focus finding: no emergency stop step is mentioned anywhere.', 'critical', 'omission')
+  FOCUS['EVAL focus draft'] = id
+}
+
+// EVAL focus ready: draft, every step ticked, no open finding
+{
+  const id = await ensureFocusSop('EVAL focus ready', { status: 'draft', objective: 'Close the guard.' })
+  const sec = await ensureFocusSection(id)
+  await ensureFocusSteps(id, sec, FOUR([true, true, true, true]).slice(0, 3))
+  const { error } = await sb.from('sop_ai_findings').delete().eq('sop_id', id)
+  if (error) throw error
+  FOCUS['EVAL focus ready'] = id
+}
+
+// EVAL focus blank: draft, no sections
+{
+  const id = await ensureFocusSop('EVAL focus blank', { status: 'draft' })
+  const { error } = await sb.from('sop_sections').delete().eq('sop_id', id)
+  if (error) throw error
+  FOCUS['EVAL focus blank'] = id
+}
+
+// EVAL focus lineage: v2 published root, v3 published child, v4 draft child
+{
+  const root = await ensureFocusSop('EVAL focus lineage', { status: 'published', version: 2 })
+  const v3 = await ensureFocusSop('EVAL focus lineage', { status: 'published', version: 3, parentId: root })
+  const v4 = await ensureFocusSop('EVAL focus lineage', { status: 'draft', version: 4, parentId: root })
+  for (const [id, key] of [[root, 'l2'], [v3, 'l3'], [v4, 'l4']]) {
+    const sec = await ensureFocusSection(id)
+    await ensureFocusSteps(id, sec, [
+      { key: key + '-1', kind: 'step', text: 'Close the guard (' + key + ').', ticked: true },
+      { key: key + '-2', kind: 'step', text: 'Start the press (' + key + ').', ticked: true },
+    ])
+  }
+  FOCUS['EVAL focus lineage'] = root + ' v3=' + v3 + ' v4=' + v4
+}
+
+// EVAL focus publish: published v1 the eval forks, ticks and publishes; later lineage members are removed each run
+{
+  const id = await ensureFocusSop('EVAL focus publish', { status: 'published' })
+  const { error } = await sb.from('sops').delete().eq('organisation_id', siteOrg.id).eq('parent_sop_id', id)
+  if (error) throw error
+  const sec = await ensureFocusSection(id)
+  await ensureFocusSteps(id, sec, [
+    { key: 'p-1', kind: 'step', text: 'Close the guard.', ticked: true },
+    { key: 'p-2', kind: 'step', text: 'Start the press.', ticked: true },
+  ])
+  FOCUS['EVAL focus publish'] = id
+}
+
+// parsing (document + video) and failed-parse states
+{
+  const doc = await ensureFocusSop('EVAL focus parsing', { status: 'parsing' })
+  await ensureParseJob(doc, { status: 'processing', inputType: 'upload', fileType: 'docx', stage: 'structuring', ageMs: 60_000 })
+  FOCUS['EVAL focus parsing'] = doc
+  const vid = await ensureFocusSop('EVAL focus parsing video', { status: 'parsing', sourceFileType: 'video' })
+  await ensureParseJob(vid, { status: 'processing', inputType: 'video_file', fileType: 'video', stage: 'drafting', ageMs: 60_000 })
+  FOCUS['EVAL focus parsing video'] = vid
+  const bad = await ensureFocusSop('EVAL focus parse failed', { status: 'parsing' })
+  await ensureParseJob(bad, { status: 'failed', inputType: 'upload', fileType: 'docx', error: 'We could not read this file. It may be password protected.' })
+  FOCUS['EVAL focus parse failed'] = bad
+}
+for (const [name, id] of Object.entries(FOCUS)) console.log('present:', name, '->', id)
+
 console.log(`SOPstart Eval Site → org=${siteOrg.id} admin=${siteAdmin.id} department=${dept.id} sop=${sop.id} worker=${siteWorker.id} plantSop=${plantSop.id} walkSop=${walkSop.id} convertSop=${convertSop.id}`)
