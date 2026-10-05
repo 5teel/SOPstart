@@ -235,7 +235,8 @@ test.describe('review fixes (55-review)', () => {
   test('WR-03: a failed autosave is retried and the pending edit is never dropped (58-15: useFocusAutosave)', () => {
     const hook = code('src/hooks/useFocusAutosave.ts')
     expect(hook).toContain('schedule(RETRY_MS)')
-    expect(hook).toContain('pending.set(stepId, { ...patch, ...pending.get(stepId) })')
+    // 58 review WR-06: entries are keyed by SOP; the merge rule is unchanged (newer edit wins).
+    expect(hook).toContain('pending.set(stepId, { sopId, patch: { ...patch, ...pending.get(stepId)?.patch } })')
     expect(hook).toContain('flush()')
   })
 
