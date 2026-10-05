@@ -62,6 +62,10 @@ const APPROVE_PUBLISH_TITLE = 'EVAL approve publish'
 const OWNER_REVIEW_TITLE = 'EVAL owner review'
 const DAY_MS = 86_400_000
 const LEDGER = ' · logged in the decision ledger'
+// Disposable people for the People tab: non-deliverable addresses in the eval-site org only (T-59-46).
+const RUN = randomUUID().slice(0, 8)
+const INVITE_EMAIL = `eval-invite-${RUN}@sopstart.invalid`
+const DISPOSABLE_EMAIL = `eval-site-disposable-${RUN}@sopstart.invalid`
 
 const officeRow = (page: Page, title: string | RegExp) => page.getByTestId('office-row').filter({ hasText: title })
 /** Sign-off rows share one SOP title, so each is told apart by its photo count: "1 photo", "2 photos", ... */
@@ -120,6 +124,7 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
     let supervisorCtx: BrowserContext
     let idleCtx: BrowserContext
     let workerCtx: BrowserContext
+    let disposableId = ''
 
     /** Every seed refuses the real org: the eval writes the eval-site org only (T-59-38). */
     function assertEvalOrg() {
@@ -244,6 +249,13 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       // A clean walk fixture: no stale completion can be mistaken for a seeded one.
       await deleteEvalCompletions(db, walkSopId)
 
+      // The disposable member the People tab changes and removes (eval-site org, worker, .invalid address).
+      const made = await db.auth.admin.createUser({ email: DISPOSABLE_EMAIL, email_confirm: true, user_metadata: { eval_fixture: true } })
+      if (made.error || !made.data.user) throw new Error(`disposable member create failed: ${made.error?.message}`)
+      disposableId = made.data.user.id
+      const joined = await db.from('organisation_members').insert({ organisation_id: siteOrgId, user_id: disposableId, role: 'worker' })
+      if (joined.error) throw new Error(`disposable membership failed: ${joined.error.message}`)
+
       // One minted session per role for the whole file (shared OTP budget).
       const viewport = { width: 1440, height: 900 }
       adminCtx = await browser.newContext({ viewport })
@@ -264,6 +276,14 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       // Completions and seeded SOPs go; ledger rows stay (append-only by design).
       await deleteEvalCompletions(db, walkSopId).catch(() => 0)
       await db.from('sops').delete().eq('organisation_id', siteOrgId).in('title', [APPROVE_BACK_TITLE, APPROVE_PUBLISH_TITLE, OWNER_REVIEW_TITLE])
+      // The disposable member (membership first, if the remove case failed) and the invited address.
+      if (disposableId) {
+        await db.from('organisation_members').delete().eq('organisation_id', siteOrgId).eq('user_id', disposableId)
+        await db.auth.admin.deleteUser(disposableId).catch(() => {})
+      }
+      const left = await db.auth.admin.listUsers({ perPage: 1000 }).catch(() => null)
+      const invitedUser = left?.data.users.find((u) => u.email === INVITE_EMAIL)
+      if (invitedUser) await db.auth.admin.deleteUser(invitedUser.id).catch(() => {})
       for (const c of [adminCtx, supervisorCtx, idleCtx, workerCtx]) await c?.close().catch(() => {})
     })
 
@@ -698,8 +718,102 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       expect(errors).toEqual([])
       await page.close()
     })
-    test.fixme('people: wide pane, invite with a role, Invited chip, role change, remove with confirmation (59-11)', async () => {})
-    test.fixme('access: the wiring screen renders in the wide pane and the map re-centres (data-scale changes) (59-11)', async () => {})
+    test('people: wide pane, invite with a role, Invited chip, role change both ways, remove with confirmation (59-11)', async () => {
+      const page = await adminCtx.newPage()
+      const errors = watchConsole(page)
+      await page.goto('/?place=office&tab=people')
+      await expect(page.getByTestId('people-tab')).toHaveCount(1, SLOW)
+      const detail = page.getByTestId('shell-detail')
+      await expect(detail).toHaveAttribute('data-wide', 'true', SLOW)
+      expect(await detail.evaluate((el) => el.getBoundingClientRect().width)).toBeGreaterThanOrEqual(560)
+
+      // Rows are told apart by the address this run seeded, never by a count (shared org).
+      const row = page.getByTestId('people-row').filter({ hasText: DISPOSABLE_EMAIL })
+      await expect(row).toHaveCount(1, SLOW)
+      await expect(row.getByTestId('people-role-select')).toBeVisible()
+      await expect(row.getByText('No department')).toBeVisible()
+      // One line at 1440: nowhere near two stacked lines of tap height.
+      expect(await row.evaluate((el) => el.getBoundingClientRect().height)).toBeLessThan(120)
+      await shot(page, '59-people')
+
+      // Invite: Send is disabled until the email is valid.
+      await page.getByTestId('people-invite').click()
+      const send = page.getByTestId('people-invite-send')
+      await expect(send).toBeDisabled()
+      await page.getByTestId('people-invite-email').fill('not-an-email')
+      await expect(send).toBeDisabled()
+      await page.getByTestId('people-invite-email').fill(INVITE_EMAIL)
+      await expect(send).toBeEnabled()
+      await shot(page, '59-people-invite')
+      await send.click()
+      const receipt = page.getByTestId('office-receipt')
+      await expect(receipt).toContainText('Invite sent', SLOW)
+      const invitedRow = page.getByTestId('people-row').filter({ hasText: INVITE_EMAIL })
+      await expect(invitedRow).toHaveCount(1, SLOW)
+      await expect(invitedRow).toContainText('Invited')
+      await expect(invitedRow).toContainText('Waiting to accept')
+      await expect(invitedRow.getByTestId('people-remove')).toHaveCount(0)
+
+      // Role change on the disposable member, both ways in one session (state must not leak).
+      const select = row.getByTestId('people-role-select')
+      await select.selectOption('supervisor')
+      await expect(receipt).toContainText('Role changed to Supervisor' + LEDGER, SLOW)
+      await expect(select).toHaveValue('supervisor', SLOW)
+      await select.selectOption('worker')
+      await expect(receipt).toContainText('Role changed to Worker' + LEDGER, SLOW)
+      await expect(select).toHaveValue('worker', SLOW)
+
+      // Remove: Keep them leaves the row; Remove takes it away.
+      const remove = row.getByTestId('people-remove')
+      await expect(remove).toHaveCount(1, SHORT)
+      await remove.click()
+      const dialog = page.getByTestId('people-remove-dialog')
+      await expect(dialog).toBeVisible(SLOW)
+      await expect(dialog).toContainText(`Remove ${DISPOSABLE_EMAIL}?`)
+      await page.getByTestId('people-remove-cancel').click()
+      await expect(dialog).toHaveCount(0)
+      await expect(row).toHaveCount(1)
+      await remove.click()
+      await page.getByTestId('people-remove-confirm').click()
+      await expect(receipt).toContainText('Removed' + LEDGER, SLOW)
+      await expect(row).toHaveCount(0, SLOW)
+      expect(errors).toEqual([])
+      await page.close()
+    })
+
+    test('people at 1024x768: the stacked layout, nothing clipped (59-11)', async () => {
+      const page = await adminCtx.newPage()
+      await page.setViewportSize({ width: 1024, height: 768 })
+      await page.goto('/?place=office&tab=people')
+      await expect(page.getByTestId('people-tab')).toHaveCount(1, SLOW)
+      await expect(page.getByTestId('people-invite')).toBeVisible(SLOW)
+      const clipped = await page.getByTestId('shell-detail').evaluate((el) => el.scrollWidth > el.clientWidth + 1)
+      expect(clipped).toBe(false)
+      await shot(page, '59-people-1024')
+      await page.close()
+    })
+
+    test('access: the wiring screen renders in the wide pane, the map re-centres, a sop address pins it (59-11)', async () => {
+      const page = await adminCtx.newPage()
+      const errors = watchConsole(page)
+      await openOffice(page)
+      const world = page.getByTestId('plant-world')
+      const camera = async () => `${await world.getAttribute('data-scale')}|${await world.getAttribute('data-x')}`
+      const inboxCamera = await camera()
+
+      await page.getByTestId('office-tab-access').click()
+      await expect(page.getByTestId('shell-detail')).toHaveAttribute('data-wide', 'true', SLOW)
+      await expect(page.getByTestId('office-pane').locator('.bay')).toHaveCount(1, SLOW)
+      await expect(world).toBeVisible()
+      await expect.poll(camera, SLOW).not.toBe(inboxCamera)
+
+      await page.goto(`/?place=office&tab=access&sop=${plantSopId}`)
+      await expect(page.getByTestId('office-pane').locator('.bay')).toHaveCount(1, SLOW)
+      await expect(page.getByTestId('office-pane')).toContainText(EVAL_PLANT_SOP_TITLE, SLOW)
+      await shot(page, '59-access')
+      expect(errors).toEqual([])
+      await page.close()
+    })
     test.fixme('supervisor Office: inbox tab only, a people tab address falls back to the inbox (59-13)', async () => {})
     test.fixme('legacy addresses (governance, team, access with a sop, attention view) land on the right Office place; assert the rendered place, not the status (59-13)', async () => {})
     test.fixme('a non-owner completion address lands on the Office (59-15)', async () => {})
