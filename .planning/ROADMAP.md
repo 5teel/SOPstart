@@ -1979,7 +1979,7 @@ Plans:
   4. The decisions tab lists the ledger newest first and can be narrowed by kind of decision; opening it, people and roles, or access widens the detail panel while the site stays visible and re-centres on the Office
   5. An admin invites a person, sets their role, sees their department, and opens the existing access wiring screen, unchanged, to decide who sees which SOPs
 
-**Plans:** 11/16 plans executed
+**Plans:** 12/16 plans executed
 Plans:
 **Wave 1**
 
@@ -2018,7 +2018,7 @@ Plans:
 
 **Wave 9** *(blocked on Wave 8 completion)*
 
-- [ ] 59-12-PLAN.md — Mount the pane behind next/dynamic in both shells, supervisor pin on the pane's read, bundle marker, lint allow-list
+- [x] 59-12-PLAN.md — Mount the pane behind next/dynamic in both shells, supervisor pin on the pane's read, bundle marker, lint allow-list
 
 **Wave 10** *(blocked on Wave 9 completion)*
 
