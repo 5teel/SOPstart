@@ -1910,7 +1910,7 @@ Plans:
   4. A SOP still being read from a document or a video opens in the editor saying what is happening and roughly how long it will take, never as an empty page, and getting there does not reload the whole app
   5. Publishing a new version means workers always get the latest published one while earlier versions stay on record; Back or Esc from any open SOP returns to the one screen with the place the user came from still selected
 
-**Plans:** 1/18 plans executed
+**Plans:** 3/18 plans executed
 Plans:
 **Wave 1**
 
@@ -1918,8 +1918,8 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 58-02-PLAN.md — Pure modules (walk order, focus addresses + placeToken, lineage-current, parse progress) + sop-focus eval skeleton
-- [ ] 58-03-PLAN.md — Migration 00071 (sop_walks, sop_ai_findings, step tick + trigger, objective, jump flag) [BLOCKING] live apply, types, matrix, eval fixtures
+- [x] 58-02-PLAN.md — Pure modules (walk order, focus addresses + placeToken, lineage-current, parse progress) + sop-focus eval skeleton
+- [x] 58-03-PLAN.md — Migration 00071 (sop_walks, sop_ai_findings, step tick + trigger, objective, jump flag) [BLOCKING] live apply, types, matrix, eval fixtures
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
