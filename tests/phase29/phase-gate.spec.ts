@@ -60,17 +60,11 @@ test.describe('APR-02 — chain snapshotted per SOP version; historical versions
   })
 })
 
-test.describe('APR-03 — one-click approve/request-changes from the SOP itself and the governance queue', () => {
+test.describe('APR-03 — one-click approve from the governance queue (58-16: the in-SOP builder panel is retired; the focus publish bar shows who holds the approval)', () => {
   const queueRowSrc = read('src/components/admin/governance/GovernanceQueueRow.tsx')
-  const panelSrc = read('src/components/admin/governance/ApprovalChainPanel.tsx')
 
   test('GovernanceQueueRow Approve branch calls approveStep(', () => {
     expect(queueRowSrc).toContain('approveStep(')
-  })
-
-  test('ApprovalChainPanel Approve/Request-changes wired to callback props', () => {
-    expect(panelSrc).toContain('onApprove(')
-    expect(panelSrc).toContain('onRequestChanges(')
   })
 })
 

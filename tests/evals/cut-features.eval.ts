@@ -209,7 +209,7 @@ test.describe('Phase 55 — cut features (deployed)', () => {
 
     // The old builder address lands on the focus editor, which carries none of the dropped tools
     // (joined, not templated: the address is a redirect probe, not a link)
-    await page.goto(['/admin/sops/builder', walkSopId].join('/'))
+    await page.goto(['/admin/sops', 'builder', walkSopId].join('/'))
     await expect(page.getByTestId('edit-document')).toHaveCount(1, { timeout: 30_000 })
     expect(page.url()).toContain(`/sops/${walkSopId}`)
     await expect(page.getByText(/training video|QR code|flow diagram/i)).toHaveCount(0)

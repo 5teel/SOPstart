@@ -69,11 +69,11 @@ test.describe('setRefresherInterval admin write action', () => {
   })
 })
 
-test.describe('refresher_interval_months copy-forward across both supersede paths', () => {
-  test('appears at least 4 times in versioning.ts (two selects + two insert payloads)', () => {
+test.describe('refresher_interval_months copy-forward across both next-version paths (58-16: cloneSopAsDraft is retired; forkDraft is the second)', () => {
+  test('appears at least 2 times in versioning.ts (the select + the insert payload of uploadNewVersion)', () => {
     const src = read(VERSIONING_FILE)
     const count = (src.match(/refresher_interval_months/g) ?? []).length
-    expect(count).toBeGreaterThanOrEqual(4)
+    expect(count).toBeGreaterThanOrEqual(2)
   })
 
   test('uploadNewVersion body carries refresher_interval_months forward independently', () => {
@@ -85,12 +85,10 @@ test.describe('refresher_interval_months copy-forward across both supersede path
     expect(body).toMatch(/refresher_interval_months:\s*oldSop\.refresher_interval_months/)
   })
 
-  test('cloneSopAsDraft body carries refresher_interval_months forward independently', () => {
-    const src = read(VERSIONING_FILE)
-    const body = extractFunctionBody(src, 'cloneSopAsDraft')
-    // Select list
-    expect(body).toContain('refresher_interval_months')
+  test('forkDraft carries refresher_interval_months forward from the source row', () => {
+    const src = read(path.join(ROOT, 'src', 'actions', 'versions.ts'))
+    const body = extractFunctionBody(src, 'forkDraft')
     // Insert payload reads from the fetched source row, not a literal/parameter
-    expect(body).toMatch(/refresher_interval_months:\s*sourceSop\.refresher_interval_months/)
+    expect(body).toMatch(/refresher_interval_months:\s*source\.refresher_interval_months/)
   })
 })

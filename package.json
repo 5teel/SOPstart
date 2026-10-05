@@ -7,12 +7,10 @@
   },
   "scripts": {
     "dev": "next dev --webpack -p 4200",
-    "prebuild": "tsx scripts/contract-check.ts",
     "build": "next build --webpack",
     "postbuild": "tsx scripts/check-bundle-size.ts",
     "start": "next start -p 4200",
     "lint": "eslint",
-    "contract:check": "tsx scripts/contract-check.ts",
     "test": "npx playwright test",
     "test:integration": "npx playwright test --project=integration",
     "postinstall": "node scripts/copy-ffmpeg.js",

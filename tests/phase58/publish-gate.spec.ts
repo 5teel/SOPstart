@@ -71,9 +71,8 @@ test.describe('WRK-04/SOP-04 publish gate', () => {
     // Bottom-bar copy (UI-SPEC).
     expect(status).toContain('Add at least one step')
     expect(status).toContain('still to check')
-    // The old builder's chip answers from the same function.
-    const old = read('src/actions/sop-section-blocks.ts')
-    expect(bodyOf(old, 'export async function getPublishGateStatus(')).toContain('getStepGateStatus(')
+    // 58-16: the old builder's chip (a thin mapper in sop-section-blocks.ts) is deleted; the focus publish bar reads this action.
+    expect(read('src/components/focus/admin/PublishBar.tsx')).toContain('getPublishGateStatus')
   })
 
   test('notifyAssignedWorkers runs when a lineage publish supersedes a version (D-18)', () => {

@@ -5,9 +5,8 @@ import Link from 'next/link'
  * Phase 40 (DUP-04) — the one shared admin creation-flow page shell.
  *
  * Consolidates the hand-rolled header + "Back to library" link duplicated
- * across /admin/sops/upload, /admin/sops/new/blank, /admin/sops/new/ai,
- * /admin/sops/[sopId]/versions. The optional
- * `backLink` slot preserves the per-SOP contextual link those last two pages
+ * across /admin/sops/upload, /admin/sops/new/blank and /admin/sops/new/ai. The optional
+ * `backLink` slot preserves the per-SOP contextual link those pages
  * need (RESEARCH Pitfall 5). Admin section nav lives in the app header
  * (sketch 004 variant A) — this shell renders no nav of its own.
  *

@@ -3,7 +3,7 @@
 /**
  * Phase 26.5 Plan 07 — admin-only agent-layer server actions (D-09/D-10).
  *
- * Reads sop_agent_metadata / block_agent_metadata for the builder's agentview
+ * Reads sop_agent_metadata for the agent
  * panel, plus the proposal approve/decline actions that back Plan 08's
  * dashboard. All org-scoped from the JWT — never from client input.
  *
@@ -40,15 +40,6 @@ export type SopAgentMetadataView = {
   hasEmbedding: boolean
   lastSynthesisStatus: string | null
   lastSynthesisError: string | null
-  regeneratedAt: string | null
-}
-
-/** One row per block, keyed by junctionId (the old block junction id — D-02). Synthesis stopped writing these in Phase 58; the builder panel that reads them goes with the builder. */
-export type BlockAgentMetadataView = {
-  junctionId: string
-  tags: string[]
-  entities: unknown
-  hasEmbedding: boolean
   regeneratedAt: string | null
 }
 
@@ -108,40 +99,6 @@ export async function getSopAgentMetadata(
       lastSynthesisError: data.last_synthesis_error,
       regeneratedAt: data.regenerated_at,
     },
-  }
-}
-
-// ---------------------------------------------------------------------------
-// 2. getBlockAgentMetadata — per-block read, keyed by junction id (D-02)
-// ---------------------------------------------------------------------------
-
-export async function getBlockAgentMetadata(
-  sopId: string
-): Promise<{ data: BlockAgentMetadataView[] } | { error: string }> {
-  if (!sopId) return { error: 'sopId required' }
-  const ctx = await requireAdmin()
-  if ('error' in ctx) return { error: ctx.error }
-  if (!ctx.organisationId) return { error: 'No organisation' }
-
-  const { data, error } = await ctx.supabase
-    .from('block_agent_metadata')
-    .select('*')
-    .eq('sop_id', sopId)
-    .eq('organisation_id', ctx.organisationId)
-
-  if (error) {
-    console.error('[getBlockAgentMetadata] error', error)
-    return { error: error.message }
-  }
-
-  return {
-    data: (data ?? []).map((row) => ({
-      junctionId: row.block_id,
-      tags: row.tags ?? [],
-      entities: row.entities,
-      hasEmbedding: !!row.embedding,
-      regeneratedAt: row.regenerated_at,
-    })),
   }
 }
 

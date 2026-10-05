@@ -57,7 +57,6 @@ export async function requireAdminContext(): Promise<AdminContext | { error: str
 export type SopEditTarget =
   | { sopId: string }
   | { sectionId: string }
-  | { junctionId: string }
   | { stepId: string }
 
 export interface SopEditContext {
@@ -79,7 +78,7 @@ export async function requireSopEditAccess(
   const admin = createAdminClient()
 
   // Resolve the target locator down to a sopId. One resolution path for all
-  // four locator shapes — callers never write their own lookup (the sibling-
+  // three locator shapes — callers never write their own lookup (the sibling-
   // caller-miss class in CLAUDE.md 2026-07-29).
   let sopId: string
   if ('sopId' in target) {
@@ -101,19 +100,7 @@ export async function requireSopEditAccess(
     if (!step) return { error: 'SOP not found' }
     sopId = (step as { sop_id: string }).sop_id
   } else {
-    const { data: junction } = await admin
-      .from('sop_section_blocks')
-      .select('sop_section_id')
-      .eq('id', target.junctionId)
-      .maybeSingle()
-    if (!junction) return { error: 'SOP not found' }
-    const { data: section } = await admin
-      .from('sop_sections')
-      .select('sop_id')
-      .eq('id', (junction as { sop_section_id: string }).sop_section_id)
-      .maybeSingle()
-    if (!section) return { error: 'SOP not found' }
-    sopId = (section as { sop_id: string }).sop_id
+    return { error: 'SOP not found' }
   }
 
   // Self-enforced org scope: filtered by the SESSION organisationId, never by

@@ -54,7 +54,10 @@ test.describe('SB-LINE-06 -- bundle gate (the worker SOP route, plus / from Phas
     expect(src).toContain("route: '/page'")
     expect(src).toContain("'Draw machine'")
     expect(src).toContain("'react-konva'")
-    expect(src).toContain("'pdfjs-dist'")
+    // 58-16: the pdfjs marker group stays; its package-name marker was re-derived to a literal pdfjs itself carries.
+    expect(src).toContain("label: 'pdfjs-dist (D-21-09)'")
+    expect(src).toContain("'pdf.worker'")
+    expect(src).toContain("'PDFWorker'")
     expect(src).toContain("'mammoth'")
     expect(src).toContain('page_client-reference-manifest.js')
   })

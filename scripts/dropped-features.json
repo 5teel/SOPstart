@@ -1010,6 +1010,350 @@
       "phase": 58,
       "kind": "file",
       "path": "src/stores/completionStore.ts"
+    },
+    {
+      "feature": "versions-page",
+      "phase": 58,
+      "kind": "route-page",
+      "path": "/admin/sops/[sopId]/versions",
+      "dir": "src/app/(protected)/admin/sops/[sopId]/versions"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "route-page",
+      "path": "/admin/sops/builder/[sopId]",
+      "dir": "src/app/(protected)/admin/sops/builder"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "route-api",
+      "path": "/api/sops/[sopId]/sections/[sectionId]|src/app/api/sops/[sopId]/sections/[sectionId]"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "dir",
+      "path": "src/components/admin/builder"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "dir",
+      "path": "src/components/admin/builder-v2"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "dir",
+      "path": "src/components/admin/verify-checklist"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "dir",
+      "path": "src/components/admin/ai-reviewer"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "dir",
+      "path": "src/components/sop/blocks"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/components/admin/SectionEditor.tsx"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/components/admin/AddSectionButton.tsx"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/components/admin/AdversarialFlagBanner.tsx"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/components/admin/MissingSectionWarningBanner.tsx"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/components/admin/OriginalDocViewer.tsx"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/components/admin/SectionKindPicker.tsx"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/components/admin/VideoReviewPanel.tsx"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/components/admin/source-viewer/BboxOverlay.tsx"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/components/admin/source-viewer/DocxPreview.tsx"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/components/admin/source-viewer/PdfCanvasPage.tsx"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/components/admin/source-viewer/SourceViewerPane.tsx"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/components/admin/source-viewer/VideoSourcePreview.tsx"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/components/admin/source-viewer/index.ts"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/components/admin/source-viewer/useSelectionSync.tsx"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/components/admin/governance/ApprovalChainPanel.tsx"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/actions/sop-section-blocks.ts"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/actions/escalation.ts"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/actions/walkthrough-progress.ts"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/hooks/useBuilderAutosave.ts"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/lib/parsers/parsed-sop-to-layout-data.ts"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/components/sop/LayoutRenderer.tsx"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/components/sop/SectionContent.tsx"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/components/sop/SopBlockContext.tsx"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/components/sop/SopImageInline.tsx"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/components/sop/SopTable.tsx"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/components/sop/EscalationFormModal.tsx"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/lib/builder/block-findings.ts"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/lib/builder/block-registry.tsx"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/lib/builder/block-type-labels.ts"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/lib/builder/content-ops.ts"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/lib/builder/layout-schema.ts"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/lib/builder/puck-to-block-content.ts"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/lib/builder/sanitize-layout.ts"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/lib/builder/sign-layout-data-images.ts"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/lib/builder/supported-versions.ts"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/lib/builder/section-blocks-core.ts"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/lib/blocks/create-block-core.ts"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "src/lib/sections/resolveRenderFamily.ts"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "scripts/contract-check.ts"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "scripts/selection-sync-check.tsx"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "scripts/field-panel-check.tsx"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "scripts/field-panel-reachability-check.tsx"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "scripts/field-patterns-check.tsx"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "scripts/render-parity-check.tsx"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "scripts/autosave-rewire-check.tsx"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "scripts/ai-overlay-check.tsx"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "scripts/agent-panel-check.tsx"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "scripts/backfill-section-layouts.ts"
+    },
+    {
+      "feature": "block-builder",
+      "phase": 58,
+      "kind": "file",
+      "path": "scripts/capture-convert-golden.ts"
     }
   ],
   "allow": [

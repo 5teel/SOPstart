@@ -56,10 +56,16 @@
       "value": 795,
       "capturedAt": "2026-10-05T00:00:00.000Z",
       "note": "Phase 58-11: tabbed page replaced by the focus frame (server-resolved page + FocusWalker); measured 794 KB, moved DOWN by hand from 795. The gate sums shared chunks only: the route's own page chunk (about 37 KB raw, URL-encoded path) is the known uncounted blind spot, so the old tabs leaving and the walk arriving are both invisible to this number."
+    },
+    {
+      "route": "/sops/[sopId]/page",
+      "value": 794,
+      "capturedAt": "2026-10-05T00:00:00.000Z",
+      "note": "Phase 58-16: block machinery, source viewer and old walkthrough/tab leftovers deleted; measured 792 KB, moved DOWN by hand from 794. Never up. The gate's forbidden-marker self-validation was re-derived in the same commit: the client source viewer carried the pdfjs-dist specifier and the mammoth literals, so the scan now also reads .next/server/chunks and the parse route bundle, and the pdfjs marker is 'pdf.worker' instead of the package name. The marker groups themselves are unchanged."
     }
   ],
   "routes": {
-    "/sops/[sopId]/page": 794,
+    "/sops/[sopId]/page": 792,
     "/page": 831
   }
 }

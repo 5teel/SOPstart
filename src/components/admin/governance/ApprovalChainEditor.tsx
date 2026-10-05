@@ -10,9 +10,7 @@
  *
  * Step rows mirror chainStepSchema (src/lib/validators/approvals.ts): exactly
  * one of role/userId, role restricted to admin/safety_manager (Pitfall 3).
- * Drag-reorder copies the ArrayFieldEditor dnd-kit idiom (Phase 26,
- * src/components/admin/builder-v2/fields/ArrayFieldEditor.tsx) — do not
- * hand-roll drag logic.
+ * Drag-reorder uses the dnd-kit idiom — do not hand-roll drag logic.
  */
 
 import { useState, useTransition } from 'react'

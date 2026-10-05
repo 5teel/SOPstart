@@ -30,13 +30,13 @@ const TEST_SCAN_EXCLUDED_PREFIXES = [
 ]
 
 // Each deleting plan appends its feature key here when it flips the block live.
-const LIVE_FEATURES: string[] = ['voice-capture', 'voice', 'phone-qr', 'shared-device', 'youtube', 'photo-scan', 'video-generation', 'offline', 'flow-diagram', 'annotation', 'version-compare', 'library', 'org-signup', 'header-nav', 'site-and-departments-pages', 'list-page', 'tabbed-sop-page', 'old-walkthrough']
+const LIVE_FEATURES: string[] = ['voice-capture', 'voice', 'phone-qr', 'shared-device', 'youtube', 'photo-scan', 'video-generation', 'offline', 'flow-diagram', 'annotation', 'version-compare', 'library', 'org-signup', 'header-nav', 'site-and-departments-pages', 'list-page', 'tabbed-sop-page', 'old-walkthrough', 'block-builder', 'versions-page']
 // 55-13 flips this once the eight packages are uninstalled.
 const PACKAGES_LIVE = true
 
 const FEATURES = [
   'voice-capture', 'voice', 'phone-qr', 'shared-device', 'youtube', 'photo-scan', 'video-generation',
-  'offline', 'flow-diagram', 'annotation', 'version-compare', 'library', 'org-signup', 'header-nav', 'site-and-departments-pages', 'list-page', 'tabbed-sop-page', 'old-walkthrough',
+  'offline', 'flow-diagram', 'annotation', 'version-compare', 'library', 'org-signup', 'header-nav', 'site-and-departments-pages', 'list-page', 'tabbed-sop-page', 'old-walkthrough', 'block-builder', 'versions-page',
 ]
 
 interface Entry {
@@ -200,24 +200,19 @@ test.describe('survivors', () => {
     'src/app/manifest.ts',
     // D-04
     'src/lib/parsers/ocr-fallback.ts',
-    // kept data plumbing
-    'src/lib/blocks/create-block-core.ts',
-    'src/lib/builder/section-blocks-core.ts',
+    // kept data plumbing (58-16: the block-model plumbing went with the block model)
     'src/lib/auth/next-redirect.ts',
   ]
   for (const f of mustExist) test(`${f} survives`, () => expect(exists(f), f).toBe(true))
 
   const mustContain: Array<[string, string]> = [
-    ['src/actions/versioning.ts', 'export async function cloneSopAsDraft'], // D-01
+    ['src/actions/versioning.ts', 'export async function uploadNewVersion'], // D-01 (58-16: cloneSopAsDraft went with the versions page; uploadNewVersion is Phase 61 residue)
     ['src/actions/auth.ts', 'joinWithInviteCode'], // D-02
     ['src/actions/auth.ts', 'inviteUserByEmail'], // D-02
     ['src/components/admin/site/SiteEditor.tsx', 'react-konva'],
-    ['src/lib/builder/block-registry.tsx', 'VoiceNoteBlock'],
     // 58-08: introspection describes the step model now, not the block registry.
     ['src/lib/validators/blocks.ts', 'voice-note'],
     ['src/styles/blueprint-theme.css', '--accent-voice:'],
-    ['src/lib/builder/sanitize-layout.ts', 'export function UnsupportedBlockPlaceholder'],
-    ['src/components/admin/builder-v2/visual/media-adapter.ts', 'bakedSrc'],
     ['src/lib/site/scene.ts', 'export function newMachineCode'],
   ]
   for (const [f, needle] of mustContain) {

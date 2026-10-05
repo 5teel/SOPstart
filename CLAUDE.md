@@ -32,21 +32,20 @@ SafeStart is a multi-tenant SaaS progressive web app that helps blue-collar trad
 - `(auth)/` — Login, sign-up, invite, join flows
 - `(protected)/` — Authenticated routes behind middleware
   - `dashboard/` — Worker/supervisor home
-  - `sops/` — SOP library browse, `[sopId]` detail, `[sopId]/walkthrough` step-by-step mode
+  - `sops/` — `[sopId]` is the one SOP focus screen (Browse, Walk, and Edit via `?mode=edit`); the old tabbed page, walkthrough route, builder and versions page are deleted (Phase 58-16) and their addresses redirect in the proxy
   - `activity/` — Completion records, supervisor review (`[completionId]`)
-  - `admin/sops/` — SOP management, upload, `[sopId]/review`, `[sopId]/assign`, `[sopId]/versions`
+  - `admin/sops/` — upload, new (blank / AI), `[sopId]/assign`
   - `admin/team/` — Team/org member management
 - `api/sops/` — REST API routes (parse, publish, assignments, sections, download-url, parse-job)
 
 ### Key Directories
 - `src/actions/` — Server actions (auth, sops, assignments, completions, versioning)
-- `src/components/sop/` — SOP-specific UI (walkthrough, steps, photos, sections, search)
+- `src/components/focus/` — the SOP focus screen (frame, browse, walk, `admin/` editor behind a lazy seam); `src/components/sop/` — plant stage, lenses, standard labels
 - `src/components/activity/` — Completion/activity UI
 - `src/components/admin/` — Admin panel UI
 - `src/components/layout/` — Shared layout (nav, sidebar, etc.)
 - `src/components/providers/` — React context providers
 - `src/hooks/` — Custom hooks (useWorkerSops, useSopDetail, useStepPhotos, useCompletions, useBuilderAutosave, useNotifications, useViewport)
-- `src/stores/` — Zustand stores (completionStore — in-memory, per-walk; walkthrough; walkthroughMode; preview)
 - `src/lib/parsers/` — File parsing pipeline (extract-docx, extract-pdf, gpt-parser, image-uploader, ocr-fallback)
 - `src/lib/supabase/` — Supabase client variants (client, server, admin, middleware)
 - `src/lib/validators/` — Zod schemas (auth, sop)

@@ -6,7 +6,7 @@
 //
 // resolveNextStepIndex / stepMatchesCaller / isChainComplete are the single
 // source of truth for "who's next" / "is this chain done" across every
-// approval surface (builder PublishStage, governance queue, approveStep
+// approval surface (focus publish bar, governance queue, approveStep
 // server action) — Phase 29 D29-04.
 // ------------------------------------------------------------
 

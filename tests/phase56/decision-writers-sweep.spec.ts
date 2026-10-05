@@ -45,8 +45,6 @@ const LIVE_WRITERS: string[] = [
   'src/actions/assignments.ts#assignSopToUser',
   'src/actions/assignments.ts#removeAssignment',
   'src/actions/observations.ts#recordObservation',
-  'src/actions/sop-section-blocks.ts#verifyBlock',
-  'src/actions/sop-section-blocks.ts#unverifyBlock',
   'src/actions/focus-steps.ts#tickFocusStep',
   'src/actions/focus-steps.ts#untickFocusStep',
   'src/actions/findings.ts#clearFinding',
@@ -278,6 +276,12 @@ test.describe('every hook is live', () => {
     const t = fileText('src/actions/focus-steps.ts')
     expect(t).toContain('export async function tickFocusStep(input: { stepId: string })')
     expect(t).toContain('export async function untickFocusStep(input: { stepId: string })')
+  })
+
+  test('clearFinding takes only a finding id (58-16: the block verify pair is gone)', () => {
+    const f = fileText('src/actions/findings.ts')
+    expect(f).toContain('export async function clearFinding(input: { findingId: string })')
+    expect(fileText('src/actions/focus-steps.ts')).not.toMatch(/organisationId\s*:\s*z\./)
   })
 })
 

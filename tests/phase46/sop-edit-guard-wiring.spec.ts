@@ -30,7 +30,6 @@ const ROOT = process.cwd()
 const GUARDS = path.join(ROOT, 'src', 'lib', 'auth', 'guards.ts')
 const SECTIONS = path.join(ROOT, 'src', 'actions', 'sections.ts')
 const FOCUS_STEPS = path.join(ROOT, 'src', 'actions', 'focus-steps.ts')
-const ROUTE = path.join(ROOT, 'src', 'app', 'api', 'sops', '[sopId]', 'sections', '[sectionId]', 'route.ts')
 
 function read(p: string): string {
   return fs.readFileSync(p, 'utf8').replace(/\r\n/g, '\n')
@@ -64,19 +63,14 @@ test.describe('CAP-02 -- requireSopEditAccess call-site wiring (source-contract)
 
   // --- Positive wiring: sections.ts (4 call sites) ---
   // activated by plan 46-03
-  test('sections.ts: createSection, reorderSections, updateSectionLayout, updateSectionTitle all call requireSopEditAccess(', () => {
+  test('sections.ts: createSection, reorderSections, updateSectionTitle all call requireSopEditAccess(', () => {
     const src = read(SECTIONS)
-    for (const fn of ['createSection', 'reorderSections', 'updateSectionLayout', 'updateSectionTitle']) {
+    for (const fn of ['createSection', 'reorderSections', 'updateSectionTitle']) {
       expect(fnBody(src, fn), `${fn} should call requireSopEditAccess(`).toContain('requireSopEditAccess(')
     }
   })
 
-  // --- Positive wiring: legacy PATCH route (1 call site) ---
-  // activated by plan 46-03
-  test('the legacy sections/[sectionId] PATCH route calls requireSopEditAccess( before any write', () => {
-    const src = read(ROUTE)
-    expect(fnBody(src, 'PATCH')).toContain('requireSopEditAccess(')
-  })
+  // 58-16: the legacy sections/[sectionId] PATCH route is deleted (its guard test went with it).
 
   // --- Negative / scope-containment: CAP-02 must not leak past "edit" ---
   // activated by plan 46-03 -- RESEARCH Pitfall 4

@@ -20,7 +20,7 @@
  *
  * Repointed a second time in 54-05 (Phase 54, D-07/D-08) onto the admin library table,
  * and a third time in 57-09 (D-13): the table is deleted, so every assertion that
- * read it went with it. What survives: the builder Tools menu, the category fix,
+ * read it went with it. What survives: the category fix on the focus editor,
  * and the row data listAdminSopRows still builds for the Workshop and the inbox.
  */
 import { test, expect } from '@playwright/test'
@@ -28,9 +28,6 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 const ROOT = process.cwd()
-const STAGE_SHELL = path.join(
-  ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'builder', '[sopId]', 'BuilderStageShell.tsx',
-)
 const CATEGORY_BUTTON = path.join(
   ROOT, 'src', 'components', 'focus', 'admin', 'CategoryButton.tsx',
 )
@@ -41,40 +38,7 @@ function read(p: string): string {
   return fs.readFileSync(p, 'utf-8')
 }
 
-test.describe('UX-06 — one-line admin rows + builder action menu', () => {
-  test('builder shell owns a labelled action menu wired to the 3 destinations', () => {
-    const shell = read(STAGE_SHELL)
-    // Href WIRING (CLAUDE.md 2026-06-05): the menu links interpolate the real
-    // sopId into the real destination routes — not just route-name tokens.
-    expect(shell).toMatch(/\/admin\/sops\/\$\{sopId\}\/assign/)
-    expect(shell).toMatch(/\/admin\/sops\/\$\{sopId\}\/versions/)
-    // Delete for drafts survives in the menu (wired, not just named):
-    // DeleteSopButton receives the sopId and the menu gates it on draft status.
-    expect(shell).toMatch(/<DeleteSopButton\s+sopId=\{sopId\}/)
-    expect(shell).toMatch(/isDraft=\{initialSop\.status === 'draft'\}/)
-    expect(shell).toMatch(/\{isDraft && \(/)
-  })
-
-  test('action menu controls are labelled, not icon-only (usability-lab F-09)', () => {
-    const shell = read(STAGE_SHELL)
-    // Visible text labels for each destination — Phase 33 (33-04) Wayfinder
-    // "Tools for this SOP" menu locked labels (sketches/builder-header-
-    // orientation README § Decisions 2026-07-19), repointed off the old
-    // Phase 30 labels in the SAME commit as the source change (CLAUDE.md
-    // 2026-07-13 stale-guard class).
-    expect(shell).toContain('Assign this SOP to workers')
-    expect(shell).toContain('See earlier versions')
-    // The old Phase 30 labels no longer appear.
-    expect(shell).not.toContain('Assign to team')
-    expect(shell).not.toContain('Version history')
-    expect(shell).not.toContain('Generate video')
-    // The menu never uses the icon-only evidence-btn idiom from the old rows.
-    expect(shell).not.toContain('evidence-btn')
-    // Trigger is a labelled control ("Tools for this SOP" visible text + aria).
-    expect(shell).toMatch(/aria-haspopup="menu"/)
-    expect(shell).toMatch(/aria-expanded=\{open\}/)
-  })
-
+test.describe('UX-06 — one-line admin rows (the builder action menu retired in Phase 58-16)', () => {
   test('listAdminSopRows builds the flag label and the owner label each row carries', () => {
     const listAction = read(ADMIN_SOP_LIST)
     expect(listAction).toContain('FLAG_PRIORITY.find((f) => r.flags.includes(f))')

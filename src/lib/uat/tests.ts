@@ -47,7 +47,7 @@ export interface UatTest {
   id: string
   /** ISO date the test was added/last revised. */
   dateAdded: string
-  /** Friendly grouping label, e.g. "Procedure builder", "Design choices". */
+  /** Friendly grouping label, e.g. "The SOP screen", "Design choices". */
   category: string
   /** Plain-English title, ideally a question. */
   title: string
@@ -127,263 +127,6 @@ export const UAT_TESTS: UatTest[] = [
       'Nav clarity pass (2026-07-30): "Activity" renamed to "Sign-off" (the header it was renamed in is gone since Phase 57); /activity no longer redirects admins to the old admin SOP page (they see the supervisor sign-off queue).',
   },
 
-  // ===================== Design choices (pick A or B) =====================
-  {
-    id: 'builder-rail-density',
-    dateAdded: '2026-06-09',
-    category: 'Design choices',
-    title: 'Which list layout is easier to use?',
-    status: 'active',
-    summary:
-      "When you build a procedure, there's a list of its steps down the left side. We're trying two looks — a tighter one and a more spacious one. Have a look at both and tell us which feels easier for you.",
-    directions: [
-      {
-        id: 'compact',
-        label: 'Tighter',
-        description: 'More fits on the screen at once. Good for long procedures with lots of steps.',
-        screenshot: '/uat/screens/rail-compact.png',
-      },
-      {
-        id: 'roomy',
-        label: 'More spacious',
-        description: 'Bigger and easier to read and tap. Fewer items on screen at once.',
-        screenshot: '/uat/screens/rail-roomy.png',
-      },
-    ],
-    questions: [
-      { id: 'readable', text: 'Is your preferred option easy to read?' },
-      { id: 'touch', text: 'Would it be comfortable to use on a phone or tablet?' },
-    ],
-    background:
-      'BuilderTreeRail default row density. Compact ≈ 32px rows, Roomy ≈ 40px. Affects scroll length vs tap-target comfort.',
-  },
-  {
-    id: 'builder-rail-add-affordance',
-    dateAdded: '2026-06-09',
-    category: 'Design choices',
-    title: "Where's the best place to add a new step?",
-    status: 'active',
-    summary:
-      "Two ideas for adding a step. Option A is one '＋ Add' button at the bottom. Option B shows a small '＋' between steps so you can add right where you want. Which feels easier?",
-    directions: [
-      {
-        id: 'end-button',
-        label: "One '＋ Add' button at the end",
-        description: 'Simple and tidy. To add a step in the middle, you add it then drag it up.',
-        screenshot: '/uat/screens/rail-add-end.png',
-      },
-      {
-        id: 'inline-insert',
-        label: "A '＋' between steps",
-        description: 'A small ＋ appears between steps and adds one right there. Quicker for adding in the middle.',
-        screenshot: '/uat/screens/rail-add-inline.png',
-      },
-    ],
-    questions: [
-      { id: 'obvious', text: 'Is it obvious how to add a step in your preferred option?' },
-      { id: 'tidy', text: 'Does it feel uncluttered (not too busy)?' },
-    ],
-    background: 'Add affordance placement in BuilderTreeRail — single end control vs inline hover insert points.',
-  },
-  {
-    id: 'builder-rail-nesting-depth',
-    dateAdded: '2026-06-09',
-    category: 'Design choices',
-    title: 'How much detail should the side list show?',
-    status: 'active',
-    summary:
-      'The side list can show everything — sections, steps, and the items inside each step — or just the sections and steps to keep it short. Which do you prefer?',
-    directions: [
-      {
-        id: 'full-tree',
-        label: 'Show everything',
-        description: 'Sections, steps, and the items inside each step. A complete map, but it can get long.',
-        screenshot: '/uat/screens/rail-nest-full.png',
-      },
-      {
-        id: 'steps-only',
-        label: 'Just sections and steps',
-        description: "Shows steps with a small note like '2 items'. Shorter and quicker to scan.",
-        screenshot: '/uat/screens/rail-nest-steps.png',
-      },
-    ],
-    questions: [
-      { id: 'find', text: 'Can you find what you need easily in your preferred option?' },
-      { id: 'manageable', text: 'Does it feel manageable, not overwhelming?' },
-    ],
-    background: 'Rail tree depth (deriveStepTree) — 3 levels vs sections+steps with a block count.',
-  },
-
-  // ===================== Procedure builder (have a look) =====================
-  {
-    id: '21.6-rail-step-centric',
-    dateAdded: '2026-06-09',
-    category: 'Procedure builder',
-    title: 'Is the procedure outline clear?',
-    status: 'active',
-    summary:
-      "When you open a procedure to edit it, there's a list on the left showing its sections and steps. We want to know if it's clear and easy to follow.",
-    spotlight: 'The list down the left side',
-    comparison: {
-      improvement:
-        "Before, there were two technical lists full of code-style names like 'StepBlock' and 'Block'. Now it's one simple list of numbered steps in plain words.",
-      before: { image: '/uat/screens/rail-before.png', caption: 'Before — two lists, technical names' },
-      after: { image: '/uat/screens/rail-after.png', caption: 'After — one plain, numbered list' },
-    },
-    tryIt: ['Open any procedure to edit it.', 'Look at the list down the left side.'],
-    links: [{ label: 'Open a procedure', href: '/' }],
-    questions: [
-      { id: 'glance', text: 'Can you tell what the sections and steps are at a glance?' },
-      { id: 'numbered', text: 'Are the steps clearly numbered (Step 1, Step 2…)?' },
-      { id: 'plain', text: 'Is it free of confusing technical words?' },
-    ],
-    background:
-      'Build-stage left rail (BuilderTreeRail): step-centric outline, blocks nested under steps, no raw PascalCase block-type names.',
-  },
-  {
-    id: '21.6-add-menu-insert',
-    dateAdded: '2026-06-09',
-    category: 'Procedure builder',
-    title: 'Is it easy to add a step or block?',
-    status: 'active',
-    summary:
-      "There's a '＋ Add step or block' button for adding new content. We want to know if it's easy to find and works the way you'd expect.",
-    spotlight: 'The Add menu',
-    comparison: {
-      improvement:
-        "Before, adding meant scrolling a long list of technical names ('TextBlock', 'HazardCardBlock'). Now it's a short, grouped menu with plain names like 'Step', 'Hazard' and 'Measurement'.",
-      before: { image: '/uat/screens/addmenu-before.png', caption: 'Before — raw component list' },
-      after: { image: '/uat/screens/addmenu-after.png', caption: 'After — grouped, plain names' },
-    },
-    tryIt: ['Open a procedure.', "Click '＋ Add step or block'.", 'Pick something from the menu.'],
-    links: [{ label: 'Open a procedure', href: '/' }],
-    questions: [
-      { id: 'findable', text: 'Was it easy to find how to add something?' },
-      { id: 'labels', text: 'Were the choices in the menu easy to understand?' },
-      { id: 'appeared', text: 'Did your new item appear where you expected?' },
-    ],
-    background: 'AddMenu: grouped humanised labels (STEPS / ANNOTATIONS / SAFETY / STRUCTURED); inserts at the step anchor.',
-  },
-  {
-    id: '21.6-inline-edit-persists',
-    dateAdded: '2026-06-09',
-    category: 'Procedure builder',
-    title: 'Can you edit text easily?',
-    status: 'active',
-    summary:
-      'You can click on text in a procedure to change it. We want to know if editing feels natural and your changes are saved.',
-    spotlight: 'Editing text on the page',
-    comparison: {
-      improvement:
-        'Before, you changed wording in a cramped panel off to the side. Now you click the text and type right where it sits.',
-      before: { image: '/uat/screens/edit-before.png', caption: 'Before — edit in a side panel' },
-      after: { image: '/uat/screens/edit-after.png', caption: 'After — type right on the page' },
-    },
-    tryIt: ["Click on a step's text.", 'Type a change.', 'Wait a moment, then refresh the page.'],
-    links: [{ label: 'Open a procedure', href: '/' }],
-    questions: [
-      { id: 'click-edit', text: 'Could you edit the text just by clicking on it?' },
-      { id: 'saved', text: 'Did it show that your change was saved?' },
-      { id: 'persisted', text: 'Was your change still there after refreshing?' },
-    ],
-    background: 'Inline contentEditable on canvas blocks; autosave (Dexie → Supabase) round-trip.',
-  },
-  {
-    id: '21.6-structured-popover',
-    dateAdded: '2026-06-09',
-    category: 'Procedure builder',
-    title: 'Are measurement / decision details easy to fill in?',
-    status: 'active',
-    summary:
-      'Some blocks (like a measurement or a yes/no decision) have extra details. Clicking one opens a small panel to fill them in. We want to know if that feels clear.',
-    spotlight: 'Filling in measurement & decision details',
-    comparison: {
-      improvement:
-        'Before, these details were in a side panel away from the block. Now a small panel opens right beneath the block you clicked.',
-      before: { image: '/uat/screens/struct-before.png', caption: 'Before — far-off side panel' },
-      after: { image: '/uat/screens/struct-after.png', caption: 'After — opens beneath the block' },
-    },
-    tryIt: ['Click a measurement or decision block.', 'Try changing a value.', 'Press Escape to close it.'],
-    links: [{ label: 'Open a procedure', href: '/' }],
-    questions: [
-      { id: 'anchored', text: 'Did a panel open right next to the block you clicked?' },
-      { id: 'clear', text: 'Was it clear what to fill in?' },
-      { id: 'close', text: 'Did closing it (or pressing Escape) work as expected?' },
-    ],
-    background: 'StructuredFieldPopover anchored to the selected structured block; Puck field threading + autosave.',
-  },
-  {
-    id: '21.6-orphan-photos-relabel',
-    dateAdded: '2026-06-09',
-    category: 'Procedure builder',
-    title: 'Is the photo group label clear?',
-    status: 'active',
-    summary:
-      "When a procedure has loose photos that aren't tied to a step, we group them together. We just want to check the label reads as plain English.",
-    spotlight: 'The photo group label',
-    comparison: {
-      improvement:
-        "Before, this group was labelled 'Unanchored figures' — confusing jargon. Now it reads 'Reference images'.",
-      before: { image: '/uat/screens/photo-before.png', caption: 'Before' },
-      after: { image: '/uat/screens/photo-after.png', caption: 'After' },
-    },
-    tryIt: ['Open a procedure that has a group of reference photos.', 'Look at the label on that group.'],
-    links: [{ label: 'Open a procedure', href: '/' }],
-    questions: [
-      { id: 'reference', text: "Does the photo group read as 'Reference images'?" },
-      { id: 'no-jargon', text: 'Is the label clear and free of jargon?' },
-    ],
-    background: "Orphan PhotoGrid relabel — rail row + canvas chip must read 'Reference images', never 'Unanchored figures'.",
-  },
-  {
-    id: '21.6-section-reorder',
-    dateAdded: '2026-06-09',
-    category: 'Procedure builder',
-    title: 'Can you reorder sections easily?',
-    status: 'active',
-    summary:
-      'You can drag sections into a different order. We want to know if that feels easy and the new order sticks.',
-    spotlight: 'Reordering sections',
-    comparison: {
-      improvement:
-        'Before, there was no easy way to change the order. Now each section has a drag handle — drag to reorder and it sticks.',
-      before: { image: '/uat/screens/reorder-before.png', caption: 'Before — fixed order' },
-      after: { image: '/uat/screens/reorder-after.png', caption: 'After — drag handles' },
-    },
-    tryIt: ['Drag a section up or down in the side list.', 'Refresh the page to check the order stuck.'],
-    links: [{ label: 'Open a procedure', href: '/' }],
-    questions: [
-      { id: 'drag', text: 'Could you drag a section into a new position?' },
-      { id: 'stuck', text: 'Did the new order stay after refreshing?' },
-    ],
-    background: 'BuilderTreeRail drag-reorder via reorderSections server action; optimistic + revert-on-error.',
-  },
-  {
-    id: '21.6-publish-gate',
-    dateAdded: '2026-06-09',
-    category: 'Procedure builder',
-    title: 'Does it stop you publishing an unfinished procedure?',
-    status: 'active',
-    summary:
-      "A procedure shouldn't go live until every safety point has been checked off. We want to confirm it stops you — with a clear message — until then.",
-    spotlight: 'The publish safety check',
-    comparison: {
-      improvement:
-        'Before, publishing just failed with a cryptic error code. Now it clearly lists exactly which safety items still need checking first.',
-      before: { image: '/uat/screens/publish-before.png', caption: 'Before — cryptic error' },
-      after: { image: '/uat/screens/publish-after.png', caption: 'After — clear checklist' },
-    },
-    tryIt: ['Try to publish a procedure that still has unchecked safety items.'],
-    links: [{ label: 'Open a procedure', href: '/' }],
-    questions: [
-      { id: 'blocked', text: 'Were you stopped from publishing while items were unchecked?' },
-      { id: 'explained', text: 'Was the reason explained clearly?' },
-      { id: 'then-publish', text: 'Once everything was checked, could you publish?' },
-    ],
-    background: 'Publish gate (POST /api/sops/[sopId]/publish) returns 400 unverified_steps / open_findings / no_steps; UI surfaces the error.',
-  },
-
-  // ===================== Phase 23 — AI Field Layer + Version Supersede =====================
   {
     id: 'p23-roster-login',
     dateAdded: '2026-06-26',
@@ -461,113 +204,27 @@ export const UAT_TESTS: UatTest[] = [
       'AFL-VER-04 / D-08 (updated-since indicator). Badge triggers when sop.published_at > worker\'s last completion. The Updated signal now rides the rel badge on the one screen (the old SOP card is gone, Phase 57). The prop is derived server-side by comparing the SOP\'s current published_at against the most recent sop_completions.completed_at for that worker+SOP pair.',
   },
   {
-    id: 'p26-annotation-editor-feel',
-    dateAdded: '2026-07-03',
-    category: 'Phase 26 — SOP Builder Redesign',
-    title: 'Does drawing on a diagram feel right on a real device?',
-    status: 'archived',
-    summary:
-      'When editing a procedure you can now draw on a diagram — arrows, boxes, circles, numbered markers and freehand — and drag or resize what you drew. This one is about how it FEELS to draw on a touchscreen or with a stylus, which we can only judge on a real device. (Available once the annotate button is wired in a later step; verify after that ships.)',
-    tryIt: [
-      'Open a procedure in the builder, add a Visual block, add a diagram, and open the annotation editor.',
-      'Draw an arrow, a box, a numbered marker, and a freehand line.',
-      'Tap one shape and resize/rotate it with the handles; undo and redo a couple of times.',
-      'Turn on "Pen only" and confirm resting your palm or a finger does not draw while the pen does (iPad if you have one).',
-      'Close and re-open the same diagram — confirm exactly what you drew comes back.',
-    ],
-    links: [
-      { label: 'SOPs (admin — builder)', href: '/' },
-    ],
-    questions: [
-      { id: 'draw-feel', text: 'Did drawing shapes feel smooth and responsive?' },
-      { id: 'transform', text: 'Could you easily select, move and resize a shape?' },
-      { id: 'undo-redo', text: 'Did undo and redo behave as you expected?' },
-      { id: 'palm-reject', text: 'With "Pen only" on, did it ignore your palm/finger while the pen drew?' },
-      { id: 'reopen', text: 'After closing and re-opening, did your annotations reload exactly?' },
-    ],
-    background:
-      'Phase 26-11 Task 3 residual (R5 / D-03 slice 2). The Konva annotation editor (admin-only, dynamic-imported) plus its pure scene model (ARCHIVED 2026-10-03: the annotation editor was removed in Phase 55-10) are built and machine-tested (14 phase26 specs green: primitives, undo/redo, non-destructive serialize, palm-reject, hotspot coordinate-stability; tsc clean; worker bundle Konva-free Δ0). The draw/transform/palm-reject FEEL is device-dependent and cannot be proven headless — carried as a deferred-residual per the v3.0 device-verification precedent. On-device verification is only possible once 26-13 wires the annotate→save→reopen launch point; run this item then, alongside the 26-13 persistence check.',
-  },
-  {
-    id: 'p26-edit-worker-parity',
-    dateAdded: '2026-07-03',
-    category: 'Phase 26 — SOP Builder Redesign',
-    title: 'Does the block you edit look the same as what the worker sees?',
-    status: 'active',
-    summary:
-      'The builder was rebuilt so admins now edit the SAME block components the worker reads — no separate "editor look" vs "published look". This check is a visual side-by-side: edit a few block types, publish, then open the worker view and confirm they match.',
-    tryIt: [
-      'Open a published SOP in the builder and edit a Step, a Hazard card, and a Callout — change some text and a field (e.g. hazard severity).',
-      'Note how each block looks while you are editing it.',
-      'Publish, then open the same SOP in the worker view (/sops/[sopId]).',
-      'Compare each block: the layout, colours, icons and spacing should match what you saw while editing.',
-    ],
-    links: [
-      { label: 'SOPs (admin — builder)', href: '/' },
-      { label: 'SOPs (worker view)', href: '/' },
-    ],
-    questions: [
-      { id: 'match', text: 'Did each block look the same in the editor as in the worker view?' },
-      { id: 'no-surprise', text: 'Was there anything that looked different after publishing than while editing?' },
-      { id: 'fields', text: 'Did field changes (e.g. hazard severity colour) carry through to the worker view?' },
-    ],
-    background:
-      'R2 edit==worker visual parity (Phase 26 D-01). LayoutRenderer + BLOCK_COMPONENTS render the same components in both mode=edit (admin canvas / EditableDocument) and mode=read (worker /sops/[sopId]) — Puck is fully removed, so there is no separate Puck-render path to diverge. Machine-proven structurally (block-registry contract-check 18/18/18, convert-golden byte-equivalence, worker bundle Δ0); the visual "they truly look identical" judgment is a human check.',
-  },
-  {
-    id: 'p26-baked-annotation-on-worker-read',
-    dateAdded: '2026-07-03',
-    category: 'Phase 26 — SOP Builder Redesign',
-    title: 'Do annotations you draw show up baked onto the worker\'s diagram?',
-    status: 'archived',
-    summary:
-      'When you annotate a diagram in the builder (arrows/boxes/numbered markers) and publish, the worker should see those marks baked flat onto the image — no editing handles, exactly as drawn. This is the end-to-end annotate → publish → worker-read check on a real device.',
-    tryIt: [
-      'Open a procedure in the builder, add a Visual block with a diagram, and annotate it (arrow + box + a numbered marker).',
-      'Close and re-open the annotation editor once to confirm your marks reload exactly (re-edit round-trip).',
-      'Publish the SOP.',
-      'Open the SOP as a worker (/sops/[sopId]) and find that diagram.',
-      'Confirm the annotations appear baked onto the image — flat, in the right places, with no draggable handles or edit controls.',
-    ],
-    links: [
-      { label: 'SOPs (admin — builder)', href: '/' },
-      { label: 'SOPs (worker view)', href: '/' },
-    ],
-    questions: [
-      { id: 'baked', text: 'Did your annotations appear on the worker\'s diagram exactly where you drew them?' },
-      { id: 'flat', text: 'On the worker view, were they flat (no edit handles or controls)?' },
-      { id: 'reopen', text: 'When you re-opened the editor before publishing, did your marks reload exactly?' },
-    ],
-    background:
-      'ARCHIVED 2026-10-03 (annotation editor removed in Phase 55-10; already-baked images still display). R5 / D-03 — annotate→re-edit→bake pipeline end-to-end. The non-destructive Konva scene serializes to layout_data; on publish it bakes to a flat PNG for the worker read path (Konva stays admin-only, worker bundle Konva-free Δ0). Machine-tested for scene serialize/reopen + palm-reject + bundle isolation; the on-device annotate→publish→worker-read visual confirmation is a human check (run alongside p26-annotation-editor-feel once 26-13 wires the launch point).',
-  },
-
-  {
     id: 'agent-layer-dashboard',
     dateAdded: '2026-07-05',
     category: 'Phase 26.5 — Agent Metadata Layer',
     title: 'Does the AI agent layer feel useful, not intrusive?',
     status: 'active',
     summary:
-      'There is now a machine layer working quietly behind every procedure — it reads what happens in the field and suggests improvements. You can peek at what it has learned in the builder (a purple "⚇ Agent layer" toggle) and review its suggestions on one org-wide dashboard.',
+      'There is now a machine layer working quietly behind every procedure — it reads what happens in the field and suggests improvements. You review its suggestions on one org-wide dashboard.',
     tryIt: [
-      'Open a published procedure in the builder and click the "⚇ Agent layer" toggle in the header.',
-      'Check the panel is read-only — summary, tags, entities, and per-block metadata, nothing editable.',
       'Open the agent dashboard and look at the proposals queue and the recent activity feed.',
       'If there is a pending proposal, approve or decline it and confirm it leaves the queue.',
     ],
     links: [
-      { label: 'SOPs (admin — builder)', href: '/' },
       { label: 'Agent dashboard', href: '/admin/agent' },
     ],
     questions: [
-      { id: 'panel-readonly', text: 'Was the agent panel in the builder clearly read-only (nothing to type into)?' },
       { id: 'evidence-clear', text: 'Was it clear what evidence a proposal was based on?' },
       { id: 'decide-works', text: 'Did approving/declining a proposal remove it from the queue?' },
       { id: 'not-intrusive', text: 'Did the agent layer feel useful rather than getting in the way?' },
     ],
     background:
-      'D-09 (two surfaces: builder agentview panel, org /admin/agent dashboard), D-10 (strictly read-only metadata + approve/decline the only interactive affordance), D-11 (proposals queue primary, activity feed secondary, no cross-SOP graph viz), D-14 (activity feed proves the layer is alive). Both server actions and UI verified behaviourally (agent-panel-readonly.spec.ts, agent-dashboard.spec.ts) — this UAT entry is the human "does it feel right" check.',
+      'D-09 (the SOP-level agent panel retired with the builder in Phase 58; the org /admin/agent dashboard remains), D-10 (strictly read-only metadata + approve/decline the only interactive affordance), D-11 (proposals queue primary, activity feed secondary, no cross-SOP graph viz), D-14 (activity feed proves the layer is alive). Both server actions and UI verified behaviourally (agent-dashboard.spec.ts) — this UAT entry is the human "does it feel right" check.',
   },
 
   {
@@ -618,31 +275,6 @@ export const UAT_TESTS: UatTest[] = [
     ],
     background:
       'D-09 (the Access view, now the /admin/access page), D-12 (wire-up entry from both the post-publish CTA and organically), D-11 (additive-only grants — no in-place revoke here), SC-4 (viz-as-library-filter deep-links). WiringPatchBay/SelectionStrip built in 32-08; the page arm, deep-links, and publish CTA land in 32-09; drill-down + plain-language copy + the answer panel land in 33-08/33-09 (see the Phase 33 — Access map entries below for current copy).',
-  },
-
-  {
-    id: 'p33-wayfinder-header',
-    dateAdded: '2026-07-19',
-    category: 'Phase 33 — Builder header',
-    title: 'Is the new builder header clear about where you are and what unlocks next?',
-    status: 'active',
-    summary:
-      'The dark bar at the top of the SOP builder is now a light bar with three parts: a "Back to The site" link, a "You\'re editing" tag with the SOP title, and a button showing the next stage — which tells you in plain words if it\'s locked and why. All the other tools (assign, versions, delete) are now in one "Tools for this SOP" menu.',
-    tryIt: [
-      'Open any draft SOP in the builder and look at the header — check you can tell where you are and what SOP you\'re editing at a glance.',
-      'With some steps still unchecked, look at the button on the right — read the sentence under it out loud; is it clear what\'s stopping you from sending this to workers?',
-      'Click "Tools for this SOP ▾" and confirm every item (assign, versions, delete draft) is there with a plain-English label.',
-      'Check every step, then look at the same button again — it should turn green and say you\'re ready to send it to workers.',
-    ],
-    links: [{ label: 'SOPs', href: '/' }],
-    questions: [
-      { id: 'orientation-clear', text: 'Could you tell where you were and what SOP you were editing at a glance?' },
-      { id: 'lock-reason-clear', text: 'Was it clear why "Send to workers" was locked, and what to do about it?' },
-      { id: 'tools-menu-findable', text: 'Did the "Tools for this SOP" menu have everything you expected, clearly labelled?' },
-      { id: 'no-clutter', text: 'Did the header feel calmer than before, without losing anything you needed?' },
-    ],
-    background:
-      'SC-6 (33-04) — replaces the dark #0a0a0b header with a light paper/hairline "Wayfinder" bar (back/here/forward zones); the old SopActionsMenu + per-tool buttons + DeleteSopButton cluster collapses into one "Tools for this SOP ▾" menu. Winner of a 3-concept sketch review (sketches/builder-header-orientation), locked 2026-07-19. Screenshot check per CLAUDE.md 2026-07-14 (an undefined CSS token renders wrong but fails no automated gate) — this entry exists so a human actually looks at the rendered bar.',
   },
 
   {
@@ -823,11 +455,11 @@ export const UAT_TESTS: UatTest[] = [
     dateAdded: '2026-07-27',
     category: 'Phase 36 — Refresher cadence & version currency',
     title: 'Set a refresher reminder on a procedure — does it show up without blocking anyone?',
-    status: 'active',
+    status: 'archived', // 58-16: the setting lived on the retired Version History page; its new home is not built yet
     summary:
       'Admins can set how often workers should re-walk a procedure (e.g. every 6 months). Once that time passes, workers see a friendly reminder — it never stops them opening or completing the procedure.',
     tryIt: [
-      'Open a procedure\'s Version History page and set a refresher interval (e.g. 1 month, to see it trigger quickly for testing).',
+      'Set a refresher interval on a procedure (e.g. 1 month, to see it trigger quickly for testing).',
       'As a worker who\'s already completed that procedure, check the "Next for you" card on the site and the training matrix for a reminder.',
       'Try opening and completing the procedure again — confirm nothing blocks you.',
     ],
@@ -836,24 +468,6 @@ export const UAT_TESTS: UatTest[] = [
       { id: 'cadence-clear', text: 'Was it clear how often workers need to re-walk this procedure?' },
       { id: 'reminder-visible', text: 'Did the reminder appear where you\'d expect (the site / the matrix)?' },
       { id: 'never-blocked', text: 'Did it ever stop anyone from opening or completing the SOP?' },
-    ],
-  },
-  {
-    id: 'p36-version-breakdown',
-    dateAdded: '2026-07-27',
-    category: 'Phase 36 — Refresher cadence & version currency',
-    title: 'Open a procedure\'s Version History — can you see who completed each version?',
-    status: 'active',
-    summary:
-      'The Version History page now shows how many people completed each version of a procedure, with a list you can expand to see names and dates.',
-    tryIt: [
-      'Open any procedure with more than one published version and go to its Version History page.',
-      'Look at each version row and expand the worker list on one of them.',
-    ],
-    links: [{ label: 'Version history', href: '/' }],
-    questions: [
-      { id: 'breakdown-visible', text: 'Could you see how many people completed each version?' },
-      { id: 'current-obvious', text: 'Was the current version obvious?' },
     ],
   },
   {
@@ -924,29 +538,6 @@ export const UAT_TESTS: UatTest[] = [
     ],
     background:
       'ASR-01/D-08 — AssessmentRequestsPanel (37-05) reads listAssessmentRequests() and mounts the shared RecordObservationModal preset to the requester + SOP; requestAssessorReview (37-03) writes the underlying worker_notifications row.',
-  },
-  {
-    id: 'p41-merged-sop-surface',
-    dateAdded: '2026-09-13',
-    category: 'Procedure builder',
-    title: 'Does the SOPs page show everything admins need in one place?',
-    status: 'archived',
-    summary:
-      'Admins used to have two separate SOP pages — one for browsing, one for managing. They are now one page: open SOPs and the extra admin views appear as extra tabs down the side.',
-    tryIt: [
-      'As an admin, open SOPs.',
-      'Look down the left side — you should see extra scopes: Drafts, Published, Needs attention, and Access, alongside the everyday view.',
-      'Click Needs attention — confirm the queue of SOPs that need a look appears.',
-      'Click back (or pick another scope) — confirm you land back where you started, on the same page.',
-    ],
-    links: [{ label: 'SOPs', href: '/' }],
-    questions: [
-      { id: 'extra-scopes-visible', text: 'Could you see the extra admin scopes (Drafts, Published, Needs attention, Access) without being told where to look?' },
-      { id: 'queue-appears', text: 'Did clicking Needs attention show you the right queue?' },
-      { id: 'no-lost-place', text: 'Did switching scopes and coming back feel like one page, not a jump to somewhere else?' },
-    ],
-    background:
-      'Archived 2026-09-29 (Phase 54): the page this test describes (tabbed scopes down the left side of /sops) no longer exists — the queue moved to its own route, /governance, and the admin table replaced the scope column. See governance-inbox and library-table below.',
   },
   {
     id: 'governance-inbox',
@@ -1040,6 +631,29 @@ export const UAT_TESTS: UatTest[] = [
     background:
       'PHN-01..03 (Phase 53) — below 1024px a worker (or an admin on a phone) whose org has a drawn site sees the phone home: ask bar, Now card, floor thumbnail → department-grouped machine sheet, and an in-app QR scanner with a typed-code fallback, all resolving to /m/<code>.',
   },
+  {
+    id: 'p58-focus-screen',
+    dateAdded: '2026-10-05',
+    category: 'The SOP screen',
+    title: 'Is the one SOP screen clear — read it, walk it, and (for admins) edit it?',
+    status: 'active',
+    summary:
+      'A SOP is now one screen. Workers read it, press Start walking and are led through the steps one at a time; admins flip the same screen to Edit and change the steps in place.',
+    tryIt: [
+      'Open a SOP from a machine or the Noticeboard and read down the page.',
+      'Press Start walking: do a hazard step, a step that needs a photo, then Send for sign-off.',
+      'If you are an admin: switch the same SOP to Edit, change a step, tick it, and look at the Publish bar.',
+    ],
+    links: [{ label: 'The site', href: '/' }],
+    questions: [
+      { id: 'one-screen', text: 'Did it feel like one screen you could read, walk and (as an admin) edit, rather than several pages?' },
+      { id: 'walk-clear', text: 'While walking, was it always obvious what to do next?' },
+      { id: 'edit-clear', text: 'As an admin, was it obvious which steps still needed checking before you could publish?' },
+    ],
+    background:
+      'Phase 58: the tabbed SOP page, the old walkthroughs, the builder and the versions page are replaced by the focus screen (Browse, Walk, Edit). Steps are the one model; the publish gate counts unchecked steps and open AI findings. Deployed eval: tests/evals/sop-focus.eval.ts.',
+  },
+
   {
     id: 'example-direction-template',
     dateAdded: '2026-06-09',

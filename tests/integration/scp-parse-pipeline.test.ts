@@ -1,9 +1,11 @@
 /**
- * SCP-PARSE-01..04 — Phase 20 conversion-pipeline contract.
+ * SCP-PARSE -- Phase 20 conversion-pipeline contract, cut down in Phase 58-16.
  *
- * Phase 21 Wave 4 (Plan 21-04) — stubs flipped to LIVE source-contract tests.
- * Same Rule-3 downgrade rationale as scp-verify-checklist.test.ts (see file
- * header there).
+ * The converter halves (block provenance, junction materialisation, the plain core module the parser
+ * used for blocks) and the builder halves (the builder route, the source-viewer pane) went with the
+ * block model. What stays is the part of the contract the focus screen still relies on: the review
+ * address redirect, the AI check firing after a parse, the bundle isolation markers, and the publish
+ * gate counting focus steps.
  */
 import { test, expect } from '@playwright/test'
 import fs from 'node:fs'
@@ -14,53 +16,24 @@ function read(rel: string): string {
   return fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8')
 }
 
-test.describe('SCP-PARSE — Phase 20 contract integration (Phase 21)', () => {
-  test('SCP-PARSE-01: parse pipeline writes block_provenance on every produced block', () => {
-    // The converter accepts a ProvenanceContext and stamps every Puck item.
-    const conv = read('src/lib/parsers/parsed-sop-to-layout-data.ts')
-    expect(conv).toContain('export interface ProvenanceContext')
-    expect(conv).toContain('sourceKind')
-    expect(conv).toContain("'pdf' | 'docx' | 'scan' | 'video' | 'ai_prompt'")
-    expect(conv).toContain('buildBlockProvenance')
-    expect(conv).toContain('BlockProvenanceSchema.safeParse')
-    expect(conv).toContain('item.props.block_provenance = prov')
-
-    // Phase 58 (D-19): the parse route no longer builds a provenance context or
-    // writes a layout; it lands focus steps (asserted in SCP-PARSE-05 below).
+test.describe('SCP-PARSE -- Phase 20 contract integration (cut down in 58-16)', () => {
+  test('SCP-PARSE-01/05: the parse route lands focus steps, never a layout or junctions (D-19)', () => {
     const route = read('src/app/api/sops/parse/route.ts')
     expect(route).not.toContain('ProvenanceContext')
+    expect(route).toContain('writeFocusStepsForSop(')
+    expect(route).not.toContain('materializeJunctionsForLayout')
+    expect(route.indexOf('writeFocusStepsForSop(')).toBeLessThan(route.indexOf("status: 'completed'"))
   })
 
-  test('SCP-PARSE-02: parsed drafts land in /admin/sops/builder/[sopId] (legacy /review redirects 308)', () => {
-    // Legacy redirect installed by Wave 2.
+  test('SCP-PARSE-02: the legacy review address redirects to the focus editor', () => {
     const next = read('next.config.ts')
     expect(next).toContain("source: '/admin/sops/:sopId/review'")
-    // Phase 58-14 (D-23): the review address now lands on the focus editor.
+    // Phase 58-14 (D-23): the review address lands on the focus editor.
     expect(next).toContain("destination: '/sops/:sopId?mode=edit'")
-
-    // Builder route exists + mounts the SOP via BuilderStageShell
-    // (Phase 26 superseded the legacy shell — 30-01 repoint).
-    const page = read('src/app/(protected)/admin/sops/builder/[sopId]/page.tsx')
-    expect(page).toContain('BuilderStageShell')
-    expect(page).toContain('layout_data')
   })
 
-  test('SCP-PARSE-03: side-by-side source viewer mounted in builder', () => {
-    // Repointed Phase 30 / 30-01: BuilderStageShell owns the provider +
-    // CONV-12 carve-out; ReviewStation (its Review stage) mounts the pane.
-    const shell = read(
-      'src/app/(protected)/admin/sops/builder/[sopId]/BuilderStageShell.tsx',
-    )
-    expect(shell).toContain('SourceViewerSelectionProvider')
-    // CONV-12 carve-out: AI-prompt SOPs skip the pane.
-    expect(shell).toMatch(/showPane = !!sourceFilePath/)
-    const reviewStation = read(
-      'src/app/(protected)/admin/sops/builder/[sopId]/ReviewStation.tsx',
-    )
-    expect(reviewStation).toContain('SourceViewerPane')
-    // D-21-09 bundle isolation is enforced structurally by the postbuild
-    // gate: pdfjs/mammoth marker scan over the WORKER route's chunk set
-    // (the source-viewer chain is admin-route-only).
+  test('SCP-PARSE-03: pdfjs and mammoth stay out of the worker route (bundle gate markers)', () => {
+    // D-21-09 bundle isolation is enforced structurally by the postbuild gate.
     const bundleGate = read('scripts/check-bundle-size.ts')
     expect(bundleGate).toContain('pdfjs-dist')
     expect(bundleGate).toContain('mammoth')
@@ -80,69 +53,19 @@ test.describe('SCP-PARSE — Phase 20 contract integration (Phase 21)', () => {
     expect(route).toMatch(/void triggerReviewerOnParseCompletion\(job\.id\)/)
   })
 
-  test('Phase 23 G-01 compat: new sop_section_blocks rows start with verified_by_admin_id NULL', () => {
-    // Wave 0 contract — the column has no DEFAULT, so newly inserted rows
-    // naturally land as NULL. Phase 23 supersede flow relies on this.
-    const migration = read(
-      'supabase/migrations/00032_phase21_verified_by_and_ai_review_results.sql',
-    )
-    // No DEFAULT clause on verified_by_admin_id.
+  test('Phase 23 G-01 compat: verified_by_admin_id has no default, so a new row starts unticked', () => {
+    // Wave 0 contract -- the column has no DEFAULT, so newly inserted rows naturally land as NULL.
+    const migration = read('supabase/migrations/00032_phase21_verified_by_and_ai_review_results.sql')
     expect(migration).not.toMatch(/verified_by_admin_id .* default/i)
     // D-21-05 documented in migration comment.
     expect(migration).toContain('D-21-05')
   })
 
-  // -------------------------------------------------------------------------
-  // Plan 21-05 — gap closure (verifier PASS-WITH-NOTES + UAT 2026-05-25).
-  // The verify checklist walks sop_section_blocks; until 21-05 the parser
-  // never wrote junctions, so the publish gate was 0===0 no-op. These tests
-  // assert the contract from the integration side.
-  // -------------------------------------------------------------------------
-
-  test('SCP-PARSE-05: parser materializes junctions per Puck item with block_provenance', () => {
-    const conv = read('src/lib/parsers/parsed-sop-to-layout-data.ts')
-    // Public export the parse route consumes.
-    expect(conv).toContain('export async function materializeJunctionsForLayout')
-    // category='parsed_inline' enforced inside the loop (T-21-05-01).
-    expect(conv).toContain("category: 'parsed_inline'")
-    // junctionId stamped on the Puck item AFTER the junction insert resolves.
-    expect(conv).toContain('item.props.junctionId = addRes.junction.id')
-    // Throws on partial failure (T-21-05-02) — no orphan junctions.
-    expect(conv).toMatch(/throw new Error\(\s*`\[materializeJunctionsForLayout\]/)
-    // Strict adapter Zod-validates on the way out (T-21-05-03).
-    expect(conv).toContain('BlockContentSchema.safeParse(candidate)')
-
-    // Phase 58 (D-19): no route materialises junctions any more; the parse route
-    // lands focus steps via the shared writer, before the job is completed.
-    const route = read('src/app/api/sops/parse/route.ts')
-    expect(route).toContain('writeFocusStepsForSop(')
-    expect(route).not.toContain('materializeJunctionsForLayout')
-    expect(route.indexOf('writeFocusStepsForSop(')).toBeLessThan(route.indexOf("status: 'completed'"))
-  })
-
-  test('SCP-PARSE-06: publish-gate gates on parser-created junctions (no longer a 0===0 no-op)', () => {
-    // The plan deliverable: parsed SOPs have junctions so the gate fires.
-    // Phase 58 D-16 re-keyed the gate onto focus steps; the old builder's chip
-    // now answers from the same three counts via src/actions/publish-gate.ts.
-    const action = read('src/actions/sop-section-blocks.ts')
-    expect(action).toContain('getStepGateStatus(')
-    expect(read('src/actions/publish-gate.ts')).toContain('ready: reasons.length === 0')
-    // Phase 46 CR-01 removed the wire-reachable service-role bypass; the
-    // parser goes through the non-'use server' core entry point, and the
-    // action module carries no trust override at all (Phase 55).
-    expect(action).not.toContain('serviceRole')
-    const core = read('src/lib/builder/section-blocks-core.ts')
-    expect(core).toContain('export async function addBlockToSectionAsService')
-    // The junction insert forwards block_provenance into the column.
-    expect(core).toContain('block_provenance: blockProvenance ?? null')
-  })
-
-  test('SCP-PARSE-07: the parser creates parsed_inline blocks through the plain core module (T-21-05-01)', () => {
-    // Phase 55 removed the content library (and its listing action); the
-    // parser's session-less path is createBlockAsService in the core module
-    // (Phase 43 T-43-01) — there is no wire-level service-role override.
-    const core = read('src/lib/blocks/create-block-core.ts')
-    expect(core).toContain('category: z.string().max(60).nullable().optional()')
-    expect(core).toContain('export async function createBlockAsService')
+  test('SCP-PARSE-06: the publish gate counts focus steps and findings (D-16)', () => {
+    // Phase 58 D-16 re-keyed the gate onto focus steps; the focus publish bar answers from the same counts.
+    const action = read('src/actions/publish-gate.ts')
+    expect(action).toContain('ready: reasons.length === 0')
+    expect(action).toContain("from('sop_focus_steps')")
+    expect(read('src/components/focus/admin/PublishBar.tsx')).toContain('getPublishGateStatus')
   })
 })

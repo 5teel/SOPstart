@@ -129,35 +129,10 @@ export const INVENTORY: Row[] = [
   { file: 'tests/lint/no-dead-internal-hrefs.spec.ts', disposition: 'repoint', plan: '58-15' },
   // ---- 58-16 retirement: whole-subject deletes and the deletion sweep ----
   { file: 'tests/phase55/deletion-sweep.spec.ts', disposition: 'repoint', plan: '58-16' }, // dropped-features list + LIVE_FEATURES
-  { file: 'tests/builder/builder-edit-stage.spec.ts', disposition: 'delete', plan: '58-16' },
-  { file: 'tests/builder/builder-review-flow.spec.ts', disposition: 'delete', plan: '58-16' }, // 58-05 moves the gate halves to phase58 first
-  { file: 'tests/sb-layout-editor.test.ts', disposition: 'delete', plan: '58-16' },
-  { file: 'tests/sb-section-schema.test.ts', disposition: 'delete', plan: '58-16' },
-  { file: 'tests/integration/scp-source-viewer.test.ts', disposition: 'delete', plan: '58-16' },
-  { file: 'tests/integration/scp-verify-checklist.test.ts', disposition: 'delete', plan: '58-16' },
-  { file: 'tests/phase23/version-supersede.spec.ts', disposition: 'delete', plan: '58-16' },
-  { file: 'tests/phase26/ghosts.spec.ts', disposition: 'delete', plan: '58-16' },
-  { file: 'tests/phase26/inserter.spec.ts', disposition: 'delete', plan: '58-16' },
-  { file: 'tests/phase26/reorder.spec.ts', disposition: 'delete', plan: '58-16' },
-  { file: 'tests/phase26/visual-block.spec.ts', disposition: 'delete', plan: '58-16' },
-  { file: 'tests/phase26/field-map.spec.ts', disposition: 'delete', plan: '58-16' },
-  { file: 'tests/phase26/field-inline-patterns.spec.ts', disposition: 'delete', plan: '58-16' },
-  { file: 'tests/phase26/autosave-rewire.spec.ts', disposition: 'delete', plan: '58-16' },
-  { file: 'tests/phase26/ai-overlay.spec.ts', disposition: 'delete', plan: '58-16' },
-  { file: 'tests/phase26.5/agent-panel-readonly.spec.ts', disposition: 'delete', plan: '58-16' },
-  { file: 'tests/phase29/publish-stage-approval.spec.ts', disposition: 'delete', plan: '58-16' },
-  { file: 'tests/phase29/version-history-approvals.spec.ts', disposition: 'delete', plan: '58-16' },
-  { file: 'tests/phase30/list-rows.spec.ts', disposition: 'delete', plan: '58-16' },
-  { file: 'tests/phase30/plain-language.spec.ts', disposition: 'delete', plan: '58-16' },
-  { file: 'tests/phase33/wayfinder-header.spec.ts', disposition: 'delete', plan: '58-16' },
-  { file: 'tests/phase33/plain-language-access.spec.ts', disposition: 'delete', plan: '58-16' },
-  { file: 'tests/phase36/version-breakdown-panel.spec.ts', disposition: 'delete', plan: '58-16' },
-  { file: 'src/components/admin/verify-checklist/__tests__/VerifyChecklistGate.test.tsx', disposition: 'delete', plan: '58-16' },
-  { file: 'src/components/admin/verify-checklist/__tests__/publish-gate.integration.test.ts', disposition: 'delete', plan: '58-16' }, // 58-05 moves the gate halves first
 ]
 
 // Each owning plan appends its id (e.g. '58-05') when its last commit lands.
-export const LIVE_PLANS: string[] = ['58-07', '58-11', '58-14', '58-15']
+export const LIVE_PLANS: string[] = ['58-07', '58-11', '58-14', '58-15', '58-16']
 
 function stripComments(src: string): string {
   return src

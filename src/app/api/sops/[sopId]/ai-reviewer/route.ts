@@ -21,12 +21,10 @@
  * GET /api/sops/[sopId]/ai-reviewer
  *   Anyone with edit access to the SOP (admin, safety manager, or a sign-off
  *   approver) — resolved by requireSopEditAccess.
- *   Returns: { findings, lastRunAt, hasSource, flags }
+ *   Returns: { findings, lastRunAt, hasSource }
  *     findings   rows of the latest run plus every still-open row
  *     lastRunAt  null means the check has never run
  *     hasSource  false => "wording and clarity only" (D-17)
- *     flags      the latest parse job's envelope flags; read only by the old
- *                builder's flag panel until 58-16 deletes it
  *
  * Trust boundary: every admin-client query below carries the SESSION
  * organisation, never a value read off a fetched row (CLAUDE.md 2026-07-28).
@@ -217,17 +215,16 @@ export async function GET(
 
   const { data: job } = await admin
     .from('parse_jobs')
-    .select('transcript_text, prompt_text, ai_review_results')
+    .select('transcript_text, prompt_text')
     .eq('sop_id', sopId)
     .eq('organisation_id', orgId)
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle()
   const hasSource = job ? pickSourceText(job as { transcript_text: string | null; prompt_text: string | null }).trim().length > 0 : false
-  const envelope = (job?.ai_review_results ?? null) as { flags?: unknown[] } | null
 
   return NextResponse.json(
-    { findings: findings ?? [], lastRunAt, hasSource, flags: envelope?.flags ?? [] },
+    { findings: findings ?? [], lastRunAt, hasSource },
     { status: 200 },
   )
 }

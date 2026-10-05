@@ -78,24 +78,6 @@ export default defineConfig({
       testMatch: /.*\.test\.ts$/,
     },
     {
-      // Phase 21.5 — source-contract stubs: block-type-labels unit test
-      // (Plan 01) + builder-review-flow integration spec (Plan 05).
-      // testDir covers both tests/ and src/ so both files are discoverable.
-      // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
-      name: 'phase21.5-stubs',
-      testDir: '.',
-      testMatch: /(block-type-labels|builder-review-flow)\.(test|spec)\.ts$/,
-    },
-    {
-      // Phase 21.6 — source-contract + lint guard stubs (Plan 01):
-      //   builder-edit-stage.spec.ts  — E3/E4/E5/E6/E7 structural invariants
-      //   no-raw-block-types-in-build.spec.ts — E2 raw block-type leak guard
-      // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
-      name: 'phase21.6-stubs',
-      testDir: '.',
-      testMatch: /(no-raw-block-types-in-build|builder-edit-stage)\.(test|spec)\.ts$/,
-    },
-    {
       // Phase 25 — departments RLS + SOP visibility integration specs.
       //   departments-rls.spec.ts      — cross-tenant isolation + no-42P17 recursion (REQ-1, T-25-01/03, D-02a)
       //   sop-dept-visibility.spec.ts  — OR-composed worker visibility: Forming sees Forming + all_departments (REQ-3, D-02)
@@ -105,22 +87,6 @@ export default defineConfig({
       name: 'phase25-integration',
       testDir: '.',
       testMatch: /(departments-rls|sop-dept-visibility|no-global-blocks-in-journeys|member-dept|wizard-sop-dept)\.(test|spec)\.ts$/,
-    },
-    {
-      // Phase 22 — Voice-Driven Walkthrough source-contract + unit stub specs (Plan 01).
-      //
-      // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
-      // Specs are registered here so the Nyquist Wave-0 harness gates every requirement
-      // before production code ships in Waves 1-2.
-      //
-      // Verify registration: `npx playwright test --list --project=phase22-stubs`
-      // (should list all 6 tests/phase22/*.spec.ts files — zero discovered = FAIL)
-      //
-      // Files registered here:
-      name: 'phase22-stubs',
-      testDir: '.',
-      testMatch: /tests\/phase22\/.*\.(spec|test)\.ts$/,
-      use: { browserName: 'chromium' },
     },
     {
       // Phase 23 — AI Field Layer + Version Supersede source-contract stubs (Wave 0 / Plan 23-00).

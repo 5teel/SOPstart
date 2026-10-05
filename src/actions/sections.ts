@@ -136,68 +136,6 @@ export async function reorderSections(
   return { success: true }
 }
 
-const UpdateSectionLayoutInput = z.object({
-  sectionId: z.string().uuid(),
-  layoutData: z.unknown(),
-  layoutVersion: z.number().int().min(1),
-  clientUpdatedAt: z.number().int().min(0),
-})
-
-const MAX_LAYOUT_BYTES = 128 * 1024 // 128 KB hard cap per Research Open Question 3
-
-export async function updateSectionLayout(
-  input: z.infer<typeof UpdateSectionLayoutInput>
-): Promise<{ success: true } | { error: string }> {
-  const parsed = UpdateSectionLayoutInput.safeParse(input)
-  if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? 'Invalid input' }
-  }
-
-  // 128 KB byte cap (T-12-04-01 mitigation)
-  const serialized = JSON.stringify(parsed.data.layoutData)
-  if (Buffer.byteLength(serialized, 'utf8') > MAX_LAYOUT_BYTES) {
-    return { error: 'Layout exceeds 128 KB; reduce block count or content' }
-  }
-
-  const ctx = await requireSopEditAccess({ sectionId: parsed.data.sectionId })
-  if ('error' in ctx) return ctx
-  const { supabase } = ctx
-
-  // LWW check (D-07): if server updated_at is newer than clientUpdatedAt,
-  // signal server_newer so the caller (flushDraftLayouts) drops the local row.
-  const { data: current, error: selErr } = await supabase
-    .from('sop_sections')
-    .select('updated_at')
-    .eq('id', parsed.data.sectionId)
-    .maybeSingle()
-  if (selErr) {
-    console.error('[updateSectionLayout] select error', selErr)
-    return { error: selErr.message }
-  }
-  if (current?.updated_at) {
-    const serverMs = new Date(current.updated_at as string).getTime()
-    if (serverMs > parsed.data.clientUpdatedAt) {
-      return { error: 'server_newer' }
-    }
-  }
-
-  const { error: updErr } = await supabase
-    .from('sop_sections')
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .update({
-      layout_data: parsed.data.layoutData as any,
-      layout_version: parsed.data.layoutVersion,
-      updated_at: new Date(parsed.data.clientUpdatedAt).toISOString(),
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any)
-    .eq('id', parsed.data.sectionId)
-  if (updErr) {
-    console.error('[updateSectionLayout] update error', updErr)
-    return { error: updErr.message }
-  }
-  return { success: true }
-}
-
 /**
  * Phase 23 AFL-AI-03 — High-stake section title update.
  * Used by the 'sop.section.title' AI field descriptor (stakeLevel:'high' when published).

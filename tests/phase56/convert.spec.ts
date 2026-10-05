@@ -328,11 +328,14 @@ test.describe('plan', () => {
 })
 
 test.describe('registry parity', () => {
-  test('the converter handles exactly the BLOCK_COMPONENTS keys', () => {
-    const src = fs.readFileSync(path.join(process.cwd(), 'src/lib/builder/block-registry.tsx'), 'utf8').replace(/\r\n/g, '\n')
-    const body = src.slice(src.indexOf('export const BLOCK_COMPONENTS = {'), src.indexOf('} as const'))
-    const keys = [...body.matchAll(/^\s+(\w+):/gm)].map((m) => m[1])
-    expect(keys).toHaveLength(18)
-    expect([...HANDLED_TYPES].sort()).toEqual([...keys].sort())
+  // 58-16: the block registry the converter used to be checked against is deleted. Stored layout_data still
+  // carries these 18 types, so the converter's handled set is pinned to the literal list instead.
+  test('the converter handles exactly the 18 block types stored layout_data can carry', () => {
+    const stored = [
+      'CalloutBlock', 'DecisionBlock', 'EscalateBlock', 'HazardCardBlock', 'HeadingBlock', 'InspectBlock',
+      'MeasurementBlock', 'ModelBlock', 'PPECardBlock', 'PhotoBlock', 'PhotoGridBlock', 'SignOffBlock',
+      'StepBlock', 'StepWithPhotosBlock', 'TextBlock', 'VisualBlock', 'VoiceNoteBlock', 'ZoneBlock',
+    ]
+    expect([...HANDLED_TYPES].sort()).toEqual([...stored].sort())
   })
 })

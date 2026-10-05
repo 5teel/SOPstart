@@ -324,8 +324,7 @@ export async function POST(request: NextRequest) {
 
     // Surface any unattributed images at SOP-level so the admin can re-anchor
     // them from the review surface instead of losing them. Attached to the
-    // first section with step_id = null so SectionEditor renders them in its
-    // inline-images gallery.
+    // first section with step_id = null so the section's inline-images gallery shows them.
     if (firstSectionId !== null) {
       const orphans = uploadedImages.filter((img) => !attachedImageIndexes.has(img.index))
       for (const img of orphans) {

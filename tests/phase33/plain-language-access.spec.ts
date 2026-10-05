@@ -17,7 +17,7 @@
  *     (Phase 32 SC-6 pixel-stability contract — repoint
  *     banner-slot-stability.spec.ts's copy pins in the same commit, keep
  *     its structural pins).
- *   - PublishStage's "Wire up access" CTA label rewritten.
+ *   - (the old builder's publish-stage CTA is retired; Phase 58-16)
  *   - Internal identifiers (`createGrant`, `pending`, testids) are OUT of
  *     scope — SC-5 is user-visible copy only.
  *
@@ -35,10 +35,6 @@ const ROOT = process.cwd()
 const STRIP = path.join(ROOT, 'src', 'components', 'admin', 'wiring', 'SelectionStrip.tsx')
 const BAY = path.join(ROOT, 'src', 'components', 'admin', 'wiring', 'WiringPatchBay.tsx')
 const PANEL = path.join(ROOT, 'src', 'components', 'admin', 'wiring', 'AccessAnswerPanel.tsx')
-const PUBLISH_STAGE = path.join(
-  ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'builder', '[sopId]', 'PublishStage.tsx',
-)
-
 function read(p: string): string {
   return fs.readFileSync(p, 'utf-8')
 }
@@ -72,12 +68,6 @@ test.describe('SC-5 — no jargon literals in rendered wiring UI copy', () => {
     expect(body).toContain('follows collection')
     expect(body).toContain('chosen by name')
     expect(body).toContain("That didn&apos;t save")
-  })
-
-  test('PublishStage CTA no longer says "Wire up access"', () => {
-    const body = renderBody(read(PUBLISH_STAGE))
-    expect(body).not.toMatch(/Wire up access/i)
-    expect(body).toContain('Choose who sees it')
   })
 })
 

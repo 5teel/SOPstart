@@ -151,10 +151,7 @@ test.describe('pathways coverage — 0 not-mapped (CLAUDE.md pathways rule)', ()
     }
     walk(appDir, [])
     const journeys = read(JOURNEYS)
-    // Phase 58-14: these two pages are redirect-only (the proxy 307s their addresses to the focus
-    // editor before they render), so no pathway names them; 58-16 deletes the directories and this exemption.
-    const redirectOnly = ['/admin/sops/builder/[sopId]', '/admin/sops/[sopId]/versions']
-    const unmapped = found.filter((r) => !redirectOnly.includes(r) && !journeys.includes(`route: '${r}'`))
+    const unmapped = found.filter((r) => !journeys.includes(`route: '${r}'`))
     expect(unmapped).toEqual([])
   })
 })

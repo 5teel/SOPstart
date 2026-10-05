@@ -67,10 +67,10 @@ test.describe('standards actions', () => {
 })
 
 const PANEL = 'src/components/focus/admin/StandardsButton.tsx'
-const SHELL = 'src/app/(protected)/admin/sops/builder/[sopId]/BuilderStageShell.tsx'
+const SHELL = 'src/components/focus/admin/ThisSopBlock.tsx' // 58-16: the whole-SOP tools block holds both buttons
 
 test.describe('standards panel wiring', () => {
-  test('the Tools menu renders the panel button after the machines button', () => {
+  test('the whole-SOP tools block renders the standards button after the machines button', () => {
     const shell = read(SHELL)
     const machines = shell.indexOf('<MachinesButton')
     const standards = shell.indexOf('<StandardsButton')

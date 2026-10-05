@@ -256,62 +256,6 @@ export interface SectionKind {
 // The stale inline union previously declared here was a subset and has been
 // removed.
 
-export interface Block {
-  id: string
-  organisation_id: string | null
-  kind_slug: string
-  name: string
-  category: string | null
-  // Phase 13: controlled-vocab tag slugs (D-Tax-01)
-  category_tags: string[]
-  // Phase 13: free-text overlay tags (D-Tax-01)
-  free_text_tags: string[]
-  current_version_id: string | null
-  archived_at: string | null
-  created_by: string | null
-  created_at: string
-  updated_at: string
-  // Phase 25: org-wide flag (all_departments=true = visible under all departments, D-04)
-  all_departments?: boolean
-}
-
-export interface BlockVersion {
-  id: string
-  block_id: string
-  version_number: number
-  content: BlockContent
-  change_note: string | null
-  created_by: string | null
-  created_at: string
-}
-
-export type PinMode = 'pinned' | 'follow_latest'
-
-export interface SopSectionBlock {
-  id: string
-  sop_section_id: string
-  block_id: string
-  pinned_version_id: string | null
-  pin_mode: PinMode
-  snapshot_content: BlockContent
-  overridden_at: string | null
-  update_available: boolean
-  sort_order: number
-  created_at: string
-  updated_at: string
-  /**
-   * Phase 21 D-CV2-06 — JSONB region pointer back to the original source.
-   * Discriminated by `kind`: 'pdf' | 'docx' | 'scan' | 'video' | 'ai_prompt'.
-   * Nullable so pre-Phase-21 rows survive. Source viewer (Plan 21-02)
-   * consumes this to highlight the matching region on block selection.
-   */
-  block_provenance?: import('@/lib/parsers/source-viewer').SourceProvenanceRegion | null
-  /** Phase 21 SCP-VERIFY-01 — admin user_id who marked this block verified. */
-  verified_by_admin_id?: string | null
-  /** Phase 21 SCP-VERIFY-01 — timestamp of verify action. */
-  verified_at?: string | null
-}
-
 // ---------------------------------------------------------------
 // Phase 15: sub-trade vocab + voice Q&A + acknowledgement trace
 // Matches supabase/migrations/00030_sub_trades.sql.

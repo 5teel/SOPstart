@@ -5,8 +5,7 @@ import { createSection } from '@/actions/sections'
  * POST /api/sops/[sopId]/sections
  *
  * Creates a new section on the given SOP. Used by admin clients that prefer
- * fetch() over server actions (e.g. SectionEditor.tsx already uses fetch for
- * PATCH on /api/sops/[sopId]/sections/[sectionId]).
+ * fetch() over server actions.
  *
  * Delegates to the createSection server action which handles Zod validation,
  * RLS-scoped kind lookup, and next-sort-order computation.

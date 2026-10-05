@@ -93,10 +93,68 @@ test.describe('retire: builder and versions addresses (58-14)', () => {
   })
 })
 
+// Mirrors the 58-16 tokens in repoint-inventory.spec.ts (that file holds them as data for the test
+// folders; this one checks src/). Identifiers match on word boundaries so a longer name is not a hit.
+const IDENTIFIERS_58_16 = [
+  'ReadTab', 'SopTabNav', 'WorkerPreviewToggle', 'MobileWalkthrough', 'DesktopWalkthrough',
+  'ImmersiveStepCard', 'WalkthroughSwitcher', 'ViewModeToggle', 'SafetyAcknowledgement', 'StepProgress',
+  'scopeSopToJob', 'procedureSections', 'useSopDetail', 'completionStore',
+  'BuilderClient', 'BuilderStageShell', 'BuilderStageStepper', 'ReviewStation', 'OrientationStrip', 'NavRow',
+  'SectionListSidebar', 'BuilderTreeRail', 'PublishStage', 'BlockEditShell', 'EditableDocument',
+  'selection-bridge', 'SectionEditor', 'verify-checklist', 'useBuilderAutosave',
+  'parsedSopToPerSectionLayoutData', 'verifyBlock', 'stepAckTrace', 'builder-v2',
+]
+const LITERALS_58_16 = ['admin/sops/builder', "'admin', 'sops', 'builder'", 'admin/sops/[sopId]/versions', "'admin', 'sops', '[sopId]', 'versions'"]
+
 test.describe('retire: deleted components, routes and modules (58-16)', () => {
-  test.fixme(true, 'flips live in 58-16')
-  test('no src file references any 58-16 token (references, not just files -- CLAUDE.md 2026-08-04)', () => {})
-  test('the builder directory and the versions directory are gone', () => {})
-  test('submitCompletion takes no client-supplied step data and no ack trace parameter', () => {})
-  test('requireSopEditAccess has no junction arm', () => {})
+  test('no src file references any 58-16 token (references, not just files -- CLAUDE.md 2026-08-04)', () => {
+    const offenders: string[] = []
+    for (const f of walkSrc(path.join(ROOT, 'src'))) {
+      const code = stripComments(fs.readFileSync(f, 'utf-8'))
+      const rel = path.relative(ROOT, f).split(path.sep).join('/')
+      for (const id of IDENTIFIERS_58_16) {
+        const esc = id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+        if (new RegExp(`(^|[^A-Za-z0-9_])${esc}($|[^A-Za-z0-9_])`).test(code)) offenders.push(`${rel}: ${id}`)
+      }
+      for (const lit of LITERALS_58_16) if (code.includes(lit)) offenders.push(`${rel}: ${lit}`)
+    }
+    expect(offenders, offenders.join('\n')).toEqual([])
+  })
+
+  test('the builder directory and the versions directory are gone', () => {
+    for (const d of ['src/app/(protected)/admin/sops/builder', 'src/app/(protected)/admin/sops/[sopId]/versions', 'src/components/admin/builder-v2', 'src/components/admin/builder', 'src/components/admin/verify-checklist', 'src/components/sop/walkthrough', 'src/components/sop/tabs', 'src/components/sop/blocks']) {
+      expect(fs.existsSync(path.join(ROOT, d)), d).toBe(false)
+    }
+    expect(fs.existsSync(path.join(ROOT, 'src/actions/sop-section-blocks.ts'))).toBe(false)
+    expect(fs.existsSync(path.join(ROOT, 'src/app/api/sops/[sopId]/sections/[sectionId]'))).toBe(false)
+  })
+
+  test('submitCompletion takes no client-supplied step data and no ack trace parameter', () => {
+    const src = stripComments(read('src/actions/completions.ts'))
+    const start = src.indexOf('export async function submitCompletion')
+    expect(start).toBeGreaterThan(-1)
+    const next = src.indexOf('export async function', start + 10)
+    const body = src.slice(start, next === -1 ? undefined : next)
+    expect(body).toContain('z.object({ walkId: z.string().uuid() }).strict().safeParse(rawInput)')
+    expect(body).not.toMatch(/parsed\.data\.(stepData|contentHash|photoStoragePaths|localId|sopId|sopVersion)/)
+    expect(body).not.toMatch(/rawInput\s*[.[]/)
+    expect(src).not.toContain('submitWalkCompletion')
+    expect(read('src/lib/validators/completions.ts')).not.toContain('SubmitCompletionSchema')
+  })
+
+  test('requireSopEditAccess has no junction arm', () => {
+    const g = stripComments(read('src/lib/auth/guards.ts'))
+    expect(g).not.toContain('junctionId')
+    expect(g).not.toContain('sop_section_blocks')
+    expect(g).toContain('{ stepId: string }')
+  })
+
+  test('no server action or route still writes the block model', () => {
+    const offenders: string[] = []
+    for (const f of walkSrc(path.join(ROOT, 'src'))) {
+      const code = stripComments(fs.readFileSync(f, 'utf-8'))
+      if (/from\('sop_section_blocks'\)\s*\.(insert|update|delete|upsert)\(/.test(code)) offenders.push(path.relative(ROOT, f))
+    }
+    expect(offenders).toEqual([])
+  })
 })

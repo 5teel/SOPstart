@@ -81,7 +81,8 @@ test.describe('CAP-01 -- capability matrix document (source-contract)', () => {
     expect(doc).toContain('Record observation')
     expect(doc).toContain('Create SOP')
     expect(doc).toContain('Edit SOP content')
-    expect(doc).toContain('Verify blocks')
+    // 58-16: the per-block verify row retired with the block model; the per-step tick row replaces it.
+    expect(doc).toContain('Phase 58 -- tick or untick a step')
     expect(doc).toContain('Publish SOP')
     expect(doc).toContain('Delete SOP')
     expect(doc).toContain('Version history')

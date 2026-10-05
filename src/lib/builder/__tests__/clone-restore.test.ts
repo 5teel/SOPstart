@@ -5,7 +5,7 @@
  *
  * Tests cover:
  *   1. computeNextVersionLineage — pure lineage helper (N→N+1, parent resolution)
- *   2. cloneSopAsDraft append-only source-contract — no superseded_by mutation, no old-row reactivation
+ *   2. static-import discipline
  *
  * Static @/ imports used throughout (phase21.5-unit testDir resolves @/).
  * Dynamic import() is NOT used (CLAUDE.md 2026-06-24 learning).
@@ -14,7 +14,6 @@
 import { test, expect } from '@playwright/test'
 import { computeNextVersionLineage } from '@/lib/builder/version-lineage'
 import * as fs from 'fs'
-import * as path from 'path'
 
 // ---------------------------------------------------------------------------
 // 1. computeNextVersionLineage — lineage continuation logic
@@ -52,27 +51,9 @@ test('lineage: newParentId is never the source id when source already has a pare
 })
 
 // ---------------------------------------------------------------------------
-// 2. cloneSopAsDraft — append-only source-contract assertions
-// D-06: starting a new version never rewrites or reactivates old rows
+// 2. static-import discipline (the cloneSopAsDraft source-contract went with the
+// versions page in Phase 58; forkDraft's append-only contract lives in tests/phase58/fork-draft.spec.ts)
 // ---------------------------------------------------------------------------
-
-const versioningPath = path.resolve(__dirname, '../../../actions/versioning.ts')
-
-test('append-only invariant: cloneSopAsDraft is exported from versioning.ts', () => {
-  const src = fs.readFileSync(versioningPath, 'utf-8')
-  expect(src).toContain('export async function cloneSopAsDraft')
-})
-
-test('append-only invariant: cloneSopAsDraft never mutates superseded_by or reactivates the source', () => {
-  const src = fs.readFileSync(versioningPath, 'utf-8')
-  const fnStart = src.indexOf('export async function cloneSopAsDraft')
-  expect(fnStart).toBeGreaterThan(-1)
-  const rest = src.slice(fnStart + 1)
-  const next = rest.indexOf('\nexport async function')
-  const fnBody = next === -1 ? rest : rest.slice(0, next)
-  expect(fnBody).not.toMatch(/update\(\{\s*superseded_by/)
-  expect(fnBody).not.toContain("status: 'published'")
-})
 
 test('append-only invariant: only static imports at file top-level (CLAUDE.md 2026-06-24)', () => {
   const testSrc = fs.readFileSync(__filename, 'utf-8')

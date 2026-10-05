@@ -194,8 +194,8 @@ export const PhotoGridBlockContentSchema = z.object({
 // Phase 26 Plan 26-09 (R5, D-03) — the unified Visual block. One
 // junction-stored block holding mixed media, each item medium-tagged
 // (visual:photo | visual:diagram | visual:video). `annotationId` links a
-// diagram item to its Konva overlay (26-11). Mirrors VisualBlockPropsSchema
-// in src/components/admin/builder-v2/visual/media-adapter.ts.
+// diagram item to its Konva overlay (26-11). Mirrors the retired
+// Visual block's props schema.
 // ---------------------------------------------------------------
 export const VisualItemContentSchema = z.object({
   medium: z.enum(['photo', 'diagram', 'video']),

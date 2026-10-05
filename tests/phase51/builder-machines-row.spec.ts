@@ -20,7 +20,7 @@ function read(rel: string): string {
 }
 
 const BUTTON_PATH = "src/components/focus/admin/MachinesButton.tsx"
-const SHELL_PATH = "src/app/(protected)/admin/sops/builder/[sopId]/BuilderStageShell.tsx"
+const SHELL_PATH = "src/components/focus/admin/ThisSopBlock.tsx" // 58-16: the whole-SOP tools block hosts the picker
 
 /** Returns the [start, end) character span of a top-level `function <name>(` body. */
 function functionSpan(src: string, name: string): [number, number] {
@@ -77,22 +77,21 @@ test.describe('modal', () => {
   })
 })
 
-test.describe('tools menu', () => {
-  test('BuilderStageShell ToolsMenu renders a "Pick machines" row inside the tools menu', () => {
+test.describe('whole-SOP tools block', () => {
+  test('ThisSopBlock renders the machines picker as its Machine row', () => {
     const src = read(SHELL_PATH)
     expect(src).toContain("import { MachinesButton } from '@/components/focus/admin/MachinesButton'")
-    expect(src).toContain('<MachinesButton sopId={sopId} />')
+    expect(src).toContain('<MachinesButton')
+    expect(src).toContain('sopId={sopId}')
   })
 
-  test('the row opens MachinesButton, not a route navigation, and sits after the tool links, before DeleteSopButton', () => {
+  test('the row opens the picker through a trigger render prop, not a route navigation', () => {
     const src = read(SHELL_PATH)
-    // JSX usages (not the import lines) — each of these tags is used exactly
-    // once as JSX in the whole file, inside ToolsMenu.
-    const editIdx = src.indexOf('items.map(')
-    const machinesIdx = src.indexOf('<MachinesButton sopId={sopId} />')
-    const deleteIdx = src.indexOf('<DeleteSopButton')
-    expect(editIdx).toBeGreaterThan(-1)
-    expect(machinesIdx).toBeGreaterThan(editIdx)
-    expect(deleteIdx).toBeGreaterThan(machinesIdx)
+    const at = src.indexOf('<MachinesButton')
+    expect(at).toBeGreaterThan(-1)
+    const tag = src.slice(at, src.indexOf('/>', at))
+    expect(tag).toContain('trigger={(openPicker)')
+    expect(tag).toContain('onClick={openPicker}')
+    expect(tag).not.toContain('href')
   })
 })

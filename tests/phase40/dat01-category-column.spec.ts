@@ -166,9 +166,8 @@ const CATEGORY_EXEMPT: CategoryExemptEntry[] = [
   { file: 'src/actions/sops.ts', keys: 'is_ocr,organisation_id,source_file_name,source_file_path,source_file_type,status,title,uploaded_by,version', reason: 'createVideoUploadSession -- pre-parse shell insert; the transcribe route’s post-parse UPDATE sets category_slug once the transcript is classified.' },
   { file: 'src/actions/sops.ts', keys: 'overall_confidence,parse_notes,status,title,updated_at', reason: 'reparseSop/restructureSop reset status to re-trigger parsing; category_slug is left untouched so the existing value survives unchanged.' },
   { file: 'src/actions/sops.ts', keys: 'title,updated_at', reason: 'Title-only rename; not a category-bearing write.' },
-  { file: 'src/actions/versioning.ts', keys: 'source_file_path', reason: 'Finalises the new-version/clone file path after upload; category was already carried into the insert above (2 call sites: uploadNewVersion, cloneSopAsDraft).' },
-  { file: 'src/actions/versioning.ts', keys: 'superseded_by', reason: 'Marks the OLD SOP as superseded when a new version/clone publishes; the new row already carries its own category via its own insert (2 call sites).' },
-  { file: 'src/actions/versioning.ts', keys: 'status', reason: 'Flips the sentinel status uploading -> draft once cloneSopAsDraft’s copy completes; category was already carried into the insert.' },
+  { file: 'src/actions/versioning.ts', keys: 'source_file_path', reason: 'Finalises the new-version file path after upload; category was already carried into the insert above (2 call sites in uploadNewVersion).' },
+  { file: 'src/actions/versioning.ts', keys: 'superseded_by', reason: 'Marks the OLD SOP as superseded when a new version is uploaded; the new row already carries its own category via its own insert (2 call sites in uploadNewVersion).' },
   { file: 'src/app/api/sops/parse/route.ts', keys: 'parse_notes,status', reason: 'Parse-failure early exit; category is only set on the success-path post-parse UPDATE.' },
   { file: 'src/app/api/sops/restructure/route.ts', keys: 'status', reason: 'Status-only transition; not a category-bearing write.' },
   { file: 'src/app/api/sops/restructure/route.ts', keys: 'parse_notes,status', reason: 'Restructure-failure early exit; category is only set on the success-path post-parse UPDATE.' },
@@ -199,7 +198,9 @@ const CATEGORY_EXEMPT: CategoryExemptEntry[] = [
 // 2026-10-05: 39 -> 42. Phase 58: focus-steps.ts writes sops.objective and
 // sops.allow_forward_jump (two exempt, justified above) and versions.ts forkDraft
 // inserts the next-version row WITH category_slug carried from the source.
-const EXPECTED_SOPS_WRITE_SITE_COUNT = 42
+// 2026-10-05: 42 -> 40. Phase 58-16 deleted cloneSopAsDraft with the versions page (its insert carried
+// category_slug and its status flip was exempt); forkDraft is the surviving next-version path.
+const EXPECTED_SOPS_WRITE_SITE_COUNT = 40
 
 // Extracts the substring between a `(` at `openIdx` and its matching `)`,
 // tracking paren depth so nested calls/objects don't truncate the payload.

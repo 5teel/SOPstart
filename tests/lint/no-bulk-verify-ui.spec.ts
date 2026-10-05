@@ -1,29 +1,18 @@
 /**
  * Phase 21 (Plan 21-04) — D-21-07 LOCK: no bulk-verify UI affordance anywhere.
  *
- * Modeled after `tests/lint/no-static-desktop-import.spec.ts`. Runs LIVE
- * (no test.fixme). Walks every `.ts`/`.tsx` file under `src/` and asserts
+ * Runs LIVE (no test.fixme). Walks every `.ts`/`.tsx` file under `src/` and asserts
  * NONE of them contain bulk-verify language patterns. The 2.5-minute
  * friction at 50 blocks IS the safety feature (Spike 004 verdict).
  *
  * Why a repo-wide grep instead of a single-file check?
  *   - A future PR could add an "Approve all flagged" button in a sibling
- *     component (e.g. AdminToolbar.tsx) and the per-component static
- *     analysis in VerifyChecklistGate.test.tsx wouldn't catch it.
- *   - This guard runs at the SAME layer as no-static-desktop-import:
- *     anywhere in src/ → fail.
+ *     component (e.g. AdminToolbar.tsx) and a per-component
+ *     check would not catch it. This guard fails on a hit anywhere in src/.
  *
- * Allowlist (the lock + its tests AND surrounding documentation are
- * permitted to MENTION the banned phrases for documentation purposes):
- *   - src/components/admin/verify-checklist/VerifyChecklistGate.tsx
- *     (the lock comment itself enumerates the banned phrases)
- *   - src/components/admin/verify-checklist/__tests__/VerifyChecklistGate.test.tsx
- *     (the static-analysis test enumerates them too)
- *   - tests/lint/no-bulk-verify-ui.spec.ts (this file)
+ * Allowlist: empty since 58-16 (the retired checklist gate and its test were the only entries).
  *
- * 58-15: the per-step tick now lives in the focus editor's StepCard (the
- * checklist gate is retired with the builder). The allow-list above stays until
- * those files are deleted; the scan root (src/) covers src/components/focus, which
+ * 58-15: the per-step tick lives in the focus editor's StepCard. The scan root (src/) covers src/components/focus, which
  * is asserted below, and the tick-all phrasings of the new editor are banned too.
  */
 
@@ -53,22 +42,8 @@ const BANNED_PHRASES = [
 ] as const
 
 // Files allowed to mention the banned phrases (documentation / the lock itself).
-const ALLOWLIST = new Set<string>([
-  // The lock comment + the static-analysis test enumerate the banned phrases.
-  path
-    .join('src', 'components', 'admin', 'verify-checklist', 'VerifyChecklistGate.tsx')
-    .replace(/\\/g, '/'),
-  path
-    .join(
-      'src',
-      'components',
-      'admin',
-      'verify-checklist',
-      '__tests__',
-      'VerifyChecklistGate.test.tsx',
-    )
-    .replace(/\\/g, '/'),
-])
+// 58-16: the checklist gate that enumerated them is deleted, so nothing under src/ is allow-listed.
+const ALLOWLIST = new Set<string>([])
 
 type Hit = { file: string; line: number; phrase: string; text: string }
 

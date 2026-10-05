@@ -5,7 +5,7 @@ import { create } from 'zustand'
 import { updateFocusStep } from '@/actions/focus-steps'
 
 /**
- * Phase 58 (58-12) -- autosave for the focus editor, the useBuilderAutosave idiom
+ * Phase 58 (58-12) -- autosave for the focus editor, the old builder autosave idiom
  * re-keyed to steps: edits to one step merge into one patch, a 750 ms quiet gap
  * sends it, a failed send is retried every 5 s up to three times, and a pending
  * edit goes out at once when the tab is hidden or the caller flushes (Back).

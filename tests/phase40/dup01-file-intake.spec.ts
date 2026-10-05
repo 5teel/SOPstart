@@ -28,16 +28,6 @@ const ROOT = process.cwd()
 const SRC_DIR = path.join(ROOT, 'src')
 
 const UPLOAD_DROPZONE = path.join(SRC_DIR, 'components', 'admin', 'UploadDropzone.tsx')
-const VERSIONS_PAGE = path.join(
-  SRC_DIR,
-  'app',
-  '(protected)',
-  'admin',
-  'sops',
-  '[sopId]',
-  'versions',
-  'page.tsx',
-)
 const FILE_INTAKE = path.join(SRC_DIR, 'lib', 'upload', 'file-intake.ts')
 const SOP_VALIDATORS = path.join(SRC_DIR, 'lib', 'validators', 'sop.ts')
 
@@ -82,9 +72,9 @@ test.describe('DUP-01 -- one shared file-intake module', () => {
   })
 
   test(
-    'UploadDropzone and versions page import from @/lib/upload/file-intake and declare no local accept-list',
+    'UploadDropzone imports from @/lib/upload/file-intake and declares no local accept-list (58-16: the versions page is retired)',
     () => {
-      for (const file of [UPLOAD_DROPZONE, VERSIONS_PAGE]) {
+      for (const file of [UPLOAD_DROPZONE]) {
         const src = stripComments(read(file))
         expect(src).toContain("from '@/lib/upload/file-intake'")
         expect(src).not.toContain('ACCEPTED_MIME_TYPES =')
@@ -119,13 +109,6 @@ test.describe('DUP-01 -- one shared file-intake module', () => {
       if (stripComments(read(file)).includes('.doc,')) hits.push(file)
     }
     expect(hits).toEqual([])
-  })
-
-  test('the new-version page routes video sources through startVideoSopUpload, not the document parser (D-06 honesty rule)', () => {
-    for (const file of [VERSIONS_PAGE]) {
-      const src = stripComments(read(file))
-      expect(src).toContain('startVideoSopUpload(')
-    }
   })
 
   test("the shared module's accept list contains image/webp, video/mp4, video/quicktime", () => {

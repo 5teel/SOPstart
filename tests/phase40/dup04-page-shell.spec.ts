@@ -110,10 +110,7 @@ test.describe('DUP-04 -- one shared admin page shell', () => {
     const journeysSrc = read(JOURNEYS_FILE)
     const routes = collectAdminSopRoutes()
     expect(routes.length).toBeGreaterThan(0)
-    // Phase 58-14: these two pages are redirect-only (the proxy 307s their addresses to the focus
-    // editor before they render), so no pathway names them; 58-16 deletes the directories and this exemption.
-    const redirectOnly = ['/admin/sops/builder/[sopId]', '/admin/sops/[sopId]/versions']
-    const missing = routes.filter((route) => !redirectOnly.includes(route) && !journeysSrc.includes(`route: '${route}'`))
+    const missing = routes.filter((route) => !journeysSrc.includes(`route: '${route}'`))
     expect(missing).toEqual([])
   })
 })

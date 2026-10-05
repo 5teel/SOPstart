@@ -76,7 +76,11 @@ const GATED_ROUTES: GatedRoute[] = [
       NEXT_DIR, 'server', 'app', '(protected)', 'sops', '[sopId]', 'page.js'
     ),
     forbiddenMarkers: [
-      { label: 'pdfjs-dist (D-21-09)', markers: ['pdfjs-dist', 'PDFWorker', 'getDocument'] },
+      // Phase 58-16: the client source viewer that dynamically imported the pdfjs package by name is
+      // deleted, so that specifier no longer exists anywhere in the build. The marker is re-derived from a
+      // surviving source: pdfjs itself, bundled server-side through unpdf for the parse route
+      // (the self-validation scan below reads server/chunks for it).
+      { label: 'pdfjs-dist (D-21-09)', markers: ['pdf.worker', 'PDFWorker', 'getDocument'] },
       { label: 'mammoth (D-21-09)', markers: ['mammoth', 'convertToHtml'] },
       { label: 'konva (26-05 D-03)', markers: ['react-konva', 'konva'] },
       { label: 'one screen machine body (MachineBody)', markers: ['No procedures for this machine yet.'] },
@@ -93,7 +97,7 @@ const GATED_ROUTES: GatedRoute[] = [
     rscManifestPath: path.join(NEXT_DIR, 'server', 'app', 'page_client-reference-manifest.js'),
     pageBundlePath: path.join(NEXT_DIR, 'server', 'app', 'page.js'),
     forbiddenMarkers: [
-      { label: 'pdfjs-dist (D-21-09)', markers: ['pdfjs-dist', 'PDFWorker', 'getDocument'] },
+      { label: 'pdfjs-dist (D-21-09)', markers: ['pdf.worker', 'PDFWorker', 'getDocument'] },
       { label: 'mammoth (D-21-09)', markers: ['mammoth', 'convertToHtml'] },
       { label: 'konva (57 D-03)', markers: ['react-konva', 'konva'] },
       {
@@ -351,6 +355,10 @@ function collectSelfValidationCorpus(): string {
     }
   }
 
+  // Phase 58-16: the pdfjs and mammoth literals now live only in the server-side parse path (the
+  // parse route bundle and the unpdf chunk); the client source viewer that carried them is deleted.
+  walkDir(path.join(NEXT_DIR, 'server', 'chunks'), 4 * 1024 * 1024)
+  walkDir(path.join(NEXT_DIR, 'server', 'app', 'api', 'sops', 'parse'), 4 * 1024 * 1024)
   walkDir(path.join(NEXT_DIR, 'server', 'app', '(protected)', 'admin', 'sops'), 4 * 1024 * 1024)
   walkDir(path.join(NEXT_DIR, 'server', 'app', '(protected)', 'governance'), 4 * 1024 * 1024)
 
