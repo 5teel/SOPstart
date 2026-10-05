@@ -157,6 +157,7 @@ const CATEGORY_EXEMPT: CategoryExemptEntry[] = [
   { file: 'src/actions/focus-steps.ts', keys: 'objective', reason: 'Editor writes the SOP objective only; category is set via setSopCategory, not this action.' },
   { file: 'src/actions/focus-steps.ts', keys: 'allow_forward_jump', reason: 'Editor writes the walk jump-ahead flag only; not a category-bearing write.' },
   { file: 'src/actions/governance.ts', keys: 'owner_user_id,updated_at', reason: 'SOP-owner reassignment; not a category-bearing write.' },
+  { file: 'src/lib/governance/owner-review.ts', keys: 'last_reviewed_at,last_reviewed_by,review_due_at,updated_at', reason: 'Phase 59-07 owner path of Mark reviewed (service client, session-scoped); review bookkeeping only, not a category-bearing write.' },
   { file: 'src/actions/governance.ts', keys: 'refresher_interval_months,updated_at', reason: 'Per-SOP refresher-interval override; category is set via a separate action, not this one.' },
   { file: 'src/actions/governance.ts', keys: 'last_reviewed_at,last_reviewed_by,review_due_at,updated_at', reason: 'Manual "confirm current" review-clock stamp; category_slug is read (not written) to resolve the cadence.' },
   { file: 'src/actions/grants.ts', keys: 'all_departments,all_departments_pre_override', reason: 'Grant-system all-departments override bookkeeping; not a category-bearing write.' },
@@ -200,7 +201,9 @@ const CATEGORY_EXEMPT: CategoryExemptEntry[] = [
 // inserts the next-version row WITH category_slug carried from the source.
 // 2026-10-05: 42 -> 40. Phase 58-16 deleted cloneSopAsDraft with the versions page (its insert carried
 // category_slug and its status flip was exempt); forkDraft is the surviving next-version path.
-const EXPECTED_SOPS_WRITE_SITE_COUNT = 40
+// 2026-10-06: 40 -> 41. Phase 59-07 added the owner path of Mark reviewed in
+// src/lib/governance/owner-review.ts (review bookkeeping only, exempt and justified above).
+const EXPECTED_SOPS_WRITE_SITE_COUNT = 41
 
 // Extracts the substring between a `(` at `openIdx` and its matching `)`,
 // tracking paren depth so nested calls/objects don't truncate the payload.
