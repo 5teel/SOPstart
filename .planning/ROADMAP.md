@@ -1910,11 +1910,11 @@ Plans:
   4. A SOP still being read from a document or a video opens in the editor saying what is happening and roughly how long it will take, never as an empty page, and getting there does not reload the whole app
   5. Publishing a new version means workers always get the latest published one while earlier versions stay on record; Back or Esc from any open SOP returns to the one screen with the place the user came from still selected
 
-**Plans:** 18 plans
+**Plans:** 1/18 plans executed
 Plans:
 **Wave 1**
 
-- [ ] 58-01-PLAN.md — Wave 0: phase58 project, repoint inventory + retirement sweep, requirement spec stubs, --text-step token
+- [x] 58-01-PLAN.md — Wave 0: phase58 project, repoint inventory + retirement sweep, requirement spec stubs, --text-step token
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -1962,6 +1962,7 @@ Plans:
 **Wave 11** *(blocked on Wave 9; runs after the optional Wave 10)*
 
 - [ ] 58-18-PLAN.md — --missing sweep, deployed eval with every screenshot read, build + full suite once, validation sign-off
+
 **UI hint**: yes
 
 ### Phase 59: The Office
