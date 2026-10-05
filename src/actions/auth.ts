@@ -163,6 +163,11 @@ export async function inviteWorker(formData: {
   const existing = list.users.find((u) => u.email?.toLowerCase() === email)
 
   let subjectId: string | null = null
+  // Invited to this site but not yet accepted (same four conjuncts as
+  // getTeamMembersWithEmails). inviteUserByEmail creates the auth user up front,
+  // so without this an invitee would be "existing" and turned into a passwordless
+  // member on the second send (59 review CR-02).
+  let pending = false
   if (existing) {
     const { data: already } = await admin
       .from('organisation_members')
@@ -171,7 +176,13 @@ export async function inviteWorker(formData: {
       .eq('organisation_id', organisationId)
       .maybeSingle()
     if (already) return { error: 'This person is already a member of your organisation.' }
+    pending =
+      existing.user_metadata?.['organisation_id'] === organisationId &&
+      !existing.last_sign_in_at &&
+      Boolean(existing.invited_at)
+  }
 
+  if (existing && !pending) {
     const { error: addError } = await admin.from('organisation_members').insert({
       organisation_id: organisationId,
       user_id: existing.id,
@@ -183,6 +194,8 @@ export async function inviteWorker(formData: {
     }
     subjectId = existing.id
   } else {
+    // New address, or a pending invitee: Supabase re-sends the invite to an
+    // unconfirmed user (no membership row is written until they accept).
     const { data: invited, error: inviteError } = await admin.auth.admin.inviteUserByEmail(email, {
       data: {
         organisation_id: organisationId,
@@ -201,9 +214,9 @@ export async function inviteWorker(formData: {
     kind: 'member_invited',
     subject: { kind: 'member', id: subjectId },
     summary: 'Invited a person',
-    details: { role: newRole, existing_account: Boolean(existing) },
+    details: { role: newRole, existing_account: Boolean(existing) && !pending, resent: pending },
   })
-  return { success: existing ? 'Added to the site' : 'Invite sent', logged: rec.ok }
+  return { success: existing && !pending ? 'Added to the site' : 'Invite sent', logged: rec.ok }
 }
 
 // ─────────────────────────────────────────────
@@ -245,7 +258,17 @@ export async function acceptInvite(formData: {
     return { error: 'Invite is missing organisation details. Please ask your admin to send a new invite.' }
   }
 
-  // Insert into organisation_members
+  // Set the user's password first (59 review CR-02): the invitee then has a way in
+  // whatever happens to the membership write below, and a retry can always finish.
+  const { error: passwordError } = await supabase.auth.updateUser({ password })
+
+  if (passwordError) {
+    console.error('accept invite password set error:', passwordError)
+    return { error: 'Failed to set password. Please try again.' }
+  }
+
+  // Insert into organisation_members. 23505 = already a member (an admin added
+  // the account meanwhile, or this is a retry): that is the state we want.
   const inviteInsert: TablesInsert<'organisation_members'> = {
     organisation_id: organisationId,
     user_id: user.id,
@@ -253,17 +276,9 @@ export async function acceptInvite(formData: {
   }
   const { error: memberError } = await supabase.from('organisation_members').insert(inviteInsert)
 
-  if (memberError) {
+  if (memberError && memberError.code !== '23505') {
     console.error('accept invite member insert error:', memberError)
     return { error: 'Failed to complete account setup. Please try again.' }
-  }
-
-  // Set the user's password
-  const { error: passwordError } = await supabase.auth.updateUser({ password })
-
-  if (passwordError) {
-    console.error('accept invite password set error:', passwordError)
-    return { error: 'Failed to set password. Please try again.' }
   }
 
   // Refresh JWT to get updated org claims

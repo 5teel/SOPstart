@@ -56,6 +56,26 @@ test.describe('people actions', () => {
     expect(b).toContain('logged: rec.ok')
   })
 
+  test('review CR-02: a pending invitee is re-sent the invite, never added as a member; acceptInvite sets the password first and tolerates an existing membership', () => {
+    const b = body('inviteWorker')
+    const pending = b.indexOf('pending =\n')
+    expect(pending).toBeGreaterThan(-1)
+    const rule = b.slice(pending, pending + 200)
+    expect(rule).toContain("existing.user_metadata?.['organisation_id'] === organisationId")
+    expect(rule).toContain('!existing.last_sign_in_at')
+    expect(rule).toContain('Boolean(existing.invited_at)')
+    expect(pending).toBeLessThan(b.indexOf("from('organisation_members').insert("))
+    expect(b).toContain('if (existing && !pending)')
+    expect(b).toContain("existing && !pending ? 'Added to the site' : 'Invite sent'")
+
+    const a = body('acceptInvite')
+    const pw = a.indexOf('updateUser({ password })')
+    const ins = a.indexOf("from('organisation_members').insert(")
+    expect(pw).toBeGreaterThan(-1)
+    expect(pw).toBeLessThan(ins)
+    expect(a).toContain("memberError && memberError.code !== '23505'")
+  })
+
   test('updateMemberRoleSafe is admin-only and a zero-row update reports failure, not success', () => {
     const b = body('updateMemberRoleSafe')
     expect(b).toContain('Only an admin can change roles.')
