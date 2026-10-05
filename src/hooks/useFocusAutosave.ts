@@ -23,6 +23,7 @@ const RETRY_MS = 5_000
 const MAX_RETRIES = 3
 
 type Patch = Parameters<typeof updateFocusStep>[0]['patch']
+export type FocusStepPatch = Patch
 
 export type FocusSaveState = 'idle' | 'saving' | 'saved' | 'error'
 

@@ -1,7 +1,7 @@
 import { kindLabel, type FocusKind } from '@/lib/sop/focus'
 
 /** One accent per kind (UI-SPEC Color): chip text + tint, and the card's left edge. */
-const CHIP: Record<FocusKind, string> = {
+export const KIND_CHIP: Record<FocusKind, string> = {
   hazard: 'text-accent-hazard bg-accent-hazard/10',
   ppe: 'text-accent-decision bg-accent-decision/10',
   step: 'text-accent-step bg-accent-step/10',
@@ -32,7 +32,7 @@ export const KIND_RING: Record<FocusKind, string> = {
 
 export function KindChip({ kind }: { kind: FocusKind }) {
   return (
-    <span data-testid="focus-kind-chip" data-kind={kind} className={`mono rounded px-2 py-1 text-meta uppercase ${CHIP[kind]}`}>
+    <span data-testid="focus-kind-chip" data-kind={kind} className={`mono rounded px-2 py-1 text-meta uppercase ${KIND_CHIP[kind]}`}>
       {kindLabel(kind)}
     </span>
   )

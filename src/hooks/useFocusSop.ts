@@ -2,6 +2,7 @@
 import { useCallback } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { getFocusSop } from '@/actions/focus-steps'
+import { listLineageVersions, type LineageVersion } from '@/actions/versions'
 import type { FocusSop } from '@/lib/sop/focus-read'
 
 /**
@@ -35,4 +36,17 @@ export function useFocusSop(sopId: string, initial: FocusSop) {
   )
 
   return { focus: query.data, invalidate, isFetching: query.isFetching }
+}
+
+/** The versions of this SOP, newest first (admin only). Empty until it loads, or if the read is refused. */
+export function useFocusLineage(sopId: string): LineageVersion[] {
+  const query = useQuery({
+    queryKey: ['focus-lineage', sopId],
+    queryFn: async () => {
+      const res = await listLineageVersions({ sopId })
+      return 'error' in res ? [] : res.versions
+    },
+    staleTime: 30_000,
+  })
+  return query.data ?? []
 }
