@@ -471,14 +471,17 @@ async function ensureFocusSteps(sopId, sectionId, specs) {
   }
   return ids
 }
+// A fixed run id: GET /api/sops/[id]/ai-reviewer keeps a CLEARED row only when it belongs to the newest run, so a
+// fixture row without one vanished the moment the eval cleared it and the "Cleared" line never showed (58-18).
+const FIXTURE_RUN_ID = 'e7a10000-0000-4000-8000-000000000058'
 async function ensureFinding(sopId, stepId, description, severity, kind) {
-  const { data: ex, error } = await sb.from('sop_ai_findings').select('id, cleared_at, step_id').eq('sop_id', sopId).eq('description', description).maybeSingle()
+  const { data: ex, error } = await sb.from('sop_ai_findings').select('id, cleared_at, step_id, run_id').eq('sop_id', sopId).eq('description', description).maybeSingle()
   if (error) throw error
   if (!ex) {
-    const { error: inErr } = await sb.from('sop_ai_findings').insert({ organisation_id: siteOrg.id, sop_id: sopId, job: 'A', kind, severity, step_id: stepId, description })
+    const { error: inErr } = await sb.from('sop_ai_findings').insert({ organisation_id: siteOrg.id, sop_id: sopId, run_id: FIXTURE_RUN_ID, job: 'A', kind, severity, step_id: stepId, description })
     if (inErr) throw inErr
-  } else if (ex.cleared_at !== null || ex.step_id !== stepId) {
-    const { error: upErr } = await sb.from('sop_ai_findings').update({ cleared_at: null, cleared_by: null, step_id: stepId }).eq('id', ex.id)
+  } else if (ex.cleared_at !== null || ex.step_id !== stepId || ex.run_id !== FIXTURE_RUN_ID) {
+    const { error: upErr } = await sb.from('sop_ai_findings').update({ cleared_at: null, cleared_by: null, step_id: stepId, run_id: FIXTURE_RUN_ID }).eq('id', ex.id)
     if (upErr) throw upErr
   }
 }
@@ -497,11 +500,15 @@ async function ensureParseJob(sopId, job) {
   }
 }
 
-// walk fixture: the converted-rows shape (hazard, ppe, step, photo step, check), only when none exist yet
+// walk fixture: the converted-rows shape (hazard, ppe, step, photo step, check).
+// The 58-14 converter run had already turned the Phase 55 two-step rows into two focus steps, so "only when none
+// exist" left the fixture at two steps while the evals walk five (58-18). Replace anything that is not ours once.
 {
-  const { count, error } = await sb.from('sop_focus_steps').select('id', { count: 'exact', head: true }).eq('sop_id', walkSop.id)
+  const { count, error } = await sb.from('sop_focus_steps').select('id', { count: 'exact', head: true }).eq('sop_id', walkSop.id).eq('source_key', 'new:eval-walk-hazard')
   if (error) throw error
   if (!count) {
+    const { error: delErr } = await sb.from('sop_focus_steps').delete().eq('sop_id', walkSop.id)
+    if (delErr) throw delErr
     await ensureFocusSteps(walkSop.id, walkSection.id, [
       { key: 'walk-hazard', kind: 'hazard', text: 'Stored energy in the hydraulic line.' },
       { key: 'walk-ppe', kind: 'ppe', text: 'Safety glasses' },

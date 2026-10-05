@@ -121,7 +121,11 @@ test.describe.serial('Phase 56 -- simpler SOP + decision ledger (deployed)', () 
     // spec's throwaway org, a real upload) is not yet converted and is out of scope here.
     const lastRunAt = (runs ?? [])[0]?.created_at as string
     const inScope = (sops ?? []).filter((s) => (s.created_at as string) <= lastRunAt)
-    const bad = inScope.filter((s) => !NEEDS_SIMON_TITLES.includes(s.title as string) && !latest.get(s.id as string)?.ok)
+    // 'EVAL focus ...' are Phase 58 fixtures: editor-native (new:/edit: keys) or still parsing, which the retired
+    // converter leaves alone by rule, so they never get a run row (58-18).
+    const bad = inScope.filter(
+      (s) => !NEEDS_SIMON_TITLES.includes(s.title as string) && !((s.title as string | null) ?? '').startsWith('EVAL focus') && !latest.get(s.id as string)?.ok,
+    )
     expect(bad.map((s) => s.title), 'SOPs without an ok conversion run').toEqual([])
     console.log(`A: ${inScope.length} of ${sops?.length} SOPs predate the last run; all have an ok latest run`)
 
@@ -182,7 +186,9 @@ test.describe.serial('Phase 56 -- simpler SOP + decision ledger (deployed)', () 
     await expect(browse.getByText('Photograph the isolation lock.')).toHaveCount(1)
     // Hazards and PPE come first in walking order (D-07).
     const kinds = await browse.getByTestId('focus-browse-step').evaluateAll((els) => els.map((e) => e.getAttribute('data-kind')))
-    expect(kinds.slice(0, 5)).toEqual(['hazard', 'hazard', 'hazard', 'hazard', 'ppe'])
+    // Source order within them: the PPE card sits between the hazards of its own section, so assert the group, not the sequence.
+    expect([...kinds.slice(0, 5)].sort()).toEqual(['hazard', 'hazard', 'hazard', 'hazard', 'ppe'])
+    expect(['hazard', 'ppe']).not.toContain(kinds[5])
     await shot(page, 'ledger-b-browse')
     expect(errors, errors.join('\n')).toEqual([])
     await page.close()

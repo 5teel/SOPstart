@@ -229,7 +229,7 @@ test.describe('Phase 55 — cut features (deployed)', () => {
 
     // The old versions address lands on the focus editor too
     await page.goto(['/admin/sops', walkSopId, 'versions'].join('/'))
-    await expect(page).toHaveURL(new RegExp(`/sops/${walkSopId}\?mode=edit`), SLOW)
+    await expect(page).toHaveURL(new RegExp(`/sops/${walkSopId}\\?mode=edit`), SLOW)
     await expect(page.getByRole('button', { name: /Compare|Restore/ })).toHaveCount(0)
     await expect(page.getByRole('link', { name: /Compare|Restore/ })).toHaveCount(0)
     await expect(page.getByRole('link', { name: 'Content', exact: true })).toHaveCount(0)

@@ -257,6 +257,8 @@ test.describe('Phase 58 — the SOP focus screen (deployed)', () => {
           // Back lands on the one screen with the originating machine still selected.
           await expect(page).toHaveURL(new RegExp(`/\\?place=${pressId}$`), SLOW)
           await expect(page.getByTestId('shell-detail')).toHaveAttribute('data-place', `/?place=${pressId}`, SLOW)
+          // The machine's own panel is on screen (not the site overview) before the shot is taken.
+          await expect(page.getByTestId('shell-detail')).toContainText(EVAL_PLANT_MACHINE, SLOW)
           await shot(page, '58-back-place')
         }
       }
@@ -340,7 +342,8 @@ test.describe('Phase 58 — the SOP focus screen (deployed)', () => {
       await expect(page).toHaveURL(new RegExp(`/sops/${ids.lineageV3}`), SLOW)
       await expect(page.getByTestId('focus-screen')).toHaveAttribute('data-version-state', 'live', SLOW)
       await expect(page.getByTestId('focus-version-chip')).toHaveCount(0)
-      await expect(page.getByText('Close the guard (l3).')).toHaveCount(1)
+      // the rail row and the step both carry the text, so assert it is there, not that it is unique
+      await expect(page.getByText('Close the guard (l3).').first()).toBeVisible(SLOW)
       await page.goto(`/sops/${ids.lineageV4}`)
       await expect(page).toHaveURL(new RegExp(`/sops/${ids.lineageV3}`), SLOW)
       await expect(page.getByText('(l4)')).toHaveCount(0)
@@ -617,11 +620,11 @@ test.describe('Phase 58 — the SOP focus screen (deployed)', () => {
       const v2Id = new URL(page.url()).pathname.split('/').pop()!
       await expect(page.getByTestId('edit-version-slot')).toContainText('Editing v2 — v1 is live', SLOW)
 
-      // One tick per step, one at a time: there is no tick-all.
+      // The copy carries the ticks of the version it was made from (58-08), so a clean copy is already
+      // publishable; any step still unchecked is ticked one at a time -- there is no tick-all.
+      await expect(page.getByTestId('publish-button')).toBeVisible(SLOW)
       const boxes = page.getByRole('checkbox', { name: /I have checked this/ })
-      await expect(boxes.first()).toBeVisible(SLOW)
       const n = await boxes.count()
-      expect(n).toBeGreaterThan(0)
       for (let i = 0; i < n; i++) {
         await boxes.first().click()
         await expect(boxes).toHaveCount(n - i - 1, SLOW)

@@ -382,7 +382,7 @@ test.describe('Phase 57 — the one screen (deployed)', () => {
     await expect(row).toBeVisible(SLOW)
     await expect(row.getByTestId('admin-panel-badge')).toBeVisible()
     await expect(row.getByTestId('admin-panel-walk')).toHaveAttribute('href', new RegExp(`^/sops/${plantSopId}\\?from=[0-9a-f-]{36}$`))
-    await expect(row.getByTestId('admin-panel-edit')).toHaveAttribute('href', new RegExp(`^/sops/${plantSopId}\?mode=edit&from=[0-9a-f-]{36}$`))
+    await expect(row.getByTestId('admin-panel-edit')).toHaveAttribute('href', new RegExp(`^/sops/${plantSopId}\\?mode=edit&from=[0-9a-f-]{36}$`))
     const newSop = panel.getByTestId('admin-panel-new-sop')
     await expect(newSop).toHaveAttribute('href', /\/admin\/sops\/new\/blank\?machine=[0-9a-f-]{36}$/)
     await shot(page, '57-admin-machine')

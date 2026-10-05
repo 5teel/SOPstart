@@ -31,6 +31,9 @@ export async function deleteEvalCompletions(db: SupabaseClient, sopId: string): 
 
   const photos = await db.from('completion_photos').delete().in('completion_id', ids)
   if (photos.error) throw new Error(`completion_photos delete failed: ${photos.error.message}`)
+  // Phase 58: recordSignature writes a counter-signature row per walk; it blocks the completion delete (58-18).
+  const sigs = await db.from('sop_completion_signatures').delete().in('completion_id', ids)
+  if (sigs.error) throw new Error(`sop_completion_signatures delete failed: ${sigs.error.message}`)
   // Sign-offs may not exist on every environment; a missing table is not an error here.
   await db.from('completion_sign_offs').delete().in('completion_id', ids)
   const done = await db.from('sop_completions').delete().in('id', ids)
