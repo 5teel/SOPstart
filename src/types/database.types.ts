@@ -1872,7 +1872,7 @@ export type Database = {
         Row: {
           id: string
           organisation_id: string
-          kind: 'approve' | 'reject' | 'sign_off' | 'countersign' | 'assign' | 'unassign' | 'publish' | 'owner_change' | 'review' | 'observation' | 'verify' | 'verify_withdrawn' | 'ai_finding_cleared' | 'cadence_change' | 'ai_field_write' | 'role_change' | 'member_invited' | 'member_removed'
+          kind: 'approve' | 'reject' | 'sign_off' | 'countersign' | 'assign' | 'unassign' | 'publish' | 'owner_change' | 'review' | 'observation' | 'verify' | 'verify_withdrawn' | 'ai_finding_cleared' | 'cadence_change' | 'ai_field_write' | 'role_change' | 'member_invited' | 'member_removed' | 'request_accepted' | 'request_declined' | 'objective_set' | 'objective_cleared' | 'objective_confirmed'
           actor_kind: 'person' | 'agent'
           actor_id: string | null
           actor_name: string | null
@@ -1890,7 +1890,7 @@ export type Database = {
         Insert: {
           id?: string
           organisation_id: string
-          kind: 'approve' | 'reject' | 'sign_off' | 'countersign' | 'assign' | 'unassign' | 'publish' | 'owner_change' | 'review' | 'observation' | 'verify' | 'verify_withdrawn' | 'ai_finding_cleared' | 'cadence_change' | 'ai_field_write' | 'role_change' | 'member_invited' | 'member_removed'
+          kind: 'approve' | 'reject' | 'sign_off' | 'countersign' | 'assign' | 'unassign' | 'publish' | 'owner_change' | 'review' | 'observation' | 'verify' | 'verify_withdrawn' | 'ai_finding_cleared' | 'cadence_change' | 'ai_field_write' | 'role_change' | 'member_invited' | 'member_removed' | 'request_accepted' | 'request_declined' | 'objective_set' | 'objective_cleared' | 'objective_confirmed'
           actor_kind: 'person' | 'agent'
           actor_id?: string | null
           actor_name?: string | null
@@ -1908,7 +1908,7 @@ export type Database = {
         Update: {
           id?: string
           organisation_id?: string
-          kind?: 'approve' | 'reject' | 'sign_off' | 'countersign' | 'assign' | 'unassign' | 'publish' | 'owner_change' | 'review' | 'observation' | 'verify' | 'verify_withdrawn' | 'ai_finding_cleared' | 'cadence_change' | 'ai_field_write' | 'role_change' | 'member_invited' | 'member_removed'
+          kind?: 'approve' | 'reject' | 'sign_off' | 'countersign' | 'assign' | 'unassign' | 'publish' | 'owner_change' | 'review' | 'observation' | 'verify' | 'verify_withdrawn' | 'ai_finding_cleared' | 'cadence_change' | 'ai_field_write' | 'role_change' | 'member_invited' | 'member_removed' | 'request_accepted' | 'request_declined' | 'objective_set' | 'objective_cleared' | 'objective_confirmed'
           actor_kind?: 'person' | 'agent'
           actor_id?: string | null
           actor_name?: string | null
@@ -1929,6 +1929,174 @@ export type Database = {
             columns: ["supersedes_decision_id"]
             isOneToOne: false
             referencedRelation: "decisions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      // Plan 60-02: manually extended (type regen unavailable)
+      requests: {
+        Row: {
+          id: string
+          organisation_id: string
+          kind: 'change_sop' | 'new_sop' | 'observe_me' | 'do_sop'
+          state: 'open' | 'accepted' | 'declined' | 'withdrawn'
+          raised_by_user: string | null
+          raised_by_agent: string | null
+          subject_type: 'sop' | 'machine' | 'site'
+          subject_id: string | null
+          target_role: 'worker' | 'supervisor' | 'admin' | 'safety_manager' | null
+          target_user_id: string | null
+          note: string | null
+          answered_by: string | null
+          answer_note: string | null
+          decided_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          organisation_id: string
+          kind: 'change_sop' | 'new_sop' | 'observe_me' | 'do_sop'
+          state?: 'open' | 'accepted' | 'declined' | 'withdrawn'
+          raised_by_user?: string | null
+          raised_by_agent?: string | null
+          subject_type: 'sop' | 'machine' | 'site'
+          subject_id?: string | null
+          target_role?: 'worker' | 'supervisor' | 'admin' | 'safety_manager' | null
+          target_user_id?: string | null
+          note?: string | null
+          answered_by?: string | null
+          answer_note?: string | null
+          decided_at?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          organisation_id?: string
+          kind?: 'change_sop' | 'new_sop' | 'observe_me' | 'do_sop'
+          state?: 'open' | 'accepted' | 'declined' | 'withdrawn'
+          raised_by_user?: string | null
+          raised_by_agent?: string | null
+          subject_type?: 'sop' | 'machine' | 'site'
+          subject_id?: string | null
+          target_role?: 'worker' | 'supervisor' | 'admin' | 'safety_manager' | null
+          target_user_id?: string | null
+          note?: string | null
+          answered_by?: string | null
+          answer_note?: string | null
+          decided_at?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "requests_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      // Plan 60-02: manually extended (type regen unavailable)
+      notifications: {
+        Row: {
+          id: string
+          organisation_id: string
+          user_id: string
+          kind: 'approve_next' | 'review_due' | 'signoff' | 'request_answered' | 'new_version' | 'asked'
+          title: string
+          place: string
+          subject_type: string
+          subject_id: string
+          decision_id: string | null
+          dedupe_key: string
+          read_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          organisation_id: string
+          user_id: string
+          kind: 'approve_next' | 'review_due' | 'signoff' | 'request_answered' | 'new_version' | 'asked'
+          title: string
+          place: string
+          subject_type: string
+          subject_id: string
+          decision_id?: string | null
+          dedupe_key: string
+          read_at?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          organisation_id?: string
+          user_id?: string
+          kind?: 'approve_next' | 'review_due' | 'signoff' | 'request_answered' | 'new_version' | 'asked'
+          title?: string
+          place?: string
+          subject_type?: string
+          subject_id?: string
+          decision_id?: string | null
+          dedupe_key?: string
+          read_at?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      // Plan 60-02: manually extended (type regen unavailable)
+      objectives: {
+        Row: {
+          id: string
+          organisation_id: string
+          subject_type: 'site' | 'department' | 'machine' | 'sop' | 'person'
+          subject_id: string | null
+          text: string
+          due_on: string | null
+          set_by_user: string | null
+          set_by_agent: string | null
+          set_at: string
+          confirmed_by: string | null
+          confirmed_at: string | null
+        }
+        Insert: {
+          id?: string
+          organisation_id: string
+          subject_type: 'site' | 'department' | 'machine' | 'sop' | 'person'
+          subject_id?: string | null
+          text: string
+          due_on?: string | null
+          set_by_user?: string | null
+          set_by_agent?: string | null
+          set_at?: string
+          confirmed_by?: string | null
+          confirmed_at?: string | null
+        }
+        Update: {
+          id?: string
+          organisation_id?: string
+          subject_type?: 'site' | 'department' | 'machine' | 'sop' | 'person'
+          subject_id?: string | null
+          text?: string
+          due_on?: string | null
+          set_by_user?: string | null
+          set_by_agent?: string | null
+          set_at?: string
+          confirmed_by?: string | null
+          confirmed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "objectives_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
             referencedColumns: ["id"]
           },
         ]

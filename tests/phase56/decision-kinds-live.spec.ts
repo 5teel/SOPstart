@@ -132,6 +132,42 @@ function samples(sopId: string): Record<DecisionKind, DecisionInput> {
       summary: 'Removed a person',
       details: probe,
     },
+    // Phase 60: plain-words summaries, no email anywhere.
+    request_accepted: {
+      kind: 'request_accepted',
+      subject: { kind: 'request', id: randomUUID() },
+      sopId: null,
+      summary: 'Accepted a request',
+      details: { ...probe, requestKind: 'do_sop' },
+    },
+    request_declined: {
+      kind: 'request_declined',
+      subject: { kind: 'request', id: randomUUID() },
+      sopId: null,
+      summary: 'Declined a request',
+      details: { ...probe, requestKind: 'change_sop' },
+    },
+    objective_set: {
+      kind: 'objective_set',
+      subject: { kind: 'objective', id: randomUUID() },
+      sopId: null,
+      summary: 'Set an objective',
+      details: probe,
+    },
+    objective_cleared: {
+      kind: 'objective_cleared',
+      subject: { kind: 'objective', id: randomUUID() },
+      sopId: null,
+      summary: 'Removed an objective',
+      details: { ...probe, previousText: 'eval objective' },
+    },
+    objective_confirmed: {
+      kind: 'objective_confirmed',
+      subject: { kind: 'objective', id: randomUUID() },
+      sopId: null,
+      summary: 'Confirmed an objective',
+      details: probe,
+    },
   }
 }
 

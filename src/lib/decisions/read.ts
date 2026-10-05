@@ -10,13 +10,14 @@
  */
 import type { DecisionKind } from '@/lib/decisions/shape'
 
-export type DecisionGroupKey = 'all' | 'approvals' | 'signoffs' | 'ownership' | 'publishing' | 'reviews' | 'ai' | 'other'
+export type DecisionGroupKey = 'all' | 'approvals' | 'signoffs' | 'ownership' | 'requests' | 'publishing' | 'reviews' | 'ai' | 'other'
 
 export const DECISION_GROUPS: ReadonlyArray<{ key: DecisionGroupKey; label: string }> = [
   { key: 'all', label: 'All' },
   { key: 'approvals', label: 'Approvals' },
   { key: 'signoffs', label: 'Sign-offs' },
   { key: 'ownership', label: 'Ownership' },
+  { key: 'requests', label: 'Requests' },
   { key: 'publishing', label: 'Publishing' },
   { key: 'reviews', label: 'Reviews' },
   { key: 'ai', label: 'AI' },
@@ -27,10 +28,11 @@ export const KIND_GROUPS: Record<Exclude<DecisionGroupKey, 'all'>, ReadonlyArray
   approvals: ['approve', 'reject'],
   signoffs: ['sign_off', 'countersign'],
   ownership: ['owner_change', 'assign', 'unassign'],
+  requests: ['request_accepted', 'request_declined'],
   publishing: ['publish'],
   reviews: ['review', 'cadence_change'],
   ai: ['ai_finding_cleared', 'ai_field_write', 'verify', 'verify_withdrawn'],
-  other: ['observation', 'role_change', 'member_invited', 'member_removed'],
+  other: ['observation', 'role_change', 'member_invited', 'member_removed', 'objective_set', 'objective_cleared', 'objective_confirmed'],
 }
 
 export const KIND_WORDS: Record<DecisionKind, string> = {
@@ -54,6 +56,11 @@ export const KIND_WORDS: Record<DecisionKind, string> = {
   role_change: 'Changed a role',
   member_invited: 'Invited someone',
   member_removed: 'Removed someone',
+  request_accepted: 'Accepted a request',
+  request_declined: 'Declined a request',
+  objective_set: 'Set an objective',
+  objective_cleared: 'Removed an objective',
+  objective_confirmed: 'Confirmed an objective',
 }
 
 /**
