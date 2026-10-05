@@ -1910,7 +1910,7 @@ Plans:
   4. A SOP still being read from a document or a video opens in the editor saying what is happening and roughly how long it will take, never as an empty page, and getting there does not reload the whole app
   5. Publishing a new version means workers always get the latest published one while earlier versions stay on record; Back or Esc from any open SOP returns to the one screen with the place the user came from still selected
 
-**Plans:** 16/18 plans executed
+**Plans:** 17/18 plans executed
 Plans:
 **Wave 1**
 
@@ -1957,7 +1957,7 @@ Plans:
 
 **Wave 10** *(blocked on Wave 9 completion — OPTIONAL, nothing depends on it)*
 
-- [ ] 58-17-PLAN.md — Konva annotation rebuilt on step photos behind a nested lazy seam; annotation un-dropped (D-03 amendment)
+- [x] 58-17-PLAN.md — Konva annotation rebuilt on step photos behind a nested lazy seam; annotation un-dropped (D-03 amendment)
 
 **Wave 11** *(blocked on Wave 9; runs after the optional Wave 10)*
 
