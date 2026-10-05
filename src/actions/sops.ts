@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getSessionContext } from '@/lib/auth/session-context'
 import { requireAdminContext } from '@/lib/auth/guards'
+import { PUBLISHED_MSG } from '@/lib/sop/editable'
 import { assignSopDepartments } from '@/actions/departments'
 import { uploadSessionSchema, getSourceFileType, isBlockedMacroFile } from '@/lib/validators/sop'
 import type { UploadSession } from '@/types/sop'
@@ -211,7 +212,7 @@ export async function reparseSop(sopId: string): Promise<{ success: true; sopId:
   // Fetch SOP details for the new parse job (and to verify org ownership)
   const { data: sop } = await supabase
     .from('sops')
-    .select('organisation_id, source_file_path, source_file_type')
+    .select('organisation_id, source_file_path, source_file_type, status')
     .eq('id', sopId)
     .single()
 
@@ -219,6 +220,9 @@ export async function reparseSop(sopId: string): Promise<{ success: true; sopId:
   // Compare against the SESSION org, never a value derived from the fetched
   // row itself (CLAUDE.md [2026-07-28]) — the row could belong to any org.
   if (sop.organisation_id !== organisationId) return { error: 'SOP not found' }
+  // A published SOP is read-only (Phase 58 D-11, review WR-04): re-parsing it would
+  // delete the live steps under in-progress walks. A failed parse is the retry case.
+  if (sop.status === 'published') return { error: PUBLISHED_MSG }
 
   const admin = createAdminClient()
 
@@ -249,7 +253,7 @@ export async function reparseSop(sopId: string): Promise<{ success: true; sopId:
     .eq('id', sopId)
 
   await admin.from('parse_jobs').insert({
-    organisation_id: sop.organisation_id,
+    organisation_id: organisationId,
     sop_id: sopId,
     file_path: sop.source_file_path,
     file_type: sop.source_file_type,
@@ -266,8 +270,16 @@ export async function reparseSop(sopId: string): Promise<{ success: true; sopId:
  * Much faster than full re-parse (~3-5s vs ~15-30s).
  */
 export async function restructureSop(sopId: string): Promise<{ success: true; sopId: string } | { error: string }> {
-  const { supabase, userId } = await getSessionContext()
+  const { supabase, userId, role, organisationId } = await getSessionContext()
   if (!userId) return { error: 'Not authenticated' }
+  // Same gates as reparseSop (review WR-04): role, session org, and never a published SOP.
+  if (!role || !['admin', 'safety_manager'].includes(role)) {
+    return { error: 'You need admin access to re-parse SOPs.' }
+  }
+  if (!organisationId) return { error: 'No organisation found' }
+  const { data: sop } = await supabase.from('sops').select('organisation_id, status').eq('id', sopId).single()
+  if (!sop || sop.organisation_id !== organisationId) return { error: 'SOP not found' }
+  if (sop.status === 'published') return { error: PUBLISHED_MSG }
 
   // Find existing parse job with transcript
   const { data: existingJob } = await supabase
@@ -300,7 +312,7 @@ export async function restructureSop(sopId: string): Promise<{ success: true; so
   // Create new parse job that carries forward the transcript
   const admin = createAdminClient()
   await admin.from('parse_jobs').insert({
-    organisation_id: existingJob.organisation_id,
+    organisation_id: organisationId,
     sop_id: sopId,
     file_path: existingJob.file_path,
     file_type: existingJob.file_type,

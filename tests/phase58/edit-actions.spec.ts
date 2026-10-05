@@ -150,6 +150,21 @@ test.describe('FOC-02/WRK-04 edit actions', () => {
     for (const fn of ['createSection', 'reorderSections', 'updateSectionTitle']) {
       expect(body(sections, fn), fn).toContain('editableSop(')
     }
+    // review WR-04: the two parse re-runs delete sop_sections (and so the focus steps by
+    // cascade); both refuse a published SOP, check the role, and scope to the session org
+    // before anything destructive.
+    const sops = read('src/actions/sops.ts')
+    expect(sops).toContain("import { PUBLISHED_MSG } from '@/lib/sop/editable'")
+    for (const fn of ['reparseSop', 'restructureSop']) {
+      const b = body(sops, fn)
+      const refuse = b.indexOf("sop.status === 'published') return { error: PUBLISHED_MSG }")
+      expect(refuse, `${fn} refuses a published SOP`).toBeGreaterThan(-1)
+      expect(refuse).toBeLessThan(b.indexOf(".from('sop_sections')"))
+      expect(b.indexOf("'safety_manager'"), `${fn} role check`).toBeLessThan(refuse)
+      expect(b).toContain('sop.organisation_id !== organisationId')
+      expect(b).not.toContain('existingJob.organisation_id')
+      expect(b).toMatch(/\.from\('parse_jobs'\)\s*\.insert\(\{\s*organisation_id: organisationId/)
+    }
   })
 
   test('tick is admin-only and writes one ledger row after the write (58-04)', () => {
