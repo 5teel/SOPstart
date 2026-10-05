@@ -1910,7 +1910,7 @@ Plans:
   4. A SOP still being read from a document or a video opens in the editor saying what is happening and roughly how long it will take, never as an empty page, and getting there does not reload the whole app
   5. Publishing a new version means workers always get the latest published one while earlier versions stay on record; Back or Esc from any open SOP returns to the one screen with the place the user came from still selected
 
-**Plans:** 3/18 plans executed
+**Plans:** 8/18 plans executed
 Plans:
 **Wave 1**
 
@@ -1923,11 +1923,11 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 58-04-PLAN.md — Step-edit server actions ({ stepId } guard arm, focus-read loader, tick/clear with ledger, objective, jump flag, step photos)
-- [ ] 58-05-PLAN.md — Publish gate re-keyed to steps and re-pinned once (D-16), getPublishGateStatus, notify on lineage publish
-- [ ] 58-06-PLAN.md — AI check reads the draft steps; findings as sop_ai_findings rows; draft-only jobs for blank SOPs
-- [ ] 58-07-PLAN.md — Every on-ramp writes focus steps ('new:' keys), no layout_data; document route reports its stage
-- [ ] 58-08-PLAN.md — forkDraft + census, latest-published in worker lists, old-model readers repointed
+- [x] 58-04-PLAN.md — Step-edit server actions ({ stepId } guard arm, focus-read loader, tick/clear with ledger, objective, jump flag, step photos)
+- [x] 58-05-PLAN.md — Publish gate re-keyed to steps and re-pinned once (D-16), getPublishGateStatus, notify on lineage publish
+- [x] 58-06-PLAN.md — AI check reads the draft steps; findings as sop_ai_findings rows; draft-only jobs for blank SOPs
+- [x] 58-07-PLAN.md — Every on-ramp writes focus steps ('new:' keys), no layout_data; document route reports its stage
+- [x] 58-08-PLAN.md — forkDraft + census, latest-published in worker lists, old-model readers repointed
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
