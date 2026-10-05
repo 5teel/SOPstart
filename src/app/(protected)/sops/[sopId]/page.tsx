@@ -4,6 +4,7 @@ import { requireSopEditAccess } from '@/lib/auth/guards'
 import { loadFocusSop } from '@/lib/sop/focus-read'
 import { focusHref } from '@/lib/sop/focus-path'
 import { latestPublishedOf, resolveFocusTarget, type LineageRow } from '@/lib/sop/lineage-current'
+import { memberLabel, userLabels } from '@/lib/members/labels'
 import { toWalkState, WALK_COLUMNS } from '@/lib/sop/walk-read'
 import type { ParseJobSnapshot } from '@/hooks/useParseJob'
 import type { ParseJobStatus } from '@/types/sop'
@@ -107,6 +108,16 @@ export default async function SopFocusPage({
   const data = await loadFocusSop(supabase, target.id)
   if (!data) notFound()
 
+  // The owner's name only goes to people who can open the editor (T-59-30): never browse or walk.
+  const ownerId = data.sop.owner_user_id
+  const owner =
+    editing || isAdminRole
+      ? {
+          label: ownerId ? memberLabel((await userLabels([ownerId])).get(ownerId)) : null,
+          canMarkReviewed: isAdminRole || ownerId === userId,
+        }
+      : null
+
   const walkRow = walks.find((w) => w.sop_id === target.id)
   const walk = walkRow ? toWalkState(walkRow) : null
 
@@ -165,6 +176,7 @@ export default async function SopFocusPage({
       initialMode={initialMode}
       job={job}
       canEdit={canEdit}
+      owner={owner}
     />
   )
 }

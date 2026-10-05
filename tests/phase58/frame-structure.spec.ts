@@ -169,7 +169,7 @@ test.describe('FOC-01/FOC-03 focus frame', () => {
 
   test('the walker hands the frame the editor, the switch and the report-back, and never mounts the editor itself (58-13)', () => {
     const W = stripComments(read('src/components/focus/FocusWalker.tsx'))
-    expect(W).toContain('editor={editing ? { sop: served, job, canPublish: canEdit } : null}')
+    expect(W).toContain('editor={editing ? { sop: served, job, canPublish: canEdit, owner } : null}')
     expect(W).toContain('onEditorFocus={setEdited}')
     expect(W).not.toContain('FocusEditor')
     expect(W).not.toMatch(/@\/components\/focus\/admin/)

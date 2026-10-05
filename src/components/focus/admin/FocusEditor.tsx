@@ -24,7 +24,7 @@ import { useFocusAutosave, useFocusSaveStatus } from '@/hooks/useFocusAutosave'
 import { useFocusSop } from '@/hooks/useFocusSop'
 import type { ParseJobSnapshot } from '@/hooks/useParseJob'
 import { railNumber, walkOrder } from '@/lib/sop/focus'
-import type { FocusSop } from '@/lib/sop/focus-read'
+import type { EditorOwner, FocusSop } from '@/lib/sop/focus-read'
 
 export interface FocusEditorProps {
   /** The server page's first read of the SOP. */
@@ -34,13 +34,15 @@ export interface FocusEditorProps {
   from: string | null
   /** Admins and safety managers: tick, run and clear the AI check, publish. */
   canPublish: boolean
+  /** The owner row of This SOP; null when the page did not compute it. */
+  owner: EditorOwner | null
   /** The page found the SOP still being read (or its read failed). */
   parsing: boolean
 }
 
 const PILL: Record<string, string> = { saving: 'Saving…', saved: 'Saved', error: 'Not saved — retrying' }
 
-export function FocusEditor({ sop: initial, job, from, canPublish, parsing: startedParsing }: FocusEditorProps) {
+export function FocusEditor({ sop: initial, job, from, canPublish, owner, parsing: startedParsing }: FocusEditorProps) {
   const sopId = initial.sop.id
   const bridge = useContext(FocusEditorBridgeContext)
   const { focus, invalidate } = useFocusSop(sopId, initial)
@@ -114,7 +116,7 @@ export function FocusEditor({ sop: initial, job, from, canPublish, parsing: star
         onClose={bridge?.closeRail ?? (() => {})}
         flaggedStepIds={flagged}
         sheetTop={bridge?.sheetTop}
-        footer={<ThisSopBlock sopId={sopId} initial={initial} from={from} isAdmin={canPublish} />}
+        footer={<ThisSopBlock sopId={sopId} initial={initial} from={from} isAdmin={canPublish} owner={owner} />}
       />
 
       <main data-testid="focus-column" className="flex min-w-0 flex-1 flex-col overflow-y-auto">

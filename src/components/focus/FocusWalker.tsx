@@ -7,7 +7,7 @@
  */
 import { useState } from 'react'
 import { BEFORE_YOU_START, currentIndex, type WalkEntry } from '@/lib/sop/focus'
-import type { FocusSop, FocusStepRow } from '@/lib/sop/focus-read'
+import type { EditorOwner, FocusSop, FocusStepRow } from '@/lib/sop/focus-read'
 import type { WalkState } from '@/lib/sop/walk-read'
 import type { ParseJobSnapshot } from '@/hooks/useParseJob'
 import { useWalk } from '@/hooks/useWalk'
@@ -32,9 +32,11 @@ export interface FocusWalkerProps {
   job: ParseJobSnapshot | null
   /** Admin or safety manager with edit access: the Walk / Edit switch, tick, run the AI check, publish (D-06). */
   canEdit: boolean
+  /** The owner row of the editor's This SOP block; null when the viewer cannot edit. */
+  owner?: EditorOwner | null
 }
 
-export function FocusWalker({ data: served, initialWalk, from, versionState: servedState, supersededBy, updatedSinceLastWalk, initialMode, job, canEdit }: FocusWalkerProps) {
+export function FocusWalker({ data: served, initialWalk, from, versionState: servedState, supersededBy, updatedSinceLastWalk, initialMode, job, canEdit, owner = null }: FocusWalkerProps) {
   // Walk / Edit flips in place (D-06): local state plus the address, never a navigation.
   const [editing, setEditing] = useState(initialMode !== 'browse')
   // The editor reports its latest read of the SOP, so Walk after an edit shows the steps as edited.
@@ -139,7 +141,7 @@ export function FocusWalker({ data: served, initialWalk, from, versionState: ser
       rowState={rowState}
       hollowDot={hollowDot}
       onPickStep={onPickStep}
-      editor={editing ? { sop: served, job, canPublish: canEdit } : null}
+      editor={editing ? { sop: served, job, canPublish: canEdit, owner } : null}
       modeSwitch={canEdit && versionState !== 'superseded' && initialMode !== 'parsing' ? { value: editing ? 'edit' : 'walk', onChange: switchTo } : null}
       onEditorFocus={setEdited}
     >

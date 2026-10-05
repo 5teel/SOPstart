@@ -10,6 +10,12 @@ import type { FocusKind } from '@/lib/sop/focus'
 
 const SIGNED_TTL_SEC = 3600
 
+/** The owner row in the editor's This SOP block; computed on the server for people who can edit. */
+export interface EditorOwner {
+  label: string | null
+  canMarkReviewed: boolean
+}
+
 export interface FocusSopMeta {
   id: string
   title: string | null
@@ -22,6 +28,8 @@ export interface FocusSopMeta {
   source_type: string | null
   source_file_path: string | null
   category_slug: string | null
+  owner_user_id: string | null
+  review_due_at: string | null
 }
 
 export interface FocusSection {
@@ -69,7 +77,7 @@ export async function loadFocusSop(client: SupabaseClient, sopId: string): Promi
   const db = client
   const { data: sop } = await db
     .from('sops')
-    .select('id, title, version, status, parent_sop_id, objective, allow_forward_jump, placement, source_type, source_file_path, category_slug, organisation_id')
+    .select('id, title, version, status, parent_sop_id, objective, allow_forward_jump, placement, source_type, source_file_path, category_slug, owner_user_id, review_due_at, organisation_id')
     .eq('id', sopId)
     .maybeSingle()
   if (!sop) return null

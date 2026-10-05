@@ -14,7 +14,7 @@ import dynamic from 'next/dynamic'
 import { useCallback, useMemo, useRef, useState, type ReactNode } from 'react'
 import { FocusBackContext, FocusEditorBridgeContext, FocusOverlayContext, useFocusBack } from '@/hooks/useFocusBack'
 import type { ParseJobSnapshot } from '@/hooks/useParseJob'
-import type { FocusSop } from '@/lib/sop/focus-read'
+import type { EditorOwner, FocusSop } from '@/lib/sop/focus-read'
 import { EditorSkeleton } from '@/components/focus/EditorSkeleton'
 import { FocusRail, type FocusRailProps } from '@/components/focus/FocusRail'
 import { FocusTopBar, ModeSwitch } from '@/components/focus/FocusTopBar'
@@ -45,7 +45,7 @@ export interface FocusFrameProps {
   /** Right-hand top-bar slot. */
   topBarSlot?: ReactNode
   /** What the lazy editor needs, passed straight through. Used in edit and parsing mode. */
-  editor?: { sop: FocusSop; job: ParseJobSnapshot | null; canPublish: boolean } | null
+  editor?: { sop: FocusSop; job: ParseJobSnapshot | null; canPublish: boolean; owner?: EditorOwner | null } | null
   /** The admin Walk / Edit switch; omitted for workers, on superseded versions and while parsing. */
   modeSwitch?: { value: 'walk' | 'edit'; onChange(next: 'walk' | 'edit'): void } | null
   /** The editor reports its latest read of the SOP, so flipping to Walk shows the steps as edited. */
@@ -136,7 +136,7 @@ export function FocusFrame({
         <div className="flex min-h-0 flex-1">
           {editing && editor ? (
             <FocusEditorBridgeContext.Provider value={bridge}>
-              <FocusEditor sop={editor.sop} job={editor.job} from={from} canPublish={editor.canPublish} parsing={mode === 'parsing'} />
+              <FocusEditor sop={editor.sop} job={editor.job} from={from} canPublish={editor.canPublish} owner={editor.owner ?? null} parsing={mode === 'parsing'} />
             </FocusEditorBridgeContext.Provider>
           ) : (
             <>

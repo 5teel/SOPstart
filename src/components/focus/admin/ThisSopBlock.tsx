@@ -9,9 +9,11 @@
  */
 import { useState } from 'react'
 import Link from 'next/link'
-import { ChevronDown, ChevronRight } from 'lucide-react'
+import { AlertTriangle, ChevronDown, ChevronRight } from 'lucide-react'
 import { setAllowForwardJump, setSopObjective } from '@/actions/focus-steps'
+import { confirmSopCurrent } from '@/actions/governance'
 import { DeleteSopButton } from '@/components/admin/DeleteSopButton'
+import { OwnerPicker } from '@/components/admin/governance/OwnerPicker'
 import { CategoryButton } from '@/components/focus/admin/CategoryButton'
 import { versionLine } from '@/components/focus/admin/EditDocument'
 import { InlineText } from '@/components/focus/admin/InlineText'
@@ -19,8 +21,9 @@ import { MachinesButton } from '@/components/focus/admin/MachinesButton'
 import { StandardsButton } from '@/components/focus/admin/StandardsButton'
 import { StandardLabels } from '@/components/sop/StandardLabels'
 import { useFocusLineage, useFocusSop } from '@/hooks/useFocusSop'
+import { reviewSegment } from '@/lib/office/format'
 import { focusHref } from '@/lib/sop/focus-path'
-import type { FocusSop } from '@/lib/sop/focus-read'
+import type { EditorOwner, FocusSop } from '@/lib/sop/focus-read'
 
 export interface ThisSopBlockProps {
   sopId: string
@@ -28,13 +31,15 @@ export interface ThisSopBlockProps {
   from: string | null
   /** Admins and safety managers: the jump-ahead switch, Assign, Delete draft and Category. */
   isAdmin: boolean
+  /** Who owns the SOP and whether this viewer can mark it reviewed; null hides both rows. */
+  owner: EditorOwner | null
 }
 
 const label = 'mono text-meta uppercase text-ink-500'
 const rowButton =
   'flex min-h-tap w-full items-center rounded px-2 text-left text-ui text-ink-900 hover:bg-paper-1'
 
-export function ThisSopBlock({ sopId, initial, from, isAdmin }: ThisSopBlockProps) {
+export function ThisSopBlock({ sopId, initial, from, isAdmin, owner }: ThisSopBlockProps) {
   const { focus, invalidate } = useFocusSop(sopId, initial)
   const lineage = useFocusLineage(sopId)
   const { sop, machines, standards } = focus
@@ -46,6 +51,13 @@ export function ThisSopBlock({ sopId, initial, from, isAdmin }: ThisSopBlockProp
   const [objective, setObjective] = useState(sop.objective ?? '')
   const [jump, setJump] = useState(sop.allow_forward_jump)
   const [error, setError] = useState<string | null>(null)
+  const [ownerLabel, setOwnerLabel] = useState(owner?.label ?? null)
+  const [hasOwner, setHasOwner] = useState(!!sop.owner_user_id)
+  const [reviewDueAt, setReviewDueAt] = useState(sop.review_due_at)
+  const [ownerReceipt, setOwnerReceipt] = useState<string | null>(null)
+  const [reviewReceipt, setReviewReceipt] = useState<{ text: string; bad: boolean } | null>(null)
+  const [marking, setMarking] = useState(false)
+  const review = reviewSegment(reviewDueAt)
 
   const earlier = lineage.filter((v) => v.version < sop.version)
   const machineName = machines.length > 0 ? machines.map((m) => m.name).join(', ') : 'Whole site'
@@ -60,6 +72,20 @@ export function ThisSopBlock({ sopId, initial, from, isAdmin }: ThisSopBlockProp
     if ('error' in res) return setError(res.error)
     setObjective(next)
     void invalidate()
+  }
+
+  async function markReviewed() {
+    setMarking(true)
+    setError(null)
+    const res = await confirmSopCurrent(sopId)
+    setMarking(false)
+    if ('error' in res) return setError(res.error)
+    setReviewDueAt(res.reviewDueAt)
+    setReviewReceipt(
+      res.logged
+        ? { text: 'Marked reviewed · logged in the decision ledger', bad: false }
+        : { text: "Marked reviewed, but it didn't reach the decision ledger. Tell an admin.", bad: true },
+    )
   }
 
   async function toggleJump(allow: boolean) {
@@ -136,6 +162,71 @@ export function ThisSopBlock({ sopId, initial, from, isAdmin }: ThisSopBlockProp
               </>
             )}
           </div>
+
+          {owner && (
+            <div className="flex flex-col gap-1 px-2" data-testid="this-sop-owner">
+              <span className={label}>Owner</span>
+              <div className="flex min-h-tap items-center gap-2">
+                {hasOwner ? (
+                  <span className="min-w-0 flex-1 truncate text-ui text-ink-900">{ownerLabel ?? 'someone who has left'}</span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 rounded bg-accent-decision/10 px-2 py-1 text-ui font-semibold text-ink-900">
+                    <AlertTriangle className="size-3 text-accent-decision" aria-hidden="true" />
+                    No owner
+                  </span>
+                )}
+                {isAdmin && (
+                  <OwnerPicker
+                    sopId={sopId}
+                    ownerUserId={hasOwner ? (sop.owner_user_id ?? 'set') : null}
+                    ownerLabel={hasOwner ? (ownerLabel ?? 'someone who has left') : 'No owner'}
+                    onDone={(r) => {
+                      setOwnerLabel(r.ownerLabel)
+                      setHasOwner(r.ownerLabel !== null)
+                      setOwnerReceipt(r.logged ? 'Owner set · logged in the decision ledger' : "Owner set, but it didn't reach the decision ledger. Tell an admin.")
+                      void invalidate()
+                    }}
+                  />
+                )}
+              </div>
+              {ownerReceipt && (
+                <p data-testid="this-sop-owner-receipt" className="text-ui text-ink-500">
+                  {ownerReceipt}
+                </p>
+              )}
+            </div>
+          )}
+
+          {owner && (
+            <div className="flex flex-col gap-1 px-2" data-testid="this-sop-review">
+              <span className={label}>Review</span>
+              <p className="text-ui text-ink-900">
+                {review.state === 'overdue' ? (
+                  <>
+                    {review.lead}
+                    <span className="font-semibold text-accent-escalate">{review.date}</span>
+                  </>
+                ) : (
+                  review.text
+                )}
+              </p>
+              {owner.canMarkReviewed && (
+                <button
+                  type="button"
+                  disabled={marking}
+                  onClick={() => void markReviewed()}
+                  className="min-h-tap w-full rounded-lg border border-ink-300 bg-paper-1 text-ui font-semibold text-ink-900"
+                >
+                  {marking ? 'Marking…' : 'Mark reviewed'}
+                </button>
+              )}
+              {reviewReceipt && (
+                <p data-testid="this-sop-review-receipt" className={`text-ui ${reviewReceipt.bad ? 'text-accent-escalate' : 'text-ink-500'}`}>
+                  {reviewReceipt.text}
+                </p>
+              )}
+            </div>
+          )}
 
           <div className="flex flex-col gap-1 px-2">
             <span className={label}>Machine</span>

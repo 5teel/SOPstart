@@ -85,3 +85,31 @@ test.describe('owner review meta -- surfaces', () => {
     expect(read('src/components/admin/governance/GovernanceQueueRow.tsx')).toContain('onDone={() => router.refresh()}')
   })
 })
+
+test.describe('owner review meta -- This SOP', () => {
+  const BLOCK = read('src/components/focus/admin/ThisSopBlock.tsx')
+  const PAGE = read('src/app/(protected)/sops/[sopId]/page.tsx')
+
+  test('ThisSopBlock wires Mark reviewed to confirmSopCurrent(sopId) and the picker to onDone; receipts follow logged', () => {
+    expect(BLOCK).toContain('confirmSopCurrent(sopId)')
+    expect(BLOCK).toContain('onClick={() => void markReviewed()}')
+    expect(BLOCK).toContain('<OwnerPicker')
+    expect(BLOCK).toContain('onDone={(r) =>')
+    expect(BLOCK).toContain('Marked reviewed · logged in the decision ledger')
+    expect(BLOCK).toContain("didn't reach the decision ledger. Tell an admin.")
+    expect(BLOCK).toContain('res.logged')
+    expect(BLOCK).toContain('r.logged ?')
+    expect(BLOCK).toContain('owner.canMarkReviewed')
+  })
+
+  test('the page computes the owner row from the session user, only for people who can edit', () => {
+    expect(PAGE).toContain('canMarkReviewed: isAdminRole || ownerId === userId')
+    expect(PAGE).toMatch(/editing \|\| isAdminRole\s*\?/)
+    expect(PAGE).toContain('owner={owner}')
+    expect(read('src/components/focus/FocusWalker.tsx')).toContain('canPublish: canEdit, owner }')
+    expect(read('src/components/focus/FocusFrame.tsx')).toContain('owner={editor.owner ?? null}')
+    expect(read('src/components/focus/admin/FocusEditor.tsx')).toContain('owner={owner}')
+    expect(read('src/lib/sop/focus-read.ts')).toContain('owner_user_id, review_due_at, organisation_id')
+  })
+})
+
