@@ -110,6 +110,7 @@ export const INVENTORY: Row[] = [
   { file: 'tests/phase36/no-refresher-gate.spec.ts', disposition: 'repoint', plan: '58-15' },
   { file: 'tests/phase37/no-competency-gate-worker.spec.ts', disposition: 'repoint', plan: '58-15' },
   { file: 'tests/phase40/dup04-page-shell.spec.ts', disposition: 'repoint', plan: '58-15' },
+  { file: 'tests/phase57/shell-structure.spec.ts', disposition: 'repoint', plan: '58-16' }, // 58-14 exempts the two redirect-only pages; 58-16 removes the exemption with the directories
   { file: 'tests/phase40/spine-freeze.spec.ts', disposition: 'repoint', plan: '58-15' },
   { file: 'tests/phase40/parse-status-no-navigate-after-unmount.spec.ts', disposition: 'repoint', plan: '58-15' },
   { file: 'tests/phase41/nav-and-shim.spec.ts', disposition: 'repoint', plan: '58-15' }, // 58-11 edits the admin-link literal first
