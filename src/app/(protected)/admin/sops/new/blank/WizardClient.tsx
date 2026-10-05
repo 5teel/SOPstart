@@ -6,6 +6,7 @@ import type { SectionKind, Department } from '@/types/sop'
 import { listSectionKinds } from '@/actions/sections'
 import { createSopFromWizard } from '@/actions/sops'
 import { setSopMachines } from '@/actions/site'
+import { focusHref } from '@/lib/sop/focus-path'
 import { SopMetadataFields } from '@/components/admin/SopMetadataFields'
 import type { SopMetadataValue } from '@/components/admin/SopMetadataFields'
 
@@ -97,10 +98,10 @@ export function WizardClient({ departments, machineId = null }: WizardClientProp
     }
 
     // D-19: place the SOP on its machine. If the link fails the SOP still exists,
-    // so carry on to the builder, where the admin can place it by hand.
+    // so carry on to the editor, where the admin can place it by hand.
     if (machineId) await setSopMachines({ sopId: result.sopId, machineIds: [machineId] })
 
-    router.push(`/admin/sops/builder/${result.sopId}`)
+    router.push(focusHref(result.sopId, { mode: 'edit', from: 'workshop' }))
   }
 
   return (

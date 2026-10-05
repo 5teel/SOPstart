@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { aiPromptSchema, type AiPromptInput } from '@/lib/validators/sop'
 import ParseJobStatus from '@/components/admin/ParseJobStatus'
+import { focusHref } from '@/lib/sop/focus-path'
 import type { Department } from '@/types/sop'
 import { SopMetadataFields } from '@/components/admin/SopMetadataFields'
 import type { SopMetadataValue } from '@/components/admin/SopMetadataFields'
@@ -98,24 +99,21 @@ export function PromptClient({ departments }: Props) {
         return
       }
       setSopId(json.sopId)
+      // The SOP exists: carry on in the editor, which shows the draft being written (58-13).
+      router.push(focusHref(json.sopId, { mode: 'edit', from: 'workshop' }))
     } catch (e) {
       setServerError(e instanceof Error ? e.message : 'Network error')
       setSubmitting(false)
     }
   }
 
-  // Once we have a sopId, swap the form for the live stepper. ParseJobStatus
-  // handles Realtime + 5s polling; on completion it invokes onCompleted to
-  // route to the existing review page (D-03).
+  // Once we have a sopId, swap the form for the live stepper while the editor
+  // opens (the push above); ParseJobStatus handles Realtime + 5s polling.
   if (sopId) {
     return (
       <div>
         <h2 className="text-lg font-semibold text-[var(--ink-900)] mb-4">Drafting your SOP</h2>
-        <ParseJobStatus
-          sopId={sopId}
-          initialIsVideo={false}
-          onCompleted={() => router.push(`/admin/sops/builder/${sopId}`)}
-        />
+        <ParseJobStatus sopId={sopId} initialIsVideo={false} />
       </div>
     )
   }
@@ -212,7 +210,7 @@ export function PromptClient({ departments }: Props) {
         </label>
         <p className="mb-2 text-sm text-[var(--ink-500)]">
           Describe the procedure in a sentence or two — AI drafts structured sections, steps,
-          hazards and PPE for you to review in the builder.
+          hazards and PPE for you to check, step by step.
         </p>
         <textarea
           id="promptText"

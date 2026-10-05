@@ -103,7 +103,8 @@ test.describe('SUR-03/SUR-04/SUR-06 reference sweep — /admin/sops list route i
 
   test('the four live /admin/sops sub-routes survived the sweep', () => {
     const uploadDropzone = read(path.join('src', 'components', 'admin', 'UploadDropzone.tsx'))
-    expect(uploadDropzone).toContain('/admin/sops/builder/')
+    // Phase 58-13: an upload opens in the focus editor, not the old builder.
+    expect(uploadDropzone).toContain('focusHref(')
 
     const workshop = read(path.join('src', 'components', 'shell', 'AdminRoomBodies.tsx'))
     expect(workshop).toContain('/admin/sops/builder/')

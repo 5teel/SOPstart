@@ -389,23 +389,265 @@ test.describe('Phase 58 — the SOP focus screen (deployed)', () => {
     expect(errors, errors.join('\n')).toEqual([])
   })
 
-  // ------------------------------------------------ SC3 -- the editor
-  test.describe('SC3 edit', () => {
-    test.fixme('58-edit-admin: version slot, AI banner at top, kind borders, tick per step, bottom bar count', async () => {})
-    test.fixme('58-edit-ai-findings: violet markers, Publish disabled with reasons', async () => {})
-    test.fixme('58-edit-publish-dialog: all ticked + cleared, green Publish enabled, dialog recessed', async () => {})
-    test.fixme('58-edit-blank: empty state copy', async () => {})
-    test.fixme('58-this-sop: version list, standards, jump-ahead switch', async () => {})
-  })
+  // ------------------------------------------------ SC3 / SC4 / SC5 -- the admin half (58-13)
+  // Admin session; the editor is opened straight from its address
+  // (/sops/<id>?mode=edit&from=workshop) until 58-14 repoints the machine panel's Edit link.
+  test.describe.serial('admin: editor, parsing, versions and publish', () => {
+    let db: SupabaseClient
+    let adminCtx: BrowserContext
+    let workerCtx: BrowserContext
+    let siteOrgId = ''
+    const ids = { draft: '', ready: '', blank: '', lineageRoot: '', lineageV4: '', publish: '', parsing: '', parsingVideo: '', parseFailed: '' }
 
-  // ------------------------------------------------ SC4 -- still parsing
-  test.describe('SC4 parsing', () => {
-    test.fixme('58-parsing: stage line, rough time, skeleton rail, frame never empty', async () => {})
-    test.fixme('58-parse-failed: error card + Try again', async () => {})
-  })
+    const editUrl = (id: string) => `/sops/${id}?mode=edit&from=workshop`
+    const rows = async (title: string) => {
+      const { data, error } = await db.from('sops').select('id, version, parent_sop_id, status').eq('organisation_id', siteOrgId).eq('title', title)
+      if (error || !data?.length) throw new Error(`"${title}" not found in the eval-site org -- run node scripts/eval-fixtures.mjs`)
+      return data
+    }
+    const reopenFindings = async () => {
+      await db.from('sop_ai_findings').update({ cleared_at: null, cleared_by: null }).eq('sop_id', ids.draft).like('description', 'EVAL focus finding:%')
+    }
+    // The publish fixture is v1 only; whatever a previous run published on top is removed (the provisioning script does the same).
+    const dropPublishedChildren = async () => {
+      await db.from('sops').delete().eq('organisation_id', siteOrgId).eq('parent_sop_id', ids.publish)
+    }
 
-  // ------------------------------------------------ SC5 -- the admin half
-  test.describe('SC5 admin versions', () => {
-    test.fixme('58-superseded: "v2 — superseded" badge, no Start walking (admin opens the exact version)', async () => {})
+    test.beforeAll(async ({ browser }) => {
+      if (!EVAL_ENV_READY) return
+      db = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } })
+      const fixture = await ensurePlantFixture(db)
+      siteOrgId = fixture.siteOrgId
+      if (siteOrgId === REAL_SOPSTART_ORG_ID) throw new Error('refusing to run -- resolved org id equals the real SOPstart org')
+      ids.draft = (await rows('EVAL focus draft'))[0].id
+      ids.ready = (await rows('EVAL focus ready'))[0].id
+      ids.blank = (await rows('EVAL focus blank'))[0].id
+      const lineage = await rows('EVAL focus lineage')
+      ids.lineageRoot = lineage.find((r) => r.parent_sop_id === null)!.id
+      ids.lineageV4 = lineage.find((r) => r.version === 4)!.id
+      ids.publish = (await rows('EVAL focus publish'))[0].id
+      ids.parsing = (await rows('EVAL focus parsing'))[0].id
+      ids.parsingVideo = (await rows('EVAL focus parsing video'))[0].id
+      ids.parseFailed = (await rows('EVAL focus parse failed'))[0].id
+      await reopenFindings()
+      await dropPublishedChildren()
+      adminCtx = await browser.newContext({ viewport: { width: 1440, height: 900 }, baseURL: EVAL_BASE_URL })
+      await signInAs(adminCtx, 'siteAdmin')
+      workerCtx = await browser.newContext({ viewport: { width: 1440, height: 900 }, baseURL: EVAL_BASE_URL })
+      await signInAs(workerCtx, 'siteWorker')
+    })
+
+    test.afterAll(async () => {
+      if (!EVAL_ENV_READY) return
+      await reopenFindings()
+      await dropPublishedChildren()
+      await adminCtx?.close()
+      await workerCtx?.close()
+    })
+
+    // ---- SC3: the editor on a draft with mixed ticks and open findings
+    test('SC3 58-edit-admin: version slot, AI banner above the first section, tick per step, kind borders, "Checked 2 of 4"', async () => {
+      test.setTimeout(180_000)
+      const page = await adminCtx.newPage()
+      const errors = watchConsole(page)
+      await page.goto(editUrl(ids.draft))
+      await expect(page.getByTestId('edit-document')).toHaveCount(1, SLOW)
+      await expect(page.getByTestId('edit-version-slot')).toContainText('Draft — not published yet', SLOW)
+      await expect(page.getByTestId('ai-check-banner')).toBeVisible(SLOW)
+      const banner = await page.getByTestId('ai-check-banner').boundingBox()
+      const firstSection = await page.getByTestId('edit-section').first().boundingBox()
+      expect(banner && firstSection && banner.y < firstSection.y, 'the AI check sits above the first section').toBe(true)
+      await expect(page.getByTestId('edit-step')).toHaveCount(4, SLOW)
+      await expect(page.locator('[data-testid="edit-rail-row"][data-ticked="true"]')).toHaveCount(2, SLOW)
+      await expect(page.getByTestId('publish-count')).toHaveText('Checked 2 of 4 steps', SLOW)
+      await expect(page.getByRole('checkbox', { name: /I have checked this/ })).toHaveCount(2, SLOW)
+      // The admin switch is there, and flipping Walk / Edit is local: no reload.
+      await page.evaluate(() => {
+        ;(window as unknown as { __nav: number }).__nav = 1
+      })
+      await expect(page.getByTestId('focus-mode-switch')).toHaveCount(1, SHORT)
+      await page.getByTestId('focus-mode-switch-walk').click()
+      await expect(page.getByTestId('edit-document')).toHaveCount(0, SLOW)
+      await expect(page).not.toHaveURL(/mode=edit/)
+      await page.getByTestId('focus-mode-switch-edit').click()
+      await expect(page.getByTestId('edit-document')).toHaveCount(1, SLOW)
+      expect(await page.evaluate(() => (window as unknown as { __nav?: number }).__nav)).toBe(1)
+      await shot(page, '58-edit-admin')
+      expect(errors, errors.join('\n')).toEqual([])
+      await page.close()
+    })
+
+    test('SC3 58-edit-ai-findings: violet markers, Publish off with reasons, Clear writes "Cleared · logged in the decision ledger"', async () => {
+      test.setTimeout(180_000)
+      const page = await adminCtx.newPage()
+      await page.goto(editUrl(ids.draft))
+      const found = page.getByTestId('ai-finding')
+      await expect(found.filter({ hasText: 'EVAL focus finding: the photo step' })).toHaveCount(1, SLOW)
+      await expect(found.filter({ hasText: 'EVAL focus finding: no emergency stop' })).toHaveCount(1, SLOW)
+      await expect(page.getByTestId('edit-step-finding')).toHaveCount(1, SLOW)
+      await expect(page.getByTestId('edit-rail-flag')).toHaveCount(1, SLOW)
+      await expect(page.getByTestId('publish-button')).toHaveAttribute('aria-disabled', 'true', SLOW)
+      await expect(page.getByTestId('publish-reasons')).toContainText(/finding/i, SLOW)
+      await shot(page, '58-edit-ai-findings')
+      const clear = found.filter({ hasText: 'EVAL focus finding: the photo step' }).getByTestId('ai-finding-clear')
+      await expect(clear).toHaveCount(1, SHORT)
+      await clear.click()
+      await expect(page.getByTestId('ai-finding-cleared')).toContainText('Cleared · logged in the decision ledger', SLOW)
+      await expect(found).toHaveCount(1, SLOW)
+      await page.close()
+    })
+
+    test('SC3 58-edit-publish-dialog: every step checked and no finding open, Publish is on; the dialog recesses the screen and "Not yet" leaves the draft alone', async () => {
+      test.setTimeout(180_000)
+      const page = await adminCtx.newPage()
+      await page.goto(editUrl(ids.ready))
+      await expect(page.getByTestId('publish-button')).toHaveAttribute('aria-disabled', 'false', SLOW)
+      await page.getByTestId('publish-button').click()
+      const dialog = page.getByTestId('publish-dialog')
+      await expect(dialog).toHaveCount(1, SLOW)
+      await expect(dialog).toContainText('Not yet')
+      await shot(page, '58-edit-publish-dialog')
+      await dialog.getByRole('button', { name: 'Not yet' }).click()
+      await expect(dialog).toHaveCount(0, SLOW)
+      const { data } = await db.from('sops').select('status').eq('id', ids.ready).single()
+      expect(data?.status).toBe('draft')
+      await page.close()
+    })
+
+    test('SC3 58-edit-blank: "Nothing here yet", Add a section, "Checked 0 of 0", Publish off', async () => {
+      test.setTimeout(120_000)
+      const page = await adminCtx.newPage()
+      await page.goto(editUrl(ids.blank))
+      await expect(page.getByTestId('edit-empty')).toContainText('Nothing here yet', SLOW)
+      await expect(page.getByTestId('edit-empty')).toContainText('Add your first section, then write the steps a worker follows.')
+      await expect(page.getByTestId('publish-count')).toHaveText('Checked 0 of 0 steps', SLOW)
+      await expect(page.getByTestId('publish-button')).toHaveAttribute('aria-disabled', 'true', SLOW)
+      await shot(page, '58-edit-blank')
+      await page.close()
+    })
+
+    test('SC3 58-this-sop: the rail block shows the version, the earlier versions and the jump-ahead switch', async () => {
+      test.setTimeout(120_000)
+      const page = await adminCtx.newPage()
+      await page.goto(editUrl(ids.lineageV4))
+      await expect(page.getByTestId('this-sop')).toHaveCount(1, SLOW)
+      await expect(page.getByTestId('this-sop-version')).toContainText('Editing v4 — v3 is live', SLOW)
+      await expect(page.getByTestId('this-sop-jump-ahead')).toHaveCount(1, SHORT)
+      const earlier = page.getByTestId('this-sop').getByRole('button', { name: /earlier versions?/ })
+      await expect(earlier).toHaveCount(1, SHORT)
+      await earlier.click()
+      await expect(page.getByTestId('this-sop-earlier').first()).toBeVisible(SLOW)
+      await shot(page, '58-this-sop')
+      await page.close()
+    })
+
+    // ---- SC5: an earlier version is read-only for an admin too
+    test('SC5 58-superseded: the admin opens the exact earlier version, "v2 — superseded", no Start walking, no switch', async () => {
+      test.setTimeout(120_000)
+      const page = await adminCtx.newPage()
+      await page.goto(`/sops/${ids.lineageRoot}?from=workshop`)
+      await expect(page.getByTestId('focus-version-chip')).toContainText('v2 — superseded', SLOW)
+      await expect(page.getByTestId('focus-start-walking')).toHaveCount(0)
+      await expect(page.getByTestId('focus-mode-switch')).toHaveCount(0)
+      await shot(page, '58-superseded')
+      await page.close()
+    })
+
+    // ---- SC4: still being read
+    test('SC4 58-parsing: the frame is never empty -- stage line, rough time, skeleton rail and cards -- and the video reads "Transcribing the video"', async () => {
+      test.setTimeout(180_000)
+      const page = await adminCtx.newPage()
+      const errors = watchConsole(page)
+      await page.goto(`/sops/${ids.parsing}?from=workshop`)
+      await expect(page.getByTestId('parse-progress')).toHaveCount(1, SLOW)
+      await expect(page.getByTestId('parse-stage')).not.toBeEmpty(SLOW)
+      await expect(page.getByTestId('parse-eta')).toContainText(/left/, SLOW)
+      await expect(page.getByTestId('edit-rail-skeleton')).toBeVisible(SLOW)
+      await expect(page.getByTestId('edit-skeleton-card')).toHaveCount(3)
+      await expect(page.getByTestId('publish-bar')).toHaveCount(0)
+      await expect(page.getByTestId('edit-document')).toHaveCount(0)
+      await shot(page, '58-parsing')
+      expect(errors, errors.join('\n')).toEqual([])
+      await page.close()
+
+      // The video fixture sits at "drafting"; point it at transcribing for this look, then put it back.
+      await db.from('parse_jobs').update({ current_stage: 'transcribing' }).eq('sop_id', ids.parsingVideo)
+      try {
+        const video = await adminCtx.newPage()
+        await video.goto(`/sops/${ids.parsingVideo}?from=workshop`)
+        await expect(video.getByTestId('parse-stage')).toContainText('Transcribing the video', SLOW)
+        await shot(video, '58-parsing-video')
+        await video.close()
+      } finally {
+        await db.from('parse_jobs').update({ current_stage: 'drafting' }).eq('sop_id', ids.parsingVideo)
+      }
+    })
+
+    test("SC4 58-parse-failed: the card says it could not read the document, shows the job's own line, Try again and Back", async () => {
+      test.setTimeout(120_000)
+      const page = await adminCtx.newPage()
+      await page.goto(`/sops/${ids.parseFailed}?from=workshop`)
+      const card = page.getByTestId('parse-progress')
+      await expect(card).toHaveAttribute('data-state', 'failed', SLOW)
+      await expect(card).toContainText("We couldn't read this document.")
+      await expect(card).toContainText('It may be password protected.')
+      await expect(page.getByTestId('parse-try-again')).toHaveCount(1, SHORT)
+      await expect(card.getByRole('button', { name: 'Back' })).toHaveCount(1, SHORT)
+      await shot(page, '58-parse-failed')
+      await page.close()
+    })
+
+    // ---- SOP-04: a new version, no reload, checked one step at a time, published; workers land on it
+    test('SOP-04: Start editing v2 (client navigation, no reload), check every step one by one, Publish; a worker on the old address lands on v2 and v1 stays on record', async () => {
+      test.setTimeout(300_000)
+      const page = await adminCtx.newPage()
+      const errors = watchConsole(page)
+      await page.goto(editUrl(ids.publish))
+      await expect(page.getByTestId('edit-version-slot')).toContainText('v1 is live', SLOW)
+      await page.evaluate(() => {
+        ;(window as unknown as { __nav: number }).__nav = 1
+      })
+      const start = page.getByTestId('edit-start-editing')
+      await expect(start).toHaveCount(1, SHORT)
+      await expect(start).toContainText('Start editing v2')
+      await start.click()
+      await page.waitForURL((u) => !u.pathname.endsWith(ids.publish) && u.searchParams.get('mode') === 'edit', SLOW)
+      expect(await page.evaluate(() => (window as unknown as { __nav?: number }).__nav), 'landed in the editor without a reload').toBe(1)
+      const v2Id = new URL(page.url()).pathname.split('/').pop()!
+      await expect(page.getByTestId('edit-version-slot')).toContainText('Editing v2 — v1 is live', SLOW)
+
+      // One tick per step, one at a time: there is no tick-all.
+      const boxes = page.getByRole('checkbox', { name: /I have checked this/ })
+      await expect(boxes.first()).toBeVisible(SLOW)
+      const n = await boxes.count()
+      expect(n).toBeGreaterThan(0)
+      for (let i = 0; i < n; i++) {
+        await boxes.first().click()
+        await expect(boxes).toHaveCount(n - i - 1, SLOW)
+      }
+      await expect(page.getByTestId('publish-button')).toHaveAttribute('aria-disabled', 'false', SLOW)
+      await shot(page, '58-publish-ready')
+      await page.getByTestId('publish-button').click()
+      await page.getByTestId('publish-dialog').getByRole('button', { name: 'Publish v2' }).click()
+      await expect(page.getByTestId('edit-version-slot')).toContainText('Published v2 · logged in the decision ledger', SLOW)
+      await shot(page, '58-publish-done')
+
+      const { data: after } = await db.from('sops').select('id, version, status').eq('organisation_id', siteOrgId).eq('title', 'EVAL focus publish')
+      expect(after?.find((r) => r.id === ids.publish)?.status, 'v1 stays on record').toBe('published')
+      expect(after?.find((r) => r.id === v2Id)).toMatchObject({ version: 2, status: 'published' })
+
+      // A worker opening the old address lands on the new version.
+      const worker = await workerCtx.newPage()
+      await worker.goto(`/sops/${ids.publish}`)
+      await worker.waitForURL(new RegExp(`/sops/${v2Id}`), SLOW)
+      await expect(worker.getByTestId('focus-top-bar')).toBeVisible(SLOW)
+      await worker.close()
+
+      // The admin's version list keeps v1.
+      await page.goto(editUrl(v2Id))
+      await expect(page.getByTestId('this-sop')).toContainText('1 earlier version', SLOW)
+      expect(errors, errors.join('\n')).toEqual([])
+      await page.close()
+    })
   })
 })

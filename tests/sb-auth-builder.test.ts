@@ -41,8 +41,8 @@ test.describe('SOP Builder authoring entry points (SB-AUTH)', () => {
     expect(wizard).toContain('steps')
     expect(wizard).toContain('emergency')
     expect(wizard).toContain('signoff')
-    // Redirect target on success — must land at unified builder route
-    expect(wizard).toContain('router.push(`/admin/sops/builder/')
+    // Redirect target on success — Phase 58-13: the focus editor (the builder route retires in 58-16)
+    expect(wizard).toContain("router.push(focusHref(result.sopId, { mode: 'edit'")
 
     // Server action shape
     const sops = await fs.readFile('src/actions/sops.ts', 'utf8')
@@ -80,7 +80,7 @@ test.describe('SOP Builder authoring entry points (SB-AUTH)', () => {
       'src/app/(protected)/admin/sops/new/blank/WizardClient.tsx',
       'utf8'
     )
-    expect(wizard).toContain('/admin/sops/builder/')
+    expect(wizard).toContain('focusHref(result.sopId')
 
     // 3. createSopFromWizard marks the row source_type='blank' — downstream
     //    assertion point for DB-level "which path did this SOP come from?"

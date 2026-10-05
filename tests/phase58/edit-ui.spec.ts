@@ -154,7 +154,12 @@ test.describe('no bulk tick, nothing in the worker path', () => {
   test('no worker file imports the admin editor components', () => {
     const files = [...walk('src/app/(protected)/sops'), ...walk('src/components/focus').filter((f) => !f.startsWith(`${ADMIN}/`))]
     for (const f of files) {
-      expect(read(f), f).not.toContain('components/focus/admin')
+      // 58-13: FocusFrame is the one seam, and only through next/dynamic (pinned in edit-rail).
+      if (f === 'src/components/focus/FocusFrame.tsx') {
+        expect(code(read(f)), f).not.toMatch(/from '@\/components\/focus\/admin/)
+        continue
+      }
+      expect(code(read(f)), f).not.toContain('components/focus/admin')
     }
   })
 

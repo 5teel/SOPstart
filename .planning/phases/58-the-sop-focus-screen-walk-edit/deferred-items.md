@@ -15,3 +15,8 @@ Found while executing 58-08; caused by it, left for the owning plan.
 
 - **`tests/phase26/visual-block.spec.ts` ("medium enum + a medium-tagged example are on the /api/schema surface") is red.** `src/actions/introspection.ts` describes the step model now and no longer registers `VisualBlock`. The spec is a 58-16 delete in the repoint inventory; leave it red until then.
 - **`src/actions/agent-layer.ts#getBlockAgentMetadata`** still reads `block_agent_metadata`, but synthesis stopped writing it (no `embedBlocks`), so it returns stale rows. Its only consumers are the builder files (`BuilderClient.tsx`, `AgentBlockMeta.tsx`) that 58-16 deletes; delete the action and view type with them.
+
+Found while executing 58-13; not caused by it, so not fixed there.
+
+- **`phase11-stubs` has 8 red specs about the old builder** (`sb-layout-editor` x6, `sb-section-schema` SB-SECT-05, `sb-auth-builder` SB-AUTH-01). SB-AUTH-01 fails on its `useForm` assertion (the wizard no longer uses it) before reaching the redirect line 58-13 repointed to `focusHref`. All grep the Puck / old builder files; they are 58-15 repoints or 58-16 deletes in the inventory.
+- **The plan's seam grep (`grep -rln "focus/admin" src | grep -v src/components/focus/admin/` prints only `FocusFrame.tsx`) also lists `BuilderStageShell.tsx` and `BlockEditShell.tsx`**: 58-12 relocated four tool buttons and repointed those two old-builder files to the new paths. Both go in 58-16; `edit-rail` pins the exception list so any third file fails.

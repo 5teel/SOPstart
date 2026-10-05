@@ -20,6 +20,7 @@ import { createUploadSession, createVideoUploadSession } from '@/actions/sops'
 import { tusUpload, TUS_THRESHOLD } from '@/lib/upload/tus-upload'
 import { ACCEPT_ATTR, INTAKE_HINT, validateIntakeFile } from '@/lib/upload/file-intake'
 import { startVideoSopUpload } from '@/lib/upload/start-video-sop-upload'
+import { focusHref } from '@/lib/sop/focus-path'
 import { TusUploadProgress } from './TusUploadProgress'
 import { VideoRecorder } from './VideoRecorder'
 
@@ -157,6 +158,8 @@ export function UploadDropzone() {
     setUploading(true)
 
     const supabase = createClient()
+    // Every SOP created by this press; one file lands straight in the editor (58-13).
+    const landedIds: string[] = []
 
     for (const item of pendingFiles) {
       // Mark as uploading
@@ -205,7 +208,10 @@ export function UploadDropzone() {
         // document branches below feed it, and the video branch didn't —
         // so a video-only upload finished at 100% with no confirmation and
         // no link to the draft.
-        if (result.ok) setUploadedSopIds(prev => [...prev, sessionResult.sopId])
+        if (result.ok) {
+          setUploadedSopIds(prev => [...prev, sessionResult.sopId])
+          landedIds.push(sessionResult.sopId)
+        }
         continue
       }
 
@@ -255,6 +261,7 @@ export function UploadDropzone() {
                 f.id === item.id ? { ...f, status: 'uploaded' as FileStatus } : f
               ))
               setUploadedSopIds(prev => [...prev, session.sopId])
+              landedIds.push(session.sopId)
               resolve()
             },
             onError: (err) => {
@@ -294,12 +301,19 @@ export function UploadDropzone() {
           f.id === item.id ? { ...f, status: 'uploaded' as FileStatus } : f
         ))
         setUploadedSopIds(prev => [...prev, session.sopId])
+        landedIds.push(session.sopId)
       }
     }
 
     setUploading(false)
     setSuccess(true)
-  }, [queue])
+    // One file, one SOP: open it in the editor now. It shows the parse as it happens
+    // (client navigation, so the parse request already sent keeps going). Several files
+    // keep the banner. This runs from the Upload press finishing, never from a mount effect.
+    if (pendingFiles.length === 1 && landedIds.length === 1) {
+      router.push(focusHref(landedIds[0], { mode: 'edit', from: 'workshop' }))
+    }
+  }, [queue, router])
 
   const hasFiles = queue.length > 0
   const queuedCount = queue.filter(f => f.status === 'queued').length
@@ -525,7 +539,7 @@ export function UploadDropzone() {
                 {uploadedSopIds.length === 1 ? (
                   <button
                     type="button"
-                    onClick={() => router.push(`/admin/sops/builder/${uploadedSopIds[0]}`)}
+                    onClick={() => router.push(focusHref(uploadedSopIds[0], { mode: 'edit', from: 'workshop' }))}
                     className="flex-1 min-h-tap px-4 bg-[var(--ink-900)] text-white font-semibold rounded-lg hover:bg-[var(--ink-700)] active:bg-[var(--ink-700)] transition-colors"
                   >
                     Review parsed SOP
@@ -570,7 +584,7 @@ export function UploadDropzone() {
           onClose={() => setRecorderOpen(false)}
           onSubmitComplete={(sopId) => {
             setRecorderOpen(false)
-            window.location.href = `/admin/sops/builder/${sopId}`
+            router.push(focusHref(sopId, { mode: 'edit', from: 'workshop' }))
           }}
         />
       )}

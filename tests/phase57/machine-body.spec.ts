@@ -92,10 +92,10 @@ test.describe('PLC-02 admin machine body', () => {
     expect(PAGE).toContain('machineId={machineId}')
   })
 
-  test('the wizard creates the SOP, then links it to the machine, then opens the builder', () => {
+  test('the wizard creates the SOP, then links it to the machine, then opens the editor (58-13)', () => {
     const create = WIZ.indexOf('await createSopFromWizard(')
     const link = WIZ.indexOf('setSopMachines({ sopId: result.sopId, machineIds: [machineId] })')
-    const push = WIZ.indexOf('router.push(`/admin/sops/builder/${result.sopId}`)')
+    const push = WIZ.indexOf("router.push(focusHref(result.sopId, { mode: 'edit', from: 'workshop' }))")
     expect(create).toBeGreaterThan(-1)
     expect(link).toBeGreaterThan(create)
     expect(push).toBeGreaterThan(link)
