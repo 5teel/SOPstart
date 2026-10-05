@@ -1715,7 +1715,7 @@ Executes 55 → 56 → 57 → 58 → 59 → 60 → 61 → 62, strictly sequentia
 - [x] **Phase 56: A Simpler SOP & the Decision Ledger** - Every SOP converted to sections and steps (hazard and PPE as kinds of step), standards as labels, machine-or-site placement; one append-only decision ledger written by every existing approve / sign-off / assign / publish path (completed 2026-10-04)
 - [x] **Phase 57: The One Screen & Its Places** - List · isometric site · detail panel as the landing screen, four signposted rooms, search, "next for you" card, pins, site edit mode; no header navigation (completed 2026-10-04)
 - [x] **Phase 58: The SOP Focus Screen — Walk & Edit** - Opening a SOP removes the map and the list; walk one step at a time to a sign-off, or edit with the AI check and tick-each-step before publish; new versions (completed 2026-10-05)
-- [ ] **Phase 59: The Office** - Inbox that drains, sign-off and approvals, decision ledger, people and roles, the existing access wiring — one room, with the detail panel widening for tables
+- [x] **Phase 59: The Office** - Inbox that drains, sign-off and approvals, decision ledger, people and roles, the existing access wiring — one room, with the detail panel widening for tables (completed 2026-10-05)
 - [ ] **Phase 60: Requests, Notifications & Objectives** - People and agents raise requests the Office answers; notifications with a bell; objectives as quiet metadata; the site overview fills in
 - [ ] **Phase 61: The Workshop & the Smoko Room** - Four ways to start a SOP, in-progress list, AI model choice, worker change requests; training matrix, simple observations, my record
 - [ ] **Phase 62: Removal Certified, Addresses & Maps** - Every old address redirects, every place has an address, a guard fails the build if a dropped route or package returns, pathways map and feedback page rebuilt
@@ -1979,7 +1979,7 @@ Plans:
   4. The decisions tab lists the ledger newest first and can be narrowed by kind of decision; opening it, people and roles, or access widens the detail panel while the site stays visible and re-centres on the Office
   5. An admin invites a person, sets their role, sees their department, and opens the existing access wiring screen, unchanged, to decide who sees which SOPs
 
-**Plans:** 15/16 plans executed
+**Plans:** 16/16 plans complete
 Plans:
 **Wave 1**
 
@@ -2034,7 +2034,7 @@ Plans:
 
 **Wave 13** *(blocked on Wave 12 completion)*
 
-- [ ] 59-16-PLAN.md — Deployed eval with every screenshot read, build + full suite once, validation sign-off, requirements ticked, Learnings
+- [x] 59-16-PLAN.md — Deployed eval with every screenshot read, build + full suite once, validation sign-off, requirements ticked, Learnings
 
 **UI hint**: yes
 
