@@ -64,12 +64,41 @@ test.describe('worker list derives from the server (55-02)', () => {
   })
 })
 
-test.describe('SOP detail and Now card read the server (55-02)', () => {
+// Repointed in 58-15: the tabbed page, its walkthroughs, the completion store and
+// the builder autosave are replaced by the focus screen. The worker path is the
+// server page + FocusWalker + useWalk + the walk actions, and the editor writes
+// through useFocusAutosave.
+const FOCUS_WORKER = [
+  'src/components/focus/FocusFrame.tsx',
+  'src/components/focus/FocusTopBar.tsx',
+  'src/components/focus/FocusRail.tsx',
+  'src/components/focus/BrowseDocument.tsx',
+  'src/components/focus/FocusWalker.tsx',
+  'src/components/focus/WalkStep.tsx',
+  'src/components/focus/ReviewAndSend.tsx',
+  'src/components/focus/SentPanel.tsx',
+  'src/components/focus/ResumeCard.tsx',
+  'src/hooks/useWalk.ts',
+  'src/hooks/useFocusSop.ts',
+  'src/actions/walk.ts',
+  'src/app/(protected)/sops/[sopId]/page.tsx',
+]
 
-  test('useSopDetail has no cache branch', () => {
-    const src = code('src/hooks/useSopDetail.ts')
-    expect(src).not.toContain(OFFLINE)
-    expect(src).not.toMatch(/\bdb\./)
+test.describe('SOP focus screen and Now card read the server (55-02, 58-15)', () => {
+  test('no worker focus file touches the on-device cache, a local db or a persisted store', () => {
+    for (const rel of FOCUS_WORKER) {
+      const src = code(rel)
+      expect(src, rel).not.toContain(OFFLINE)
+      expect(src, rel).not.toMatch(/\bdb\./)
+      expect(src, rel).not.toMatch(/localStorage|indexedDB|idb-keyval|dexie/i)
+    }
+  })
+
+  test('the worker page reads through the server and renders FocusWalker (the caller calls it)', () => {
+    const page = code('src/app/(protected)/sops/[sopId]/page.tsx')
+    expect(page).toContain('loadFocusSop(')
+    expect(page).toContain('<FocusWalker')
+    expect(code('src/components/focus/FocusWalker.tsx')).toContain('useWalk(')
   })
 
   test('NowCard sums step minutes from the server', () => {
@@ -80,27 +109,28 @@ test.describe('SOP detail and Now card read the server (55-02)', () => {
   })
 })
 
-test.describe('builder autosave writes straight to the server (55-02)', () => {
-
-  test('useBuilderAutosave debounces then calls updateSectionLayout', () => {
-    const src = code('src/hooks/useBuilderAutosave.ts')
-    expect(src).toContain('updateSectionLayout(')
+test.describe('editor autosave writes straight to the server (55-02, 58-15)', () => {
+  test('useFocusAutosave debounces then calls updateFocusStep, and a failed send is retried', () => {
+    const src = code('src/hooks/useFocusAutosave.ts')
+    expect(src).toContain('updateFocusStep(')
     expect(src).toMatch(/DEBOUNCE_MS\s*=\s*750/)
-    expect(src).toContain('server_newer')
-    expect(src).toContain('useBuilderSaveStatus')
+    expect(src).toContain('useFocusSaveStatus')
+    expect(src).toMatch(/RETRY_MS\s*=/)
+    expect(src).toContain('MAX_RETRIES')
     expect(src).not.toContain(OFFLINE)
   })
 
-  test('BuilderClient reads the save status store, not the cache', () => {
-    const src = code('src/app/(protected)/admin/sops/builder/[sopId]/BuilderClient.tsx')
-    expect(src).not.toContain('useDraftLayoutSync')
-    expect(src).not.toContain(OFFLINE)
-    expect(src).not.toContain('useNetworkStore')
-    expect(src).toContain('useBuilderSaveStatus')
+  test('the editor mounts the autosave and reads the save status store, not the cache', () => {
+    const editor = code('src/components/focus/admin/FocusEditor.tsx')
+    expect(editor).toContain('useFocusAutosave(')
+    expect(editor).toContain('useFocusSaveStatus(')
+    expect(editor).not.toContain(OFFLINE)
+    expect(editor).not.toContain('useNetworkStore')
+    expect(code('src/components/focus/admin/EditDocument.tsx')).toContain('useFocusAutosave(')
   })
 })
 
-test.describe('walk photos upload directly (55-03)', () => {
+test.describe('walk photos upload directly (55-03, 58-15)', () => {
   test('compressPhoto lives in lib/photo and useStepPhotos does the two-call upload', () => {
     expect(code('src/lib/photo/compress.ts')).toMatch(/export (async )?function compressPhoto/)
     const hook = code('src/hooks/useStepPhotos.ts')
@@ -109,34 +139,27 @@ test.describe('walk photos upload directly (55-03)', () => {
     expect(hook).toContain("method: 'PUT'")
   })
 
-  test('photos follow the active completion, so a second walk never submits the first walk photos', () => {
+  test('photos follow the active walk, so a second walk never submits the first walk photos', () => {
     const hook = code('src/hooks/useStepPhotos.ts')
     expect(hook).toContain('export function useStepPhotos(activeCompletionId')
     expect(hook).toContain('p.completionId === activeCompletionId')
-    expect(code('src/components/sop/walkthrough/MobileWalkthrough.tsx')).toContain(
-      'useStepPhotos(activeCompletion?.localId)'
-    )
+    expect(code('src/hooks/useWalk.ts')).toContain('useStepPhotos(walk?.id)')
   })
 
-  test('MobileWalkthrough submits with uploaded photos and nothing is queued', () => {
-    const src = code('src/components/sop/walkthrough/MobileWalkthrough.tsx')
-    expect(src).toContain('useStepPhotos(')
-    expect(src).toContain('submitCompletion(')
-    expect(src).not.toContain('window.confirm')
-    expect(src).not.toContain(OFFLINE)
-    expect(src).not.toContain('@/hooks/usePhotoQueue')
-    expect(src).not.toMatch(/queued/i)
+  test('the walk submits from the server walk row and nothing is queued', () => {
+    const send = code('src/components/focus/ReviewAndSend.tsx')
+    expect(send).toContain('submitCompletion({ walkId')
+    expect(send).not.toContain('window.confirm')
+    expect(send).not.toContain(OFFLINE)
+    expect(code('src/hooks/useWalk.ts')).toContain('useStepPhotos(')
+    for (const rel of ['src/components/focus/WalkStep.tsx', 'src/components/focus/ReviewAndSend.tsx', 'src/hooks/useWalk.ts']) {
+      const src = code(rel)
+      expect(src, rel).not.toContain('@/hooks/usePhotoQueue')
+      expect(src, rel).not.toContain("'Queued'")
+      expect(src, rel).not.toMatch(/queued/i)
+    }
   })
 
-  test('the other walk files and the store drop the cache', () => {
-    const card = code('src/components/sop/walkthrough/ImmersiveStepCard.tsx')
-    expect(card).not.toContain('@/hooks/usePhotoQueue')
-    expect(card).not.toContain("'Queued'")
-    expect(code('src/components/sop/walkthrough/DesktopWalkthrough.tsx')).not.toContain(OFFLINE)
-    const store = code('src/stores/completionStore.ts')
-    expect(store).not.toContain(OFFLINE)
-    expect(store).not.toContain('restoreFromDexie')
-  })
 })
 
 test.describe('photo upload URL takes its organisation from the session (55-03)', () => {
@@ -209,13 +232,11 @@ test.describe('review fixes (55-review)', () => {
     expect(body).not.toMatch(/23505'\)\s*\{\s*return/)
   })
 
-  test('WR-03: a failed autosave is retried and the save-status store resets per SOP', () => {
-    const hook = code('src/hooks/useBuilderAutosave.ts')
-    expect(hook).toContain('saveWithRetry(')
-    expect(hook).not.toMatch(/void saveLayout\(/)
-    const client = code('src/app/(protected)/admin/sops/builder/[sopId]/BuilderClient.tsx')
-    expect(client).toMatch(/useBuilderSaveStatus\.setState\(\{[^}]*error: null/)
-    expect(client).toContain('[sopId]')
+  test('WR-03: a failed autosave is retried and the pending edit is never dropped (58-15: useFocusAutosave)', () => {
+    const hook = code('src/hooks/useFocusAutosave.ts')
+    expect(hook).toContain('schedule(RETRY_MS)')
+    expect(hook).toContain('pending.set(stepId, { ...patch, ...pending.get(stepId) })')
+    expect(hook).toContain('flush()')
   })
 
   test('WR-04: a failed library read throws and the worker shell renders an error state, not an empty list', () => {

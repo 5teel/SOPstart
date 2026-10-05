@@ -23,9 +23,8 @@
  *     GovernanceQueueRow (the merged surface).
  *   GQ-04/D28-09: listAdminSopRows counts from listGovernanceQueue, and the
  *     session proxy + the governance inbox's chips deep-link the flags.
- *   REV-03/D28-07: ReadTab (Phase 30 merged Overview+Tools+Hazards) contains
- *     the "Current as of" caption and contains NO review_due_at
- *     conditional/gate anywhere (hard rule).
+ *   REV-03/D28-07: every worker focus file (58-15; the tabbed read page is
+ *     gone) contains NO review_due_at conditional/gate (hard rule).
  *   REV-02/D28-07: the worker SOP detail route contains no
  *     review_due_at/owner_user_id gating branch — governance never blocks
  *     worker read/walkthrough access.
@@ -45,8 +44,16 @@ const INBOX = path.join(ROOT, 'src', 'lib', 'governance', 'inbox.ts')
 const FLAG_DISPLAY = path.join(ROOT, 'src', 'lib', 'governance', 'flag-display.ts')
 const QUEUE_ROW = path.join(ROOT, 'src', 'components', 'admin', 'governance', 'GovernanceQueueRow.tsx')
 const CLASSIFY = path.join(ROOT, 'src', 'lib', 'governance', 'classify.ts')
-const READ_TAB = path.join(ROOT, 'src', 'components', 'sop', 'tabs', 'ReadTab.tsx')
 const WORKER_SOP_DETAIL = path.join(ROOT, 'src', 'app', '(protected)', 'sops', '[sopId]', 'page.tsx')
+// 58-15: the worker's read/walk surface is the focus screen -- its frame, browse
+// document, walker, walk steps, review/send panels and the walk hook + actions.
+const FOCUS = (f: string) => path.join(ROOT, 'src', 'components', 'focus', f)
+const WORKER_FOCUS_FILES = [
+  'FocusFrame.tsx', 'FocusTopBar.tsx', 'FocusRail.tsx', 'BrowseDocument.tsx', 'FocusWalker.tsx',
+  'WalkStep.tsx', 'ReviewAndSend.tsx', 'SentPanel.tsx', 'ResumeCard.tsx', 'KindChip.tsx',
+].map(FOCUS)
+const WALK_HOOK = path.join(ROOT, 'src', 'hooks', 'useWalk.ts')
+const WALK_ACTIONS = path.join(ROOT, 'src', 'actions', 'walk.ts')
 
 function read(p: string): string {
   return fs.readFileSync(p, 'utf-8')
@@ -141,25 +148,25 @@ test.describe('admin scope counts — counts from listGovernanceQueue + deep lin
 })
 
 // ---------------------------------------------------------------------------
-// ReadTab.tsx — REV-03/D28-07 worker no-gate hard rule (merged tab, Phase 30)
+// The focus screen — REV-03/D28-07 worker no-gate hard rule. 58-15: the tabbed
+// read page and its "Current as of" caption are gone with no successor (the
+// focus screen shows no currency caption), so the caption assertion is dropped;
+// the no-gate half survives on every worker focus file.
 // ---------------------------------------------------------------------------
 
-test.describe('ReadTab — passive currency caption, no gate (D28-07)', () => {
-  const src = read(READ_TAB)
-
-  test('renders exactly one "Current as of" caption', () => {
-    expect(src).toContain('Current as of')
+test.describe('focus screen worker files — no review gate (D28-07)', () => {
+  test('GATE_PATTERN self-check: matches a review_due_at comparison', () => {
+    expect('if (sop.review_due_at < now)').toMatch(GATE_PATTERN)
   })
 
-  test('contains NO review_due_at conditional/gate anywhere', () => {
-    // GATE_PATTERN catches comparisons/if-branches on the field; a bare mention
-    // in a documentation comment (explaining the hard rule itself) is fine.
-    expect(src).not.toMatch(GATE_PATTERN)
-  })
-
-  test('does not import any governance action', () => {
-    expect(src).not.toContain("from '@/actions/governance'")
-  })
+  for (const file of [...WORKER_FOCUS_FILES, WALK_HOOK, WALK_ACTIONS]) {
+    const rel = path.relative(ROOT, file)
+    test(`${rel} contains NO review_due_at/owner_user_id conditional/gate and no governance action import`, () => {
+      const src = read(file)
+      expect(src).not.toMatch(GATE_PATTERN)
+      expect(src).not.toContain("from '@/actions/governance'")
+    })
+  }
 })
 
 // ---------------------------------------------------------------------------

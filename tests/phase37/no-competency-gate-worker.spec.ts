@@ -31,8 +31,15 @@ import path from 'node:path'
 
 const ROOT = process.cwd()
 
-const READ_TAB = path.join(ROOT, 'src', 'components', 'sop', 'tabs', 'ReadTab.tsx')
 const WORKER_SOP_DETAIL = path.join(ROOT, 'src', 'app', '(protected)', 'sops', '[sopId]', 'page.tsx')
+// 58-15: the worker's read/walk surface is the focus screen (the tabbed read page is gone).
+const FOCUS = (f: string) => path.join(ROOT, 'src', 'components', 'focus', f)
+const FOCUS_WORKER_FILES = [
+  'FocusFrame.tsx', 'FocusTopBar.tsx', 'FocusRail.tsx', 'BrowseDocument.tsx', 'FocusWalker.tsx',
+  'WalkStep.tsx', 'ReviewAndSend.tsx', 'SentPanel.tsx', 'ResumeCard.tsx', 'KindChip.tsx',
+].map(FOCUS)
+const WALK_HOOK = path.join(ROOT, 'src', 'hooks', 'useWalk.ts')
+const WALK_ACTIONS = path.join(ROOT, 'src', 'actions', 'walk.ts')
 // 57-08: the worker list page and library card are gone; the worker surfaces are the shell + plant files.
 const SHELL = (f: string) => path.join(ROOT, 'src', 'components', 'shell', f)
 const PLANT = (f: string) => path.join(ROOT, 'src', 'components', 'sop', 'plant', f)
@@ -42,8 +49,10 @@ const CLASSIFY = path.join(ROOT, 'src', 'lib', 'competency', 'classify.ts')
 const WORKER_SOPS_HOOK = path.join(ROOT, 'src', 'hooks', 'useWorkerSops.ts')
 
 const TARGETS: Array<{ label: string; file: string }> = [
-  { label: 'ReadTab.tsx (worker SOP read surface)', file: READ_TAB },
   { label: 'worker SOP detail / walkthrough route page.tsx', file: WORKER_SOP_DETAIL },
+  ...FOCUS_WORKER_FILES.map((file) => ({ label: `focus/${path.basename(file)}`, file })),
+  { label: 'useWalk.ts (the walk hook)', file: WALK_HOOK },
+  { label: 'walk.ts (walk server actions)', file: WALK_ACTIONS },
   { label: 'WorkerShell.tsx (worker one screen)', file: SHELL('WorkerShell.tsx') },
   { label: 'OneScreen.tsx', file: SHELL('OneScreen.tsx') },
   { label: 'RoomBodies.tsx', file: SHELL('RoomBodies.tsx') },

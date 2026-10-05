@@ -3,7 +3,7 @@
  *
  * Eventual contract (30-RESEARCH § Current Wiring 7 + § Dead-Href Inventory):
  *   - Deleted: ModelTab.tsx + tab entry, /sops/[sopId]/walkthrough route
- *     (page.tsx + layout.tsx — hrefs become ?tab=walk), WalkthroughTab.tsx
+ *     (page.tsx + layout.tsx — hrefs moved to the tab address, now the focus screen), WalkthroughTab.tsx
  *     shim, BuilderWithSourceViewer.tsx (this plan, 30-01), fake
  *     notifications bell (the whole header went in Phase 57), AdminDashboard/PendingDashboard UI (UX-01).
  *   - No-op worker department filter fixed or removed (decision #3 —
@@ -20,25 +20,39 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 const ROOT = process.cwd()
-const BUILDER_DIR = path.join(
-  ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'builder', '[sopId]',
-)
-const TABS_DIR = path.join(ROOT, 'src', 'components', 'sop', 'tabs')
+
+// 58-15: the builder and tabs directories are retired wholesale (58-16), so a
+// deletion guard that read a file INSIDE them would throw or pass vacuously.
+// Each guard now walks src/ for the file name and for any reference to it.
+function srcFiles(dir = path.join(ROOT, 'src'), out: string[] = []): string[] {
+  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+    const p = path.join(dir, e.name)
+    if (e.isDirectory()) srcFiles(p, out)
+    else if (/\.tsx?$/.test(e.name)) out.push(p)
+  }
+  return out
+}
+function stripComments(src: string): string {
+  return src.split('\n').map((l) => (/^\s*(\/\/|\/\*|\*\/|\*)/.test(l) ? '' : l)).join('\n')
+}
+/** Absence of the file anywhere in src/ AND of any code reference to its symbol. */
+function expectGone(symbol: string) {
+  const files = srcFiles()
+  expect(files.filter((p) => path.basename(p) === `${symbol}.tsx`).map((p) => path.relative(ROOT, p))).toEqual([])
+  const refs = files.filter((p) => stripComments(fs.readFileSync(p, 'utf-8')).includes(symbol)).map((p) => path.relative(ROOT, p))
+  expect(refs, `${symbol} is still referenced`).toEqual([])
+}
 
 test.describe('UX-08 — dead-weight sweep', () => {
   // LIVE from 30-01 Task 2: the legacy Phase-21 builder shell is gone.
-  test('BuilderWithSourceViewer.tsx is deleted (superseded by BuilderStageShell, Phase 26)', () => {
-    expect(fs.existsSync(path.join(BUILDER_DIR, 'BuilderWithSourceViewer.tsx'))).toBe(false)
+  test('BuilderWithSourceViewer.tsx is deleted and nothing references it (superseded in Phase 26, then by the focus editor)', () => {
+    expectGone('BuilderWithSourceViewer')
   })
 
   // LIVE from 30-06: UX-05 tab merge deletions.
   test('ModelTab + WalkthroughTab shim are deleted with their tab entries', () => {
-    expect(fs.existsSync(path.join(TABS_DIR, 'ModelTab.tsx'))).toBe(false)
-    expect(fs.existsSync(path.join(TABS_DIR, 'WalkthroughTab.tsx'))).toBe(false)
-    // Their exports are gone from the tabs barrel too.
-    const barrel = fs.readFileSync(path.join(TABS_DIR, 'index.ts'), 'utf-8')
-    expect(barrel).not.toContain('ModelTab')
-    expect(barrel).not.toContain('WalkthroughTab')
+    expectGone('ModelTab')
+    expectGone('WalkthroughTab')
   })
 
   test('/sops/[sopId]/walkthrough route (page + orphan layout) is deleted', () => {

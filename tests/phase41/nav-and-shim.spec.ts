@@ -13,7 +13,7 @@ import path from 'node:path'
 
 const ROOT = process.cwd()
 const NEXT_CONFIG = path.join(ROOT, 'next.config.ts')
-// 57-09: the library table is gone; the Workshop's draft rows are the admin list -> builder chain.
+// 57-09: the library table is gone; the Workshop's draft rows are the admin list -> editor chain.
 const WORKSHOP = path.join(ROOT, 'src', 'components', 'shell', 'AdminRoomBodies.tsx')
 // 57-08: the worker list is gone; the worker half of the one screen is the shell.
 const WORKER_SHELL = ['OneScreen.tsx', 'WorkerShell.tsx', 'RoomBodies.tsx', 'SiteSummary.tsx', 'OfficeCard.tsx'].map(
@@ -41,17 +41,18 @@ test.describe('legacy /admin/sops — static next.config.ts redirect (Phase 43 D
   })
 })
 
-test.describe('SUR-04 — one path from a SOP to its builder', () => {
-  test('SUR-04: the Workshop (AdminRoomBodies) links the focus editor; the worker shell links no builder', () => {
+test.describe('SUR-04 — one path from a SOP to its editor', () => {
+  test('SUR-04: the Workshop (AdminRoomBodies) links the focus editor; the worker shell links no edit address', () => {
     const workshop = read(WORKSHOP)
     expect(workshop).toContain("focusHref(d.id, { mode: 'edit', from: 'workshop' })")
-    for (const f of WORKER_SHELL) expect(read(f), f).not.toContain('/admin/sops/builder')
+    for (const f of WORKER_SHELL) expect(read(f), f).not.toContain("mode: 'edit'")
   })
 
-  test('SUR-04: the SOP focus page is not a second list-to-builder chain (Phase 58: its edit entry arrives with the Walk / Edit switch)', () => {
+  test('SUR-04: the SOP focus page is not a second list-to-editor chain (58-15: it renders no links of its own; its edit entry is the Walk / Edit switch)', () => {
     // The Workshop's draft rows are the only admin list that links directly
-    // into the builder; the focus page adds no second one.
+    // into the editor; the server page renders only FocusWalker and adds no second one.
     const detail = read(SOP_DETAIL_PAGE)
-    expect(detail).not.toContain('/admin/sops/builder')
+    expect(detail).not.toMatch(/<Link|href=/)
+    expect(detail).toContain('<FocusWalker')
   })
 })
