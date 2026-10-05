@@ -1,29 +1,59 @@
 /**
  * Phase 54 (D-02): the inbox is derived on read from the governance queue,
- * the library rows and the site links -- no table, no stored state. It
- * classifies rows into chips/severity only; it never decides who may act --
- * GovernanceQueueRow and approveStep own that (D-03). Plain module, no
- * directive -- importable from both client and server code.
+ * the library rows and the site links -- no table, no stored state. Phase 59
+ * adds completions waiting for sign-off and the caller's own due reviews as
+ * OPTIONAL inputs, so every older call shape stays valid. It classifies rows
+ * into chips/severity only; it never decides who may act -- the server
+ * actions own that (D-03). Plain module, no directive -- importable from both
+ * client and server code.
  */
 import type { GovernanceRow } from '@/actions/governance'
 import type { MillerSop } from '@/lib/sop-list/admin-rows'
 import type { SopMachineLink } from '@/lib/validators/site'
 import { machinesWithoutSops } from '@/lib/sop/admin-health'
 import { focusHref } from '@/lib/sop/focus-path'
+import { DUE_SOON_WINDOW_DAYS } from '@/lib/governance/classify'
+import { relativeWhen } from '@/lib/office/format'
 
-export type InboxChip = 'owner' | 'overdue' | 'approve' | 'stuck' | 'machines'
+export type InboxChip = 'owner' | 'overdue' | 'approve' | 'signoff' | 'stuck' | 'machines'
 export type InboxSeverity = 'bad' | 'warn' | 'info' | 'grey'
+
+/** A completion waiting for a counter-signature (never the caller's own walk). */
+export interface PendingSignOff {
+  completionId: string
+  sopId: string
+  sopTitle: string
+  sopVersion: number
+  workerId: string
+  workerLabel: string
+  submittedAt: string
+  photoCount: number
+}
+
+/** A published SOP the caller owns, with its review date. */
+export interface OwnedReview {
+  sopId: string
+  title: string
+  reviewDueAt: string
+}
 
 export interface InboxItem {
   key: string
-  kind: 'governance' | 'stuck' | 'machines'
+  kind: 'governance' | 'stuck' | 'machines' | 'signoff' | 'review'
   chips: InboxChip[]
   severity: InboxSeverity
   title: string
   meta: string
   age: string
   gov: GovernanceRow | null
-  action: { label: 'Retry' | 'Add'; href: string } | null
+  signOff: PendingSignOff | null
+  review: OwnedReview | null
+  /** The row's one button when it is a link or a retry; null where the row opens its own panel. */
+  action: {
+    label: 'Try again' | 'Open' | 'Write a SOP'
+    href: string
+    retry: { sopId: string; isVideo: boolean } | null
+  } | null
 }
 
 export const INBOX_CHIPS: ReadonlyArray<{ key: 'all' | InboxChip; label: string }> = [
@@ -31,11 +61,20 @@ export const INBOX_CHIPS: ReadonlyArray<{ key: 'all' | InboxChip; label: string 
   { key: 'owner', label: 'No owner' },
   { key: 'overdue', label: 'Overdue' },
   { key: 'approve', label: 'Approve' },
+  { key: 'signoff', label: 'Sign-off' },
   { key: 'stuck', label: 'Stuck' },
   { key: 'machines', label: 'Machines' },
 ]
 
 const SEVERITY_RANK: Record<InboxSeverity, number> = { bad: 0, warn: 1, info: 2, grey: 3 }
+
+function stuckAction(lib: MillerSop): InboxItem['action'] {
+  const href = focusHref(lib.id, { mode: 'edit', from: 'office' })
+  const pr = lib.parseRetry
+  return pr?.canRetry
+    ? { label: 'Try again', href, retry: { sopId: lib.id, isVideo: pr.isVideo } }
+    : { label: 'Open', href, retry: null }
+}
 
 function statusWord(status: string): string {
   if (status === 'published') return 'live'
@@ -78,7 +117,11 @@ export function deriveInbox(input: {
   library: ReadonlyArray<MillerSop>
   machines: ReadonlyArray<{ id: string; name: string }>
   links: ReadonlyArray<SopMachineLink>
+  signOffs?: ReadonlyArray<PendingSignOff>
+  ownedReviews?: ReadonlyArray<OwnedReview>
+  now?: Date
 }): InboxItem[] {
+  const now = input.now ?? new Date()
   const libraryById = new Map(input.library.map((l) => [l.id, l]))
   const items: InboxItem[] = []
 
@@ -98,6 +141,8 @@ export function deriveInbox(input: {
       meta,
       age: lib?.age ?? '',
       gov: row,
+      signOff: null,
+      review: null,
       action: null,
     })
   }
@@ -115,7 +160,9 @@ export function deriveInbox(input: {
       meta,
       age: lib.age,
       gov: null,
-      action: { label: 'Retry', href: focusHref(lib.id, { mode: 'edit', from: 'office' }) },
+      signOff: null,
+      review: null,
+      action: stuckAction(lib),
     })
   }
 
@@ -129,7 +176,47 @@ export function deriveInbox(input: {
       meta: 'no procedures yet',
       age: '',
       gov: null,
-      action: { label: 'Add', href: '/admin/sops/new' },
+      signOff: null,
+      review: null,
+      action: { label: 'Write a SOP', href: `/admin/sops/new/blank?machine=${machine.id}`, retry: null },
+    })
+  }
+
+  for (const so of input.signOffs ?? []) {
+    items.push({
+      key: `signoff-${so.completionId}`,
+      kind: 'signoff',
+      chips: ['signoff'],
+      severity: 'warn',
+      title: so.sopTitle,
+      meta: `From ${so.workerLabel} · ${so.photoCount} ${so.photoCount === 1 ? 'photo' : 'photos'}`,
+      age: relativeWhen(so.submittedAt, now),
+      gov: null,
+      signOff: so,
+      review: null,
+      action: null,
+    })
+  }
+
+  // A SOP already in the queue is not listed twice.
+  const queued = new Set(items.filter((i) => i.gov).map((i) => i.gov!.id))
+  for (const r of input.ownedReviews ?? []) {
+    if (queued.has(r.sopId)) continue
+    const due = new Date(r.reviewDueAt)
+    const overdue = due < now
+    if (!overdue && due.getTime() - now.getTime() > DUE_SOON_WINDOW_DAYS * 86_400_000) continue
+    items.push({
+      key: `review-${r.sopId}`,
+      kind: 'review',
+      chips: overdue ? ['overdue'] : [],
+      severity: overdue ? 'warn' : 'grey',
+      title: libraryById.get(r.sopId)?.displayTitle ?? r.title,
+      meta: 'You own this SOP.',
+      age: '',
+      gov: null,
+      signOff: null,
+      review: r,
+      action: null,
     })
   }
 
@@ -142,6 +229,7 @@ export function inboxCounts(items: ReadonlyArray<InboxItem>): Record<'all' | Inb
     owner: 0,
     overdue: 0,
     approve: 0,
+    signoff: 0,
     stuck: 0,
     machines: 0,
   }

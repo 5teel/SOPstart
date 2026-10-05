@@ -104,6 +104,8 @@ export type MillerSop = {
   chainRequired: boolean
   hasPersonGrant: boolean
   parseFailed: boolean
+  /** Latest parse job: how to re-queue it, and whether a re-queue makes sense (an AI-prompt SOP has no file). */
+  parseRetry: { isVideo: boolean; canRetry: boolean } | null
   machines: string[]
 }
 

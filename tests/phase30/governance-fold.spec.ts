@@ -117,14 +117,14 @@ test.describe('UX-03 — governance lives at /governance', () => {
     ).toBe(false)
   })
 
-  test('stuck conversions reach the inbox (Retry -> focus editor) and the Access lens stays reachable from its own admin page', () => {
+  test('stuck conversions reach the inbox (Try again -> re-queue, Open -> focus editor) and the Access lens stays reachable from its own admin page', () => {
     // Phase 54: the tab rail / Miller scope column is gone. Stuck/failed
     // conversions surface as inbox rows with a Retry link into the focus editor;
     // the Access lens is mounted by its own admin-gated page, /admin/access
     // (57-07; the library table that used to host it is gone, 57-09).
     const inbox = read(INBOX)
     expect(inbox).toContain("if (!lib.stuck && !lib.parseFailed) continue")
-    expect(inbox).toContain("action: { label: 'Retry', href: focusHref(lib.id, { mode: 'edit', from: 'office' }) }")
+    expect(inbox).toContain("{ label: 'Try again', href, retry: { sopId: lib.id, isVideo: pr.isVideo } }")
     const access = read(ACCESS_PAGE)
     expect(access).toContain('await requireAdminContext()')
     expect(access).toContain('<AdminAccessLens pinnedSopId={pinnedSopId} />')

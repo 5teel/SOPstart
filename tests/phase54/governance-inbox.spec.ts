@@ -67,6 +67,7 @@ function libRow(id: string, overrides: Partial<MillerSop> = {}): MillerSop {
     hasPersonGrant: false,
     parseFailed: false,
     machines: [],
+    parseRetry: { isVideo: false, canRetry: true },
     ...overrides,
   }
 }
@@ -132,23 +133,23 @@ test.describe('deriveInbox', () => {
     expect(items[0].severity).toBe('bad')
   })
 
-  test('library row stuck -> kind stuck, chips [stuck], severity bad, meta + Retry action', () => {
+  test('library row stuck -> kind stuck, chips [stuck], severity bad, meta + Try again action', () => {
     const items = deriveInbox({ governance: [], library: [libRow(SOP_ID, { stuck: true })], machines: [], links: [] })
     expect(items).toHaveLength(1)
     expect(items[0].kind).toBe('stuck')
     expect(items[0].chips).toEqual(['stuck'])
     expect(items[0].severity).toBe('bad')
     expect(items[0].meta).toContain('stopped while converting')
-    expect(items[0].action).toEqual({ label: 'Retry', href: `/sops/${SOP_ID}?mode=edit&from=office` })
+    expect(items[0].action).toEqual({ label: 'Try again', href: `/sops/${SOP_ID}?mode=edit&from=office`, retry: { sopId: SOP_ID, isVideo: false } })
   })
 
   test('library row parseFailed -> meta contains conversion failed, same action shape', () => {
     const items = deriveInbox({ governance: [], library: [libRow(SOP_ID, { parseFailed: true })], machines: [], links: [] })
     expect(items[0].meta).toContain('conversion failed')
-    expect(items[0].action).toEqual({ label: 'Retry', href: `/sops/${SOP_ID}?mode=edit&from=office` })
+    expect(items[0].action).toEqual({ label: 'Try again', href: `/sops/${SOP_ID}?mode=edit&from=office`, retry: { sopId: SOP_ID, isVideo: false } })
   })
 
-  test('machine with no links -> kind machines, chips [machines], severity grey, Add action', () => {
+  test('machine with no links -> kind machines, chips [machines], severity grey, Write a SOP action', () => {
     const items = deriveInbox({
       governance: [],
       library: [],
@@ -160,7 +161,7 @@ test.describe('deriveInbox', () => {
     expect(items[0].chips).toEqual(['machines'])
     expect(items[0].severity).toBe('grey')
     expect(items[0].meta).toBe('no procedures yet')
-    expect(items[0].action).toEqual({ label: 'Add', href: '/admin/sops/new' })
+    expect(items[0].action).toEqual({ label: 'Write a SOP', href: '/admin/sops/new/blank?machine=m1', retry: null })
   })
 
   test('machine with a link -> no item', () => {
@@ -237,8 +238,8 @@ test.describe('deriveInbox', () => {
     expect(items).toEqual([])
   })
 
-  test('INBOX_CHIPS carries all six chip keys in order', () => {
-    expect(INBOX_CHIPS.map((c) => c.key)).toEqual(['all', 'owner', 'overdue', 'approve', 'stuck', 'machines'])
+  test('INBOX_CHIPS carries all seven chip keys in order', () => {
+    expect(INBOX_CHIPS.map((c) => c.key)).toEqual(['all', 'owner', 'overdue', 'approve', 'signoff', 'stuck', 'machines'])
   })
 })
 

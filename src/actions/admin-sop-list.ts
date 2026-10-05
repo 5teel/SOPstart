@@ -154,7 +154,7 @@ export async function listAdminSopRows(params: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (supabase as any)
       .from('parse_jobs')
-      .select('sop_id, status, created_at')
+      .select('sop_id, status, created_at, file_type, input_type')
       .eq('organisation_id', organisationId)
       .order('created_at', { ascending: false }),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -182,8 +182,18 @@ export async function listAdminSopRows(params: {
 
   // Latest parse status per SOP — first row per sop_id in the descending read.
   const latestParseStatusBySop: Record<string, string> = {}
-  for (const r of (parseJobsResult?.data ?? []) as Array<{ sop_id: string; status: string; created_at: string }>) {
-    if (!(r.sop_id in latestParseStatusBySop)) latestParseStatusBySop[r.sop_id] = r.status
+  const parseRetryBySop: Record<string, { isVideo: boolean; canRetry: boolean }> = {}
+  for (const r of (parseJobsResult?.data ?? []) as Array<{
+    sop_id: string
+    status: string
+    created_at: string
+    file_type: string | null
+    input_type: string | null
+  }>) {
+    if (r.sop_id in latestParseStatusBySop) continue
+    latestParseStatusBySop[r.sop_id] = r.status
+    // An AI-prompt SOP has no source file, so a re-queue has nothing to read.
+    parseRetryBySop[r.sop_id] = { isVideo: r.file_type === 'video', canRetry: r.input_type !== 'ai_prompt' }
   }
 
   const siteMachineNameById: Record<string, string> = {}
@@ -319,6 +329,7 @@ export async function listAdminSopRows(params: {
       chainRequired: chainCategories.has(sop.category_slug ?? ''),
       hasPersonGrant: personGrantSops.has(sop.id),
       parseFailed: latestParseStatusBySop[sop.id] === 'failed',
+      parseRetry: parseRetryBySop[sop.id] ?? null,
       machines: machineNamesBySop[sop.id] ?? [],
     }
   })
