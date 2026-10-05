@@ -1979,7 +1979,7 @@ Plans:
   4. The decisions tab lists the ledger newest first and can be narrowed by kind of decision; opening it, people and roles, or access widens the detail panel while the site stays visible and re-centres on the Office
   5. An admin invites a person, sets their role, sees their department, and opens the existing access wiring screen, unchanged, to decide who sees which SOPs
 
-**Plans:** 1/16 plans executed
+**Plans:** 4/16 plans executed
 Plans:
 **Wave 1**
 
@@ -1987,9 +1987,9 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 59-02-PLAN.md — Migration 00073 (three ledger kinds, no policy change) [BLOCKING] live apply, DECISION_KINDS + types, decisions read module (groups, words, cursor)
-- [ ] 59-03-PLAN.md — Office tab on the place address, tabsForRole, wide detail pane, Esc guard, page threads tab + UUID-gated sop
-- [ ] 59-04-PLAN.md — Sign-offs and the owner's own due reviews join the one inbox derivation, one action per row, member labels by email, getOfficeInbox, drafts carry owner + review
+- [x] 59-02-PLAN.md — Migration 00073 (three ledger kinds, no policy change) [BLOCKING] live apply, DECISION_KINDS + types, decisions read module (groups, words, cursor)
+- [x] 59-03-PLAN.md — Office tab on the place address, tabsForRole, wide detail pane, Esc guard, page threads tab + UUID-gated sop
+- [x] 59-04-PLAN.md — Sign-offs and the owner's own due reviews join the one inbox derivation, one action per row, member labels by email, getOfficeInbox, drafts carry owner + review
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
