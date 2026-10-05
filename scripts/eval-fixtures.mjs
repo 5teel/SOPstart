@@ -138,6 +138,44 @@ if (!siteSupervisor) {
   console.log(`${EVAL_SITE_SUPERVISOR_EMAIL} → supervisor of ${EVAL_SITE_ORG_NAME} (${siteSupervisor.id})`)
 }
 
+// --- Phase 59 (59-01): Office eval people, all in the eval-site org only ---
+//   supervisor -> worker assignment (a supervisor's sign-off leg),
+//   an idle supervisor (supervises nobody, owns nothing: a true empty inbox),
+//   a second worker supervised by nobody (its walk must never reach a supervisor).
+export const EVAL_SITE_SUPERVISOR_IDLE_EMAIL = 'eval-site-supervisor-idle@sopstart.com'
+export const EVAL_SITE_WORKER2_EMAIL = 'eval-site-worker2@sopstart.com'
+async function ensureSiteMember(email, role) {
+  let u = list.users.find(x => x.email === email)
+  if (u && u.user_metadata?.eval_fixture !== true) throw new Error(`${email} exists but is not an eval fixture — refusing to change its membership`)
+  if (!u) {
+    const { data, error } = await sb.auth.admin.createUser({ email, email_confirm: true, user_metadata: { eval_fixture: true } })
+    if (error) throw error
+    u = data.user
+    console.log('created', email)
+  }
+  const { error } = await sb.from('organisation_members').upsert({ organisation_id: siteOrg.id, user_id: u.id, role }, { onConflict: 'organisation_id,user_id' })
+  if (error) throw error
+  console.log(`${email} → ${role} of ${EVAL_SITE_ORG_NAME} (${u.id}) present`)
+  return u
+}
+const siteSupervisorIdle = await ensureSiteMember(EVAL_SITE_SUPERVISOR_IDLE_EMAIL, 'supervisor')
+const siteWorker2 = await ensureSiteMember(EVAL_SITE_WORKER2_EMAIL, 'worker')
+{
+  const { data, error } = await sb.from('supervisor_assignments').select('id').eq('organisation_id', siteOrg.id).eq('supervisor_id', siteSupervisor.id).eq('worker_id', siteWorker.id).maybeSingle()
+  if (error) throw error
+  if (!data) {
+    const { error: ie } = await sb.from('supervisor_assignments').insert({ organisation_id: siteOrg.id, supervisor_id: siteSupervisor.id, worker_id: siteWorker.id })
+    if (ie) throw ie
+    console.log('created supervisor_assignments: eval-site supervisor → eval-site worker')
+  } else console.log('supervisor_assignments: eval-site supervisor → eval-site worker present')
+}
+// The idle supervisor and the second worker carry no assignment by construction; fail loudly if one appeared.
+{
+  const { data, error } = await sb.from('supervisor_assignments').select('id').eq('organisation_id', siteOrg.id).or(`supervisor_id.eq.${siteSupervisorIdle.id},worker_id.eq.${siteWorker2.id}`)
+  if (error) throw error
+  if (data.length) throw new Error('idle supervisor / second worker must have no supervisor assignment — found ' + data.length)
+}
+
 let plantSop
 {
   const { data, error } = await sb.from('sops').select('id, status').eq('organisation_id', siteOrg.id).eq('title', EVAL_PLANT_SOP_TITLE).maybeSingle()

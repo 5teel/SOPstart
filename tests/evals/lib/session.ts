@@ -32,7 +32,12 @@ export const EVAL_USERS = {
   // Phase 57 D-06: supervisor member of the eval-site org (never the real
   // org), so the supervisor Office card can be proved on the deployed site.
   siteSupervisor: 'eval-site-supervisor@sopstart.com',
+  // Phase 59: supervisor with no assigned worker and no owned SOP -- its Office
+  // inbox is empty by construction, so a sibling eval cannot fill it.
+  siteSupervisorIdle: 'eval-site-supervisor-idle@sopstart.com',
 } as const
+// Phase 59: a worker nobody supervises. No session is minted for it; the eval only seeds rows for it.
+export const EVAL_SITE_WORKER2_EMAIL = 'eval-site-worker2@sopstart.com'
 export type EvalRole = keyof typeof EVAL_USERS
 export const EVAL_SITE_ORG_NAME = 'SOPstart Eval Site'
 export const EVAL_SITE_SOP_TITLE = 'Eval site fixture SOP'
