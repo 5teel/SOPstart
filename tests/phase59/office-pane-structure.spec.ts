@@ -79,6 +79,87 @@ test.describe('inbox row (59-09)', () => {
   })
 })
 
+const PANE = strip(read('src/components/office/OfficePane.tsx'))
+const TAB = strip(read('src/components/office/InboxTab.tsx'))
+
+test.describe('office pane and inbox tab (59-09)', () => {
+  test('the pane has a header, a tab bar, a receipt slot, chips and the empty-state sentence', () => {
+    expect(PANE).toContain('role="tablist"')
+    expect(PANE).toContain('data-testid="office-receipt"')
+    expect(PANE).toContain('data-testid="office-pane"')
+    expect(PANE).toContain('<InboxChips')
+    expect(TAB).toContain("Nothing needs you. That&apos;s the goal.")
+    expect(TAB).toContain('data-testid="office-empty"')
+    expect(TAB).toContain('Nothing under this filter.')
+    expect(TAB).toContain('Show all')
+  })
+
+  test('a tab click goes through the shell select(), never the address bar or the router', () => {
+    expect(PANE).toMatch(/onClick=\{\(\) => select\(\{ kind: 'room', id: 'office', \.\.\.\(t === 'inbox' \? \{\} : \{ tab: t \}\) \}\)\}/)
+    expect(PANE).not.toMatch(/replaceState|pushState|router\.|next\/navigation/)
+    expect(PANE).toContain('tabsForRole(role)')
+    // Manual activation: the arrow keys move focus and never select.
+    expect(PANE).toMatch(/ArrowRight[\s\S]*?tabRefs\.current\[next\]\?\.focus\(\)/)
+    expect(PANE).toContain('tabIndex={i === rove ? 0 : -1}')
+  })
+
+  test('a cleared row refetches the inbox and writes the shell cache; the shell query is never invalidated', () => {
+    expect(TAB).toContain('invalidateQueries({ queryKey: OFFICE_INBOX_KEY })')
+    expect(TAB).toContain('setQueryData<AdminShellData | { error: string }>(SHELL_KEY')
+    expect(TAB).toContain('inboxCount: freshItems.length, inboxChips: inboxCounts(freshItems)')
+    expect(TAB).not.toMatch(/invalidateQueries\(\{ queryKey: SHELL_KEY/)
+    expect(TAB).not.toMatch(/refetchQueries/)
+    expect(TAB).toContain('getOfficeInbox(')
+    // The patch happens after the refetch, for admins only (a supervisor's shell has no admin cache).
+    const done = TAB.slice(TAB.indexOf('async function handleDone'))
+    expect(done.indexOf('await queryClient.invalidateQueries')).toBeLessThan(done.indexOf('setQueryData'))
+    expect(done).toContain("fresh.role !== 'supervisor'")
+  })
+
+  test('the ledger suffix is said only when the action says it was logged', () => {
+    expect(PANE).toMatch(/r\.logged === true\) return \{ text: `\$\{r\.receipt\} · logged in the decision ledger`/)
+    expect(PANE).toMatch(/r\.logged === false/)
+    expect(PANE).toContain("didn't reach the decision ledger")
+    // The suffix literal appears exactly once, inside the logged === true branch.
+    expect(PANE.match(/logged in the decision ledger/g)?.length).toBe(1)
+  })
+
+  test('chips are hidden for a supervisor', () => {
+    expect(TAB).toContain("data.role === 'supervisor'")
+    const chips = TAB.slice(TAB.indexOf('export function InboxChips'), TAB.indexOf('type Ghost'))
+    expect(chips).toContain('return null')
+  })
+
+  test('no effect selects a place or calls a router, and no pane file imports the router', () => {
+    for (const [name, src] of [['OfficePane', PANE], ['InboxTab', TAB], ['InboxRow', ROW]] as const) {
+      const effects = src.match(/useEffect\(\(\) => \{[\s\S]*?\n {2}\}(?:, \[[^\]]*\])?\)/g) ?? []
+      for (const body of effects) {
+        expect(body, `${name} effect`).not.toMatch(/select\(|router\.|redirect\(|location\./)
+      }
+      expect(src, name).not.toMatch(/next\/navigation|router\.refresh/)
+    }
+  })
+
+  test('the pane is a module nothing imports statically yet (59-12 mounts it lazily)', () => {
+    const importers: string[] = []
+    const walk = (dir: string) => {
+      for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+        const p = path.join(dir, e.name)
+        if (e.isDirectory()) walk(p)
+        else if (/\.(ts|tsx)$/.test(e.name) && /^import[^\n]*OfficePane/m.test(fs.readFileSync(p, 'utf-8'))) importers.push(p)
+      }
+    }
+    walk(path.join(process.cwd(), 'src'))
+    expect(importers).toEqual([])
+  })
+
+  test('the inbox query is the key the supervisor pin will read, and the rows live in the pane\'s own module', () => {
+    expect(TAB).toContain('queryKey: OFFICE_INBOX_KEY')
+    expect(TAB).toMatch(/<InboxRow[\s\S]*?onDone=\{\(r\) => void handleDone\(item, r\)\}/)
+    expect(PANE).toContain('<InboxTab')
+  })
+})
+
 test.describe('office pane structure (stubs for later plans)', () => {
   test.fixme(true, 'flips live in 59-12')
   test('the pane is one lazy module imported by next/dynamic from both shells (59-12)', () => {})
