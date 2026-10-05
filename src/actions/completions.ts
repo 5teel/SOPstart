@@ -415,7 +415,7 @@ export async function recordSignature(
   // T-23-06-04 — service-role bypasses RLS so we must check manually)
   const { data: completion, error: fetchError } = await admin
     .from('sop_completions')
-    .select('id, organisation_id, sop_id')
+    .select('id, organisation_id, sop_id, worker_id')
     .eq('id', completionId)
     .single()
 
@@ -424,6 +424,11 @@ export async function recordSignature(
   }
   if (completion.organisation_id !== organisationId) {
     return { success: false, error: 'Completion does not belong to your organisation.' }
+  }
+  // A worker signature is the walker's own (58 review CR-02): this export is
+  // POST-reachable by every org member, so the target is checked, not assumed.
+  if (role === 'worker' && completion.worker_id !== userId) {
+    return { success: false, error: 'Only the worker who did this walk can sign it.' }
   }
 
   // Insert signature row — service-role, append-only (no UPDATE/DELETE)
