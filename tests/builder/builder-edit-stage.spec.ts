@@ -15,7 +15,7 @@
  *   E5  — BuilderTreeRail.tsx exists and imports reorderSections
  *   E6  — BuilderTreeRail.tsx renders 'Reference images' and does NOT leak
  *          'Unanchored figures' as a user-visible text string
- *   E7  — server publish route still contains the unverified_blocks 400 gate
+ *   E7  — server publish gate still 400s on unticked steps (D-16)
  *          (REGRESSION TRIPWIRE — must stay GREEN)
  *   E3-bespoke — BuilderClient.tsx mounts the bespoke EditableDocument and no
  *          longer imports Puck (@puckeditor/core absent)
@@ -94,13 +94,14 @@ test('E6: BuilderTreeRail uses "Reference images" label; does not leak "Unanchor
 })
 
 // ---------------------------------------------------------------------------
-// E7: publish route unchanged — unverified_blocks gate still present.
+// E7: publish route still delegates to the gate, which still 400s on unticked steps.
 //     REGRESSION TRIPWIRE — GREEN now, must stay GREEN through Plans 02–05.
 // ---------------------------------------------------------------------------
-test('E7: server publish route still contains the unverified_blocks 400 gate', () => {
+test('E7: server publish route still calls the 400 unverified_steps gate', () => {
   const src = readSrc('src/app/api/sops/[sopId]/publish/route.ts')
-  expect(src, "publish route must contain 'unverified_blocks' literal").toContain(
-    'unverified_blocks',
+  expect(src, 'publish route must call the shared gate').toContain('assertPublishGates(')
+  expect(readSrc('src/lib/governance/publish-core.ts'), 'gate must emit unverified_steps').toContain(
+    'unverified_steps',
   )
 })
 

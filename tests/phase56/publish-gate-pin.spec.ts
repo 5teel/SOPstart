@@ -1,11 +1,17 @@
 /**
  * Phase 56 / Plan 56-01 -- publish gate pin (SOP-01 / T-56-14).
  *
- * The sha256 of assertPublishGates' body was taken BEFORE any Phase 56 edit to
- * publish-core.ts. Any change to the gate body is a phase-failing change;
- * repoint PUBLISH_GATE_SHA256 only with a signed-off decision (CLAUDE.md
- * 2026-07-13: a safety gate edited without the guard noticing is a gate that
- * stopped gating).
+ * The sha256 of assertPublishGates' body. Any change to the gate body is a
+ * phase-failing change; repoint PUBLISH_GATE_SHA256 only with a signed-off
+ * decision (CLAUDE.md 2026-07-13: a safety gate edited without the guard
+ * noticing is a gate that stopped gating).
+ *
+ * Re-pin history:
+ *   - Phase 56 (43cd12ec...): the block-keyed gate, hashed before any Phase 56 edit.
+ *   - D-16 (58-CONTEXT, 2026-10-05): the gate re-keyed from blocks to focus steps;
+ *     the section-sign-off check and the ai_prompt / no-source bypass dropped. Now
+ *     three counts for every SOP: at least one step, every step ticked, no open AI
+ *     finding. This is the one signed-off re-pin.
  *
  * Registration: playwright.config.ts `phase56` project.
  */
@@ -14,7 +20,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { createHash } from 'node:crypto'
 
-const PUBLISH_GATE_SHA256 = '43cd12ec266ec2508c710c8e7faac869b3ae7a128a947940fce29ce5a0935849'
+const PUBLISH_GATE_SHA256 = '78120e600bbd91d805a6317a7f98d37e5aa498f27a1ffb4a6519d5e52c962d33'
 const src = fs
   .readFileSync(path.join(process.cwd(), 'src/lib/governance/publish-core.ts'), 'utf-8')
   .replace(/\r\n/g, '\n')

@@ -16,9 +16,8 @@ import { recordDecision } from '@/lib/decisions/record'
 // not just similar-looking. Do NOT duplicate any gate logic elsewhere
 // (RESEARCH anti-pattern).
 //
-// assertPublishGates() factors the unapproved-sections + unverified_blocks
-// checks out so Plan 29-02's chain-gate can run the SAME gates BEFORE
-// diverting an SOP into pending_approval (locked D29-03 ordering).
+// assertPublishGates() factors the step / tick / open-finding checks out so
+// Plan 29-02's chain-gate can run the SAME gates BEFORE diverting an SOP into pending_approval (locked D29-03 ordering).
 //
 // This is a plain module (no 'use server') — importable by both the API
 // route and future server actions.
@@ -35,71 +34,49 @@ export type PerformPublishResult =
   | { success: false; error: string; status: number; count?: number }
 
 /**
- * Runs the two publish-blocking gates (unapproved sections, unverified
- * blocks) for the given SOP. Verbatim relocation of route.ts steps 2/2b.
+ * Phase 58 D-16: the one publish gate, for every SOP. Three counts, no bypass:
+ * at least one focus step, every focus step ticked, no open AI finding.
  */
 export async function assertPublishGates(supabase: Supabase, sopId: string): Promise<PublishGateResult> {
-  // Step 2: Verify all sections are approved (server-side check — don't
-  // trust client). PRESERVED EXACTLY from pre-Phase-9 implementation
-  // (PATH-06, D-02).
-  const { count: unapprovedCount, error: countError } = await supabase
-    .from('sop_sections')
+  const { count: total, error: totalErr } = await supabase
+    .from('sop_focus_steps')
     .select('*', { count: 'exact', head: true })
     .eq('sop_id', sopId)
-    .eq('approved', false)
 
-  if (countError) {
-    return { ok: false, error: 'Failed to check section approvals', status: 500 }
+  if (totalErr) {
+    return { ok: false, error: 'Failed to check steps', status: 500 }
   }
 
-  if (unapprovedCount && unapprovedCount > 0) {
-    return { ok: false, error: 'All sections must be approved before publishing', status: 400 }
+  if (!total) {
+    return { ok: false, error: 'no_steps', status: 400, count: 0 }
   }
 
-  // Step 2b: Phase 21 verify-checklist gate — defence in depth (D-CV2-04
-  // Layer 3). Bypass for AI-prompt sources (CONV-12) and pre-Phase-20 SOPs
-  // (no source_file_path means there's no parser-provenance to verify).
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: sopRow, error: sopErr } = await (supabase as any)
-    .from('sops')
-    .select('source_type, source_file_path')
-    .eq('id', sopId)
-    .maybeSingle()
+  const { count: unticked, error: tickErr } = await supabase
+    .from('sop_focus_steps')
+    .select('*', { count: 'exact', head: true })
+    .eq('sop_id', sopId)
+    .is('verified_by_admin_id', null)
 
-  if (sopErr) {
-    return { ok: false, error: 'Failed to load SOP for verify gate', status: 500 }
+  if (tickErr) {
+    return { ok: false, error: 'Failed to check step ticks', status: 500 }
   }
 
-  const sourceType: string | null = (sopRow?.source_type as string | null) ?? null
-  const sourceFilePath: string | null = (sopRow?.source_file_path as string | null) ?? null
-  const verifyGateApplies = sourceType !== 'ai_prompt' && !!sourceFilePath
+  if (unticked && unticked > 0) {
+    return { ok: false, error: 'unverified_steps', status: 400, count: unticked }
+  }
 
-  if (verifyGateApplies) {
-    const { data: sectionRows, error: sectErr } = await supabase
-      .from('sop_sections')
-      .select('id')
-      .eq('sop_id', sopId)
+  const { count: open, error: findErr } = await supabase
+    .from('sop_ai_findings')
+    .select('*', { count: 'exact', head: true })
+    .eq('sop_id', sopId)
+    .is('cleared_at', null)
 
-    if (sectErr) {
-      return { ok: false, error: 'Failed to load sections for verify gate', status: 500 }
-    }
+  if (findErr) {
+    return { ok: false, error: 'Failed to check AI findings', status: 500 }
+  }
 
-    const sectionIds = (sectionRows ?? []).map((r: { id: string }) => r.id)
-    if (sectionIds.length > 0) {
-      const { count: unverifiedCount, error: blkErr } = await supabase
-        .from('sop_section_blocks')
-        .select('*', { count: 'exact', head: true })
-        .in('sop_section_id', sectionIds)
-        .is('verified_by_admin_id', null)
-
-      if (blkErr) {
-        return { ok: false, error: 'Failed to check verified_by_admin_id', status: 500 }
-      }
-
-      if (unverifiedCount && unverifiedCount > 0) {
-        return { ok: false, error: 'unverified_blocks', status: 400, count: unverifiedCount }
-      }
-    }
+  if (open && open > 0) {
+    return { ok: false, error: 'open_findings', status: 400, count: open }
   }
 
   return { ok: true }

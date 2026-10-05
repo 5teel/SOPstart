@@ -127,12 +127,12 @@ test.describe('SCP-PARSE — Phase 20 contract integration (Phase 21)', () => {
   })
 
   test('SCP-PARSE-06: publish-gate gates on parser-created junctions (no longer a 0===0 no-op)', () => {
-    // The plan deliverable: parsed SOPs now have N>0 junctions so the
-    // existing gate (Wave 4) actually fires. Wave 4 already enforces
-    // "publish requires verifiedCount === totalCount" — see getPublishGateStatus.
+    // The plan deliverable: parsed SOPs have junctions so the gate fires.
+    // Phase 58 D-16 re-keyed the gate onto focus steps; the old builder's chip
+    // now answers from the same three counts via src/actions/publish-gate.ts.
     const action = read('src/actions/sop-section-blocks.ts')
-    // getPublishGateStatus returns ready=false when total>0 AND unverified>0.
-    expect(action).toContain('ready: totalNum > 0 && unverifiedNum === 0')
+    expect(action).toContain('getStepGateStatus(')
+    expect(read('src/actions/publish-gate.ts')).toContain('ready: reasons.length === 0')
     // Phase 46 CR-01 removed the wire-reachable service-role bypass; the
     // parser goes through the non-'use server' core entry point, and the
     // action module carries no trust override at all (Phase 55).

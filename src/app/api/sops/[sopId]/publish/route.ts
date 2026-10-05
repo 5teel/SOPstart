@@ -4,14 +4,13 @@ import { performPublish, assertPublishGates } from '@/lib/governance/publish-cor
 
 // POST /api/sops/[sopId]/publish — transition draft -> published
 //
-// Phase 29 Plan 01 — steps 2 through 5 (unapproved-sections gate,
-// verify-checklist gate, status flip, review-clock reset,
+// Phase 29 Plan 01 — steps 2 through 5 (step gate, status flip, review-clock reset,
 // agent synthesis) were relocated VERBATIM into performPublish()
 // (src/lib/governance/publish-core.ts).
 //
 // Phase 29 Plan 02 — chain-gate divert (D29-03). LOCKED ORDERING: assertPublishGates()
-// runs BEFORE any pending-approval divert, so an SOP with unapproved sections or
-// unverified blocks can NEVER enter pending_approval, chain or no chain
+// runs BEFORE any pending-approval divert, so an SOP with no steps, unticked steps or
+// open findings can NEVER enter pending_approval, chain or no chain
 // (plan-checker Blocker 1). performPublish() still re-runs the identical gates
 // internally at final-approval time (RESEARCH Pitfall 6, closed for free by the
 // shared extraction) — this is an EXTRA up-front check via the SAME shared
@@ -90,8 +89,8 @@ export async function POST(
   const result = await performPublish(supabase, { sopId, organisationId, userId })
 
   if (!result.success) {
-    // count is only present for the unverified_blocks 400 — byte-identical
-    // to the pre-Phase-29 { error: 'unverified_blocks', count } shape.
+    // count is only present for the step-count 400s (no_steps, unverified_steps,
+    // open_findings) — same { error, count } shape as before.
     const body = result.count !== undefined ? { error: result.error, count: result.count } : { error: result.error }
     return NextResponse.json(body, { status: result.status })
   }

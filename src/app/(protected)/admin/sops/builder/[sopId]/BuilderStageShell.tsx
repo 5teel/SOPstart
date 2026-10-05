@@ -216,9 +216,15 @@ export function BuilderStageShell({
           error?: string
           count?: number
         }
-        if (body.error === 'unverified_blocks') {
+        if (body.error === 'unverified_steps') {
           setPublishError(
-            `Cannot publish — ${body.count ?? 'some'} block(s) still need verification.`,
+            `Cannot publish — ${body.count ?? 'some'} step(s) still need checking.`,
+          )
+        } else if (body.error === 'no_steps' || body.error === 'open_findings') {
+          setPublishError(
+            body.error === 'no_steps'
+              ? 'Cannot publish — this SOP has no steps yet.'
+              : `Cannot publish — ${body.count ?? 'some'} AI finding(s) still open.`,
           )
         } else {
           setPublishError(body.error || `Publish failed (${res.status})`)

@@ -380,7 +380,7 @@ export const UAT_TESTS: UatTest[] = [
       { id: 'explained', text: 'Was the reason explained clearly?' },
       { id: 'then-publish', text: 'Once everything was checked, could you publish?' },
     ],
-    background: 'Publish gate (POST /api/sops/[sopId]/publish) returns 400 unverified_blocks; UI surfaces the error.',
+    background: 'Publish gate (POST /api/sops/[sopId]/publish) returns 400 unverified_steps / open_findings / no_steps; UI surfaces the error.',
   },
 
   // ===================== Phase 23 — AI Field Layer + Version Supersede =====================

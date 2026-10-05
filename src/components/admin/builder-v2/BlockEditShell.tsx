@@ -72,7 +72,7 @@ interface BlockEditShellProps {
   /**
    * P8 per-block verify (26-12). Single-block verify only — NO bulk affordance
    * (R8 lint guard). Writes through the existing verify action (host-owned);
-   * the server publish gate (400 `unverified_blocks`) stays authoritative.
+   * the server publish gate (400 `unverified_steps`) stays authoritative.
    */
   verified?: boolean
   onToggleVerify?: () => void

@@ -14,7 +14,7 @@
  *               page.tsx renders BuilderStageShell (not BuilderWithSourceViewer)
  *   2. R7/R10 — Shell has handlePublish/onPublish and the POST /publish target;
  *               no VerifyProgressIndicator or second publish-button mount
- *   3. R10    — Server publish route still contains unverified_blocks 400 gate
+ *   3. R10    — Server publish gate still 400s on unticked steps (D-16: focus steps)
  *   4. R4     — NavRow/NavRow + BlockChecklistRow use humanizeBlockType, not raw {block.type}
  *   5. R10    — no-bulk-verify-ui.spec.ts exists + is registered in a playwright project
  *   6. R8     — Shell derives hasSourceDoc/showPane and gates Review on it
@@ -112,16 +112,16 @@ test('R7/R10: Shell has handlePublish/onPublish and POST /publish; no VerifyProg
 })
 
 // ---------------------------------------------------------------------------
-// Test 3: R10 server gate — publish route still returns 400 unverified_blocks
+// Test 3: R10 server gate — publish route still returns 400 unverified_steps
 // ---------------------------------------------------------------------------
 // Phase 29 factored the gate out of the route into assertPublishGates()
 // (publish-core.ts) so the chain-gate divert could reuse the identical checks.
 // Assert the gate WHERE IT LIVES, plus that the route still CALLS it.
-test('R10: Server publish route still contains the 400 unverified_blocks gate', () => {
+test('R10: Server publish route still contains the 400 unverified_steps gate', () => {
   const coreSrc = readSrc('src/lib/governance/publish-core.ts')
 
-  expect(coreSrc, "Publish gate must contain 'unverified_blocks' literal").toContain(
-    "error: 'unverified_blocks'",
+  expect(coreSrc, "Publish gate must contain 'unverified_steps' literal").toContain(
+    "error: 'unverified_steps'",
   )
   expect(coreSrc, 'Publish gate must reject with status: 400').toMatch(/status:\s*400/)
 

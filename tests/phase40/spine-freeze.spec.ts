@@ -33,14 +33,14 @@ test.describe('Frozen publish spine (spine-freeze, LIVE)', () => {
     expect(src).toContain('export async function assertPublishGates(')
   })
 
-  test('assertPublishGates body still contains the unverified_blocks gate and status: 400', () => {
+  test('assertPublishGates body still contains the unverified_steps gate and status: 400', () => {
     const src = read(PUBLISH_CORE)
     const start = src.indexOf('export async function assertPublishGates(')
     expect(start).toBeGreaterThan(-1)
     // Body runs from the function declaration to the next top-level export.
     const end = src.indexOf('\nexport ', start + 1)
     const body = end > -1 ? src.slice(start, end) : src.slice(start)
-    expect(body).toContain('unverified_blocks')
+    expect(body).toContain('unverified_steps')
     expect(body).toContain('status: 400')
   })
 

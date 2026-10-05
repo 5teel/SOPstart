@@ -7,13 +7,11 @@
  * deferred to manual UAT per Wave-1/2/3 convention (see Phase 12 / 13 UAT
  * scripting in CLAUDE.md).
  *
- * What this guards:
- *   - POST /api/sops/[sopId]/publish has the verify-gate branch wired
- *     (queries sop_section_blocks for verified_by_admin_id IS NULL).
- *   - The branch is bypassed for source_type === 'ai_prompt' (CONV-12)
- *     and for SOPs with no source_file_path (pre-Phase-20).
- *   - The branch returns `{ error: 'unverified_blocks', count }` on 400.
- *   - getPublishGateStatus mirrors the server-side bypass logic.
+ * What this guards (Phase 58 D-16: the gate counts focus steps, not blocks):
+ *   - The gate in publish-core counts sop_focus_steps (none / unticked) and open
+ *     sop_ai_findings, for every SOP, with no ai_prompt / no-source bypass.
+ *   - It returns `{ error: 'unverified_steps', count }` on 400.
+ *   - getPublishGateStatus answers from the same three tables.
  *   - BuilderStageShell wires onPublish through to the POST.
  *
  * Phase 30 (30-01): repointed off the deleted legacy Phase-21 shell onto
@@ -36,7 +34,7 @@ const PUBLISH_ROUTE = path.join(
   'publish',
   'route.ts',
 )
-const ACTIONS = path.join(REPO_ROOT, 'src', 'actions', 'sop-section-blocks.ts')
+const STATUS_ACTION = path.join(REPO_ROOT, 'src', 'actions', 'publish-gate.ts')
 // Phase 29 factored the publish gates out of the route into publish-core.
 const GATE_CORE = path.join(REPO_ROOT, 'src', 'lib', 'governance', 'publish-core.ts')
 const BUILDER = path.join(
@@ -51,47 +49,42 @@ const BUILDER = path.join(
   'BuilderStageShell.tsx',
 )
 
-test('publish gate queries sop_section_blocks for verified_by_admin_id IS NULL (publish-core)', () => {
+test('publish gate counts focus steps, ticks and open findings (publish-core)', () => {
   const src = fs.readFileSync(GATE_CORE, 'utf8')
-  expect(src).toContain('verified_by_admin_id')
-  expect(src).toContain("sop_section_blocks")
-  // The actual count-via-PostgREST pattern.
+  expect(src).toContain("from('sop_focus_steps')")
+  expect(src).toContain("from('sop_ai_findings')")
   expect(src).toContain(".is('verified_by_admin_id', null)")
+  expect(src).toContain(".is('cleared_at', null)")
   // The route still delegates to the gate (end-to-end wiring).
   const route = fs.readFileSync(PUBLISH_ROUTE, 'utf8')
   expect(route).toContain('performPublish(')
 })
 
-test('publish gate rejects with 400 + { error: "unverified_blocks", count }', () => {
+test('publish gate rejects with 400 + { error: "unverified_steps", count }', () => {
   const src = fs.readFileSync(GATE_CORE, 'utf8')
-  expect(src).toContain("error: 'unverified_blocks'")
+  expect(src).toContain("error: 'unverified_steps'")
   // The numeric count must be in the response body for the UI to render.
-  expect(src).toMatch(/count:\s*unverifiedCount/)
+  expect(src).toMatch(/count:\s*unticked/)
   expect(src).toContain('status: 400')
 })
 
-test('publish gate bypasses verify gate for ai_prompt sources (CONV-12)', () => {
+test('publish gate has no bypass for any source (D-16)', () => {
   const src = fs.readFileSync(GATE_CORE, 'utf8')
-  expect(src).toContain("sourceType !== 'ai_prompt'")
+  const start = src.indexOf('export async function assertPublishGates(')
+  const end = src.indexOf('\nexport ', start + 1)
+  const body = src.slice(start, end)
+  expect(body).not.toContain('ai_prompt')
+  expect(body).not.toContain('source_file_path')
 })
 
-test('publish gate bypasses verify gate for pre-Phase-20 SOPs (no source_file_path)', () => {
-  const src = fs.readFileSync(GATE_CORE, 'utf8')
-  expect(src).toMatch(/!!sourceFilePath/)
-})
-
-test('getPublishGateStatus mirrors server-side bypass for ai_prompt + no-source', () => {
-  const src = fs.readFileSync(ACTIONS, 'utf8')
+test('getPublishGateStatus answers from the same three counts as the gate', () => {
+  const src = fs.readFileSync(STATUS_ACTION, 'utf8')
   expect(src).toContain('export async function getPublishGateStatus')
-  expect(src).toMatch(/sourceType === 'ai_prompt'/)
-  expect(src).toMatch(/!sourceFilePath/)
-  // Bypassed payload shape.
-  expect(src).toMatch(/bypassed:\s*true/)
-})
-
-test('getPublishGateStatus returns ready=true only when verifiedCount === totalCount', () => {
-  const src = fs.readFileSync(ACTIONS, 'utf8')
-  expect(src).toMatch(/ready:\s*totalNum\s*>\s*0\s*&&\s*unverifiedNum\s*===\s*0/)
+  expect(src).toContain("from('sop_focus_steps')")
+  expect(src).toContain("from('sop_ai_findings')")
+  expect(src).toContain(".is('verified_by_admin_id', null)")
+  expect(src).toContain(".is('cleared_at', null)")
+  expect(src).not.toContain('ai_prompt')
 })
 
 test('BuilderStageShell wires handlePublish to POST /publish with the gate rules', () => {
@@ -102,8 +95,8 @@ test('BuilderStageShell wires handlePublish to POST /publish with the gate rules
   expect(src).toMatch(/\/api\/sops\/\$\{sopId\}\/publish/)
   // Method must be POST.
   expect(src).toMatch(/method:\s*'POST'/)
-  // Error-banner UI for the unverified_blocks response.
-  expect(src).toContain("'unverified_blocks'")
+  // Error-banner UI for the unverified_steps response.
+  expect(src).toContain("'unverified_steps'")
   // Gate visibility honours the same bypass rules.
   expect(src).toMatch(/showVerifyGate/)
 })

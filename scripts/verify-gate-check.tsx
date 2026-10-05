@@ -5,8 +5,10 @@
  * gate is the UNCHANGED server route `POST /api/sops/[sopId]/publish`. This harness
  * invokes the REAL route handler (createClient mocked) and proves the
  * two behaviours the UI depends on (CLAUDE.md 2026-06-05 — not a source grep):
- *   - one block unverified → 400 { error: 'unverified_blocks', count }
- *   - all blocks verified   → 200 { success: true }
+ *   - no focus steps        → 400 { error: 'no_steps' }
+ *   - one step unticked     → 400 { error: 'unverified_steps', count }
+ *   - one finding open      → 400 { error: 'open_findings', count }
+ *   - all ticked, none open → 200 { success: true }  (Phase 58 D-16: same for every SOP)
  *
  * The route file itself is untouched (acceptance: git diff empty). We mock only
  * its two collaborators so the real branch logic runs against controlled data.
@@ -17,20 +19,18 @@ export {} // isolate module scope (sibling *-check.tsx harnesses share globals o
 
 type Cfg = {
   orgId?: string
-  unapprovedCount?: number
-  sourceType?: string | null
-  sourceFilePath?: string | null
-  sectionIds?: string[]
+  totalSteps?: number
   unverifiedCount?: number
+  openFindings?: number
   publishError?: unknown
 }
 
 // Fake Supabase — a chainable, thenable query builder that resolves per table +
 // whether a count/head or update was requested. Mirrors exactly the calls the
-// real route makes (auth.getUser/getSession, sop_sections, sops, sop_section_blocks).
+// real route makes (auth.getUser/getSession, sop_focus_steps, sop_ai_findings, sops).
 function makeSupabase(cfg: Cfg) {
   function builder(table: string) {
-    const state = { table, count: false, head: false, isUpdate: false }
+    const state = { table, count: false, head: false, isUpdate: false, isNull: false }
     const resolve = () => {
       // update().eq('status','draft').select('id') — publish-core's Phase 29
       // zero-rows-updated guard 409s unless the update returns the row.
@@ -41,10 +41,10 @@ function makeSupabase(cfg: Cfg) {
       if (state.table === 'sops')
         // status: publish-core (Phase 29 extraction) verifies the SOP is a
         // draft before flipping it — without this the harness 409s.
-        return { data: { status: 'draft', source_type: cfg.sourceType ?? 'pdf', source_file_path: cfg.sourceFilePath ?? 'x.pdf' }, error: null }
-      if (state.table === 'sop_sections' && state.count) return { count: cfg.unapprovedCount ?? 0, error: null }
-      if (state.table === 'sop_sections') return { data: (cfg.sectionIds ?? ['sec-1']).map((id) => ({ id })), error: null }
-      if (state.table === 'sop_section_blocks' && state.count) return { count: cfg.unverifiedCount ?? 0, error: null }
+        return { data: { status: 'draft', category_slug: null, parent_sop_id: null }, error: null }
+      if (state.table === 'sop_focus_steps' && state.count)
+        return { count: state.isNull ? (cfg.unverifiedCount ?? 0) : (cfg.totalSteps ?? 3), error: null }
+      if (state.table === 'sop_ai_findings' && state.count) return { count: cfg.openFindings ?? 0, error: null }
       return { data: null, error: null }
     }
     const b: any = {
@@ -59,7 +59,7 @@ function makeSupabase(cfg: Cfg) {
       },
       eq() { return b },
       in() { return b },
-      is() { return b },
+      is() { state.isNull = true; return b },
       maybeSingle() { return Promise.resolve(resolve()) },
       then(onF: any, onR: any) { return Promise.resolve(resolve()).then(onF, onR) },
     }
@@ -125,30 +125,34 @@ async function callPublish(cfg: Cfg) {
 }
 
 async function main() {
-  // ── Unverified block → 400 unverified_blocks. ────────────────────────────────
+  // ── Unticked step → 400 unverified_steps. ────────────────────────────────────
   {
     const { status, body } = await callPublish({ unverifiedCount: 2 })
-    check(status === 400, `unverified publish should be 400, got ${status}`)
-    check(body.error === 'unverified_blocks', `expected error 'unverified_blocks', got ${JSON.stringify(body)}`)
+    check(status === 400, `unticked publish should be 400, got ${status}`)
+    check(body.error === 'unverified_steps', `expected error 'unverified_steps', got ${JSON.stringify(body)}`)
     check(body.count === 2, `expected count 2, got ${JSON.stringify(body.count)}`)
   }
 
-  // ── All verified → publish succeeds. ─────────────────────────────────────────
+  // ── Open AI finding → 400 open_findings. ─────────────────────────────────────
   {
-    const { status, body } = await callPublish({ unverifiedCount: 0 })
-    check(status === 200, `all-verified publish should be 200, got ${status} ${JSON.stringify(body)}`)
-    check(body.success === true, `expected success:true, got ${JSON.stringify(body)}`)
+    const { status, body } = await callPublish({ openFindings: 1 })
+    check(status === 400, `open-finding publish should be 400, got ${status}`)
+    check(body.error === 'open_findings', `expected error 'open_findings', got ${JSON.stringify(body)}`)
+    check(body.count === 1, `expected count 1, got ${JSON.stringify(body.count)}`)
   }
 
-  // ── Gate is real, not blanket: a still-unapproved section 400s BEFORE the
-  //    verify branch (guards against a mock that always passes). ───────────────
+  // ── No steps at all → 400 no_steps (nothing bypasses, whatever the source). ──
   {
-    const { status, body } = await callPublish({ unapprovedCount: 1, unverifiedCount: 0 })
-    check(status === 400, `unapproved-section publish should be 400, got ${status}`)
-    check(
-      typeof body.error === 'string' && body.error.includes('approved'),
-      `expected an approval error, got ${JSON.stringify(body)}`,
-    )
+    const { status, body } = await callPublish({ totalSteps: 0 })
+    check(status === 400, `empty publish should be 400, got ${status}`)
+    check(body.error === 'no_steps', `expected error 'no_steps', got ${JSON.stringify(body)}`)
+  }
+
+  // ── Every step ticked, nothing open → publish succeeds. ──────────────────────
+  {
+    const { status, body } = await callPublish({ unverifiedCount: 0, openFindings: 0 })
+    check(status === 200, `all-ticked publish should be 200, got ${status} ${JSON.stringify(body)}`)
+    check(body.success === true, `expected success:true, got ${JSON.stringify(body)}`)
   }
 
   if (failures.length > 0) {
@@ -157,7 +161,7 @@ async function main() {
     process.exit(1)
   }
   console.log(
-    'VERIFY-GATE OK — real route: unverified → 400 unverified_blocks{count}; all-verified → 200 success; server gate authoritative + unchanged (P8).',
+    'VERIFY-GATE OK — real route: no steps / unticked / open finding → 400 {error,count}; all ticked and clear → 200 success; one gate for every SOP (D-16).',
   )
 }
 

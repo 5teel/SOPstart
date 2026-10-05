@@ -18,12 +18,13 @@ test.describe('performPublish shared — publish-core extraction', () => {
     expect(routeSrc).toContain('performPublish(')
   })
 
-  test('publish-core.ts contains the unapproved-sections gate', () => {
-    expect(coreSrc).toContain(".eq('approved', false)")
+  test('publish-core.ts contains the focus-step and open-finding gates (D-16)', () => {
+    expect(coreSrc).toContain("from('sop_focus_steps')")
+    expect(coreSrc).toContain("from('sop_ai_findings')")
   })
 
-  test('publish-core.ts contains the unverified_blocks gate', () => {
-    expect(coreSrc).toContain('unverified_blocks')
+  test('publish-core.ts contains the unverified_steps gate', () => {
+    expect(coreSrc).toContain('unverified_steps')
   })
 
   test('publish-core.ts contains the status: published UPDATE', () => {

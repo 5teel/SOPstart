@@ -6,7 +6,7 @@
  * the frozen spine (R8) — the four invariants the full-bespoke swap (D-01) must
  * NOT have touched:
  *
- *   (a) Publish gate  — server still 400s `unverified_blocks` on unverified blocks.
+ *   (a) Publish gate  — server still 400s `unverified_steps` on unticked steps (D-16).
  *   (b) Meta survival — a converted block round-tripped through the bespoke
  *                       content-ops editor keeps `props.junctionId` +
  *                       `block_provenance` (behavioural, not grep).
@@ -36,10 +36,10 @@ test.describe('R8 — frozen spine regression (post-bespoke swap)', () => {
   // Phase 29 factored the gate out of the route into assertPublishGates()
   // (publish-core.ts) so the chain-gate divert could reuse it. Assert the gate
   // WHERE IT LIVES, and that the route still CALLS it — wiring, not presence.
-  test('publish route still rejects unverified blocks with 400 unverified_blocks', () => {
+  test('publish route still rejects unticked steps with 400 unverified_steps', () => {
     const core = read('src/lib/governance/publish-core.ts')
-    expect(core, 'gate must emit the unverified_blocks error').toContain("error: 'unverified_blocks'")
-    expect(core, 'gate must reject with a 400').toMatch(/unverified_blocks',\s*status:\s*400/)
+    expect(core, 'gate must emit the unverified_steps error').toContain("error: 'unverified_steps'")
+    expect(core, 'gate must reject with a 400').toMatch(/unverified_steps',\s*status:\s*400/)
 
     const route = read('src/app/api/sops/[sopId]/publish/route.ts')
     expect(route, 'publish route must call the shared gate').toContain('assertPublishGates(')

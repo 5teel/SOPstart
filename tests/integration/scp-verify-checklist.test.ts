@@ -60,7 +60,8 @@ test.describe('SCP-VERIFY — per-block verify checklist + publish gate (Phase 2
     // performPublish out of the route into publish-core.ts (30-01 repoint) —
     // the route delegates, the gate logic lives in the core module.
     const gateCore = read('src/lib/governance/publish-core.ts')
-    expect(gateCore).toContain("error: 'unverified_blocks'")
+    // Phase 58 D-16: the gate counts focus steps, not block junctions.
+    expect(gateCore).toContain("error: 'unverified_steps'")
     expect(gateCore).toContain('status: 400')
     expect(gateCore).toContain(".is('verified_by_admin_id', null)")
     const route = read('src/app/api/sops/[sopId]/publish/route.ts')
