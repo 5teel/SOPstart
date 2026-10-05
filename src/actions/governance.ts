@@ -251,7 +251,9 @@ export async function confirmSopCurrent(
     const now = new Date().toISOString()
     reviewDue = computeReviewDueDate(now, months)
 
-    const { error: updateErr } = await supabase
+    // Zero rows is a failure (59 review WR-05): nothing to confirm, so no review
+    // event and no ledger row. Session client, so the org scope is the RLS policy's.
+    const { data: updated, error: updateErr } = await supabase
       .from('sops')
       .update({
         last_reviewed_at: now,
@@ -260,11 +262,14 @@ export async function confirmSopCurrent(
         updated_at: now,
       })
       .eq('id', sopId)
+      .eq('organisation_id', ctx.organisationId)
+      .select('id')
 
     if (updateErr) {
       console.error('[confirmSopCurrent] update error', updateErr)
       return { error: updateErr.message }
     }
+    if (!updated?.length) return { error: 'SOP not found' }
 
     // Append-only audit event — rides sop_review_events_insert_admin RLS
     // (reviewed_by = auth.uid(), organisation_id = current org).

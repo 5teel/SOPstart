@@ -47,6 +47,19 @@ test.describe('owner review meta -- server', () => {
     expect(confirm).toMatch(/confirmSopCurrent\(\s*sopId: string,\s*\)/)
   })
 
+  test('review WR-05: the admin branch treats a zero-row sops update as failure, before the review event and the ledger', () => {
+    const confirm = body(GOV, 'confirmSopCurrent')
+    const update = confirm.indexOf("from('sops')\n      .update(")
+    expect(update).toBeGreaterThan(-1)
+    const chain = confirm.slice(update, update + 320)
+    expect(chain).toContain(".eq('organisation_id', ctx.organisationId)")
+    expect(chain).toContain(".select('id')")
+    const bail = confirm.indexOf("if (!updated?.length) return { error: 'SOP not found' }")
+    expect(bail).toBeGreaterThan(update)
+    expect(bail).toBeLessThan(confirm.indexOf("from('sop_review_events')"))
+    expect(bail).toBeLessThan(confirm.indexOf('await recordDecision('))
+  })
+
   test('getOrgMembers labels are emails or names, never "role (uuid8)"', () => {
     const picker = read('src/components/admin/governance/OwnerPicker.tsx')
     expect(picker).not.toMatch(/slice\(0, 8\)/)
