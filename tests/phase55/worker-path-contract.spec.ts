@@ -74,7 +74,7 @@ test.describe('SOP detail and Now card read the server (55-02)', () => {
 
   test('NowCard sums step minutes from the server', () => {
     const src = code('src/components/sop/plant/NowCard.tsx')
-    expect(src).toContain("from('sop_sections')")
+    expect(src).toContain("from('sop_focus_steps')")
     expect(src).not.toContain('networkMode')
     expect(src).not.toContain(OFFLINE)
   })
