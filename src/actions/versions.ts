@@ -200,14 +200,17 @@ export async function forkDraft({ sopId }: { sopId: string }): Promise<{ draftId
     // own image_paths (copied above) carry the attachment.
     const { data: imgData, error: imgErr } = await admin
       .from('sop_images')
-      .select('section_id, storage_path, content_type, alt_text, sort_order')
+      .select('id, section_id, storage_path, content_type, alt_text, sort_order')
       .eq('sop_id', source.id)
     if (imgErr) throw new Error(`Failed to read images: ${imgErr.message}`)
     const images = imgData ?? []
+    const imageIds = images.map(() => randomUUID())
+    const imageMap = new Map(images.map((im, i) => [im.id, imageIds[i]]))
     if (images.length) {
       await must(
         admin.from('sop_images').insert(
-          images.map((im) => ({
+          images.map((im, i) => ({
+            id: imageIds[i],
             sop_id: newId,
             section_id: im.section_id ? (sectionMap.get(im.section_id) ?? null) : null,
             step_id: null,
@@ -219,6 +222,25 @@ export async function forkDraft({ sopId }: { sopId: string }): Promise<{ draftId
         ),
         'sop_images'
       )
+
+      // The marks on an annotated photo (keyed on the image row, review WR-02), so
+      // "Annotate" on the draft reopens the original with its scene instead of
+      // baking marks over marks.
+      const { data: anns, error: annErr } = await db
+        .from('sop_image_annotations')
+        .select('sop_image_id, scene, natural_width, natural_height, baked_storage_path, baked_at')
+        .eq('organisation_id', orgId)
+        .in('sop_image_id', images.map((im) => im.id))
+      if (annErr) throw new Error(`Failed to read annotations: ${annErr.message}`)
+      if (anns?.length) {
+        await must(
+          db.from('sop_image_annotations').insert(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            anns.map((a: any) => ({ ...a, organisation_id: orgId, sop_image_id: imageMap.get(a.sop_image_id) }))
+          ),
+          'sop_image_annotations'
+        )
+      }
     }
 
     // Standards at all three levels, ids remapped.

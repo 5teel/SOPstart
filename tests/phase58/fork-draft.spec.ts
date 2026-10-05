@@ -28,18 +28,38 @@ function forkBody(): string {
   return SRC.slice(start, end)
 }
 
-/** Tables with a `references [public.]sops(id)` column, walking migrations in order. */
+/**
+ * Tables keyed on the SOP, walking migrations in order: a `references
+ * [public.]sops(id)` column, or (review WR-02) a reference to a table already in
+ * the set -- sop_image_annotations hangs off sop_images(id), not sops(id).
+ */
 function sopKeyedTables(): Set<string> {
-  const tables = new Set<string>()
+  const refs = new Map<string, Set<string>>()
   let current = ''
   for (const file of fs.readdirSync(MIGRATIONS).filter((f) => f.endsWith('.sql')).sort()) {
     for (const raw of fs.readFileSync(path.join(MIGRATIONS, file), 'utf8').split('\n')) {
       const line = raw.replace(/--.*$/, '')
       const drop = line.match(/^\s*drop\s+table\s+(?:if\s+exists\s+)?(?:public\.)?"?(\w+)"?/i)
-      if (drop) tables.delete(drop[1].toLowerCase())
+      if (drop) refs.delete(drop[1].toLowerCase())
       const t = line.match(/^\s*(?:create\s+table(?:\s+if\s+not\s+exists)?|alter\s+table(?:\s+only)?(?:\s+if\s+exists)?)\s+(?:public\.)?"?(\w+)"?/i)
       if (t) current = t[1].toLowerCase()
-      if (/references\s+(?:public\.)?sops\s*\(\s*id\s*\)/i.test(line) && current) tables.add(current)
+      const r = line.match(/references\s+(?:public\.)?(\w+)\s*\(\s*id\s*\)/i)
+      if (r && current) {
+        if (!refs.has(current)) refs.set(current, new Set())
+        refs.get(current)!.add(r[1].toLowerCase())
+      }
+    }
+  }
+  // sops seeds the walk and stays in the set (parent_sop_id references sops(id)).
+  const tables = new Set<string>(['sops'])
+  let grew = true
+  while (grew) {
+    grew = false
+    for (const [table, parents] of refs) {
+      if (!tables.has(table) && [...parents].some((p) => tables.has(p))) {
+        tables.add(table)
+        grew = true
+      }
     }
   }
   return tables
@@ -98,6 +118,7 @@ const COPIED = [
   'sop_sections',
   'sop_focus_steps',
   'sop_images',
+  'sop_image_annotations',
   'standard_attachments',
   'sop_machines',
   'sop_departments',
@@ -128,6 +149,13 @@ const NOT_COPIED: Record<string, string> = {
   sop_walks: 'a worker walk finishes on the version it started on (D-12)',
   sop_ai_findings: 'findings belong to the draft they were raised on; the reviewer re-runs on the fork',
   sop_conversion_runs: 'conversion report for the rows of that specific SOP',
+  // reached through a second key (sop_sections / sop_completions), review WR-02
+  sop_steps: 'legacy rows of the old SOP page; the focus screen reads sop_focus_steps only (Phase 58)',
+  sop_section_blocks: 'builder-era block junctions, retired with the builder (Phase 58)',
+  sop_block_update_decisions: 'builder-era block decisions, retired with the builder (Phase 58)',
+  completion_photos: 'photos of a completion, which stays on the version that was walked',
+  completion_sign_offs: 'sign-off of a completion, which stays on the version that was walked',
+  sop_completion_signatures: 'signatures on a completion, which stays on the version that was walked',
 }
 
 test.describe('SOP-04 forkDraft', () => {
@@ -186,6 +214,8 @@ test.describe('SOP-04 forkDraft', () => {
     expect(body).toContain('randomUUID()')
     expect(body).toMatch(/sections\.map\(\(s, i\) => \[s\.id, sectionIds\[i\]\]\)/)
     expect(body).toMatch(/steps\.map\(\(s, i\) => \[s\.id as string, stepIds\[i\]\]\)/)
+    expect(body).toMatch(/images\.map\(\(im, i\) => \[im\.id, imageIds\[i\]\]\)/)
+    expect(body).toContain('sop_image_id: imageMap.get(a.sop_image_id)')
     expect(body).not.toMatch(/sort_order\s*===/)
     expect(body).not.toContain('step_number')
   })
