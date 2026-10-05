@@ -94,7 +94,7 @@ export const INVENTORY: Row[] = [
   // ---- 58-13 bundle gate ----
   { file: 'tests/phase41/bundle-gate.spec.ts', disposition: 'repoint', plan: '58-13' }, // baseline moves DOWN by hand with history, never recaptured by an executor
   // ---- 58-14 cutover ----
-  { file: 'tests/evals/governance.eval.ts', disposition: 'repoint', plan: '58-14' },
+  { file: 'tests/evals/governance.eval.ts', disposition: 'delete', plan: '58-14' }, // deleted in 59-14
   { file: 'tests/evals/site-editor.eval.ts', disposition: 'repoint', plan: '58-14' },
   { file: 'tests/phase56/convert-apply.spec.ts', disposition: 'repoint', plan: '58-14' }, // converter refuses --apply
   // ---- 58-15 surviving guards repointed onto the focus files ----
@@ -120,7 +120,7 @@ export const INVENTORY: Row[] = [
   { file: 'tests/phase46/sop-edit-guard-wiring.spec.ts', disposition: 'repoint', plan: '58-15' },
   { file: 'tests/phase53/login-next-redirect.spec.ts', disposition: 'repoint', plan: '58-15' }, // 58-11 edits the tab literal first
   { file: 'tests/phase54/governance-inbox.spec.ts', disposition: 'repoint', plan: '58-15' },
-  { file: 'tests/phase54/inbox-reuses-governance-gating.spec.ts', disposition: 'repoint', plan: '58-15' },
+  { file: 'tests/phase54/inbox-reuses-governance-gating.spec.ts', disposition: 'delete', plan: '58-15' }, // deleted in 59-14
   { file: 'tests/phase54/library-table.spec.ts', disposition: 'repoint', plan: '58-15' },
   { file: 'tests/phase55/worker-path-contract.spec.ts', disposition: 'repoint', plan: '58-15' },
   { file: 'tests/phase56/decision-writers-sweep.spec.ts', disposition: 'repoint', plan: '58-15' },

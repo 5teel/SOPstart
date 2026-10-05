@@ -90,7 +90,7 @@ export const INVENTORY: Row[] = [
   { file: 'tests/lint/no-static-admin-lens-import.spec.ts', disposition: 'repoint', plan: '59-14' }, // 59-12 adds the OfficePane entry first
   { file: 'tests/evals/governance.eval.ts', disposition: 'delete', plan: '59-14' }, // subject gone; replaced by tests/evals/office.eval.ts
   // whole-subject governance / team / access / org-model specs (the grep is the source of truth; first-guess dispositions)
-  { file: 'tests/phase28/governance-queue.spec.ts', disposition: 'delete', plan: '59-14' }, // page + queue components gone
+  { file: 'tests/phase28/governance-queue.spec.ts', disposition: 'repoint', plan: '59-14' }, // page + queue wiring dropped; the data gate, picker and redirect guards stay
   { file: 'tests/phase28/library-and-worker.spec.ts', disposition: 'repoint', plan: '59-14' }, // queue row wiring + proxy destination; 59-13 changes the destination first
   { file: 'tests/phase29/phase-gate.spec.ts', disposition: 'repoint', plan: '59-14' },
   { file: 'tests/phase29/queue-approve-action.spec.ts', disposition: 'repoint', plan: '59-14' },
@@ -127,7 +127,7 @@ export const INVENTORY: Row[] = [
 ]
 
 // Each owning plan appends its id (e.g. '59-05') when its last commit lands.
-export const LIVE_PLANS: string[] = []
+export const LIVE_PLANS: string[] = ['59-05', '59-12', '59-14']
 
 function stripComments(src: string): string {
   return src

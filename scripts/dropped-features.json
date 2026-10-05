@@ -1300,6 +1300,84 @@
       "phase": 58,
       "kind": "file",
       "path": "scripts/capture-convert-golden.ts"
+    },
+    {
+      "feature": "office-pages",
+      "phase": 59,
+      "kind": "route-page",
+      "path": "/governance",
+      "dir": "src/app/(protected)/governance",
+      "ref": "(href=\\{?|router\\.(push|replace)\\()\\s*[\"'`]/governance([\"'`?#/]|$)"
+    },
+    {
+      "feature": "office-pages",
+      "phase": 59,
+      "kind": "route-page",
+      "path": "/admin/team",
+      "dir": "src/app/(protected)/admin/team",
+      "ref": "(href=\\{?|router\\.(push|replace)\\()\\s*[\"'`]/admin/team([\"'`?#/]|$)"
+    },
+    {
+      "feature": "office-pages",
+      "phase": 59,
+      "kind": "route-page",
+      "path": "/admin/access",
+      "dir": "src/app/(protected)/admin/access",
+      "ref": "(href=\\{?|router\\.(push|replace)\\()\\s*[\"'`]/admin/access([\"'`?#/]|$)"
+    },
+    {
+      "feature": "office-pages",
+      "phase": 59,
+      "kind": "file",
+      "path": "src/components/admin/governance/GovernanceInbox.tsx"
+    },
+    {
+      "feature": "office-pages",
+      "phase": 59,
+      "kind": "file",
+      "path": "src/components/admin/governance/GovernanceQueueRow.tsx"
+    },
+    {
+      "feature": "office-pages",
+      "phase": 59,
+      "kind": "file",
+      "path": "src/components/admin/org-model/TeamViewShell.tsx"
+    },
+    {
+      "feature": "office-pages",
+      "phase": 59,
+      "kind": "file",
+      "path": "src/components/admin/org-model/OrgChartCanvas.tsx"
+    },
+    {
+      "feature": "office-pages",
+      "phase": 59,
+      "kind": "file",
+      "path": "src/components/admin/org-model/OrgColumnsBoard.tsx"
+    },
+    {
+      "feature": "office-pages",
+      "phase": 59,
+      "kind": "file",
+      "path": "src/components/admin/org-model/ViewToggle.tsx"
+    },
+    {
+      "feature": "office-pages",
+      "phase": 59,
+      "kind": "file",
+      "path": "src/components/admin/RoleAssignmentTable.tsx"
+    },
+    {
+      "feature": "office-pages",
+      "phase": 59,
+      "kind": "file",
+      "path": "src/lib/org-model/auto-layout.ts"
+    },
+    {
+      "feature": "office-pages",
+      "phase": 59,
+      "kind": "file",
+      "path": "src/lib/org-model/__tests__/auto-layout.test.ts"
     }
   ],
   "allow": [

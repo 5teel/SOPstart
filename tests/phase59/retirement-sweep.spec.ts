@@ -73,10 +73,56 @@ test.describe('retire: legacy addresses redirect to Office places (59-13)', () =
 })
 
 test.describe('retire: governance, team and access pages (59-14)', () => {
-  test.fixme(true, 'flips live in 59-14')
-  test('the three page directories are gone', () => {})
-  test('the named components and the org-model canvases are gone', () => {})
-  test('no src file links to the retired addresses (anchored on href or a router call, so the proxy source strings are not counted)', () => {})
+  const GONE_DIRS = ['src/app/(protected)/governance', 'src/app/(protected)/admin/team', 'src/app/(protected)/admin/access']
+  const GONE_FILES = [
+    'src/components/admin/governance/GovernanceInbox.tsx',
+    'src/components/admin/governance/GovernanceQueueRow.tsx',
+    'src/components/admin/org-model/TeamViewShell.tsx',
+    'src/components/admin/org-model/OrgChartCanvas.tsx',
+    'src/components/admin/org-model/OrgColumnsBoard.tsx',
+    'src/components/admin/org-model/ViewToggle.tsx',
+    'src/components/admin/RoleAssignmentTable.tsx',
+    'src/lib/org-model/auto-layout.ts',
+  ]
+  const SYMBOLS = /\b(GovernanceInbox|GovernanceQueueRow|TeamViewShell|OrgChartCanvas|OrgColumnsBoard|RoleAssignmentTable|ViewToggle|layoutOrgTree|createRole|assignRoleMembers|setDepartmentArea)\b/
+
+  test('the three page directories are gone', () => {
+    for (const d of GONE_DIRS) expect(fs.existsSync(path.join(ROOT, d)), d).toBe(false)
+  })
+
+  test('the named components and the org-model canvases are gone, no src file still names them, and the survivors are still there', () => {
+    for (const f of GONE_FILES) expect(fs.existsSync(path.join(ROOT, f)), f).toBe(false)
+    const offenders = walkSrc(path.join(ROOT, 'src'))
+      .filter((f) => SYMBOLS.test(stripComments(fs.readFileSync(f, 'utf-8'))))
+      .map((f) => path.relative(ROOT, f))
+    expect(offenders, offenders.join('\n')).toEqual([])
+    // A-05 / D-13: what the training bridge and the Office still mount
+    for (const f of [
+      'src/components/admin/org-model/PersonPanel.tsx',
+      'src/components/admin/competency/TrainingMatrixView.tsx',
+      'src/components/observations/AssessmentRequestsPanel.tsx',
+      'src/components/admin/governance/OwnerPicker.tsx',
+      'src/components/admin/governance/ApprovalChainEditor.tsx',
+      'src/components/admin/governance/AdminMachinePanel.tsx',
+    ]) expect(fs.existsSync(path.join(ROOT, f)), f).toBe(true)
+  })
+
+  test('org-model.ts exports listOrgTree and no write action (T-59-52)', () => {
+    const src = stripComments(read('src/actions/org-model.ts'))
+    expect(src.match(/^export (async )?function \w+/gm)).toEqual(['export async function listOrgTree'])
+    expect(src).not.toMatch(/\.(insert|update|delete|upsert)\(/)
+  })
+
+  test('no src file links to the retired addresses (anchored on href or a router call, so the proxy source strings are not counted)', () => {
+    const link = /(?:href=\{?|href:|route:|router\.(?:replace|push)\(|redirect\(|location\.href\s*=)\s*['"`]\/(?:governance|admin\/team|admin\/access)(?:['"`?/#]|$)/
+    const offenders = walkSrc(path.join(ROOT, 'src'))
+      .filter((f) => link.test(stripComments(fs.readFileSync(f, 'utf-8'))))
+      .map((f) => path.relative(ROOT, f))
+    expect(offenders, offenders.join('\n')).toEqual([])
+    // the dropped list keeps the three pages out and the Phase 55 sweep runs it live
+    expect(read('scripts/dropped-features.json')).toContain('"feature": "office-pages"')
+    expect(read('tests/phase55/deletion-sweep.spec.ts')).toContain("'office-pages'")
+  })
 })
 
 test.describe('retire: supervisor activity view and completion supervisor half (59-15)', () => {
