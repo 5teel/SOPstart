@@ -1979,7 +1979,7 @@ Plans:
   4. The decisions tab lists the ledger newest first and can be narrowed by kind of decision; opening it, people and roles, or access widens the detail panel while the site stays visible and re-centres on the Office
   5. An admin invites a person, sets their role, sees their department, and opens the existing access wiring screen, unchanged, to decide who sees which SOPs
 
-**Plans:** 8/16 plans executed
+**Plans:** 9/16 plans executed
 Plans:
 **Wave 1**
 
@@ -2006,7 +2006,7 @@ Plans:
 
 **Wave 6** *(blocked on Wave 5 completion)*
 
-- [ ] 59-09-PLAN.md — Office pane: tabs, receipt slot, inbox rows with one button, owner Mark reviewed rows, accordion, empty goal state, shell-cache patch; admin, supervisor, owner, approve and reject eval legs
+- [x] 59-09-PLAN.md — Office pane: tabs, receipt slot, inbox rows with one button, owner Mark reviewed rows, accordion, empty goal state, shell-cache patch; admin, supervisor, owner, approve and reject eval legs
 
 **Wave 7** *(blocked on Wave 6 completion)*
 
