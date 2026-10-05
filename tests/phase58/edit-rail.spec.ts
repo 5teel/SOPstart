@@ -65,9 +65,6 @@ test.describe('FOC-02 edit rail', () => {
   test('no import of the old builder', () => {
     expect(block).not.toMatch(/admin\/sops\/builder|builder-v2/)
   })
-
-  test.fixme('Walk and Edit switch shows for admins only (D-06) (58-13)', () => {})
-  test.fixme('Walk and Edit switch is hidden on superseded versions (D-28) (58-13)', () => {})
 })
 
 test.describe('FOC-02 bottom bar and publish dialog (D-16, D-25)', () => {
@@ -136,3 +133,92 @@ test.describe('FOC-02 bottom bar and publish dialog (D-16, D-25)', () => {
     }
   })
 })
+
+test.describe('FOC-02 Walk / Edit switch and the lazy seam (D-06, D-11, D-28, 58-13)', () => {
+  const walker = read('src/components/focus/FocusWalker.tsx')
+  const frame = read('src/components/focus/FocusFrame.tsx')
+  const bar = read('src/components/focus/FocusTopBar.tsx')
+  const page = read('src/app/(protected)/sops/[sopId]/page.tsx')
+  const strip = (src: string) => src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')
+
+  test('the switch is Walk / Edit, min-h-tap, and shows for admins only: canEdit is conjoined with a role check (D-06)', () => {
+    expect(bar).toContain("{m === 'walk' ? 'Walk' : 'Edit'}")
+    expect(bar).toContain('min-h-tap')
+    const code = strip(page)
+    expect(code).toContain("const isAdminRole = ['admin', 'safety_manager'].includes(role ?? '')")
+    expect(code).toMatch(/const canEdit = isAdminRole && /)
+    expect(strip(walker)).toContain('modeSwitch={canEdit &&')
+    // An approver with edit access reaches the editor but is never handed the switch or Publish.
+    expect(strip(walker)).toContain('canPublish: canEdit')
+  })
+
+  test('the switch is hidden on a superseded version (D-28) and while a SOP is still being read', () => {
+    expect(strip(walker)).toContain("versionState !== 'superseded'")
+    expect(strip(walker)).toContain("initialMode !== 'parsing'")
+  })
+
+  test('flipping is local state plus history.replaceState: no router call, no refetch (CLAUDE.md 2026-05-13)', () => {
+    const code = strip(walker)
+    expect(code).toContain('window.history.replaceState(')
+    expect(code).toContain("url.searchParams.set('mode', 'edit')")
+    expect(code).toContain("url.searchParams.delete('mode')")
+    expect(code).not.toMatch(/router\.|useRouter/)
+  })
+
+  test('on a phone the switch moves to the top of the rail sheet (below sm)', () => {
+    expect(frame).toContain('max-sm:hidden')
+    expect(frame).toContain('focus-mode-switch-sheet')
+    expect(read('src/components/focus/FocusRail.tsx')).toContain('sm:hidden')
+    expect(read(`${ADMIN}/EditRail.tsx`)).toContain('sm:hidden')
+  })
+
+  test('only FocusFrame reaches the editor, and only through next/dynamic with ssr off', () => {
+    const code = strip(frame)
+    expect(code).toMatch(/dynamic\(\(\) => import\('@\/components\/focus\/admin\/FocusEditor'\)/)
+    expect(code).toContain('ssr: false')
+    const outside = walkSrc('src').filter((f) => !f.startsWith(`${ADMIN}/`) && /focus\/admin/.test(strip(read(f))))
+    // The old builder still imports the relocated tool buttons until 58-16 deletes it.
+    const OLD_BUILDER = ['src/app/(protected)/admin/sops/builder/[sopId]/BuilderStageShell.tsx', 'src/components/admin/builder-v2/BlockEditShell.tsx']
+    expect(outside.filter((f) => !OLD_BUILDER.includes(f))).toEqual(['src/components/focus/FocusFrame.tsx'])
+  })
+
+  test('no worker focus file statically imports the editor, its autosave, its actions or the findings', () => {
+    const banned = ['@/components/focus/admin', '@/hooks/useFocusAutosave', '@/actions/focus-steps', '@/actions/findings', '@/actions/versions', '@/hooks/useFindings', '@/hooks/useFocusSop']
+    const worker = fs
+      .readdirSync(path.join(ROOT, 'src/components/focus'), { withFileTypes: true })
+      .filter((e) => e.isFile() && e.name.endsWith('.tsx'))
+      .map((e) => `src/components/focus/${e.name}`)
+    expect(worker.length).toBeGreaterThan(5)
+    for (const f of worker) {
+      for (const spec of banned) {
+        expect(strip(read(f)), `${f} imports ${spec}`).not.toContain(`from '${spec}`)
+      }
+    }
+  })
+
+  test('edit mode is decided on the server: requireSopEditAccess, the exact row, and a published SOP with an open draft redirects to it (T-58-draft, D-11)', () => {
+    const code = strip(page)
+    expect(code).toContain('requireSopEditAccess({ sopId })')
+    expect(code).toContain("rawMode === 'edit'")
+    expect(code).toContain("redirect(focusHref(draft.id, { mode: 'edit', from }))")
+    // A refusal falls back to the worker resolution (a draft stays not found for a worker).
+    expect(code).toContain('if (editing)')
+    expect(code).toContain('resolveFocusTarget(')
+    // The page itself never navigates from an effect.
+    expect(code).not.toMatch(/useEffect|useRouter|router\./)
+  })
+
+  test('the page hands the editor the latest parse job and decides parsing from the SOP and the job', () => {
+    const code = strip(page)
+    expect(code).toContain(".from('parse_jobs')")
+    expect(code).toContain("['queued', 'processing', 'failed']")
+    expect(code).toContain("initialMode = editing ? (stillReading ? 'parsing' : 'edit') : 'browse'")
+  })
+})
+
+function walkSrc(dir: string): string[] {
+  return fs.readdirSync(path.join(ROOT, dir), { withFileTypes: true }).flatMap((e) => {
+    const rel = `${dir}/${e.name}`
+    return e.isDirectory() ? walkSrc(rel) : /\.tsx?$/.test(e.name) ? [rel] : []
+  })
+}

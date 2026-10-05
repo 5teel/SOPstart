@@ -146,4 +146,46 @@ test.describe('FOC-01/FOC-03 focus frame', () => {
     // Browse creates no completion.
     expect(stripComments(BROWSE)).not.toMatch(/startWalk|submitCompletion|@\/actions/)
   })
+
+  test('edit and parsing mount the lazy editor inside the same frame, with a skeleton while the chunk loads (58-13)', () => {
+    const FRAME = stripComments(read('src/components/focus/FocusFrame.tsx'))
+    expect(FRAME).toContain("const FocusEditor = dynamic(() => import('@/components/focus/admin/FocusEditor')")
+    expect(FRAME).toContain('ssr: false')
+    expect(FRAME).toContain('loading: () => <EditorSkeleton />')
+    expect(FRAME).toContain("(mode === 'edit' || mode === 'parsing') && !!editor")
+    expect(FRAME).toContain('<FocusEditor sop={editor.sop}')
+    // The editor is handed the frame through a context, not an import of the frame.
+    expect(FRAME).toContain('<FocusEditorBridgeContext.Provider value={bridge}>')
+    expect(stripComments(read('src/components/focus/admin/FocusEditor.tsx'))).not.toMatch(/from '@\/components\/focus\/FocusFrame'/)
+  })
+
+  test('the top bar gets a save-pill slot in edit mode, and Back waits for the editor flush as well (58-13)', () => {
+    const FRAME = read('src/components/focus/FocusFrame.tsx')
+    expect(FRAME).toContain('data-testid="focus-save-slot"')
+    expect(FRAME).toContain('editorBack.current?.()')
+    expect(FRAME).toContain('beforeBack: mergedBeforeBack')
+    expect(FRAME).toContain('setBeforeBack: setEditorBeforeBack')
+  })
+
+  test('the walker hands the frame the editor, the switch and the report-back, and never mounts the editor itself (58-13)', () => {
+    const W = stripComments(read('src/components/focus/FocusWalker.tsx'))
+    expect(W).toContain('editor={editing ? { sop: served, job, canPublish: canEdit } : null}')
+    expect(W).toContain('onEditorFocus={setEdited}')
+    expect(W).not.toContain('FocusEditor')
+    expect(W).not.toMatch(/@\/components\/focus\/admin/)
+  })
+
+  test('the page passes the mode, the job and canEdit to the walker, and the walker is still keyed to the SOP and the walk (58-13)', () => {
+    const code = stripComments(read('src/app/(protected)/sops/[sopId]/page.tsx'))
+    for (const prop of ['initialMode={initialMode}', 'job={job}', 'canEdit={canEdit}', "key={`${target.id}:${walk?.id ?? 'none'}`}"]) {
+      expect(code, prop).toContain(prop)
+    }
+  })
+
+  test('the parsing and skeleton views are tokens only and static under reduced motion (58-13)', () => {
+    const SK = read('src/components/focus/EditorSkeleton.tsx')
+    expect(SK).toContain('motion-reduce:animate-none')
+    expect(SK).toContain('data-testid="edit-rail-skeleton"')
+    expect(SK).toContain('w-75')
+  })
 })

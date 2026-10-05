@@ -3,6 +3,37 @@
 import type { ReactNode } from 'react'
 import { ArrowLeft, List } from 'lucide-react'
 
+/**
+ * The admin-only Walk / Edit switch (D-06). It flips in place: the walker sets
+ * local state and rewrites ?mode= with history.replaceState, no navigation.
+ */
+export function ModeSwitch({
+  value,
+  onChange,
+  testId,
+}: {
+  value: 'walk' | 'edit'
+  onChange(next: 'walk' | 'edit'): void
+  testId: string
+}) {
+  return (
+    <div role="group" aria-label="Mode" data-testid={testId} className="inline-flex overflow-hidden rounded-lg border border-ink-300">
+      {(['walk', 'edit'] as const).map((m) => (
+        <button
+          key={m}
+          type="button"
+          aria-pressed={value === m}
+          data-testid={`${testId}-${m}`}
+          onClick={() => m !== value && onChange(m)}
+          className={`min-h-tap px-4 text-ui ${value === m ? 'bg-ink-900 font-semibold text-paper' : 'bg-paper text-ink-700'}`}
+        >
+          {m === 'walk' ? 'Walk' : 'Edit'}
+        </button>
+      ))}
+    </div>
+  )
+}
+
 /** Back + title + a version chip + one right-hand slot. Nothing from the site lives here (focus rule). */
 export function FocusTopBar({
   title,

@@ -80,6 +80,11 @@ const GATED_ROUTES: GatedRoute[] = [
       { label: 'mammoth (D-21-09)', markers: ['mammoth', 'convertToHtml'] },
       { label: 'konva (26-05 D-03)', markers: ['react-konva', 'konva'] },
       { label: 'one screen machine body (MachineBody)', markers: ['No procedures for this machine yet.'] },
+      // Phase 58-13: the editor mounts through one next/dynamic({ ssr: false }) seam in
+      // FocusFrame. These two literals live only in that lazy chunk (StepCard's tick and
+      // the AI check banner), so seeing either in this route's own chunk set means the
+      // seam was bypassed with a static import.
+      { label: 'focus editor (lazy admin chunk, 58-13)', markers: ['I have checked this', 'Run the AI check'] },
     ],
   },
   {
@@ -262,9 +267,42 @@ for (const entry of GATED_ROUTES) {
 // as its own lazy chunk") is retired. The SOP route is now the server-resolved
 // focus screen and mounts no old walkthrough, so that chunk is no longer in the
 // build -- and its absence from the route is exactly what the marker gate above
-// proves. 58-13 adds the lazy FocusEditor seam and its own positive marker.
+// proves.
+//
+// Phase 58-13: its replacement. The FocusEditor must exist as its OWN lazy chunk
+// somewhere in the build, and not in the worker route's chunk set. If it is absent
+// the seam was folded into another chunk (or removed); if it sits in the route's set
+// the marker group above already failed. Found by a string literal that only the
+// editor's step card carries (minification keeps literals, not identifiers).
 // ---------------------------------------------------------------------------
 const routeA = GATED_ROUTES[0]
+const EDITOR_LITERAL = 'I have checked this'
+const editorChunks: string[] = []
+function findEditorChunks(dir: string) {
+  if (!fs.existsSync(dir)) return
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name)
+    if (entry.isDirectory()) findEditorChunks(full)
+    else if (entry.isFile() && entry.name.endsWith('.js') && fs.statSync(full).size <= 2 * 1024 * 1024) {
+      if (fs.readFileSync(full, 'utf-8').includes(EDITOR_LITERAL)) {
+        editorChunks.push(path.relative(NEXT_DIR, full).split(path.sep).join('/'))
+      }
+    }
+  }
+}
+findEditorChunks(path.join(NEXT_DIR, 'static', 'chunks'))
+if (editorChunks.length === 0) {
+  fail(
+    `the focus editor chunk was not found (no static chunk carries "${EDITOR_LITERAL}"). ` +
+      'FocusFrame must reach the editor through its own next/dynamic({ ssr: false }) import.'
+  )
+}
+const workerSet = routeChunkSets.get(routeA.route) ?? new Set<string>()
+const leaked = editorChunks.filter((c) => workerSet.has(c))
+if (leaked.length > 0) {
+  fail(`the focus editor chunk ${leaked.join(', ')} is in the ${routeA.route} chunk set -- it must stay lazy.`)
+}
+console.log(`check-bundle-size: ✓ Focus editor is its own lazy chunk, not charged to ${routeA.route}: ${editorChunks.join(', ')}`)
 
 console.log('check-bundle-size: ✓ Bundle isolation OK (delta within tolerance, no forbidden marker in a gated route)')
 console.log(

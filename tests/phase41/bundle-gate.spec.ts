@@ -59,6 +59,19 @@ test.describe('SB-LINE-06 -- bundle gate (the worker SOP route, plus / from Phas
     expect(src).toContain('page_client-reference-manifest.js')
   })
 
+  test('the worker SOP route keeps the lazy focus editor out and the gate proves the chunk exists (58-13)', () => {
+    const src = read('scripts/check-bundle-size.ts')
+    expect(src).toContain("label: 'focus editor (lazy admin chunk, 58-13)'")
+    expect(src).toContain("markers: ['I have checked this', 'Run the AI check']")
+    // The positive half: the editor must be its own chunk and must not be in the route's set.
+    expect(src).toContain('const EDITOR_LITERAL')
+    expect(src).toContain('the focus editor chunk was not found')
+    expect(src).toContain('workerSet.has(c)')
+    // Both literals are authored in the editor (so the marker group is not vacuous).
+    expect(read('src/components/focus/admin/StepCard.tsx')).toContain('I have checked this')
+    expect(read('src/components/focus/admin/AiCheckBanner.tsx')).toContain('Run the AI check')
+  })
+
   test('the worker SOP route still forbids the machine body and carries no library-table marker group', () => {
     const src = read('scripts/check-bundle-size.ts')
       .split('\n')

@@ -5,9 +5,11 @@
  * (58-11). The server page hands over the resolved SOP and the worker's own
  * in-progress walk; useWalk owns everything that changes after that.
  */
+import { useState } from 'react'
 import { BEFORE_YOU_START, currentIndex, type WalkEntry } from '@/lib/sop/focus'
 import type { FocusSop, FocusStepRow } from '@/lib/sop/focus-read'
 import type { WalkState } from '@/lib/sop/walk-read'
+import type { ParseJobSnapshot } from '@/hooks/useParseJob'
 import { useWalk } from '@/hooks/useWalk'
 import { FocusFrame, type VersionState } from '@/components/focus/FocusFrame'
 import { BrowseDocument } from '@/components/focus/BrowseDocument'
@@ -24,10 +26,33 @@ export interface FocusWalkerProps {
   /** The live version a superseded one was replaced by (D-14). */
   supersededBy: { id: string; version: number } | null
   updatedSinceLastWalk: boolean
+  /** 'browse' unless the page opened the editor: ?mode=edit, or a SOP still being read. */
+  initialMode: 'browse' | 'edit' | 'parsing'
+  /** The latest parse job (edit and parsing only). */
+  job: ParseJobSnapshot | null
+  /** Admin or safety manager with edit access: the Walk / Edit switch, tick, run the AI check, publish (D-06). */
+  canEdit: boolean
 }
 
-export function FocusWalker({ data, initialWalk, from, versionState, supersededBy, updatedSinceLastWalk }: FocusWalkerProps) {
+export function FocusWalker({ data: served, initialWalk, from, versionState: servedState, supersededBy, updatedSinceLastWalk, initialMode, job, canEdit }: FocusWalkerProps) {
+  // Walk / Edit flips in place (D-06): local state plus the address, never a navigation.
+  const [editing, setEditing] = useState(initialMode !== 'browse')
+  // The editor reports its latest read of the SOP, so Walk after an edit shows the steps as edited.
+  const [edited, setEdited] = useState<FocusSop | null>(null)
+  const data = edited ?? served
+  // A draft published from the editor is live from that moment (no reload).
+  const versionState: VersionState = servedState === 'draft' && data.sop.status === 'published' ? 'live' : servedState
   const w = useWalk({ data, initialWalk, from })
+
+  function switchTo(next: 'walk' | 'edit') {
+    const url = new URL(window.location.href)
+    if (next === 'edit') url.searchParams.set('mode', 'edit')
+    else url.searchParams.delete('mode')
+    window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}`)
+    setEditing(next === 'edit')
+  }
+  const reading = initialMode === 'parsing' && !(edited && edited.steps.length > 0)
+  const frameMode = editing ? (reading ? 'parsing' : 'edit') : w.phase
   const { order, phase, walk, entry } = w
   const canWalk = versionState === 'live'
 
@@ -105,7 +130,7 @@ export function FocusWalker({ data, initialWalk, from, versionState, supersededB
   return (
     <FocusFrame
       title={data.sop.title ?? 'Untitled SOP'}
-      mode={phase}
+      mode={frameMode}
       versionState={versionState}
       from={from}
       order={order}
@@ -114,6 +139,9 @@ export function FocusWalker({ data, initialWalk, from, versionState, supersededB
       rowState={rowState}
       hollowDot={hollowDot}
       onPickStep={onPickStep}
+      editor={editing ? { sop: served, job, canPublish: canEdit } : null}
+      modeSwitch={canEdit && versionState !== 'superseded' && initialMode !== 'parsing' ? { value: editing ? 'edit' : 'walk', onChange: switchTo } : null}
+      onEditorFocus={setEdited}
     >
       {phase === 'browse' && w.error && (
         <p role="alert" data-testid="walk-error" className="mx-auto max-w-205 px-4 pt-4 text-ui text-accent-escalate lg:px-8">
