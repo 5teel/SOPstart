@@ -1,18 +1,20 @@
 /**
  * SOP -> focus-step conversion runner (Phase 56-02 dry run, 56-07 apply,
- * 58-14 cutover run).
+ * 58-14 cutover run, then retired).
  *
- * Default is a read-only dry run. `--apply` (needs --sop, --org or --all) writes
- * ONLY public.sop_focus_steps and public.sop_conversion_runs. This file never
- * touches the old section or step tables: no insert, update or delete on them.
+ * RETIRED in Phase 58 (D-23): the editor writes steps now, so this runner can no
+ * longer overwrite them. The full-apply flag exits 1 before any env read.
+ *   - default: read-only dry run (still reports what a full run would have done).
+ *   - --missing: converts ONLY SOPs with zero focus steps (and not uploading /
+ *     parsing), same gate, same sop_conversion_runs row. A SOP with any step is
+ *     never read for writing, updated or deleted. Writes ONLY public.sop_focus_steps
+ *     and public.sop_conversion_runs; never the old section or step tables.
  *
- * Cutover rules (Phase 58, D-23): a SOP that already has native steps
- * ('new:' / 'edit:' keys), a tick set in the editor, or a step edited since its
- * last conversion run is "native" and is never read, updated or deleted. On a
- * draft SOP a verified block carries its tick onto the steps it produced.
+ * A SOP that already has native steps ('new:' / 'edit:' keys), a tick set in the
+ * editor, or a step edited since its last conversion run is "native": left alone.
  *
  * Run: npx tsx scripts/convert-sops-to-steps.ts --all --report <path.md>
- *      npx tsx scripts/convert-sops-to-steps.ts --apply --sop <uuid> | --org <uuid> | --all
+ *      npx tsx scripts/convert-sops-to-steps.ts --missing --sop <uuid> | --org <uuid> | --all
  */
 import fs from 'node:fs'
 import { execSync } from 'node:child_process'
@@ -27,9 +29,14 @@ const flag = (n: string) => {
   return i >= 0 ? args[i + 1] : undefined
 }
 
-const APPLY = args.includes('--apply')
-if (APPLY && !flag('--sop') && !flag('--org') && !args.includes('--all')) {
-  console.error('--apply needs an explicit scope: --sop <uuid>, --org <uuid> or --all. Nothing was touched.')
+if (args.includes('--apply')) {
+  console.error('converter retired in Phase 58 — the editor writes steps now; use --missing for SOPs with no steps')
+  process.exit(1)
+}
+
+const MISSING = args.includes('--missing')
+if (MISSING && !flag('--sop') && !flag('--org') && !args.includes('--all')) {
+  console.error('--missing needs an explicit scope: --sop <uuid>, --org <uuid> or --all. Nothing was touched.')
   process.exit(2)
 }
 
@@ -99,7 +106,7 @@ async function main() {
     const c = convertSop({ sopId: sop.id, sections: secs, sopImagePaths: (imgs ?? []).map((i) => i.storage_path as string) })
 
     const lastOkAt = runs?.find((r) => r.ok)?.created_at ?? null
-    const why = nativeReason(ex, lastOkAt)
+    const why = MISSING ? (ex.length ? 'has steps' : null) : nativeReason(ex, lastOkAt)
     let state: State
     let plan: ReturnType<typeof planFocusStepWrites> | null = null
     let ticks: TickCarry[] = []
@@ -108,7 +115,9 @@ async function main() {
     else if (!c.gate.ok) state = 'failed'
     else {
       const last = runs?.[0]
-      state = last?.ok && last.layout_hash === c.hash && last.converter_version === CONVERTER_VERSION ? 'unchanged' : 'convert'
+      state = MISSING
+        ? (c.steps.length ? 'convert' : 'unchanged')
+        : last?.ok && last.layout_hash === c.hash && last.converter_version === CONVERTER_VERSION ? 'unchanged' : 'convert'
       if (state === 'convert') plan = planFocusStepWrites(c.steps, ex)
       if (sop.status === 'draft') {
         const ids = secs.map((s) => s.id)
@@ -125,9 +134,9 @@ async function main() {
   // ---- apply: per SOP, gate first; upsert before delete so a failure leaves a superset, never a loss.
   const action = new Map<string, string>()
   const ticked = new Map<string, number>()
-  if (APPLY) {
+  if (MISSING) {
     const runId = randomUUID()
-    for (const { sop, c, state, existing, plan, ticks } of rows) {
+    for (const { sop, c, state, plan, ticks } of rows) {
       if (state === 'native' || state === 'in_flight') { action.set(sop.id, state); continue }
       if (!sop.organisation_id) throw new Error(`SOP ${sop.id} has no organisation_id; refusing to write`)
       const runRow = {
@@ -142,10 +151,6 @@ async function main() {
       }
       if (plan) {
         const now = new Date().toISOString()
-        const doomed = existing.filter((e) => plan.deleteIds.includes(e.id))
-        if (doomed.some((e) => e.verified_by_admin_id || isNativeKey(e.source_key))) {
-          throw new Error(`SOP ${sop.id}: a delete would remove a ticked or native step; stopping`)
-        }
         for (const part of chunk(plan.upserts)) {
           const { error: ue } = await sb.from('sop_focus_steps').upsert(
             part.map((d) => ({
@@ -158,10 +163,7 @@ async function main() {
           )
           if (ue) throw ue
         }
-        for (const part of chunk(plan.deleteIds)) {
-          const { error: de } = await sb.from('sop_focus_steps').delete().in('id', part).eq('sop_id', sop.id)
-          if (de) throw de
-        }
+        console.log(`missing: ${sop.id} ${sop.title ?? ''} -> ${plan.upserts.length} steps`)
       }
       // Ticks go on after the upsert (an update that sets the tick keeps it), before the run row.
       for (const t of ticks) {
@@ -178,7 +180,7 @@ async function main() {
       action.set(sop.id, plan ? 'converted' : 'unchanged')
     }
     const n = (a: string) => [...action.values()].filter((v) => v === a).length
-    console.log(`apply: ${n('converted')} converted / ${n('unchanged')} unchanged / ${n('failed')} failed / ${n('native')} native left alone / ${n('in_flight')} still parsing (run ${runId})`)
+    console.log(`missing: ${n('converted')} converted / ${n('unchanged')} unchanged / ${n('failed')} failed / ${n('native')} native left alone / ${n('in_flight')} still parsing (run ${runId})`)
   }
 
   const failing = rows.filter((r) => r.state === 'failed')
@@ -215,14 +217,14 @@ async function main() {
     const scope = only ? `sop ${only}` : org ? `org ${org}` : 'all SOPs'
     const n = (a: string) => [...action.values()].filter((v) => v === a).length
     const out: string[] = [
-      APPLY ? '## Apply output' : '## Dry run',
+      MISSING ? '## Missing-steps run' : '## Dry run',
       '',
       `- Date: ${new Date().toISOString()}`,
       `- Commit: ${sha}`,
       `- Scope: ${scope}`,
       `- CONVERTER_VERSION: ${CONVERTER_VERSION}`,
       `- SOPs in scope at run time (\`select count(*) from sops\`): ${count}; rows below: ${rows.length}`,
-      APPLY
+      MISSING
         ? `- Applied: ${n('converted')} converted / ${n('unchanged')} unchanged / ${n('failed')} failed / ${n('native')} native left alone / ${n('in_flight')} still parsing; ticks carried: ${[...ticked.values()].reduce((a, b) => a + b, 0)}`
         : '- Read-only: this run wrote nothing.',
       '',
@@ -252,11 +254,11 @@ async function main() {
       '',
       '### Per SOP',
       '',
-      '| Id | Title | Status | Source | Hazard before->after | PPE cards->steps (items) | Step | Check | Photo | Existing steps | Plan (+ins ~upd -del =same) | Ticks | Gate |' + (APPLY ? ' Action |' : ''),
-      '|---|---|---|---|---|---|---|---|---|---|---|---|---|' + (APPLY ? '---|' : ''),
+      '| Id | Title | Status | Source | Hazard before->after | PPE cards->steps (items) | Step | Check | Photo | Existing steps | Plan (+ins ~upd -del =same) | Ticks | Gate |' + (MISSING ? ' Action |' : ''),
+      '|---|---|---|---|---|---|---|---|---|---|---|---|---|' + (MISSING ? '---|' : ''),
       ...rows.map((r) => {
         const b = r.c.before
-        return `| ${r.sop.id.slice(0, 8)} | ${cell(r.sop.title ?? '')} | ${r.sop.status} | ${r.c.source} | ${b.hazardSources}->${r.c.after.hazard} | ${b.ppeSources}->${r.c.after.ppe} (${ppeCount(r)}/${b.ppeItems.length}) | ${r.c.after.step} | ${r.c.after.check} | ${r.c.after.photoRequired} | ${r.existing.length} | ${planCell(r)} | ${r.ticks.length} | ${r.c.gate.ok ? 'ok' : cell(r.c.gate.failures.join(' '))} |${APPLY ? ` ${action.get(r.sop.id)} |` : ''}`
+        return `| ${r.sop.id.slice(0, 8)} | ${cell(r.sop.title ?? '')} | ${r.sop.status} | ${r.c.source} | ${b.hazardSources}->${r.c.after.hazard} | ${b.ppeSources}->${r.c.after.ppe} (${ppeCount(r)}/${b.ppeItems.length}) | ${r.c.after.step} | ${r.c.after.check} | ${r.c.after.photoRequired} | ${r.existing.length} | ${planCell(r)} | ${r.ticks.length} | ${r.c.gate.ok ? 'ok' : cell(r.c.gate.failures.join(' '))} |${MISSING ? ` ${action.get(r.sop.id)} |` : ''}`
       }),
       '',
     ]
