@@ -23,11 +23,15 @@ export function OwnerPicker({
   ownerUserId,
   ownerLabel,
   onDone,
+  triggerClassName = 'evidence-btn !min-h-9 text-sm inline-flex items-center gap-1.5',
+  triggerTestId,
 }: {
   sopId: string
   ownerUserId: string | null
   ownerLabel: string
   onDone?: (r: { logged: boolean; ownerLabel: string | null }) => void
+  triggerClassName?: string
+  triggerTestId?: string
 }) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -81,7 +85,8 @@ export function OwnerPicker({
       <button
         type="button"
         onClick={handleOpen}
-        className="evidence-btn !min-h-9 text-sm inline-flex items-center gap-1.5"
+        data-testid={triggerTestId}
+        className={triggerClassName}
       >
         <User className="h-3.5 w-3.5" />
         {ownerUserId ? 'Reassign' : 'Assign owner'}
