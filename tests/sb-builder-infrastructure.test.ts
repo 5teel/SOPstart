@@ -1,23 +1,44 @@
 import { test, expect } from '@playwright/test'
 
-test.describe('Builder infrastructure and safety gates (SB-INFRA)', () => {
-  test('SB-INFRA-00 /admin/sops/builder/[sopId] route scaffold exists as RSC guard + client shell pair', async () => {
-    // Repointed 2026-07-13: Puck was deleted in Phase 26 (bespoke inline editor);
-    // this spec had rotted against the old @puckeditor/core scaffold and was
-    // failing silently. The auth guard now flows through the shared
-    // getSessionContext() (local JWT verify + cached member-role lookup).
+/**
+ * SB-INFRA -- editor infrastructure and safety gates. Repointed in 58-15 onto the
+ * focus editor.
+ *
+ * Moved: SB-INFRA-00 (route scaffold: server guard + client shell) is now the
+ * focus page's edit branch + the lazy FocusEditor seam; SB-INFRA-03 (worker
+ * bundle carries no editor) is the seam's static shape.
+ *
+ * Dropped: SB-INFRA-02 (Dexie offline authoring + sync engine) -- the app is
+ * online-only since Phase 55 and the editor writes straight to the server
+ * (useFocusAutosave); asserting it would reintroduce the cache.
+ */
+test.describe('Editor infrastructure and safety gates (SB-INFRA)', () => {
+  test('SB-INFRA-00 the focus page is a server guard (session + edit access) rendering a client shell', async () => {
     const fs = await import('node:fs/promises')
-    const page = await fs.readFile('src/app/(protected)/admin/sops/builder/[sopId]/page.tsx', 'utf8')
+    const page = await fs.readFile('src/app/(protected)/sops/[sopId]/page.tsx', 'utf8')
     expect(page).toContain('getSessionContext')
     expect(page).toContain("redirect('/login')")
-    expect(page).toContain("redirect('/')")
-    expect(page).toContain("redirect('/')")
-    expect(page).toContain('BuilderStageShell')
+    expect(page).toContain('requireSopEditAccess({ sopId })')
+    expect(page).toContain('<FocusWalker')
 
-    const shell = await fs.readFile('src/app/(protected)/admin/sops/builder/[sopId]/BuilderStageShell.tsx', 'utf8')
-    expect(shell).toContain("'use client'")
+    const walker = await fs.readFile('src/components/focus/FocusWalker.tsx', 'utf8')
+    expect(walker).toContain("'use client'")
+    const frame = await fs.readFile('src/components/focus/FocusFrame.tsx', 'utf8')
+    expect(frame).toContain('<FocusEditor')
   })
-  test.fixme('SB-INFRA-02 all builder content persists through Dexie for offline authoring and syncs via the existing sync engine with no explicit save step (auto-save to Dexie on change, debounced to Supabase)', async ({ page }) => {})
-  test.fixme('SB-INFRA-03 builder bundle is code-split; CI verifies worker route First-Load-JS does not include Puck, Konva, Yjs, or y-dexie imports', async ({ page }) => {})
+
   test.fixme('SB-INFRA-04 AI-drafted content passes the same Phase 6 adversarial verification gate before admin review so hallucinated hazards/PPE are flagged', async ({ page }) => {})
+
+  test('SB-INFRA-03 the editor is code-split: only the frame names it, behind next/dynamic with ssr off', async () => {
+    const fs = await import('node:fs/promises')
+    const frame = await fs.readFile('src/components/focus/FocusFrame.tsx', 'utf8')
+    expect(frame).toMatch(/dynamic\(\(\) => import\('@\/components\/focus\/admin\/FocusEditor'\)/)
+    expect(frame).toContain('ssr: false')
+    // No worker focus file imports the editor statically.
+    for (const f of ['FocusWalker', 'FocusTopBar', 'FocusRail', 'BrowseDocument', 'WalkStep', 'ReviewAndSend', 'SentPanel', 'ResumeCard']) {
+      const src = await fs.readFile(`src/components/focus/${f}.tsx`, 'utf8')
+      expect(src, f).not.toMatch(/from '@\/components\/focus\/admin\//)
+    }
+    expect(await fs.readFile('src/hooks/useWalk.ts', 'utf8')).not.toContain('focus/admin')
+  })
 })

@@ -67,17 +67,35 @@ test.describe('Dead controls: scan-document, wiring lens, dead state (D-02/D-04/
     }
   })
 
-  test('dead state removed from the creation and version surfaces (D-02)', () => {
+  test('dead state removed from the creation surfaces (D-02)', () => {
     const wizardSrc = read('src/app/(protected)/admin/sops/new/blank/WizardClient.tsx')
     expect(wizardSrc).not.toContain('sopCategoryOptions')
 
     const blankPageSrc = read('src/app/(protected)/admin/sops/new/blank/page.tsx')
     expect(blankPageSrc).not.toContain('listBlockCategories')
     expect(blankPageSrc).toContain('<WizardClient departments={departments} machineId={machineId} />')
+  })
 
-    const versionsSrc = read('src/app/(protected)/admin/sops/[sopId]/versions/page.tsx')
-    expect(versionsSrc).not.toContain('selectedForCompare')
-    expect(versionsSrc).not.toContain('setSelectedForCompare')
+  // 58-15: the versions-page half ("no selectedForCompare state") went with the page --
+  // there is no compare UI on the focus screen. Replaced by the same dead-control net
+  // pointed at the new surface: every <button> in the focus screen carries a handler.
+  test('every <button> in src/components/focus has an onClick or is a form submit (no dead control)', () => {
+    const offenders: string[] = []
+    for (const file of walkTsFiles(path.join(ROOT, 'src', 'components', 'focus'))) {
+      const rel = path.relative(ROOT, file)
+      const stripped = stripComments(read(rel))
+      for (const m of stripped.matchAll(/<button\b(?:=>|[^>])*>/g)) {
+        const tag = m[0]
+        // A spread ({...props}) may carry the handler; anything else must name one.
+        if (!/onClick=|type="submit"|\{\.\.\./.test(tag)) offenders.push(`${rel}: ${tag.replace(/\s+/g, ' ').slice(0, 90)}`)
+      }
+    }
+    expect(offenders, offenders.join('\n')).toEqual([])
+  })
+
+  test('the dead-control scan is live: it flags a handler-less button', () => {
+    const tag = '<button type="button" className="x">'.match(/<button\b(?:=>|[^>])*>/)![0]
+    expect(/onClick=|type="submit"/.test(tag)).toBe(false)
   })
 
   test('no eslint-disable carve-out for no-unused-vars anywhere in src/ (D-02)', () => {

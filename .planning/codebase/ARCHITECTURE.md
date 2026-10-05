@@ -138,7 +138,7 @@ SafeStart is a multi-tenant Next.js 16 App Router SaaS web app that implements a
    - Calls `parsedSopToPerSectionLayoutData` to generate layout JSON (Puck blocks)
    - Inserts `SopSection` rows, `SopStep` rows, and optional `SopImage` rows
    - Updates parse job (status: `completed`)
-6. **Review** → Admin reviews and edits in the builder at `/admin/sops/builder/[sopId]` (source viewer, AI reviewer, per-block verify checklist)
+6. **Review** → Admin reviews and edits in the builder at `/sops/[sopId]?mode=edit` (the focus editor: source steps, AI check findings, per-step tick)
 7. **Publish** → `publishSop` server action updates status to `published`
 8. **Assignment** → Admin assigns to roles/trades at `/admin/sops/[sopId]/assign`
 

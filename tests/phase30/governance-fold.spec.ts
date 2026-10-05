@@ -12,8 +12,10 @@
  *   - /admin/governance is a redirect() shim to /governance (GQ-04 —
  *     legacy ?filter=X bookmarks land on the whole inbox), with the admin
  *     guard IN FRONT of the redirect.
- *   - APR-03/APR-04 preserved: approveStep( wired in GovernanceQueueRow AND
- *     builder PublishStage.
+ *   - APR-03/APR-04 preserved: approveStep( wired in GovernanceQueueRow; the focus
+ *     editor's PublishBar withholds Publish while a chain is pending and names the
+ *     approver (58-15: the old builder's publish stage and its own Approve button are
+ *     gone; approving happens from the governance inbox).
  *   - GovernanceWidget + LibraryReviewCell removed as separate surfaces.
  *   - The old STATUS_TABS "Needs attention" (value=failed) renamed to
  *     "Parse issues" (decision #4 — no naming collision).
@@ -44,9 +46,7 @@ const QUEUE_ROW = path.join(
 const FLAG_DISPLAY = path.join(
   ROOT, 'src', 'lib', 'governance', 'flag-display.ts',
 )
-const PUBLISH_STAGE = path.join(
-  ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'builder', '[sopId]', 'PublishStage.tsx',
-)
+const PUBLISH_BAR = path.join(ROOT, 'src', 'components', 'focus', 'admin', 'PublishBar.tsx')
 const NEXT_CONFIG = path.join(ROOT, 'next.config.ts')
 const JOURNEYS = path.join(ROOT, 'src', 'lib', 'journeys', 'journeys.ts')
 
@@ -78,14 +78,20 @@ test.describe('UX-03 — governance lives at /governance', () => {
     expect(page).not.toContain('GovernanceQueueRow')
   })
 
-  test('approveStep stays wired in GovernanceQueueRow AND PublishStage (APR-03/04 hard constraint)', () => {
+  test('approveStep stays wired in GovernanceQueueRow AND the focus PublishBar defers to the chain (APR-03/04 hard constraint)', () => {
     const row = read(QUEUE_ROW)
     // Verbatim move: the gate AND the wired call site survive (2026-06-05:
     // assert handler wiring, not token presence).
     expect(row).toContain("row.flags.includes('awaiting_approval') && row.isCallerNextApprover")
     expect(row).toContain('await approveStep(row.id)')
     expect(row).toContain('onClick={handleApprove}')
-    expect(read(PUBLISH_STAGE)).toContain('approveStep')
+    // The editor never publishes around a pending chain: it reads the approval status,
+    // withholds the Publish button while pending, and the dialog reports pending approval.
+    const bar = read(PUBLISH_BAR)
+    expect(bar).toContain('getApprovalStatus(')
+    expect(bar).toContain("approval.data?.state === 'pending'")
+    expect(bar).toContain('isAdmin && !pending')
+    expect(bar).toContain('onPendingApproval={() => setSentNow(true)}')
   })
 
   test('awaiting-approval survives as an always-visible inbox chip', () => {

@@ -24,7 +24,6 @@ const SHELL_TARGETS = [
   path.join(ADMIN_SOPS_DIR, 'upload', 'page.tsx'),
   path.join(ADMIN_SOPS_DIR, 'new', 'blank', 'page.tsx'),
   path.join(ADMIN_SOPS_DIR, 'new', 'ai', 'page.tsx'),
-  path.join(ADMIN_SOPS_DIR, '[sopId]', 'versions', 'page.tsx'),
 ]
 
 const ADMIN_PAGE_SHELL = path.join(SRC_DIR, 'components', 'admin', 'AdminPageShell.tsx')
@@ -92,9 +91,13 @@ test.describe('DUP-04 -- one shared admin page shell', () => {
     expect(src).toMatch(/backHref\?:|backLink\?:/)
   })
 
-  test('versions/page.tsx preserves the per-SOP back link', () => {
-    const versionsSrc = read(path.join(ADMIN_SOPS_DIR, '[sopId]', 'versions', 'page.tsx'))
-    expect(versionsSrc).toContain('/admin/sops/builder/')
+  // 58-15: the per-SOP back link lived on the versions page (retired, no successor page).
+  // Its job -- a way back from a SOP -- is the focus screen's Back, which sits in the
+  // frame's top bar and is driven by useFocusBack (place-whitelisted ?from).
+  test('the focus screen keeps a per-SOP Back in its top bar, fed by the frame', () => {
+    const bar = read(path.join(SRC_DIR, 'components', 'focus', 'FocusTopBar.tsx'))
+    expect(bar).toContain('onClick={onBack}')
+    expect(read(path.join(SRC_DIR, 'components', 'focus', 'FocusFrame.tsx'))).toContain('onBack=')
   })
 
   test('upload/page.tsx uses the shared INTAKE_HINT, not the stale hardcoded format list', () => {

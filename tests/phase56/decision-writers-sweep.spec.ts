@@ -272,10 +272,12 @@ test.describe('every hook is live', () => {
     expect(v).toMatch(/agentName:\s*z\.enum\(AGENT_NAMES\)\.optional\(\)/)
   })
 
-  test('verifyBlock / unverifyBlock take only blockId (SOP is resolved server-side)', () => {
-    const t = fileText('src/actions/sop-section-blocks.ts')
-    expect(t).toMatch(/export async function verifyBlock\(\s*blockId: string\s*\)/)
-    expect(t).toMatch(/export async function unverifyBlock\(\s*blockId: string\s*\)/)
+  // 58-15: the per-block verify actions are replaced by the per-step tick; same rule --
+  // the caller names only the step, never an organisation, user or agent.
+  test('tickFocusStep / untickFocusStep take only stepId (SOP and org are resolved server-side)', () => {
+    const t = fileText('src/actions/focus-steps.ts')
+    expect(t).toContain('export async function tickFocusStep(input: { stepId: string })')
+    expect(t).toContain('export async function untickFocusStep(input: { stepId: string })')
   })
 })
 

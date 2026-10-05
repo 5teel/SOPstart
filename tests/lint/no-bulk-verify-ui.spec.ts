@@ -20,6 +20,11 @@
  *   - src/components/admin/verify-checklist/__tests__/VerifyChecklistGate.test.tsx
  *     (the static-analysis test enumerates them too)
  *   - tests/lint/no-bulk-verify-ui.spec.ts (this file)
+ *
+ * 58-15: the per-step tick now lives in the focus editor's StepCard (the
+ * checklist gate is retired with the builder). The allow-list above stays until
+ * those files are deleted; the scan root (src/) covers src/components/focus, which
+ * is asserted below, and the tick-all phrasings of the new editor are banned too.
  */
 
 import { test, expect } from '@playwright/test'
@@ -40,6 +45,11 @@ const BANNED_PHRASES = [
   'bulk verify',
   'trust score',
   'skip remaining',
+  // 58-15: the same affordance under the focus editor's wording of a tick.
+  'tick all',
+  'check all',
+  'mark all',
+  'confirm all',
 ] as const
 
 // Files allowed to mention the banned phrases (documentation / the lock itself).
@@ -122,4 +132,14 @@ test('D-21-07: no bulk-verify UI affordance anywhere in src/', () => {
     )
   }
   expect(hits).toEqual([])
+})
+
+test('58-15: the scan covers the focus editor (the tick lives in StepCard) and flags a tick-all phrase', () => {
+  const files: string[] = []
+  walk(SRC_DIR, files)
+  const rel = files.map((f) => path.relative(REPO_ROOT, f).replace(/\\/g, '/'))
+  expect(rel).toContain('src/components/focus/admin/StepCard.tsx')
+  expect(rel).toContain('src/components/focus/admin/EditDocument.tsx')
+  // The phrase list is live: a rendered "Tick all" label matches.
+  expect(BANNED_PHRASES.some((p) => '<button>Tick all</button>'.toLowerCase().includes(p))).toBe(true)
 })

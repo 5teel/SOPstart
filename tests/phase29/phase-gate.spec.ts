@@ -96,14 +96,28 @@ test.describe('APR-04 — final approval auto-completes publish; pending state v
   })
 })
 
-test.describe('APR-05 — approval history visible in version history', () => {
-  const versionsPageSrc = read('src/app/(protected)/admin/sops/[sopId]/versions/page.tsx')
+// APR-05 -- approval history. 58-15: the versions page (the only place that
+// rendered the per-version rows) is retired with no successor surface -- the
+// focus editor's rail lists earlier versions but not their approvals -- so the
+// two page assertions are dropped. What survives is the read itself: the admin
+// action that returns every version's approvals with step labels resolved from
+// the version's own approval_snapshot. (No caller renders it after 58-16; it is
+// kept so the history is one component away, and it is pinned here so it cannot
+// rot into a read of the live chain.)
+test.describe('APR-05 — approval history read survives the versions page', () => {
+  const approvalsSrc = read('src/actions/approvals.ts')
+  const start = approvalsSrc.indexOf('export async function getApprovalHistory(')
+  const body = approvalsSrc.slice(start, approvalsSrc.indexOf('export async function', start + 10) === -1 ? undefined : approvalsSrc.indexOf('export async function', start + 10))
 
-  test('versions page calls getApprovalHistory(', () => {
-    expect(versionsPageSrc).toContain('getApprovalHistory(')
+  test('getApprovalHistory is admin-gated and reads per-version sop_approvals', () => {
+    expect(start).toBeGreaterThan(-1)
+    expect(body).toContain('requireAdmin()')
+    expect(body).toContain(".from('sop_approvals')")
+    expect(body).toContain(".in('sop_id', versionIds)")
   })
 
-  test('renders rows grouped by version (per-version filter)', () => {
-    expect(versionsPageSrc).toMatch(/approvals\.filter\(.*ver\.id/)
+  test("step labels come from the version's own approval_snapshot, not the live chain", () => {
+    expect(body).toContain('approval_snapshot')
+    expect(body).toContain('steps[r.step_index]?.label')
   })
 })

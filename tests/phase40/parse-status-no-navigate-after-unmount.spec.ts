@@ -10,7 +10,7 @@ import path from 'node:path'
  * unmount does NOT cancel a request already in flight, so a poll fired just
  * before navigation resolved on a dead component and still ran its completion
  * branch — `onCompleted()`, which PromptClient binds
- * to router.push('/admin/sops/builder/…'). The user had left the page; the
+ * to router.push(focusHref(…, { mode: 'edit' })). The user had left the page; the
  * app dragged them back.
  *
  * The fix is an effect-scoped `cancelled` flag set in the cleanup and checked

@@ -16,9 +16,9 @@ const WORKER_SIGNAL_PATH = path.join(ROOT, 'src', 'lib', 'sop', 'worker-signal.t
 const CATEGORY_BUTTON_PATH = path.join(
   ROOT, 'src', 'components', 'focus', 'admin', 'CategoryButton.tsx'
 )
-const STAGE_SHELL_PATH = path.join(
-  ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'builder', '[sopId]', 'BuilderStageShell.tsx'
-)
+// 58-15: the category control moved from the old builder header into the focus editor's
+// "This SOP" block.
+const THIS_SOP_BLOCK_PATH = path.join(ROOT, 'src', 'components', 'focus', 'admin', 'ThisSopBlock.tsx')
 
 function read(p: string): string {
   return fs.readFileSync(p, 'utf-8').replace(/\r\n/g, '\n')
@@ -35,7 +35,10 @@ test.describe('surviving affordances', () => {
     expect(code).toContain('SOP_CATEGORIES')
   })
 
-  test('BuilderStageShell renders <CategoryButton sopId={sopId}', () => {
-    expect(read(STAGE_SHELL_PATH)).toContain('<CategoryButton sopId={sopId}')
+  test("the focus editor's This-SOP block renders <CategoryButton for admins", () => {
+    const block = read(THIS_SOP_BLOCK_PATH)
+    expect(block).toContain('<CategoryButton')
+    expect(block).toContain('sopId={sopId}')
+    expect(block).toContain('isAdmin && (')
   })
 })

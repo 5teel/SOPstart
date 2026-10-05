@@ -70,7 +70,7 @@ test.describe('SHL-02 place address', () => {
   })
 
   test('placeForPath sends every other page to the site, and /pending nowhere', () => {
-    for (const p of ['/admin/sops/builder/abc', '/profile']) expect(placeForPath(p), p).toBe('/')
+    for (const p of ['/admin/sops/abc/assign', '/profile']) expect(placeForPath(p), p).toBe('/')
     expect(placeForPath('/pending')).toBeNull()
   })
 

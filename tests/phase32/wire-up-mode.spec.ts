@@ -6,7 +6,7 @@
  * 32-07): source-contract assertions prove connect mode, live wire toggling,
  * the PEOPLE blast-radius derivation, and the createGrant write-on-Done are
  * all actually wired together — not just present as strings. The
- * post-publish "Wire up access" CTA (PublishStage.tsx) and the true
+ * post-publish "Wire up access" CTA (retired with the old builder, 58-15) and the true
  * end-to-end publish->wire-up->library flow are 32-09 scope (this plan ships
  * the WiringPatchBay component layer only) and are kept as documented
  * `test.fixme` items.
@@ -138,7 +138,7 @@ test.describe('SC-5 — ✓ Done writes grants via createGrant', () => {
 // ---------------------------------------------------------------------------
 // Runtime smoke — requires chromium + live app + a published NEW SOP
 // (Rule-3 fallback documented above). The post-publish "Choose who sees it"
-// CTA (PublishStage.tsx -> /admin/access?sop=<id>) is 32-09/33-09 scope.
+// CTA (a link to /admin/access?sop=<id>) is 32-09/33-09 scope.
 // ---------------------------------------------------------------------------
 
 test.describe('SC-5 — wire-up mode runtime (requires chromium + live app, 32-09 page arm)', () => {
@@ -174,11 +174,10 @@ test.describe('SC-5 — wire-up mode runtime (requires chromium + live app, 32-0
     expect(src).toContain("className={`jack${opts.nested ? ' child' : ''} newsop")
   })
 
-  test('the builder hands PublishStage the Access bridge URL pinned to the SOP (Phase 57 D-14)', () => {
-    const shell = fs.readFileSync(
-      path.join(process.cwd(), 'src', 'app', '(protected)', 'admin', 'sops', 'builder', '[sopId]', 'BuilderStageShell.tsx'),
-      'utf-8',
-    )
-    expect(shell).toContain('`/admin/access?sop=${sopId}`')
-  })
+  // Dropped in 58-15: "the builder hands the publish stage the Access bridge URL pinned
+  // to the SOP" (Phase 57 D-14). Its subject -- the old builder's post-publish
+  // stage -- is gone and the focus editor's PublishBar has no equivalent link.
+  // The receiving end survives: the access page's pinnedSopId (pinned in phase30/governance-fold)
+  // and WiringPatchBay's saved-grants state above; the proxy still maps legacy
+  // addresses to /admin/access?sop=<id>.
 })

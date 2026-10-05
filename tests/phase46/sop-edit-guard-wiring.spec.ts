@@ -29,7 +29,7 @@ import path from 'node:path'
 const ROOT = process.cwd()
 const GUARDS = path.join(ROOT, 'src', 'lib', 'auth', 'guards.ts')
 const SECTIONS = path.join(ROOT, 'src', 'actions', 'sections.ts')
-const BLOCKS = path.join(ROOT, 'src', 'actions', 'sop-section-blocks.ts')
+const FOCUS_STEPS = path.join(ROOT, 'src', 'actions', 'focus-steps.ts')
 const ROUTE = path.join(ROOT, 'src', 'app', 'api', 'sops', '[sopId]', 'sections', '[sectionId]', 'route.ts')
 
 function read(p: string): string {
@@ -80,12 +80,21 @@ test.describe('CAP-02 -- requireSopEditAccess call-site wiring (source-contract)
 
   // --- Negative / scope-containment: CAP-02 must not leak past "edit" ---
   // activated by plan 46-03 -- RESEARCH Pitfall 4
-  test('verifyBlock, unverifyBlock stay admin-only -- no requireSopEditAccess leak', () => {
-    const src = read(BLOCKS)
-    for (const fn of ['verifyBlock', 'unverifyBlock']) {
+  // 58-15: the per-block verify actions are replaced by the focus editor's per-step tick;
+  // the rule is unchanged -- ticking a step is an admin decision, not an edit right.
+  test('tickFocusStep, untickFocusStep stay admin-only -- no requireSopEditAccess leak', () => {
+    const src = read(FOCUS_STEPS)
+    for (const fn of ['tickFocusStep', 'untickFocusStep']) {
       const body = fnBody(src, fn)
       expect(body, `${fn} must NOT call requireSopEditAccess(`).not.toContain('requireSopEditAccess(')
-      expect(body, `${fn} must still call requireAdmin(`).toContain('requireAdmin(')
+      expect(body, `${fn} must call requireAdminContext(`).toContain('requireAdminContext(')
+    }
+  })
+
+  test('every focus editor content write calls requireSopEditAccess( inside its own body', () => {
+    const src = read(FOCUS_STEPS)
+    for (const fn of ['getFocusSop', 'updateFocusStep', 'addFocusStep', 'deleteFocusStep', 'moveFocusStep', 'deleteFocusSection', 'setSopObjective', 'getStepImageUploadUrl', 'attachStepImage', 'removeStepImage']) {
+      expect(fnBody(src, fn), `${fn} should call requireSopEditAccess(`).toContain('requireSopEditAccess(')
     }
   })
 
@@ -121,12 +130,13 @@ test.describe('CAP-02 -- requireSopEditAccess call-site wiring (source-contract)
   // server action (every 'use server' export is a POST endpoint). Phase 55
   // deleted the guarded junction-insert action with the content library; the
   // parser path lives in a plain core module with no action endpoint ID. ---
-  test('no wire-reachable serviceRole bypass in sop-section-blocks.ts; the parser path lives in the non-server core module', () => {
-    const src = read(BLOCKS)
-    expect(src, 'sop-section-blocks.ts must not carry a serviceRole wire flag').not.toContain('serviceRole')
-    // The service path is a plain module (not 'use server' — no endpoint ID)
+  test('no wire-reachable serviceRole bypass in the focus actions; the on-ramp write path lives in a plain module', () => {
+    for (const rel of ['focus-steps.ts', 'findings.ts', 'walk.ts', 'publish-gate.ts', 'versions.ts']) {
+      expect(read(path.join(ROOT, 'src', 'actions', rel)), `${rel} must not carry a serviceRole wire flag`).not.toContain('serviceRole')
+    }
+    // The on-ramp path is a plain module (not 'use server' — no endpoint ID)
     // and performs no auth-flag branching.
-    const core = read(path.join(ROOT, 'src', 'lib', 'builder', 'section-blocks-core.ts'))
+    const core = read(path.join(ROOT, 'src', 'lib', 'sop', 'focus-write.ts'))
     // A 'use server' DIRECTIVE must be the module's first statement -- check
     // that position, not token absence (the core's comments legitimately
     // mention the literal when explaining why it is NOT a server module).
@@ -134,9 +144,9 @@ test.describe('CAP-02 -- requireSopEditAccess call-site wiring (source-contract)
       /^s*['"]use server['"]/.test(core),
       'core module must not open with a use server directive'
     ).toBe(false)
-    expect(core).toContain('export async function addBlockToSectionAsService')
-    // The parser imports the core entry point.
-    const parser = read(path.join(ROOT, 'src', 'lib', 'parsers', 'parsed-sop-to-layout-data.ts'))
-    expect(parser).toContain('addBlockToSectionAsService')
+    expect(core).toContain('export async function writeFocusStepsForSop')
+    // The parse route (the on-ramp) imports and calls the core entry point.
+    const parse = read(path.join(ROOT, 'src', 'app', 'api', 'sops', 'parse', 'route.ts'))
+    expect(parse).toContain('writeFocusStepsForSop(')
   })
 })
