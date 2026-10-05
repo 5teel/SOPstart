@@ -306,3 +306,18 @@ Real org (`bd2c2b88`, SOPstart) - none of these has any content to convert (the 
 Fixtures and probes (other orgs, not customer data): `33ac8099` EVAL focus blank, `aee074df` Eval site fixture SOP, `51ef4bad` / `aaf1e057` / `87ddb832` EVAL focus parse failed / parsing / parsing video (deliberately without steps), `6113a213` / `cd5f9c66` / `f347db12` Org B SOP, and the "Phase46 approver-edit probe SOP" rows left by live probes (`2f03802a`, `fdc50e35`, `189eb641`, `c293512d`, `141b1611`, `6f77d708`, `7a88b59f`, `a590f111`, `68342f48`, `714df145`, `fc66c0be`, `9b347868`, `e6d86d0d`, `ae6cff75`, `492f6300`, `824ed9ea`, `1ad8745e`, `7291ce78`, `78b9b2a1`, `67c9044e`, `86e5b66f`, `36c1cc3d`, `3fff1329`, `602e2421`, `e91909b1`, `b2ca92b1`, `7a355269`, `d5370512`, `e118e7e4`, `23042cf1`, `785816f3`, `bddf88db`, `8c87536c`, `e83f1fae`, `e0f3f6bc`, `c0b184f6`, `16080372`, `1563ca39`; org prefix per SOP is in the run table above).
 
 The zero-step real-org drafts are what `--missing` (Task 2) is for: after this plan the converter can only fill a SOP that has no steps, and never touches one that has.
+
+# Post-retirement sweep (58-18, D-23)
+
+Run 2026-10-05 at commit `5119898c` (every plan 58-01..58-17), production database, after the retirement code was pushed. Railway's `/api/version` still read the previous deploy (`1aa29086`) when these ran; both modes are converter-side only and read the same tables, so the order does not change the result.
+
+## Default dry run (`npx tsx scripts/convert-sops-to-steps.ts --all`) - read-only
+
+- 92 SOPs in scope, 92 ok, 0 failing, 9 native (left alone: the 7 fixtures from the cutover plus 2 new eval fixtures).
+- Planned writes: insert 0, update 0, delete 0; ticks to carry 0. Source: layout 22, rows 2, empty 68. The real-org content is unchanged since the 58-14 apply (hazard 288->293 and PPE 17->19 totals identical).
+
+## `--missing --all` (writes only SOPs with zero steps that are not uploading / parsing)
+
+- Output line: `missing: 0 converted / 56 unchanged / 0 failed / 31 native left alone / 5 still parsing (run da4322c4-7e86-4a27-bf9c-7cd249237060)`
+- **Zero SOPs needed steps.** Every SOP that has content has steps; the SOPs still without steps are the same empty shells named above (converter source `empty`: no layout and no step rows), the 5 parse fixtures / unfinished parses, and nothing a worker can open (none is published). Nothing was written to `sop_focus_steps`.
+- 31 "native" is the `--missing` mode's meaning: any SOP that already carries steps is left alone, so it is larger than the dry run's 9.

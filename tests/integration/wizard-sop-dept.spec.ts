@@ -59,10 +59,9 @@ test('WizardClient passes departmentIds state into createSopFromWizard arguments
 // ── A4: localOnly = no server action on toggle during create ─────────────────
 
 test('DepartmentPicker in wizard mode uses sopId sentinel __new__ (A4)', () => {
-  // Phase 40-08: the __new__ sentinel now lives inside the shared
-  // SopMetadataFields composite (hardcoded there), not per-page in
-  // WizardClient — repointed from WizardClient.tsx (STALE-GUARD).
-  const src = readSrc('components/admin/SopMetadataFields.tsx')
+  // Phase 40-08 put the __new__ sentinel in the shared SopMetadataFields composite; the one-decision-at-a-time
+  // metadata dialog (23cb3dc3) moved the picker, and with it the sentinel, into SopMetadataDialog (repointed in 58-18).
+  const src = readSrc('components/admin/SopMetadataDialog.tsx')
   expect(src).toContain('__new__')
 })
 

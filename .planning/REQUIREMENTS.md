@@ -997,24 +997,24 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 
 ### Focus on the SOP (FOC) — Phase 58
 
-- [ ] **FOC-01**: Opening a SOP to walk it removes the list and the site from the screen; what remains is a slim top bar, the SOP's sections and steps down the left, and the current step in one centred column
-- [ ] **FOC-02**: Opening a SOP to edit it removes the list and the site in the same way; the steps are shown grouped under their sections in one centred column, and SOP-level details (version, machine, objective, standards) sit quietly in the left rail
-- [ ] **FOC-03**: While a SOP is open, nothing else from the site is on screen — no map, no list, no inbox count, no notifications — and Back or Esc returns to the one screen with the place the user came from still selected
-- [ ] **FOC-04**: A worker walks a SOP one step at a time: hazard and PPE steps must be acknowledged before going on, a step can ask for a photo, and finishing the last step records the completion and sends it for sign-off
+- [x] **FOC-01**: Opening a SOP to walk it removes the list and the site from the screen; what remains is a slim top bar, the SOP's sections and steps down the left, and the current step in one centred column
+- [x] **FOC-02**: Opening a SOP to edit it removes the list and the site in the same way; the steps are shown grouped under their sections in one centred column, and SOP-level details (version, machine, objective, standards) sit quietly in the left rail
+- [x] **FOC-03**: While a SOP is open, nothing else from the site is on screen — no map, no list, no inbox count, no notifications — and Back or Esc returns to the one screen with the place the user came from still selected
+- [x] **FOC-04**: A worker walks a SOP one step at a time: hazard and PPE steps must be acknowledged before going on, a step can ask for a photo, and finishing the last step records the completion and sends it for sign-off
 
 ### The SOP Itself (SOP) — Phases 56, 58
 
 - [x] **SOP-01**: A SOP is sections and steps; hazard, PPE, step and check are kinds of step, and every existing SOP is converted so that none of its hazard or PPE content is lost
 - [x] **SOP-02**: An admin can put a standard — a plain label such as "LOTO" — on a whole SOP, a section or a single step, and manage the list of standards in the Workshop; content that was linked from the old reusable library stays in the SOPs that used it
 - [x] **SOP-03**: Every SOP belongs either to one or more machines or to the whole site, and its department comes from its machine rather than being picked separately
-- [ ] **SOP-04**: An admin can publish a new version of a SOP; workers always get the latest published version and earlier versions are kept on record
+- [x] **SOP-04**: An admin can publish a new version of a SOP; workers always get the latest published version and earlier versions are kept on record
 
 ### Workshop — Writing and Editing (WRK) — Phases 58, 61
 
 - [ ] **WRK-01**: An admin can start a new SOP from the Workshop in exactly four ways, each shown once: upload a document, describe it to AI, record a video, start blank
 - [ ] **WRK-02**: Every way of starting asks for a title and where the SOP lives (a machine or the whole site) before anything is created, and then opens the same editor
-- [ ] **WRK-03**: A SOP that is still being read from a document or a video opens in the editor showing what is happening and roughly how long it takes, never an empty page, and moving into the editor never reloads the whole app
-- [ ] **WRK-04**: The editor shows what the AI check found; the admin must tick every step as checked and clear every AI finding before Publish becomes available
+- [x] **WRK-03**: A SOP that is still being read from a document or a video opens in the editor showing what is happening and roughly how long it takes, never an empty page, and moving into the editor never reloads the whole app
+- [x] **WRK-04**: The editor shows what the AI check found; the admin must tick every step as checked and clear every AI finding before Publish becomes available
 - [ ] **WRK-05**: The Workshop lists SOPs in progress with their state in plain words (being read, AI found things, steps left to check, waiting for approval) and opens any of them in the editor
 - [ ] **WRK-06**: An admin can choose which AI model reads documents and which checks drafts from the Workshop
 - [ ] **WRK-07**: A worker who enters the Workshop can ask for a change to a SOP, or for a new one, and that becomes a request in the Office
@@ -1093,11 +1093,11 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 | SHL-06 | Phase 59 | Pending |
 | SHL-07 | Phase 62 | Pending |
 | PLC-01..05 (5) | Phase 57 | Pending |
-| FOC-01..04 (4) | Phase 58 | Pending |
+| FOC-01..04 (4) | Phase 58 | Complete |
 | SOP-01..03 (3) | Phase 56 | Complete |
-| SOP-04 | Phase 58 | Pending |
+| SOP-04 | Phase 58 | Complete |
 | WRK-01..02 (2) | Phase 61 | Pending |
-| WRK-03..04 (2) | Phase 58 | Pending |
+| WRK-03..04 (2) | Phase 58 | Complete |
 | WRK-05..07 (3) | Phase 61 | Pending |
 | OFF-01..06 (6) | Phase 59 | Pending |
 | DEC-01 | Phase 56 | Complete |
