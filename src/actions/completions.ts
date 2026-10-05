@@ -5,10 +5,7 @@ import { z } from 'zod'
 import { getSessionContext } from '@/lib/auth/session-context'
 import { createAdminClient } from '@/lib/supabase/admin'
 import type { Json } from '@/types/database.types'
-import {
-  SignOffSchema as signOffSchema,
-  RecordSignatureSchema as recordSignatureSchema,
-} from '@/lib/validators/completions'
+import { SignOffSchema as signOffSchema } from '@/lib/validators/completions'
 import { isSignedOffAssessor } from '@/lib/competency/assessor'
 import { recordDecision } from '@/lib/decisions/record'
 import { createHash } from 'node:crypto'
@@ -157,7 +154,7 @@ export async function submitCompletion(
   }
 
   // The worker's own ledger row (D-22). Its failure never undoes the completion.
-  const signed = await recordSignature({ completionId: walk.id, role: 'worker' })
+  const signed = await recordSignature({ completionId: walk.id, sopId: walk.sop_id, role: 'worker' })
   if (!signed.success) console.error('submitCompletion signature error:', signed.error)
   return { success: true, completionId: walk.id }
 }
@@ -315,7 +312,7 @@ export async function signOffCompletion(
   // The supervisor counter-signature is written here, after the status change, so no
   // client can skip it (59 F-04). Its failure never undoes the sign-off.
   if (decision === 'approved') {
-    const countersigned = await recordSignature({ completionId, role: 'supervisor' })
+    const countersigned = await recordSignature({ completionId, sopId: completion.sop_id, role: 'supervisor' })
     if (!countersigned.success) console.error('signOffCompletion counter-signature error:', countersigned.error)
   }
 
@@ -397,58 +394,32 @@ export async function getPhotoUploadUrl(input: {
 }
 
 // ---------------------------------------------------------------
-// recordSignature
+// recordSignature -- internal helper, deliberately NOT exported (59 review CR-01):
+// an exported function in this file is a POST endpoint for every org member,
+// and this one writes an immutable signature row plus a ledger row.
 //
 // Appends a worker or supervisor signature to sop_completion_signatures.
 // This table has NO authenticated INSERT policy (append-only, legally
-// immutable — migration 00038). MUST use createAdminClient() with
-// self-enforced org-scope (CLAUDE.md 2026-06-15, T-23-06-04).
+// immutable — migration 00038), so the write is service-role.
 //
 // AFL-VER-05: worker self-sign at completion + supervisor counter-sign (D-09/D-10).
-// The signer is always the signed-in session user -- never a client-supplied id --
-// and a supervisor counter-signature needs a supervisor-or-above session role.
+// Its only callers are submitCompletion (role worker, the caller's own walk) and
+// signOffCompletion (role supervisor, after the status change); both have already
+// checked the session role, the org and the completion. The signer is always the
+// signed-in session user.
 // ---------------------------------------------------------------
-export async function recordSignature(
-  rawInput: unknown
-): Promise<{ success: true } | { success: false; error: string }> {
-  const parsed = recordSignatureSchema.safeParse(rawInput)
-  if (!parsed.success) {
-    return { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
-  }
-
-  const { completionId, role } = parsed.data
-
-  const { userId, role: sessionRole, organisationId } = await getSessionContext()
-  if (!userId) return { success: false, error: 'Not authenticated' }
-  if (role === 'supervisor' && (!sessionRole || !['supervisor', 'safety_manager', 'admin'].includes(sessionRole))) {
-    return { success: false, error: 'Only supervisors, safety managers and admins can counter-sign.' }
-  }
-  if (!organisationId) return { success: false, error: 'No organisation found' }
-
-  const admin = createAdminClient()
-
-  // Verify the completion belongs to the caller's org (org-scope self-enforcement,
-  // T-23-06-04 — service-role bypasses RLS so we must check manually)
-  const { data: completion, error: fetchError } = await admin
-    .from('sop_completions')
-    .select('id, organisation_id, sop_id, worker_id')
-    .eq('id', completionId)
-    .single()
-
-  if (fetchError || !completion) {
-    return { success: false, error: 'Completion not found.' }
-  }
-  if (completion.organisation_id !== organisationId) {
-    return { success: false, error: 'Completion does not belong to your organisation.' }
-  }
-  // A worker signature is the walker's own (58 review CR-02): this export is
-  // POST-reachable by every org member, so the target is checked, not assumed.
-  if (role === 'worker' && completion.worker_id !== userId) {
-    return { success: false, error: 'Only the worker who did this walk can sign it.' }
-  }
+async function recordSignature(input: {
+  completionId: string
+  sopId: string
+  role: 'worker' | 'supervisor'
+}): Promise<{ success: true } | { success: false; error: string }> {
+  const { completionId, sopId, role } = input
+  const { userId, organisationId } = await getSessionContext()
+  if (!userId || !organisationId) return { success: false, error: 'Not authenticated' }
 
   // Insert signature row — service-role, append-only (no UPDATE/DELETE)
   // signed_at is DB DEFAULT now() (not client-supplied — authoritative server timestamp)
+  const admin = createAdminClient()
   const { error: insertError } = await admin
     .from('sop_completion_signatures')
     .insert({
@@ -466,7 +437,7 @@ export async function recordSignature(
   await recordDecision({
     kind: role === 'supervisor' ? 'countersign' : 'sign_off',
     subject: { kind: 'completion', id: completionId },
-    sopId: completion.sop_id,
+    sopId,
     summary: role === 'supervisor' ? 'Counter-signed a completion' : 'Signed their completion',
     details: { role },
   })

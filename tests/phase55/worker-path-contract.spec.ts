@@ -212,10 +212,16 @@ test.describe('review fixes (55-review)', () => {
   }
 
   test('CR-02: recordSignature takes the signer from the session and gates counter-signing by role', () => {
-    const body = actionBody('recordSignature')
+    // 59 review CR-01: recordSignature is an internal helper, not an endpoint; the
+    // role gate for a counter-signature is signOffCompletion's own.
+    const src = code('src/actions/completions.ts')
+    expect(src).not.toMatch(/export async function recordSignature\b/)
+    const start = src.indexOf('async function recordSignature(')
+    expect(start).toBeGreaterThan(-1)
+    const body = src.slice(start)
     expect(body).not.toContain('rosterUserId')
     expect(body).toContain('roster_user_id: userId')
-    expect(body).toMatch(/role === 'supervisor' && .*\['supervisor', 'safety_manager', 'admin'\]\.includes\(sessionRole\)/)
+    expect(actionBody('signOffCompletion')).toMatch(/\['supervisor', 'safety_manager', 'admin'\]\.includes\(role\)/)
     expect(code('src/lib/validators/completions.ts')).not.toContain('rosterUserId')
     expect(code('src/app/(protected)/activity/[completionId]/CompletionDetailClient.tsx')).not.toContain(
       'rosterUserId'

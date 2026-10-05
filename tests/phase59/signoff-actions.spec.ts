@@ -45,13 +45,23 @@ test.describe('signoff actions', () => {
 
   test('the counter-signature is still written after approval, on the server (A-08)', () => {
     const update = SIGN_OFF.indexOf('.update({ status: newStatus })')
-    const sign = SIGN_OFF.indexOf("await recordSignature({ completionId, role: 'supervisor' })")
+    const sign = SIGN_OFF.indexOf("await recordSignature({ completionId, sopId: completion.sop_id, role: 'supervisor'")
     expect(update).toBeGreaterThan(-1)
     expect(sign).toBeGreaterThan(update)
     // only on an approval
     expect(SIGN_OFF.slice(update, sign)).toContain("decision === 'approved'")
     const client = read('src/app/(protected)/activity/[completionId]/CompletionDetailClient.tsx')
     expect(client).not.toContain('recordSignature')
+  })
+
+  test('review CR-01: recordSignature is not an endpoint -- the file exports exactly three actions', () => {
+    expect(COMPLETIONS.match(/^export async function (\w+)/gm)?.sort()).toEqual([
+      'export async function getPhotoUploadUrl',
+      'export async function signOffCompletion',
+      'export async function submitCompletion',
+    ])
+    expect(COMPLETIONS).toMatch(/\nasync function recordSignature\(/)
+    expect(read('src/lib/validators/completions.ts')).not.toContain('RecordSignatureSchema')
   })
 
   test('signOffCompletion returns whether the ledger row was written', () => {

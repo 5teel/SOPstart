@@ -43,14 +43,3 @@ export const SignOffSchema = z.object({
   overrideReason: z.string().trim().min(10).max(500).optional(),
 })
 export type SignOffInput = z.infer<typeof SignOffSchema>
-
-/**
- * Phase 23 AFL-VER-05: append-only sign-off chain for worker + supervisor signatures.
- * Inserts into sop_completion_signatures (no authenticated write policy — service-role only,
- * per CLAUDE.md 2026-06-15). The signer is the session user, never a client field.
- */
-export const RecordSignatureSchema = z.object({
-  completionId: z.string().uuid(),
-  role: z.enum(['worker', 'supervisor']),
-})
-export type RecordSignatureInput = z.infer<typeof RecordSignatureSchema>

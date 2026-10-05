@@ -26,7 +26,7 @@
     { "file": "src/actions/governance.ts", "function": "confirmSopCurrent", "status": "hook", "key": "sop_review_events", "kind": "review", "plan": 5 },
     { "file": "src/actions/governance.ts", "function": "setReviewCadence", "status": "hook", "key": "sop_review_cadences", "kind": "cadence_change", "plan": 5 },
     { "file": "src/actions/completions.ts", "function": "signOffCompletion", "status": "hook", "key": "completion_sign_offs", "kind": "sign_off/reject", "plan": 5 },
-    { "file": "src/actions/completions.ts", "function": "recordSignature", "status": "hook", "key": "sop_completion_signatures", "kind": "sign_off/countersign", "plan": 5 },
+    { "file": "src/actions/completions.ts", "function": "recordSignature", "status": "hook", "key": "sop_completion_signatures", "kind": "sign_off/countersign", "plan": 5, "note": "Internal helper, not exported (59 review CR-01); takes { completionId, sopId, role }" },
     { "file": "src/actions/assignments.ts", "function": "assignSopToRole", "status": "hook", "key": "sop_assignments", "kind": "assign", "plan": 8 },
     { "file": "src/actions/assignments.ts", "function": "assignSopToUser", "status": "hook", "key": "sop_assignments", "kind": "assign", "plan": 8 },
     { "file": "src/actions/assignments.ts", "function": "removeAssignment", "status": "hook", "key": "sop_assignments", "kind": "unassign", "plan": 8 },

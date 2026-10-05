@@ -162,12 +162,16 @@ test.describe('FOC-04 walk actions', () => {
     expect(b).toContain('prev.storagePath !== photo!.storagePath')
   })
 
-  test('review CR-02: a worker signature is refused unless the completion is the caller\'s own', () => {
-    const b = body(completions, 'recordSignature')
-    expect(b).toMatch(/\.select\('[^']*worker_id[^']*'\)/)
-    const own = b.indexOf("role === 'worker' && completion.worker_id !== userId")
+  test('review CR-02: a worker signature is written only for the caller\'s own walk', () => {
+    // 59 review CR-01: recordSignature is no longer an endpoint, so the only way to a
+    // worker signature is submitCompletion, which loads the walk by the session worker.
+    expect(completions).not.toMatch(/export async function recordSignature\b/)
+    expect(completions).toMatch(/\nasync function recordSignature\(/)
+    const b = body(completions, 'submitCompletion')
+    const own = b.indexOf(".eq('worker_id', userId)")
     expect(own).toBeGreaterThan(-1)
-    expect(own).toBeLessThan(b.indexOf(".from('sop_completion_signatures')"))
+    expect(own).toBeLessThan(b.indexOf("role: 'worker'"))
+    expect(body(completions, 'recordSignature')).toContain("from('sop_completion_signatures')")
   })
 
   test('submitCompletion takes only { walkId }: no client step data, no ack trace, no hash, no photo list (T-58-walk)', () => {
