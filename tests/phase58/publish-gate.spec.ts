@@ -76,5 +76,21 @@ test.describe('WRK-04/SOP-04 publish gate', () => {
     expect(bodyOf(old, 'export async function getPublishGateStatus(')).toContain('getStepGateStatus(')
   })
 
-  test.fixme('notifyAssignedWorkers runs when a lineage publish supersedes a version (D-18) (58-05)', () => {})
+  test('notifyAssignedWorkers runs when a lineage publish supersedes a version (D-18)', () => {
+    const publish = bodyOf(core, 'export async function performPublish(')
+    const prevAt = publish.indexOf('latestPublished(')
+    const writeAt = publish.search(/\.(insert|update|upsert|delete)\(/)
+    const notifyAt = publish.indexOf('notifyAssignedWorkers(')
+    // Predecessor read before the publish write; notify after it and after the ledger row.
+    expect(prevAt).toBeGreaterThan(-1)
+    expect(prevAt).toBeLessThan(writeAt)
+    expect(notifyAt).toBeGreaterThan(publish.indexOf("kind: 'publish'"))
+    expect(core).toContain("from '@/actions/versioning'")
+    // Lineage rows are scoped by the session organisation parameter.
+    expect(publish).toMatch(/\.eq\('organisation_id', organisationId\)[\s\S]*?\.or\(/)
+    // Fail-soft, and currency is the lineage rule: no superseded pointer, no status flip on the old row.
+    expect(publish).toMatch(/try \{[\s\S]*notifyAssignedWorkers\([\s\S]*\} catch/)
+    expect(core).not.toContain('superseded_by')
+    expect(core.match(/status: 'published'/g)).toHaveLength(1)
+  })
 })

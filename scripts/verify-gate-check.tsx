@@ -22,6 +22,7 @@ type Cfg = {
   totalSteps?: number
   unverifiedCount?: number
   openFindings?: number
+  predecessor?: boolean
   publishError?: unknown
 }
 
@@ -30,7 +31,7 @@ type Cfg = {
 // real route makes (auth.getUser/getSession, sop_focus_steps, sop_ai_findings, sops).
 function makeSupabase(cfg: Cfg) {
   function builder(table: string) {
-    const state = { table, count: false, head: false, isUpdate: false, isNull: false }
+    const state = { table, count: false, head: false, isUpdate: false, isNull: false, single: false }
     const resolve = () => {
       // update().eq('status','draft').select('id') — publish-core's Phase 29
       // zero-rows-updated guard 409s unless the update returns the row.
@@ -38,6 +39,17 @@ function makeSupabase(cfg: Cfg) {
         return cfg.publishError
           ? { data: null, error: cfg.publishError }
           : { data: [{ id: 'sop-1' }], error: null }
+      // performPublish's lineage read (a list, awaited directly): no predecessor.
+      if (state.table === 'sops' && !state.single)
+        return {
+          data: cfg.predecessor
+            ? [
+                { id: 'sop-0', version: 1, parent_sop_id: null, status: 'published' },
+                { id: 'sop-1', version: 2, parent_sop_id: 'sop-0', status: 'draft' },
+              ]
+            : [],
+          error: null,
+        }
       if (state.table === 'sops')
         // status: publish-core (Phase 29 extraction) verifies the SOP is a
         // draft before flipping it — without this the harness 409s.
@@ -60,7 +72,8 @@ function makeSupabase(cfg: Cfg) {
       eq() { return b },
       in() { return b },
       is() { state.isNull = true; return b },
-      maybeSingle() { return Promise.resolve(resolve()) },
+      or() { return b },
+      maybeSingle() { state.single = true; return Promise.resolve(resolve()) },
       then(onF: any, onR: any) { return Promise.resolve(resolve()).then(onF, onR) },
     }
     return b
@@ -75,6 +88,7 @@ function makeSupabase(cfg: Cfg) {
   }
 }
 
+const notifyCalls: string[][] = []
 let currentSupabase: any = makeSupabase({})
 let currentOrgId = 'org1'
 
@@ -87,6 +101,16 @@ Module._load = function (request: string, parent: unknown, isMain: boolean) {
   // server-only (not loadable under tsx) and not what this harness proves.
   if (request.includes('lib/decisions/record')) {
     return { recordDecision: async () => ({ ok: true, id: 'decision-1' }) }
+  }
+  // Phase 58 D-18: performPublish notifies workers of a new version through a
+  // session-scoped server action; the harness has no predecessor, so it is inert.
+  if (request.includes('actions/versioning')) {
+    return {
+      notifyAssignedWorkers: async (...args: string[]) => {
+        notifyCalls.push(args)
+        return { success: true, notified: 0 }
+      },
+    }
   }
   if (request.includes('lib/supabase/server')) {
     return { createClient: async () => currentSupabase }
@@ -153,6 +177,18 @@ async function main() {
     const { status, body } = await callPublish({ unverifiedCount: 0, openFindings: 0 })
     check(status === 200, `all-ticked publish should be 200, got ${status} ${JSON.stringify(body)}`)
     check(body.success === true, `expected success:true, got ${JSON.stringify(body)}`)
+  }
+
+  // ── D-18: publishing a version with a published predecessor notifies once,
+  //    old id first; a first version notifies nobody. ───────────────────────────
+  {
+    check(notifyCalls.length === 0, `no predecessor must not notify, got ${JSON.stringify(notifyCalls)}`)
+    const { status } = await callPublish({ predecessor: true })
+    check(status === 200, `lineage publish should be 200, got ${status}`)
+    check(
+      notifyCalls.length === 1 && notifyCalls[0][0] === 'sop-0' && notifyCalls[0][1] === 'sop-1',
+      `expected one notify(sop-0, sop-1), got ${JSON.stringify(notifyCalls)}`,
+    )
   }
 
   if (failures.length > 0) {

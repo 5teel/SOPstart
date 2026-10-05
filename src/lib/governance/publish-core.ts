@@ -5,6 +5,8 @@ import { resolveCadenceMonths, computeReviewDueDate } from '@/lib/governance/cad
 import { createAdminClient } from '@/lib/supabase/admin'
 import { ensureSopCollectionsForOrg } from '@/lib/org-model/sop-collections'
 import { recordDecision } from '@/lib/decisions/record'
+import { latestPublished, type LineageRow } from '@/lib/sop/lineage-current'
+import { notifyAssignedWorkers } from '@/actions/versioning'
 
 // ------------------------------------------------------------
 // Phase 29 D29-03/Pattern 4 — performPublish() is the SINGLE relocated
@@ -120,6 +122,19 @@ export async function performPublish(
     .eq('id', sopId)
     .maybeSingle()
 
+  // Phase 58 D-18: which published version this one replaces, read BEFORE the
+  // write (after it, this row would be the latest). Rows are filtered by the
+  // session organisation parameter, never by a row's own org. Currency is the
+  // lineage rule (src/lib/sop/lineage-current.ts); the old version stays
+  // published on record and no pointer column is written.
+  const lineageRoot: string = sopRow?.parent_sop_id ?? sopId
+  const { data: lineageRows } = await supabase
+    .from('sops')
+    .select('id, version, parent_sop_id, status')
+    .eq('organisation_id', organisationId)
+    .or(`id.eq.${lineageRoot},parent_sop_id.eq.${lineageRoot}`)
+  const previousId = latestPublished((lineageRows ?? []) as LineageRow[])[0]?.id
+
   // Step 3: Publish. The ONLY functional change from pre-Phase-29 behavior:
   // when approvalState is provided, the same UPDATE also stamps it — when
   // undefined (no-chain path) this UPDATE is byte-equivalent to today.
@@ -160,6 +175,22 @@ export async function performPublish(
     summary: approvalState ? 'Published the SOP after its approval chain' : 'Published the SOP',
     details: { approval_state: approvalState ?? null, replaces_sop_id: sopRow?.parent_sop_id ?? null },
   })
+
+  // Phase 58 D-18: a new version re-points the old version's assignments and
+  // notifies its workers. Fail-soft: the publish and its ledger row are the
+  // decision. notifyAssignedWorkers needs an admin session, so a final approval
+  // by a non-admin chain approver skips this; workers still reach the new
+  // version through the lineage rule in the page resolver.
+  if (previousId && previousId !== sopId) {
+    try {
+      const notified = await notifyAssignedWorkers(previousId, sopId)
+      if (!notified.success) {
+        console.error(`[performPublish] notifyAssignedWorkers skipped for SOP ${sopId}:`, notified.error)
+      }
+    } catch (err) {
+      console.error(`[performPublish] notifyAssignedWorkers threw for SOP ${sopId}:`, err)
+    }
+  }
 
   // Step 3b: Phase 28 D28-04 — review-clock reset on publish. Non-fatal: the
   //     publish above already succeeded and is never rolled back for this.
