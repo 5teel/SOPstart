@@ -30,8 +30,21 @@ test.describe('capability matrix', () => {
       expect(r).toContain(name)
     }
   })
-  test.fixme('Sign off completion row: self sign-off refused, supervisor scoped to assigned workers (59-06)', () => {})
-  test.fixme('Approve step row: the drifted supervisor cell is corrected to admin and safety manager (59-06)', () => {})
+  test('Sign off completion row: self sign-off refused, supervisor scoped to assigned workers (59-06)', () => {
+    const r = row('Sign off completion')
+    expect(r.split('|').map((c) => c.trim()).slice(2, 6)).toEqual(['—', '✅', '✅', '✅'])
+    for (const name of ['own walk', 'getCompletionForReview()', 'src/actions/office.ts', 'assigned to the worker', 'override reason']) {
+      expect(r).toContain(name)
+    }
+    expect(row('Counter-sign completion')).toContain('signOffCompletion()')
+  })
+  test('Approve step row: the drifted supervisor cell is corrected to admin and safety manager (59-06)', () => {
+    const r = row('Approval chains')
+    expect(r.split('|').map((c) => c.trim()).slice(2, 6)).toEqual(['—', '—', '✅', '✅'])
+    for (const name of ['requireAdmin()', 'setApprovalChain', 'refuses anyone else', '/admin/settings']) {
+      expect(r).toContain(name)
+    }
+  })
   test.fixme('Mark reviewed row: owner or admin (59-07)', () => {})
   test.fixme('Decisions tab row: admin and safety manager only (59-10)', () => {})
   test.fixme('legacy addresses row: the governance, team and access addresses redirect (59-13)', () => {})

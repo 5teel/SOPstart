@@ -65,6 +65,7 @@ export interface ApprovalStatus {
   approvals: ApprovalRow[]
   nextStepIndex: number
   isCallerNextApprover: boolean
+  version: number
 }
 
 export interface ApprovalHistoryRow {
@@ -93,6 +94,24 @@ export async function setApprovalChain(
   const parsed = approvalChainSchema.safeParse({ category, steps })
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? 'Invalid approval chain' }
+  }
+
+  // A chain can only name someone who can act (59 A-02): every person step must be an
+  // admin or safety manager of THIS organisation (read under the session's own RLS).
+  const personIds = [...new Set(parsed.data.steps.flatMap((st) => (st.userId ? [st.userId] : [])))]
+  if (personIds.length > 0) {
+    const supabase = await createClient()
+    const { data: people } = await supabase
+      .from('organisation_members')
+      .select('user_id, role')
+      .eq('organisation_id', ctx.organisationId)
+      .in('user_id', personIds)
+    const eligible = new Set(
+      (people ?? []).filter((m) => ['admin', 'safety_manager'].includes(m.role as string)).map((m) => m.user_id as string),
+    )
+    if (personIds.some((id) => !eligible.has(id))) {
+      return { error: 'A chain step can only name an admin or safety manager.' }
+    }
   }
 
   // approval_chains has NO authenticated write policy by design — writes go
@@ -150,7 +169,7 @@ export async function getApprovalChains(): Promise<
 export async function approveStep(
   sopId: string,
   comment?: string,
-): Promise<{ success: true } | { error: string }> {
+): Promise<{ success: true; logged: boolean; published: boolean } | { error: string }> {
   if (!sopId) return { error: 'sopId required' }
 
   const ctx = await requireAdmin()
@@ -198,16 +217,21 @@ export async function approveStep(
   // as an idempotent no-op, not an error.
   if (insertErr && insertErr.code !== '23505') return { error: insertErr.message }
 
-  // Ledger row only for a fresh approval -- a 23505 duplicate click wrote nothing.
+  // Ledger row only for a fresh approval -- a 23505 duplicate click wrote nothing,
+  // so there is nothing to log and nothing the caller needs to be told about.
+  let logged = true
   if (!insertErr) {
-    await recordDecision({
+    const rec = await recordDecision({
       kind: 'approve',
       subject: { kind: 'sop', id: sopId },
       sopId,
       summary: `Approved step ${nextIndex + 1} of the approval chain`,
       details: { version: sop.version, step_index: nextIndex, comment: comment ?? null },
     })
+    logged = rec.ok
   }
+
+  let published = false
 
   if (nextIndex === steps.length - 1) {
     // Final step — auto-complete the publish via the SAME function the
@@ -219,9 +243,10 @@ export async function approveStep(
       approvalState: 'approved',
     })
     if (!result.success) return { error: result.error }
+    published = true
   }
 
-  return { success: true }
+  return { success: true, logged, published }
 }
 
 // ---------------------------------------------------------------------------
@@ -231,7 +256,7 @@ export async function approveStep(
 export async function requestChanges(
   sopId: string,
   comment: string,
-): Promise<{ success: true } | { error: string }> {
+): Promise<{ success: true; logged: boolean } | { error: string }> {
   if (!comment?.trim()) return { error: 'A comment is required' }
 
   const ctx = await requireAdmin()
@@ -274,7 +299,7 @@ export async function requestChanges(
   })
   if (insertErr) return { error: insertErr.message }
 
-  await recordDecision({
+  const rec = await recordDecision({
     kind: 'reject',
     subject: { kind: 'sop', id: sopId },
     sopId,
@@ -290,7 +315,7 @@ export async function requestChanges(
     .eq('id', sopId)
   if (updateErr) return { error: updateErr.message }
 
-  return { success: true }
+  return { success: true, logged: rec.ok }
 }
 
 // ---------------------------------------------------------------------------
@@ -354,6 +379,7 @@ export async function getApprovalStatus(
       approvals,
       nextStepIndex,
       isCallerNextApprover,
+      version: sop.version,
     },
   }
 }

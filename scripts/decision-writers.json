@@ -44,7 +44,8 @@
     { "file": "src/actions/auth.ts", "function": "removeMember", "status": "hook", "anchor": "deleteOrgMember(", "kind": "member_removed", "plan": 59 }
   ],
   "delegatedHooks": [
-    { "file": "src/actions/completions.ts", "function": "submitCompletion", "calls": "recordSignature(", "after": ".from('sop_completions')", "kind": "sign_off", "note": "Send for sign-off (D-22): the worker's signature row and its ledger row are written by recordSignature, after the completion insert" }
+    { "file": "src/actions/completions.ts", "function": "submitCompletion", "calls": "recordSignature(", "after": ".from('sop_completions')", "kind": "sign_off", "note": "Send for sign-off (D-22): the worker's signature row and its ledger row are written by recordSignature, after the completion insert" },
+    { "file": "src/actions/completions.ts", "function": "signOffCompletion", "calls": "recordSignature(", "after": ".update({ status: newStatus })", "kind": "countersign", "note": "Office sign-off (59): the supervisor counter-signature and its ledger row are written by recordSignature after the status change" }
   ],
   "allow": [
     { "file": "src/actions/assignments.ts", "function": "selfAddSop", "key": "sop_assignments", "reason": "A worker bookmarking a SOP on their own list is not a governance decision (RESEARCH A7); logging it would be noise." },

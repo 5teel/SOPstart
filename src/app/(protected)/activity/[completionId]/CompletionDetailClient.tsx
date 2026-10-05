@@ -6,7 +6,7 @@ import { ArrowLeft, Camera, Check, X } from 'lucide-react'
 import { StatusBadge } from '@/components/admin/StatusBadge'
 import { CompletionStepRow } from '@/components/activity/CompletionStepRow'
 import { RejectReasonSheet } from '@/components/activity/RejectReasonSheet'
-import { signOffCompletion, recordSignature } from '@/actions/completions'
+import { signOffCompletion } from '@/actions/completions'
 import { requestAssessorReview } from '@/actions/observations'
 import type { CompletionStatus } from '@/types/sop'
 
@@ -94,7 +94,6 @@ export function CompletionDetailClient({
   photos,
   signOff: initialSignOff,
   isSupervisor,
-  currentUserId,
   alreadySigned: initialAlreadySigned,
   isAssessor,
   canOverride,
@@ -134,19 +133,7 @@ export function CompletionDetailClient({
         setOverrideSheetOpen(false)
         setOverrideReason('')
 
-        // D-10 / AFL-VER-05: Record the supervisor counter-signature as the signed-in
-        // supervisor (currentUserId). Using workerId here would record the WORKER's uid
-        // as the counter-signer, corrupting the sign-off chain (WR-05 fix).
-        // recordSignature is best-effort — sign-off is already committed above; signature
-        // failure is non-fatal (logged only). The completion is legally recorded via signOffCompletion.
-        if (currentUserId) {
-          recordSignature({
-            completionId,
-            role: 'supervisor',
-          }).catch((err) => {
-            console.warn('recordSignature (supervisor) failed — non-fatal:', err)
-          })
-        }
+        // The supervisor counter-signature is written by signOffCompletion on the server (59 F-04).
       } else {
         // T-37-04-01: the server is the authority and can differ from the
         // client's blocked state (e.g. a needs_support reset landing between

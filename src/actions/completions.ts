@@ -171,7 +171,7 @@ export async function submitCompletion(
 // ---------------------------------------------------------------
 export async function signOffCompletion(
   rawInput: unknown
-): Promise<{ success: true } | { success: false; error: string }> {
+): Promise<{ success: true; logged: boolean } | { success: false; error: string }> {
   const parsed = signOffSchema.safeParse(rawInput)
   if (!parsed.success) {
     return { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
@@ -203,7 +203,7 @@ export async function signOffCompletion(
   // Fetch the completion to get worker_id and sop_id
   const { data: completion, error: fetchError } = await admin
     .from('sop_completions')
-    .select('id, worker_id, sop_id, organisation_id')
+    .select('id, worker_id, sop_id, organisation_id, status')
     .eq('id', completionId)
     .single()
 
@@ -216,6 +216,15 @@ export async function signOffCompletion(
   // self-enforce here (CLAUDE.md 2026-06-15 pattern, CR-04 fix).
   if (completion.organisation_id !== organisationId) {
     return { success: false, error: 'Completion record not found.' }
+  }
+
+  // Nobody signs off their own walk (59 A-03), and a walk already decided is not
+  // decided twice -- a double submit must not write a second sign-off or ledger row.
+  if (completion.worker_id === userId) {
+    return { success: false, error: 'You cannot sign off your own walk' }
+  }
+  if (completion.status !== 'pending_sign_off') {
+    return { success: false, error: 'This walk has already been decided.' }
   }
 
   // ASR-01 gate (D-03) — the completion sign-off is the strongest
@@ -277,7 +286,7 @@ export async function signOffCompletion(
     return { success: false, error: 'Failed to record sign-off.' }
   }
 
-  await recordDecision({
+  const rec = await recordDecision({
     kind: decision === 'approved' ? 'sign_off' : 'reject',
     subject: { kind: 'completion', id: completionId },
     sopId: completion.sop_id,
@@ -303,6 +312,13 @@ export async function signOffCompletion(
     return { success: false, error: 'Sign-off recorded but status update failed.' }
   }
 
+  // The supervisor counter-signature is written here, after the status change, so no
+  // client can skip it (59 F-04). Its failure never undoes the sign-off.
+  if (decision === 'approved') {
+    const countersigned = await recordSignature({ completionId, role: 'supervisor' })
+    if (!countersigned.success) console.error('signOffCompletion counter-signature error:', countersigned.error)
+  }
+
   // On rejection: notify the worker
   if (decision === 'rejected') {
     const { error: notifyError } = await admin
@@ -322,7 +338,7 @@ export async function signOffCompletion(
   }
 
   revalidatePath('/activity')
-  return { success: true }
+  return { success: true, logged: rec.ok }
 }
 
 // ---------------------------------------------------------------
