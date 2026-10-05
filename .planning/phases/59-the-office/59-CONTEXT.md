@@ -128,3 +128,23 @@ Requirements: OFF-01..06, DEC-02, SHL-06.
 
 *Phase: 59-the-office*
 *Context gathered: 2026-10-05*
+
+<amendments>
+## Amendments after research (2026-10-05, Claude's calls — redirect before planning if wrong)
+
+Research (`59-RESEARCH.md` § Spec-versus-code findings, § Open Questions) found the code disagrees with D-03/D-06/D-11 in places. Resolutions, binding on the planner:
+
+- **A-01 (O1) — Owner-or-admin can mark reviewed.** `confirmSopCurrent` gains an owner path (service client, `.eq('organisation_id', session org)`, `owner_user_id = userId` re-checked server-side); **Mark reviewed** shows to admins everywhere and to the owner on the inbox row. Matrix row added. No "SOPs I own" supervisor section this phase.
+- **A-02 (O2) — Supervisors do NOT approve chain steps.** Guards stay admin / safety-manager; the drifted matrix cell is corrected. Supervisor inbox = completions awaiting their sign-off only. D-03 is narrowed accordingly.
+- **A-03 (O3) — Self sign-off is refused** ("You cannot sign off your own walk"): excluded from the inbox and refused in `signOffCompletion`.
+- **A-04 (O4) — No RLS widening for the ledger.** The Decisions tab is admin / safety-manager only; supervisors get the Inbox tab alone. D-03 is narrowed; migration 00073 widens only the `decisions.kind` check (D-10), no new SELECT policy.
+- **A-05 (O5) — Training matrix + assessment requests get a thin bridge, not a gap.** Keep `TrainingMatrixView`, `PersonPanel`, `AssessmentRequestsPanel` mounted on a minimal `/admin/training` page (admin guard, `BackToSite` bar — the 57 D-14 bridge idiom), linked from the **Smoko room** admin card ("Training matrix") until Phase 61 re-homes it. Everything else under `/admin/team` and the org-model canvases are deleted per D-13; `listOrgTree` stays (Access reads it).
+- **A-06 (O6) — Rejected completions do not count as done** anywhere: `useWorkerSops` adds `.neq('status','rejected')`; if `competency.ts` also counts them, fix it in the same plan and say so.
+- **A-07 (O7) — People show by email.** `getOrgMembers()` returns email (and `user_metadata.full_name` when present) so owner labels and the People table never read `role (uuid)`.
+- **A-08 (F-03) — The sign-off row keeps every gate the old page had:** assessor gate with admin override reason, reject reason ≥ 10 characters, the counter-signature written after approval. "Two buttons" means two primary affordances, not fewer rules.
+- **A-09 (F-05) — Completion review reads through the session client first** (RLS scopes supervisors to assigned workers), then signs storage paths for the rows it got back.
+- **A-10 (F-10/F-11) — People actions get the guards they lack:** `inviteWorker` requires admin and takes a role; a role change that matches zero rows reports failure, not success. "Invited" status reads from auth users (`invited_at` + org metadata) — `[ASSUMED]` A6 verified in Wave 0.
+- **A-11 (F-01/F-02) — Supervisor Office is a second lazy import** (`OfficePane` via `next/dynamic` from both shells) with a forbidden marker in `check-bundle-size.ts`; sign-offs join `deriveInbox` as an optional input so the Office pin, card and tab count the same rows; shell cache is patched per action (`SHELL_KEY`), never invalidated.
+- **A-12 (Pitfall 4) — Esc inside a lightbox or dialog closes that layer only**, never the Office (stop propagation at the overlay).
+
+</amendments>
