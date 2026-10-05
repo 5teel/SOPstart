@@ -70,10 +70,13 @@ test.describe('WRK-04 reviewer reads steps', () => {
     expect(ins).toBeGreaterThan(-1)
     expect(del).toBeGreaterThan(ins)
     // Only OPEN rows of other runs are deleted: cleared rows stay on record.
-    const delChain = orch.slice(del, del + 260)
+    const delChain = orch.slice(del, del + 320)
     expect(delChain).toContain(".is('cleared_at', null)")
-    expect(delChain).toContain(".neq('run_id', runId)")
+    // review WR-03 / IN-05: other runs (a null run_id included), and only the jobs this run re-checked.
+    expect(delChain).toContain(".or(`run_id.is.null,run_id.neq.${runId}`)")
+    expect(delChain).toContain(".in('job', [...jobsRequested, 'all'])")
     expect(delChain).toContain(".eq('organisation_id', organisationId)")
+    expect(orch).toContain('persistFindings(sopId, organisationId, runId, flags, stepIds, [...requested])')
     // An erroring job is an open SOP-level row; a clean run leaves a cleared marker.
     expect(orch).toContain("'job_error'")
     expect(orch).toContain("kind: 'all_clear'")

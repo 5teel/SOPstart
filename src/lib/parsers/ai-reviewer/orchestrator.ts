@@ -298,6 +298,7 @@ async function persistFindings(
   runId: string,
   flags: ReviewerFlag[],
   stepIds: Set<string>,
+  jobsRequested: ReviewerJobId[],
 ): Promise<void> {
   const admin = createAdminClient()
   const now = new Date().toISOString()
@@ -332,6 +333,9 @@ async function persistFindings(
   }
   // Insert first, then retire the previous run's OPEN rows: a failed insert
   // must leave the old findings (and so the gate) in place. Cleared rows stay.
+  // Only the jobs this run re-checked are retired (review WR-03): a partial run
+  // must not clear a finding from a job that did not look again. The 'all'
+  // marker rows always go. A null run_id is retired too (`<>` alone would skip it).
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error: insErr } = await admin.from('sop_ai_findings').insert(rows as any)
   if (insErr) throw new Error(`sop_ai_findings insert failed: ${insErr.message}`)
@@ -341,7 +345,8 @@ async function persistFindings(
     .eq('sop_id', sopId)
     .eq('organisation_id', organisationId)
     .is('cleared_at', null)
-    .neq('run_id', runId)
+    .or(`run_id.is.null,run_id.neq.${runId}`)
+    .in('job', [...jobsRequested, 'all'])
   if (delErr) console.error('[orchestrator] retire previous open findings failed', delErr)
 }
 
@@ -515,7 +520,7 @@ async function runReview(args: {
 
   // The spend is real whether or not persistence succeeds.
   try {
-    await persistFindings(sopId, organisationId, runId, flags, stepIds)
+    await persistFindings(sopId, organisationId, runId, flags, stepIds, [...requested])
     if (load) await persistEnvelope(load.parse_job_id, envelope)
   } finally {
     await recordOrgSpend(organisationId, aggUsage.cost_usd)
