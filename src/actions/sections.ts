@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireSopEditAccess } from '@/lib/auth/guards'
+import { editableSop } from '@/lib/sop/editable'
 import type { SectionKind, SopSection } from '@/types/sop'
 
 /**
@@ -41,6 +42,8 @@ export async function createSection(
 
   const ctx = await requireSopEditAccess({ sopId: parsed.sopId })
   if ('error' in ctx) throw new Error(ctx.error)
+  const open = await editableSop(ctx.organisationId, ctx.sopId)
+  if ('error' in open) throw new Error(open.error)
   const supabase = await createClient()
 
   // Fetch the kind (RLS-scoped) to get its slug for section_type and to
@@ -117,6 +120,8 @@ export async function reorderSections(
 
   const ctx = await requireSopEditAccess({ sopId: parsed.data.sopId })
   if ('error' in ctx) return ctx
+  const open = await editableSop(ctx.organisationId, ctx.sopId)
+  if ('error' in open) return open
   const { supabase } = ctx
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -209,6 +214,8 @@ export async function updateSectionTitle(
 
   const ctx = await requireSopEditAccess({ sectionId })
   if ('error' in ctx) return ctx
+  const open = await editableSop(ctx.organisationId, ctx.sopId)
+  if ('error' in open) return open
 
   // Use admin client to handle published/superseded SOPs (RESEARCH Pitfall 5).
   // requireSopEditAccess already self-enforced org-scope + edit authorization.

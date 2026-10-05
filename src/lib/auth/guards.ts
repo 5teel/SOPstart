@@ -58,6 +58,7 @@ export type SopEditTarget =
   | { sopId: string }
   | { sectionId: string }
   | { junctionId: string }
+  | { stepId: string }
 
 export interface SopEditContext {
   supabase: SessionContext['supabase']
@@ -78,7 +79,7 @@ export async function requireSopEditAccess(
   const admin = createAdminClient()
 
   // Resolve the target locator down to a sopId. One resolution path for all
-  // three locator shapes — callers never write their own lookup (the sibling-
+  // four locator shapes — callers never write their own lookup (the sibling-
   // caller-miss class in CLAUDE.md 2026-07-29).
   let sopId: string
   if ('sopId' in target) {
@@ -91,6 +92,14 @@ export async function requireSopEditAccess(
       .maybeSingle()
     if (!section) return { error: 'SOP not found' }
     sopId = (section as { sop_id: string }).sop_id
+  } else if ('stepId' in target) {
+    const { data: step } = await admin
+      .from('sop_focus_steps')
+      .select('sop_id')
+      .eq('id', target.stepId)
+      .maybeSingle()
+    if (!step) return { error: 'SOP not found' }
+    sopId = (step as { sop_id: string }).sop_id
   } else {
     const { data: junction } = await admin
       .from('sop_section_blocks')
