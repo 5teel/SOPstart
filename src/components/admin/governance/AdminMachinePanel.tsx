@@ -9,21 +9,13 @@
 import Link from 'next/link'
 import type { AdminPanelSop, AdminSopBadge } from '@/lib/sop/admin-health'
 import { focusHref } from '@/lib/sop/focus-path'
+import { OwnerReviewMeta } from '@/components/admin/governance/OwnerReviewMeta'
 
 const BADGE_CLASS: Record<AdminSopBadge, string> = {
   'NO OWNER': 'bg-accent-escalate/12 text-accent-escalate',
   'REVIEW DUE': 'bg-accent-decision/16 text-accent-decision',
   OK: 'bg-accent-ok/14 text-accent-ok',
   DRAFT: 'bg-[var(--paper-2)] text-[var(--ink-500)]',
-}
-
-function reviewLabel(reviewDueAt: string | null): string {
-  if (!reviewDueAt) return '—'
-  return new Date(reviewDueAt).toLocaleDateString('en-NZ', {
-    month: 'short',
-    year: 'numeric',
-    timeZone: 'Pacific/Auckland',
-  })
 }
 
 /** One row per SOP: badge, Walk (published only), Edit, owner and review line. */
@@ -74,9 +66,7 @@ export function AdminSopRows({ sops, empty, from }: { sops: AdminPanelSop[]; emp
               Edit
             </Link>
           </div>
-          <p className="mono text-meta text-[var(--ink-500)]">
-            owner {sop.ownerLabel ?? 'none'} · review due {reviewLabel(sop.reviewDueAt)}
-          </p>
+          <OwnerReviewMeta ownerLabel={sop.ownerLabel} reviewDueAt={sop.reviewDueAt} />
         </div>
       ))}
     </>

@@ -59,7 +59,7 @@ test.describe('PLC-02 admin machine body', () => {
     expect(ADMIN).toMatch(/sop\.status === 'published' && \(\s*<Link\s+href=\{focusHref\(sop\.id, \{ from \}\)\}\s+data-testid="admin-panel-walk"/)
     expect(ADMIN).toContain("href={focusHref(sop.id, { mode: 'edit', from })}")
     expect(ADMIN).toContain('data-testid="admin-panel-edit"')
-    expect(ADMIN).toContain('owner {sop.ownerLabel ??')
+    expect(ADMIN).toContain('<OwnerReviewMeta ownerLabel={sop.ownerLabel} reviewDueAt={sop.reviewDueAt} />')
   })
 
   test('machine body has no close button and starts a SOP for this machine', () => {

@@ -7,6 +7,7 @@
  */
 import Link from 'next/link'
 import { AdminSopRows } from '@/components/admin/governance/AdminMachinePanel'
+import { OwnerReviewMeta } from '@/components/admin/governance/OwnerReviewMeta'
 import { focusHref } from '@/lib/sop/focus-path'
 import type { AdminPanelSop } from '@/lib/sop/admin-health'
 
@@ -64,7 +65,14 @@ export function AdminOfficeBody({
 export function AdminWorkshopBody({
   drafts,
 }: {
-  drafts: Array<{ id: string; title: string; status: string; stuck: boolean }>
+  drafts: Array<{
+    id: string
+    title: string
+    status: string
+    stuck: boolean
+    ownerLabel: string | null
+    reviewDueAt: string | null
+  }>
 }) {
   return (
     <div data-testid="room-body" data-room-id="workshop" className="flex flex-col gap-3 p-4 pr-16">
@@ -77,13 +85,16 @@ export function AdminWorkshopBody({
             <li
               key={d.id}
               data-testid="room-workshop-draft"
-              className="flex min-h-tap items-center gap-2 rounded-lg border border-ink-200 px-3 text-ui text-ink-900"
+              className="rounded-lg border border-ink-200 px-3 py-1.5 text-ui text-ink-900"
             >
-              <span className="min-w-0 flex-1 truncate font-semibold">{d.title}</span>
-              <span className="mono text-meta text-ink-500">{d.stuck ? 'stuck' : d.status}</span>
-              <Link href={focusHref(d.id, { mode: 'edit', from: 'workshop' })} className="mono text-meta text-ink-500">
-                Open
-              </Link>
+              <div className="flex min-h-tap items-center gap-2">
+                <span className="min-w-0 flex-1 truncate font-semibold">{d.title}</span>
+                <span className="mono text-meta text-ink-500">{d.stuck ? 'stuck' : d.status}</span>
+                <Link href={focusHref(d.id, { mode: 'edit', from: 'workshop' })} className="mono text-meta text-ink-500">
+                  Open
+                </Link>
+              </div>
+              <OwnerReviewMeta ownerLabel={d.ownerLabel} reviewDueAt={d.reviewDueAt} />
             </li>
           ))}
         </ul>

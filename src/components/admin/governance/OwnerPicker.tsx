@@ -4,34 +4,49 @@
  * OWN-02: inline ≤2-click owner reassignment.
  * Click 1 opens the popover (fetches org members via getOrgMembers — reused,
  * not hand-rolled). Click 2 picks a member (or "No owner") → setSopOwner then
- * closes + refreshes. Errors surfaced inline, never swallowed.
+ * closes and tells the caller through `onDone`, so the caller decides what to
+ * refresh. Esc closes the popover and nothing else (the Office stays put).
+ * Errors surfaced inline, never swallowed.
  */
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import { User } from 'lucide-react'
 import { getOrgMembers, type OrgMemberWithProfile } from '@/actions/assignments'
 import { setSopOwner } from '@/actions/governance'
 
 function memberLabel(m: OrgMemberWithProfile): string {
-  return m.email ?? m.full_name ?? `${m.role} (${m.user_id.slice(0, 8)})`
+  return m.full_name ?? m.email ?? 'someone who has left'
 }
 
 export function OwnerPicker({
   sopId,
   ownerUserId,
   ownerLabel,
+  onDone,
 }: {
   sopId: string
   ownerUserId: string | null
   ownerLabel: string
+  onDone?: (r: { logged: boolean; ownerLabel: string | null }) => void
 }) {
-  const router = useRouter()
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [members, setMembers] = useState<OrgMemberWithProfile[]>([])
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
+
+  // Capture phase and preventDefault: the shell's own Esc handler sees a
+  // handled key and leaves the Office open.
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return
+      e.preventDefault()
+      setOpen(false)
+    }
+    window.addEventListener('keydown', onKey, true)
+    return () => window.removeEventListener('keydown', onKey, true)
+  }, [open])
 
   async function handleOpen() {
     setError(null)
@@ -57,7 +72,8 @@ export function OwnerPicker({
       return
     }
     setOpen(false)
-    router.refresh()
+    const picked = userId ? members.find((m) => m.user_id === userId) : null
+    onDone?.({ logged: result.logged, ownerLabel: picked ? memberLabel(picked) : null })
   }
 
   return (
@@ -72,19 +88,17 @@ export function OwnerPicker({
       </button>
 
       {open && (
-        <div className="absolute right-0 z-10 mt-1 w-64 blueprint-frame bg-[var(--paper-1)] shadow-lg p-2">
-          <p className="mono text-meta uppercase tracking-wider text-[var(--ink-500)] mb-2">
-            Current: {ownerLabel}
-          </p>
-          {loading && <p className="text-xs text-[var(--ink-500)]">Loading members…</p>}
-          {error && <p className="text-xs text-accent-escalate mb-2">{error}</p>}
-          <ul className="max-h-56 overflow-y-auto space-y-0.5">
+        <div className="absolute right-0 z-10 mt-1 w-64 rounded-lg border border-ink-200 bg-paper-1 p-2 shadow-lg">
+          <p className="mono mb-2 text-meta uppercase tracking-wider text-ink-500">Current: {ownerLabel}</p>
+          {loading && <p className="text-xs text-ink-500">Loading members…</p>}
+          {error && <p className="mb-2 text-xs text-accent-escalate">{error}</p>}
+          <ul className="max-h-56 space-y-0.5 overflow-y-auto">
             <li>
               <button
                 type="button"
                 onClick={() => handlePick(null)}
                 disabled={saving}
-                className="w-full text-left text-sm px-2 py-1 rounded hover:bg-[var(--paper-2)] text-[var(--ink-500)]"
+                className="min-h-tap w-full rounded px-2 text-left text-sm text-ink-500 hover:bg-paper-2"
               >
                 No owner
               </button>
@@ -95,7 +109,7 @@ export function OwnerPicker({
                   type="button"
                   onClick={() => handlePick(m.user_id)}
                   disabled={saving}
-                  className="w-full text-left text-sm px-2 py-1 rounded hover:bg-[var(--paper-2)] text-[var(--ink-900)]"
+                  className="min-h-tap w-full rounded px-2 text-left text-sm text-ink-900 hover:bg-paper-2"
                 >
                   {memberLabel(m)}
                 </button>

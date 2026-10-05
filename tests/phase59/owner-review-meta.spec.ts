@@ -55,8 +55,33 @@ test.describe('owner review meta -- server', () => {
 })
 
 test.describe('owner review meta -- surfaces', () => {
-  test.fixme(true, 'flips live in task 2 and 3')
-  test('the meta line reads "Owner · name · review due date"; no owner reads "No owner" in the warn tint; overdue in the escalate tint', () => {})
-  test('AdminSopRows and Workshop drafts render the line', () => {})
-  test('OwnerPicker closes on onDone and on Escape', () => {})
+  const META = read('src/components/admin/governance/OwnerReviewMeta.tsx')
+  const PICKER = read('src/components/admin/governance/OwnerPicker.tsx')
+
+  test('the meta line reads "Owner · name · review due date"; no owner reads "No owner" in the warn tint; overdue in the escalate tint', () => {
+    expect(META).toContain('data-testid="owner-review-meta"')
+    expect(META).toContain("data-owner={ownerLabel ? 'set' : 'none'}")
+    expect(META).toContain('data-review={review.state}')
+    expect(META).toContain('Owner ·')
+    expect(META).toContain('No owner')
+    expect(META).toContain('bg-accent-decision/10')
+    expect(META).toContain('text-accent-escalate')
+    expect(META).toContain("from '@/lib/office/format'")
+  })
+
+  test('AdminSopRows and Workshop drafts render the line', () => {
+    expect(read('src/components/admin/governance/AdminMachinePanel.tsx')).toContain('<OwnerReviewMeta ownerLabel={sop.ownerLabel}')
+    expect(read('src/components/admin/governance/AdminMachinePanel.tsx')).not.toContain('reviewLabel(')
+    const rooms = read('src/components/shell/AdminRoomBodies.tsx')
+    expect(rooms).toContain('<OwnerReviewMeta ownerLabel={d.ownerLabel} reviewDueAt={d.reviewDueAt}')
+  })
+
+  test('OwnerPicker closes on onDone and on Escape', () => {
+    expect(PICKER).not.toContain('router.refresh')
+    expect(PICKER).not.toContain('next/navigation')
+    expect(PICKER).toContain('onDone?.(')
+    expect(PICKER).toMatch(/e\.key !== 'Escape'[\s\S]*e\.preventDefault\(\)/)
+    expect(PICKER).toContain("addEventListener('keydown', onKey, true)")
+    expect(read('src/components/admin/governance/GovernanceQueueRow.tsx')).toContain('onDone={() => router.refresh()}')
+  })
 })

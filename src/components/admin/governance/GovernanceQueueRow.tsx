@@ -122,7 +122,12 @@ export function GovernanceQueueRow({
             {isPending ? 'Approving…' : 'Approve'}
           </button>
         ) : row.flags.includes('unowned') ? (
-          <OwnerPicker sopId={row.id} ownerUserId={row.ownerUserId} ownerLabel={row.ownerLabel} />
+          <OwnerPicker
+            sopId={row.id}
+            ownerUserId={row.ownerUserId}
+            ownerLabel={row.ownerLabel}
+            onDone={() => router.refresh()}
+          />
         ) : row.flags.includes('stale_role') ? (
           <Link href={`/admin/sops/${row.id}/assign`} className="evidence-btn !min-h-9 text-sm">
             Fix assignment
