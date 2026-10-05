@@ -16,6 +16,7 @@ import { CheckCircle } from 'lucide-react'
 import { countClearedToday, getOfficeInbox, type OfficeInbox } from '@/actions/office'
 import type { AdminShellData } from '@/actions/shell'
 import { useRole } from '@/components/providers/RoleProvider'
+import { officePinCount } from '@/lib/requests/model'
 import { INBOX_CHIPS, chipMatches, inboxCounts, type InboxChip, type InboxItem } from '@/lib/governance/inbox'
 import { OFFICE_INBOX_KEY, SHELL_KEY } from '@/lib/shell/query-keys'
 import { InboxRow, type RowDone } from './InboxRow'
@@ -129,7 +130,7 @@ export function InboxTab({
     // The Office pin and the tab count must agree: write the shell cache, never refetch it.
     if (!('error' in fresh) && fresh.role !== 'supervisor') {
       queryClient.setQueryData<AdminShellData | { error: string }>(SHELL_KEY, (old) =>
-        old && !('error' in old) ? { ...old, inboxCount: freshItems.length, inboxChips: inboxCounts(freshItems) } : old,
+        old && !('error' in old) ? { ...old, inboxCount: officePinCount(freshItems, fresh.requests), inboxChips: inboxCounts(freshItems) } : old,
       )
     }
 

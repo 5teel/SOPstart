@@ -21,10 +21,11 @@ import { CLEARED_KINDS, KIND_GROUPS, PAGE_SIZE, cursorFilter, type DecisionGroup
 import type { DecisionKind } from '@/lib/decisions/shape'
 import { nzStartOfDayIso } from '@/lib/office/format'
 import { deriveInbox, type InboxItem } from '@/lib/governance/inbox'
-import { listMyReviewRows, listPendingSignOffs, loadInbox } from '@/lib/governance/load-inbox'
+import { listMyReviewRows, listOpenRequests, listPendingSignOffs, loadInbox } from '@/lib/governance/load-inbox'
 import { memberLabel, userLabels } from '@/lib/members/labels'
+import type { OfficeRequest } from '@/lib/requests/model'
 
-export type OfficeInbox = { role: 'admin' | 'safety_manager' | 'supervisor'; items: InboxItem[] }
+export type OfficeInbox = { role: 'admin' | 'safety_manager' | 'supervisor'; items: InboxItem[]; requests: OfficeRequest[] }
 
 export async function getOfficeInbox(): Promise<OfficeInbox | { error: string }> {
   const { userId, role } = await getSessionContext()
@@ -33,17 +34,23 @@ export async function getOfficeInbox(): Promise<OfficeInbox | { error: string }>
   if (role === 'admin' || role === 'safety_manager') {
     const inbox = await loadInbox()
     if ('error' in inbox) return { error: inbox.error }
-    return { role, items: inbox.items }
+    return { role, items: inbox.items, requests: inbox.requests }
   }
 
   if (role === 'supervisor') {
-    // A-02: a supervisor has no approval, owner or machine rows -- sign-offs and own reviews only.
-    const [signOffs, ownedReviews] = await Promise.all([listPendingSignOffs(), listMyReviewRows()])
+    // A-02: a supervisor has no approval or owner rows -- sign-offs and own reviews only; D-03: they answer requests.
+    const [signOffs, ownedReviews, requests] = await Promise.all([
+      listPendingSignOffs(),
+      listMyReviewRows(),
+      listOpenRequests(),
+    ])
     if ('error' in signOffs) return { error: signOffs.error }
     if ('error' in ownedReviews) return { error: ownedReviews.error }
+    if ('error' in requests) return { error: requests.error }
     return {
       role,
-      items: deriveInbox({ governance: [], library: [], machines: [], links: [], signOffs, ownedReviews }),
+      items: deriveInbox({ governance: [], library: [], signOffs, ownedReviews }),
+      requests,
     }
   }
 

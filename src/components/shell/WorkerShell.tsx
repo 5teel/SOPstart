@@ -28,6 +28,7 @@ import { useWorkerSops } from '@/hooks/useWorkerSops'
 import { zoneColour } from '@/lib/site/scene'
 import type { Place } from '@/lib/shell/place'
 import { tabsForRole } from '@/lib/shell/office-tabs'
+import { officePinCount } from '@/lib/requests/model'
 import { OFFICE_INBOX_KEY } from '@/lib/shell/query-keys'
 import {
   compareToDoFirst,
@@ -75,7 +76,7 @@ export function WorkerShell({ siteName, userEmail, initialPlace, initialTab, ini
     enabled: isSupervisor,
   })
   const inboxItems = inbox && !('error' in inbox) ? inbox.items : []
-  const pending = inboxItems.length
+  const pending = inbox && !('error' in inbox) ? officePinCount(inbox.items, inbox.requests) : 0
   const signOffs = inboxItems.filter((i) => i.kind === 'signoff').length
 
   const sopsById = new Map(workerSops.map((s) => [s.id, s]))

@@ -73,7 +73,7 @@ function libRow(id: string, overrides: Partial<MillerSop> = {}): MillerSop {
 
 test.describe('deriveInbox', () => {
   test('unowned row -> chips [owner], severity bad, gov set, action null', () => {
-    const items = deriveInbox({ governance: [govRow('a', { flags: ['unowned'] })], library: [], machines: [], links: [] })
+    const items = deriveInbox({ governance: [govRow('a', { flags: ['unowned'] })], library: [] })
     expect(items).toHaveLength(1)
     expect(items[0].chips).toEqual(['owner'])
     expect(items[0].severity).toBe('bad')
@@ -82,7 +82,7 @@ test.describe('deriveInbox', () => {
   })
 
   test('overdue only -> chips [overdue], severity warn', () => {
-    const items = deriveInbox({ governance: [govRow('a', { flags: ['overdue'] })], library: [], machines: [], links: [] })
+    const items = deriveInbox({ governance: [govRow('a', { flags: ['overdue'] })], library: [] })
     expect(items[0].chips).toEqual(['overdue'])
     expect(items[0].severity).toBe('warn')
   })
@@ -91,8 +91,6 @@ test.describe('deriveInbox', () => {
     const items = deriveInbox({
       governance: [govRow('a', { flags: ['awaiting_approval'], isCallerNextApprover: true })],
       library: [],
-      machines: [],
-      links: [],
     })
     expect(items[0].chips).toEqual(['approve'])
     expect(items[0].severity).toBe('info')
@@ -102,19 +100,17 @@ test.describe('deriveInbox', () => {
     const items = deriveInbox({
       governance: [govRow('a', { flags: ['awaiting_approval'], isCallerNextApprover: false })],
       library: [],
-      machines: [],
-      links: [],
     })
     expect(items).toHaveLength(0)
   })
 
   test('due_soon only -> excluded', () => {
-    const items = deriveInbox({ governance: [govRow('a', { flags: ['due_soon'] })], library: [], machines: [], links: [] })
+    const items = deriveInbox({ governance: [govRow('a', { flags: ['due_soon'] })], library: [] })
     expect(items).toHaveLength(0)
   })
 
   test('stale_role only -> included, chips [], severity grey', () => {
-    const items = deriveInbox({ governance: [govRow('a', { flags: ['stale_role'] })], library: [], machines: [], links: [] })
+    const items = deriveInbox({ governance: [govRow('a', { flags: ['stale_role'] })], library: [] })
     expect(items).toHaveLength(1)
     expect(items[0].chips).toEqual([])
     expect(items[0].severity).toBe('grey')
@@ -124,8 +120,6 @@ test.describe('deriveInbox', () => {
     const items = deriveInbox({
       governance: [govRow('a', { flags: ['unowned', 'overdue'] })],
       library: [],
-      machines: [],
-      links: [],
     })
     expect(items).toHaveLength(1)
     expect(items[0].chips).toEqual(['owner', 'overdue'])
@@ -133,7 +127,7 @@ test.describe('deriveInbox', () => {
   })
 
   test('library row stuck -> kind stuck, chips [stuck], severity bad, meta + Try again action', () => {
-    const items = deriveInbox({ governance: [], library: [libRow(SOP_ID, { stuck: true })], machines: [], links: [] })
+    const items = deriveInbox({ governance: [], library: [libRow(SOP_ID, { stuck: true })] })
     expect(items).toHaveLength(1)
     expect(items[0].kind).toBe('stuck')
     expect(items[0].chips).toEqual(['stuck'])
@@ -143,42 +137,21 @@ test.describe('deriveInbox', () => {
   })
 
   test('library row parseFailed -> meta contains conversion failed, same action shape', () => {
-    const items = deriveInbox({ governance: [], library: [libRow(SOP_ID, { parseFailed: true })], machines: [], links: [] })
+    const items = deriveInbox({ governance: [], library: [libRow(SOP_ID, { parseFailed: true })] })
     expect(items[0].meta).toContain('conversion failed')
     expect(items[0].action).toEqual({ label: 'Try again', href: `/sops/${SOP_ID}?mode=edit&from=office`, retry: { sopId: SOP_ID, isVideo: false } })
   })
 
-  test('machine with no links -> kind machines, chips [machines], severity grey, Write a SOP action', () => {
-    const items = deriveInbox({
-      governance: [],
-      library: [],
-      machines: [{ id: 'm1', name: 'Press 1' }],
-      links: [],
-    })
-    expect(items).toHaveLength(1)
-    expect(items[0].kind).toBe('machines')
-    expect(items[0].chips).toEqual(['machines'])
-    expect(items[0].severity).toBe('grey')
-    expect(items[0].meta).toBe('no procedures yet')
-    expect(items[0].action).toEqual({ label: 'Write a SOP', href: '/admin/sops/new/blank?machine=m1', retry: null })
-  })
-
-  test('machine with a link -> no item', () => {
-    const items = deriveInbox({
-      governance: [],
-      library: [],
-      machines: [{ id: 'm1', name: 'Press 1' }],
-      links: [{ sop_id: 's1', machine_id: 'm1' }],
-    })
-    expect(items).toHaveLength(0)
+  test('machines are not an inbox input any more: a floor with machines and no links derives no row (D-05)', () => {
+    // Machines without SOPs arrive as agent-raised requests, not inbox rows.
+    expect(deriveInbox({ governance: [], library: [] })).toEqual([])
+    expect(INBOX_CHIPS.some((c) => (c.key as string) === 'machines')).toBe(false)
   })
 
   test('governance meta = machine names then status word; title falls back displayTitle -> row title -> Untitled SOP; age from library', () => {
     const withLibrary = deriveInbox({
       governance: [govRow('a', { flags: ['unowned'], status: 'published' })],
       library: [libRow('a', { displayTitle: 'Oven Cleaning', machines: ['Oven 1', 'Oven 2'], age: '5d' })],
-      machines: [],
-      links: [],
     })
     expect(withLibrary[0].title).toBe('Oven Cleaning')
     expect(withLibrary[0].meta).toBe('Oven 1 · Oven 2 · live')
@@ -187,16 +160,12 @@ test.describe('deriveInbox', () => {
     const withoutLibrary = deriveInbox({
       governance: [govRow('b', { flags: ['unowned'], title: 'Fallback Title' })],
       library: [],
-      machines: [],
-      links: [],
     })
     expect(withoutLibrary[0].title).toBe('Fallback Title')
 
     const untitled = deriveInbox({
       governance: [govRow('c', { flags: ['unowned'], title: null })],
       library: [],
-      machines: [],
-      links: [],
     })
     expect(untitled[0].title).toBe('Untitled SOP')
   })
@@ -211,8 +180,6 @@ test.describe('deriveInbox', () => {
         govRow('bad2', { flags: ['unowned'] }),
       ],
       library: [],
-      machines: [],
-      links: [],
     })
     expect(items.map((i) => i.key)).toEqual(['gov-bad1', 'gov-bad2', 'gov-warn1', 'gov-info1', 'gov-grey1'])
   })
@@ -221,8 +188,6 @@ test.describe('deriveInbox', () => {
     const items = deriveInbox({
       governance: [govRow('a', { flags: ['unowned'] }), govRow('b', { flags: ['overdue'] })],
       library: [],
-      machines: [],
-      links: [],
     })
     const counts = inboxCounts(items)
     expect(counts.all).toBe(2)
@@ -233,24 +198,27 @@ test.describe('deriveInbox', () => {
   })
 
   test('empty inputs -> [] (the All clear state)', () => {
-    const items = deriveInbox({ governance: [], library: [], machines: [], links: [] })
+    const items = deriveInbox({ governance: [], library: [] })
     expect(items).toEqual([])
   })
 
   test('INBOX_CHIPS carries all seven chip keys in order', () => {
-    expect(INBOX_CHIPS.map((c) => c.key)).toEqual(['all', 'owner', 'overdue', 'approve', 'signoff', 'stuck', 'machines'])
+    expect(INBOX_CHIPS.map((c) => c.key)).toEqual(['all', 'owner', 'overdue', 'approve', 'signoff', 'stuck'])
   })
 })
 
 test.describe('loadInbox wiring (54-02 Task 2, repointed 59-14)', () => {
   test('load-inbox.ts: one Promise.all(listGovernanceQueue, listAdminSopRows, listSiteHealthForOrg), deriveInbox called server-side', () => {
     const src = read(LOAD_INBOX).replace(/\r\n/g, '\n')
-    expect(src.match(/Promise\.all\(/g)).toHaveLength(1)
-    const allMatch = src.match(/Promise\.all\(\[([\s\S]*?)\]\)/)
+    // loadInbox owns one Promise.all; listOpenRequests has its own label and title pair.
+    const body = src.slice(src.indexOf('export async function loadInbox'))
+    expect(body.match(/Promise\.all\(/g)).toHaveLength(1)
+    const allMatch = body.match(/Promise\.all\(\[([\s\S]*?)\]\)/)
     expect(allMatch).not.toBeNull()
     expect(allMatch![1]).toContain('listGovernanceQueue()')
     expect(allMatch![1]).toContain('listAdminSopRows(')
     expect(allMatch![1]).toContain('listSiteHealthForOrg()')
+    expect(allMatch![1]).toContain('listOpenRequests()')
     expect(src).toContain('deriveInbox(')
   })
 })

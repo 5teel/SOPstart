@@ -7,7 +7,7 @@
  * folder). Assert the absence of REFERENCES, not only of files (CLAUDE.md 2026-08-04).
  * Registration: playwright.config.ts `phase60` project.
  */
-import { test } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 import fs from 'node:fs'
 import path from 'node:path'
 
@@ -32,9 +32,20 @@ export function walkSrc(dir: string, out: string[] = []): string[] {
 }
 
 test.describe('retire: the Machines inbox kind (60-05)', () => {
-  test.fixme(true, 'flips live in 60-05')
-  test('the inbox model has no machines kind, no machines chip and no "write a SOP" action', () => {})
-  test('the stale-department row links to the SOP edit address and reads "Open SOP"', () => {})
+  test('the inbox model has no machines kind, no machines chip and no "write a SOP" action', () => {
+    const src = stripComments(read('src/lib/governance/inbox.ts'))
+    expect(src).not.toContain("'machines'")
+    expect(src).not.toContain('Write a SOP')
+    expect(src).not.toContain('machinesWithoutSops')
+    expect(src).not.toMatch(/machines:\s*ReadonlyArray/)
+  })
+  test('the stale-department row links to the SOP edit address and reads "Open SOP"', () => {
+    const row = read('src/components/office/InboxRow.tsx')
+    expect(row).toContain("focusHref(g.id, { mode: 'edit', from: 'office' })")
+    expect(row).toContain('Open SOP')
+    expect(row).not.toContain('Fix assignment')
+    expect(row).not.toMatch(/href=\{`\/admin\/sops\/\$\{[^}]+\}\/assign`\}/)
+  })
 })
 
 test.describe('retire: the SOP objective column writer (60-14)', () => {

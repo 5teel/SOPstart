@@ -1,6 +1,8 @@
 /**
  * Phase 54 (D-02): the inbox is derived on read from the governance queue,
- * the library rows and the site links -- no table, no stored state. Phase 59
+ * the library rows -- no table, no stored state. Machines with no SOP are no
+ * longer a row here: they reach the Office as agent-raised new-SOP requests
+ * (Phase 60 D-05). Phase 59
  * adds completions waiting for sign-off and the caller's own due reviews as
  * OPTIONAL inputs, so every older call shape stays valid. It classifies rows
  * into chips/severity only; it never decides who may act -- the server
@@ -9,13 +11,11 @@
  */
 import type { GovernanceRow } from '@/actions/governance'
 import type { MillerSop } from '@/lib/sop-list/admin-rows'
-import type { SopMachineLink } from '@/lib/validators/site'
-import { machinesWithoutSops } from '@/lib/sop/admin-health'
 import { focusHref } from '@/lib/sop/focus-path'
 import { DUE_SOON_WINDOW_DAYS } from '@/lib/governance/classify'
 import { relativeWhen } from '@/lib/office/format'
 
-export type InboxChip = 'owner' | 'overdue' | 'approve' | 'signoff' | 'stuck' | 'machines'
+export type InboxChip = 'owner' | 'overdue' | 'approve' | 'signoff' | 'stuck'
 export type InboxSeverity = 'bad' | 'warn' | 'info' | 'grey'
 
 /** A completion waiting for a counter-signature (never the caller's own walk). */
@@ -39,7 +39,7 @@ export interface OwnedReview {
 
 export interface InboxItem {
   key: string
-  kind: 'governance' | 'stuck' | 'machines' | 'signoff' | 'review'
+  kind: 'governance' | 'stuck' | 'signoff' | 'review'
   chips: InboxChip[]
   severity: InboxSeverity
   title: string
@@ -50,7 +50,7 @@ export interface InboxItem {
   review: OwnedReview | null
   /** The row's one button when it is a link or a retry; null where the row opens its own panel. */
   action: {
-    label: 'Try again' | 'Open' | 'Write a SOP'
+    label: 'Try again' | 'Open'
     href: string
     retry: { sopId: string; isVideo: boolean } | null
   } | null
@@ -63,7 +63,6 @@ export const INBOX_CHIPS: ReadonlyArray<{ key: 'all' | InboxChip; label: string 
   { key: 'approve', label: 'Approve' },
   { key: 'signoff', label: 'Sign-off' },
   { key: 'stuck', label: 'Stuck' },
-  { key: 'machines', label: 'Machines' },
 ]
 
 const SEVERITY_RANK: Record<InboxSeverity, number> = { bad: 0, warn: 1, info: 2, grey: 3 }
@@ -115,8 +114,6 @@ function classifyGovernanceRow(row: GovernanceRow): { chips: InboxChip[]; severi
 export function deriveInbox(input: {
   governance: ReadonlyArray<GovernanceRow>
   library: ReadonlyArray<MillerSop>
-  machines: ReadonlyArray<{ id: string; name: string }>
-  links: ReadonlyArray<SopMachineLink>
   signOffs?: ReadonlyArray<PendingSignOff>
   ownedReviews?: ReadonlyArray<OwnedReview>
   now?: Date
@@ -163,22 +160,6 @@ export function deriveInbox(input: {
       signOff: null,
       review: null,
       action: stuckAction(lib),
-    })
-  }
-
-  for (const machine of machinesWithoutSops(input.machines, input.links)) {
-    items.push({
-      key: `machines-${machine.id}`,
-      kind: 'machines',
-      chips: ['machines'],
-      severity: 'grey',
-      title: machine.name,
-      meta: 'no procedures yet',
-      age: '',
-      gov: null,
-      signOff: null,
-      review: null,
-      action: { label: 'Write a SOP', href: `/admin/sops/new/blank?machine=${machine.id}`, retry: null },
     })
   }
 
@@ -231,7 +212,6 @@ export function inboxCounts(items: ReadonlyArray<InboxItem>): Record<'all' | Inb
     approve: 0,
     signoff: 0,
     stuck: 0,
-    machines: 0,
   }
   for (const item of items) {
     for (const chip of item.chips) counts[chip]++

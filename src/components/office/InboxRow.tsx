@@ -212,8 +212,8 @@ export function InboxRow({
     )
   } else if (branch === 'fix' && g) {
     button = (
-      <Link data-testid="office-row-action" href={`/admin/sops/${g.id}/assign`} className={ROW_BUTTON}>
-        Fix assignment
+      <Link data-testid="office-row-action" href={focusHref(g.id, { mode: 'edit', from: 'office' })} className={ROW_BUTTON}>
+        Open SOP
       </Link>
     )
   } else if ((branch === 'confirm' && g) || (branch === 'review' && item.review)) {

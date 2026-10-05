@@ -11,6 +11,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { requireAdminContext } from '@/lib/auth/guards'
 import { loadInbox } from '@/lib/governance/load-inbox'
 import { inboxCounts, type InboxChip } from '@/lib/governance/inbox'
+import { officePinCount } from '@/lib/requests/model'
 import type { GovernanceRow } from '@/actions/governance'
 import type { AdminSiteFloor } from '@/lib/validators/site'
 
@@ -61,7 +62,7 @@ export async function getAdminShell(): Promise<AdminShellData | { error: string 
     floor,
     floorError,
     governance: inbox.governance,
-    inboxCount: inbox.items.length,
+    inboxCount: officePinCount(inbox.items, inbox.requests),
     inboxChips: inboxCounts(inbox.items),
     // D-13: the Workshop list is every non-published SOP in the org.
     drafts: inbox.library

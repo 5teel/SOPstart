@@ -59,7 +59,8 @@ test.describe('inbox row (59-09)', () => {
     expect(ROW).toMatch(/<SignOffPanel completionId=\{item\.signOff\.completionId\} onDone=\{onDone\} \/>/)
     expect(ROW).toMatch(/<ApprovePanel sopId=\{g\.id\} title=\{item\.title\} onDone=\{onDone\} \/>/)
     expect(ROW).toMatch(/<OwnerPicker[\s\S]*?onDone=\{\(r\) => onDone\(\{ receipt: 'Owner set', logged: r\.logged \}\)\}/)
-    expect(ROW).toContain('/admin/sops/${g.id}/assign')
+    expect(ROW).toContain("focusHref(g.id, { mode: 'edit', from: 'office' })")
+    expect(ROW).toContain('Open SOP')
     // Expansion is the only thing the Sign off / Approve opener does.
     expect(ROW).toMatch(/aria-expanded=\{expanded\}[\s\S]*?aria-controls=\{panelId\}[\s\S]*?onClick=\{onToggle\}/)
   })
@@ -106,7 +107,7 @@ test.describe('office pane and inbox tab (59-09)', () => {
   test('a cleared row refetches the inbox and writes the shell cache; the shell query is never invalidated', () => {
     expect(TAB).toContain('invalidateQueries({ queryKey: OFFICE_INBOX_KEY })')
     expect(TAB).toContain('setQueryData<AdminShellData | { error: string }>(SHELL_KEY')
-    expect(TAB).toContain('inboxCount: freshItems.length, inboxChips: inboxCounts(freshItems)')
+    expect(TAB).toContain('inboxCount: officePinCount(freshItems, fresh.requests), inboxChips: inboxCounts(freshItems)')
     expect(TAB).not.toMatch(/invalidateQueries\(\{ queryKey: SHELL_KEY/)
     expect(TAB).not.toMatch(/refetchQueries/)
     expect(TAB).toContain('getOfficeInbox(')

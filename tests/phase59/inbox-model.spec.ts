@@ -80,7 +80,7 @@ const signOff = (o: Partial<PendingSignOff> = {}): PendingSignOff => ({
 })
 
 const review = (reviewDueAt: string, sopId = SOP): OwnedReview => ({ sopId, title: 'Press 3', reviewDueAt })
-const empty = { governance: [], library: [], machines: [], links: [] }
+const empty = { governance: [], library: [] }
 
 test.describe('inbox model', () => {
   test('deriveInbox adds signoff and review kinds; legacy call shapes still valid (optional inputs)', () => {
@@ -121,8 +121,8 @@ test.describe('inbox model', () => {
     expect(dup[0].kind).toBe('governance')
   })
 
-  test('chip order is All, Owner, Overdue, Approve, Sign-off, Stuck, Machines', () => {
-    expect(INBOX_CHIPS.map((c) => c.key)).toEqual(['all', 'owner', 'overdue', 'approve', 'signoff', 'stuck', 'machines'])
+  test('chip order is All, Owner, Overdue, Approve, Sign-off, Stuck', () => {
+    expect(INBOX_CHIPS.map((c) => c.key)).toEqual(['all', 'owner', 'overdue', 'approve', 'signoff', 'stuck'])
     expect(INBOX_CHIPS.find((c) => c.key === 'signoff')?.label).toBe('Sign-off')
   })
 
@@ -152,7 +152,7 @@ test.describe('inbox model', () => {
     expect(inboxCounts([]).all).toBe(0)
   })
 
-  test('row actions: stuck retry / open and machine write-a-SOP', () => {
+  test('row actions: stuck retry / open', () => {
     const href = `/sops/${SOP}?mode=edit&from=office`
     const [retry] = deriveInbox({
       ...empty,
@@ -169,8 +169,6 @@ test.describe('inbox model', () => {
       library: [libRow(SOP, { stuck: true, parseRetry: { isVideo: false, canRetry: false } })],
     })
     expect(open.action).toEqual({ label: 'Open', href, retry: null })
-    const [m] = deriveInbox({ ...empty, machines: [{ id: 'm1', name: 'Press 1' }] })
-    expect(m.action).toEqual({ label: 'Write a SOP', href: '/admin/sops/new/blank?machine=m1', retry: null })
   })
 
   test('relativeWhen, nzDay, nzDateTime and reviewSegment format as the spec states (NZ dates)', () => {
@@ -204,7 +202,7 @@ test.describe('inbox model', () => {
     expect(src).toContain(".eq('owner_user_id', userId)")
     expect(src).toContain('ownedReviews')
     expect(read('src', 'lib', 'members', 'labels.ts')).not.toContain('server-only')
-    expect(read('src', 'actions', 'shell.ts')).toContain('inboxCount: inbox.items.length')
+    expect(read('src', 'actions', 'shell.ts')).toContain('inboxCount: officePinCount(inbox.items, inbox.requests)')
   })
 
   test('getOfficeInbox: use server, async exports only, session client only, no parameter, per-role branches', () => {
@@ -215,7 +213,8 @@ test.describe('inbox model', () => {
     expect(src.match(/^export (?!async function|type)\S+/gm)).toBeNull()
     // admin / safety manager: the full list; supervisor: sign-offs and own reviews only
     expect(src).toContain('loadInbox()')
-    expect(src).toMatch(/governance: \[\], library: \[\], machines: \[\], links: \[\], signOffs, ownedReviews/)
+    expect(src).toMatch(/governance: \[\], library: \[\], signOffs, ownedReviews/)
+    expect(src).toContain('listOpenRequests()')
     expect(src).toContain("'Office access required'")
   })
 
