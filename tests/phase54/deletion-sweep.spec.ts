@@ -50,13 +50,13 @@ const DEAD_NAMES =
 // so `admin-access-view` (the survivor) is never a false positive.
 const DEAD_PARAMS = /view=attention|['"]admin-(all|draft|published|failed|attention|access)['"]/g
 
-// The `status === 'attention'` legacy comparison. Only the middleware's
-// server-side legacy redirect may still spell it (57-09: the table's
+// The `status === 'attention'` legacy comparison. Only the server-side
+// legacy redirect helper may still spell it (57-09: the table's
 // deep-link resolver, the last other home, is deleted).
 const ATTENTION_COMPARE = /===\s*'attention'/g
 const PERMITTED_ATTENTION_FILES = [
-  // 2026-09-29: the /sops?view=attention -> /governance redirect is server-side.
-  path.join('src', 'lib', 'supabase', 'middleware.ts'),
+  // Phase 59: the attention view -> Office inbox redirect is server-side; the pure helper the proxy calls holds the comparison.
+  path.join('src', 'lib', 'shell', 'place.ts'),
 ]
 const EXPECTED_ATTENTION_COUNT = 1
 
@@ -116,7 +116,7 @@ test.describe('D-09 deletion sweep -- Miller/scope-column admin surface is fully
     expect(offenders, `Dead-name references:\n${offenders.join('\n')}`).toEqual([])
   })
 
-  test('no comment-stripped src/ file references the old attention deep link or scope-id params; the attention comparison survives only in its one permitted home (the proxy)', () => {
+  test('no comment-stripped src/ file references the old attention deep link or scope-id params; the attention comparison survives only in its one permitted home (the redirect helper the proxy calls)', () => {
     const paramOffenders: string[] = []
     let attentionTotal = 0
     const attentionBreakdown: string[] = []

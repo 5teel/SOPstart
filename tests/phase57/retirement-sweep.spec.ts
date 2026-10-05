@@ -8,7 +8,6 @@ import { test, expect } from '@playwright/test'
 import fs from 'node:fs'
 import path from 'node:path'
 import { roleHome } from '@/lib/auth/role-home'
-import { placeForPath } from '@/lib/shell/place'
 
 const ROOT = process.cwd()
 const read = (rel: string) => fs.readFileSync(path.join(ROOT, rel), 'utf-8').replace(/\r\n/g, '\n')
@@ -64,26 +63,26 @@ test.describe('retire sweep', () => {
     expect(page).toContain('<AdminAccessLens pinnedSopId={pinnedSopId} />')
     expect(read('src/components/sop/lenses/AdminAccessLens.tsx')).not.toContain('onBack')
     expect(read('src/components/shell/AdminRoomBodies.tsx')).not.toContain('/admin/access')
-    expect(placeForPath('/admin/access')).toBe('/?place=office')
+    // Phase 59: the access address redirects on the server; the page is reached only by the redirect's Office tab.
   })
 
-  test('retire list: the proxy redirects every list address to a fixed destination, server-side', () => {
+  test('retire list: the proxy redirects every list address to a fixed destination, server-side (Phase 59: the Office places)', () => {
     const proxy = stripComments(read('src/lib/supabase/middleware.ts'))
     expect(proxy).toContain("path === '/sops'")
-    expect(proxy).toContain("view === 'attention'")
-    expect(proxy).toContain("destination = '/governance'")
-    expect(proxy).toContain(": '/admin/access'")
-    expect(proxy).toMatch(/let destination = '\/'/)
-    expect(proxy).toMatch(/sop && SOP_ID\.test\(sop\)/)
-    expect(proxy).toContain('/admin/access?sop=${sop}')
-    // /governance?view=library is the retired library scope: it goes home (D-17).
-    expect(proxy).toMatch(/path === '\/governance' && request\.nextUrl\.searchParams\.get\('view'\) === 'library'/)
+    expect(proxy).toContain('officeRedirectFor(path, request.nextUrl.search)')
+    const helper = stripComments(read('src/lib/shell/place.ts'))
+    expect(helper).toContain("view === 'attention'")
+    expect(helper).toContain("'/?place=office'")
+    expect(helper).toContain('sop && UUID.test(sop)')
+    expect(helper).toContain('/?place=office&tab=access')
+    // the library scope is retired: it goes home (D-17).
+    expect(helper).toContain("view === 'library' ? '/' :")
     // refreshed session cookies survive the hop; the redirect is built from a fixed string
     expect(proxy).toContain('response.cookies.getAll().forEach((c) => redirect.cookies.set(c))')
-    expect(proxy).toContain('NextResponse.redirect(new URL(destination, request.url))')
+    expect(proxy).toContain('NextResponse.redirect(new URL(office, request.url))')
     // no client-side copy of the redirect may come back (CLAUDE.md 2026-09-29)
     const clientCopies = walkSrc(path.join(ROOT, 'src'))
-      .filter((f) => /router\.(replace|push)\(\s*['"`]\/governance['"`]\s*\)/.test(stripComments(fs.readFileSync(f, 'utf-8'))))
+      .filter((f) => /router\.(replace|push)\(\s*['"`]\/(governance|admin\/team|admin\/access)['"`]\s*\)/.test(stripComments(fs.readFileSync(f, 'utf-8'))))
       .map((f) => path.relative(ROOT, f))
     expect(clientCopies, clientCopies.join(', ')).toEqual([])
   })
@@ -190,7 +189,8 @@ test.describe('retire sweep', () => {
     for (const f of walkSrc(path.join(ROOT, 'src'))) {
       const rel = path.relative(ROOT, f).replace(/\\/g, '/')
       const code = stripComments(fs.readFileSync(f, 'utf-8'))
-      if (rel !== 'src/lib/supabase/middleware.ts' && bareList.test(code)) listHits.push(rel)
+      // Phase 59: the proxy and the pure helper it calls are the two homes of the list address
+      if (rel !== 'src/lib/supabase/middleware.ts' && rel !== 'src/lib/shell/place.ts' && bareList.test(code)) listHits.push(rel)
       if (accessView.test(code)) accessHits.push(rel)
     }
     expect(listHits, listHits.join(', ')).toEqual([])

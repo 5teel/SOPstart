@@ -9,6 +9,7 @@
  * and the action payload; this file only composes them.
  */
 import dynamic from 'next/dynamic'
+import Link from 'next/link'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { getAdminShell } from '@/actions/shell'
 import { listSiteForOrg } from '@/actions/site'
@@ -143,7 +144,18 @@ export function AdminShell({ siteName, userEmail, initialPlace, initialTab, init
       if (place.id === 'office') {
         return <OfficePane place={place} select={ctx.select} initialSop={initialSop} />
       }
-      if (place.id === 'smoko') return <SmokoBody />
+      if (place.id === 'smoko') {
+        return (
+          <SmokoBody>
+            <Link
+              href="/admin/training"
+              className="flex min-h-tap items-center justify-center rounded-lg border border-ink-300 bg-white px-4 text-ui font-semibold text-ink-900"
+            >
+              Training matrix
+            </Link>
+          </SmokoBody>
+        )
+      }
       if (place.id === 'workshop') return <AdminWorkshopBody drafts={drafts} />
       const q = ctx.query.trim().toLowerCase()
       return <AdminNoticeboardBody sops={q ? siteSops.filter((s) => s.title.toLowerCase().includes(q)) : siteSops} />

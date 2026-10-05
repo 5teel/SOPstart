@@ -104,8 +104,8 @@ test.describe('Route truth: legacy shims retired to config redirects (D-01, acti
 
       const middlewareSrc = read('src/lib/supabase/middleware.ts')
       expect(middlewareSrc).toContain("path === '/sops'")
-      expect(middlewareSrc).toContain("view === 'attention'")
-      expect(middlewareSrc).toContain("destination = '/governance'")
+      expect(middlewareSrc).toContain('officeRedirectFor(path, request.nextUrl.search)')
+      expect(read('src/lib/shell/place.ts')).toContain("view === 'attention' ? '/?place=office'")
     }
   )
 
@@ -113,7 +113,8 @@ test.describe('Route truth: legacy shims retired to config redirects (D-01, acti
     const src = read('src/lib/journeys/journeys.ts')
     expect(src).not.toContain("route: '/admin/governance'")
     expect(src).not.toContain("route: '/admin/sops'")
-    expect(src).toContain("route: '/governance'")
+    // Phase 59: the governance address redirects to the Office; no journey names it as a route.
+    expect(src).not.toContain("route: '/governance'")
   })
 
   test('journeys routes Publish to the real API route and the architecture doc matches roleHome (D-06)', () => {

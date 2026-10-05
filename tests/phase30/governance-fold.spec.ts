@@ -151,7 +151,9 @@ test.describe('pathways coverage — 0 not-mapped (CLAUDE.md pathways rule)', ()
     }
     walk(appDir, [])
     const journeys = read(JOURNEYS)
-    const unmapped = found.filter((r) => !journeys.includes(`route: '${r}'`))
+    // Phase 59: the governance, team and access pages only redirect to the Office; 59-14 deletes them.
+    const REDIRECT_ONLY = ['/governance', '/admin/team', '/admin/access']
+    const unmapped = found.filter((r) => !REDIRECT_ONLY.includes(r) && !journeys.includes(`route: '${r}'`))
     expect(unmapped).toEqual([])
   })
 })

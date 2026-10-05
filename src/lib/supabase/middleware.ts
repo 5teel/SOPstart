@@ -3,8 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { roleHome } from '@/lib/auth/role-home'
 import { safeNextPath } from '@/lib/auth/next-redirect'
 import { legacyRedirectFor } from '@/lib/sop/focus-path'
-
-const SOP_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+import { officeRedirectFor } from '@/lib/shell/place'
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request })
@@ -60,27 +59,26 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
-  // The worker list page is gone (Phase 57): the one screen at / is the only
-  // list of places. Every legacy list address redirects to a fixed
-  // destination (the attention view to /governance, the access view to the
-  // Access page, anything else to the one screen). Server-side on purpose: a
+  // The worker list page is gone (Phase 57) and so are the governance, team and
+  // access pages (Phase 59): the one screen at / is the only list of places and
+  // the Office is where those three lived. Each legacy address redirects to a
+  // fixed destination built by officeRedirectFor (the bare list and the library
+  // scope go to the site, the attention view and the governance page to the
+  // Office inbox, the team page to its People tab, the access page and the
+  // access view to the Access tab). Server-side on purpose: a
   // client router.replace fired on mount raced the page's own mount-time
   // server actions, and Next 16.2.1's action queue orphans a server action
   // dispatched while a navigation has discarded another — the router then
   // waits on it forever (fixed upstream in 16.3). CLAUDE.md 2026-09-29.
   // The sop value is appended only when it is a UUID; nothing else from the
   // query reaches the destination, so the redirect cannot be steered offsite.
-  if (path === '/sops' || (path === '/governance' && request.nextUrl.searchParams.get('view') === 'library')) {
-    const view = request.nextUrl.searchParams.get('view')
-    const sop = request.nextUrl.searchParams.get('sop')
-    let destination = '/'
-    if (path === '/sops' && view === 'attention') destination = '/governance'
-    else if (path === '/sops' && view === 'access') {
-      destination = sop && SOP_ID.test(sop) ? `/admin/access?sop=${sop}` : '/admin/access'
+  if (path === '/sops' || path === '/governance' || path === '/admin/team' || path === '/admin/access') {
+    const office = officeRedirectFor(path, request.nextUrl.search)
+    if (office) {
+      const redirect = NextResponse.redirect(new URL(office, request.url))
+      response.cookies.getAll().forEach((c) => redirect.cookies.set(c))
+      return redirect
     }
-    const redirect = NextResponse.redirect(new URL(destination, request.url))
-    response.cookies.getAll().forEach((c) => redirect.cookies.set(c))
-    return redirect
   }
 
   // Old tabbed SOP addresses (/sops/<uuid>?tab=read|walk) land on the bare focus

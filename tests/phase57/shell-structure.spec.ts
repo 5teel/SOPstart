@@ -191,6 +191,8 @@ test.describe('SHL-01 one screen structure', () => {
     const journeys = read('src/lib/journeys/journeys.ts').replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')
     const mapped = new Set([...journeys.matchAll(/route: '([^']+)'/g)].map((m) => m[1].split('?')[0]))
     expect(found.has('/')).toBe(true)
-    expect([...found].filter((r) => !mapped.has(r)).sort()).toEqual([])
+    // Phase 59: the governance, team and access pages only redirect to the Office; 59-14 deletes them.
+    const REDIRECT_ONLY = new Set(['/governance', '/admin/team', '/admin/access'])
+    expect([...found].filter((r) => !mapped.has(r) && !REDIRECT_ONLY.has(r)).sort()).toEqual([])
   })
 })

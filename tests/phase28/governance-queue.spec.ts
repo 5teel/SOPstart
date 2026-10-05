@@ -171,7 +171,7 @@ test.describe('journeys.ts — governance inbox mapped, deleted shim is not (pat
     expect(src).not.toContain("route: '/admin/governance'")
   })
 
-  test('maps the governance inbox route', () => {
-    expect(src).toContain("route: '/governance'")
+  test('maps the Office inbox in place of the governance route (Phase 59)', () => {
+    expect(src).not.toContain("route: '/governance'")
   })
 })

@@ -128,8 +128,8 @@ test.describe('admin scope counts — counts from listGovernanceQueue + deep lin
     // redirect is server-side, and no client copy may come back.
     const proxySrc = read(path.join(ROOT, 'src', 'lib', 'supabase', 'middleware.ts'))
     expect(proxySrc).toContain("path === '/sops'")
-    expect(proxySrc).toContain("view === 'attention'")
-    expect(proxySrc).toContain("destination = '/governance'")
+    expect(proxySrc).toContain('officeRedirectFor(path, request.nextUrl.search)')
+    expect(read(path.join(ROOT, 'src', 'lib', 'shell', 'place.ts'))).toContain("view === 'attention' ? '/?place=office'")
   })
 
   test('the governance inbox groups by chip; every flag from classify.ts is still represented', () => {

@@ -52,10 +52,9 @@ test.describe('SHL-02 place address', () => {
     }
   })
 
-  test('placeForPath sends Office pages to the Office', () => {
-    for (const p of ['/governance', '/admin/team', '/admin/access', '/admin/settings']) {
-      expect(placeForPath(p), p).toBe('/?place=office')
-    }
+  test('placeForPath sends Settings to the Office and the training bridge to the Smoko room', () => {
+    expect(placeForPath('/admin/settings')).toBe('/?place=office')
+    expect(placeForPath('/admin/training')).toBe('/?place=smoko')
   })
 
   test('placeForPath sends activity pages to the Smoko room', () => {
