@@ -4,10 +4,6 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { extractDocx } from '@/lib/parsers/extract-docx'
 import { extractDocxStructural } from '@/lib/parsers/extract-docx-structural'
 import { structuredDocToPrompt } from '@/lib/parsers/structured-doc-to-prompt'
-import {
-  parsedSopToPerSectionLayoutData,
-  materializeJunctionsForLayout,
-} from '@/lib/parsers/parsed-sop-to-layout-data'
 import { extractPdf } from '@/lib/parsers/extract-pdf'
 import { extractXlsx } from '@/lib/parsers/extract-xlsx'
 import { extractPptx } from '@/lib/parsers/extract-pptx'
@@ -19,18 +15,10 @@ import { getOrgAiModels, resolveOrgModel } from '@/lib/ai/org-settings'
 import { ensureSopTitle } from '@/lib/parsers/sop-title'
 import { uploadExtractedImages } from '@/lib/parsers/image-uploader'
 import { triggerReviewerOnParseCompletion } from '@/lib/parsers/parse-pipeline'
-import {
-  extractDocxParagraphAnchors,
-  extractPdfBlockBboxes,
-} from '@/lib/parsers/source-viewer'
-import type { ProvenanceContext } from '@/lib/parsers/parsed-sop-to-layout-data'
+import { writeFocusStepsForSop } from '@/lib/sop/focus-write'
 import type { ParsedSop } from '@/lib/validators/sop'
 import { normaliseToCategorySlug } from '@/lib/sop-categories'
 import type { SourceFileType } from '@/types/sop'
-
-// Phase 21 (Plan 21-04 Task 3) — bump when the parsed-sop-to-layout-data
-// shape changes in a way that downstream consumers must distinguish.
-const PARSER_VERSION = '21.4.0'
 
 // Vercel Pro: 300s max; Hobby: 10s — parsing requires Pro for large docs
 export const maxDuration = 300
@@ -97,8 +85,15 @@ export async function POST(request: NextRequest) {
   // Mark job as processing
   await admin
     .from('parse_jobs')
-    .update({ status: 'processing', started_at: new Date().toISOString() })
+    .update({ status: 'processing', current_stage: 'parsing', started_at: new Date().toISOString() })
     .eq('id', job.id)
+
+  // Stage keys are STAGE_TO_PLAIN keys (job-stages.ts) so the parsing view can label them.
+  const setStage = (stage: string) =>
+    admin
+      .from('parse_jobs')
+      .update({ current_stage: stage, updated_at: new Date().toISOString() })
+      .eq('id', job.id)
 
   try {
     // Retry semantics: a previous failed attempt may have inserted sections /
@@ -191,6 +186,7 @@ export async function POST(request: NextRequest) {
 
     // 4. Parse — pass file_type for format-specific prompt hints + org model
     // overrides from AI Settings (org setting > env > registry default).
+    await setStage('drafting')
     const orgModels = organisationId ? await getOrgAiModels(admin, organisationId) : {}
     const parsed: ParsedSop = await parseSop(extractedText, {
       sourceMode: fileType,
@@ -214,101 +210,8 @@ export async function POST(request: NextRequest) {
     // 6. Upload extracted images to Storage
     const uploadedImages = await uploadExtractedImages(organisationId, sopId, extractedImages)
 
-    // 7. Write parsed data to database
-    // Phase 20 CONV-03 — for DOCX parses, also emit Puck layout_data PER
-    // SECTION (layout_data lives on sop_sections per migration 00020, NOT
-    // on sops). Each procedural section's row gets its own StepWithPhotos
-    // / PhotoGrid tree so the Phase 12 builder renders side-by-side step+
-    // photo. Worker walkthrough continues reading sop_steps until that
-    // codepath migrates separately.
-    //
-    // Phase 21 (Plan 21-04 Task 3) — build a ProvenanceContext so every
-    // emitted Puck item carries `block_provenance`. Image-bearing blocks
-    // get a precise region (PDF: page+bbox; DOCX: paragraph anchor).
-    // Non-image blocks fall through to fallbackRegion so the verify gate
-    // still has SOMETHING to point at.
-    let provenanceContext: ProvenanceContext | undefined
-    if (fileType === 'docx' || fileType === 'pdf' || fileType === 'image') {
-      const sourceKind: ProvenanceContext['sourceKind'] =
-        fileType === 'pdf' ? 'pdf' : fileType === 'docx' ? 'docx' : 'scan'
-      const ctx: ProvenanceContext = {
-        sourceKind,
-        parser_run_id: job.id,
-        parser_version: PARSER_VERSION,
-        fallbackRegion:
-          sourceKind === 'pdf'
-            ? { kind: 'pdf', page: 1, bbox: [0, 0, 0, 0], pageWidth: 1, pageHeight: 1 }
-            : sourceKind === 'docx'
-              ? { kind: 'docx', paragraph_id: 'unknown', run_start: 0, run_end: 0 }
-              : { kind: 'scan', image_crop: [0, 0, 0, 0] },
-      }
-
-      // DOCX: build the index → paragraph anchor map from
-      // extractDocxParagraphAnchors. Wraps the structural extractor, so we
-      // can co-run it with the parse path without re-parsing the file.
-      if (sourceKind === 'docx') {
-        try {
-          const anchors = await extractDocxParagraphAnchors(Buffer.from(buffer))
-          const m = new Map<number, { paragraph_id: string; run_start: number; run_end: number }>()
-          for (let i = 0; i < anchors.length; i++) {
-            const a = anchors[i]
-            if (a.region.kind === 'docx') {
-              m.set(i, {
-                paragraph_id: a.region.paragraph_id,
-                run_start: a.region.run_start,
-                run_end: a.region.run_end,
-              })
-            }
-          }
-          ctx.paragraphOfImageIndex = m
-        } catch (err) {
-          console.warn('[parse] extractDocxParagraphAnchors failed — using fallback region only', err)
-        }
-      }
-
-      // PDF: per-page bbox extraction. CLAUDE.md learning: pdfjs needs a
-      // FRESH Uint8Array per call — extractPdfBlockBboxes already does that
-      // internally; we just pass the same Node Buffer each iteration.
-      if (sourceKind === 'pdf') {
-        try {
-          const m = new Map<number, { page: number; bbox: [number, number, number, number]; pageWidth: number; pageHeight: number }>()
-          // We don't know the page count up-front without a separate doc-open;
-          // walk extracted images by their `index` and probe pages 1..N where
-          // N is bounded by uploadedImages.length (one page per image upper bound).
-          // Most SOPs are <50 pages, so this is cheap.
-          const maxPages = Math.max(1, Math.min(50, uploadedImages.length + 5))
-          let imgIdx = 0
-          for (let p = 1; p <= maxPages && imgIdx < uploadedImages.length; p++) {
-            const blocks = await extractPdfBlockBboxes(Buffer.from(buffer), p)
-            for (const b of blocks) {
-              if (b.region.kind === 'pdf') {
-                m.set(imgIdx, {
-                  page: b.region.page,
-                  bbox: b.region.bbox,
-                  pageWidth: b.region.pageWidth,
-                  pageHeight: b.region.pageHeight,
-                })
-                imgIdx++
-              }
-            }
-          }
-          ctx.pageOfImageIndex = m
-        } catch (err) {
-          console.warn('[parse] extractPdfBlockBboxes failed — using fallback region only', err)
-        }
-      }
-
-      provenanceContext = ctx
-    }
-
-    // ALL file types get layout_data — the Phase 26 builder canvas renders from
-    // it exclusively, so a section without layout_data is invisible there (bug:
-    // pdf/txt/xlsx/pptx parses opened an empty builder). provenanceContext is
-    // undefined for types without source anchoring — converter tolerates that.
-    const perSectionLayouts = parsedSopToPerSectionLayoutData(parsed, uploadedImages, {
-      provenanceContext,
-    })
-
+    // 7. Write parsed data to database: sections + steps rows, then focus steps
+    // (D-19). No block layout and no library-block links are written any more.
     // Update SOP metadata
     await admin
       .from('sops')
@@ -337,10 +240,6 @@ export async function POST(request: NextRequest) {
 
     // Insert sections
     for (const section of parsed.sections) {
-      const sectionLayout = perSectionLayouts?.layouts.get(section.order) ?? null
-      // Step 1: insert section WITHOUT layout_data first — Plan 21-05 needs
-      // the section.id to materialize junctions, and the junction ids get
-      // stamped onto the Puck items before layout_data is written.
       const { data: sectionRow, error: sectionError } = await admin
         .from('sop_sections')
         .insert({
@@ -360,36 +259,6 @@ export async function POST(request: NextRequest) {
         continue
       }
       if (firstSectionId === null) firstSectionId = sectionRow.id
-
-      // Plan 21-05 — materialize library blocks + junctions per Puck item,
-      // stamping props.junctionId onto each item, then write the now-stamped
-      // layout_data onto the section row. ANY failure throws and is caught
-      // by the outer try/catch (parse_job marked failed; no partial junctions
-      // because the section row is the only artifact and gets cleaned up
-      // alongside the SOP rollback path).
-      if (sectionLayout && sectionLayout.content.length > 0) {
-        await materializeJunctionsForLayout({
-          organisationId,
-          sectionId: sectionRow.id,
-          puckItems: sectionLayout.content,
-          createdByUserId: null,
-        })
-        // Now write layout_data WITH the junctionId-stamped items.
-        const { error: updErr } = await admin
-          .from('sop_sections')
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          .update({
-            layout_data: sectionLayout as unknown as object,
-            layout_version: 1,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          } as any)
-          .eq('id', sectionRow.id)
-        if (updErr) {
-          throw new Error(
-            `Section ${sectionRow.id} layout_data write failed: ${updErr.message}`,
-          )
-        }
-      }
 
       // Insert steps if present
       if (section.steps && section.steps.length > 0) {
@@ -470,11 +339,19 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 8. Mark job completed
+    // 8. Focus steps first (D-19): the editor reads only these, and the AI
+    // check below reads them too. A SOP that cannot be turned into steps
+    // fails the job (T-58-15) rather than completing empty.
+    await setStage('structuring')
+    const written = await writeFocusStepsForSop(admin, { organisationId, sopId })
+    if ('error' in written) throw new Error(written.error)
+
+    // 9. Mark job completed
     await admin
       .from('parse_jobs')
       .update({
         status: 'completed',
+        current_stage: 'completed',
         completed_at: new Date().toISOString(),
       })
       .eq('id', job.id)
@@ -494,6 +371,7 @@ export async function POST(request: NextRequest) {
       .from('parse_jobs')
       .update({
         status: 'failed',
+        current_stage: 'failed',
         error_message: message,
         retry_count: (job.retry_count ?? 0) + 1,
       })

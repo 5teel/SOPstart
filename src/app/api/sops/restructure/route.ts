@@ -2,10 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionContext } from '@/lib/auth/session-context'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { parseSop } from '@/lib/parsers/sop-parser'
-import {
-  parsedSopToPerSectionLayoutData,
-  materializeJunctionsForLayout,
-} from '@/lib/parsers/parsed-sop-to-layout-data'
+import { writeFocusStepsForSop } from '@/lib/sop/focus-write'
 import { verifyTranscriptVsSop, detectMissingSections } from '@/lib/parsers/verify-sop'
 import { triggerReviewerOnParseCompletion } from '@/lib/parsers/parse-pipeline'
 import type { ParsedSop } from '@/lib/validators/sop'
@@ -119,8 +116,11 @@ export async function POST(request: NextRequest) {
       updated_at: new Date().toISOString(),
     }).eq('id', sopId)
 
+    // Re-runs replace the draft wholesale: clear the previous sections first (steps,
+    // focus steps and findings cascade) so a retry never duplicates them.
+    await admin.from('sop_sections').delete().eq('sop_id', sopId)
+
     // Insert sections and steps
-    const perSectionLayouts = parsedSopToPerSectionLayoutData(parsed, [])
     for (const section of parsed.sections) {
       const { data: sectionRow, error: sectionError } = await admin
         .from('sop_sections')
@@ -141,28 +141,6 @@ export async function POST(request: NextRequest) {
         continue
       }
 
-      // Builder canvas renders exclusively from per-section layout_data —
-      // without it a video-derived draft opens as an empty canvas (2026-07-07
-      // sweep, same fix as parse/ai-prompt). Fail-open: never lose the draft.
-      const sectionLayout = perSectionLayouts.layouts.get(section.order) ?? null
-      if (sectionLayout && sectionLayout.content.length > 0) {
-        try {
-          await materializeJunctionsForLayout({
-            organisationId,
-            sectionId: sectionRow.id,
-            puckItems: sectionLayout.content,
-            createdByUserId: null,
-          })
-          await admin
-            .from('sop_sections')
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            .update({ layout_data: sectionLayout as unknown as object, layout_version: 1 } as any)
-            .eq('id', sectionRow.id)
-        } catch (err) {
-          console.error('[layout] section layout_data write failed', sectionRow.id, err)
-        }
-      }
-
       if (section.steps) {
         for (const step of section.steps) {
           await admin.from('sop_steps').insert({
@@ -179,6 +157,10 @@ export async function POST(request: NextRequest) {
         }
       }
     }
+
+    // Focus steps first (D-19); a draft that cannot become steps fails the job (T-58-15).
+    const written = await writeFocusStepsForSop(admin, { organisationId, sopId })
+    if ('error' in written) throw new Error(written.error)
 
     // Mark complete
     await admin.from('parse_jobs').update({
