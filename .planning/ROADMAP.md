@@ -1910,7 +1910,58 @@ Plans:
   4. A SOP still being read from a document or a video opens in the editor saying what is happening and roughly how long it will take, never as an empty page, and getting there does not reload the whole app
   5. Publishing a new version means workers always get the latest published one while earlier versions stay on record; Back or Esc from any open SOP returns to the one screen with the place the user came from still selected
 
-**Plans**: TBD
+**Plans:** 18 plans
+Plans:
+**Wave 1**
+
+- [ ] 58-01-PLAN.md — Wave 0: phase58 project, repoint inventory + retirement sweep, requirement spec stubs, --text-step token
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 58-02-PLAN.md — Pure modules (walk order, focus addresses + placeToken, lineage-current, parse progress) + sop-focus eval skeleton
+- [ ] 58-03-PLAN.md — Migration 00071 (sop_walks, sop_ai_findings, step tick + trigger, objective, jump flag) [BLOCKING] live apply, types, matrix, eval fixtures
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 58-04-PLAN.md — Step-edit server actions ({ stepId } guard arm, focus-read loader, tick/clear with ledger, objective, jump flag, step photos)
+- [ ] 58-05-PLAN.md — Publish gate re-keyed to steps and re-pinned once (D-16), getPublishGateStatus, notify on lineage publish
+- [ ] 58-06-PLAN.md — AI check reads the draft steps; findings as sop_ai_findings rows; draft-only jobs for blank SOPs
+- [ ] 58-07-PLAN.md — Every on-ramp writes focus steps ('new:' keys), no layout_data; document route reports its stage
+- [ ] 58-08-PLAN.md — forkDraft + census, latest-published in worker lists, old-model readers repointed
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 58-09-PLAN.md — Walk server (start / record / start over), submit from the walk row + recordSignature, photo URL locked to own walk
+- [ ] 58-10-PLAN.md — Focus frame + browse state; every entry from the one screen links to browse with ?from=
+
+**Wave 5** *(blocked on Wave 4 completion)*
+
+- [ ] 58-11-PLAN.md — Walk / review / sent / resume, server page resolver, tab redirect in the proxy, bundle, worker half of the eval
+- [ ] 58-12-PLAN.md — Editor components (document, step card + tick, rail This SOP, bottom bar, publish dialog), relocated tool buttons, autosave
+
+**Wave 6** *(blocked on Wave 5 completion)*
+
+- [ ] 58-13-PLAN.md — Lazy editor seam, ?mode=edit + parsing view, Walk ⇄ Edit switch, AI banner, on-ramps without reload, admin half of the eval
+
+**Wave 7** *(blocked on Wave 6 completion)*
+
+- [ ] 58-14-PLAN.md — Cutover: [BLOCKING] final converter run, converter retired + --missing, builder/versions redirects, admin Edit links
+
+**Wave 8** *(blocked on Wave 7 completion)*
+
+- [ ] 58-15-PLAN.md — Surviving guards moved onto the focus files
+
+**Wave 9** *(blocked on Wave 8 completion)*
+
+- [ ] 58-16-PLAN.md — Delete tabbed page, old walkthroughs, builder, versions page and block machinery by consumer graph; dropped list, sweeps, map, matrix, bundle
+
+**Wave 10** *(blocked on Wave 9 completion — OPTIONAL, nothing depends on it)*
+
+- [ ] 58-17-PLAN.md — Konva annotation rebuilt on step photos behind a nested lazy seam; annotation un-dropped (D-03 amendment)
+
+**Wave 11** *(blocked on Wave 9; runs after the optional Wave 10)*
+
+- [ ] 58-18-PLAN.md — --missing sweep, deployed eval with every screenshot read, build + full suite once, validation sign-off
 **UI hint**: yes
 
 ### Phase 59: The Office
