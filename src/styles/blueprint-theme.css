@@ -75,6 +75,9 @@
   --text-ui--line-height: 1.4;
   --text-reading: 15px;
   --text-reading--line-height: 1.55;
+  /* Phase 58 walk step text (focus rule: 28 px) */
+  --text-step: 28px;
+  --text-step--line-height: 1.25;
   --spacing-tap: 44px;
   --spacing-tap-glove: 60px;
   --spacing-tap-row: 72px;

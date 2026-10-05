@@ -127,7 +127,7 @@ test.describe('design tokens — one source of truth', () => {
 
   test('the type and tap-target tokens are declared', () => {
     const theme = fs.readFileSync(path.join(SRC, 'styles', 'blueprint-theme.css'), 'utf-8')
-    for (const t of ['--text-micro', '--text-meta', '--text-ui', '--text-reading', '--spacing-tap', '--spacing-tap-glove', '--spacing-tap-row']) {
+    for (const t of ['--text-micro', '--text-meta', '--text-ui', '--text-reading', '--text-step', '--spacing-tap', '--spacing-tap-glove', '--spacing-tap-row']) {
       expect(theme, t).toMatch(new RegExp(`\\n\\s*${t}:\\s*[0-9]+px`))
     }
   })
