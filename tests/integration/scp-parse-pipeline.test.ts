@@ -25,16 +25,10 @@ test.describe('SCP-PARSE — Phase 20 contract integration (Phase 21)', () => {
     expect(conv).toContain('BlockProvenanceSchema.safeParse')
     expect(conv).toContain('item.props.block_provenance = prov')
 
-    // Parse route builds the context per file_type and calls the extractors.
+    // Phase 58 (D-19): the parse route no longer builds a provenance context or
+    // writes a layout; it lands focus steps (asserted in SCP-PARSE-05 below).
     const route = read('src/app/api/sops/parse/route.ts')
-    expect(route).toContain('ProvenanceContext')
-    expect(route).toContain('extractDocxParagraphAnchors')
-    expect(route).toContain('extractPdfBlockBboxes')
-    expect(route).toContain('parser_run_id')
-    expect(route).toContain('parser_version')
-    // CLAUDE.md learning — fresh Uint8Array per call (extractPdfBlockBboxes
-    // does that internally; route passes a Node Buffer each iteration).
-    expect(route).toContain('Buffer.from(buffer)')
+    expect(route).not.toContain('ProvenanceContext')
   })
 
   test('SCP-PARSE-02: parsed drafts land in /admin/sops/builder/[sopId] (legacy /review redirects 308)', () => {
@@ -118,12 +112,12 @@ test.describe('SCP-PARSE — Phase 20 contract integration (Phase 21)', () => {
     // Strict adapter Zod-validates on the way out (T-21-05-03).
     expect(conv).toContain('BlockContentSchema.safeParse(candidate)')
 
+    // Phase 58 (D-19): no route materialises junctions any more; the parse route
+    // lands focus steps via the shared writer, before the job is completed.
     const route = read('src/app/api/sops/parse/route.ts')
-    expect(route).toContain('materializeJunctionsForLayout')
-    // Section row inserted FIRST without layout_data so we have an id to
-    // attach junctions to. layout_data UPDATE happens after junctions are
-    // materialized + props.junctionId is stamped.
-    expect(route).toContain('// Step 1: insert section WITHOUT layout_data first')
+    expect(route).toContain('writeFocusStepsForSop(')
+    expect(route).not.toContain('materializeJunctionsForLayout')
+    expect(route.indexOf('writeFocusStepsForSop(')).toBeLessThan(route.indexOf("status: 'completed'"))
   })
 
   test('SCP-PARSE-06: publish-gate gates on parser-created junctions (no longer a 0===0 no-op)', () => {

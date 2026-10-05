@@ -75,7 +75,7 @@ export const INVENTORY: Row[] = [
   { file: 'tests/phase29/publish-chain-gate.spec.ts', disposition: 'repoint', plan: '58-05' },
   { file: 'tests/phase56/publish-gate-pin.spec.ts', disposition: 'repoint', plan: '58-05' }, // hash re-pinned WITH the decision recorded (D-16)
   // ---- 58-07 on-ramps write focus steps (D-19) ----
-  { file: 'tests/integration/scp-parse-pipeline.test.ts', disposition: 'delete', plan: '58-07' },
+  { file: 'tests/integration/scp-parse-pipeline.test.ts', disposition: 'repoint', plan: '58-16' }, // 58-07 repoints the parse-route halves (focus steps, no layout); the builder halves go with 58-16
   { file: 'src/lib/parsers/__tests__/parser-creates-junctions.test.ts', disposition: 'delete', plan: '58-07' },
   // ---- 58-10 worker entry hrefs ----
   { file: 'tests/phase52/plant-panel.spec.ts', disposition: 'repoint', plan: '58-10' }, // 58-11 edits the tab literal
@@ -162,7 +162,7 @@ export const INVENTORY: Row[] = [
 ]
 
 // Each owning plan appends its id (e.g. '58-05') when its last commit lands.
-export const LIVE_PLANS: string[] = []
+export const LIVE_PLANS: string[] = ['58-07']
 
 function stripComments(src: string): string {
   return src

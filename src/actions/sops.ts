@@ -378,21 +378,15 @@ export async function deleteSop(sopId: string): Promise<{ success: true } | { er
 
 // ---------------------------------------------------------------
 // createSopFromWizard (Phase 12 SB-AUTH-01)
-// Atomic SOP + sections create for the blank-page authoring wizard.
-// - Zod-validates input (title required, kindIds min 1 max 10)
+// SOP create for the blank-page authoring wizard (no sections since Phase 58).
+// - Zod-validates input (title required)
 // - admin/safety_manager role guard (via session context)
 // - Inserts sops row with source_type='blank', status='draft'
-// - Fetches section_kinds via the user's RLS-scoped client (prevents
-//   cross-org kind forgery — T-12-03-02)
-// - Batched insert of sop_sections mirroring kind.slug → section_type
-//   (matches createSection precedent in src/actions/sections.ts)
-// - Compensating cleanup (admin.from('sops').delete) on any section
-//   insert failure so no orphan sops rows are left behind
 // ---------------------------------------------------------------
 const CreateSopFromWizardInput = z.object({
   title: z.string().min(1).max(200),
   sopNumber: z.string().max(60).nullable().optional(),
-  kindIds: z.array(z.string().uuid()).min(1).max(10),
+  kindIds: z.array(z.string().uuid()).max(10).optional().default([]),
   // Phase 40 DAT-01: SOP-level category from the fixed SOP_CATEGORIES vocab
   // (src/lib/sop-categories.ts). Optional — picker scoring still works
   // without it (falls back to all-of-kind). Validated at the write site,
@@ -412,7 +406,7 @@ export async function createSopFromWizard(
     return { error: parsed.error.issues[0]?.message ?? 'Invalid input' }
   }
 
-  const { supabase, userId, role, organisationId } = await getSessionContext()
+  const { userId, role, organisationId } = await getSessionContext()
   if (!userId) return { error: 'Not authenticated' }
   if (!organisationId) return { error: 'No organisation found' }
 
@@ -462,47 +456,9 @@ export async function createSopFromWizard(
     }
   }
 
-  // 2. Fetch the selected kinds via the caller's RLS-scoped supabase client
-  //    (prevents an attacker from forging another org's custom kind —
-  //    T-12-03-02). If the count is off, RLS filtered something out.
-  const { data: kinds, error: kindsErr } = await supabase
-    .from('section_kinds')
-    .select('id, slug, display_name')
-    .in('id', parsed.data.kindIds)
-
-  if (kindsErr || !kinds || kinds.length !== parsed.data.kindIds.length) {
-    // Compensating cleanup: delete the orphan SOP row
-    await admin.from('sops').delete().eq('id', sop.id)
-    return { error: 'One or more section kinds not found or not accessible' }
-  }
-
-  // 3. Batched insert of sop_sections — mirror kind.slug → section_type
-  //    (sections.ts:71-80 precedent). gap-of-10 sort_order for future manual
-  //    reordering (reorderSections RPC in Plan 04 relies on this).
-  const sectionsPayload = parsed.data.kindIds.map((kindId, i) => {
-    const kind = kinds.find((k) => k.id === kindId)!
-    return {
-      sop_id: sop.id,
-      section_type: kind.slug,
-      section_kind_id: kind.id,
-      title: kind.display_name,
-      content: null,
-      sort_order: (i + 1) * 10,
-      approved: false,
-    }
-  })
-
-  const { error: sectionsErr } = await admin
-    .from('sop_sections')
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .insert(sectionsPayload as any)
-
-  if (sectionsErr) {
-    console.error('[createSopFromWizard] sections insert error', sectionsErr)
-    // Compensating cleanup
-    await admin.from('sops').delete().eq('id', sop.id)
-    return { error: 'Failed to create SOP sections. Please try again.' }
-  }
+  // 2. No sections: a blank SOP opens on the editor's empty state ('Nothing here yet')
+  //    and the author adds the first section there (Phase 58, D-19). kindIds is still
+  //    accepted so the wizard form keeps working; it no longer creates anything.
 
   return { sopId: sop.id }
 }
