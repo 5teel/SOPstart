@@ -45,6 +45,8 @@
   "allow": [
     { "file": "src/actions/assignments.ts", "function": "selfAddSop", "key": "sop_assignments", "reason": "A worker bookmarking a SOP on their own list is not a governance decision (RESEARCH A7); logging it would be noise." },
     { "file": "src/actions/assignments.ts", "function": "selfRemoveSop", "key": "sop_assignments", "reason": "A worker removing a SOP from their own list is not a governance decision (RESEARCH A7)." },
+    { "file": "src/actions/versions.ts", "function": "forkDraft", "key": "owner_user_id:", "reason": "Copies the source version's existing owner onto the next-version draft; ownership does not change, so there is no decision to log." },
+    { "file": "src/actions/versions.ts", "function": "forkDraft", "key": "verified_by_admin_id:", "reason": "Carries each step's existing tick onto the copy (A2); nobody ticks anything here. An edit clears the tick by trigger and the publish is the decision (D-11)." },
     { "file": "src/actions/versioning.ts", "function": "notifyAssignedWorkers", "key": "sop_assignments", "reason": "Housekeeping: re-points existing assignments to the new version when it replaces the old one. The version publish is the decision." },
     { "file": "src/actions/sops.ts", "function": "deleteSop", "key": "sop_assignments", "reason": "Housekeeping: assignments are cleared as part of deleting the SOP itself." },
     { "file": "src/lib/ai-fields/approval.ts", "function": "defaultAdminInsert", "key": "ai_field_proposals", "reason": "gateWrite inserts a proposal, which is a request, not a decision (Phase 60). Its accept/reject is logged in acceptProposal/rejectProposal." }
