@@ -1979,7 +1979,7 @@ Plans:
   4. The decisions tab lists the ledger newest first and can be narrowed by kind of decision; opening it, people and roles, or access widens the detail panel while the site stays visible and re-centres on the Office
   5. An admin invites a person, sets their role, sees their department, and opens the existing access wiring screen, unchanged, to decide who sees which SOPs
 
-**Plans:** 12/16 plans executed
+**Plans:** 13/16 plans executed
 Plans:
 **Wave 1**
 
@@ -2022,7 +2022,7 @@ Plans:
 
 **Wave 10** *(blocked on Wave 9 completion)*
 
-- [ ] 59-13-PLAN.md — Server redirects for the old addresses, /admin/training bridge, journeys / UAT / matrix for the Office, legacy-address and supervisor eval cases
+- [x] 59-13-PLAN.md — Server redirects for the old addresses, /admin/training bridge, journeys / UAT / matrix for the Office, legacy-address and supervisor eval cases
 
 **Wave 11** *(blocked on Wave 10 completion)*
 
