@@ -1979,11 +1979,11 @@ Plans:
   4. The decisions tab lists the ledger newest first and can be narrowed by kind of decision; opening it, people and roles, or access widens the detail panel while the site stays visible and re-centres on the Office
   5. An admin invites a person, sets their role, sees their department, and opens the existing access wiring screen, unchanged, to decide who sees which SOPs
 
-**Plans:** 16 plans
+**Plans:** 1/16 plans executed
 Plans:
 **Wave 1**
 
-- [ ] 59-01-PLAN.md — Wave 0: phase59 project, repoint inventory + retirement sweep, requirement spec stubs, office eval skeleton, eval fixtures (supervisor assignment, idle supervisor, unsupervised worker), invited-person check, validation map
+- [x] 59-01-PLAN.md — Wave 0: phase59 project, repoint inventory + retirement sweep, requirement spec stubs, office eval skeleton, eval fixtures (supervisor assignment, idle supervisor, unsupervised worker), invited-person check, validation map
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
