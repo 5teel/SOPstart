@@ -154,6 +154,8 @@ const CATEGORY_EXEMPT: CategoryExemptEntry[] = [
   { file: 'src/actions/approvals.ts', keys: 'approval_state', reason: 'Approval-chain state stamp; not a category-bearing write.' },
   { file: 'src/actions/departments.ts', keys: 'organisation_id', reason: 'Repairs a SOP row’s organisation_id; not a category-bearing write.' },
   { file: 'src/actions/departments.ts', keys: 'all_departments', reason: 'Toggles the all-departments grant flag; not a category-bearing write.' },
+  { file: 'src/actions/focus-steps.ts', keys: 'objective', reason: 'Editor writes the SOP objective only; category is set via setSopCategory, not this action.' },
+  { file: 'src/actions/focus-steps.ts', keys: 'allow_forward_jump', reason: 'Editor writes the walk jump-ahead flag only; not a category-bearing write.' },
   { file: 'src/actions/governance.ts', keys: 'owner_user_id,updated_at', reason: 'SOP-owner reassignment; not a category-bearing write.' },
   { file: 'src/actions/governance.ts', keys: 'refresher_interval_months,updated_at', reason: 'Per-SOP refresher-interval override; category is set via a separate action, not this one.' },
   { file: 'src/actions/governance.ts', keys: 'last_reviewed_at,last_reviewed_by,review_due_at,updated_at', reason: 'Manual "confirm current" review-clock stamp; category_slug is read (not written) to resolve the cadence.' },
@@ -194,7 +196,10 @@ const CATEGORY_EXEMPT: CategoryExemptEntry[] = [
 // update); no remaining path lost category_slug, and cloneSopAsDraft still carries it.
 // 2026-10-03: 40 -> 39. Phase 55-11 deleted the block-update accept action (its single
 // status reset to draft); no remaining path lost category_slug.
-const EXPECTED_SOPS_WRITE_SITE_COUNT = 39
+// 2026-10-05: 39 -> 42. Phase 58: focus-steps.ts writes sops.objective and
+// sops.allow_forward_jump (two exempt, justified above) and versions.ts forkDraft
+// inserts the next-version row WITH category_slug carried from the source.
+const EXPECTED_SOPS_WRITE_SITE_COUNT = 42
 
 // Extracts the substring between a `(` at `openIdx` and its matching `)`,
 // tracking paren depth so nested calls/objects don't truncate the payload.
