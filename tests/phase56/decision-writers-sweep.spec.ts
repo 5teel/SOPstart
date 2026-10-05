@@ -51,6 +51,9 @@ const LIVE_WRITERS: string[] = [
   'src/actions/ai-fields.ts#acceptProposal',
   'src/actions/ai-fields.ts#rejectProposal',
   'src/actions/ai-fields.ts#applyAiWrite',
+  'src/actions/auth.ts#inviteWorker',
+  'src/actions/auth.ts#updateMemberRoleSafe',
+  'src/actions/auth.ts#removeMember',
 ]
 // performPublish is hooked outside the gate body (56-05).
 const PUBLISH_GUARD_LIVE = true

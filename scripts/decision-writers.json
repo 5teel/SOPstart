@@ -9,7 +9,8 @@
     "completion_sign_offs",
     "sop_assignments",
     "sop_review_cadences",
-    "ai_field_proposals"
+    "ai_field_proposals",
+    "organisation_members"
   ],
   "columnKeys": [
     { "table": "sops", "token": "owner_user_id:", "what": "owner change" },
@@ -34,10 +35,13 @@
     { "file": "src/actions/focus-steps.ts", "function": "untickFocusStep", "status": "hook", "key": "verified_by_admin_id:", "kind": "verify_withdrawn", "plan": 8 },
     { "file": "src/actions/findings.ts", "function": "clearFinding", "status": "hook", "key": "cleared_by:", "kind": "ai_finding_cleared", "plan": 8 },
     { "file": "src/actions/ai-fields.ts", "function": "acceptProposal", "status": "hook", "key": "ai_field_proposals", "kind": "approve", "plan": 8 },
-    { "file": "src/actions/ai-fields.ts", "function": "rejectProposal", "status": "hook", "key": "ai_field_proposals", "kind": "reject", "plan": 8 }
+    { "file": "src/actions/ai-fields.ts", "function": "rejectProposal", "status": "hook", "key": "ai_field_proposals", "kind": "reject", "plan": 8 },
+    { "file": "src/actions/auth.ts", "function": "inviteWorker", "status": "hook", "key": "organisation_members", "kind": "member_invited", "plan": 59 },
+    { "file": "src/actions/auth.ts", "function": "updateMemberRoleSafe", "status": "hook", "key": "organisation_members", "kind": "role_change", "plan": 59 }
   ],
   "extraHooks": [
-    { "file": "src/actions/ai-fields.ts", "function": "applyAiWrite", "status": "hook", "anchor": "gateWrite(", "kind": "ai_field_write", "actor": "agent", "plan": 8 }
+    { "file": "src/actions/ai-fields.ts", "function": "applyAiWrite", "status": "hook", "anchor": "gateWrite(", "kind": "ai_field_write", "actor": "agent", "plan": 8 },
+    { "file": "src/actions/auth.ts", "function": "removeMember", "status": "hook", "anchor": "deleteOrgMember(", "kind": "member_removed", "plan": 59 }
   ],
   "delegatedHooks": [
     { "file": "src/actions/completions.ts", "function": "submitCompletion", "calls": "recordSignature(", "after": ".from('sop_completions')", "kind": "sign_off", "note": "Send for sign-off (D-22): the worker's signature row and its ledger row are written by recordSignature, after the completion insert" }
@@ -49,6 +53,9 @@
     { "file": "src/actions/versions.ts", "function": "forkDraft", "key": "verified_by_admin_id:", "reason": "Carries each step's existing tick onto the copy (A2); nobody ticks anything here. An edit clears the tick by trigger and the publish is the decision (D-11)." },
     { "file": "src/actions/versioning.ts", "function": "notifyAssignedWorkers", "key": "sop_assignments", "reason": "Housekeeping: re-points existing assignments to the new version when it replaces the old one. The version publish is the decision." },
     { "file": "src/actions/sops.ts", "function": "deleteSop", "key": "sop_assignments", "reason": "Housekeeping: assignments are cleared as part of deleting the SOP itself." },
-    { "file": "src/lib/ai-fields/approval.ts", "function": "defaultAdminInsert", "key": "ai_field_proposals", "reason": "gateWrite inserts a proposal, which is a request, not a decision (Phase 60). Its accept/reject is logged in acceptProposal/rejectProposal." }
+    { "file": "src/lib/ai-fields/approval.ts", "function": "defaultAdminInsert", "key": "ai_field_proposals", "reason": "gateWrite inserts a proposal, which is a request, not a decision (Phase 60). Its accept/reject is logged in acceptProposal/rejectProposal." },
+    { "file": "src/lib/members/remove.ts", "function": "deleteOrgMember", "key": "organisation_members", "reason": "The service-role delete behind removeMember, which records member_removed after it returns." },
+    { "file": "src/actions/auth.ts", "function": "joinWithInviteCode", "key": "organisation_members", "reason": "A person joining with the site's join code; the code the admin handed out is the authorisation, no governance decision is taken here." },
+    { "file": "src/actions/auth.ts", "function": "acceptInvite", "key": "organisation_members", "reason": "Completes an invitation already logged as member_invited when it was sent." }
   ]
 }
