@@ -13,7 +13,7 @@ import { useState, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { createSection, listSectionKinds, reorderSections, updateSectionTitle } from '@/actions/sections'
 import { addFocusStep, deleteFocusSection } from '@/actions/focus-steps'
-import { forkDraft } from '@/actions/versions'
+import { forkDraft, type LineageVersion } from '@/actions/versions'
 import { InlineText } from '@/components/focus/admin/InlineText'
 import { menuItemClass, OverflowMenu, StepCard } from '@/components/focus/admin/StepCard'
 import { StandardsButton } from '@/components/focus/admin/StandardsButton'
@@ -52,6 +52,18 @@ export interface EditDocumentProps {
   publishedNote?: boolean
 }
 
+/** The one line that says which version this is, shared with the rail's version row. */
+export function versionLine(sop: FocusSop['sop'], lineage: LineageVersion[], publishedNote = false): string {
+  const live = lineage.find((v) => v.state === 'live')
+  if (sop.status === 'published') {
+    if (publishedNote) return `Published v${sop.version} · logged in the decision ledger`
+    return lineage.find((v) => v.id === sop.id)?.state === 'superseded'
+      ? `v${sop.version} — superseded`
+      : `v${sop.version} is live`
+  }
+  return live && live.version < sop.version ? `Editing v${sop.version} — v${live.version} is live` : 'Draft — not published yet'
+}
+
 const pad = (n: number) => String(n).padStart(2, '0')
 
 const dashedRow =
@@ -77,22 +89,10 @@ export function EditDocument({ sopId, initial, from, canTick, findings = [], ban
   for (const s of steps) stepsBySection.set(s.section_id, [...(stepsBySection.get(s.section_id) ?? []), s])
 
   // ---- version slot -------------------------------------------------------
-  const live = lineage.find((v) => v.state === 'live')
   const own = lineage.find((v) => v.id === sop.id)
   const draftInLineage = lineage.find((v) => v.state === 'draft')
   const nextVersion = draftInLineage?.version ?? Math.max(sop.version, ...lineage.map((v) => v.version)) + 1
-  let slot: string
-  if (sop.status === 'published') {
-    slot = publishedNote
-      ? `Published v${sop.version} · logged in the decision ledger`
-      : own?.state === 'superseded'
-        ? `v${sop.version} — superseded`
-        : `v${sop.version} is live`
-  } else if (live && live.version < sop.version) {
-    slot = `Editing v${sop.version} — v${live.version} is live`
-  } else {
-    slot = 'Draft — not published yet'
-  }
+  const slot = versionLine(sop, lineage, publishedNote)
   const canStartEditing = sop.status === 'published' && own?.state !== 'superseded'
 
   // ---- actions (every one is a click handler; none runs on mount) ---------

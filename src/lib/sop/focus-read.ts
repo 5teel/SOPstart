@@ -21,6 +21,7 @@ export interface FocusSopMeta {
   placement: 'machine' | 'site'
   source_type: string | null
   source_file_path: string | null
+  category_slug: string | null
 }
 
 export interface FocusSection {
@@ -68,7 +69,7 @@ export async function loadFocusSop(client: SupabaseClient, sopId: string): Promi
   const db = client
   const { data: sop } = await db
     .from('sops')
-    .select('id, title, version, status, parent_sop_id, objective, allow_forward_jump, placement, source_type, source_file_path, organisation_id')
+    .select('id, title, version, status, parent_sop_id, objective, allow_forward_jump, placement, source_type, source_file_path, category_slug, organisation_id')
     .eq('id', sopId)
     .maybeSingle()
   if (!sop) return null

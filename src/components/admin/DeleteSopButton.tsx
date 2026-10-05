@@ -9,12 +9,15 @@ export function DeleteSopButton({
   sopId,
   redirectTo,
   showLabel = false,
+  label = 'Delete SOP',
 }: {
   sopId: string
   /** When set, navigate here after delete instead of refreshing (builder context — the deleted SOP's page can't refresh). */
   redirectTo?: string
   /** Render a visible text label next to the icon (labelled action menu, UX-06). */
   showLabel?: boolean
+  /** The visible text when showLabel is set (the focus editor says "Delete draft"). */
+  label?: string
 }) {
   const router = useRouter()
   const [pending, startTransition] = useTransition()
@@ -63,10 +66,10 @@ export function DeleteSopButton({
         type="button"
         onClick={() => setConfirming(true)}
         className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-[var(--accent-escalate)] hover:bg-[var(--paper-2)] transition-colors"
-        aria-label="Delete SOP"
+        aria-label={label}
       >
         <Trash2 className="h-4 w-4 shrink-0" aria-hidden="true" />
-        Delete SOP
+        {label}
       </button>
     )
   }
