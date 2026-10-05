@@ -31,6 +31,10 @@ export function useRegisterOverlay(open: boolean, close: Overlay): void {
   }, [open, register])
 }
 
+/** Lets a child of the frame (the "sent" panel) trigger the same Back as the top bar. */
+export const FocusBackContext = createContext<() => void>(() => {})
+export const useFocusGoBack = () => useContext(FocusBackContext)
+
 const isField = (el: Element | null): el is HTMLElement =>
   !!el && (el.matches('input, textarea, select') || (el as HTMLElement).isContentEditable)
 

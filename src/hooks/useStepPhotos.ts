@@ -31,10 +31,15 @@ export function useStepPhotos(activeCompletionId: string | undefined) {
     setPhotos((prev) => prev.map((p) => (p.localId === localId ? { ...p, ...change } : p)))
   }, [])
 
+  // Resolves to the uploaded photo (the walk records it server-side) or null when the upload failed.
   const addPhoto = useCallback(
-    async (completionId: string, stepId: string, file: File) => {
+    async (completionId: string, stepId: string, file: File): Promise<{ localId: string; path: string } | null> => {
       const localId = crypto.randomUUID()
       setPhotos((prev) => [...prev, { localId, completionId, stepId, storagePath: null, status: 'uploading' }])
+      const fail = () => {
+        patch(localId, { status: 'error' })
+        return null
+      }
       try {
         const blob = await compressPhoto(file)
         const result = await getPhotoUploadUrl({
@@ -42,16 +47,17 @@ export function useStepPhotos(activeCompletionId: string | undefined) {
           contentType: 'image/jpeg',
           completionLocalId: completionId,
         })
-        if ('error' in result) return patch(localId, { status: 'error' })
+        if ('error' in result) return fail()
         const res = await fetch(result.url, {
           method: 'PUT',
           body: blob,
           headers: { 'Content-Type': 'image/jpeg' },
         })
-        if (!res.ok) return patch(localId, { status: 'error' })
+        if (!res.ok) return fail()
         patch(localId, { status: 'uploaded', storagePath: result.path })
+        return { localId, path: result.path }
       } catch {
-        patch(localId, { status: 'error' })
+        return fail()
       }
     },
     [patch]

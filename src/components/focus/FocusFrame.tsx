@@ -8,11 +8,11 @@
  * `BrowseDocument`.
  */
 import { useState, type ReactNode } from 'react'
-import { FocusOverlayContext, useFocusBack } from '@/hooks/useFocusBack'
+import { FocusBackContext, FocusOverlayContext, useFocusBack } from '@/hooks/useFocusBack'
 import { FocusRail, type FocusRailProps } from '@/components/focus/FocusRail'
 import { FocusTopBar } from '@/components/focus/FocusTopBar'
 
-export type FocusMode = 'browse' | 'walk' | 'review' | 'edit' | 'parsing'
+export type FocusMode = 'browse' | 'walk' | 'review' | 'sent' | 'edit' | 'parsing'
 export type VersionState = 'live' | 'draft' | 'superseded'
 
 export interface FocusFrameProps {
@@ -26,6 +26,7 @@ export interface FocusFrameProps {
   /** Top-bar chip, e.g. "v2 — superseded" or "Draft". */
   versionChip?: string | null
   rowState?: FocusRailProps['rowState']
+  hollowDot?: FocusRailProps['hollowDot']
   onPickStep?: FocusRailProps['onPick']
   /** Awaited (up to 3 s) before Back leaves, so a pending save can flush. */
   beforeBack?: () => Promise<unknown>
@@ -43,6 +44,7 @@ export function FocusFrame({
   position,
   versionChip,
   rowState,
+  hollowDot,
   onPickStep,
   beforeBack,
   topBarSlot,
@@ -54,6 +56,7 @@ export function FocusFrame({
 
   return (
     <FocusOverlayContext.Provider value={registerOverlay}>
+      <FocusBackContext.Provider value={() => void goBack()}>
       <div data-testid="focus-screen" data-mode={mode} data-version-state={versionState} className="flex h-dvh flex-col bg-paper">
         <FocusTopBar
           title={title}
@@ -70,6 +73,7 @@ export function FocusFrame({
             open={railOpen}
             onClose={() => setRailOpen(false)}
             rowState={rowState}
+            hollowDot={hollowDot}
             onPick={onPickStep}
           />
           <main data-testid="focus-column" className="min-w-0 flex-1 overflow-y-auto">
@@ -77,6 +81,7 @@ export function FocusFrame({
           </main>
         </div>
       </div>
+      </FocusBackContext.Provider>
     </FocusOverlayContext.Provider>
   )
 }

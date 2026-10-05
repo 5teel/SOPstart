@@ -3,7 +3,7 @@
 import { Check, Lock, X } from 'lucide-react'
 import { railNumber, type WalkEntry } from '@/lib/sop/focus'
 import type { FocusStepRow } from '@/lib/sop/focus-read'
-import { KIND_DOT } from '@/components/focus/KindChip'
+import { KIND_DOT, KIND_RING } from '@/components/focus/KindChip'
 import { useRegisterOverlay } from '@/hooks/useFocusBack'
 
 /** Browse rows are all plain. The walk (58-11) passes `rowState` to mark done, current and locked rows. */
@@ -15,6 +15,8 @@ export interface FocusRailProps {
   open: boolean
   onClose(): void
   rowState?(entry: WalkEntry<FocusStepRow>): RailRowState
+  /** Jump-ahead walks: hazard / PPE rows not yet acknowledged show a hollow dot. */
+  hollowDot?(entry: WalkEntry<FocusStepRow>): boolean
   /** Defaults to scrolling the column to the step. */
   onPick?(entry: WalkEntry<FocusStepRow>): void
 }
@@ -26,7 +28,7 @@ export function scrollToStep(stepId: string): void {
   el.focus({ preventScroll: true })
 }
 
-export function FocusRail({ order, open, onClose, rowState, onPick }: FocusRailProps) {
+export function FocusRail({ order, open, onClose, rowState, hollowDot, onPick }: FocusRailProps) {
   useRegisterOverlay(open, onClose)
 
   let lastGroup: string | null = null
@@ -74,7 +76,11 @@ export function FocusRail({ order, open, onClose, rowState, onPick }: FocusRailP
               ) : locked ? (
                 <Lock className="size-4 shrink-0 text-ink-400" aria-hidden="true" />
               ) : (
-                <span className={`size-2 shrink-0 rounded-full ${KIND_DOT[entry.step.kind]}`} aria-hidden="true" />
+                <span
+                  data-hollow={hollowDot?.(entry) ? 'true' : undefined}
+                  className={`size-2 shrink-0 rounded-full ${hollowDot?.(entry) ? `border ${KIND_RING[entry.step.kind]}` : KIND_DOT[entry.step.kind]}`}
+                  aria-hidden="true"
+                />
               )}
               <span className="min-w-0 flex-1 truncate">{entry.step.text || 'New step'}</span>
             </button>

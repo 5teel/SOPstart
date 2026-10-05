@@ -22,6 +22,14 @@ export const KIND_DOT: Record<FocusKind, string> = {
   check: 'bg-accent-measure',
 }
 
+/** Hollow dot: the kind's border colour, no fill. */
+export const KIND_RING: Record<FocusKind, string> = {
+  hazard: 'border-accent-hazard',
+  ppe: 'border-accent-decision',
+  step: 'border-accent-step',
+  check: 'border-accent-measure',
+}
+
 export function KindChip({ kind }: { kind: FocusKind }) {
   return (
     <span data-testid="focus-kind-chip" data-kind={kind} className={`mono rounded px-2 py-1 text-meta uppercase ${CHIP[kind]}`}>
