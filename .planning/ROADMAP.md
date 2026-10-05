@@ -1979,7 +1979,7 @@ Plans:
   4. The decisions tab lists the ledger newest first and can be narrowed by kind of decision; opening it, people and roles, or access widens the detail panel while the site stays visible and re-centres on the Office
   5. An admin invites a person, sets their role, sees their department, and opens the existing access wiring screen, unchanged, to decide who sees which SOPs
 
-**Plans:** 4/16 plans executed
+**Plans:** 5/16 plans executed
 Plans:
 **Wave 1**
 
@@ -1993,7 +1993,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 59-05-PLAN.md — People actions guarded and logged (admin-only invite with role, admin-only role change, service-role remove in a plain module), writer registry, matrix
+- [x] 59-05-PLAN.md — People actions guarded and logged (admin-only invite with role, admin-only role change, service-role remove in a plain module), writer registry, matrix
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
