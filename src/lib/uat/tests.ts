@@ -228,31 +228,6 @@ export const UAT_TESTS: UatTest[] = [
   },
 
   {
-    id: 'p32-org-model-team-view',
-    dateAdded: '2026-07-18',
-    category: 'Phase 32 — Visual Org Model',
-    title: 'Does the org chart make it easy to see and grow your team structure?',
-    status: 'active',
-    summary:
-      'The Team tab is now a visual org model: a chart of your areas, departments, roles and people, with a Columns view for adding people fast. Open roles you haven\'t filled yet show up as a dashed "Vacant" chip instead of just being missing.',
-    tryIt: [
-      'Open Team from the admin nav — you should see a chart with your organisation at the top branching down to departments and roles.',
-      'Click the ▤ Columns button top-right and confirm departments render as side-by-side columns with role cards.',
-      'Try the "+ Add role" and "+ ADD DEPARTMENT" dashed buttons in either view.',
-      'Open "Manage members, invites & org roles" at the bottom of Columns and confirm inviting people and changing someone\'s org role still works exactly as before.',
-    ],
-    links: [{ label: 'People & roles (Office)', href: '/?place=office&tab=people' }],
-    questions: [
-      { id: 'chart-clear', text: 'Was it clear from the chart how your org is structured?' },
-      { id: 'columns-fast', text: 'Did Columns feel faster for adding roles/departments than the chart?' },
-      { id: 'vacancy-clear', text: 'Was an unfilled role obviously different from an error or missing data?' },
-      { id: 'member-mgmt-intact', text: 'Could you still invite people and change their org role without trouble?' },
-    ],
-    background:
-      'D-08 — /admin/team becomes the org model; AdminNav stays 5 tabs (UX-02). Node Chart (layoutOrgTree, 32-06) is the default view; Columns (32-07) wins on raw entry speed and absorbs the Phase 15/25 RoleAssignmentTable roster as a collapsible sub-panel so invite/org-role/department-picker editing is never lost. Vacancies (budgeted_count - filled) render as first-class dashed chips, never styled as an error.',
-  },
-
-  {
     id: 'p32-wiring-access-view',
     dateAdded: '2026-07-18',
     category: 'Phase 32 — Visual Org Model',
@@ -274,7 +249,7 @@ export const UAT_TESTS: UatTest[] = [
       { id: 'blast-radius-trust', text: 'Did the "N people can see this" count feel trustworthy before you confirmed?' },
     ],
     background:
-      'D-09 (the Access view, now the /admin/access page), D-12 (wire-up entry from both the post-publish CTA and organically), D-11 (additive-only grants — no in-place revoke here), SC-4 (viz-as-library-filter deep-links). WiringPatchBay/SelectionStrip built in 32-08; the page arm, deep-links, and publish CTA land in 32-09; drill-down + plain-language copy + the answer panel land in 33-08/33-09 (see the Phase 33 — Access map entries below for current copy).',
+      'D-09 (the Access view, now the Office Access tab), D-12 (wire-up entry from both the post-publish CTA and organically), D-11 (additive-only grants — no in-place revoke here), SC-4 (viz-as-library-filter deep-links). WiringPatchBay/SelectionStrip built in 32-08; the page arm, deep-links, and publish CTA land in 32-09; drill-down + plain-language copy + the answer panel land in 33-08/33-09 (see the Phase 33 — Access map entries below for current copy).',
   },
 
   {
@@ -561,7 +536,7 @@ export const UAT_TESTS: UatTest[] = [
       { id: 'site-marks-make-sense', text: 'Did the red and orange marks on the site picture make sense?' },
     ],
     background:
-      'Phase 54 (D-01/D-02) — /governance server-renders listGovernanceQueue + listAdminSopRows + listSiteHealthForOrg, derived into InboxItem[] by deriveInbox() and rendered by GovernanceInbox.tsx; since Phase 57 the site floor lives on the one screen, not here.',
+      'Phase 54 (D-01/D-02) — the inbox is listGovernanceQueue + listAdminSopRows + listSiteHealthForOrg derived into InboxItem[] by deriveInbox(); Phase 59 moved it into the Office Inbox tab and the old governance page redirects there.',
   },
   {
     id: 'p59-office',

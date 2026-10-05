@@ -5,18 +5,12 @@
 // export in a 'use server' file fails `next build` with "Server Actions must
 // be async functions" while passing `tsc` (CLAUDE.md 2026-06-27).
 //
-// `src/components/admin/governance/GovernanceQueueRow.tsx` deliberately keeps
-// its OWN private copies of FLAG_STYLE/FLAG_LABEL (it is 'use client' and
-// pre-dates this module). Do NOT refactor that file to import from here —
-// `tests/phase30/list-rows.spec.ts` is the sync contract between the two and
-// that sync contract is out of scope for this plan.
+// The old governance queue row (deleted in Phase 59) kept private copies of
+// these maps; this module is now their only home.
 
 import type { GovernanceFlag } from '@/lib/governance/classify'
 
-// UX-06 one-line rows: ONE flag chip per row, worst-first. Styling mirrors
-// GovernanceQueueRow's FLAG_STYLE/FLAG_LABEL (that file is 'use client', so
-// its consts can't be imported into this server component — kept in sync by
-// the phase30 list-rows spec).
+// UX-06 one-line rows: ONE flag chip per row, worst-first.
 export const FLAG_PRIORITY: GovernanceFlag[] = ['overdue', 'due_soon', 'awaiting_approval', 'unowned', 'stale_role']
 
 export const FLAG_STYLE: Record<GovernanceFlag, string> = {

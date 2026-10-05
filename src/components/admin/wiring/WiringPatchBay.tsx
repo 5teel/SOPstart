@@ -418,7 +418,7 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, sops
     return s
   }, [connecting, focus, wires])
 
-  // ---- draw SVG wires imperatively (OrgChartCanvas idiom) --
+  // ---- draw SVG wires imperatively (imperative SVG idiom) --
   const drawWires = useCallback(() => {
     const bay = bayRef.current
     const svg = svgRef.current

@@ -11,7 +11,7 @@
  *  - materializeSopAccess(sopId)           — resolves + replace-writes sop_departments AND sop_access_people for one SOP
  *  - materializeCollectionAccess(collectionId) — materializeSopAccess for every SOP in a collection
  *  - materializeOrgAccess()                — re-materializes every collection-bearing SOP in the org (CR-03:
- *    called by org-model.ts after chain/membership mutations so revocation propagates)
+ *    no remaining caller since Phase 59 removed the org-model writes)
  *  - ensureSopCollections(sopId)           — runtime sop_collections companion write (CR-02, mirrors 00047 A/B)
  *
  * This is the security-critical write path (T-32-05-01/02/03/04). access_grants,
@@ -332,8 +332,8 @@ export async function materializeCollectionAccess(collectionId: string): Promise
 // ---------------------------------------------------------------------------
 // 5b. materializeOrgAccess — re-materializes EVERY collection-bearing SOP in
 // the caller's org (CR-03). Resolved access changes not only on grant CRUD but
-// whenever the inheritance chain or role membership changes (assignRoleMembers,
-// archiveRole, setDepartmentArea, archiveArea in org-model.ts). Without this,
+// whenever the inheritance chain or role membership changes (role member,
+// role, department-area and area writes, retired in Phase 59). Without this,
 // removing a person from a role left their materialized sop_access_people rows
 // live indefinitely — retained access after revocation. Sequential per-SOP
 // fanout is fine at this scale (50-500 SOPs); per-role narrowing is an

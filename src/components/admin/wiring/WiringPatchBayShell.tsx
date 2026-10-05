@@ -2,8 +2,8 @@
 
 /**
  * Phase 32-09 — thin client wrapper mounting WiringPatchBay from the async
- * Server Component `/admin/sops` page. Same class of fix as 32-07's
- * TeamViewShell: an async page.tsx can fetch listOrgTree()/listGrants()/
+ * Server Component `/admin/sops` page. Same class of fix as the retired
+ * team-page shell: an async page.tsx can fetch listOrgTree()/listGrants()/
  * collections server-side but cannot hold a client onWireUpComplete callback
  * (router.refresh()) itself — that requires a 'use client' boundary.
  */

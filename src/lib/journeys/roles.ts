@@ -177,12 +177,11 @@ export const ACCESS_MATRIX: AccessRow[] = [
   // NOTE: the one screen (/) is one row: every role lands on it. It lists,
   // draws and opens the places a role may see; what an admin can do from it
   // (the Office card, Workshop, edit mode) is gated by the server reads it
-  // fetches, never by this row. Governance is its own route and its own row
-  // below.
+  // fetches, never by this row. The Office is its own row below.
   { surface: 'The one screen (read / walk)', route: '/',              access: { worker: true,  supervisor: true,  safety_manager: true, admin: true } },
   { surface: 'Activity (review sign-off)', route: '/activity',    access: { worker: 'own', supervisor: true,  safety_manager: true, admin: true } },
-  { surface: 'Governance inbox', route: '/governance', access: { worker: false, supervisor: false, safety_manager: true, admin: true } },
-  { surface: 'Team & roles',         route: '/admin/team',        access: { worker: false, supervisor: false, safety_manager: true, admin: true } },
+  { surface: 'Office: Inbox (sign-offs only for a supervisor)', route: '/', access: { worker: false, supervisor: true, safety_manager: true, admin: true } },
+  { surface: 'Office: Decisions, People & roles, Access', route: '/', access: { worker: false, supervisor: false, safety_manager: true, admin: true } },
   { surface: 'Departments (site edit mode)', route: '/', access: { worker: false, supervisor: false, safety_manager: true, admin: true } },
 ]
 

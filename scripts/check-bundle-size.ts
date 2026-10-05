@@ -347,9 +347,8 @@ function collectSelfValidationCorpus(): string {
   }
 
   // Phase 54: walked RECURSIVELY (not a flat readdir) so route-level chunks
-  // — e.g. /governance's, which now carries GovernanceQueueRow's
-  // 'Owner role gone' literal now that the old admin-attention lens is gone
-  // from /sops — still count as "somewhere in the build". A flat scan would
+  // — e.g. a route-level chunk carrying a literal now that the old
+  // admin-attention lens is gone from /sops — still count as "somewhere in the build". A flat scan would
   // miss any chunk Next.js nests under a route subdirectory.
   walkDir(path.join(NEXT_DIR, 'static', 'chunks'), 2 * 1024 * 1024)
 
