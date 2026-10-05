@@ -1910,7 +1910,7 @@ Plans:
   4. A SOP still being read from a document or a video opens in the editor saying what is happening and roughly how long it will take, never as an empty page, and getting there does not reload the whole app
   5. Publishing a new version means workers always get the latest published one while earlier versions stay on record; Back or Esc from any open SOP returns to the one screen with the place the user came from still selected
 
-**Plans:** 8/18 plans executed
+**Plans:** 10/18 plans executed
 Plans:
 **Wave 1**
 
@@ -1931,8 +1931,8 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 58-09-PLAN.md — Walk server (start / record / start over), submit from the walk row + recordSignature, photo URL locked to own walk
-- [ ] 58-10-PLAN.md — Focus frame + browse state; every entry from the one screen links to browse with ?from=
+- [x] 58-09-PLAN.md — Walk server (start / record / start over), submit from the walk row + recordSignature, photo URL locked to own walk
+- [x] 58-10-PLAN.md — Focus frame + browse state; every entry from the one screen links to browse with ?from=
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
