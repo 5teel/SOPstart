@@ -13,9 +13,11 @@ import { Check } from 'lucide-react'
 import { useRole } from '@/components/providers/RoleProvider'
 import { OFFICE_TABS, tabsForRole, type OfficeTab } from '@/lib/shell/office-tabs'
 import type { Place } from '@/lib/shell/place'
+import { AdminAccessLens } from '@/components/sop/lenses/AdminAccessLens'
 import { DecisionsTab } from './DecisionsTab'
 import { InboxChips, InboxTab, inboxItemsOf, useOfficeInbox, type ChipKey } from './InboxTab'
 import type { RowDone } from './InboxRow'
+import { PeopleTab } from './PeopleTab'
 
 const TAB_LABEL: Record<OfficeTab, string> = {
   inbox: 'Inbox',
@@ -40,10 +42,11 @@ function receiptWords(r: RowDone): { text: string; failed: boolean } {
 export function OfficePane({
   place,
   select,
+  initialSop,
 }: {
   place: Extract<Place, { kind: 'room' }>
   select(p: Place): void
-  /** Read by the Access tab (59-11). */
+  /** Pins the Access tab to one SOP; the page has already UUID-gated it. */
   initialSop: string | null
 }) {
   const role = useRole()
@@ -143,10 +146,15 @@ export function OfficePane({
         </header>
 
         <div id="office-tabpanel" role={tabs.length > 1 ? 'tabpanel' : undefined} className="px-4 pb-8">
-          {/* The People and Access arms arrive in 59-11, before the pane is mounted. */}
           {tab === 'decisions' && <DecisionsTab />}
+          {tab === 'people' && <PeopleTab onReceipt={(r) => setReceipt({ ...r, tab })} />}
           {tab === 'inbox' && (
             <InboxTab chip={chip} onChip={setChip} onReceipt={(r) => setReceipt({ ...r, tab })} />
+          )}
+          {tab === 'access' && (
+            <div className="overflow-x-auto px-2 pb-8">
+              <AdminAccessLens pinnedSopId={initialSop ?? undefined} />
+            </div>
           )}
         </div>
       </div>

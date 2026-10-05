@@ -1,14 +1,90 @@
 /**
- * Phase 59 -- people tab (stub; Wave 0 / 59-01). Requirement OFF-05; decision D-11.
- * Owner: 59-11. Registration: playwright.config.ts `phase59`.
+ * Phase 59 -- people tab. Requirement OFF-05; decisions D-11, A-10.
+ * Owner: 59-11. Source-contract guards over comment-stripped source (CLAUDE.md 2026-09-28).
+ * Registration: playwright.config.ts `phase59`.
  */
-import { test } from '@playwright/test'
+import { test, expect } from '@playwright/test'
+import fs from 'node:fs'
+import path from 'node:path'
+
+const ROOT = process.cwd()
+const read = (rel: string) => fs.readFileSync(path.join(ROOT, rel), 'utf-8').replace(/\r\n/g, '\n')
+const strip = (src: string) =>
+  src
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .split('\n')
+    .map((l) => l.replace(/^\s*\/\/.*$/, ''))
+    .join('\n')
+
+const TAB = strip(read('src/components/office/PeopleTab.tsx'))
+const PANE = strip(read('src/components/office/OfficePane.tsx'))
 
 test.describe('people tab', () => {
-  test.fixme(true, 'flips live in 59-11')
-  test('the table has name, email, role select, departments, status and Remove columns', () => {})
-  test('the role select calls the safe role writer, never the retired one', () => {})
-  test('Remove asks for confirmation in an aria-modal dialog', () => {})
-  test('the department picker is the existing member_departments picker, unchanged', () => {})
-  test('Invited shows as a status chip and an invite form takes an email and a role', () => {})
+  test('the table has email, role select, departments, status and Remove, in a 3-3-3-2-1 grid at xl', () => {
+    expect(TAB).toContain('data-testid="people-row"')
+    expect(TAB).toContain('data-testid="people-role-select"')
+    expect(TAB).toContain('data-testid="people-remove"')
+    expect(TAB).toContain('xl:col-span-3')
+    expect(TAB).toContain('xl:col-span-2')
+    expect(TAB).toContain('xl:col-span-1')
+    for (const w of ['Email', 'Role', 'Departments', 'Status']) expect(TAB).toContain(`>${w}<`)
+  })
+
+  test('the role select calls the safe role writer, never the retired one', () => {
+    expect(TAB).toContain('updateMemberRoleSafe({')
+    expect(TAB).not.toContain('updateMemberRole(')
+    expect(TAB).toContain('inviteWorker({')
+    expect(TAB).toContain('removeMember(')
+    expect(TAB).not.toContain('addMemberByEmail')
+    // A safety manager sees the role select and the Invite button disabled, with the server's words.
+    expect(TAB).toMatch(/disabled=\{!isAdmin \|\| pendingRole === m\.id\}/)
+    expect(TAB).toMatch(/data-testid="people-invite"[\s\S]{0,80}disabled=\{!isAdmin\}/)
+    expect(TAB).toContain('Only an admin can invite people.')
+    expect(TAB).toContain('Only an admin can change roles.')
+  })
+
+  test('a refused role change shows the server words and leaves the select on the old role', () => {
+    expect(TAB).toMatch(/setRowError\(\{ id: m\.id, text: res\.error \}\)/)
+    expect(TAB).toContain('value={m.role}')
+  })
+
+  test('Remove asks for confirmation in an aria-modal dialog with "Keep them"', () => {
+    expect(TAB).toContain('aria-modal="true"')
+    expect(TAB).toContain('Keep them')
+    expect(TAB).toContain('They lose access to the site. Their past sign-offs stay on record.')
+    expect(TAB).toContain('aria-label={`Remove ${label}`}')
+    // Esc closes only the dialog.
+    expect(TAB).toMatch(/e\.key !== 'Escape'[\s\S]{0,120}e\.stopPropagation\(\)/)
+  })
+
+  test('the department picker is the existing member_departments picker, unchanged', () => {
+    expect(TAB).toContain("from '@/components/admin/departments/DepartmentPicker'")
+    expect(TAB).toContain('<DepartmentPicker')
+    expect(TAB).toContain('mode="member"')
+    expect(TAB).toContain("receipt: 'Departments updated', logged: null")
+  })
+
+  test('Invited shows as a status chip; the invite form takes an email and a role and says Don\'t invite', () => {
+    expect(TAB).toContain('>Invited<')
+    expect(TAB).toContain('Waiting to accept')
+    expect(TAB).toContain('type="email"')
+    expect(TAB).toContain('data-testid="people-invite-role"')
+    expect(TAB).toContain('Send invite')
+    expect(TAB).toContain('Don&apos;t invite')
+    expect(TAB).toContain('Admins can change roles, invite people and publish SOPs.')
+    expect(TAB).toContain('disabled={!emailValid || inviting}')
+  })
+
+  test('receipts carry the ledger flag from the server, the join code is admin-only, and nothing touches the router', () => {
+    expect(TAB).toMatch(/'logged' in res \? \(res\.logged \?\? null\) : null/)
+    expect(TAB).not.toMatch(/router\.refresh|useRouter|router\.push|router\.replace/)
+    expect(TAB).toMatch(/isAdmin && shownCode/)
+    expect(TAB).toContain('regenerateInviteCode()')
+    expect(TAB).toContain('/admin/settings')
+  })
+
+  test('the pane renders the People arm with its receipt callback', () => {
+    expect(PANE).toContain("tab === 'people' && <PeopleTab")
+    expect(PANE).toContain('onReceipt={(r) => setReceipt({ ...r, tab })}')
+  })
 })
