@@ -169,6 +169,11 @@ const siteWorker2 = await ensureSiteMember(EVAL_SITE_WORKER2_EMAIL, 'worker')
     console.log('created supervisor_assignments: eval-site supervisor → eval-site worker')
   } else console.log('supervisor_assignments: eval-site supervisor → eval-site worker present')
 }
+// --- Phase 60 (60-01): a safety manager in the eval-site org, the second approver of a two-step chain
+// (chain steps name only admins or safety managers, so the eval-site supervisor cannot be one).
+// It owns nothing and supervises nobody. Created through the admin API: no email is sent.
+export const EVAL_SITE_SAFETY_EMAIL = 'eval-site-safety@sopstart.com'
+const siteSafety = await ensureSiteMember(EVAL_SITE_SAFETY_EMAIL, 'safety_manager')
 // The idle supervisor and the second worker carry no assignment by construction; fail loudly if one appeared.
 {
   const { data, error } = await sb.from('supervisor_assignments').select('id').eq('organisation_id', siteOrg.id).or(`supervisor_id.eq.${siteSupervisorIdle.id},worker_id.eq.${siteWorker2.id}`)

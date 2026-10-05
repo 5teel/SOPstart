@@ -35,6 +35,8 @@ export const EVAL_USERS = {
   // Phase 59: supervisor with no assigned worker and no owned SOP -- its Office
   // inbox is empty by construction, so a sibling eval cannot fill it.
   siteSupervisorIdle: 'eval-site-supervisor-idle@sopstart.com',
+  // Phase 60: safety manager member of the eval-site org -- the second approver of a two-step chain.
+  siteSafety: 'eval-site-safety@sopstart.com',
 } as const
 // Phase 59: a worker nobody supervises. No session is minted for it; the eval only seeds rows for it.
 export const EVAL_SITE_WORKER2_EMAIL = 'eval-site-worker2@sopstart.com'
