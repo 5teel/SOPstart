@@ -125,3 +125,23 @@ Requirements: RQS-01..04, NTF-01, NTF-02, OBJ-01..03, SHL-03. Out of scope: the 
 
 *Phase: 60-requests-notifications-objectives*
 *Context gathered: 2026-10-06*
+
+<amendments>
+## Amendments after research (2026-10-06, Claude's calls — redirect before planning if wrong)
+
+Binding on the planner; see `60-RESEARCH.md` F-01..F-23 for the evidence.
+
+- **A-01 — `sops.objective` migrates into `objectives`.** The two live rows are copied to `objectives` keyed on the SOP's lineage root (`subject_type='sop'`), the column is no longer read (`BrowseDocument`, This SOP) or written (`focus-steps.ts`, `forkDraft` copies nothing), and it stays undropped. D-10's 200-char limit stands; the live rows are ≤ 31 chars.
+- **A-02 (Q1) — The new `notifications` table starts empty.** The 28 unread `worker_notifications` rows are `completion_rejected` / `removal_request`, not `sop_updated`; copying them would light stale bells on first deploy. D-07's data copy is dropped. `worker_notifications` keeps serving the Phase 37 assessment-request panel (its only surviving reader/writer); the five NTF-02 writers move to `notifications`.
+- **A-03 (Q2) — Decline is person-targeted only.** A role ask is one dynamic role row; a single worker cannot decline it. The worker-side Decline (D-02) appears only on asks aimed at a named person. Role asks are withdrawn by the asker.
+- **A-04 (Q3) — Supervisors can ask from the worker machine panel.** D-06 names the admin surfaces; add the same "Ask someone to do this" to the supervisor's machine-panel SOP row, in a lazy module, since supervisors use the worker shell.
+- **A-05 (Q5) — An auto-accepted ask writes ONE ledger row, `request_accepted`, at raise time** (no row for the raise itself). A new service-role core (`src/lib/requests/ask-core.ts`) writes the request + the `sop_assignments` row(s); the admin-only `assignSopToRole/User` actions are retired into it so no path writes two rows.
+- **A-06 (F-04) — Notification reads, the unread count and mark-read use the browser Supabase client under RLS**, never a server action (the Next 16.2.1 action-queue orphan). The bell is a prop slot on `ShellFrame` (it is source-pinned: no router, one `setPlace`); tapping a notification calls `select()`/`placeToken` navigation exactly like a list click.
+- **A-07 (F-05) — Every new surface is a lazy module with a forbidden marker:** the overview body, the request composer, the ask picker, the objective editor, the Requests tab — `/` is at 834/834 and `/sops/[sopId]` reads 794 against 792. No CSS imports in any of them (the 59-12 mini-css lesson). The baseline is not touched by an executor.
+- **A-08 (F-06, Q4) — The daily sweeps are two header-authenticated routes** (`review-due` and `machines-without-sops`), each exempted by exact path in the proxy, callable with `CRON_SECRET`; the deployed eval calls them directly. **Scheduling them on Railway is a human action** (checkpoint in the sign-off plan): Simon confirms whether the existing synthesis sweep is scheduled and adds these two, or the plan documents the two `curl` lines to schedule.
+- **A-09 (F-07) — D-12 via the AI field interface is scoped to what the interface can carry:** `FieldContext` gains `subjectType` + `subjectId` + `agent`; the `objective` field is registered per subject type; a published-SOP objective write is NOT diverted to a proposal (objectives are metadata, not SOP content) — it lands live as `set_by = agent, unconfirmed`, which is the proposal state. `packSopForPrompt` is byte-pinned and feeds the embedding — the objective line goes in `signals`, not the pack.
+- **A-10 — New tables carry no foreign key to `sops`** (the fork-draft census would fail), only `subject_id uuid`; `deleteSop` clears `requests`, `notifications`, `objectives` rows about that SOP.
+- **A-11 — `scripts/verify-gate-check.tsx` gets a stub** for the new server-only notification module the publish route will import.
+- **A-12 — The "fix assignment" inbox row (stale department reference) re-points its link** from the deleted assign page to the SOP's focus address with the This SOP block open; SOP sub-trade tagging (only on the assign page, 0 live rows, already cut by D-A10) is deleted with it.
+
+</amendments>
