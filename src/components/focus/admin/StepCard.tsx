@@ -10,10 +10,12 @@
  * the card says so at once without waiting for the re-read.
  */
 import { useRef, useState, type ReactNode } from 'react'
+import dynamic from 'next/dynamic'
 import { Camera, Check, MoreHorizontal, X } from 'lucide-react'
 import {
   attachStepImage,
   deleteFocusStep,
+  getStepAnnotation,
   getStepImageUploadUrl,
   moveFocusStep,
   removeStepImage,
@@ -29,6 +31,9 @@ import type { FocusStepPatch } from '@/hooks/useFocusAutosave'
 import { kindLabel, type FocusKind } from '@/lib/sop/focus'
 import type { FocusStandard, FocusStepRow } from '@/lib/sop/focus-read'
 import { compressPhoto } from '@/lib/photo/compress'
+
+// Konva loads only when the tool opens: a nested lazy import, referenced nowhere else (58-17, CLAUDE.md 2026-09-13).
+const AnnotationEditor = dynamic(() => import('./annotate/AnnotationEditor'), { ssr: false })
 
 const KINDS: FocusKind[] = ['hazard', 'ppe', 'step', 'check']
 
@@ -112,8 +117,11 @@ export function StepCard({
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const [annotating, setAnnotating] = useState<{ originalPath: string; originalUrl: string; scene?: unknown } | null>(null)
+  const [confirmRemove, setConfirmRemove] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
   useRegisterOverlay(confirmDelete, () => setConfirmDelete(false))
+  useRegisterOverlay(confirmRemove !== null, () => setConfirmRemove(null))
 
   const wasTicked = !!step.verified_by_admin_id
   const ticked = wasTicked && !edited
@@ -155,6 +163,45 @@ export function StepCard({
       return attachStepImage({ stepId: step.id, storagePath: slot.storagePath })
     }, "That photo didn't upload. Try again.")
     setEdited(wasTicked)
+  }
+
+  function removePhoto(path: string) {
+    return run(() => removeStepImage({ stepId: step.id, storagePath: path }), "Couldn't remove that photo.").then(() => setEdited(wasTicked))
+  }
+
+  // A photo with marks asks first; a plain one goes at once.
+  async function askRemove(path: string) {
+    setBusy(true)
+    setError(null)
+    try {
+      const res = await getStepAnnotation({ stepId: step.id, storagePath: path })
+      if ('error' in res) return setError("Couldn't remove that photo.")
+      if (res.annotation) return setConfirmRemove(path)
+    } catch {
+      return setError("Couldn't remove that photo.")
+    } finally {
+      setBusy(false)
+    }
+    await removePhoto(path)
+  }
+
+  // Open the tool on the untouched original, with its marks when there are some.
+  async function openAnnotate(img: { path: string; url: string }) {
+    setBusy(true)
+    setError(null)
+    try {
+      const res = await getStepAnnotation({ stepId: step.id, storagePath: img.path })
+      if ('error' in res) return setError("Couldn't open that photo.")
+      setAnnotating(
+        res.annotation
+          ? { originalPath: res.annotation.originalPath, originalUrl: res.annotation.originalUrl, scene: res.annotation.scene }
+          : { originalPath: img.path, originalUrl: img.url }
+      )
+    } catch {
+      setError("Couldn't open that photo.")
+    } finally {
+      setBusy(false)
+    }
   }
 
   return (
@@ -334,22 +381,31 @@ export function StepCard({
       {(step.image_urls.length > 0 || !readOnly) && (
         <div className="flex flex-wrap items-center gap-2">
           {step.image_urls.map((img) => (
-            <span key={img.path} className="relative">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={img.url} alt="" loading="lazy" decoding="async" className="size-18 rounded-lg border border-ink-200 object-cover" />
+            <span key={img.path} className="flex flex-col items-start">
+              <span className="relative">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={img.url} alt="" loading="lazy" decoding="async" className="size-18 rounded-lg border border-ink-200 object-cover" />
+                {!readOnly && (
+                  <button
+                    type="button"
+                    aria-label="Remove photo"
+                    disabled={busy}
+                    onClick={() => void askRemove(img.path)}
+                    className="absolute -right-2 -top-2 flex size-6 items-center justify-center rounded-full border border-ink-300 bg-paper-1 text-ink-700"
+                  >
+                    <X className="size-3" aria-hidden="true" />
+                  </button>
+                )}
+              </span>
               {!readOnly && (
                 <button
                   type="button"
-                  aria-label="Remove photo"
+                  data-testid="annotate-photo"
                   disabled={busy}
-                  onClick={() =>
-                    void run(() => removeStepImage({ stepId: step.id, storagePath: img.path }), "Couldn't remove that photo.").then(() =>
-                      setEdited(wasTicked)
-                    )
-                  }
-                  className="absolute -right-2 -top-2 flex size-6 items-center justify-center rounded-full border border-ink-300 bg-paper-1 text-ink-700"
+                  onClick={() => void openAnnotate(img)}
+                  className="min-h-tap rounded px-1 text-meta text-ink-500 hover:text-accent-step"
                 >
-                  <X className="size-3" aria-hidden="true" />
+                  Annotate
                 </button>
               )}
             </span>
@@ -379,6 +435,45 @@ export function StepCard({
             </>
           )}
         </div>
+      )}
+
+      {confirmRemove && (
+        <div role="alertdialog" aria-label="Remove this photo?" className="flex flex-col gap-3 rounded-lg border border-ink-200 bg-paper-2 p-4">
+          <p className="text-reading font-semibold text-ink-900">Remove this photo?</p>
+          <p className="text-ui text-ink-700">Its marks are lost too.</p>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => {
+                const path = confirmRemove
+                setConfirmRemove(null)
+                void removePhoto(path)
+              }}
+              className="min-h-tap rounded-lg bg-accent-escalate px-4 text-ui font-semibold text-white"
+            >
+              Remove photo
+            </button>
+            <button type="button" onClick={() => setConfirmRemove(null)} className="min-h-tap rounded-lg border border-ink-300 px-4 text-ui text-ink-900">
+              Keep it
+            </button>
+          </div>
+        </div>
+      )}
+
+      {annotating && (
+        <AnnotationEditor
+          stepId={step.id}
+          originalPath={annotating.originalPath}
+          originalUrl={annotating.originalUrl}
+          initialScene={annotating.scene}
+          onClose={() => setAnnotating(null)}
+          onSaved={() => {
+            setAnnotating(null)
+            setEdited(wasTicked)
+            onChanged()
+          }}
+        />
       )}
 
       {findings.map((f) => (

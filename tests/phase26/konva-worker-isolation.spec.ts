@@ -37,6 +37,8 @@ const SRC_DIR = path.join(REPO_ROOT, 'src')
 // SiteEditor. Anything else is a leak.
 const ALLOWED_DIRS = [
   path.join('src', 'components', 'admin', 'site').replace(/\\/g, '/'),
+  // Phase 58-17 (D-03): image annotation returned on step photos, reached only through StepCard's nested lazy import.
+  path.join('src', 'components', 'focus', 'admin', 'annotate').replace(/\\/g, '/'),
 ]
 
 type Hit = { file: string; line: number; text: string }

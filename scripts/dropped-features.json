@@ -656,60 +656,6 @@
       "pattern": "\\b(FlowGraphCanvas|FlowTab|BuilderFlowButton|BuilderFlowEditButton|hideFlow)\\b|/(lib/sop|lib/validators|actions)/flow-graph|flow-graph-field"
     },
     {
-      "feature": "annotation",
-      "phase": 55,
-      "kind": "file",
-      "path": "src/components/admin/builder-v2/visual/AnnotationEditor.tsx"
-    },
-    {
-      "feature": "annotation",
-      "phase": 55,
-      "kind": "file",
-      "path": "src/components/admin/builder-v2/visual/AnnotationEditorLoader.tsx"
-    },
-    {
-      "feature": "annotation",
-      "phase": 55,
-      "kind": "file",
-      "path": "src/components/admin/builder-v2/visual/DiagramAnnotateModal.tsx"
-    },
-    {
-      "feature": "annotation",
-      "phase": 55,
-      "kind": "file",
-      "path": "src/components/admin/builder-v2/visual/DiagramHotspotBlock.tsx"
-    },
-    {
-      "feature": "annotation",
-      "phase": 55,
-      "kind": "file",
-      "path": "src/components/admin/builder-v2/visual/annotation-tools.ts"
-    },
-    {
-      "feature": "annotation",
-      "phase": 55,
-      "kind": "file",
-      "path": "src/components/admin/builder-v2/visual/bake-on-publish.ts"
-    },
-    {
-      "feature": "annotation",
-      "phase": 55,
-      "kind": "file",
-      "path": "src/actions/annotations.ts"
-    },
-    {
-      "feature": "annotation",
-      "phase": 55,
-      "kind": "file",
-      "path": "src/lib/builder/baked-path.ts"
-    },
-    {
-      "feature": "annotation",
-      "phase": 55,
-      "kind": "symbol",
-      "pattern": "\\b(AnnotationEditor|AnnotationEditorLoader|DiagramAnnotateModal|DiagramHotspotBlock|annotatingIndex|applyAnnotation)\\b|annotation-tools|bake-on-publish|@/actions/annotations|builder/baked-path"
-    },
-    {
       "feature": "version-compare",
       "phase": 55,
       "kind": "route-page",

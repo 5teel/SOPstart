@@ -528,6 +528,13 @@ export async function removeStepImage(input: { stepId: string; storagePath: stri
   const paths = (step as { image_paths: string[] }).image_paths
   if (!paths.includes(storagePath)) return { error: 'That photo is not on this step.' }
 
+  const { data: marked } = await admin
+    .from('sop_image_annotations')
+    .select('sop_image_id')
+    .eq('organisation_id', ctx.organisationId)
+    .eq('baked_storage_path', storagePath)
+    .maybeSingle()
+
   const { error } = await admin
     .from('sop_focus_steps')
     .update({ image_paths: paths.filter((p) => p !== storagePath) })
@@ -544,6 +551,206 @@ export async function removeStepImage(input: { stepId: string; storagePath: stri
   if (storagePath.startsWith(`${ctx.organisationId}/${ctx.sopId}/steps/${stepId}/`)) {
     await admin.from('sop_images').delete().eq('sop_id', ctx.sopId).eq('storage_path', storagePath)
     await admin.storage.from(BUCKET).remove([storagePath])
+  }
+  // An annotated photo takes its marks with it: the original goes too (its image row
+  // cascades the annotation) when this editor uploaded it, else only the marks go.
+  const markedImageId = (marked as { sop_image_id: string } | null)?.sop_image_id
+  if (markedImageId) {
+    const { data: orig } = await admin.from('sop_images').select('storage_path').eq('id', markedImageId).eq('sop_id', ctx.sopId).maybeSingle()
+    const origPath = (orig as { storage_path: string } | null)?.storage_path
+    if (origPath?.startsWith(`${ctx.organisationId}/${ctx.sopId}/steps/${stepId}/`)) {
+      await admin.from('sop_images').delete().eq('id', markedImageId).eq('sop_id', ctx.sopId)
+      await admin.storage.from(BUCKET).remove([origPath])
+    } else {
+      await admin.from('sop_image_annotations').delete().eq('sop_image_id', markedImageId).eq('organisation_id', ctx.organisationId)
+    }
+  }
+  return { ok: true }
+}
+
+// ---------------------------------------------------------------------------
+// Annotation (D-03, optional wave 58-17): marks on a step photo, baked into the image
+// ---------------------------------------------------------------------------
+
+const ink = z.string().max(40)
+const pts = z.array(z.number()).max(4000)
+const sid = z.string().max(40)
+const px = z.number().min(-20000).max(20000)
+// Element-count and size caps keep one save from carrying an unbounded scene (T-58-26).
+const sceneSchema = z.object({
+  schemaVersion: z.literal(1),
+  width: z.number().int().min(1).max(8000),
+  height: z.number().int().min(1).max(8000),
+  shapes: z
+    .array(
+      z.discriminatedUnion('type', [
+        z.object({ id: sid, type: z.literal('Arrow'), points: pts, stroke: ink, strokeWidth: px, pointerLength: px, pointerWidth: px, tension: px }),
+        z.object({ id: sid, type: z.literal('Rect'), x: px, y: px, width: px, height: px, stroke: ink, strokeWidth: px, dash: pts.optional() }),
+        z.object({ id: sid, type: z.literal('Ellipse'), x: px, y: px, radiusX: px, radiusY: px, stroke: ink, strokeWidth: px }),
+        z.object({ id: sid, type: z.literal('Text'), x: px, y: px, text: z.string().max(300), fontSize: px, fontFamily: ink, fill: ink }),
+        z.object({
+          id: sid,
+          type: z.literal('Label'),
+          x: px,
+          y: px,
+          number: z.number().int().min(0).max(1000),
+          tag: z.object({ fill: ink, cornerRadius: px, pointerDirection: ink, pointerWidth: px, pointerHeight: px }),
+          text: z.object({ text: z.string().max(300), fontSize: px, fontFamily: ink, fill: ink, padding: px }),
+        }),
+        z.object({
+          id: sid,
+          type: z.literal('Line'),
+          points: pts,
+          stroke: ink,
+          strokeWidth: px,
+          tension: px,
+          lineCap: z.enum(['round', 'butt', 'square']),
+          lineJoin: z.enum(['round', 'bevel', 'miter']),
+        }),
+      ])
+    )
+    .max(200),
+})
+const SCENE_MAX_BYTES = 150_000
+
+/** The photo's marks and untouched original when the displayed photo is a baked one; null for a plain photo. */
+export async function getStepAnnotation(input: { stepId: string; storagePath: string }): Promise<
+  { annotation: { originalPath: string; originalUrl: string; scene: unknown } | null } | Fail
+> {
+  const parsed = z.object({ stepId: uuid, storagePath: z.string().max(300) }).safeParse(input)
+  if (!parsed.success) return { error: firstIssue(parsed.error) }
+  const { stepId, storagePath } = parsed.data
+
+  const ctx = await requireSopEditAccess({ stepId })
+  if ('error' in ctx) return { error: ctx.error }
+
+  const admin = createAdminClient()
+  const { data: step } = await admin
+    .from('sop_focus_steps')
+    .select('image_paths')
+    .eq('id', stepId)
+    .eq('organisation_id', ctx.organisationId)
+    .eq('sop_id', ctx.sopId)
+    .maybeSingle()
+  if (!step || !(step as { image_paths: string[] }).image_paths.includes(storagePath)) return { error: 'That photo is not on this step.' }
+
+  const { data: ann } = await admin
+    .from('sop_image_annotations')
+    .select('sop_image_id, scene')
+    .eq('organisation_id', ctx.organisationId)
+    .eq('baked_storage_path', storagePath)
+    .maybeSingle()
+  if (!ann) return { annotation: null }
+  const { data: orig } = await admin
+    .from('sop_images')
+    .select('storage_path')
+    .eq('id', (ann as { sop_image_id: string }).sop_image_id)
+    .eq('sop_id', ctx.sopId)
+    .maybeSingle()
+  const originalPath = (orig as { storage_path: string } | null)?.storage_path
+  if (!originalPath) return { annotation: null }
+  const { data: signed } = await admin.storage.from(BUCKET).createSignedUrl(originalPath, 3600)
+  if (!signed) return { annotation: null }
+  return { annotation: { originalPath, originalUrl: signed.signedUrl, scene: (ann as { scene: unknown }).scene } }
+}
+
+/**
+ * Swap a step photo for its baked, marked-up copy and keep the marks for later edits.
+ * `originalPath` must already be on this step (or be the original behind a baked photo
+ * that is); `bakedPath` must be a fresh upload this server handed out for this step.
+ */
+export async function saveAnnotatedStepImage(input: {
+  stepId: string
+  originalPath: string
+  bakedPath: string
+  scene: unknown
+}): Promise<Ok | Fail> {
+  const parsed = z
+    .object({ stepId: uuid, originalPath: z.string().max(300), bakedPath: z.string().max(300), scene: sceneSchema })
+    .safeParse(input)
+  if (!parsed.success) return { error: firstIssue(parsed.error) }
+  const { stepId, originalPath, bakedPath, scene } = parsed.data
+  if (JSON.stringify(scene).length > SCENE_MAX_BYTES) return { error: 'There are too many marks on this photo.' }
+
+  const ctx = await requireSopEditAccess({ stepId })
+  if ('error' in ctx) return { error: ctx.error }
+  const open = await editableSop(ctx.organisationId, ctx.sopId)
+  if ('error' in open) return open
+
+  const dir = `${ctx.organisationId}/${ctx.sopId}/steps/${stepId}`
+  const file = bakedPath.startsWith(`${dir}/`) ? bakedPath.slice(dir.length + 1) : ''
+  if (!IMAGE_FILE.test(file) || bakedPath === originalPath) return { error: 'That photo path is not valid.' }
+
+  const admin = createAdminClient()
+  const { data: listed } = await admin.storage.from(BUCKET).list(dir, { search: file })
+  if (!(listed ?? []).some((o) => o.name === file)) return { error: 'The photo did not finish uploading.' }
+
+  const { data: step } = await admin
+    .from('sop_focus_steps')
+    .select('image_paths, section_id')
+    .eq('id', stepId)
+    .eq('organisation_id', ctx.organisationId)
+    .eq('sop_id', ctx.sopId)
+    .maybeSingle()
+  if (!step) return { error: 'Step not found.' }
+  const { image_paths, section_id } = step as { image_paths: string[]; section_id: string }
+
+  const { data: orig } = await admin.from('sop_images').select('id').eq('sop_id', ctx.sopId).eq('storage_path', originalPath).limit(1).maybeSingle()
+  if (!orig) return { error: 'That photo is not on this step.' }
+  const originalId = (orig as { id: string }).id
+  const { data: priorRow } = await admin
+    .from('sop_image_annotations')
+    .select('id, baked_storage_path')
+    .eq('organisation_id', ctx.organisationId)
+    .eq('sop_image_id', originalId)
+    .limit(1)
+    .maybeSingle()
+  const prior = priorRow as { id: string; baked_storage_path: string | null } | null
+  const oldBaked = prior?.baked_storage_path ?? null
+  // The path on the step right now: the earlier baked copy when there is one, else the original.
+  const current = oldBaked && image_paths.includes(oldBaked) ? oldBaked : originalPath
+  if (!image_paths.includes(current)) return { error: 'That photo is not on this step.' }
+
+  const { data: bakedRow, error: bakedErr } = await admin
+    .from('sop_images')
+    .insert({ sop_id: ctx.sopId, section_id, storage_path: bakedPath, content_type: 'image/jpeg', sort_order: image_paths.indexOf(current) })
+    .select('id')
+    .single()
+  if (bakedErr || !bakedRow) {
+    console.error('[saveAnnotatedStepImage] image row error', bakedErr)
+    return { error: bakedErr?.message ?? 'Could not save the photo.' }
+  }
+  const bakedId = (bakedRow as { id: string }).id
+  const undoImage = () => admin.from('sop_images').delete().eq('id', bakedId).eq('sop_id', ctx.sopId)
+
+  const now = new Date().toISOString()
+  const fields = { scene, natural_width: scene.width, natural_height: scene.height, baked_storage_path: bakedPath, baked_at: now }
+  const annotationWrite = prior
+    ? await admin.from('sop_image_annotations').update({ ...fields, updated_at: now }).eq('id', prior.id).eq('organisation_id', ctx.organisationId)
+    : await admin.from('sop_image_annotations').insert({ organisation_id: ctx.organisationId, sop_image_id: originalId, ...fields })
+  if (annotationWrite.error) {
+    console.error('[saveAnnotatedStepImage] annotation error', annotationWrite.error)
+    await undoImage()
+    return { error: annotationWrite.error.message }
+  }
+
+  const { error } = await admin
+    .from('sop_focus_steps')
+    .update({ image_paths: image_paths.map((p) => (p === current ? bakedPath : p)) })
+    .eq('id', stepId)
+    .eq('organisation_id', ctx.organisationId)
+    .eq('sop_id', ctx.sopId)
+  if (error) {
+    console.error('[saveAnnotatedStepImage] step update error', error)
+    await undoImage()
+    if (!prior) await admin.from('sop_image_annotations').delete().eq('sop_image_id', originalId).eq('organisation_id', ctx.organisationId)
+    return { error: error.message }
+  }
+
+  // The earlier baked copy is no longer on the step: its row and file go.
+  if (oldBaked && oldBaked !== bakedPath && oldBaked.startsWith(`${dir}/`)) {
+    await admin.from('sop_images').delete().eq('sop_id', ctx.sopId).eq('storage_path', oldBaked)
+    await admin.storage.from(BUCKET).remove([oldBaked])
   }
   return { ok: true }
 }

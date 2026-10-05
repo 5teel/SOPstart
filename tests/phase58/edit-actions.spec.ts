@@ -51,9 +51,11 @@ const STEP_EXPORTS = [
   'getStepImageUploadUrl',
   'attachStepImage',
   'removeStepImage',
+  'getStepAnnotation',
+  'saveAnnotatedStepImage',
 ]
 const ADMIN_ONLY = ['tickFocusStep', 'untickFocusStep', 'setAllowForwardJump']
-const NOT_CONTENT = ['getFocusSop']
+const NOT_CONTENT = ['getFocusSop', 'getStepAnnotation']
 
 test.describe('FOC-02/WRK-04 edit actions', () => {
   test('both files are use-server with async-only exports and the plan\'s exact export list', () => {
@@ -76,7 +78,7 @@ test.describe('FOC-02/WRK-04 edit actions', () => {
     expect(g.slice(arm, arm + 260)).toContain(".from('sop_focus_steps')")
     // the session-org sops filter runs after every arm, unchanged
     expect(g.indexOf(".eq('organisation_id', organisationId)", arm)).toBeGreaterThan(arm)
-    for (const fn of ['updateFocusStep', 'deleteFocusStep', 'moveFocusStep', 'getStepImageUploadUrl', 'attachStepImage', 'removeStepImage']) {
+    for (const fn of ['updateFocusStep', 'deleteFocusStep', 'moveFocusStep', 'getStepImageUploadUrl', 'attachStepImage', 'removeStepImage', 'getStepAnnotation', 'saveAnnotatedStepImage']) {
       expect(body(steps, fn), fn).toContain('requireSopEditAccess({ stepId })')
     }
   })
