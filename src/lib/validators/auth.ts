@@ -11,6 +11,7 @@ export const inviteCodeSchema = z.object({
 
 export const inviteWorkerSchema = z.object({
   email: z.string().email('Enter a valid email address'),
+  role: z.enum(['worker', 'supervisor', 'admin', 'safety_manager']).default('worker'),
 })
 
 export const acceptInviteSchema = z.object({

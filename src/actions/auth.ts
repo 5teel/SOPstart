@@ -1,12 +1,15 @@
 'use server'
 
 import { redirect } from 'next/navigation'
+import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { parseJwtPayload } from '@/lib/supabase/jwt'
 import { getSessionContext } from '@/lib/auth/session-context'
 import { roleHome } from '@/lib/auth/role-home'
 import { safeNextPath } from '@/lib/auth/next-redirect'
+import { recordDecision } from '@/lib/decisions/record'
+import { deleteOrgMember } from '@/lib/members/remove'
 import type { TablesInsert, TablesUpdate } from '@/types/database.types'
 import type { AppRole } from '@/types/auth'
 import {
@@ -125,43 +128,82 @@ export async function joinWithInviteCode(formData: {
 }
 
 // ─────────────────────────────────────────────
-// inviteWorker — D-05, D-06, AUTH-02
-// Admin sends an email invite to a worker
+// inviteWorker — D-05, D-06, AUTH-02; Phase 59 D-11, A-10
+// Admin-only. One form: an existing account is added to the site with the
+// chosen role; a new address gets the email invite carrying that role.
 // ─────────────────────────────────────────────
 export async function inviteWorker(formData: {
   email: string
+  role?: AppRole
 }) {
   const result = inviteWorkerSchema.safeParse(formData)
   if (!result.success) {
     return { error: result.error.issues[0]?.message ?? 'Invalid input' }
   }
 
-  const { email } = result.data
-  const { userId, organisationId } = await getSessionContext()
+  const { role: newRole } = result.data
+  const email = result.data.email.trim().toLowerCase()
+  const { userId, role, organisationId } = await getSessionContext()
   if (!userId) {
     redirect('/login')
   }
-
+  if (role !== 'admin') return { error: 'Only an admin can invite people.' }
   if (!organisationId) {
-    return { error: 'You must be part of an organisation to invite workers.' }
+    return { error: 'You must be part of an organisation to invite people.' }
   }
 
   const admin = createAdminClient()
 
-  const { error: inviteError } = await admin.auth.admin.inviteUserByEmail(email, {
-    data: {
-      organisation_id: organisationId,
-      invited_role: 'worker',
-    },
-    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? ''}/invite/accept`,
-  })
+  // ponytail: first 1000 auth users only (same ceiling as getTeamMembersWithEmails); page it if an org outgrows that.
+  const { data: list, error: listError } = await admin.auth.admin.listUsers({ perPage: 1000 })
+  if (listError) {
+    console.error('invite listUsers error:', listError)
+    return { error: 'Failed to send invite. Please try again.' }
+  }
+  const existing = list.users.find((u) => u.email?.toLowerCase() === email)
 
-  if (inviteError) {
-    console.error('invite worker error:', inviteError)
-    return { error: inviteError.message ?? 'Failed to send invite. Please try again.' }
+  let subjectId: string | null = null
+  if (existing) {
+    const { data: already } = await admin
+      .from('organisation_members')
+      .select('id')
+      .eq('user_id', existing.id)
+      .eq('organisation_id', organisationId)
+      .maybeSingle()
+    if (already) return { error: 'This person is already a member of your organisation.' }
+
+    const { error: addError } = await admin.from('organisation_members').insert({
+      organisation_id: organisationId,
+      user_id: existing.id,
+      role: newRole,
+    })
+    if (addError) {
+      console.error('invite existing member insert error:', addError)
+      return { error: 'Failed to add this person. Please try again.' }
+    }
+    subjectId = existing.id
+  } else {
+    const { data: invited, error: inviteError } = await admin.auth.admin.inviteUserByEmail(email, {
+      data: {
+        organisation_id: organisationId,
+        invited_role: newRole,
+      },
+      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? ''}/invite/accept`,
+    })
+    if (inviteError) {
+      console.error('invite worker error:', inviteError)
+      return { error: inviteError.message ?? 'Failed to send invite. Please try again.' }
+    }
+    subjectId = invited?.user?.id ?? null
   }
 
-  return { success: `Invite sent to ${email}` }
+  const rec = await recordDecision({
+    kind: 'member_invited',
+    subject: { kind: 'member', id: subjectId },
+    summary: 'Invited a person',
+    details: { role: newRole, existing_account: Boolean(existing) },
+  })
+  return { success: existing ? 'Added to the site' : 'Invite sent', logged: rec.ok }
 }
 
 // ─────────────────────────────────────────────
@@ -232,36 +274,6 @@ export async function acceptInvite(formData: {
 }
 
 // ─────────────────────────────────────────────
-// updateMemberRole — D-10 through D-15, AUTH-04
-// Admin updates a member's role (RLS enforced — only admins can do this per RLS policy)
-// ─────────────────────────────────────────────
-export async function updateMemberRole(formData: {
-  memberId: string
-  role: string
-}) {
-  const result = updateRoleSchema.safeParse(formData)
-  if (!result.success) {
-    return { error: result.error.issues[0]?.message ?? 'Invalid input' }
-  }
-
-  const { memberId, role } = result.data
-  const supabase = await createClient()
-
-  const roleUpdate: TablesUpdate<'organisation_members'> = { role }
-  const { error } = await supabase
-    .from('organisation_members')
-    .update(roleUpdate)
-    .eq('id', memberId)
-
-  if (error) {
-    console.error('update member role error:', error)
-    return { error: 'Failed to update role. You may not have permission to do this.' }
-  }
-
-  return { success: 'Role updated successfully' }
-}
-
-// ─────────────────────────────────────────────
 // getTeamMembersWithEmails — fetch members + emails via admin client
 // ─────────────────────────────────────────────
 
@@ -273,6 +285,14 @@ export interface TeamMember {
   created_at: string | null
   /** Phase 25: department IDs this member is assigned to (from member_departments junction). */
   department_ids: string[]
+}
+
+/** Phase 59 (A-10): someone invited to this site who has not accepted yet. */
+export interface InvitedPerson {
+  user_id: string
+  email: string | null
+  role: AppRole
+  invited_at: string
 }
 
 export async function getTeamMembersWithEmails() {
@@ -295,13 +315,30 @@ export async function getTeamMembersWithEmails() {
   // Fetch emails via admin client (RLS blocks auth.users from regular client)
   const admin = createAdminClient()
   const userIds = members.map((m) => m.user_id)
+  const memberIds = new Set(userIds)
   const emailMap: Record<string, string> = {}
+  const invited: InvitedPerson[] = []
 
   // Supabase admin API: list users and filter
   const { data: { users } } = await admin.auth.admin.listUsers({ perPage: 1000 })
   for (const u of users) {
-    if (userIds.includes(u.id) && u.email) {
+    if (memberIds.has(u.id) && u.email) {
       emailMap[u.id] = u.email
+    }
+    // Invited, not yet accepted: this site's metadata, no membership row, never
+    // signed in, and an invite stamp. last_sign_in_at alone is not enough (59-01).
+    if (
+      u.user_metadata?.['organisation_id'] === organisationId &&
+      !memberIds.has(u.id) &&
+      !u.last_sign_in_at &&
+      u.invited_at
+    ) {
+      invited.push({
+        user_id: u.id,
+        email: u.email ?? null,
+        role: (u.user_metadata?.['invited_role'] as AppRole | undefined) ?? 'worker',
+        invited_at: u.invited_at,
+      })
     }
   }
 
@@ -330,11 +367,23 @@ export async function getTeamMembersWithEmails() {
     department_ids: deptMap[m.user_id] ?? [],
   }))
 
-  return { members: result, currentUserId: userId }
+  // The join code is an admin-only secret (regenerateInviteCode is admin-only too).
+  let inviteCode: string | null = null
+  if (role === 'admin') {
+    const { data: org } = await supabase
+      .from('organisations')
+      .select('invite_code')
+      .eq('id', organisationId)
+      .maybeSingle()
+    inviteCode = (org as { invite_code?: string | null } | null)?.invite_code ?? null
+  }
+
+  return { members: result, currentUserId: userId, invited, inviteCode }
 }
 
 // ─────────────────────────────────────────────
 // removeMember — remove a user from the organisation
+// The delete itself is deleteOrgMember: organisation_members has no delete policy.
 // ─────────────────────────────────────────────
 
 export async function removeMember(memberId: string) {
@@ -344,16 +393,21 @@ export async function removeMember(memberId: string) {
     return { error: 'Admin access required' }
   }
   if (!organisationId) return { error: 'No organisation' }
+  if (!z.string().uuid().safeParse(memberId).success) return { error: 'Member not found' }
 
-  // Prevent removing yourself
+  // Read the target (and its user id) BEFORE the delete, in the session organisation.
   const { data: target } = await supabase
     .from('organisation_members')
     .select('user_id, role')
     .eq('id', memberId)
+    .eq('organisation_id', organisationId)
     .maybeSingle()
 
   if (!target) return { error: 'Member not found' }
   if (target.user_id === userId) return { error: 'You cannot remove yourself' }
+  if (target.role === 'admin' && role !== 'admin') {
+    return { error: 'Only an admin can remove an admin.' }
+  }
 
   // Prevent removing the last admin
   if (target.role === 'admin') {
@@ -364,17 +418,20 @@ export async function removeMember(memberId: string) {
       .eq('role', 'admin')
 
     if ((count ?? 0) <= 1) {
-      return { error: 'Cannot remove the last admin. Promote another member first.' }
+      return { error: 'There has to be at least one admin.' }
     }
   }
 
-  const { error } = await supabase
-    .from('organisation_members')
-    .delete()
-    .eq('id', memberId)
+  const removed = await deleteOrgMember({ memberId, organisationId })
+  if (removed === 0) return { error: 'Failed to remove member' }
 
-  if (error) return { error: 'Failed to remove member' }
-  return { success: true }
+  const rec = await recordDecision({
+    kind: 'member_removed',
+    subject: { kind: 'member', id: target.user_id },
+    summary: 'Removed a person',
+    details: { role: target.role },
+  })
+  return { success: true, logged: rec.ok }
 }
 
 // ─────────────────────────────────────────────
@@ -405,7 +462,7 @@ export async function regenerateInviteCode() {
 }
 
 // ─────────────────────────────────────────────
-// updateMemberRole with self-demotion protection
+// updateMemberRoleSafe — admin-only role change (mirrors RLS 00062), last-admin protected
 // ─────────────────────────────────────────────
 
 export async function updateMemberRoleSafe(formData: {
@@ -418,84 +475,54 @@ export async function updateMemberRoleSafe(formData: {
   }
 
   const { memberId, role: newRole } = result.data
-  const { supabase, userId, organisationId } = await getSessionContext()
+  const { supabase, userId, role, organisationId } = await getSessionContext()
   if (!userId) return { error: 'Not authenticated' }
+  if (role !== 'admin') return { error: 'Only an admin can change roles.' }
+  if (!organisationId) return { error: 'No organisation' }
 
-  // Check if this is self-demotion from admin
   const { data: target } = await supabase
     .from('organisation_members')
     .select('user_id, role')
     .eq('id', memberId)
+    .eq('organisation_id', organisationId)
     .maybeSingle()
 
   if (!target) return { error: 'Member not found' }
 
-  if (target.user_id === userId && target.role === 'admin' && newRole !== 'admin') {
-    // Check if they're the last admin
+  // Demoting an admin: someone must stay admin.
+  if (target.role === 'admin' && newRole !== 'admin') {
     const { count } = await supabase
       .from('organisation_members')
       .select('id', { count: 'exact', head: true })
-      .eq('organisation_id', organisationId!)
+      .eq('organisation_id', organisationId)
       .eq('role', 'admin')
 
     if ((count ?? 0) <= 1) {
-      return { error: 'You are the last admin. Promote another member before changing your role.' }
+      return { error: 'There has to be at least one admin.' }
     }
   }
 
   const roleUpdate: TablesUpdate<'organisation_members'> = { role: newRole }
-  const { error } = await supabase
+  const { data: updated, error } = await supabase
     .from('organisation_members')
     .update(roleUpdate)
     .eq('id', memberId)
+    .eq('organisation_id', organisationId)
+    .select('id')
 
   if (error) {
     return { error: 'Failed to update role' }
   }
-
-  return { success: 'Role updated successfully' }
-}
-
-// ─────────────────────────────────────────────
-// addMemberByEmail — admin adds existing user to their org with a role
-// ─────────────────────────────────────────────
-
-export async function addMemberByEmail(email: string, role: AppRole) {
-  const { userId, role: currentRole, organisationId } = await getSessionContext()
-  if (!userId) return { error: 'Not authenticated' }
-  if (!currentRole || !['admin', 'safety_manager'].includes(currentRole)) {
-    return { error: 'Admin access required' }
-  }
-  if (!organisationId) return { error: 'No organisation' }
-
-  const admin = createAdminClient()
-
-  // Find user by email
-  const { data: { users } } = await admin.auth.admin.listUsers({ perPage: 1000 })
-  const targetUser = users.find((u) => u.email?.toLowerCase() === email.toLowerCase())
-
-  if (!targetUser) {
-    return { error: 'No account found for this email. Send an invite instead.' }
+  // Zero rows means RLS or the scope filtered the write out: not a success.
+  if (!updated || updated.length === 0) {
+    return { error: 'Failed to update role' }
   }
 
-  // Check if already a member of this org
-  const { data: existing } = await admin
-    .from('organisation_members')
-    .select('id')
-    .eq('user_id', targetUser.id)
-    .eq('organisation_id', organisationId)
-    .maybeSingle()
-
-  if (existing) {
-    return { error: 'This person is already a member of your organisation.' }
-  }
-
-  const { error } = await admin.from('organisation_members').insert({
-    organisation_id: organisationId,
-    user_id: targetUser.id,
-    role,
+  const rec = await recordDecision({
+    kind: 'role_change',
+    subject: { kind: 'member', id: target.user_id },
+    summary: "Changed a person's role",
+    details: { from: target.role, to: newRole },
   })
-
-  if (error) return { error: 'Failed to add member' }
-  return { success: true }
+  return { success: 'Role updated', logged: rec.ok }
 }

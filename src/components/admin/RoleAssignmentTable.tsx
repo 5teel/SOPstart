@@ -5,7 +5,6 @@ import { RefreshCw, UserMinus, Shield, AlertTriangle } from 'lucide-react'
 import {
   updateMemberRoleSafe,
   inviteWorker,
-  addMemberByEmail,
   regenerateInviteCode,
   removeMember,
   getTeamMembersWithEmails,
@@ -117,7 +116,7 @@ export default function RoleAssignmentTable({
     if (!addEmail.trim()) return
     setAddLoading(true)
     setAddFeedback(null)
-    const result = await addMemberByEmail(addEmail.trim(), addRole)
+    const result = await inviteWorker({ email: addEmail.trim(), role: addRole })
     if ('error' in result && result.error) {
       setAddFeedback({ message: result.error, type: 'error' })
     } else {
