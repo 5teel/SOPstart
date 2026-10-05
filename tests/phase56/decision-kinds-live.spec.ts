@@ -110,6 +110,28 @@ function samples(sopId: string): Record<DecisionKind, DecisionInput> {
       summary: `Changed ${LONGEST_AI_FIELD_LABEL}`,
       details: probe,
     },
+    // Phase 59: plain-words summaries, no email anywhere (details carry roles only).
+    role_change: {
+      kind: 'role_change',
+      subject: { kind: 'member', id: randomUUID() },
+      sopId: null,
+      summary: "Changed a person's role",
+      details: { ...probe, from: 'worker', to: 'safety_manager' },
+    },
+    member_invited: {
+      kind: 'member_invited',
+      subject: { kind: 'member', id: randomUUID() },
+      sopId: null,
+      summary: 'Invited a person',
+      details: { ...probe, role: 'safety_manager' },
+    },
+    member_removed: {
+      kind: 'member_removed',
+      subject: { kind: 'member', id: randomUUID() },
+      sopId: null,
+      summary: 'Removed a person',
+      details: probe,
+    },
   }
 }
 

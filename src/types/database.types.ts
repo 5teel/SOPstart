@@ -1872,7 +1872,7 @@ export type Database = {
         Row: {
           id: string
           organisation_id: string
-          kind: 'approve' | 'reject' | 'sign_off' | 'countersign' | 'assign' | 'unassign' | 'publish' | 'owner_change' | 'review' | 'observation' | 'verify' | 'verify_withdrawn' | 'ai_finding_cleared' | 'cadence_change' | 'ai_field_write'
+          kind: 'approve' | 'reject' | 'sign_off' | 'countersign' | 'assign' | 'unassign' | 'publish' | 'owner_change' | 'review' | 'observation' | 'verify' | 'verify_withdrawn' | 'ai_finding_cleared' | 'cadence_change' | 'ai_field_write' | 'role_change' | 'member_invited' | 'member_removed'
           actor_kind: 'person' | 'agent'
           actor_id: string | null
           actor_name: string | null
@@ -1890,7 +1890,7 @@ export type Database = {
         Insert: {
           id?: string
           organisation_id: string
-          kind: 'approve' | 'reject' | 'sign_off' | 'countersign' | 'assign' | 'unassign' | 'publish' | 'owner_change' | 'review' | 'observation' | 'verify' | 'verify_withdrawn' | 'ai_finding_cleared' | 'cadence_change' | 'ai_field_write'
+          kind: 'approve' | 'reject' | 'sign_off' | 'countersign' | 'assign' | 'unassign' | 'publish' | 'owner_change' | 'review' | 'observation' | 'verify' | 'verify_withdrawn' | 'ai_finding_cleared' | 'cadence_change' | 'ai_field_write' | 'role_change' | 'member_invited' | 'member_removed'
           actor_kind: 'person' | 'agent'
           actor_id?: string | null
           actor_name?: string | null
@@ -1908,7 +1908,7 @@ export type Database = {
         Update: {
           id?: string
           organisation_id?: string
-          kind?: 'approve' | 'reject' | 'sign_off' | 'countersign' | 'assign' | 'unassign' | 'publish' | 'owner_change' | 'review' | 'observation' | 'verify' | 'verify_withdrawn' | 'ai_finding_cleared' | 'cadence_change' | 'ai_field_write'
+          kind?: 'approve' | 'reject' | 'sign_off' | 'countersign' | 'assign' | 'unassign' | 'publish' | 'owner_change' | 'review' | 'observation' | 'verify' | 'verify_withdrawn' | 'ai_finding_cleared' | 'cadence_change' | 'ai_field_write' | 'role_change' | 'member_invited' | 'member_removed'
           actor_kind?: 'person' | 'agent'
           actor_id?: string | null
           actor_name?: string | null
