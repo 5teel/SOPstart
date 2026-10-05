@@ -41,6 +41,7 @@ const SELECT =
   'min-h-tap rounded-lg border border-ink-300 bg-paper-1 px-3 text-ui text-ink-900 disabled:opacity-60'
 const CHIP = 'rounded mono text-meta uppercase tracking-wide px-2 py-1'
 const EMAIL_OK = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const FAILED_COPY = "That didn't work. Nothing was changed — try again."
 
 function StatusChip({ invited }: { invited: boolean }) {
   return invited ? (
@@ -157,62 +158,87 @@ export function PeopleTab({ onReceipt }: { onReceipt(r: RowDone): void }) {
   const [code, setCode] = useState<string | null>(null)
   const shownCode = code ?? data?.inviteCode ?? null
   const [codeBusy, setCodeBusy] = useState(false)
+  const [codeError, setCodeError] = useState<string | null>(null)
 
+  // Every action call is wrapped (59 review WR-03): a thrown action (network drop,
+  // orphaned action, 5xx) must re-enable the control and say so, like InboxRow.run.
   async function sendInvite() {
     setInviting(true)
     setInviteError(null)
-    const res = await inviteWorker({ email: email.trim(), role: inviteRole })
-    setInviting(false)
-    if ('error' in res && res.error) {
-      setInviteError(res.error)
-      return
+    try {
+      const res = await inviteWorker({ email: email.trim(), role: inviteRole })
+      if ('error' in res && res.error) {
+        setInviteError(res.error)
+        return
+      }
+      const added = 'success' in res && res.success === 'Added to the site'
+      setInviteOpen(false)
+      setEmail('')
+      setInviteRole('worker')
+      onReceipt({
+        receipt: `${added ? 'Added to the site' : 'Invite sent'}`,
+        logged: 'logged' in res ? (res.logged ?? null) : null,
+      })
+      await refetch()
+    } catch {
+      setInviteError(FAILED_COPY)
+    } finally {
+      setInviting(false)
     }
-    const added = 'success' in res && res.success === 'Added to the site'
-    setInviteOpen(false)
-    setEmail('')
-    setInviteRole('worker')
-    onReceipt({
-      receipt: `${added ? 'Added to the site' : 'Invite sent'}`,
-      logged: 'logged' in res ? (res.logged ?? null) : null,
-    })
-    await refetch()
   }
 
   async function changeRole(m: TeamMember, next: AppRole) {
     if (next === m.role) return
     setRowError(null)
     setPendingRole(m.id)
-    const res = await updateMemberRoleSafe({ memberId: m.id, role: next })
-    setPendingRole(null)
-    if ('error' in res && res.error) {
-      // The select is controlled by the server's row, so a refusal leaves it on the old role.
-      setRowError({ id: m.id, text: res.error })
-      return
+    try {
+      const res = await updateMemberRoleSafe({ memberId: m.id, role: next })
+      if ('error' in res && res.error) {
+        // The select is controlled by the server's row, so a refusal leaves it on the old role.
+        setRowError({ id: m.id, text: res.error })
+        return
+      }
+      onReceipt({ receipt: `Role changed to ${ROLE_WORDS[next]}`, logged: 'logged' in res ? (res.logged ?? null) : null })
+      await refetch()
+    } catch {
+      setRowError({ id: m.id, text: FAILED_COPY })
+    } finally {
+      setPendingRole(null)
     }
-    onReceipt({ receipt: `Role changed to ${ROLE_WORDS[next]}`, logged: 'logged' in res ? (res.logged ?? null) : null })
-    await refetch()
   }
 
   async function confirmRemove() {
     if (!removing) return
     setRemovePending(true)
     setRemoveError(null)
-    const res = await removeMember(removing.id)
-    setRemovePending(false)
-    if ('error' in res && res.error) {
-      setRemoveError(res.error)
-      return
+    try {
+      const res = await removeMember(removing.id)
+      if ('error' in res && res.error) {
+        setRemoveError(res.error)
+        return
+      }
+      setRemoving(null)
+      onReceipt({ receipt: 'Removed', logged: 'logged' in res ? (res.logged ?? null) : null })
+      await refetch()
+    } catch {
+      setRemoveError(FAILED_COPY)
+    } finally {
+      setRemovePending(false)
     }
-    setRemoving(null)
-    onReceipt({ receipt: 'Removed', logged: 'logged' in res ? (res.logged ?? null) : null })
-    await refetch()
   }
 
   async function newCode() {
     setCodeBusy(true)
-    const res = await regenerateInviteCode()
-    setCodeBusy(false)
-    if ('code' in res && res.code) setCode(res.code)
+    setCodeError(null)
+    try {
+      const res = await regenerateInviteCode()
+      if ('code' in res && res.code) setCode(res.code)
+      else setCodeError(FAILED_COPY)
+    } catch {
+      setCodeError(FAILED_COPY)
+    } finally {
+      setCodeBusy(false)
+    }
   }
 
   if (team.isLoading) {
@@ -473,6 +499,11 @@ export function PeopleTab({ onReceipt }: { onReceipt(r: RowDone): void }) {
             >
               New code
             </button>
+            {codeError && (
+              <span role="alert" className="text-accent-escalate">
+                {codeError}
+              </span>
+            )}
           </span>
         )}
       </div>

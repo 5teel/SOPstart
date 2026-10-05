@@ -77,15 +77,21 @@ export function ThisSopBlock({ sopId, initial, from, isAdmin, owner }: ThisSopBl
   async function markReviewed() {
     setMarking(true)
     setError(null)
-    const res = await confirmSopCurrent(sopId)
-    setMarking(false)
-    if ('error' in res) return setError(res.error)
-    setReviewDueAt(res.reviewDueAt)
-    setReviewReceipt(
-      res.logged
-        ? { text: 'Marked reviewed · logged in the decision ledger', bad: false }
-        : { text: "Marked reviewed, but it didn't reach the decision ledger. Tell an admin.", bad: true },
-    )
+    try {
+      const res = await confirmSopCurrent(sopId)
+      if ('error' in res) return setError(res.error)
+      setReviewDueAt(res.reviewDueAt)
+      setReviewReceipt(
+        res.logged
+          ? { text: 'Marked reviewed · logged in the decision ledger', bad: false }
+          : { text: "Marked reviewed, but it didn't reach the decision ledger. Tell an admin.", bad: true },
+      )
+    } catch {
+      // 59 review WR-03: a thrown action must not leave the button disabled with no message.
+      setError("That didn't work. Nothing was changed — try again.")
+    } finally {
+      setMarking(false)
+    }
   }
 
   async function toggleJump(allow: boolean) {

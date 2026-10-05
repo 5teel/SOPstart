@@ -14,6 +14,8 @@ import { User } from 'lucide-react'
 import { getOrgMembers, type OrgMemberWithProfile } from '@/actions/assignments'
 import { setSopOwner } from '@/actions/governance'
 
+const FAILED_COPY = "That didn't work. Nothing was changed — try again."
+
 function memberLabel(m: OrgMemberWithProfile): string {
   return m.full_name ?? m.email ?? 'someone who has left'
 }
@@ -52,32 +54,44 @@ export function OwnerPicker({
     return () => window.removeEventListener('keydown', onKey, true)
   }, [open])
 
+  // Both action calls are wrapped (59 review WR-03): a thrown action re-enables
+  // the picker and says so instead of leaving it stuck.
   async function handleOpen() {
     setError(null)
     setOpen((o) => !o)
     if (open || members.length > 0) return
     setLoading(true)
-    const result = await getOrgMembers()
-    setLoading(false)
-    if (!result.success) {
-      setError(result.error)
-      return
+    try {
+      const result = await getOrgMembers()
+      if (!result.success) {
+        setError(result.error)
+        return
+      }
+      setMembers(result.members)
+    } catch {
+      setError(FAILED_COPY)
+    } finally {
+      setLoading(false)
     }
-    setMembers(result.members)
   }
 
   async function handlePick(userId: string | null) {
     setSaving(true)
     setError(null)
-    const result = await setSopOwner(sopId, userId)
-    setSaving(false)
-    if ('error' in result) {
-      setError(result.error)
-      return
+    try {
+      const result = await setSopOwner(sopId, userId)
+      if ('error' in result) {
+        setError(result.error)
+        return
+      }
+      setOpen(false)
+      const picked = userId ? members.find((m) => m.user_id === userId) : null
+      onDone?.({ logged: result.logged, ownerLabel: picked ? memberLabel(picked) : null })
+    } catch {
+      setError(FAILED_COPY)
+    } finally {
+      setSaving(false)
     }
-    setOpen(false)
-    const picked = userId ? members.find((m) => m.user_id === userId) : null
-    onDone?.({ logged: result.logged, ownerLabel: picked ? memberLabel(picked) : null })
   }
 
   return (

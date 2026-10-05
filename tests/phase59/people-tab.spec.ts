@@ -87,4 +87,22 @@ test.describe('people tab', () => {
     expect(PANE).toContain("tab === 'people' && <PeopleTab")
     expect(PANE).toContain('onReceipt={(r) => setReceipt({ ...r, tab })}')
   })
+
+  test('review WR-03: every action call is wrapped, so a thrown action re-enables the control and says so', () => {
+    const FAILED = `"That didn't work. Nothing was changed — try again."`
+    for (const [file, calls, finals] of [
+      ['src/components/office/PeopleTab.tsx', ['inviteWorker(', 'updateMemberRoleSafe(', 'removeMember(', 'regenerateInviteCode('], ['setInviting(false)', 'setPendingRole(null)', 'setRemovePending(false)', 'setCodeBusy(false)']],
+      ['src/components/focus/admin/ThisSopBlock.tsx', ['confirmSopCurrent('], ['setMarking(false)']],
+      ['src/components/admin/governance/OwnerPicker.tsx', ['getOrgMembers(', 'setSopOwner('], ['setLoading(false)', 'setSaving(false)']],
+    ] as const) {
+      const src = strip(read(file))
+      expect(src, file).toContain(FAILED)
+      for (const c of calls) {
+        const at = src.indexOf(`await ${c}`)
+        expect(at, `${file} ${c}`).toBeGreaterThan(-1)
+        expect(src.lastIndexOf('try {', at), `${file} ${c} inside try`).toBeGreaterThan(src.lastIndexOf('async function', at))
+      }
+      for (const f of finals) expect(src, `${file} ${f}`).toMatch(new RegExp(`finally \\{\\s*${f.replace(/[()]/g, '\\$&')}`))
+    }
+  })
 })
