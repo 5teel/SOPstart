@@ -1,24 +1,20 @@
 'use client'
 
-import React, { useEffect, useRef, useState, useTransition } from 'react'
+import React, { useEffect, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { CheckCircle, AlertTriangle, Loader2 } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
 import { reparseSop, restructureSop } from '@/actions/sops'
+import { useParseJob } from '@/hooks/useParseJob'
 import type { ParseJobStatus as ParseJobStatusType } from '@/types/sop'
 import {
   PLAIN_STAGES,
   STAGE_SETS,
   STAGE_TO_PLAIN,
   plainLabel,
-  shouldStartPolling,
 } from '@/lib/admin/job-stages'
 
-// D-08: realtime + polling engine for the document/AI/video-to-SOP parse flow
-// (three-timer model: realtime grace, stale watchdog, 5s poll).
-const POLL_INTERVAL_MS = 5000
-const REALTIME_GRACE_MS = 5000
-const REALTIME_STALE_MS = 15000
+// D-08: the realtime + polling engine (three-timer model: realtime grace, stale
+// watchdog, 5s poll) lives in useParseJob (Phase 58-13), shared with the editor.
 
 interface ParseJobStatusBaseProps {
   isOcr?: boolean
@@ -50,26 +46,28 @@ export default function ParseJobStatus(props: ParseJobStatusProps) {
     onCompleted,
   } = props
   const router = useRouter()
-  const [status, setStatus] = useState<ParseJobStatusType | null>(
-    initialStatus ?? null
-  )
-  const [errorMessage, setErrorMessage] = useState<string | null>(
-    initialErrorMessage ?? null
-  )
+  const { job, patch } = useParseJob(sopId, {
+    initial: {
+      status: initialStatus ?? null,
+      errorMessage: initialErrorMessage ?? null,
+      currentStage: initialStage ?? null,
+      isVideo: initialIsVideo ?? false,
+    },
+    onCompleted,
+    onPollCompleted: () => router.refresh(), // auto-refresh to show review UI
+  })
+  const { status, errorMessage, currentStage, isVideo: isVideoSop, inputType } = job
+  const setStatus = (v: ParseJobStatusType | null) => patch({ status: v })
+  const setErrorMessage = (v: string | null) => patch({ errorMessage: v })
+  const setCurrentStage = (v: string | null) => patch({ currentStage: v })
   const [deleting, setDeleting] = useState(false)
   const [reParsing, setReParsing] = useState(false)
-  const [currentStage, setCurrentStage] = useState<string | null>(initialStage ?? null)
-  const [isVideoSop, setIsVideoSop] = useState(initialIsVideo ?? false)
-  const [inputType, setInputType] = useState<string | null>(null)
   const [detailLevel, setDetailLevel] = useState(3)
   const [startTime] = useState<number>(Date.now())
   const [elapsed, setElapsed] = useState(0)
   // Loading state for "Review now →" click — router.refresh() runs in a
   // transition so we can show a spinner while the slow RSC fetch lands.
   const [reviewLoading, startReviewTransition] = useTransition()
-
-  const lastUpdateRef = useRef<number>(Date.now())
-  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   // Elapsed timer for transcribing stage
   useEffect(() => {
@@ -79,101 +77,6 @@ export default function ParseJobStatus(props: ParseJobStatusProps) {
     }, 1000)
     return () => clearInterval(interval)
   }, [currentStage, startTime])
-
-  useEffect(() => {
-    const supabase = createClient()
-    lastUpdateRef.current = Date.now()
-
-    // Clearing the interval on unmount does NOT cancel a request already in
-    // flight. Without this flag, a poll fired just before you navigate away
-    // resolves a second later on a dead component and still runs its
-    // completion branch — which on the AI-draft surfaces is a router.push into
-    // the builder. Symptom: you click Manage SOPs and get thrown into the last
-    // SOP you were drafting, with no input from you.
-    let cancelled = false
-
-    function startPolling() {
-      if (cancelled || pollingRef.current) return
-      pollingRef.current = setInterval(fetchParseJob, POLL_INTERVAL_MS)
-    }
-
-    async function fetchParseJob() {
-      const { data } = await supabase
-        .from('parse_jobs')
-        .select('status, error_message, current_stage, file_type, input_type')
-        .eq('sop_id', sopId as string)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle() as { data: { status: string; error_message: string | null; current_stage: string | null; file_type: string; input_type: string | null } | null }
-      if (cancelled) return
-      if (data) {
-        setStatus(data.status as ParseJobStatusType)
-        if (data.error_message) setErrorMessage(data.error_message)
-        if (data.current_stage) setCurrentStage(data.current_stage as string)
-        if (data.file_type === 'video') setIsVideoSop(true)
-        setInputType(data.input_type ?? null)
-        lastUpdateRef.current = Date.now()
-        if (data.status === 'completed') {
-          if (onCompleted) onCompleted()
-          router.refresh() // auto-refresh to show review UI
-        }
-      }
-    }
-
-    const channel = supabase
-      .channel(`parse-job-${sopId}`)
-      .on(
-        'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'parse_jobs', filter: `sop_id=eq.${sopId}` },
-        (payload) => {
-          if (cancelled) return
-          lastUpdateRef.current = Date.now()
-          if (pollingRef.current) { clearInterval(pollingRef.current); pollingRef.current = null }
-          setStatus(payload.new.status as ParseJobStatusType)
-          if (payload.new.error_message) setErrorMessage(payload.new.error_message)
-          if (payload.new.current_stage) {
-            setCurrentStage(payload.new.current_stage as string)
-          }
-          if (payload.new.file_type === 'video') setIsVideoSop(true)
-          if (payload.new.input_type !== undefined) setInputType((payload.new.input_type as string | null) ?? null)
-          if (payload.new.status === 'completed' && onCompleted) onCompleted()
-        }
-      )
-      .subscribe((subStatus) => {
-        lastUpdateRef.current = Date.now()
-        if (subStatus === 'CHANNEL_ERROR' || subStatus === 'TIMED_OUT' || subStatus === 'CLOSED') {
-          startPolling()
-        }
-      })
-    fetchParseJob()
-
-    // Polling grace period: if no realtime event fires within REALTIME_GRACE_MS, start polling.
-    const startPollingTimeout = setTimeout(() => {
-      if (shouldStartPolling(lastUpdateRef.current, Date.now(), REALTIME_GRACE_MS)) {
-        startPolling()
-      }
-    }, REALTIME_GRACE_MS)
-
-    // Stale watchdog: even if realtime is delivering events, start polling after
-    // REALTIME_STALE_MS to catch silent drops (connected then went quiet).
-    const staleWatchdog = setInterval(() => {
-      if (shouldStartPolling(lastUpdateRef.current, Date.now(), REALTIME_STALE_MS)) {
-        startPolling()
-      }
-    }, REALTIME_STALE_MS)
-
-    return () => {
-      cancelled = true
-      clearTimeout(startPollingTimeout)
-      clearInterval(staleWatchdog)
-      if (pollingRef.current) {
-        clearInterval(pollingRef.current)
-        pollingRef.current = null
-      }
-      supabase.removeChannel(channel)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sopId])
 
   const handleReparse = async () => {
     setReParsing(true)

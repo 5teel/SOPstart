@@ -11,9 +11,10 @@
  * Esc order: the topmost registered overlay closes first, then a text field
  * being edited is left, then Back.
  */
-import { createContext, useCallback, useContext, useEffect, useRef } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { backHref } from '@/lib/sop/focus-path'
+import type { FocusSop } from '@/lib/sop/focus-read'
 
 const SAVE_WAIT_MS = 3000
 
@@ -34,6 +35,25 @@ export function useRegisterOverlay(open: boolean, close: Overlay): void {
 /** Lets a child of the frame (the "sent" panel) trigger the same Back as the top bar. */
 export const FocusBackContext = createContext<() => void>(() => {})
 export const useFocusGoBack = () => useContext(FocusBackContext)
+
+/**
+ * What the frame hands the lazy editor (58-13). The editor lives in a chunk the
+ * worker never downloads, so it cannot be imported by the frame; this is the only
+ * seam between them. `setBeforeBack` lets the editor flush a pending save before
+ * Back leaves; `onFocus` reports the latest read of the SOP so flipping to Walk
+ * shows the steps as edited.
+ */
+export interface FocusEditorBridge {
+  railOpen: boolean
+  closeRail(): void
+  /** The top bar's slot for the save pill (the editor portals into it). */
+  saveSlot: HTMLElement | null
+  /** The Walk / Edit switch, shown at the top of the rail sheet on a phone. */
+  sheetTop: ReactNode
+  setBeforeBack(fn: (() => Promise<unknown>) | null): void
+  onFocus(focus: FocusSop): void
+}
+export const FocusEditorBridgeContext = createContext<FocusEditorBridge | null>(null)
 
 const isField = (el: Element | null): el is HTMLElement =>
   !!el && (el.matches('input, textarea, select') || (el as HTMLElement).isContentEditable)

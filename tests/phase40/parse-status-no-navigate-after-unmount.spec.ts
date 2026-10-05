@@ -20,10 +20,13 @@ import path from 'node:path'
  */
 
 const ROOT = process.cwd()
+// Phase 58-13: the realtime + polling engine moved out of ParseJobStatus into
+// useParseJob (shared with the editor's parsing view); the guard lives with it.
 const PARSE_JOB_STATUS = path.join(ROOT, 'src', 'components', 'admin', 'ParseJobStatus.tsx')
+const PARSE_JOB_HOOK = path.join(ROOT, 'src', 'hooks', 'useParseJob.ts')
 
 function read(): string {
-  return fs.readFileSync(PARSE_JOB_STATUS, 'utf-8').replace(/\r\n/g, '\n')
+  return fs.readFileSync(PARSE_JOB_HOOK, 'utf-8').replace(/\r\n/g, '\n')
 }
 
 /**
@@ -41,7 +44,20 @@ function readCode(): string {
     .join('\n')
 }
 
-test('ParseJobStatus declares a cancelled flag and sets it in the effect cleanup', () => {
+test('ParseJobStatus gets its engine from useParseJob and keeps no poll of its own', () => {
+  const src = fs.readFileSync(PARSE_JOB_STATUS, 'utf-8')
+  expect(src).toContain('useParseJob(')
+  expect(src).not.toContain('POLL_INTERVAL_MS')
+  expect(src).not.toContain('postgres_changes')
+})
+
+test('the focus editor view reads the same hook and the hook never navigates', () => {
+  const progress = fs.readFileSync(path.join(ROOT, 'src', 'components', 'focus', 'admin', 'ParseProgress.tsx'), 'utf-8')
+  expect(progress).toContain('useParseJob(')
+  expect(read()).not.toMatch(/router\.|useRouter|window\.location/)
+})
+
+test('the parse-job hook declares a cancelled flag and sets it in the effect cleanup', () => {
   const src = read()
   expect(src, 'effect-scoped cancellation flag').toContain('let cancelled = false')
   expect(src, 'flag must be raised in the cleanup, not just declared').toContain('cancelled = true')
@@ -54,7 +70,7 @@ test('ParseJobStatus declares a cancelled flag and sets it in the effect cleanup
 test('every onCompleted call is preceded by a cancelled check', () => {
   const src = readCode()
   const completions = [...src.matchAll(/onCompleted\(\)/g)].map((m) => m.index ?? -1)
-  expect(completions.length, 'ParseJobStatus should still invoke onCompleted').toBeGreaterThan(0)
+  expect(completions.length, 'useParseJob should still invoke onCompleted').toBeGreaterThan(0)
 
   for (const at of completions) {
     // Walk back to the nearest cancelled guard and the nearest await. A guard

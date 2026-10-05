@@ -1,5 +1,6 @@
 'use client'
 
+import type { ReactNode } from 'react'
 import { Check, Lock, X } from 'lucide-react'
 import { railNumber, type WalkEntry } from '@/lib/sop/focus'
 import type { FocusStepRow } from '@/lib/sop/focus-read'
@@ -19,6 +20,8 @@ export interface FocusRailProps {
   hollowDot?(entry: WalkEntry<FocusStepRow>): boolean
   /** Defaults to scrolling the column to the step. */
   onPick?(entry: WalkEntry<FocusStepRow>): void
+  /** Phone only: the Walk / Edit switch moves here from the top bar (UI-SPEC). */
+  sheetTop?: ReactNode
 }
 
 export function scrollToStep(stepId: string): void {
@@ -28,7 +31,7 @@ export function scrollToStep(stepId: string): void {
   el.focus({ preventScroll: true })
 }
 
-export function FocusRail({ order, open, onClose, rowState, hollowDot, onPick }: FocusRailProps) {
+export function FocusRail({ order, open, onClose, rowState, hollowDot, onPick, sheetTop }: FocusRailProps) {
   useRegisterOverlay(open, onClose)
 
   let lastGroup: string | null = null
@@ -47,6 +50,7 @@ export function FocusRail({ order, open, onClose, rowState, hollowDot, onPick }:
         <X className="size-4" aria-hidden="true" />
         Close
       </button>
+      {sheetTop && <div className="px-4 pb-2 sm:hidden">{sheetTop}</div>}
       {order.map((entry) => {
         const header = entry.groupLabel !== lastGroup ? entry.groupLabel : null
         lastGroup = entry.groupLabel

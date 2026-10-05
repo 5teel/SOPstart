@@ -22,7 +22,9 @@ const ROOT = process.cwd()
 const SRC_DIR = path.join(ROOT, 'src')
 
 const PIPELINE_STEPPER = path.join(SRC_DIR, 'components', 'admin', 'PipelineStepper.tsx')
-const PARSE_JOB_STATUS = path.join(SRC_DIR, 'components', 'admin', 'ParseJobStatus.tsx')
+// Phase 58-13: the realtime/polling engine moved from ParseJobStatus.tsx into the
+// useParseJob hook so the editor's parsing view shares it; still ONE owner.
+const PARSE_JOB_STATUS = path.join(SRC_DIR, 'hooks', 'useParseJob.ts')
 const JOB_STAGES = path.join(SRC_DIR, 'lib', 'admin', 'job-stages.ts')
 
 function read(p: string): string {
@@ -54,7 +56,7 @@ test.describe('DUP-03 -- one shared job-progress component', () => {
     expect(fs.existsSync(PIPELINE_STEPPER)).toBe(false)
   })
 
-  test('exactly one file under src/ contains both REALTIME_GRACE_MS and REALTIME_STALE_MS, and it is ParseJobStatus.tsx', () => {
+  test('exactly one file under src/ contains both REALTIME_GRACE_MS and REALTIME_STALE_MS, and it is the useParseJob hook', () => {
     const files: string[] = []
     walk(SRC_DIR, files)
     const owners = files.filter((f) => {
@@ -92,7 +94,7 @@ test.describe('DUP-03 -- one shared job-progress component', () => {
     }
   })
 
-  test('ParseJobStatus subscribes to parse_jobs only (generation pipeline gone)', () => {
+  test('the parse-job engine subscribes to parse_jobs only (generation pipeline gone)', () => {
     const src = stripComments(read(PARSE_JOB_STATUS))
     expect(src).toContain("table: 'parse_jobs'")
     for (const literal of ['sop_pipeline_runs', 'video_generation_jobs', 'pipeline_run_id=eq.']) {

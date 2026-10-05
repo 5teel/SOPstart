@@ -25,9 +25,11 @@ export interface EditRailProps {
   flaggedStepIds?: ReadonlySet<string>
   /** Pinned under the list (58-13 passes ThisSopBlock). */
   footer?: ReactNode
+  /** Phone only: the Walk / Edit switch, moved here from the top bar. */
+  sheetTop?: ReactNode
 }
 
-export function EditRail({ sopId, initial, open, onClose, flaggedStepIds, footer }: EditRailProps) {
+export function EditRail({ sopId, initial, open, onClose, flaggedStepIds, footer, sheetTop }: EditRailProps) {
   useRegisterOverlay(open, onClose)
   const { focus, invalidate } = useFocusSop(sopId, initial)
   const [error, setError] = useState<string | null>(null)
@@ -54,6 +56,7 @@ export function EditRail({ sopId, initial, open, onClose, flaggedStepIds, footer
         <X className="size-4" aria-hidden="true" />
         Close
       </button>
+      {sheetTop && <div className="px-4 pb-2 sm:hidden">{sheetTop}</div>}
 
       {focus.sections.map((section, i) => (
         <div key={section.id}>
