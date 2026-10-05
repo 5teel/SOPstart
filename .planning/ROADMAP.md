@@ -1979,7 +1979,7 @@ Plans:
   4. The decisions tab lists the ledger newest first and can be narrowed by kind of decision; opening it, people and roles, or access widens the detail panel while the site stays visible and re-centres on the Office
   5. An admin invites a person, sets their role, sees their department, and opens the existing access wiring screen, unchanged, to decide who sees which SOPs
 
-**Plans:** 6/16 plans executed
+**Plans:** 8/16 plans executed
 Plans:
 **Wave 1**
 
@@ -2001,8 +2001,8 @@ Plans:
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
-- [ ] 59-07-PLAN.md — Owner can mark reviewed (plain-module owner path); owner + review line under every admin SOP row; This SOP Owner and Review rows
-- [ ] 59-08-PLAN.md — Sign off and Approve panels with every old gate, lightbox (Esc stays in the layer), reason dialog
+- [x] 59-07-PLAN.md — Owner can mark reviewed (plain-module owner path); owner + review line under every admin SOP row; This SOP Owner and Review rows
+- [x] 59-08-PLAN.md — Sign off and Approve panels with every old gate, lightbox (Esc stays in the layer), reason dialog
 
 **Wave 6** *(blocked on Wave 5 completion)*
 
