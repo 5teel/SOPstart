@@ -241,7 +241,7 @@ export const UAT_TESTS: UatTest[] = [
       'Try the "+ Add role" and "+ ADD DEPARTMENT" dashed buttons in either view.',
       'Open "Manage members, invites & org roles" at the bottom of Columns and confirm inviting people and changing someone\'s org role still works exactly as before.',
     ],
-    links: [{ label: 'Team & org model', href: '/admin/team' }],
+    links: [{ label: 'People & roles (Office)', href: '/?place=office&tab=people' }],
     questions: [
       { id: 'chart-clear', text: 'Was it clear from the chart how your org is structured?' },
       { id: 'columns-fast', text: 'Did Columns feel faster for adding roles/departments than the chart?' },
@@ -266,7 +266,7 @@ export const UAT_TESTS: UatTest[] = [
       'Click the new SOP, choose a department or two, and hit "✓ Save — done" — confirm the banner and the "Who can see this?" panel below update live.',
       'With something focused, click "Open in the SOP list →" and confirm the site opens on that department place.',
     ],
-    links: [{ label: 'Access (from the Office)', href: '/admin/access' }],
+    links: [{ label: 'Access (from the Office)', href: '/?place=office&tab=access' }],
     questions: [
       { id: 'trace-clear', text: 'Was it clear which SOPs an area/department/person can see when you clicked it?' },
       { id: 'wireup-easy', text: 'Was wiring up a new SOP\'s access straightforward?' },
@@ -292,7 +292,7 @@ export const UAT_TESTS: UatTest[] = [
       'Click a person or team on the left instead — the same panel should flip to say what THEY can see.',
       'Look through the whole screen for the words "wire", "wiring", "grant" or "UNWIRED" — you shouldn\'t find any.',
     ],
-    links: [{ label: 'Access (from the Office)', href: '/admin/access' }],
+    links: [{ label: 'Access (from the Office)', href: '/?place=office&tab=access' }],
     questions: [
       { id: 'drilldown-clear', text: 'Was it obvious you could open a collection and pick one of the SOPs inside it?' },
       { id: 'panel-plain', text: 'Did the "Who can see this?" / "What can they see?" panel read like plain English, not tech jargon?' },
@@ -316,7 +316,7 @@ export const UAT_TESTS: UatTest[] = [
       'Choose the department(s)/person(s) who should actually see this one SOP, then click "Save — done".',
       'Confirm the panel now says the SOP is "chosen by name" and no longer follows the wider collection.',
     ],
-    links: [{ label: 'Access (from the Office)', href: '/admin/access' }],
+    links: [{ label: 'Access (from the Office)', href: '/?place=office&tab=access' }],
     questions: [
       { id: 'wr02-found', text: 'Could you find this SOP and see the plain-language explanation of who currently sees it?' },
       { id: 'wr02-narrowed', text: 'Were you able to choose the right people/department by name and save it?' },
@@ -338,11 +338,11 @@ export const UAT_TESTS: UatTest[] = [
     summary:
       'Supervisors can now record that they personally watched a worker perform a SOP — a verdict (performed to SOP / needs support) plus an optional note. You can start this from a person\'s panel in Team, or straight from a completion in Activity.',
     tryIt: [
-      'Open a worker in Team, click their name/chip to open their panel, then click "Record observation".',
+      'Open the Training matrix from the Smoko room, click a cell to open the panel for that person, then click "Record observation".',
       'Pick a SOP, choose a verdict, add a short note, and save — check it appears in their observation history.',
       'Now try the other way in: open Activity, find a completion, and use the "I observed this" row action instead — confirm it pre-fills the worker and SOP.',
     ],
-    links: [{ label: 'Team', href: '/admin/team' }, { label: 'Activity', href: '/activity' }],
+    links: [{ label: 'Training matrix', href: '/admin/training' }, { label: 'Activity', href: '/activity' }],
     questions: [
       { id: 'entry-found', text: 'Was it easy to find "Record observation" from both Team and Activity?' },
       { id: 'save-clear', text: 'Was it clear the record is permanent once saved (can\'t be edited or deleted)?' },
@@ -380,16 +380,16 @@ export const UAT_TESTS: UatTest[] = [
     id: 'p35-training-matrix',
     dateAdded: '2026-07-24',
     category: 'Phase 35 — Training matrix & records',
-    title: 'Open Team, switch to the Matrix view — do you see each person\'s training state per SOP?',
+    title: 'Open the Training matrix — do you see each person\'s training state per SOP?',
     status: 'active',
     summary:
       'Team now has a third view: a Matrix showing, for each person and each procedure they need to know, whether they\'ve read it, been watched doing it, or been signed off.',
     tryIt: [
-      'Open Team from the admin nav.',
-      'Click the ▦ Matrix button top-right.',
+      'Open the Smoko room and press Training matrix.',
+      'Look at the matrix of people and procedures.',
       'Look down a column and along a row — each cell should be a coloured/labelled pill.',
     ],
-    links: [{ label: 'Team & org model', href: '/admin/team' }],
+    links: [{ label: 'Training matrix', href: '/admin/training' }],
     questions: [
       { id: 'matrix-clear', text: 'Was it clear which SOPs each person has and hasn\'t completed?' },
       { id: 'labels-clear', text: 'Were the labels (e.g. "Signed off", "Read only") easy to understand?' },
@@ -407,7 +407,7 @@ export const UAT_TESTS: UatTest[] = [
       'From the Matrix view, click any cell.',
       'Check the panel opens for the right person, and that the procedure you clicked is highlighted or already in view.',
     ],
-    links: [{ label: 'Team & org model', href: '/admin/team' }],
+    links: [{ label: 'Training matrix', href: '/admin/training' }],
     questions: [
       { id: 'right-person', text: 'Did the panel open for the right person?' },
       { id: 'right-sop', text: 'Was the procedure you clicked already scrolled into view?' },
@@ -426,7 +426,7 @@ export const UAT_TESTS: UatTest[] = [
       'From a person\'s panel, press their "Export CSV" and open that file too.',
       'Check the worker name/email, procedure, dates, and sign-off columns look right.',
     ],
-    links: [{ label: 'Team & org model', href: '/admin/team' }],
+    links: [{ label: 'Training matrix', href: '/admin/training' }],
     questions: [
       { id: 'file-opens', text: 'Did the downloaded file open cleanly in a spreadsheet program?' },
       { id: 'columns-right', text: 'Did the columns (worker, procedure, dates, sign-off) look correct?' },
@@ -444,7 +444,7 @@ export const UAT_TESTS: UatTest[] = [
       'Pick a procedure someone has already completed, and publish a new version of it (Edit into new version, then publish).',
       'Open Team → Matrix, or that person\'s training record, and look at that procedure.',
     ],
-    links: [{ label: 'Team & org model', href: '/admin/team' }],
+    links: [{ label: 'Training matrix', href: '/admin/training' }],
     questions: [
       { id: 'outdated-visible', text: 'Could you tell at a glance who is still trained on the older version?' },
       { id: 'record-intact', text: 'Did their existing training record stay intact (nothing was reset or removed)?' },
@@ -463,7 +463,7 @@ export const UAT_TESTS: UatTest[] = [
       'As a worker who\'s already completed that procedure, check the "Next for you" card on the site and the training matrix for a reminder.',
       'Try opening and completing the procedure again — confirm nothing blocks you.',
     ],
-    links: [{ label: 'Team & org model', href: '/admin/team' }],
+    links: [{ label: 'Training matrix', href: '/admin/training' }],
     questions: [
       { id: 'cadence-clear', text: 'Was it clear how often workers need to re-walk this procedure?' },
       { id: 'reminder-visible', text: 'Did the reminder appear where you\'d expect (the site / the matrix)?' },
@@ -484,7 +484,7 @@ export const UAT_TESTS: UatTest[] = [
       'Check the coaching option ("needs support") still works normally.',
       'Look for a way to ask someone to sign you off, and try it.',
     ],
-    links: [{ label: 'Team', href: '/admin/team' }, { label: 'Activity', href: '/activity' }],
+    links: [{ label: 'Training matrix', href: '/admin/training' }, { label: 'Activity', href: '/activity' }],
     questions: [
       { id: 'option-unavailable', text: 'Was it clear that "done correctly" wasn\'t available to you yet?' },
       { id: 'explanation-clear', text: 'Did the on-screen message explain why, in a way that made sense?' },
@@ -508,7 +508,7 @@ export const UAT_TESTS: UatTest[] = [
       'Read the on-screen message about what happens to that reason.',
       'Save it and confirm it goes through.',
     ],
-    links: [{ label: 'Team', href: '/admin/team' }],
+    links: [{ label: 'Training matrix', href: '/admin/training' }],
     questions: [
       { id: 'asked-for-reason', text: 'Were you asked for a reason before it would let you save?' },
       { id: 'permanent-record-explained', text: 'Did the screen make it clear this goes on the permanent record?' },
@@ -521,17 +521,17 @@ export const UAT_TESTS: UatTest[] = [
     id: 'p37-assessment-requests',
     dateAdded: '2026-07-28',
     category: 'Phase 37 — Assessor governance',
-    title: 'As an admin or safety manager, check the assessment-requests list on Team',
+    title: 'As an admin or safety manager, check the assessment-requests list on the Training matrix page',
     status: 'active',
     summary:
       'When a supervisor who isn\'t signed off yet asks to be assessed, it shows up in a short list for admins and safety managers, with a one-tap way to go and assess them.',
     tryIt: [
-      'Open Team as an admin or safety manager.',
+      'Open the Training matrix page as an admin or safety manager.',
       'Find the assessment-requests list and check it shows who asked and which procedure it\'s for.',
       'Click "Assess now" on one of the requests.',
       'Confirm the recording screen opens with the right person and procedure already filled in.',
     ],
-    links: [{ label: 'Team', href: '/admin/team' }],
+    links: [{ label: 'Training matrix', href: '/admin/training' }],
     questions: [
       { id: 'list-shows-who-and-what', text: 'Was it clear who asked and which procedure they need to be assessed on?' },
       { id: 'assess-now-prefilled', text: 'Did "Assess now" open the form with the right person and procedure already filled in?' },
@@ -543,18 +543,18 @@ export const UAT_TESTS: UatTest[] = [
     id: 'governance-inbox',
     dateAdded: '2026-09-29',
     category: 'Admin home',
-    title: 'Does Governance show you what needs doing?',
+    title: 'Does the Office show you what needs doing?',
     status: 'active',
     summary:
       'Admins now have a Governance page: a list of things that need attention, with a picture of the site next to it.',
     tryIt: [
-      'Open Governance.',
+      'Open the Office from the site.',
       'Look at the list and the numbers on the filters above it.',
       'Give one procedure an owner.',
       'Look at the picture of the site beside the list.',
       'Click a machine with a red mark on it.',
     ],
-    links: [{ label: 'Governance', href: '/governance' }],
+    links: [{ label: 'Office inbox', href: '/?place=office' }],
     questions: [
       { id: 'row-clear', text: 'Was it clear what each row wanted you to do?' },
       { id: 'row-disappears', text: 'Did the row disappear once you had done it?' },
@@ -562,6 +562,37 @@ export const UAT_TESTS: UatTest[] = [
     ],
     background:
       'Phase 54 (D-01/D-02) — /governance server-renders listGovernanceQueue + listAdminSopRows + listSiteHealthForOrg, derived into InboxItem[] by deriveInbox() and rendered by GovernanceInbox.tsx; since Phase 57 the site floor lives on the one screen, not here.',
+  },
+  {
+    id: 'p59-office',
+    dateAdded: '2026-10-06',
+    category: 'Admin home',
+    title: 'Is the Office the one place to get things done?',
+    status: 'active',
+    summary:
+      'The Office now holds everything that used to be spread over Governance, Team and Access: an Inbox of things waiting on you, a Decisions record, People and roles, and who can see which SOPs.',
+    tryIt: [
+      'Open the Office from the site.',
+      'In the Inbox, sign a walk off or mark one of your own SOPs as reviewed. Do it without leaving the row.',
+      'Look at the Decisions tab and find what you just did.',
+      'Open People and roles and look at who is on the team.',
+      'Open Access and pick a SOP to see who can see it.',
+      'Type an old address such as /governance into the browser.',
+    ],
+    links: [
+      { label: 'Office inbox', href: '/?place=office' },
+      { label: 'Decisions', href: '/?place=office&tab=decisions' },
+      { label: 'People & roles', href: '/?place=office&tab=people' },
+      { label: 'Access', href: '/?place=office&tab=access' },
+    ],
+    questions: [
+      { id: 'inbox-one-action', text: 'Was it clear what each row in the Inbox wanted you to do?' },
+      { id: 'decision-recorded', text: 'Did your action show up on the Decisions tab?' },
+      { id: 'old-address', text: 'Did the old address take you to the right place in the Office?' },
+      { id: 'supervisor-inbox-only', text: 'As a supervisor, did you see only the Inbox, with no tabs?' },
+    ],
+    background:
+      'Phase 59 — tabs live at /?place=office&tab=inbox|decisions|people|access (tabsForRole decides what mounts; each tab\'s server read is the gate). The old governance, team and access addresses redirect in the proxy via officeRedirectFor(); the training matrix stays on /admin/training until Phase 61.',
   },
   {
     id: 'library-table',

@@ -814,8 +814,70 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       expect(errors).toEqual([])
       await page.close()
     })
-    test.fixme('supervisor Office: inbox tab only, a people tab address falls back to the inbox (59-13)', async () => {})
-    test.fixme('legacy addresses (governance, team, access with a sop, attention view) land on the right Office place; assert the rendered place, not the status (59-13)', async () => {})
+    test('supervisor Office: inbox tab only, a people tab address falls back to the inbox (59-13)', async () => {
+      const page = await supervisorCtx.newPage()
+      const errors = watchConsole(page)
+      for (const address of ['/?place=office', '/?place=office&tab=people', '/?place=office&tab=access', '/?place=office&tab=decisions']) {
+        await page.goto(address)
+        await expect(page.getByTestId('office-pane'), address).toHaveCount(1, SLOW)
+        await expect(page.getByTestId('office-pane'), address).toHaveAttribute('data-tab', 'inbox', SLOW)
+        await expect(page.getByRole('tablist'), address).toHaveCount(0)
+        await expect(page.getByTestId('office-chip'), address).toHaveCount(0)
+        await expect(page.getByTestId('people-tab'), address).toHaveCount(0)
+      }
+      await shot(page, '59-supervisor')
+      expect(errors).toEqual([])
+      await page.close()
+    })
+
+    test('legacy addresses (governance, team, access with a sop, attention view) land on the right Office place; assert the rendered place, not the status (59-13)', async () => {
+      const page = await adminCtx.newPage()
+      const errors = watchConsole(page)
+      const cases: Array<{ from: string; place: string; tab: string; probe: string }> = [
+        { from: '/governance', place: '/?place=office', tab: 'inbox', probe: 'office-tab-inbox' },
+        { from: '/sops?view=attention', place: '/?place=office', tab: 'inbox', probe: 'office-tab-inbox' },
+        { from: '/admin/team', place: '/?place=office&tab=people', tab: 'people', probe: 'people-tab' },
+        { from: `/admin/access?sop=${plantSopId}`, place: `/?place=office&tab=access`, tab: 'access', probe: 'office-tab-access' },
+      ]
+      for (const c of cases) {
+        await page.goto(c.from)
+        await expect(page.getByTestId('office-pane'), c.from).toHaveCount(1, SLOW)
+        await expect(page.getByTestId('office-pane'), c.from).toHaveAttribute('data-tab', c.tab, SLOW)
+        await expect(page.getByTestId('shell-detail'), c.from).toHaveAttribute('data-place', c.place, SLOW)
+        await expect(page.getByTestId(c.probe).first(), c.from).toBeVisible(SLOW)
+        expect(new URL(page.url()).pathname, c.from).toBe('/')
+      }
+      // an address pinned to a SOP carries it through to the Access tab
+      await page.goto(`/admin/access?sop=${plantSopId}`)
+      await expect(page.getByTestId('office-pane')).toContainText(EVAL_PLANT_SOP_TITLE, SLOW)
+      // the retired library scope goes to the site itself: no Office pane at all
+      await page.goto('/governance?view=library')
+      await expect(page.getByTestId('plant-world')).toBeVisible(SLOW)
+      await expect(page.getByTestId('office-pane')).toHaveCount(0)
+      // a sop value that is not an id is dropped, not carried
+      await page.goto('/admin/access?sop=not-an-id')
+      await expect(page.getByTestId('office-pane')).toHaveAttribute('data-tab', 'access', SLOW)
+      expect(new URL(page.url()).search).not.toContain('not-an-id')
+      await shot(page, '59-legacy-redirects')
+      expect(errors).toEqual([])
+      await page.close()
+    })
+
+    test('the training bridge: the Smoko room links it, the matrix renders, Back returns to the Smoko room (59-13)', async () => {
+      const page = await adminCtx.newPage()
+      const errors = watchConsole(page)
+      await page.goto('/?place=smoko')
+      const link = page.getByRole('link', { name: 'Training matrix' })
+      await expect(link).toHaveCount(1, SLOW)
+      await link.click()
+      await expect(page).toHaveURL(/\/admin\/training$/, SLOW)
+      await expect(page.getByRole('heading', { name: 'Training', exact: true })).toBeVisible(SLOW)
+      await shot(page, '59-training-bridge')
+      await page.getByTestId('back-to-site').click()
+      await expect(page).toHaveURL(/place=smoko/, SLOW)
+      expect(errors).toEqual([])
+      await page.close()
+    })
     test.fixme('a non-owner completion address lands on the Office (59-15)', async () => {})
   })
 })

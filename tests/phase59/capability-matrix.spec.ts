@@ -62,6 +62,22 @@ test.describe('capability matrix', () => {
       expect(r).toContain(name)
     }
   })
-  test.fixme('legacy addresses row: the governance, team and access addresses redirect (59-13)', () => {})
+  test('Office tab rows: worker none, supervisor the Inbox only, admin and safety manager all four; the training bridge and the redirects are named (59-13)', () => {
+    const cells = (label: string) => row(label).split('|').map((c) => c.trim())
+    expect(cells('Office -- Inbox tab').slice(2, 6)).toEqual(['—', expect.stringContaining('✅'), '✅', '✅'])
+    for (const label of ['Office -- Decisions tab', 'Office -- People & roles tab', 'Office -- Access tab']) {
+      expect(cells(label).slice(2, 5), label).toEqual(['—', '—', '✅'])
+      expect(cells(label)[5], label).toContain('✅')
+      expect(row(label), label).toContain('tabsForRole()')
+    }
+    expect(row('Office -- Inbox tab')).toContain('falls back to the Inbox')
+    expect(row('Office -- Access tab')).toContain('listAdminAccessData()')
+    expect(row('Office -- People & roles tab')).toContain('/admin/team')
+    expect(row('Training matrix')).toContain('/admin/training')
+    expect(row('Training matrix')).toContain('requireAdminContext()')
+    expect(row('SOP library table + Access lens (admin)')).toContain('Office Access tab')
+    expect(row('Manage departments')).toContain('People & roles tab')
+    for (const address of ['/?place=office&tab=people', '/?place=office&tab=access']) expect(MATRIX).toContain(address)
+  })
   test.fixme('Activity row: a non-owner completion address redirects to the Office (59-15)', () => {})
 })
