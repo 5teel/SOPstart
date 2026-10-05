@@ -141,6 +141,13 @@ test.describe('signoff actions', () => {
     expect(q).toContain(".neq('status', 'rejected')")
   })
 
+  test('review WR-04: the SOP focus page does not count a rejected walk as done (A-06)', () => {
+    const page = strip(read('src/app/(protected)/sops/[sopId]/page.tsx'))
+    const at = page.indexOf("from('sop_completions')")
+    expect(at).toBeGreaterThan(-1)
+    expect(page.slice(at, at + 160)).toContain(".neq('status', 'rejected')")
+  })
+
   test('competency reads never count a rejected walk (A-06)', () => {
     const src = strip(read('src/actions/competency.ts'))
     const reads = src.match(/\.from\('sop_completions'\)/g) ?? []
