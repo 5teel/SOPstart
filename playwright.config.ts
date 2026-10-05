@@ -709,5 +709,29 @@ export default defineConfig({
       testMatch: /tests\/phase57\/.*\.(spec|test)\.ts$/,
       use: { browserName: 'chromium' },
     },
+    {
+      // Phase 58 -- the SOP focus screen (walk + edit).
+      // Nyquist harness (Wave 0 / Plan 58-01).
+      //
+      // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
+      // DELIBERATELY BROAD testMatch (tests/phase58/**) so later plans drop
+      // specs in with NO further config edit. Pure-module unit specs (focus,
+      // focus-path, lineage-current, parse-progress) live here with static `@/`
+      // imports. Live-DB specs self-skip unless PHASE58_LIVE=1, so quick runs
+      // never spend the shared OTP budget (CLAUDE.md 2026-09-28).
+      //
+      // Verify registration: `npx playwright test --list --project=phase58`
+      //
+      // Files registered here (fixme stubs until the owning plan lands):
+      //   repoint-inventory (stale-guard inventory, LIVE from 58-01)
+      //   retirement-sweep, frame-structure, edit-rail, legacy-redirects,
+      //   walk-actions, walk-no-leak, parse-pipelines, publish-gate,
+      //   reviewer-steps, edit-actions, fork-draft, cutover-converter-retired,
+      //   capability-matrix
+      name: 'phase58',
+      testDir: '.',
+      testMatch: /tests\/phase58\/.*\.(spec|test)\.ts$/,
+      use: { browserName: 'chromium' },
+    },
   ],
 })
