@@ -1979,7 +1979,7 @@ Plans:
   4. The decisions tab lists the ledger newest first and can be narrowed by kind of decision; opening it, people and roles, or access widens the detail panel while the site stays visible and re-centres on the Office
   5. An admin invites a person, sets their role, sees their department, and opens the existing access wiring screen, unchanged, to decide who sees which SOPs
 
-**Plans:** 10/16 plans executed
+**Plans:** 11/16 plans executed
 Plans:
 **Wave 1**
 
@@ -2014,7 +2014,7 @@ Plans:
 
 **Wave 8** *(blocked on Wave 7 completion)*
 
-- [ ] 59-11-PLAN.md — People & roles tab and Access tab (lens unchanged) in the wide pane; invite, role change and remove eval
+- [x] 59-11-PLAN.md — People & roles tab and Access tab (lens unchanged) in the wide pane; invite, role change and remove eval
 
 **Wave 9** *(blocked on Wave 8 completion)*
 
