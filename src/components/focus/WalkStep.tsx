@@ -26,6 +26,8 @@ export interface WalkStepProps {
   /** Finishing this step finishes the walk. */
   isLast: boolean
   standardNames: string[]
+  /** Standards attached to the step's section, shown beside the group label. */
+  groupStandardNames: string[]
   hasPhoto: boolean
   previewUrl?: string
   busy: boolean
@@ -41,6 +43,7 @@ export function WalkStep({
   total,
   isLast,
   standardNames,
+  groupStandardNames,
   hasPhoto,
   previewUrl,
   busy,
@@ -108,7 +111,10 @@ export function WalkStep({
           </span>
         </div>
 
-        <p className="mono text-meta uppercase text-ink-500">{entry.groupLabel}</p>
+        <p className="mono flex flex-wrap items-center gap-2 text-meta uppercase text-ink-500">
+          {entry.groupLabel}
+          <StandardLabels names={groupStandardNames} />
+        </p>
 
         {carded ? (
           <div

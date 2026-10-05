@@ -5,7 +5,7 @@
  * (58-11). The server page hands over the resolved SOP and the worker's own
  * in-progress walk; useWalk owns everything that changes after that.
  */
-import { currentIndex, type WalkEntry } from '@/lib/sop/focus'
+import { BEFORE_YOU_START, currentIndex, type WalkEntry } from '@/lib/sop/focus'
 import type { FocusSop, FocusStepRow } from '@/lib/sop/focus-read'
 import type { WalkState } from '@/lib/sop/walk-read'
 import { useWalk } from '@/hooks/useWalk'
@@ -53,6 +53,7 @@ export function FocusWalker({ data, initialWalk, from, versionState, supersededB
         total={order.length}
         isLast={order.every((e) => e.step.id === entry.step.id || w.done.has(e.step.id))}
         standardNames={names}
+        groupStandardNames={entry.groupLabel === BEFORE_YOU_START ? [] : (data.standards.sections[entry.step.section_id] ?? []).map((s) => s.name)}
         hasPhoto={w.photoSteps.has(entry.step.id)}
         previewUrl={w.previews[`${walk.id}:${entry.step.id}`]}
         busy={w.busy}

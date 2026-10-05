@@ -58,7 +58,7 @@ export interface FocusSop {
   steps: FocusStepRow[]
   /** Names of standards per target, keyed by sop id / section id / step id. */
   standards: { sop: FocusStandard[]; sections: Record<string, FocusStandard[]>; steps: Record<string, FocusStandard[]> }
-  machines: Array<{ id: string; name: string }>
+  machines: Array<{ id: string; name: string; department: string | null }>
   totalMinutes: number
 }
 
@@ -139,8 +139,16 @@ export async function loadFocusSop(client: SupabaseClient, sopId: string): Promi
   const machineIds = ((macRes.data ?? []) as Array<{ machine_id: string }>).map((m) => m.machine_id)
   let machines: FocusSop['machines'] = []
   if (machineIds.length > 0) {
-    const { data } = await db.from('site_machines').select('id, name').in('id', machineIds).eq('organisation_id', orgId)
-    machines = (data ?? []) as FocusSop['machines']
+    const { data } = await db
+      .from('site_machines')
+      .select('id, name, departments ( name )')
+      .in('id', machineIds)
+      .eq('organisation_id', orgId)
+    machines = ((data ?? []) as unknown as Array<{ id: string; name: string; departments: { name: string } | null }>).map((m) => ({
+      id: m.id,
+      name: m.name,
+      department: m.departments?.name ?? null,
+    }))
   }
 
   const totalMinutes = steps.reduce((sum, s) => sum + (Number(s.time_estimate_minutes) || 0), 0)
