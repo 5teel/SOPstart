@@ -1910,7 +1910,7 @@ Plans:
   4. A SOP still being read from a document or a video opens in the editor saying what is happening and roughly how long it will take, never as an empty page, and getting there does not reload the whole app
   5. Publishing a new version means workers always get the latest published one while earlier versions stay on record; Back or Esc from any open SOP returns to the one screen with the place the user came from still selected
 
-**Plans:** 10/18 plans executed
+**Plans:** 12/18 plans executed
 Plans:
 **Wave 1**
 
@@ -1936,8 +1936,8 @@ Plans:
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
-- [ ] 58-11-PLAN.md — Walk / review / sent / resume, server page resolver, tab redirect in the proxy, bundle, worker half of the eval
-- [ ] 58-12-PLAN.md — Editor components (document, step card + tick, rail This SOP, bottom bar, publish dialog), relocated tool buttons, autosave
+- [x] 58-11-PLAN.md — Walk / review / sent / resume, server page resolver, tab redirect in the proxy, bundle, worker half of the eval
+- [x] 58-12-PLAN.md — Editor components (document, step card + tick, rail This SOP, bottom bar, publish dialog), relocated tool buttons, autosave
 
 **Wave 6** *(blocked on Wave 5 completion)*
 
