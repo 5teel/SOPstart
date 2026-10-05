@@ -48,6 +48,7 @@
     { "file": "src/actions/completions.ts", "function": "signOffCompletion", "calls": "recordSignature(", "after": ".update({ status: newStatus })", "kind": "countersign", "note": "Office sign-off (59): the supervisor counter-signature and its ledger row are written by recordSignature after the status change" }
   ],
   "allow": [
+    { "file": "src/lib/governance/owner-review.ts", "function": "markReviewedAsOwner", "key": "sop_review_events", "reason": "The owner path's sop_review_events insert; confirmSopCurrent records the review decision after it returns." },
     { "file": "src/actions/assignments.ts", "function": "selfAddSop", "key": "sop_assignments", "reason": "A worker bookmarking a SOP on their own list is not a governance decision (RESEARCH A7); logging it would be noise." },
     { "file": "src/actions/assignments.ts", "function": "selfRemoveSop", "key": "sop_assignments", "reason": "A worker removing a SOP from their own list is not a governance decision (RESEARCH A7)." },
     { "file": "src/actions/versions.ts", "function": "forkDraft", "key": "owner_user_id:", "reason": "Copies the source version's existing owner onto the next-version draft; ownership does not change, so there is no decision to log." },

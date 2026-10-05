@@ -45,6 +45,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { getSessionContext } from '@/lib/auth/session-context'
 import { recordDecision } from '@/lib/decisions/record'
 import { resolveCadenceMonths, computeReviewDueDate } from '@/lib/governance/cadences'
+import { markReviewedAsOwner } from '@/lib/governance/owner-review'
 import { classifyGovernanceRow, type GovernanceFlag } from '@/lib/governance/classify'
 import { resolveNextStepIndex, stepMatchesCaller, type ChainStep } from '@/lib/governance/approvals'
 import { getOrgMembers } from '@/actions/assignments'
@@ -119,7 +120,7 @@ async function fetchOrgCadences(organisationId: string): Promise<Record<string, 
 export async function setSopOwner(
   sopId: string,
   userId: string | null,
-): Promise<{ success: true } | { error: string }> {
+): Promise<{ success: true; logged: boolean } | { error: string }> {
   if (!sopId) return { error: 'sopId required' }
 
   const ctx = await requireAdmin()
@@ -159,14 +160,14 @@ export async function setSopOwner(
     return { error: 'SOP not found' }
   }
 
-  await recordDecision({
+  const rec = await recordDecision({
     kind: 'owner_change',
     subject: { kind: 'sop', id: sopId },
     sopId,
     summary: userId === null ? 'Cleared the SOP owner' : 'Changed the SOP owner',
     details: { owner_user_id: userId },
   })
-  return { success: true }
+  return { success: true, logged: rec.ok }
 }
 
 // ---------------------------------------------------------------------------
@@ -218,62 +219,72 @@ export async function setRefresherInterval(
 
 export async function confirmSopCurrent(
   sopId: string,
-): Promise<{ success: true } | { error: string }> {
+): Promise<{ success: true; logged: boolean; reviewDueAt: string } | { error: string }> {
   if (!sopId) return { error: 'sopId required' }
 
   const ctx = await requireAdmin()
-  if ('error' in ctx) return { error: ctx.error }
+  let reviewDue: string
+  if ('error' in ctx) {
+    // Not an admin: only the SOP's owner may go on, and the plain module
+    // re-checks that against the session user and organisation (A-01); a
+    // non-owner gets back "Only the owner or an admin can mark this reviewed."
+    const s = await getSessionContext()
+    if (!s.userId || !s.organisationId) return { error: ctx.error }
+    const r = await markReviewedAsOwner({ sopId, organisationId: s.organisationId, userId: s.userId })
+    if ('error' in r) return { error: r.error }
+    reviewDue = r.reviewDueAt
+  } else {
+    const supabase = await createClient()
+    const { data: sopRow, error: sopErr } = await supabase
+      .from('sops')
+      .select('category_slug')
+      .eq('id', sopId)
+      .maybeSingle()
 
-  const supabase = await createClient()
-  const { data: sopRow, error: sopErr } = await supabase
-    .from('sops')
-    .select('category_slug')
-    .eq('id', sopId)
-    .maybeSingle()
+    if (sopErr || !sopRow) {
+      console.error('[confirmSopCurrent] load error', sopErr)
+      return { error: 'SOP not found' }
+    }
 
-  if (sopErr || !sopRow) {
-    console.error('[confirmSopCurrent] load error', sopErr)
-    return { error: 'SOP not found' }
+    const orgCadences = await fetchOrgCadences(ctx.organisationId)
+    const months = resolveCadenceMonths(sopRow.category_slug, orgCadences)
+    const now = new Date().toISOString()
+    reviewDue = computeReviewDueDate(now, months)
+
+    const { error: updateErr } = await supabase
+      .from('sops')
+      .update({
+        last_reviewed_at: now,
+        review_due_at: reviewDue,
+        last_reviewed_by: ctx.userId,
+        updated_at: now,
+      })
+      .eq('id', sopId)
+
+    if (updateErr) {
+      console.error('[confirmSopCurrent] update error', updateErr)
+      return { error: updateErr.message }
+    }
+
+    // Append-only audit event — rides sop_review_events_insert_admin RLS
+    // (reviewed_by = auth.uid(), organisation_id = current org).
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: eventErr } = await (supabase as any)
+      .from('sop_review_events')
+      .insert({
+        sop_id: sopId,
+        organisation_id: ctx.organisationId,
+        reviewed_by: ctx.userId,
+        action: 'confirmed_current',
+      })
+
+    if (eventErr) {
+      console.error('[confirmSopCurrent] event insert error', eventErr)
+      return { error: eventErr.message }
+    }
   }
 
-  const orgCadences = await fetchOrgCadences(ctx.organisationId)
-  const months = resolveCadenceMonths(sopRow.category_slug, orgCadences)
-  const now = new Date().toISOString()
-  const reviewDue = computeReviewDueDate(now, months)
-
-  const { error: updateErr } = await supabase
-    .from('sops')
-    .update({
-      last_reviewed_at: now,
-      review_due_at: reviewDue,
-      last_reviewed_by: ctx.userId,
-      updated_at: now,
-    })
-    .eq('id', sopId)
-
-  if (updateErr) {
-    console.error('[confirmSopCurrent] update error', updateErr)
-    return { error: updateErr.message }
-  }
-
-  // Append-only audit event — rides sop_review_events_insert_admin RLS
-  // (reviewed_by = auth.uid(), organisation_id = current org).
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error: eventErr } = await (supabase as any)
-    .from('sop_review_events')
-    .insert({
-      sop_id: sopId,
-      organisation_id: ctx.organisationId,
-      reviewed_by: ctx.userId,
-      action: 'confirmed_current',
-    })
-
-  if (eventErr) {
-    console.error('[confirmSopCurrent] event insert error', eventErr)
-    return { error: eventErr.message }
-  }
-
-  await recordDecision({
+  const rec = await recordDecision({
     kind: 'review',
     subject: { kind: 'sop', id: sopId },
     sopId,
@@ -281,7 +292,7 @@ export async function confirmSopCurrent(
     details: { action: 'confirmed_current', review_due_at: reviewDue },
   })
 
-  return { success: true }
+  return { success: true, logged: rec.ok, reviewDueAt: reviewDue }
 }
 
 // ---------------------------------------------------------------------------

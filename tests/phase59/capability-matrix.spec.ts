@@ -45,7 +45,16 @@ test.describe('capability matrix', () => {
       expect(r).toContain(name)
     }
   })
-  test.fixme('Mark reviewed row: owner or admin (59-07)', () => {})
+  test('Mark reviewed row: owner or admin; workers have no Office until Phase 60/61 (59-07)', () => {
+    const r = row('Mark a SOP reviewed')
+    const cells = r.split('|').map((c) => c.trim())
+    expect(cells[2]).toContain('Phase 60/61')
+    expect(cells[3]).toContain('own')
+    expect(cells.slice(4, 6)).toEqual(['✅', '✅'])
+    for (const name of ['confirmSopCurrent()', 'markReviewedAsOwner()', 'src/lib/governance/owner-review.ts', 'owner_user_id', 'session organisation']) {
+      expect(r).toContain(name)
+    }
+  })
   test.fixme('Decisions tab row: admin and safety manager only (59-10)', () => {})
   test.fixme('legacy addresses row: the governance, team and access addresses redirect (59-13)', () => {})
   test.fixme('Activity row: a non-owner completion address redirects to the Office (59-15)', () => {})
