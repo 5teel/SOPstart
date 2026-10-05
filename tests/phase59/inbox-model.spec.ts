@@ -206,4 +206,16 @@ test.describe('inbox model', () => {
     expect(read('src', 'lib', 'members', 'labels.ts')).not.toContain('server-only')
     expect(read('src', 'actions', 'shell.ts')).toContain('inboxCount: inbox.items.length')
   })
+
+  test('getOfficeInbox: use server, async exports only, session client only, no parameter, per-role branches', () => {
+    const src = read('src', 'actions', 'office.ts')
+    expect(src.split(/\r?\n/)[0]).toContain("'use server'")
+    expect(src).toContain('export async function getOfficeInbox()')
+    expect(src).not.toContain('createAdminClient')
+    expect(src.match(/^export (?!async function|type)\S+/gm)).toBeNull()
+    // admin / safety manager: the full list; supervisor: sign-offs and own reviews only
+    expect(src).toContain('loadInbox()')
+    expect(src).toMatch(/governance: \[\], library: \[\], machines: \[\], links: \[\], signOffs, ownedReviews/)
+    expect(src).toContain("'Office access required'")
+  })
 })

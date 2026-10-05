@@ -5,16 +5,27 @@
  * "Manage team" or "Sign off completion" (tests/phase46/capability-matrix-doc.spec.ts pins them);
  * edit their cells. Registration: playwright.config.ts `phase59`.
  */
-import { test } from '@playwright/test'
+import { test, expect } from '@playwright/test'
+import fs from 'node:fs'
+import path from 'node:path'
+
+const MATRIX = fs.readFileSync(path.resolve(__dirname, '..', '..', '.planning', 'codebase', 'CAPABILITY-MATRIX.md'), 'utf-8')
+const row = (label: string) => MATRIX.split(/\r?\n/).find((l) => l.startsWith(`| ${label} |`)) ?? ''
 
 test.describe('capability matrix', () => {
-  test.fixme(true, 'flips live as each owning plan lands')
-  test('Office inbox row: admin and safety manager see all, supervisor sees own sign-offs (59-04)', () => {})
-  test('Manage team row: invite is admin-only, role change guarded, removal logged (59-05)', () => {})
-  test('Sign off completion row: self sign-off refused, supervisor scoped to assigned workers (59-06)', () => {})
-  test('Approve step row: the drifted supervisor cell is corrected to admin and safety manager (59-06)', () => {})
-  test('Mark reviewed row: owner or admin (59-07)', () => {})
-  test('Decisions tab row: admin and safety manager only (59-10)', () => {})
-  test('legacy addresses row: the governance, team and access addresses redirect (59-13)', () => {})
-  test('Activity row: a non-owner completion address redirects to the Office (59-15)', () => {})
+  test('Office inbox row: admin and safety manager see all, supervisor sees own sign-offs (59-04)', () => {
+    const cells = row('Governance queue').split('|').map((c) => c.trim())
+    // | label | worker | supervisor | admin | safety_manager | chain approver | enforced at |
+    expect(cells.slice(2, 6)).toEqual(['—', '✅', '✅', '✅'])
+    for (const name of ['getOfficeInbox()', 'listPendingSignOffs()', 'listMyReviewRows()', 'src/actions/office.ts']) {
+      expect(row('Governance queue')).toContain(name)
+    }
+  })
+  test.fixme('Manage team row: invite is admin-only, role change guarded, removal logged (59-05)', () => {})
+  test.fixme('Sign off completion row: self sign-off refused, supervisor scoped to assigned workers (59-06)', () => {})
+  test.fixme('Approve step row: the drifted supervisor cell is corrected to admin and safety manager (59-06)', () => {})
+  test.fixme('Mark reviewed row: owner or admin (59-07)', () => {})
+  test.fixme('Decisions tab row: admin and safety manager only (59-10)', () => {})
+  test.fixme('legacy addresses row: the governance, team and access addresses redirect (59-13)', () => {})
+  test.fixme('Activity row: a non-owner completion address redirects to the Office (59-15)', () => {})
 })
