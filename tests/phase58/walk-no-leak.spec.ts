@@ -47,6 +47,20 @@ test.describe('FOC-04 walk no-leak', () => {
     expect(HOOK).toMatch(/setWalk\(res\.walk\)\s*\n\s*afterWrite\(res\.walk, id\)/)
   })
 
+  test('review WR-05: a stale-walk refusal drops the local walk and re-reads the page; a locked step is said in its own words', () => {
+    for (const msg of ['Start the walk again.', 'That step is not part of this SOP.']) expect(HOOK).toContain(`'${msg}':`)
+    expect(HOOK).toContain("export const LOCKED_STEP = 'Finish the steps before this one first.'")
+    const fn = HOOK.slice(HOOK.indexOf('const serverError = useCallback('), HOOK.indexOf('const afterWrite'))
+    expect(fn).toMatch(/setWalk\(null\)[\s\S]*setPhase\('browse'\)[\s\S]*router\.refresh\(\)/)
+    expect(fn).toContain("msg === 'Add a photo to continue.' || msg === LOCKED_STEP ? msg : fallback")
+    // every server refusal in complete(), photo() and startOver() goes through it
+    expect(HOOK).toContain('serverError(res.error, SAVE_ERROR)')
+    expect(HOOK).toContain('serverError(res.error, PHOTO_ERROR)')
+    expect(HOOK).toContain('serverError(res.error, res.error)')
+    expect(HOOK).not.toMatch(/return setError\(res\.error === 'Add a photo/)
+    expect(HOOK).not.toMatch(/'error' in res\) return setError\(/)
+  })
+
   test('the step is synced to the URL with history.replaceState, never router.push', () => {
     expect(HOOK).toContain('window.history.replaceState')
     expect(HOOK).not.toMatch(/router\.push\(['"`]\?step/)
