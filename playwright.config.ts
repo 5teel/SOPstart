@@ -721,5 +721,31 @@ export default defineConfig({
       testMatch: /tests\/phase59\/.*\.(spec|test)\.ts$/,
       use: { browserName: 'chromium' },
     },
+    {
+      // Phase 60 -- requests, notifications and objectives.
+      // Nyquist harness (Wave 0 / Plan 60-01).
+      //
+      // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
+      // DELIBERATELY BROAD testMatch (tests/phase60/**) so later plans drop
+      // specs in with NO further config edit. The live-DB spec
+      // (requests-notifications-objectives-rls-live) self-skips unless
+      // PHASE60_LIVE=1, so quick runs never spend the shared OTP budget
+      // (CLAUDE.md 2026-09-28).
+      //
+      // Verify registration: `npx playwright test --list --project=phase60`
+      //
+      // Files registered here (fixme stubs until the owning plan lands):
+      //   repoint-inventory (stale-guard inventory, LIVE from 60-01),
+      //   retirement-sweep, ledger-kinds, requests-notifications-objectives-rls-live,
+      //   request-model, notification-places, objective-model, request-actions,
+      //   answer-actions, agent-requests, ask-do-sop, notification-triggers,
+      //   review-due, cron-route, objective-actions, ai-objective-fields,
+      //   office-requests, request-surfaces, objective-meta, overview-structure,
+      //   bell-structure, capability-matrix
+      name: 'phase60',
+      testDir: '.',
+      testMatch: /tests\/phase60\/.*\.(spec|test)\.ts$/,
+      use: { browserName: 'chromium' },
+    },
   ],
 })
