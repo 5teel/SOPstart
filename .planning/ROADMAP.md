@@ -1979,7 +1979,7 @@ Plans:
   4. The decisions tab lists the ledger newest first and can be narrowed by kind of decision; opening it, people and roles, or access widens the detail panel while the site stays visible and re-centres on the Office
   5. An admin invites a person, sets their role, sees their department, and opens the existing access wiring screen, unchanged, to decide who sees which SOPs
 
-**Plans:** 13/16 plans executed
+**Plans:** 14/16 plans executed
 Plans:
 **Wave 1**
 
@@ -2026,7 +2026,7 @@ Plans:
 
 **Wave 11** *(blocked on Wave 10 completion)*
 
-- [ ] 59-14-PLAN.md — Delete governance, team and access pages, org-chart views, old role table, org-model write exports; spec repoints; office-pages dropped feature
+- [x] 59-14-PLAN.md — Delete governance, team and access pages, org-chart views, old role table, org-model write exports; spec repoints; office-pages dropped feature
 
 **Wave 12** *(blocked on Wave 11 completion)*
 
