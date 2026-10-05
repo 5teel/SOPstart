@@ -4,8 +4,8 @@ milestone: v11.0
 milestone_name: — One-Screen MVP
 status: executing
 stopped_at: Phase 59 planning complete
-last_updated: "2026-10-05T12:22:55.999Z"
-last_activity: 2026-10-05
+last_updated: "2026-10-05T12:23:17.336Z"
+last_activity: 2026-10-05 -- Phase 59 execution started
 progress:
   total_phases: 14
   completed_phases: 4
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-03)
 
 **Core value:** A worker can find the SOP for the machine in front of them and follow it step by step with nothing else on the screen — and the business can see, in one ledger, who decided and did what.
-**Current focus:** Phase 58 — the-sop-focus-screen-walk-edit
+**Current focus:** Phase 59 — the-office
 
 ## Current Position
 
-Phase: 59
-Plan: Not started
-Status: Executing Phase 58
-Last activity: 2026-10-05
+Phase: 59 (the-office) — EXECUTING
+Plan: 1 of 16
+Status: Executing Phase 59
+Last activity: 2026-10-05 -- Phase 59 execution started
 
 ### v11.0 roadmap (created 2026-10-03)
 
