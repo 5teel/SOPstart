@@ -13,6 +13,7 @@ import { Check } from 'lucide-react'
 import { useRole } from '@/components/providers/RoleProvider'
 import { OFFICE_TABS, tabsForRole, type OfficeTab } from '@/lib/shell/office-tabs'
 import type { Place } from '@/lib/shell/place'
+import { DecisionsTab } from './DecisionsTab'
 import { InboxChips, InboxTab, inboxItemsOf, useOfficeInbox, type ChipKey } from './InboxTab'
 import type { RowDone } from './InboxRow'
 
@@ -142,7 +143,8 @@ export function OfficePane({
         </header>
 
         <div id="office-tabpanel" role={tabs.length > 1 ? 'tabpanel' : undefined} className="px-4 pb-8">
-          {/* The Decisions, People and Access arms arrive in 59-10 and 59-11, before the pane is mounted. */}
+          {/* The People and Access arms arrive in 59-11, before the pane is mounted. */}
+          {tab === 'decisions' && <DecisionsTab />}
           {tab === 'inbox' && (
             <InboxTab chip={chip} onChip={setChip} onReceipt={(r) => setReceipt({ ...r, tab })} />
           )}

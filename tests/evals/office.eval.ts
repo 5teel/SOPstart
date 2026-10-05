@@ -647,7 +647,57 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       expect(errors).toEqual([])
     })
 
-    test.fixme('decisions: wide pane, newest first, a kind chip narrows, Show older only past 50 (59-10)', async () => {})
+    test('decisions: wide pane, newest first, a kind chip narrows, absolute time on hover, the map re-centres (59-10)', async () => {
+      const page = await adminCtx.newPage()
+      const errors = watchConsole(page)
+      await openOffice(page)
+      const world = page.getByTestId('plant-world')
+      const camera = async () => `${await world.getAttribute('data-scale')}|${await world.getAttribute('data-x')}`
+      const detail = page.getByTestId('shell-detail')
+      await expect(detail).toHaveAttribute('data-wide', 'false', SLOW)
+      const inboxCamera = await camera()
+
+      await page.getByTestId('office-tab-decisions').click()
+      await expect(detail).toHaveAttribute('data-wide', 'true', SLOW)
+      const rows = page.getByTestId('decisions-row')
+      await expect(rows.first()).toBeVisible(SLOW)
+      expect(await detail.evaluate((el) => el.getBoundingClientRect().width)).toBeGreaterThanOrEqual(560)
+      // The earlier cases wrote sign-offs and owner changes into the shared eval org, so the ledger has rows.
+      await expect.poll(() => rows.count(), SLOW).toBeGreaterThanOrEqual(2)
+
+      const times = await rows.locator('time').evaluateAll((els) => els.map((e) => (e as HTMLTimeElement).dateTime))
+      expect(new Date(times[0]).getTime()).toBeGreaterThanOrEqual(new Date(times[1]).getTime())
+      await expect.poll(camera, SLOW).not.toBe(inboxCamera)
+
+      // Hover a time: the absolute NZ date and time is its title.
+      const firstTime = rows.first().locator('time')
+      await firstTime.hover()
+      await expect(firstTime).toHaveAttribute('title', /\d{1,2}:\d{2} (am|pm)/)
+      await shot(page, '59-decisions-hover')
+
+      // The Ownership chip leaves ownership words only.
+      await page.locator('[data-testid="decisions-chip"][data-chip="ownership"]').click()
+      const ownership = new Set(['Changed owner', 'Assigned', 'Unassigned'])
+      await expect(rows.first()).toBeVisible(SLOW)
+      await expect
+        .poll(async () => (await rows.evaluateAll((els) => els.map((e) => e.getAttribute('data-kind')))).every((k) => ['owner_change', 'assign', 'unassign'].includes(k ?? '')), SLOW)
+        .toBe(true)
+      for (const w of await rows.locator('td:nth-child(3)').allTextContents()) expect(ownership.has(w.trim())).toBe(true)
+      await shot(page, '59-decisions')
+
+      // Show older appears only when another page exists; if it does, it adds rows.
+      await page.locator('[data-testid="decisions-chip"][data-chip="all"]').click()
+      await expect(rows.first()).toBeVisible(SLOW)
+      const older = page.getByTestId('decisions-show-older')
+      if (await older.count()) {
+        const before = await rows.count()
+        expect(before).toBe(50)
+        await older.click()
+        await expect.poll(() => rows.count(), SLOW).toBeGreaterThan(before)
+      }
+      expect(errors).toEqual([])
+      await page.close()
+    })
     test.fixme('people: wide pane, invite with a role, Invited chip, role change, remove with confirmation (59-11)', async () => {})
     test.fixme('access: the wiring screen renders in the wide pane and the map re-centres (data-scale changes) (59-11)', async () => {})
     test.fixme('supervisor Office: inbox tab only, a people tab address falls back to the inbox (59-13)', async () => {})

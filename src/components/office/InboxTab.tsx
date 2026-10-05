@@ -13,11 +13,14 @@
 import { useEffect, useRef, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { CheckCircle } from 'lucide-react'
-import { getOfficeInbox, type OfficeInbox } from '@/actions/office'
+import { countClearedToday, getOfficeInbox, type OfficeInbox } from '@/actions/office'
 import type { AdminShellData } from '@/actions/shell'
+import { useRole } from '@/components/providers/RoleProvider'
 import { INBOX_CHIPS, chipMatches, inboxCounts, type InboxChip, type InboxItem } from '@/lib/governance/inbox'
 import { OFFICE_INBOX_KEY, SHELL_KEY } from '@/lib/shell/query-keys'
 import { InboxRow, type RowDone } from './InboxRow'
+
+const CLEARED_TODAY_KEY = ['office-cleared-today'] as const
 
 export type ChipKey = 'all' | InboxChip
 type InboxData = OfficeInbox | { error: string }
@@ -81,7 +84,12 @@ export function InboxTab({
   onReceipt(r: RowDone): void
 }) {
   const queryClient = useQueryClient()
+  const role = useRole()
+  // A-04: the ledger is readable by admin and safety manager only, so a supervisor never asks.
+  const canSeeLedger = role === 'admin' || role === 'safety_manager'
   const { data, isLoading, isError, refetch } = useOfficeInbox()
+  const cleared = useQuery({ queryKey: CLEARED_TODAY_KEY, queryFn: () => countClearedToday(), enabled: canSeeLedger })
+  const clearedCount = cleared.data && !('error' in cleared.data) ? cleared.data.count : null
   const items = inboxItemsOf(data)
   const visible = items ? items.filter((i) => chipMatches(i, chip)) : []
 
@@ -112,6 +120,7 @@ export function InboxTab({
     onReceipt(r)
     setOpenKey(null)
     const before = visibleRef.current
+    void queryClient.invalidateQueries({ queryKey: CLEARED_TODAY_KEY })
     await queryClient.invalidateQueries({ queryKey: OFFICE_INBOX_KEY })
     const fresh = queryClient.getQueryData<InboxData>(OFFICE_INBOX_KEY)
     const freshItems = inboxItemsOf(fresh)
@@ -178,6 +187,11 @@ export function InboxTab({
         >
           Nothing needs you. That&apos;s the goal.
         </h3>
+        {canSeeLedger && clearedCount !== null && (
+          <p data-testid="office-cleared-today" className="mt-1 text-ui text-ink-500">
+            {clearedCount === 0 ? 'Nothing was waiting today.' : `${clearedCount} cleared today.`}
+          </p>
+        )}
       </div>
     )
   }
