@@ -58,6 +58,12 @@ test.describe('AI objective fields (60-10)', () => {
     expect(apply).toContain('agent: agentName')
     // one ledger row for an applied write
     expect(apply.match(/recordDecision\(/g)?.length).toBe(1)
+    // WR-05: the row is keyed to the SOP when the resolved subject is one, carries the subject,
+    // and names the session user because the actor column holds the agent
+    expect(apply).toContain("sopId: serverSopId ?? (landed?.type === 'sop' ? landed.id : null)")
+    expect(apply).toContain('session_user_id: userId')
+    expect(apply).toContain('subject_type: landed.type, subject_id: landed.id')
+    expect(DESCRIPTORS).toContain("return { outcome: 'applied', value: { text: result.text, dueOn: result.dueOn }, subject: result.subject }")
   })
 
   test('an agent write lands unconfirmed under the agent name, logged once, not diverted to a proposal', () => {

@@ -101,13 +101,20 @@ export async function applyAiWrite(
     const result = await gateWrite(descriptor, safeContext, newValue, currentValue)
     // A pending proposal is a request, not a decision -- only an applied write is logged.
     if (result.outcome === 'applied') {
+      // The descriptor's resolved subject (org-checked by its core) keys the row to the SOP
+      // when the subject is one; the session user is kept because the actor is the agent.
+      const landed = result.subject
       await recordDecision({
         kind: 'ai_field_write',
         agent: agentName,
         subject: { kind: 'field', id: context.subjectId ?? context.sectionId ?? context.sopId ?? null },
-        sopId: serverSopId,
+        sopId: serverSopId ?? (landed?.type === 'sop' ? landed.id : null),
         summary: `Changed ${descriptor.label}`,
-        details: { field_id: fieldId },
+        details: {
+          field_id: fieldId,
+          session_user_id: userId,
+          ...(landed ? { subject_type: landed.type, subject_id: landed.id } : {}),
+        },
       })
     }
     return { success: true, result }

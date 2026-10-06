@@ -30,7 +30,8 @@ import type { FieldContext, StakeLevel } from '@/lib/validators/ai-fields'
 // ---------------------------------------------------------------------------
 
 export type WriteResult =
-  | { outcome: 'applied'; value: unknown }
+  // subject: what the write landed on, resolved by the descriptor under the session org (ledger row, WR-05)
+  | { outcome: 'applied'; value: unknown; subject?: { type: string; id: string | null } }
   | { outcome: 'pending_approval'; proposalId: string }
 
 export interface FieldDescriptor<T = unknown> {

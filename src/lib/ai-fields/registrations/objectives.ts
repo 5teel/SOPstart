@@ -50,7 +50,7 @@ for (const type of OBJECTIVE_SUBJECTS) {
         { agent: ctx.agentName ?? DEFAULT_AGENT_NAME },
       )
       if ('error' in result) throw new Error(`${id}.write failed: ${result.error}`)
-      return { outcome: 'applied', value: { text: result.text, dueOn: result.dueOn } }
+      return { outcome: 'applied', value: { text: result.text, dueOn: result.dueOn }, subject: result.subject }
     },
   })
 }
