@@ -55,6 +55,8 @@ export interface SitePresetMachine {
   frac: ReadonlyArray<Frac>
 }
 
+// ponytail: never '#3b82f6' -- zoneColour() reads it as the column default
+// ("no colour set") and substitutes a theme accent.
 export interface SitePreset {
   id: SitePresetId
   name: string
@@ -109,7 +111,7 @@ export const SITE_PRESETS: ReadonlyArray<SitePreset> = [
     blurb: 'Training bays where learners are signed off before they go to an employer.',
     departments: [
       { name: 'Fabrication', colour: '#f97316' },
-      { name: 'Electrical', colour: '#3b82f6' },
+      { name: 'Electrical', colour: '#ef4444' },
       { name: 'Plumbing', colour: '#06b6d4' },
       { name: 'Plant and heights', colour: '#fbbf24' },
       { name: 'Induction', colour: '#8b5cf6' },
@@ -132,7 +134,7 @@ export const SITE_PRESETS: ReadonlyArray<SitePreset> = [
     name: 'Food-safety training kitchen',
     blurb: 'HACCP flow left to right: receive, store, prep, cook, chill, hold, wash.',
     departments: [
-      { name: 'Receiving and storage', colour: '#3b82f6' },
+      { name: 'Receiving and storage', colour: '#8b5cf6' },
       { name: 'Preparation', colour: '#10b981' },
       { name: 'Cooking and holding', colour: '#ef4444' },
       { name: 'Cleaning', colour: '#06b6d4' },
@@ -157,7 +159,7 @@ export const SITE_PRESETS: ReadonlyArray<SitePreset> = [
     blurb: 'Four filling lines, a syrup room, water treatment and a finished-goods warehouse.',
     departments: [
       { name: 'Line 1', colour: '#f97316' },
-      { name: 'Line 2', colour: '#3b82f6' },
+      { name: 'Line 2', colour: '#8b5cf6' },
       { name: 'Line 3', colour: '#10b981' },
       { name: 'Line 4', colour: '#ec4899' },
       { name: 'Utilities', colour: '#06b6d4' },
