@@ -58,6 +58,9 @@ const LIVE_WRITERS: string[] = [
   'src/actions/asks.ts#askToDoSop',
   'src/actions/asks.ts#declineAsk',
   'src/actions/asks.ts#stopAsking',
+  'src/actions/objectives.ts#setObjective',
+  'src/actions/objectives.ts#clearObjective',
+  'src/actions/objectives.ts#confirmObjective',
 ]
 // performPublish is hooked outside the gate body (56-05).
 const PUBLISH_GUARD_LIVE = true

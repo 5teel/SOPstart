@@ -11,7 +11,8 @@
     "sop_review_cadences",
     "ai_field_proposals",
     "organisation_members",
-    "requests"
+    "requests",
+    "objectives"
   ],
   "columnKeys": [
     { "table": "sops", "token": "owner_user_id:", "what": "owner change" },
@@ -46,7 +47,10 @@
     { "file": "src/actions/requests.ts", "function": "answerRequest", "status": "hook", "anchor": "claimOpenRequest(", "kind": "request_accepted/request_declined", "plan": 60 },
     { "file": "src/actions/asks.ts", "function": "askToDoSop", "status": "hook", "anchor": "askToDoSopCore(", "kind": "request_accepted", "plan": 60 },
     { "file": "src/actions/asks.ts", "function": "declineAsk", "status": "hook", "anchor": "declineAskCore(", "kind": "request_declined", "plan": 60 },
-    { "file": "src/actions/asks.ts", "function": "stopAsking", "status": "hook", "anchor": "stopAskingCore(", "kind": "request_declined", "plan": 60 }
+    { "file": "src/actions/asks.ts", "function": "stopAsking", "status": "hook", "anchor": "stopAskingCore(", "kind": "request_declined", "plan": 60 },
+    { "file": "src/actions/objectives.ts", "function": "setObjective", "status": "hook", "anchor": "setObjectiveCore(", "kind": "objective_set", "plan": 60 },
+    { "file": "src/actions/objectives.ts", "function": "clearObjective", "status": "hook", "anchor": "clearObjectiveCore(", "kind": "objective_cleared", "plan": 60 },
+    { "file": "src/actions/objectives.ts", "function": "confirmObjective", "status": "hook", "anchor": "confirmObjectiveCore(", "kind": "objective_confirmed", "plan": 60 }
   ],
   "delegatedHooks": [
     { "file": "src/actions/completions.ts", "function": "submitCompletion", "calls": "recordSignature(", "after": ".from('sop_completions')", "kind": "sign_off", "note": "Send for sign-off (D-22): the worker's signature row and its ledger row are written by recordSignature, after the completion insert" },
@@ -72,6 +76,11 @@
     { "file": "src/lib/requests/ask-core.ts", "function": "askToDoSopCore", "key": "requests", "reason": "The service-role write behind askToDoSop, which records the decision after it returns." },
     { "file": "src/lib/requests/ask-core.ts", "function": "dropAskedAssignments", "key": "sop_assignments", "reason": "The service-role write behind declineAsk and stopAsking, which records the decision after it returns." },
     { "file": "src/lib/requests/ask-core.ts", "function": "declineAskCore", "key": "requests", "reason": "The service-role write behind declineAsk, which records the decision after it returns." },
-    { "file": "src/lib/requests/ask-core.ts", "function": "stopAskingCore", "key": "requests", "reason": "The service-role write behind stopAsking, which records the decision after it returns." }
+    { "file": "src/lib/requests/ask-core.ts", "function": "stopAskingCore", "key": "requests", "reason": "The service-role write behind stopAsking, which records the decision after it returns." },
+    { "file": "src/lib/objectives/core.ts", "function": "setObjectiveCore", "key": "objectives", "reason": "The service-role write behind setObjective, which records the decision after it returns; the agent path is logged once as ai_field_write by applyAiWrite (A-09)." },
+    { "file": "src/lib/objectives/core.ts", "function": "clearObjectiveCore", "key": "objectives", "reason": "The service-role write behind clearObjective, which records the decision after it returns; the agent path is logged once as ai_field_write by applyAiWrite (A-09)." },
+    { "file": "src/lib/objectives/core.ts", "function": "confirmObjectiveCore", "key": "objectives", "reason": "The service-role write behind confirmObjective, which records the decision after it returns; the agent path is logged once as ai_field_write by applyAiWrite (A-09)." },
+    { "file": "src/actions/sops.ts", "function": "deleteSop", "key": "requests", "reason": "Housekeeping: rows about the SOP are cleared as part of deleting the SOP itself." },
+    { "file": "src/actions/sops.ts", "function": "deleteSop", "key": "objectives", "reason": "Housekeeping: rows about the SOP are cleared as part of deleting the SOP itself." }
   ]
 }

@@ -53,7 +53,19 @@ test.describe("Capability matrix rows (60-02 / 60-04 / 60-06 / 60-09 / 60-11 / 6
     expect(cells(targets)).toEqual(['—', '✅', '✅', '✅', '—'])
     for (const name of ['listAskTargets()', 'getOrgMembers']) expect(targets).toContain(name)
   })
-  test.fixme("60-09: setObjective, clearObjective, confirmObjective and listObjectives rows", () => {})
+  test('60-09: set, confirm and agent objective rows, and the list read', () => {
+    const cells = (l: string) => l.split('|').map((c) => c.trim()).slice(2, 7)
+    const set = row('Set, change or remove an objective')
+    expect(cells(set)).toEqual(['—', '—', '✅', '✅', '—']) // only admin and safety manager
+    for (const name of ['setObjective()', 'clearObjective()', 'src/lib/objectives/core.ts', 'service role', 'lineage root', 'objective_set', 'objective_cleared']) expect(set).toContain(name)
+    const confirm = row('Confirm an agent-set objective')
+    expect(cells(confirm)).toEqual(['—', '—', '✅', '✅', '—'])
+    for (const name of ['confirmObjective()', 'objective_confirmed', 'not yet confirmed']) expect(confirm).toContain(name)
+    const agent = row('Agent sets an objective')
+    expect(cells(agent)).toEqual(['—', '—', '✅', '✅', '—']) // the same core gate, under the caller's session
+    for (const name of ['objective.*', 'setObjectiveCore()', 'ai_field_write', 'unconfirmed']) expect(agent).toContain(name)
+    expect(row('Read objectives')).toContain('listObjectives()')
+  })
   test.fixme("60-11: Office Requests tab rows (existing labels are never renamed, phase46 pins them)", () => {})
   test.fixme("60-17: the four removed assign rows are gone and the reassignment path is described as a request", () => {})
 })

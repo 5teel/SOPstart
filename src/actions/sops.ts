@@ -382,6 +382,10 @@ export async function deleteSop(sopId: string): Promise<{ success: true } | { er
   await admin.from('sop_assignments').delete().eq('sop_id', sopId)
   await admin.from('video_generation_jobs').delete().eq('sop_id', sopId)
   await admin.from('worker_notifications').delete().eq('sop_id', sopId)
+  // Phase 60 (A-10, F-18): these tables carry no foreign key to sops, so rows about the SOP go here.
+  await admin.from('notifications').delete().eq('organisation_id', ctx.organisationId).eq('subject_type', 'sop').eq('subject_id', sopId)
+  await admin.from('requests').delete().eq('organisation_id', ctx.organisationId).eq('subject_type', 'sop').eq('subject_id', sopId)
+  await admin.from('objectives').delete().eq('organisation_id', ctx.organisationId).eq('subject_type', 'sop').eq('subject_id', sopId)
   const { error } = await admin.from('sops').delete().eq('id', sopId)
 
   if (error) return { error: error.message }

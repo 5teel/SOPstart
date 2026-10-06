@@ -175,4 +175,20 @@ test.describe('CR-01 — deleteSop guard ordering (source-contract)', () => {
     expect(fetchIdx).toBeLessThan(firstDeleteIdx)
     expect(mismatchIdx).toBeLessThan(firstDeleteIdx)
   })
+
+  // Phase 60 (A-10, F-18): requests, notifications and objectives carry no foreign key to sops,
+  // so deleteSop clears rows about the SOP itself, each under the session organisation.
+  test('deleteSop clears notifications, requests and objectives about the SOP under the session org filter', () => {
+    const content = fs.readFileSync(path.join(ROOT, 'src', 'actions', 'sops.ts'), 'utf8').replace(/\r\n/g, '\n')
+    const fnStart = content.indexOf('export async function deleteSop')
+    const fnBody = content.slice(fnStart, content.indexOf('\nexport ', fnStart + 1))
+    const sopDelete = fnBody.indexOf("from('sops').delete")
+    for (const table of ['notifications', 'requests', 'objectives']) {
+      const needle = `from('${table}')`
+      const line = fnBody.split('\n').find((l) => l.includes(needle)) ?? ''
+      expect(line, table).toContain(".eq('organisation_id', ctx.organisationId)")
+      expect(line, table).toContain(".eq('subject_type', 'sop').eq('subject_id', sopId)")
+      expect(fnBody.indexOf(needle), table).toBeLessThan(sopDelete)
+    }
+  })
 })
