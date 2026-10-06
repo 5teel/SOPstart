@@ -134,7 +134,7 @@ test.describe('SHL-01 one screen structure', () => {
   test('the root page renders the landing signed out and the one screen signed in', () => {
     const page = read('src/app/page.tsx')
     expect(page).toContain('getSessionContext(')
-    expect(page).toMatch(/if \(!userId\) return <Landing \/>/)
+    expect(page).toContain("if (!userId) redirect('/welcome')")
     expect(page).toContain("redirect('/pending')")
     expect(page).toContain('<ProtectedProviders')
     expect(page).toContain('<OneScreen')

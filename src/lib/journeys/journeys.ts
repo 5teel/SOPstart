@@ -57,6 +57,7 @@ export const JOURNEYS: Journey[] = [
     summary: 'An existing member signs in and lands on their home screen.',
     steps: [
       { id: 's', type: 'start', label: 'Has an account' },
+      { id: 'welcome', type: 'screen', label: 'Promo reel', route: '/welcome', detail: 'A signed-out visit to / lands here: a looping reel over a template site (machines and SOPs, consistent structure, visual steps, AI building). Sign in leads to the login screen.' },
       { id: 'login', type: 'screen', label: 'Login screen', route: '/login' },
       { id: 'auth', type: 'action', label: 'Enter email + password', detail: 'Supabase Auth verifies and sets a session. roleHome(role) sends every role to the one screen, or to /pending when there is no role (UX-01, Phase 57).' },
       { id: 'role', type: 'decision', label: 'Role?', branches: [

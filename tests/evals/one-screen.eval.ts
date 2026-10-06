@@ -503,9 +503,10 @@ test.describe('Phase 57 — the one screen (deployed)', () => {
 
   // -------------------------------------------------------------- signed out
 
-  test('D-10: signed-out root shows the landing page', async ({ page }) => {
+  test('D-10: signed-out root shows the promo reel', async ({ page }) => {
     await page.goto('/')
-    await expect(page.getByRole('link', { name: 'Log In' })).toBeVisible(SLOW)
+    await expect(page).toHaveURL(/\/welcome$/)
+    await expect(page.getByTestId('promo-reel')).toBeVisible(SLOW)
     await expect(page.getByTestId('shell')).toHaveCount(0)
   })
 })
