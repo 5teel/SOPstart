@@ -85,6 +85,7 @@ export async function GET(req: NextRequest) {
     sectionId: searchParams.get('sectionId') ?? undefined,
     stepId: searchParams.get('stepId') ?? undefined,
     memberId: searchParams.get('memberId') ?? undefined,
+    subjectId: searchParams.get('subjectId') ?? undefined,
   }
 
   const contextResult = FieldContextSchema.safeParse(rawContext)

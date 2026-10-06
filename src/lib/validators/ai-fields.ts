@@ -44,6 +44,14 @@ export const FieldContextSchema = z.object({
   sectionId: z.string().uuid().optional(),
   stepId: z.string().uuid().optional(),
   memberId: z.string().uuid().optional(),
+  /**
+   * The thing a non-SOP-content field is about (an objective's department, machine,
+   * SOP or person). Kept apart from sopId so a SOP-subject objective is not diverted
+   * to a proposal by the published-SOP gate (60-10, A-09).
+   */
+  subjectId: z.string().uuid().optional(),
+  /** Set by applyAiWrite from the request's validated agent name; never trusted from the caller. */
+  agentName: z.enum(AGENT_NAMES).optional(),
   /** Passed from the API route (RESEARCH.md A6 mitigation). */
   sopIsPublished: z.boolean().optional(),
 })

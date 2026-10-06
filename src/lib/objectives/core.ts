@@ -256,3 +256,13 @@ export async function listObjectivesCore(): Promise<{ viewerCanEdit: boolean; ro
     })),
   }
 }
+
+/** The one objective on a subject (a SOP resolves to its lineage root), or null. Any member may read. */
+export async function readObjectiveCore(subject: SubjectIn): Promise<ObjectiveView | null | { error: string }> {
+  const list = await listObjectivesCore()
+  if ('error' in list) return list
+  const { organisationId } = await getSessionContext()
+  const resolved = organisationId ? await resolveSubject(organisationId, subject) : null
+  if (!resolved) return { error: 'We could not find that.' }
+  return list.rows.find((r) => r.subjectType === resolved.type && r.subjectId === resolved.id) ?? null
+}

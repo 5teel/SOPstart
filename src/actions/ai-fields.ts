@@ -31,7 +31,7 @@ import { gateWrite } from '@/lib/ai-fields/approval'
 import { getField } from '@/lib/ai-fields/registry'
 import type { WriteResult } from '@/lib/ai-fields/registry'
 import { recordDecision } from '@/lib/decisions/record'
-import { DEFAULT_AGENT_NAME } from '@/lib/decisions/shape'
+import { DEFAULT_AGENT_NAME, type AgentName } from '@/lib/decisions/shape'
 
 // ────────────────────────────────────────────────────────────────────────────
 // applyAiWrite
@@ -76,7 +76,9 @@ export async function applyAiWrite(
     // If sopRow is null (SOP not found / cross-org), leave sopIsPublished undefined —
     // gateWrite's A6 fail-safe treats undefined-on-SOP-scoped as high-stake.
   }
-  const safeContext = { ...context, organisationId, sopIsPublished: serverSopIsPublished }
+  const agentName = parsed.data.agentName ?? DEFAULT_AGENT_NAME
+  // agentName comes from the validated top-level field; anything inside context is overwritten.
+  const safeContext = { ...context, organisationId, sopIsPublished: serverSopIsPublished, agentName }
 
   // ── 3. Registry lookup (allow-list gate — T-23-04-05) ─────────────────────
   const descriptor = getField(fieldId)
@@ -101,8 +103,8 @@ export async function applyAiWrite(
     if (result.outcome === 'applied') {
       await recordDecision({
         kind: 'ai_field_write',
-        agent: parsed.data.agentName ?? DEFAULT_AGENT_NAME,
-        subject: { kind: 'field', id: context.sectionId ?? context.sopId ?? null },
+        agent: agentName,
+        subject: { kind: 'field', id: context.subjectId ?? context.sectionId ?? context.sopId ?? null },
         sopId: serverSopId,
         summary: `Changed ${descriptor.label}`,
         details: { field_id: fieldId },
@@ -196,6 +198,8 @@ export async function acceptProposal(
     sectionId: ctx['sectionId'] as string | undefined,
     stepId: ctx['stepId'] as string | undefined,
     memberId: ctx['memberId'] as string | undefined,
+    subjectId: ctx['subjectId'] as string | undefined,
+    agentName: ctx['agentName'] as AgentName | undefined,
   }
 
   try {

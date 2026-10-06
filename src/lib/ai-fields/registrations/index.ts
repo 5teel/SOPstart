@@ -17,10 +17,13 @@
  * | sop.section.title     | high  | Published SOP content — routes to proposal      |
  *
  * WRITE RULE (CLAUDE.md 2026-06-15 + RESEARCH anti-pattern):
- * Each write() descriptor calls an existing @/actions/ server action.
- * It NEVER calls createClient() / createAdminClient() directly — business
- * rules and org-scoping live in the action, not the descriptor.
+ * Each write() descriptor calls an existing @/actions/ server action OR a plain
+ * server-only core (objectives.ts). It NEVER calls createClient() /
+ * createAdminClient() directly — business rules and org-scoping live in the
+ * action or core, not the descriptor. An objective setter must not sit on a
+ * client-reachable action (CLAUDE.md 2026-09-30), hence the core.
  */
+import '@/lib/ai-fields/registrations/objectives'
 
 import { registerField } from '@/lib/ai-fields/registry'
 import { updateSopTitle } from '@/actions/sops'
