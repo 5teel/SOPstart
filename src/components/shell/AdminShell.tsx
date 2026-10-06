@@ -19,7 +19,6 @@ import { SiteEmptyState } from '@/components/admin/site/SiteEmptyState'
 import { SiteWorkspace } from '@/components/admin/site/SiteWorkspace'
 import { AccountControl } from '@/components/shell/AccountControl'
 import { AdminNoticeboardBody, AdminWorkshopBody } from '@/components/shell/AdminRoomBodies'
-import { NotificationBell } from '@/components/shell/NotificationBell'
 import { OfficeCard } from '@/components/shell/OfficeCard'
 import { useObjectives } from '@/components/shell/ObjectiveLine'
 import { ObjectiveSlot } from '@/components/shell/ObjectiveSlot'
@@ -36,6 +35,10 @@ import { useRole } from '@/components/providers/RoleProvider'
 import { zoneColour } from '@/lib/site/scene'
 
 // The Office pane is its own chunk, reached only here and in WorkerShell (59 A-11).
+const NotificationBell = dynamic(() => import('@/components/shell/NotificationBell').then((m) => m.NotificationBell), {
+  ssr: false,
+  loading: () => null,
+})
 const SiteOverview = dynamic(() => import('@/components/shell/SiteOverview').then((m) => m.SiteOverview), {
   ssr: false,
   loading: () => null,

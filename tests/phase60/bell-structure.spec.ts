@@ -56,6 +56,9 @@ test.describe('Notification bell (60-16)', () => {
     for (const rel of ['src/components/shell/WorkerShell.tsx', 'src/components/shell/AdminShell.tsx']) {
       const s = read(rel)
       expect(s, rel).toContain('<NotificationBell')
+      // the bell is a lazy seam (bundle fallback, 60-16): the home route could not carry it statically
+      expect(s, rel).toContain("import('@/components/shell/NotificationBell')")
+      expect(s, rel).not.toMatch(/from '@\/components\/shell\/NotificationBell'/)
       expect(s, rel).toContain("requestOverviewSection('notifications')")
       expect(s, rel).toContain("select({ kind: 'overview' })")
       expect(s, rel).toContain('renderBell=')

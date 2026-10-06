@@ -12,7 +12,6 @@ import { useQuery } from '@tanstack/react-query'
 import { getOfficeInbox } from '@/actions/office'
 import { listSiteForWorker } from '@/actions/site-worker'
 import { AccountControl } from '@/components/shell/AccountControl'
-import { NotificationBell } from '@/components/shell/NotificationBell'
 import { OfficeCard } from '@/components/shell/OfficeCard'
 import { ShellFrame, type ShellSite } from '@/components/shell/ShellFrame'
 import {
@@ -66,6 +65,10 @@ const AskTrigger = dynamic(() => import('@/components/requests/AskPicker').then(
 })
 
 // The objective line is a lazy module: the static line cost the home download past its gate (60-13).
+const NotificationBell = dynamic(() => import('@/components/shell/NotificationBell').then((m) => m.NotificationBell), {
+  ssr: false,
+  loading: () => null,
+})
 const SiteOverview = dynamic(() => import('@/components/shell/SiteOverview').then((m) => m.SiteOverview), {
   ssr: false,
   loading: () => null,
