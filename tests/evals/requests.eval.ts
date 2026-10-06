@@ -38,25 +38,9 @@ import { deleteEvalRequestRows, ensureZeroSopMachine } from './lib/requests-fixt
 import { deleteEvalCompletions } from './lib/completion-cleanup'
 import { startWalking, walkFixture } from './lib/walk'
 import { SOP_CATEGORIES } from '../../src/lib/sop-categories'
+import { newMachineCode } from '../../src/lib/site/scene'
 
 export const SLOW = { timeout: 30_000 }
-
-/**
- * Shared cron helper (60-11; 60-16 reuses it). A wrong bearer must be refused first -- that proves the
- * route checks the secret at all -- then the real secret is sent; if THAT is refused too, the eval's
- * CRON_SECRET is not the deployed one, and every later assertion would be noise.
- */
-export async function postCron(path: string, body: Record<string, unknown>): Promise<Record<string, number>> {
-  const url = `${EVAL_BASE_URL}${path}`
-  const send = (secret: string) =>
-    fetch(url, { method: 'POST', headers: { authorization: `Bearer ${secret}`, 'content-type': 'application/json' }, body: JSON.stringify(body) })
-  const wrong = await send('not-the-cron-secret')
-  expect(wrong.status, `${path} accepted a wrong bearer`).toBe(401)
-  const real = await send(process.env.CRON_SECRET ?? '')
-  if (real.status === 401) throw new Error('CRON_SECRET differs from the deployed value (Railway env vs .env.local)')
-  expect(real.status, `${path} with the real secret`).toBe(200)
-  return (await real.json()) as Record<string, number>
-}
 
 test.describe('Phase 60 -- requests, notifications and objectives (deployed)', () => {
   test.skip(!EVAL_ENV_READY, 'EVAL_BASE_URL/Supabase env not configured -- self-skipping')
@@ -83,6 +67,7 @@ test.describe('Phase 60 -- requests, notifications and objectives (deployed)', (
     test.afterAll(async () => {
       if (!EVAL_ENV_READY || !db || !siteOrgId || siteOrgId === REAL_SOPSTART_ORG_ID) return
       await deleteEvalRequestRows(db, siteOrgId).catch(() => null)
+      await db.from('site_machines').delete().eq('organisation_id', siteOrgId).like('name', 'EVAL Lathe %').then(() => null, () => null)
     })
 
     test('supervisor Requests tab and pin: tab bar shows Inbox and Requests, pin equals inbox plus requests (60-11)', async ({ browser }) => {
@@ -128,11 +113,20 @@ test.describe('Phase 60 -- requests, notifications and objectives (deployed)', (
       await ctx.close()
     })
 
-    test('agent new-SOP request from the machines sweep appears with the agent chip; declined; a second run raises nothing (60-11)', async ({ browser }) => {
+    test('agent new-SOP requests for machines with no SOP appear when the Office loads (ADR-0002); declined; a second load raises nothing (60-11)', async ({ browser }) => {
       test.setTimeout(240_000)
-      // Clear anything an earlier run left for this machine so the first sweep has something to raise.
+      // Clear anything an earlier run left for this machine, and add a brand-new machine with no request
+      // at all: nothing runs on a timer, so the Office read is what has to notice both.
       await db.from('requests').delete().eq('organisation_id', siteOrgId).eq('subject_type', 'machine').eq('subject_id', zeroMachine.id)
-      await postCron('/api/cron/machines-without-sops', { organisationId: siteOrgId })
+      const { data: layoutRow } = await db.from('site_machines').select('site_layout_id, department_id, polygon').eq('id', zeroMachine.id).single()
+      if (!layoutRow) throw new Error('zero-SOP machine row missing')
+      const lathe = `EVAL Lathe ${runId}`
+      const made = await db
+        .from('site_machines')
+        .insert({ site_layout_id: layoutRow.site_layout_id, organisation_id: siteOrgId, name: lathe, department_id: layoutRow.department_id, polygon: layoutRow.polygon, code: newMachineCode(), sort: 2 })
+        .select('id')
+        .single()
+      if (made.error || !made.data) throw new Error(`lathe insert failed: ${made.error?.message}`)
 
       const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } })
       await signInAs(ctx, 'siteAdmin')
@@ -142,6 +136,7 @@ test.describe('Phase 60 -- requests, notifications and objectives (deployed)', (
       await expect(row).toHaveCount(1, SLOW)
       await expect(row).toHaveAttribute('data-agent', 'true')
       await expect(row.getByText('agent', { exact: true })).toHaveCount(1)
+      await expect(page.getByTestId('request-row').filter({ hasText: lathe })).toHaveCount(1, SLOW)
       // Normal width, two buttons, each at least 44 px tall.
       const pane = await page.getByTestId('office-pane').boundingBox()
       expect(pane?.width ?? 0).toBeLessThan(520)
@@ -159,12 +154,14 @@ test.describe('Phase 60 -- requests, notifications and objectives (deployed)', (
       await expect(page.getByTestId('office-receipt')).toContainText('Declined · logged in the decision ledger', SLOW)
       await expect(page.getByTestId('request-row').filter({ hasText: zeroMachine.name })).toHaveCount(0, SLOW)
 
-      // A second sweep run raises nothing new for a machine whose request was just answered.
-      await postCron('/api/cron/machines-without-sops', { organisationId: siteOrgId })
+      // A second load raises nothing new: the declined machine is skipped, the other keeps its one request.
       await page.reload()
       await expect(page.getByTestId('office-pane')).toHaveCount(1, SLOW)
-      await expect(page.getByTestId('request-row').filter({ hasText: zeroMachine.name })).toHaveCount(0, SLOW)
+      await expect(page.getByTestId('request-row').filter({ hasText: lathe })).toHaveCount(1, SLOW)
+      await expect(page.getByTestId('request-row').filter({ hasText: zeroMachine.name })).toHaveCount(0)
+      await shot(page, '60-requests-reload')
       await ctx.close()
+      await db.from('site_machines').delete().eq('id', made.data.id).eq('organisation_id', siteOrgId)
     })
     test('composer opens from the machine panel; the ask picker works in role mode and person mode (60-12)', async ({ browser }) => {
       test.setTimeout(240_000)
@@ -568,19 +565,26 @@ test.describe('Phase 60 -- requests, notifications and objectives (deployed)', (
       await dropSops(title)
     })
 
-    test('review due sweep notifies the SOP owner once (60-16 c)', async ({ browser }) => {
+    test('review due: loading the screen as the SOP owner writes the notice once (ADR-0002, 60-16 c)', async ({ browser }) => {
       test.setTimeout(120_000)
       const title = `EVAL review-due ${runId}`
       const adminId = await userIdOf(EVAL_USERS.siteAdmin)
       await seedSop(title, { status: 'published', ownerId: adminId, extra: { review_due_at: new Date(Date.now() + 5 * 86_400_000).toISOString() } })
-      await postCron('/api/cron/review-due', { organisationId: siteOrgId })
-      const admin = await as(browser, 'siteAdmin')
-      await openSite(admin.page)
       const text = new RegExp(`${title} is due for you to review by `)
-      await expect(notif(admin.page, text)).toHaveCount(1, SLOW)
-      await postCron('/api/cron/review-due', { organisationId: siteOrgId })
+      // Nothing is scheduled, so nothing exists yet.
+      const before = await db.from('notifications').select('id', { count: 'exact', head: true }).eq('organisation_id', siteOrgId).like('title', `${title}%`)
+      expect(before.count ?? 0).toBe(0)
+      const admin = await as(browser, 'siteAdmin')
+      // The first load writes the notice (the bell may already have read); the next one shows it.
+      await openSite(admin.page)
       await admin.page.reload()
       await expect(notif(admin.page, text)).toHaveCount(1, SLOW)
+      await shot(admin.page, '60-review-due-on-read')
+      // A repeat load writes nothing new.
+      await admin.page.reload()
+      await expect(notif(admin.page, text)).toHaveCount(1, SLOW)
+      const after = await db.from('notifications').select('id', { count: 'exact', head: true }).eq('organisation_id', siteOrgId).like('title', `${title}%`)
+      expect(after.count).toBe(1)
       await admin.ctx.close()
       await dropSops(title)
     })
