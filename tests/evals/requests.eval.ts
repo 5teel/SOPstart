@@ -32,7 +32,7 @@
  */
 import { test, expect, type Browser, type BrowserContext, type Page } from '@playwright/test'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
-import { EVAL_BASE_URL, EVAL_ENV_READY, EVAL_SITE_SOP_TITLE, EVAL_USERS, signInAs } from './lib/session'
+import { EVAL_BASE_URL, EVAL_ENV_READY, EVAL_PLANT_SOP_TITLE, EVAL_SITE_SOP_TITLE, EVAL_WALK_SOP_TITLE, EVAL_USERS, signInAs } from './lib/session'
 import { ensurePlantFixture, REAL_SOPSTART_ORG_ID, shot } from './lib/plant-fixture'
 import { deleteEvalRequestRows, ensureZeroSopMachine } from './lib/requests-fixture'
 import { deleteEvalCompletions } from './lib/completion-cleanup'
@@ -174,7 +174,7 @@ test.describe('Phase 60 -- requests, notifications and objectives (deployed)', (
       await signInAs(adminCtx, 'siteAdmin')
       const admin = await adminCtx.newPage()
       await admin.goto(`/?place=${pressId}`)
-      const adminRow = admin.getByTestId('admin-panel-row').filter({ hasText: EVAL_SITE_SOP_TITLE })
+      const adminRow = admin.getByTestId('admin-panel-row').filter({ hasText: EVAL_PLANT_SOP_TITLE })
       await expect(adminRow).toHaveCount(1, SLOW)
       const ask = adminRow.getByTestId('ask-trigger')
       await expect(ask).toHaveCount(1, SLOW)
@@ -320,7 +320,7 @@ test.describe('Phase 60 -- requests, notifications and objectives (deployed)', (
     })
     test('SOP objective in This SOP and browse; a second request raised from browse, never in the walk (60-14)', async ({ browser }) => {
       test.setTimeout(240_000)
-      const { data: sopRow } = await db.from('sops').select('id').eq('organisation_id', siteOrgId).eq('title', EVAL_SITE_SOP_TITLE).single()
+      const { data: sopRow } = await db.from('sops').select('id').eq('organisation_id', siteOrgId).eq('title', EVAL_PLANT_SOP_TITLE).single()
       const sopId = sopRow!.id as string
       const text = `EVAL SOP objective ${runId}`
 
@@ -449,7 +449,8 @@ test.describe('Phase 60 -- requests, notifications and objectives (deployed)', (
       const worker = await as(browser, 'siteWorker')
       const w = worker.page
       await openSite(w)
-      const accepted = notif(w, /Your request about .* was accepted\./).first()
+      // By title: the 60-11 case also left an accepted notification, and a `.first()` moves once the opened row is read.
+      const accepted = notif(w, new RegExp(`Your request about ${EVAL_PLANT_SOP_TITLE} was accepted\.`)).first()
       await expect(accepted).toBeVisible(SLOW)
       await expect(w.getByTestId('shell-bell-count')).toHaveCount(1, SLOW)
 
@@ -457,14 +458,19 @@ test.describe('Phase 60 -- requests, notifications and objectives (deployed)', (
       await w.getByTestId('shell-search').fill('Press')
       await w.getByTestId('shell-bell').click()
       await expect(w.getByTestId('overview-notifications')).toBeVisible(SLOW)
-      await expect(w.locator(':focus')).toContainText('Notifications', SLOW)
+      await expect
+        .poll(() => w.evaluate(() => { const a = document.activeElement; return a ? `${a.tagName} ${a.getAttribute('data-testid') ?? ''} | ${(a.textContent ?? '').slice(0, 40)}` : 'none' }), { ...SLOW, message: 'focus after the bell click' })
+        .toMatch(/notifications/i) // the heading text is uppercase in the source
       await shot(w, '60-bell-click')
 
       // Opening the row marks it read and lands on My requests showing Accepted.
       await accepted.click()
       await expect(w.getByTestId('overview-requests')).toContainText('Accepted', SLOW)
       await shot(w, '60-overview-worker')
-      await expect(notif(w, /Your request about .* was accepted\./).first()).toHaveAttribute('data-unread', 'false', SLOW)
+      // A read row leaves the unread list; "Show read" lists it again, no longer unread.
+      await expect(w.getByTestId('overview-notifications').getByTestId('notification-row').filter({ hasText: EVAL_PLANT_SOP_TITLE })).toHaveCount(0, SLOW)
+      await w.getByTestId('notification-show-read').click()
+      await expect(notif(w, new RegExp(`Your request about ${EVAL_PLANT_SOP_TITLE} was accepted`)).first()).toHaveAttribute('data-unread', 'false', SLOW)
 
       // Second round in the same session: decline the observe-me request with a reason.
       await admin.page.goto('/?place=office&tab=requests')
@@ -481,7 +487,9 @@ test.describe('Phase 60 -- requests, notifications and objectives (deployed)', (
       await expect(declined).toBeVisible(SLOW)
       await expect(w.getByTestId('overview-requests')).toContainText(reason, SLOW)
       await declined.click()
-      await expect(declined).toHaveAttribute('data-unread', 'false', SLOW)
+      await expect(declined).toHaveCount(0, SLOW)
+      await w.getByTestId('notification-show-read').click()
+      await expect(notif(w, /Your request about .* was declined/).first()).toHaveAttribute('data-unread', 'false', SLOW)
       await admin.ctx.close()
       await worker.ctx.close()
     })
@@ -504,6 +512,8 @@ test.describe('Phase 60 -- requests, notifications and objectives (deployed)', (
       await sup.page.getByPlaceholder('Find a person…').fill('worker')
       await sup.page.getByRole('button', { name: /worker/i }).first().click()
       await sup.page.getByTestId('ask-confirm').click()
+      // The ask must have landed before the worker loads: the bell does not poll.
+      await expect(sup.page.getByTestId('ask-picker')).toHaveCount(0, SLOW)
 
       const worker = await as(browser, 'siteWorker')
       const w = worker.page
@@ -633,7 +643,7 @@ test.describe('Phase 60 -- requests, notifications and objectives (deployed)', (
 
     test('a sent walk notifies the supervisor, who finds the sign-off row (60-16 e)', async ({ browser }) => {
       test.setTimeout(300_000)
-      const { data: sopRow } = await db.from('sops').select('id').eq('organisation_id', siteOrgId).eq('title', EVAL_SITE_SOP_TITLE).single()
+      const { data: sopRow } = await db.from('sops').select('id').eq('organisation_id', siteOrgId).eq('title', EVAL_WALK_SOP_TITLE).single()
       const sopId = sopRow!.id as string
       const worker = await as(browser, 'siteWorker')
       await worker.page.goto(`/sops/${sopId}`)
@@ -643,11 +653,11 @@ test.describe('Phase 60 -- requests, notifications and objectives (deployed)', (
 
       const sup = await as(browser, 'siteSupervisor')
       await openSite(sup.page)
-      const row = notif(sup.page, new RegExp(`finished ${EVAL_SITE_SOP_TITLE} and is waiting for you to sign off\\.`)).first()
+      const row = notif(sup.page, new RegExp(`finished ${EVAL_WALK_SOP_TITLE} and is waiting for you to sign off\\.`)).first()
       await expect(row).toBeVisible(SLOW)
       await row.click()
       await expect(sup.page.getByTestId('room-body')).toHaveAttribute('data-room-id', 'office', SLOW)
-      await expect(sup.page.getByTestId('office-row').filter({ hasText: EVAL_SITE_SOP_TITLE }).first()).toBeVisible(SLOW)
+      await expect(sup.page.getByTestId('office-row').filter({ hasText: EVAL_WALK_SOP_TITLE }).first()).toBeVisible(SLOW)
       await sup.ctx.close()
       await deleteEvalCompletions(db, sopId)
     })
@@ -683,7 +693,7 @@ test.describe('Phase 60 -- requests, notifications and objectives (deployed)', (
 
     test('the old assign address lands on the SOP edit surface (rendered place, not status) (60-17)', async ({ browser }) => {
       test.setTimeout(120_000)
-      const { data: sopRow } = await db.from('sops').select('id').eq('organisation_id', siteOrgId).eq('title', EVAL_SITE_SOP_TITLE).single()
+      const { data: sopRow } = await db.from('sops').select('id').eq('organisation_id', siteOrgId).eq('title', EVAL_PLANT_SOP_TITLE).single()
       const sopId = sopRow!.id as string
       const adminCtx = await browser.newContext({ viewport: { width: 1440, height: 900 } })
       await signInAs(adminCtx, 'siteAdmin')
