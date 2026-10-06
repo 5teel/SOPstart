@@ -87,7 +87,7 @@ test.describe('CAP-02 -- requireSopEditAccess call-site wiring (source-contract)
 
   test('every focus editor content write calls requireSopEditAccess( inside its own body', () => {
     const src = read(FOCUS_STEPS)
-    for (const fn of ['getFocusSop', 'updateFocusStep', 'addFocusStep', 'deleteFocusStep', 'moveFocusStep', 'deleteFocusSection', 'setSopObjective', 'getStepImageUploadUrl', 'attachStepImage', 'removeStepImage']) {
+    for (const fn of ['getFocusSop', 'updateFocusStep', 'addFocusStep', 'deleteFocusStep', 'moveFocusStep', 'deleteFocusSection', 'getStepImageUploadUrl', 'attachStepImage', 'removeStepImage']) {
       expect(fnBody(src, fn), `${fn} should call requireSopEditAccess(`).toContain('requireSopEditAccess(')
     }
   })

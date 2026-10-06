@@ -2,7 +2,7 @@
 
 /**
  * Phase 58 (58-04, FOC-02, WRK-04) -- the focus editor's server surface over
- * sop_focus_steps: step and section edits, the per-step tick, the objective, the
+ * sop_focus_steps: step and section edits, the per-step tick, the
  * jump-ahead flag and step images.
  *
  * sop_focus_steps has no authenticated write policy (00069/00071), so every write
@@ -363,34 +363,8 @@ export async function untickFocusStep(input: { stepId: string }): Promise<Ok | F
 }
 
 // ---------------------------------------------------------------------------
-// Objective and jump-ahead (drafts only; the flag travels with the next version)
+// Jump-ahead (drafts only; the flag travels with the next version)
 // ---------------------------------------------------------------------------
-
-const objectiveSchema = z.object({
-  sopId: uuid,
-  objective: z.string().trim().max(500, 'Keep the objective under 500 characters'),
-})
-
-export async function setSopObjective(input: { sopId: string; objective: string }): Promise<Ok | Fail> {
-  const parsed = objectiveSchema.safeParse(input)
-  if (!parsed.success) return { error: firstIssue(parsed.error) }
-
-  const ctx = await requireSopEditAccess({ sopId: parsed.data.sopId })
-  if ('error' in ctx) return { error: ctx.error }
-  const open = await editableSop(ctx.organisationId, ctx.sopId)
-  if ('error' in open) return open
-
-  const { error } = await createAdminClient()
-    .from('sops')
-    .update({ objective: parsed.data.objective === '' ? null : parsed.data.objective })
-    .eq('id', ctx.sopId)
-    .eq('organisation_id', ctx.organisationId)
-  if (error) {
-    console.error('[setSopObjective] update error', error)
-    return { error: error.message }
-  }
-  return { ok: true }
-}
 
 export async function setAllowForwardJump(input: { sopId: string; allow: boolean }): Promise<Ok | Fail> {
   const parsed = z.object({ sopId: uuid, allow: z.boolean() }).safeParse(input)

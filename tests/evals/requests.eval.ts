@@ -315,7 +315,49 @@ test.describe('Phase 60 -- requests, notifications and objectives (deployed)', (
       await expect(worker.getByRole('button', { name: /Change|Set an objective|Confirm/ })).toHaveCount(0)
       await wctx.close()
     })
-    test.fixme('SOP objective in browse and This SOP; a second request raised from browse (60-14)', async () => {})
+    test('SOP objective in This SOP and browse; a second request raised from browse, never in the walk (60-14)', async ({ browser }) => {
+      test.setTimeout(240_000)
+      const { data: sopRow } = await db.from('sops').select('id').eq('organisation_id', siteOrgId).eq('title', EVAL_SITE_SOP_TITLE).single()
+      const sopId = sopRow!.id as string
+      const text = `EVAL SOP objective ${runId}`
+
+      // Admin: set the objective from This SOP.
+      const adminCtx = await browser.newContext({ viewport: { width: 1440, height: 900 } })
+      await signInAs(adminCtx, 'siteAdmin')
+      const admin = await adminCtx.newPage()
+      await admin.goto(`/sops/${sopId}?mode=edit`)
+      const rail = admin.getByTestId('this-sop')
+      await expect(rail).toHaveCount(1, SLOW)
+      await rail.getByRole('button', { name: /Set an objective/ }).click()
+      await rail.getByLabel('Objective', { exact: true }).fill(text)
+      await rail.getByRole('button', { name: 'Save objective' }).click()
+      await expect(rail.getByTestId('objective-line')).toContainText(text, SLOW)
+      await shot(admin, '60-sop-objective-rail')
+      await adminCtx.close()
+
+      // Worker: the line sits in the summary card, then the second request goes from browse.
+      const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } })
+      await signInAs(ctx, 'siteWorker')
+      const page = await ctx.newPage()
+      await page.goto(`/sops/${sopId}`)
+      const summary = page.getByTestId('focus-summary')
+      await expect(summary.getByTestId('objective-line')).toContainText(text, SLOW)
+      const trigger = page.getByTestId('request-composer-trigger')
+      await expect(trigger).toHaveCount(1, SLOW)
+      await trigger.click()
+      await expect(page.getByTestId('request-composer')).toHaveCount(1, SLOW)
+      await shot(page, '60-composer')
+      await page.getByRole('radio', { name: /Observe me/ }).check({ force: true })
+      await page.getByTestId('composer-note').fill(`EVAL observe request ${runId}`)
+      await page.getByTestId('composer-send').click()
+      await expect(page.getByTestId('request-sent')).toContainText('Request sent', SLOW)
+
+      // The walk state offers no request.
+      await page.getByTestId('focus-start-walking').click()
+      await expect(page.getByTestId('focus-browse')).toHaveCount(0, SLOW)
+      await expect(page.getByTestId('request-composer-trigger')).toHaveCount(0)
+      await ctx.close()
+    })
     test.fixme('worker raises, admin accepts, bell count shows, the notification opens its place, mark-read clears it; a second round (60-16)', async () => {})
     test.fixme('decline with a note; the asker sees the answer (60-16)', async () => {})
     test.fixme('supervisor asks a worker: due on the badge and the Now card; a new version is published and the worker is told; the worker declines (60-16)', async () => {})

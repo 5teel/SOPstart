@@ -46,7 +46,6 @@ const STEP_EXPORTS = [
   'deleteFocusSection',
   'tickFocusStep',
   'untickFocusStep',
-  'setSopObjective',
   'setAllowForwardJump',
   'getStepImageUploadUrl',
   'attachStepImage',
@@ -178,8 +177,6 @@ test.describe('FOC-02/WRK-04 edit actions', () => {
     expect(body(steps, 'untickFocusStep')).toContain("kind: 'verify_withdrawn'")
     // the SOP for the ledger row is resolved server-side from the session-org step lookup
     expect(body(steps, 'tickFocusStep')).toContain('stepSopId(ctx.organisationId, stepId)')
-    // objective and content edits never take the admin-only guard away from the approver path
-    expect(body(steps, 'setSopObjective')).toContain('requireSopEditAccess({ sopId')
   })
 
   test('clearFinding writes a ledger decision through recordDecision (D-17) (58-04)', () => {
@@ -193,11 +190,9 @@ test.describe('FOC-02/WRK-04 edit actions', () => {
     expect(findings).toMatch(/import\s*\{\s*recordDecision\s*\}\s*from\s*'@\/lib\/decisions\/record'/)
   })
 
-  test('objective is capped at 500 characters (D-20) (58-04)', () => {
-    const b = body(steps, 'setSopObjective')
-    expect(steps).toMatch(/objective: z\.string\(\)\.trim\(\)\.max\(500/)
-    expect(b).toContain("objective === '' ? null")
-    expect(read('supabase/migrations/00071_focus_editor_walk.sql')).toContain('char_length(objective) <= 500')
+  test('the SOP objective is written through the objectives actions, not a focus-steps writer (A-01)', () => {
+    expect(steps).not.toMatch(/\bobjective\b\s*:/)
+    expect(read('src/actions/objectives.ts')).toContain('export async function setObjective(')
   })
 
   test('attachStepImage rebuilds the exact path prefix from the session and resolved SOP', () => {

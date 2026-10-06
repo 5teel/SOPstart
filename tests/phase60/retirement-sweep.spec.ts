@@ -49,9 +49,21 @@ test.describe('retire: the Machines inbox kind (60-05)', () => {
 })
 
 test.describe('retire: the SOP objective column writer (60-14)', () => {
-  test.fixme(true, 'flips live in 60-14')
-  test('the SOP objective writer action is gone and no src file names it', () => {})
-  test('no src file reads or writes the sops objective column; forkDraft no longer copies it', () => {})
+  const srcFiles = () => walkSrc(path.join(ROOT, 'src')).filter((f) => !f.endsWith('database.types.ts'))
+  test('the SOP objective writer action is gone and no src file names it', () => {
+    for (const f of srcFiles()) expect(stripComments(fs.readFileSync(f, 'utf-8')), f).not.toContain('setSopObjective')
+  })
+  test('no src file reads or writes the sops objective column; forkDraft no longer copies it', () => {
+    const read1 = stripComments(read('src/lib/sop/focus-read.ts'))
+    expect(read1).not.toMatch(/\.select\('[^']*\bobjective\b[^']*'\)/)
+    expect(read1).toContain(".from('objectives')")
+    expect(read1).toContain('lineageRoot(')
+    const fork = stripComments(read('src/actions/versions.ts'))
+    expect(fork).not.toMatch(/\bobjective\s*:/)
+    expect(stripComments(read('src/actions/focus-steps.ts'))).not.toMatch(/\bobjective\s*:/)
+    // no component reads the old string field off the SOP meta
+    for (const f of srcFiles()) expect(stripComments(fs.readFileSync(f, 'utf-8')), f).not.toMatch(/\bsop\.objective\b/)
+  })
 })
 
 test.describe('retire: the assign screen and its writers (60-17)', () => {

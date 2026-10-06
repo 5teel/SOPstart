@@ -154,7 +154,6 @@ const CATEGORY_EXEMPT: CategoryExemptEntry[] = [
   { file: 'src/actions/approvals.ts', keys: 'approval_state', reason: 'Approval-chain state stamp; not a category-bearing write.' },
   { file: 'src/actions/departments.ts', keys: 'organisation_id', reason: 'Repairs a SOP row’s organisation_id; not a category-bearing write.' },
   { file: 'src/actions/departments.ts', keys: 'all_departments', reason: 'Toggles the all-departments grant flag; not a category-bearing write.' },
-  { file: 'src/actions/focus-steps.ts', keys: 'objective', reason: 'Editor writes the SOP objective only; category is set via setSopCategory, not this action.' },
   { file: 'src/actions/focus-steps.ts', keys: 'allow_forward_jump', reason: 'Editor writes the walk jump-ahead flag only; not a category-bearing write.' },
   { file: 'src/actions/governance.ts', keys: 'owner_user_id,updated_at', reason: 'SOP-owner reassignment; not a category-bearing write.' },
   { file: 'src/lib/governance/owner-review.ts', keys: 'last_reviewed_at,last_reviewed_by,review_due_at,updated_at', reason: 'Phase 59-07 owner path of Mark reviewed (service client, session-scoped); review bookkeeping only, not a category-bearing write.' },
@@ -203,7 +202,9 @@ const CATEGORY_EXEMPT: CategoryExemptEntry[] = [
 // category_slug and its status flip was exempt); forkDraft is the surviving next-version path.
 // 2026-10-06: 40 -> 41. Phase 59-07 added the owner path of Mark reviewed in
 // src/lib/governance/owner-review.ts (review bookkeeping only, exempt and justified above).
-const EXPECTED_SOPS_WRITE_SITE_COUNT = 41
+// 2026-10-06: 41 -> 40. Phase 60-14 deleted the SOP objective writer (its single update);
+// the objective now lives in the objectives table.
+const EXPECTED_SOPS_WRITE_SITE_COUNT = 40
 
 // Extracts the substring between a `(` at `openIdx` and its matching `)`,
 // tracking paren depth so nested calls/objects don't truncate the payload.

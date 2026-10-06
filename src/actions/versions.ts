@@ -109,7 +109,6 @@ export async function forkDraft({ sopId }: { sopId: string }): Promise<{ draftId
       applicable_equipment: source.applicable_equipment,
       related_sops: source.related_sops,
       flow_graph: source.flow_graph,
-      objective: source.objective,
       allow_forward_jump: source.allow_forward_jump,
     })
     .select('id')

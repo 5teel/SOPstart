@@ -105,6 +105,7 @@ const SOPS_COLUMNS_NOT_COPIED: Record<string, string> = {
   superseded_by: 'written by publish, never by a fork',
   uploaded_by: 'the forking admin',
   placement: 'trigger-synced from sop_machines',
+  objective: 'the objective lives in the objectives table, keyed on the lineage root (60 A-01)',
   approval_state: 'the fork runs its own approval chain at publish',
   approval_snapshot: 'the fork runs its own approval chain at publish',
   review_due_at: 'review cadence restarts when the new version publishes',

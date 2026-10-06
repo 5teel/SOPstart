@@ -11,15 +11,16 @@ import { useState } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { AlertTriangle, ChevronDown, ChevronRight } from 'lucide-react'
-import { setAllowForwardJump, setSopObjective } from '@/actions/focus-steps'
+import { setAllowForwardJump } from '@/actions/focus-steps'
 import { confirmSopCurrent } from '@/actions/governance'
 import { DeleteSopButton } from '@/components/admin/DeleteSopButton'
 import { OwnerPicker } from '@/components/admin/governance/OwnerPicker'
 import { CategoryButton } from '@/components/focus/admin/CategoryButton'
 import { versionLine } from '@/components/focus/admin/EditDocument'
-import { InlineText } from '@/components/focus/admin/InlineText'
 import { MachinesButton } from '@/components/focus/admin/MachinesButton'
 import { StandardsButton } from '@/components/focus/admin/StandardsButton'
+import { ObjectiveLine } from '@/components/shell/ObjectiveLine'
+import { ObjectiveSlot } from '@/components/shell/ObjectiveSlot'
 import { StandardLabels } from '@/components/sop/StandardLabels'
 import { useFocusLineage, useFocusSop } from '@/hooks/useFocusSop'
 import { reviewSegment } from '@/lib/office/format'
@@ -49,13 +50,11 @@ const rowButton =
 export function ThisSopBlock({ sopId, initial, from, isAdmin, owner }: ThisSopBlockProps) {
   const { focus, invalidate } = useFocusSop(sopId, initial)
   const lineage = useFocusLineage(sopId)
-  const { sop, machines, standards } = focus
+  const { sop, machines, standards, objective } = focus
   const isDraft = sop.status === 'draft'
 
   const [open, setOpen] = useState(true)
   const [showVersions, setShowVersions] = useState(false)
-  const [editingObjective, setEditingObjective] = useState(false)
-  const [objective, setObjective] = useState(sop.objective ?? '')
   const [jump, setJump] = useState(sop.allow_forward_jump)
   const [error, setError] = useState<string | null>(null)
   const [ownerLabel, setOwnerLabel] = useState(owner?.label ?? null)
@@ -69,17 +68,6 @@ export function ThisSopBlock({ sopId, initial, from, isAdmin, owner }: ThisSopBl
   const earlier = lineage.filter((v) => v.version < sop.version)
   const machineName = machines.length > 0 ? machines.map((m) => m.name).join(', ') : 'Whole site'
   const summary = `v${sop.version} · ${machineName} · ${standards.sop.length} ${standards.sop.length === 1 ? 'standard' : 'standards'}`
-
-  async function saveObjective(value: string) {
-    setEditingObjective(false)
-    const next = value.trim()
-    if (next === objective) return
-    setError(null)
-    const res = await setSopObjective({ sopId, objective: next })
-    if ('error' in res) return setError(res.error)
-    setObjective(next)
-    void invalidate()
-  }
 
   async function markReviewed() {
     setMarking(true)
@@ -255,22 +243,16 @@ export function ThisSopBlock({ sopId, initial, from, isAdmin, owner }: ThisSopBl
 
           <div className="flex flex-col gap-1 px-2">
             <span className={label}>Objective</span>
-            {editingObjective && isDraft ? (
-              <InlineText
-                initialValue={objective}
-                ariaLabel="Objective"
-                className="min-h-tap rounded-lg border border-dashed border-ink-300 p-2 text-ui text-ink-900 outline-none focus:outline-2 focus:outline-accent-step"
-                onCommit={(v) => void saveObjective(v)}
+            {isAdmin ? (
+              <ObjectiveSlot
+                subject={{ type: 'sop', id: sop.parent_sop_id ?? sop.id }}
+                current={objective}
+                emptyLabel="Set an objective"
+                emptyStyle="dashed"
+                onChanged={() => void invalidate()}
               />
             ) : (
-              <button
-                type="button"
-                disabled={!isDraft}
-                onClick={() => setEditingObjective(true)}
-                className="min-h-tap rounded-lg border border-dashed border-ink-300 p-2 text-left text-ui text-ink-900 disabled:text-ink-500"
-              >
-                {objective || 'Add an objective'}
-              </button>
+              objective && <ObjectiveLine view={objective} />
             )}
           </div>
 

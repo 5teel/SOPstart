@@ -16,7 +16,7 @@ test.describe('FOC-02 edit rail', () => {
   const block = read(`${ADMIN}/ThisSopBlock.tsx`)
 
   test('This SOP has rows for version, machine, objective, standards, jump-ahead switch (D-08), Ask someone to do this, Delete draft, Category and Open original document (D-24), each wired to its action', () => {
-    expect(block).toContain('setSopObjective(')
+    expect(block).toContain('<ObjectiveSlot')
     expect(block).toContain('setAllowForwardJump(')
     expect(block).toContain('useFocusLineage(')
     expect(block).toContain('<MachinesButton')
@@ -30,12 +30,11 @@ test.describe('FOC-02 edit rail', () => {
     expect(block).toContain('variant="rail"')
     expect(read('src/components/requests/AskPicker.tsx')).toContain('Ask someone to do this')
     expect(block).toContain('Open original document')
-    expect(block).toContain('Add an objective')
+    expect(block).toContain('Set an objective')
     expect(block).toContain('Whole site')
     expect(block).toContain('+ Standard')
     // The handlers are what the controls call, not just functions in the file.
     expect(block).toContain('onChange={(e) => void toggleJump(e.target.checked)}')
-    expect(block).toContain('onCommit={(v) => void saveObjective(v)}')
     expect(block).toContain('onClick={() => void openOriginal()}')
   })
 

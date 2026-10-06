@@ -115,6 +115,25 @@ test.describe('Objective line (60-13)', () => {
     }
   })
 
-  test.fixme('the SOP objective is read from objectives (lineage root) in loadFocusSop, BrowseDocument and This SOP', () => {})
-  test.fixme('browse offers "Make a request"', () => {})
+  test('the SOP objective is read from objectives (lineage root) in loadFocusSop, BrowseDocument and This SOP (A-01)', () => {
+    const focus = read('src/lib/sop/focus-read.ts')
+    expect(focus).toContain(".from('objectives')")
+    expect(focus).toContain(".eq('subject_type', 'sop')")
+    expect(focus).toContain('lineageRoot(')
+    expect(focus).toContain('objective: ObjectiveView | null')
+    expect(read('src/components/focus/BrowseDocument.tsx')).toContain('<ObjectiveLine view={data.objective} />')
+    const block = read('src/components/focus/admin/ThisSopBlock.tsx')
+    expect(block).toContain("subject={{ type: 'sop', id: sop.parent_sop_id ?? sop.id }}")
+    expect(block).toContain('<ObjectiveSlot')
+    expect(block).not.toMatch(/from\s+'@\/components\/requests\/ObjectiveEditor'/)
+  })
+  test('browse offers "Make a request" for a live SOP only, through a lazy import', () => {
+    const browse = read('src/components/focus/BrowseDocument.tsx')
+    expect(browse).toMatch(/dynamic\(\(\) => import\('@\/components\/requests\/RequestComposer'\)/)
+    expect(browse).not.toMatch(/from\s+'@\/components\/requests\/RequestComposer'/)
+    expect(browse).toContain("sop.status === 'published' && !supersededBy")
+    expect(browse).toContain("kinds={['change_sop', 'observe_me']}")
+    // never in the walk state
+    expect(read('src/components/focus/FocusWalker.tsx')).not.toContain('RequestComposer')
+  })
 })
