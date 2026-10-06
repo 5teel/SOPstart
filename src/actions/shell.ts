@@ -42,7 +42,9 @@ export async function getAdminShell(): Promise<AdminShellData | { error: string 
 
   // ADR-0002: due reviews are written when the owner loads the screen, so the bell
   // and the overview show them on this same load. Never throws.
-  const [inbox] = await Promise.all([loadInbox(), ensureReviewDueNotifications(ctx.organisationId, ctx.user.id)])
+  const reviewDue = ensureReviewDueNotifications(ctx.organisationId, ctx.user.id)
+  const inbox = await loadInbox()
+  await reviewDue
   if ('error' in inbox) return { error: inbox.error }
 
   const db = ctx.supabase as unknown as SupabaseClient
