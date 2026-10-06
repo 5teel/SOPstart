@@ -72,6 +72,27 @@ test.describe('Agent requests (60-04 helper)', () => {
 })
 
 test.describe('Agent requests (60-08 producer)', () => {
-  test.fixme('the ledger row carries the agent name', () => {})
-  test.fixme('a declined request is not re-raised by the next sweep', () => {})
+  const SWEEPS = strip(read('src/lib/cron/sweeps.ts'))
+  const machines = SWEEPS.slice(SWEEPS.indexOf('export async function runMachinesWithoutSopsSweep'))
+
+  test('the sweep raises as the default agent, per machine without a SOP, never via the ledger', () => {
+    expect(machines).toContain('machinesWithoutSops(')
+    expect(machines).toContain('raiseRequestAsAgent({')
+    expect(machines).toContain('agent: DEFAULT_AGENT_NAME')
+    expect(machines).toContain("type: 'machine'")
+    expect(machines).toContain('This machine has no SOPs yet.')
+    expect(SWEEPS).not.toContain('recordDecision')
+  })
+
+  test('both reads carry the organisation and a repeat run counts skips instead of raising again', () => {
+    expect(machines).toContain(".from('site_machines').select('id').eq('organisation_id', org)")
+    expect(machines).toContain(".from('sop_machines').select('sop_id, machine_id').eq('organisation_id', org)")
+    expect(machines).toMatch(/'raised' in result\) raised\+\+\s*\n\s*else skipped\+\+/)
+  })
+
+  test('a declined request is not re-raised by the next sweep (the helper skips an answered one for 30 days)', () => {
+    expect(AGENT).toContain("in('state', ['accepted', 'declined'])")
+    expect(AGENT).toContain('RECENT_DAYS = 30')
+    expect(AGENT).toContain("skipped: 'recent'")
+  })
 })

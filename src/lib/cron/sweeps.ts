@@ -4,6 +4,10 @@ import { notify } from '@/lib/notifications/write'
 import { dedupeKey, notificationTitle } from '@/lib/notifications/kinds'
 import { notificationPlace } from '@/lib/notifications/places'
 import { reviewDueTargets, type ReviewDueRow } from '@/lib/notifications/review-due'
+import { machinesWithoutSops } from '@/lib/sop/admin-health'
+import { raiseRequestAsAgent } from '@/lib/requests/agent'
+import { DEFAULT_AGENT_NAME } from '@/lib/decisions/shape'
+import type { SopMachineLink } from '@/lib/validators/site'
 
 /**
  * Phase 60 (A-08) -- the daily sweeps behind the cron routes.
@@ -61,4 +65,35 @@ export async function runReviewDueSweep(opts: { now?: Date; organisationId?: str
     )
   }
   return { notified }
+}
+
+/** D-05: one agent-raised new-SOP request per machine with no SOP; raiseRequestAsAgent skips an open or recently answered one. */
+export async function runMachinesWithoutSopsSweep(opts: { organisationId?: string } = {}): Promise<{ raised: number; skipped: number }> {
+  // ponytail: site_machines / sop_machines are not in the generated types, so this read goes through a loose client.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const admin = createAdminClient() as any
+  let raised = 0
+  let skipped = 0
+  for (const org of await orgIds(opts.organisationId)) {
+    const [machines, links] = await Promise.all([
+      admin.from('site_machines').select('id').eq('organisation_id', org).limit(MAX_ROWS_PER_ORG),
+      admin.from('sop_machines').select('sop_id, machine_id').eq('organisation_id', org).limit(MAX_ROWS_PER_ORG),
+    ])
+    if (machines.error || links.error) {
+      console.error('[machines-without-sops] read error', machines.error ?? links.error)
+      continue
+    }
+    const bare = machinesWithoutSops((machines.data ?? []) as { id: string }[], (links.data ?? []) as SopMachineLink[])
+    for (const m of bare) {
+      const result = await raiseRequestAsAgent({
+        organisationId: org,
+        agent: DEFAULT_AGENT_NAME,
+        subject: { type: 'machine', id: m.id },
+        note: 'This machine has no SOPs yet.',
+      })
+      if ('raised' in result) raised++
+      else skipped++
+    }
+  }
+  return { raised, skipped }
 }
