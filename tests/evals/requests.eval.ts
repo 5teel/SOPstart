@@ -681,6 +681,19 @@ test.describe('Phase 60 -- requests, notifications and objectives (deployed)', (
       await real.ctx.close()
     })
 
-    test.fixme('the old assign address lands on the SOP (assert rendered place, not status) (60-17)', async () => {})
+    test('the old assign address lands on the SOP edit surface (rendered place, not status) (60-17)', async ({ browser }) => {
+      test.setTimeout(120_000)
+      const { data: sopRow } = await db.from('sops').select('id').eq('organisation_id', siteOrgId).eq('title', EVAL_SITE_SOP_TITLE).single()
+      const sopId = sopRow!.id as string
+      const adminCtx = await browser.newContext({ viewport: { width: 1440, height: 900 } })
+      await signInAs(adminCtx, 'siteAdmin')
+      const page = await adminCtx.newPage()
+      await page.goto(`/admin/sops/${sopId}/assign`)
+      await expect(page.getByTestId('this-sop')).toHaveCount(1, SLOW)
+      expect(page.url()).toContain(`/sops/${sopId}`)
+      expect(page.url()).not.toContain('/assign')
+      await shot(page, '60-legacy-assign')
+      await adminCtx.close()
+    })
   })
 })

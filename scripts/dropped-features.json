@@ -1408,6 +1408,44 @@
       "phase": 59,
       "kind": "symbol",
       "pattern": "\b(SupervisorActivityView|useSupervisorCompletions|CompletionSummaryCard|RejectReasonSheet|ActivityFilter)\b"
+    },
+    {
+      "feature": "assign-page",
+      "phase": 60,
+      "kind": "route-page",
+      "path": "/admin/sops/[sopId]/assign",
+      "dir": "src/app/(protected)/admin/sops/[sopId]/assign",
+      "ref": "\\[sopId\\]/assign"
+    },
+    {
+      "feature": "assign-page",
+      "phase": 60,
+      "kind": "file",
+      "path": "src/components/admin/AssignmentRow.tsx"
+    },
+    {
+      "feature": "assign-page",
+      "phase": 60,
+      "kind": "file",
+      "path": "src/components/admin/SubTradePicker.tsx"
+    },
+    {
+      "feature": "assign-page",
+      "phase": 60,
+      "kind": "file",
+      "path": "src/app/api/sops/[sopId]/assignments/route.ts"
+    },
+    {
+      "feature": "assign-page",
+      "phase": 60,
+      "kind": "file",
+      "path": "src/hooks/useNotifications.ts"
+    },
+    {
+      "feature": "assign-page",
+      "phase": 60,
+      "kind": "file",
+      "path": "src/actions/sub-trades.ts"
     }
   ],
   "allow": [

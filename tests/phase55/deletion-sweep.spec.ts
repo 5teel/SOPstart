@@ -32,13 +32,13 @@ const TEST_SCAN_EXCLUDED_PREFIXES = [
 // Image annotation was dropped in 55-10 and returned on step photos in Phase 58-17 (D-03): its entries left
 // scripts/dropped-features.json and this list together, and the Konva isolation spec now allow-lists annotate/.
 // Each deleting plan appends its feature key here when it flips the block live.
-const LIVE_FEATURES: string[] = ['voice-capture', 'voice', 'phone-qr', 'shared-device', 'youtube', 'photo-scan', 'video-generation', 'offline', 'flow-diagram', 'version-compare', 'library', 'org-signup', 'header-nav', 'site-and-departments-pages', 'list-page', 'tabbed-sop-page', 'old-walkthrough', 'block-builder', 'versions-page', 'office-pages', 'supervisor-review']
+const LIVE_FEATURES: string[] = ['voice-capture', 'voice', 'phone-qr', 'shared-device', 'youtube', 'photo-scan', 'video-generation', 'offline', 'flow-diagram', 'version-compare', 'library', 'org-signup', 'header-nav', 'site-and-departments-pages', 'list-page', 'tabbed-sop-page', 'old-walkthrough', 'block-builder', 'versions-page', 'office-pages', 'supervisor-review', 'assign-page']
 // 55-13 flips this once the eight packages are uninstalled.
 const PACKAGES_LIVE = true
 
 const FEATURES = [
   'voice-capture', 'voice', 'phone-qr', 'shared-device', 'youtube', 'photo-scan', 'video-generation',
-  'offline', 'flow-diagram', 'version-compare', 'library', 'org-signup', 'header-nav', 'site-and-departments-pages', 'list-page', 'tabbed-sop-page', 'old-walkthrough', 'block-builder', 'versions-page', 'office-pages', 'supervisor-review',
+  'offline', 'flow-diagram', 'version-compare', 'library', 'org-signup', 'header-nav', 'site-and-departments-pages', 'list-page', 'tabbed-sop-page', 'old-walkthrough', 'block-builder', 'versions-page', 'office-pages', 'supervisor-review', 'assign-page',
 ]
 
 interface Entry {
@@ -231,7 +231,7 @@ test.describe('dropped list is not vacuous', () => {
     expect(dropped.version).toBe(1)
     expect(dropped.entries.length).toBeGreaterThanOrEqual(100)
     for (const e of dropped.entries) {
-      expect([55, 57, 58, 59]).toContain(e.phase)
+      expect([55, 57, 58, 59, 60]).toContain(e.phase)
       expect(FEATURES, `unknown feature ${e.feature}`).toContain(e.feature)
       for (const src of [e.ref, e.pattern]) if (src) expect(() => new RegExp(src), src).not.toThrow()
     }

@@ -67,9 +67,36 @@ test.describe('retire: the SOP objective column writer (60-14)', () => {
 })
 
 test.describe('retire: the assign screen and its writers (60-17)', () => {
-  test.fixme(true, 'flips live in 60-17')
-  test('the assign page directory, the assignment row component, the SOP-level sub-trade picker, the assignments API route and the old notifications hook are gone', () => {})
-  test('the four assign actions and the request-removal action are gone from src, and the writer registry no longer lists them', () => {})
-  test('no src file links to an assign address (regex anchored on an href or a router call plus the admin SOP path, so the proxy redirect source is not counted)', () => {})
-  test('legacyRedirectFor sends the assign address to the SOP edit address, and the proxy applies it', () => {})
+  const srcFiles = () => walkSrc(path.join(ROOT, 'src')).filter((f) => !f.endsWith('database.types.ts'))
+  test('the assign page directory, the assignment row component, the SOP-level sub-trade picker and its actions, the assignments API route and the old notifications hook are gone', () => {
+    for (const rel of [
+      'src/app/(protected)/admin/sops/[sopId]/assign',
+      'src/components/admin/AssignmentRow.tsx',
+      'src/components/admin/SubTradePicker.tsx',
+      'src/actions/sub-trades.ts',
+      'src/lib/validators/sub-trades.ts',
+      'src/app/api/sops/[sopId]/assignments/route.ts',
+      'src/hooks/useNotifications.ts',
+    ]) expect(fs.existsSync(path.join(ROOT, rel)), rel).toBe(false)
+  })
+  test('the four assign actions and the request-removal action are gone from src, and the writer registry no longer lists them', () => {
+    const names = /\b(assignSopToRole|assignSopToUser|removeAssignment|getAssignments|requestRemoveAssignment)\b/
+    for (const f of srcFiles()) expect(stripComments(fs.readFileSync(f, 'utf-8')), f).not.toMatch(names)
+    expect(read('scripts/decision-writers.json')).not.toMatch(names)
+    expect(read('tests/phase56/decision-writers-sweep.spec.ts')).not.toMatch(names)
+    // the surviving sop_assignments writers stay registered: no assignment is written without a ledger row or an allow reason
+    const reg = read('scripts/decision-writers.json')
+    for (const fn of ['selfAddSop', 'selfRemoveSop', 'askToDoSopCore', 'notifyAssignedWorkers', 'deleteSop']) expect(reg, fn).toContain(`"function": "${fn}"`)
+  })
+  test('no src file links to an assign address (regex anchored on an href or a router call plus the admin SOP path, so the proxy redirect source is not counted)', () => {
+    const link = /(href=|href:|\.push\(|\.replace\(|redirect\()[^\n]*\/admin\/sops\/[^\n]*\/assign/
+    for (const f of srcFiles()) expect(stripComments(fs.readFileSync(f, 'utf-8')), f).not.toMatch(link)
+  })
+  test('legacyRedirectFor sends the assign address to the SOP edit address, and the proxy applies it', () => {
+    const fp = read('src/lib/sop/focus-path.ts')
+    expect(fp).toContain('(?:versions|assign)')
+    const mw = read('src/lib/supabase/middleware.ts')
+    expect(mw).toContain("path.startsWith('/admin/sops/')")
+    expect(mw).toContain('legacyRedirectFor(path, request.nextUrl.search)')
+  })
 })

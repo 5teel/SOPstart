@@ -42,7 +42,7 @@ test.describe("Capability matrix rows (60-02 / 60-04 / 60-06 / 60-09 / 60-11 / 6
     const cells = (l: string) => l.split('|').map((c) => c.trim()).slice(2, 7)
     const ask = row('Ask someone to do a SOP')
     expect(cells(ask)).toEqual(['—', '✅', '✅', '✅', '—']) // a worker never asks
-    for (const name of ['askToDoSop()', 'src/lib/requests/ask-core.ts', 'service role', 'request_accepted', 'assignSopToRole']) expect(ask).toContain(name)
+    for (const name of ['askToDoSop()', 'src/lib/requests/ask-core.ts', 'service role', 'request_accepted']) expect(ask).toContain(name)
     const decline = row('Decline a SOP you were asked to do')
     expect(cells(decline)).toEqual(['✅', '✅', '✅', '✅', '—'])
     for (const name of ['declineAsk()', 'target_user_id', 'role ask cannot be declined', 'request_declined']) expect(decline).toContain(name)
@@ -71,5 +71,11 @@ test.describe("Capability matrix rows (60-02 / 60-04 / 60-06 / 60-09 / 60-11 / 6
     expect(r.split('|').map((c) => c.trim()).slice(2, 6)).toEqual(['—', '✅', '✅', '✅'])
     for (const name of ['tabsForRole()', 'getOfficeInbox()', 'requests_read', 'answerRequest()', 'browse address']) expect(r).toContain(name)
   })
-  test.fixme("60-17: the four removed assign rows are gone and the reassignment path is described as a request", () => {})
+  test('60-17: no matrix row names a live assign action; the self-add note says assignments come from asks', () => {
+    const self = row('Self-add SOP')
+    expect(self).toContain('askToDoSop')
+    expect(self).toContain('deleted')
+    expect(row('Ask someone to do a SOP')).not.toContain('remain until')
+    expect(MATRIX).not.toMatch(/^\|\s*Assign (SOP|a SOP)/m)
+  })
 })

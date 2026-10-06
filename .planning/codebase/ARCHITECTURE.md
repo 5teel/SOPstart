@@ -140,7 +140,7 @@ SafeStart is a multi-tenant Next.js 16 App Router SaaS web app that implements a
    - Updates parse job (status: `completed`)
 6. **Review** → Admin reviews and edits in the builder at `/sops/[sopId]?mode=edit` (the focus editor: source steps, AI check findings, per-step tick)
 7. **Publish** → `publishSop` server action updates status to `published`
-8. **Assignment** → Admin assigns to roles/trades at `/admin/sops/[sopId]/assign`
+8. **Assignment** → A supervisor or admin asks for a SOP to be done (`askToDoSop`, Phase 60); a worker can also self-add. The old assign address redirects to the SOP edit address
 
 ### Tertiary Path: Supervisor Sign-Off
 
