@@ -117,6 +117,10 @@ export const JOURNEYS: Journey[] = [
       ] },
       { id: 'panel', type: 'screen', label: 'Machine in the detail pane', route: '/', detail: 'The machine\'s photo (or "no photo yet"), its department named in that department\'s colour, then its procedures to-do first with the shared badge (Due, Updated, Never done, Done — "Updated" marks any SOP published after the worker\'s last completion, AFL-VER-04), a Walk › link and the SOP title, both opening the focus screen. A refresher chip never blocks opening the card (Phase 36).', branches: [
         { label: 'Walk › or the SOP title', to: 'detail' },
+        { label: 'Make a request', to: 'request' },
+      ] },
+      { id: 'request', type: 'action', label: 'Make a request', route: '/', detail: 'Under the SOP rows, a worker or supervisor can ask for a change to a SOP, a new SOP for this machine, or to be observed. A focused dialog with the screen recessed; Send request answers under My requests. Nothing in the walk offers it.', branches: [
+        { label: 'Request sent', to: 'e' },
       ] },
       { id: 'board', type: 'screen', label: 'Noticeboard room', route: '/', detail: 'The site-wide SOPs in the detail pane, each with the same shared badge and a Walk › link.', branches: [
         { label: 'Walk › or the SOP title', to: 'detail' },
@@ -335,7 +339,7 @@ export const JOURNEYS: Journey[] = [
     summary: 'The core editing flow: shape the steps, run the AI check, tick every step once, then publish. Create-from-scratch, AI-convert and edit-draft all land in the one focus editor; the old builder and version-history addresses redirect there.',
     steps: [
       { id: 's', type: 'start', label: 'Have a draft' },
-      { id: 'build', type: 'screen', label: 'Edit the draft', route: '/sops/[sopId]', detail: 'The focus editor: the step list in a rail, one document of steps. Add, edit, reorder and delete steps in place; hazards and PPE come first. The This SOP block holds the version, machine, objective, standards, jump-ahead switch, Assign this SOP and the earlier versions.' },
+      { id: 'build', type: 'screen', label: 'Edit the draft', route: '/sops/[sopId]', detail: 'The focus editor: the step list in a rail, one document of steps. Add, edit, reorder and delete steps in place; hazards and PPE come first. The This SOP block holds the version, machine, objective, standards, jump-ahead switch, Ask someone to do this and the earlier versions.' },
       { id: 'check', type: 'action', label: 'Run the AI check and tick each step', detail: 'The AI check lists findings; Show me scrolls to the step and Clear finding is logged in the decision ledger. Each step is ticked once; changing a step clears its tick and says "Edited — check it again".' },
       { id: 'verify', type: 'decision', label: 'Every step ticked and every finding cleared?', branches: [
         { label: 'Yes', to: 'publish' },
@@ -402,14 +406,14 @@ export const JOURNEYS: Journey[] = [
     id: 'assign-sop',
     group: 'Refine & publish',
     persona: 'SOP Admin',
-    title: 'Assign to the team',
-    summary: 'An admin assigns a published procedure to roles, trades or specific sub-trades; workers get notified.',
+    title: 'Ask someone to do a SOP',
+    summary: 'An admin, safety manager or supervisor asks a role or a named person to do a published procedure, from a machine row or This SOP. It is due at once; a person asked by name can decline from My requests.',
     steps: [
       { id: 's', type: 'start', label: 'SOP published' },
-      { id: 'lib', type: 'screen', label: 'Workshop room on the one screen', route: '/' },
-      { id: 'assign', type: 'screen', label: 'Assign', route: '/admin/sops/[sopId]/assign', detail: 'By role / trade / sub-trade. Back to the SOP returns to the focus editor.' },
-      { id: 'notify', type: 'action', label: 'Workers notified', detail: 'Appears in their SOP list on the one screen.' },
-      { id: 'e', type: 'end', label: 'Assigned' },
+      { id: 'lib', type: 'screen', label: 'A machine on the one screen', route: '/', detail: 'Each published SOP row has Ask ›; a supervisor sees it on the worker panel too.' },
+      { id: 'assign', type: 'screen', label: 'Ask someone to do this', route: '/sops/[sopId]', detail: 'The This SOP rail has the same button. Choose a role or a person, then press Ask: choosing alone sends nothing, and the picker says how many people will be told.' },
+      { id: 'notify', type: 'action', label: 'They are told and it is due', detail: 'It shows on their machines and Now card at once. A person asked by name can decline from My requests.' },
+      { id: 'e', type: 'end', label: 'Asked' },
     ],
   },
   {

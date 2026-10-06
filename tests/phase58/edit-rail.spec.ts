@@ -15,7 +15,7 @@ const ADMIN = 'src/components/focus/admin'
 test.describe('FOC-02 edit rail', () => {
   const block = read(`${ADMIN}/ThisSopBlock.tsx`)
 
-  test('This SOP has rows for version, machine, objective, standards, jump-ahead switch (D-08), Assign, Delete draft, Category and Open original document (D-24), each wired to its action', () => {
+  test('This SOP has rows for version, machine, objective, standards, jump-ahead switch (D-08), Ask someone to do this, Delete draft, Category and Open original document (D-24), each wired to its action', () => {
     expect(block).toContain('setSopObjective(')
     expect(block).toContain('setAllowForwardJump(')
     expect(block).toContain('useFocusLineage(')
@@ -24,9 +24,11 @@ test.describe('FOC-02 edit rail', () => {
     expect(block).toContain('<CategoryButton')
     expect(block).toContain('<DeleteSopButton')
     expect(block).toContain('label="Delete draft"')
-    expect(block).toContain('/admin/sops/${sopId}/assign')
     expect(block).toContain('/api/sops/${sopId}/download-url')
-    expect(block).toContain('Assign this SOP')
+    expect(block).toContain("import('@/components/requests/AskPicker')")
+    expect(block).toContain('<AskTrigger')
+    expect(block).toContain('variant="rail"')
+    expect(read('src/components/requests/AskPicker.tsx')).toContain('Ask someone to do this')
     expect(block).toContain('Open original document')
     expect(block).toContain('Add an objective')
     expect(block).toContain('Whole site')

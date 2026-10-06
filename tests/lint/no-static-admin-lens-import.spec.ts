@@ -37,6 +37,9 @@ const ALLOWED_IMPORTERS: Record<string, string[]> = {
   AdminShell: [],
   // Phase 59: the Office pane is only ever reached through next/dynamic (A-11).
   OfficePane: [],
+  // Phase 60: the composer and the ask picker are only ever reached through next/dynamic (A-07).
+  RequestComposer: [],
+  AskPicker: [],
 }
 
 const WORKER_SHELL_FILES = [

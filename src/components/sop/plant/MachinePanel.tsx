@@ -10,6 +10,7 @@
  * (worker-signal's machineSops/narrowForAsk) -- this component renders
  * what it is handed, it never re-sorts.
  */
+import type { ReactNode } from 'react'
 import Link from 'next/link'
 import { X } from 'lucide-react'
 import { plantRelState, type WorkerSop } from '@/lib/sop/worker-signal'
@@ -21,7 +22,18 @@ import { focusHref } from '@/lib/sop/focus-path'
  * `from` is the place token the row was opened from (machine id or room name),
  * so the focus screen's Back returns to it.
  */
-export function SopRows({ sops, empty, from }: { sops: WorkerSop[]; empty: string; from: string | null }) {
+export function SopRows({
+  sops,
+  empty,
+  from,
+  rowAction,
+}: {
+  sops: WorkerSop[]
+  empty: string
+  from: string | null
+  /** An extra control after Walk, supplied by the shell (a lazy module); none for a worker. */
+  rowAction?: (sop: WorkerSop) => ReactNode
+}) {
   if (sops.length === 0) {
     return (
       <div
@@ -53,6 +65,7 @@ export function SopRows({ sops, empty, from }: { sops: WorkerSop[]; empty: strin
             >
               Walk ›
             </Link>
+            {rowAction?.(sop)}
           </div>
         )
       })}
@@ -66,11 +79,16 @@ export function MachineBody({
   department,
   sops,
   onClose,
+  rowAction,
+  footer,
 }: {
   machine: { id: string; name: string; spriteUrl: string | null }
   department: { name: string; colour: string } | null
   sops: WorkerSop[]
   onClose?(): void
+  rowAction?: (sop: WorkerSop) => ReactNode
+  /** Under the rows, supplied by the shell (a lazy module). */
+  footer?: ReactNode
 }) {
   return (
     <>
@@ -100,7 +118,8 @@ export function MachineBody({
           </span>
         )}
         <h2 className="mb-2.5 text-xl font-semibold leading-tight text-[var(--ink-900)]">{machine.name}</h2>
-        <SopRows sops={sops} empty="No procedures for this machine yet." from={machine.id} />
+        <SopRows sops={sops} empty="No procedures for this machine yet." from={machine.id} rowAction={rowAction} />
+        {footer}
       </div>
     </>
   )

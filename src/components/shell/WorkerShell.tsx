@@ -53,6 +53,16 @@ const OfficePane = dynamic(() => import('@/components/office/OfficePane').then((
   loading: () => <p className="p-4 text-ui text-ink-500">Opening the Office…</p>,
 })
 
+// Raise and ask are lazy modules: neither rides in the home download (60 A-07).
+const RequestComposerTrigger = dynamic(
+  () => import('@/components/requests/RequestComposer').then((m) => m.RequestComposerTrigger),
+  { ssr: false, loading: () => null },
+)
+const AskTrigger = dynamic(() => import('@/components/requests/AskPicker').then((m) => m.AskTrigger), {
+  ssr: false,
+  loading: () => null,
+})
+
 const EMPTY_SITE: ShellSite = { layout: null, machines: [], links: [], departments: [] }
 
 export function WorkerShell({ siteName, userEmail, initialPlace, initialTab, initialSop }: ShellProps) {
@@ -110,11 +120,23 @@ export function WorkerShell({ siteName, userEmail, initialPlace, initialTab, ini
       const machine = site.machines.find((m) => m.id === place.id)
       if (machine) {
         const dept = site.departments.find((d) => d.id === machine.department_id)
+        const rows = machineSops(machine.id, site.links, sopsById)
         return (
           <MachineBody
             machine={{ id: machine.id, name: machine.name, spriteUrl: machine.spriteUrl }}
             department={dept ? { name: dept.name, colour: colourByDept.get(dept.id) ?? 'var(--ink-500)' } : null}
-            sops={narrowForAsk(ctx.query, machine.name, machineSops(machine.id, site.links, sopsById))}
+            sops={narrowForAsk(ctx.query, machine.name, rows)}
+            rowAction={
+              isSupervisor
+                ? (sop) => <AskTrigger sopId={sop.id} sopTitle={sop.title} variant="row" align="end" />
+                : undefined
+            }
+            footer={
+              <RequestComposerTrigger
+                kinds={['change_sop', 'new_sop', 'observe_me']}
+                about={{ sops: rows.map((s) => ({ id: s.id, title: s.title })), machines: [{ id: machine.id, name: machine.name }] }}
+              />
+            }
           />
         )
       }

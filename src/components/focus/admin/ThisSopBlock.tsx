@@ -3,11 +3,12 @@
 /**
  * Phase 58 (58-12) -- "This SOP", pinned under the editor rail (D-08, D-14, D-20,
  * D-24): version and earlier versions, machine, objective, standards, the
- * jump-ahead switch, then Assign, Delete draft, Category and the original document.
+ * jump-ahead switch, then Ask someone to do this, Delete draft, Category and the original document.
  *
  * Every row writes through its own guarded action; nothing here decides access.
  */
 import { useState } from 'react'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { AlertTriangle, ChevronDown, ChevronRight } from 'lucide-react'
 import { setAllowForwardJump, setSopObjective } from '@/actions/focus-steps'
@@ -29,11 +30,17 @@ export interface ThisSopBlockProps {
   sopId: string
   initial: FocusSop
   from: string | null
-  /** Admins and safety managers: the jump-ahead switch, Assign, Delete draft and Category. */
+  /** Admins and safety managers: the jump-ahead switch, Ask someone to do this, Delete draft and Category. */
   isAdmin: boolean
   /** Who owns the SOP and whether this viewer can mark it reviewed; null hides both rows. */
   owner: EditorOwner | null
 }
+
+// Ask someone to do this: a lazy module (60 A-07), published SOPs only (D-06).
+const AskTrigger = dynamic(() => import('@/components/requests/AskPicker').then((m) => m.AskTrigger), {
+  ssr: false,
+  loading: () => null,
+})
 
 const label = 'mono text-meta uppercase text-ink-500'
 const rowButton =
@@ -304,10 +311,8 @@ export function ThisSopBlock({ sopId, initial, from, isAdmin, owner }: ThisSopBl
           )}
 
           <div className="flex flex-col border-t border-ink-200 pt-2">
-            {isAdmin && (
-              <Link href={`/admin/sops/${sopId}/assign`} className={rowButton}>
-                Assign this SOP
-              </Link>
+            {isAdmin && sop.status === 'published' && (
+              <AskTrigger sopId={sopId} sopTitle={sop.title ?? 'this SOP'} variant="rail" align="start" />
             )}
             {isAdmin && (
               <CategoryButton

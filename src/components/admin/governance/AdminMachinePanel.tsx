@@ -6,10 +6,17 @@
  * Renders what it is handed (order comes from machinePanelSops) -- these
  * components never classify or fetch. The frame owns the close button.
  */
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import type { AdminPanelSop, AdminSopBadge } from '@/lib/sop/admin-health'
 import { focusHref } from '@/lib/sop/focus-path'
 import { OwnerReviewMeta } from '@/components/admin/governance/OwnerReviewMeta'
+
+// The ask picker is a lazy module (60 A-07); this panel is already in the lazy admin chunk.
+const AskTrigger = dynamic(() => import('@/components/requests/AskPicker').then((m) => m.AskTrigger), {
+  ssr: false,
+  loading: () => null,
+})
 
 const BADGE_CLASS: Record<AdminSopBadge, string> = {
   'NO OWNER': 'bg-accent-escalate/12 text-accent-escalate',
@@ -65,6 +72,7 @@ export function AdminSopRows({ sops, empty, from }: { sops: AdminPanelSop[]; emp
             >
               Edit
             </Link>
+            {sop.status === 'published' && <AskTrigger sopId={sop.id} sopTitle={sop.title} variant="row" align="end" />}
           </div>
           <OwnerReviewMeta ownerLabel={sop.ownerLabel} reviewDueAt={sop.reviewDueAt} />
         </div>

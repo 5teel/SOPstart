@@ -63,6 +63,7 @@ test.describe('Phase 60 -- requests, notifications and objectives (deployed)', (
     let db: SupabaseClient
     let siteOrgId: string
     let zeroMachine: { id: string; name: string }
+    let pressId: string
     const runId = Date.now().toString(36)
 
     test.beforeAll(async () => {
@@ -70,6 +71,7 @@ test.describe('Phase 60 -- requests, notifications and objectives (deployed)', (
       db = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } })
       const fixture = await ensurePlantFixture(db)
       siteOrgId = fixture.siteOrgId
+      pressId = fixture.pressId
       if (siteOrgId === REAL_SOPSTART_ORG_ID) throw new Error('refusing to run -- resolved org id equals the real SOPstart org')
       // The agent-request case needs a machine with no linked SOP.
       zeroMachine = await ensureZeroSopMachine(db, siteOrgId)
@@ -161,7 +163,62 @@ test.describe('Phase 60 -- requests, notifications and objectives (deployed)', (
       await expect(page.getByTestId('request-row').filter({ hasText: zeroMachine.name })).toHaveCount(0, SLOW)
       await ctx.close()
     })
-    test.fixme('composer opens from the machine panel; the ask picker works in role mode and person mode (60-12)', async () => {})
+    test('composer opens from the machine panel; the ask picker works in role mode and person mode (60-12)', async ({ browser }) => {
+      test.setTimeout(240_000)
+
+      // Admin: Ask > on the fixture SOP row; choosing is not sending.
+      const adminCtx = await browser.newContext({ viewport: { width: 1440, height: 900 } })
+      await signInAs(adminCtx, 'siteAdmin')
+      const admin = await adminCtx.newPage()
+      await admin.goto(`/?place=${pressId}`)
+      const adminRow = admin.getByTestId('admin-panel-row').filter({ hasText: EVAL_SITE_SOP_TITLE })
+      await expect(adminRow).toHaveCount(1, SLOW)
+      const ask = adminRow.getByTestId('ask-trigger')
+      await expect(ask).toHaveCount(1, SLOW)
+      await ask.click()
+      await expect(admin.getByTestId('ask-picker')).toHaveCount(1, SLOW)
+      await expect(admin.getByTestId('ask-confirm')).toBeDisabled()
+      await admin.getByTestId('ask-role-option').filter({ hasText: 'Workers' }).click()
+      await expect(admin.getByTestId('ask-confirm')).toHaveText('Ask Workers')
+      await expect(admin.getByTestId('ask-told')).toContainText('will be told')
+      await shot(admin, '60-ask-picker')
+
+      await admin.getByTestId('ask-mode-person').click()
+      await expect(admin.getByTestId('ask-confirm')).toBeDisabled()
+      await admin.getByTestId('ask-person-search').fill('worker')
+      const person = admin.getByTestId('ask-person-option').first()
+      await expect(person).toHaveCount(1, SLOW)
+      await person.click()
+      await expect(admin.getByTestId('ask-confirm')).toBeEnabled()
+      await shot(admin, '60-ask-person')
+      await admin.getByTestId('ask-cancel').click()
+      await expect(admin.getByTestId('ask-picker')).toHaveCount(0)
+      await adminCtx.close()
+
+      // Worker: the composer, twice; the second starts empty.
+      const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } })
+      await signInAs(ctx, 'siteWorker')
+      const page = await ctx.newPage()
+      await page.goto(`/?place=${pressId}`)
+      await expect(page.getByTestId('ask-trigger')).toHaveCount(0)
+      const trigger = page.getByTestId('request-composer-trigger')
+      await expect(trigger).toHaveCount(1, SLOW)
+      await trigger.click()
+      await expect(page.getByTestId('request-composer')).toHaveCount(1, SLOW)
+      await expect(page.getByTestId('composer-send')).toBeDisabled()
+      await shot(page, '60-composer-machine')
+      await page.getByRole('radio', { name: /Change a SOP/ }).check({ force: true })
+      await page.getByTestId('composer-note').fill(`EVAL change request ${runId}: step text is out of date`)
+      await page.getByTestId('composer-send').click()
+      await expect(page.getByTestId('request-sent')).toContainText("Request sent. You'll see its answer under My requests.", SLOW)
+      await shot(page, '60-composer-sent')
+
+      await trigger.click()
+      await expect(page.getByTestId('request-composer')).toHaveCount(1, SLOW)
+      await expect(page.getByTestId('composer-note')).toHaveValue('')
+      await page.getByTestId('composer-cancel').click()
+      await ctx.close()
+    })
     test.fixme('objective on a machine, a department and a person; an agent-set objective is confirmed (60-13)', async () => {})
     test.fixme('SOP objective in browse and This SOP; a second request raised from browse (60-14)', async () => {})
     test.fixme('worker raises, admin accepts, bell count shows, the notification opens its place, mark-read clears it; a second round (60-16)', async () => {})
