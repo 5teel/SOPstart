@@ -1037,21 +1037,21 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 
 ### Requests (RQS) — Phase 60
 
-- [ ] **RQS-01**: Any user can raise a request — change a SOP, write a new SOP, observe me doing a job — and see the state of the requests they have raised
-- [ ] **RQS-02**: An admin or supervisor can accept or decline a request in the Office; the answer is written to the decision ledger and the person who asked is told
-- [ ] **RQS-03**: A supervisor or admin can ask that a role or a named person does a SOP; once accepted it shows as due for those people on their machines and in their "next for you" card
-- [ ] **RQS-04**: An AI agent can raise a request (for example, a machine that has no SOPs) and it appears in the Office marked as coming from an agent
+- [x] **RQS-01**: Any user can raise a request — change a SOP, write a new SOP, observe me doing a job — and see the state of the requests they have raised
+- [x] **RQS-02**: An admin or supervisor can accept or decline a request in the Office; the answer is written to the decision ledger and the person who asked is told
+- [x] **RQS-03**: A supervisor or admin can ask that a role or a named person does a SOP; once accepted it shows as due for those people on their machines and in their "next for you" card
+- [x] **RQS-04**: An AI agent can raise a request (for example, a machine that has no SOPs) and it appears in the Office marked as coming from an agent
 
 ### Notifications (NTF) — Phase 60
 
-- [ ] **NTF-01**: A user sees their notifications in the site overview, with a count on the bell in the list, and a notification opens the place it is about
+- [x] **NTF-01**: A user sees their notifications in the site overview, with a count on the bell in the list, and a notification opens the place it is about
 - [ ] **NTF-02**: A user is notified when they are next to approve a SOP, when a SOP they own is due for review, when a completion is waiting for their sign-off, when a request they raised is answered, and when a SOP they do has a new version
 
 ### Objectives (OBJ) — Phase 60
 
-- [ ] **OBJ-01**: An admin can set an objective — a short statement of intent — on the site, a department, a machine, a SOP or a person, and change or remove it
-- [ ] **OBJ-02**: An objective is shown as quiet metadata on the detail panel of the thing it applies to, saying who set it
-- [ ] **OBJ-03**: An AI agent can read every objective and can set one through the existing AI field interface; an objective set by an agent is marked as such until a person confirms it
+- [x] **OBJ-01**: An admin can set an objective — a short statement of intent — on the site, a department, a machine, a SOP or a person, and change or remove it
+- [x] **OBJ-02**: An objective is shown as quiet metadata on the detail panel of the thing it applies to, saying who set it
+- [x] **OBJ-03**: An AI agent can read every objective and can set one through the existing AI field interface; an objective set by an agent is marked as such until a person confirms it
 
 ### Smoko Room — Training (SMK) — Phase 61
 
@@ -1103,9 +1103,9 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 | DEC-01 | Phase 56 | Complete |
 | DEC-02 | Phase 59 | Complete |
 | DEC-03..04 (2) | Phase 56 | Complete |
-| RQS-01..04 (4) | Phase 60 | Pending |
-| NTF-01..02 (2) | Phase 60 | Pending |
-| OBJ-01..03 (3) | Phase 60 | Pending |
+| RQS-01..04 (4) | Phase 60 | Complete |
+| NTF-01..02 (2) | Phase 60 | NTF-01 complete; NTF-02 pending (60-18 eval legs d, e unproven) |
+| OBJ-01..03 (3) | Phase 60 | Complete |
 | SMK-01..03 (3) | Phase 61 | Pending |
 | ORG-01 | Phase 55 | Complete |
 | CUT-01..02 (2) | Phase 55 | Pending |

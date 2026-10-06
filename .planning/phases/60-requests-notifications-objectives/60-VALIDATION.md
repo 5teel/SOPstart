@@ -1,7 +1,7 @@
 ---
 phase: 60
 slug: requests-notifications-objectives
-status: draft
+status: partial (60-18: NTF-02 legs d and e, SHL-03 overview case and the 60-17 case not yet green on the deployed site; Railway schedules pending)
 nyquist_compliant: false
 wave_0_complete: true
 created: 2026-10-06
@@ -106,7 +106,7 @@ created: 2026-10-06
 
 | Behavior | Requirement | Why Manual | Test Instructions |
 |----------|-------------|------------|-------------------|
-| Railway cron schedules for the two sweep routes | RQS-04, NTF-02 | A-08: the schedule lives in the Railway dashboard (60-18 human action) | Add the two schedules with the bearer secret; the eval then proves the routes |
+| Railway cron schedules for the two sweep routes (PENDING; only the SOPstart service exists, no synthesis-sweep cron exists either) | RQS-04, NTF-02 | A-08: the schedule lives in the Railway dashboard (60-18 human action) | Add the two schedules with the bearer secret; the eval then proves the routes |
 
 Everything else: the deployed eval and its screenshots replace click-path checks (CLAUDE.md § Deployed-site evals).
 
@@ -121,4 +121,4 @@ Everything else: the deployed eval and its screenshots replace click-path checks
 - [ ] Feedback latency < 60s
 - [ ] `nyquist_compliant: true` set in frontmatter (60-18)
 
-**Approval:** pending (60-18)
+**Approval:** NOT signed off. Deployed eval: 8 of 12 requests cases green at a4225ad (60-11, 60-11 agent, 60-12, 60-13, 60-14, 60-16 a, b, c). Open: 60-16 d (next approver at the divert: notification absent after 30 s), 60-16 e, 60-16 f (overview structure, real org), 60-17 (assign address). Full suite: 2228 passed, 6 failed (phase46 live probes, verifyOtp rate limit, environmental). Cron schedules: not yet done (60-18 Task 2).
