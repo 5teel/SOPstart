@@ -196,8 +196,7 @@ const cropStyle: CSSProperties = {
 function WalkPanel() {
   return (
     <div className="mx-auto w-full max-w-72 rounded-2xl border-4 border-ink-900 bg-paper p-3 shadow-lg" style={enter(1.3)}>
-      <div className="grid">
-        <div className="reel-gone col-start-1 row-start-1 flex flex-col gap-2" style={leave(3.4)}>
+      <div className="flex flex-col gap-2">
           <div className="h-1 rounded-full bg-ink-100">
             <div className="h-1 w-full rounded-full bg-accent-step" />
           </div>
@@ -227,16 +226,22 @@ function WalkPanel() {
               <Camera size={12} /> Photo added
             </span>
           </div>
-          <span className="relative flex min-h-tap-glove w-full items-center justify-center rounded-lg bg-ink-900 text-reading font-semibold text-paper">
-            {primaryLabel('step', true)}
-            <Tap at={3} style={{ left: '50%', top: '50%' }} />
-          </span>
-        </div>
-        <div className="col-start-1 row-start-1 flex flex-col items-center justify-center gap-3 text-center" style={enter(3.6)}>
-          <CheckCircle className="size-12 text-accent-ok" aria-hidden="true" />
-          <p className="text-lg font-semibold text-ink-900">Sent for sign-off</p>
-          <p className="text-reading text-ink-700">Your supervisor will check it.</p>
-        </div>
+          <div className="grid">
+            <span
+              className="reel-gone relative col-start-1 row-start-1 flex min-h-tap-glove w-full items-center justify-center rounded-lg bg-ink-900 text-reading font-semibold text-paper"
+              style={leave(3.3)}
+            >
+              {primaryLabel('step', true)}
+              <Tap at={2.9} style={{ left: '50%', top: '50%' }} />
+            </span>
+            <span className="col-start-1 row-start-1 flex min-h-tap-glove items-center gap-2 rounded-lg bg-accent-ok/10 px-3" style={enter(3.4)}>
+              <CheckCircle className="size-6 shrink-0 text-accent-ok" aria-hidden="true" />
+              <span className="text-left">
+                <span className="block text-ui font-semibold text-ink-900">Sent for sign-off</span>
+                <span className="block text-meta text-ink-700">Your supervisor will check it.</span>
+              </span>
+            </span>
+          </div>
       </div>
     </div>
   )
