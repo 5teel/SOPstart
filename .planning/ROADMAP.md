@@ -2052,7 +2052,7 @@ Plans:
   4. The bell in the list shows a count, and a person is notified when they are next to approve a SOP, when a SOP they own is due for review, when a completion waits for their sign-off, when a request they raised is answered and when a SOP they do has a new version; opening a notification goes to the place it is about
   5. An admin sets, changes and removes an objective on the site, a department, a machine, a SOP or a person, and it shows as quiet metadata saying who set it; an AI agent's request appears in the Office marked as from an agent, and an objective an agent set stays marked until a person confirms it
 
-**Plans:** 15/18 plans executed
+**Plans:** 16/18 plans executed
 Plans:
 **Wave 1**
 
@@ -2098,7 +2098,7 @@ Plans:
 
 **Wave 10** *(blocked on Wave 9 completion)*
 
-- [ ] 60-16-PLAN.md — Bell in the list header, overview mounted in both shells (bundle fallback rule), pathways / UAT, eval cases for the loop and every NTF-02 trigger
+- [x] 60-16-PLAN.md — Bell in the list header, overview mounted in both shells (bundle fallback rule), pathways / UAT, eval cases for the loop and every NTF-02 trigger
 
 **Wave 11** *(blocked on Wave 10 completion)*
 
