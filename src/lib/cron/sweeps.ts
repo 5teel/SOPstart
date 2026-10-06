@@ -44,7 +44,8 @@ export async function runReviewDueSweep(opts: { now?: Date; organisationId?: str
       .select('id, title, version, parent_sop_id, status, owner_user_id, review_due_at')
       .eq('organisation_id', org)
       .eq('status', 'published')
-      .not('review_due_at', 'is', null)
+      // every published row: reviewDueTargets picks the latest per lineage FIRST, then
+      // skips a missing date, so a superseded version is never flagged (WR-06)
       .limit(MAX_ROWS_PER_ORG)
     if (error) {
       console.error('[review-due] read error', error)
