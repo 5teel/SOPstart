@@ -239,7 +239,8 @@ export async function notifyAssignedWorkers(
     }
   }
 
-  const userIds = Array.from(userIdSet)
+  // the publishing admin is never told of their own publish (every trigger drops the actor)
+  const userIds = Array.from(userIdSet).filter((id) => id !== userId)
 
   // D-08 / A-02: the new version reaches everyone who does this SOP through the
   // notifications table. Fail-soft: the assignment repoint below always runs.
@@ -254,10 +255,12 @@ export async function notifyAssignedWorkers(
   }
 
   // Update sop_assignments to point to new SOP
+  // Service-role write: the session org is enforced here, not left to the RLS read above.
   await admin
     .from('sop_assignments')
     .update({ sop_id: newSopId })
     .eq('sop_id', oldSopId)
+    .eq('organisation_id', organisationId)
 
   return { success: true, notified: userIds.length }
 }

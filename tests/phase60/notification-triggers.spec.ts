@@ -95,6 +95,9 @@ test.describe('Notification writers (60-07)', () => {
     expect(fn).toContain("notificationPlace('new_version', { sopId: newSopId })")
     // the notification comes before, and never blocks, the assignment repoint
     expect(fn.indexOf('await notify(')).toBeLessThan(fn.indexOf(".from('sop_assignments')\n    .update"))
+    // WR-03: the actor is never told of their own publish; the service-role repoint carries the session org
+    expect(fn).toContain('Array.from(userIdSet).filter((id) => id !== userId)')
+    expect(fn).toContain(".update({ sop_id: newSopId })\n    .eq('sop_id', oldSopId)\n    .eq('organisation_id', organisationId)")
     // the assessment-request panel's own table is untouched
     expect(v).toContain(".from('worker_notifications')")
   })
