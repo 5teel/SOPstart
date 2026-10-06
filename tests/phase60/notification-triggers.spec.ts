@@ -55,6 +55,40 @@ test.describe('Notification writers (60-07)', () => {
     expect(h).toContain('notifyNextApprover')
   })
 
-  test.fixme('submitCompletion notifies the worker\'s supervisors, or admins and safety managers, after the signature (Task 2)', () => {})
-  test.fixme('notifyAssignedWorkers writes through notify with the session org (Task 2)', () => {})
+  test('submitCompletion notifies sign-off recipients after the signature, inside try/catch, deduped per completion', () => {
+    const c = strip(read('src/actions/completions.ts'))
+    const body = c.slice(c.indexOf('export async function submitCompletion'), c.indexOf('export async function signOffCompletion'))
+    const sig = body.indexOf('await recordSignature(')
+    const rec = body.indexOf('await signOffRecipients(organisationId, userId)')
+    expect(sig).toBeGreaterThan(-1)
+    expect(rec).toBeGreaterThan(sig)
+    expect(body.slice(sig, rec)).toContain('try {')
+    expect(body).toContain("dedupeKey({ kind: 'signoff', completionId: walk.id })")
+    expect(body.indexOf('await notify(')).toBeGreaterThan(rec)
+    expect(body.slice(body.indexOf('await notify('))).toContain('catch (err)')
+  })
+
+  test('signOffRecipients reads supervisors, falls back to admins and safety managers, and never returns the worker', () => {
+    const fn = WRITE.slice(WRITE.indexOf('export async function signOffRecipients'), WRITE.indexOf('export async function membersWithRole'))
+    expect(fn).toContain("from('supervisor_assignments')")
+    expect(fn).toContain(".eq('organisation_id', organisationId)")
+    expect(fn).toContain("membersWithRole(organisationId, 'admin')")
+    expect(fn).toContain("membersWithRole(organisationId, 'safety_manager')")
+    expect(fn).toContain('id !== workerId')
+  })
+
+  test('notifyAssignedWorkers writes through notify with the session org and no worker_notifications insert', () => {
+    const v = strip(read('src/actions/versioning.ts'))
+    const fn = v.slice(v.indexOf('export async function notifyAssignedWorkers'), v.indexOf('export async function markNotificationRead'))
+    expect(fn).toContain('organisationId } = await getSessionContext()')
+    expect(fn).toContain(".eq('organisation_id', organisationId)")
+    expect(fn).not.toContain('newSop.organisation_id')
+    expect(fn).not.toContain('worker_notifications')
+    expect(fn).toContain("dedupeKey({ kind: 'new_version', sopId: newSopId })")
+    expect(fn).toContain("notificationPlace('new_version', { sopId: newSopId })")
+    // the notification comes before, and never blocks, the assignment repoint
+    expect(fn.indexOf('await notify(')).toBeLessThan(fn.indexOf(".from('sop_assignments')\n    .update"))
+    // the assessment-request panel's own table is untouched
+    expect(v).toContain(".from('worker_notifications')")
+  })
 })

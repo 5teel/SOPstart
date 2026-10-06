@@ -94,6 +94,24 @@ export async function notifyNextApprover(a: {
   }
 }
 
+/**
+ * D-08 trigger 3: who is told a walk is waiting for sign-off -- the worker's
+ * supervisors, else the organisation's admins and safety managers. Never the worker.
+ */
+export async function signOffRecipients(organisationId: string, workerId: string): Promise<string[]> {
+  const { data, error } = await createAdminClient()
+    .from('supervisor_assignments')
+    .select('supervisor_id')
+    .eq('organisation_id', organisationId)
+    .eq('worker_id', workerId)
+  if (error) console.error('[signOffRecipients] read error', error)
+  let ids = (data ?? []).map((r) => r.supervisor_id as string)
+  if (ids.length === 0) {
+    ids = [...(await membersWithRole(organisationId, 'admin')), ...(await membersWithRole(organisationId, 'safety_manager'))]
+  }
+  return [...new Set(ids)].filter((id) => id !== workerId)
+}
+
 /** User ids holding a role in the organisation (for the triggers that notify a role). */
 export async function membersWithRole(organisationId: string, role: 'worker' | 'supervisor' | 'admin' | 'safety_manager'): Promise<string[]> {
   const { data, error } = await createAdminClient()

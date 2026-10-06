@@ -8,6 +8,10 @@ import type { Json } from '@/types/database.types'
 import { SignOffSchema as signOffSchema } from '@/lib/validators/completions'
 import { isSignedOffAssessor } from '@/lib/competency/assessor'
 import { recordDecision } from '@/lib/decisions/record'
+import { notify, signOffRecipients } from '@/lib/notifications/write'
+import { dedupeKey, notificationTitle } from '@/lib/notifications/kinds'
+import { notificationPlace } from '@/lib/notifications/places'
+import { userLabels } from '@/lib/members/labels'
 import { createHash } from 'node:crypto'
 import { hashInput, reviewMissing } from '@/lib/sop/focus'
 import { loadWalkSop, toWalkState, WALK_COLUMNS } from '@/lib/sop/walk-read'
@@ -156,6 +160,26 @@ export async function submitCompletion(
   // The worker's own ledger row (D-22). Its failure never undoes the completion.
   const signed = await recordSignature({ completionId: walk.id, sopId: walk.sop_id, role: 'worker' })
   if (!signed.success) console.error('submitCompletion signature error:', signed.error)
+
+  // D-08: tell whoever signs this off. After the ledger row; never fails the submit.
+  try {
+    const recipients = await signOffRecipients(organisationId, userId)
+    if (recipients.length > 0) {
+      const [labels, { data: sopRow }] = await Promise.all([
+        userLabels([userId]),
+        admin.from('sops').select('title').eq('id', walk.sop_id).eq('organisation_id', organisationId).maybeSingle(),
+      ])
+      const title = notificationTitle({ kind: 'signoff', sop: sopRow?.title ?? 'a SOP', name: labels.get(userId)?.fullName ?? null })
+      const place = notificationPlace('signoff')
+      const key = dedupeKey({ kind: 'signoff', completionId: walk.id })
+      await notify(
+        organisationId,
+        recipients.map((uid) => ({ userId: uid, kind: 'signoff' as const, title, place, subjectType: 'sop', subjectId: walk.sop_id, dedupeKey: key })),
+      )
+    }
+  } catch (err) {
+    console.error('submitCompletion sign-off notification failed:', err)
+  }
   return { success: true, completionId: walk.id }
 }
 

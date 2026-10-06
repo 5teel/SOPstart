@@ -3,6 +3,9 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getSessionContext } from '@/lib/auth/session-context'
 import { getSourceFileType, isBlockedMacroFile } from '@/lib/validators/sop'
+import { notify } from '@/lib/notifications/write'
+import { dedupeKey, notificationTitle } from '@/lib/notifications/kinds'
+import { notificationPlace } from '@/lib/notifications/places'
 
 // ------------------------------------------------------------
 // uploadNewVersion
@@ -186,23 +189,23 @@ export async function notifyAssignedWorkers(
   oldSopId: string,
   newSopId: string
 ): Promise<{ success: true; notified: number } | { success: false; error: string }> {
-  const { supabase, userId, role } = await getSessionContext()
+  const { supabase, userId, role, organisationId } = await getSessionContext()
   if (!userId) return { success: false, error: 'Not authenticated' }
 
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { success: false, error: 'You need admin access to notify workers.' }
   }
+  if (!organisationId) return { success: false, error: 'No organisation found' }
 
-  // Fetch new SOP to get organisation_id
+  // The new SOP must be in the caller's own organisation (never an org read off the row).
   const { data: newSop } = await supabase
     .from('sops')
-    .select('organisation_id')
+    .select('title, version')
     .eq('id', newSopId)
+    .eq('organisation_id', organisationId)
     .single()
 
   if (!newSop) return { success: false, error: 'New SOP not found' }
-
-  const organisationId: string = newSop.organisation_id
 
   // Get all assignments for old SOP
   const { data: assignments } = await supabase
@@ -238,23 +241,16 @@ export async function notifyAssignedWorkers(
 
   const userIds = Array.from(userIdSet)
 
+  // D-08 / A-02: the new version reaches everyone who does this SOP through the
+  // notifications table. Fail-soft: the assignment repoint below always runs.
   if (userIds.length > 0) {
-    const notificationRows = userIds.map(uid => ({
-      organisation_id: organisationId,
-      user_id: uid,
-      sop_id: newSopId,
-      type: 'sop_updated',
-      read: false,
-    }))
-
-    const { error: notifyError } = await admin
-      .from('worker_notifications')
-      .insert(notificationRows)
-
-    if (notifyError) {
-      console.error('Notification insert error:', notifyError)
-      return { success: false, error: 'Failed to create notifications.' }
-    }
+    const title = notificationTitle({ kind: 'new_version', sop: newSop.title ?? 'a SOP', version: newSop.version })
+    const place = notificationPlace('new_version', { sopId: newSopId })
+    const key = dedupeKey({ kind: 'new_version', sopId: newSopId })
+    await notify(
+      organisationId,
+      userIds.map((uid) => ({ userId: uid, kind: 'new_version' as const, title, place, subjectType: 'sop', subjectId: newSopId, dedupeKey: key })),
+    )
   }
 
   // Update sop_assignments to point to new SOP
