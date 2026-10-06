@@ -628,6 +628,8 @@ test.describe('Phase 60 -- requests, notifications and objectives (deployed)', (
         await row.getByTestId('office-row-action').click()
         await row.getByTestId('approve-panel').getByTestId('approve-commit').click()
 
+        // The bell does not poll: the approval must have landed before the admin loads.
+        await expect(row).toHaveCount(0, SLOW)
         await admin.page.goto('/')
         const next = notif(admin.page, `Your approval is next on ${title}.`)
         await expect(next).toHaveCount(1, SLOW)
