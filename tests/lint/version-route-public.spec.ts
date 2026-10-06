@@ -11,3 +11,11 @@ test('/api/version is exempted from the session middleware', () => {
   expect(mw).toMatch(/const isPublicRoute = [^\n]*isVersionRoute/)
   expect(fs.existsSync(path.join(process.cwd(), 'src/app/api/version/route.ts'))).toBe(true)
 })
+
+// Railway's healthcheck needs a 2xx with no session. `/` redirects a signed-out
+// request to /welcome (307), which failed every deploy's healthcheck
+// (2026-10-06), so the check targets the always-200 version route.
+test('the Railway healthcheck targets /api/version, never a redirecting page', () => {
+  const cfg = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'railway.json'), 'utf8'))
+  expect(cfg.deploy.healthcheckPath).toBe('/api/version')
+})
