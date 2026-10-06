@@ -981,7 +981,7 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 
 - [x] **SHL-01**: After signing in, every user lands on one screen made of three panes — a list on the left, the isometric site in the middle, a detail panel on the right — and there is no header navigation anywhere in the app
 - [x] **SHL-02**: A user can select any room or machine either by clicking its shape on the site or by clicking its row in the list; both highlight the shape, move the camera to it and fill the detail panel identically
-- [ ] **SHL-03**: With nothing selected, the detail panel shows the site overview: objectives, the user's notifications and open requests
+- [x] **SHL-03**: With nothing selected, the detail panel shows the site overview: objectives, the user's notifications and open requests
 - [x] **SHL-04**: A user can type in the list's search box and see matching rooms and machines filtered in the list and highlighted on the site; the search matches machine names and the titles of the SOPs on them
 - [x] **SHL-05**: The list shows one "next for you" card: for a worker, the single next SOP due with Walk it and Show me; for an admin or supervisor, how many things are waiting in the Office with a button that opens it
 - [x] **SHL-06**: When the detail panel shows a table (decision ledger, people and roles, access, training matrix) it widens, and the site stays visible and re-centres on the selected place
@@ -1045,7 +1045,7 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 ### Notifications (NTF) — Phase 60
 
 - [x] **NTF-01**: A user sees their notifications in the site overview, with a count on the bell in the list, and a notification opens the place it is about
-- [ ] **NTF-02**: A user is notified when they are next to approve a SOP, when a SOP they own is due for review, when a completion is waiting for their sign-off, when a request they raised is answered, and when a SOP they do has a new version
+- [x] **NTF-02**: A user is notified when they are next to approve a SOP, when a SOP they own is due for review, when a completion is waiting for their sign-off, when a request they raised is answered, and when a SOP they do has a new version
 
 ### Objectives (OBJ) — Phase 60
 
@@ -1088,7 +1088,7 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
 | SHL-01..02 (2) | Phase 57 | Pending |
-| SHL-03 | Phase 60 | Pending |
+| SHL-03 | Phase 60 | Complete |
 | SHL-04..05 (2) | Phase 57 | Pending |
 | SHL-06 | Phase 59 | Complete |
 | SHL-07 | Phase 62 | Pending |
@@ -1104,7 +1104,7 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 | DEC-02 | Phase 59 | Complete |
 | DEC-03..04 (2) | Phase 56 | Complete |
 | RQS-01..04 (4) | Phase 60 | Complete |
-| NTF-01..02 (2) | Phase 60 | NTF-01 complete; NTF-02 pending (60-18 eval legs d, e unproven) |
+| NTF-01..02 (2) | Phase 60 | complete (60-18 eval legs all proven) |
 | OBJ-01..03 (3) | Phase 60 | Complete |
 | SMK-01..03 (3) | Phase 61 | Pending |
 | ORG-01 | Phase 55 | Complete |

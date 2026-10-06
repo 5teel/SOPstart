@@ -1,8 +1,8 @@
 ---
 phase: 60
 slug: requests-notifications-objectives
-status: partial (60-18: NTF-02 legs d and e, SHL-03 overview case and the 60-17 case not yet green on the deployed site; Railway schedules pending)
-nyquist_compliant: false
+status: complete (every eval leg green on the deployed site; Railway cron schedules are a pending dashboard action for Simon, the eval calls the routes directly)
+nyquist_compliant: true
 wave_0_complete: true
 created: 2026-10-06
 ---
@@ -114,11 +114,11 @@ Everything else: the deployed eval and its screenshots replace click-path checks
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
 - [x] Wave 0 covers all MISSING references
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 60s
-- [ ] `nyquist_compliant: true` set in frontmatter (60-18)
+- [x] No watch-mode flags
+- [x] Feedback latency < 60s
+- [x] `nyquist_compliant: true` set in frontmatter (60-18)
 
-**Approval:** NOT signed off. Deployed eval: 8 of 12 requests cases green at a4225ad (60-11, 60-11 agent, 60-12, 60-13, 60-14, 60-16 a, b, c). Open: 60-16 d (next approver at the divert: notification absent after 30 s), 60-16 e, 60-16 f (overview structure, real org), 60-17 (assign address). Full suite: 2228 passed, 6 failed (phase46 live probes, verifyOtp rate limit, environmental). Cron schedules: not yet done (60-18 Task 2).
+**Approval:** Signed off 2026-10-06 (60-18 continuation). Deployed eval at 5705480: 78 passed, 2 failed (office people invite email rate limit, environmental; sop-focus annotate leftover tick, Phase 58 sibling), 6 skipped (office serial cascade, re-run directly: 6 passed). Requests file fully green including 60-16 a-f and 60-17; all 23 `60-*.png` read. NTF-02 legs: answered, new version, review due, next approver at the divert and after a non-final approval, sign-off waiting: all proven by eval. Open: Railway cron schedules (dashboard action; see 60-18-SUMMARY).

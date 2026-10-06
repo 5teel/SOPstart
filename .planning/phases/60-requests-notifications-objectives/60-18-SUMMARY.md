@@ -19,7 +19,7 @@ key-files:
     - .planning/REQUIREMENTS.md
     - CLAUDE.md
 completed: 2026-10-06
-status: PARTIAL -- NTF-02 not proven, cron schedules pending (checkpoint), sign-off withheld
+status: COMPLETE after continuation (cron schedules pending, human dashboard action)
 ---
 
 # Phase 60 Plan 18: Deployed proof and sign-off Summary
@@ -85,3 +85,15 @@ Read: 60-requests-supervisor, 60-objective-meta, 60-ask-picker (defect, fixed), 
 ## Self-Check: PASSED
 
 SUMMARY, 60-EVAL.md notes, VALIDATION and REQUIREMENTS edits exist; commits 5ca988b4 and a4225ad0 exist. STATE.md and ROADMAP.md untouched.
+
+## Continuation
+
+- **60-16 d root cause: eval defect, not product.** The divert-time notification and `notifyNextApprover` work (the safety manager's row appeared on the deployed site; chain steps by role resolve through `membersWithRole`; nothing in Railway needed). The case failed on its second half: it clicked Approve and loaded the admin overview at once, and the bell does not poll, so the page was read before the server action wrote the next-approver row. Fix in `tests/evals/requests.eval.ts`: wait for the approved row to leave the safety manager's inbox before the admin loads (commit 5705480, pushed). No product change; no live probe spec was needed (every NTF-02 leg is driven end to end by the eval).
+- **Re-runs:** 60-16 d, e, f and 60-17 alone, retries off: 4 passed. Full `npm run eval -- --phase 60` at 5705480: 78 passed / 2 failed / 6 skipped. Failures: office People case (`email rate limit exceeded` on the invite, environmental, not looped; it passed in the 90f467a and 5ca988b full runs) and sop-focus annotate (leftover tick, Phase 58 sibling residue). The 6 skips (office serial cases after People) were re-run once directly: 6 passed. Every requests case is green.
+- **Screenshots:** all 23 `60-*.png` read; one line each in `60-EVAL.md`. The Ask picker fix is confirmed by eye (role and person modes both normal width, nothing clipped). No further visual defects.
+- **Sign-off:** `60-VALIDATION.md` set to `nyquist_compliant: true`, status complete; NTF-02 and SHL-03 ticked in REQUIREMENTS.md (all ten Phase 60 plan ids now ticked). STATE.md and ROADMAP.md untouched. CLAUDE.md Learnings: no new entry (the bell-does-not-poll rule is already recorded by the 2026-10-06 entry).
+
+## Issues
+
+- Task 2 (Railway cron schedules, three services) remains Simon's dashboard action; the steps are above. Until it is done the review-due, machines-without-SOPs and synthesis sweeps do not run on a schedule, though the routes are proven by the eval.
+- Environmental reds to ignore: office People invite email rate limit; phase46 live probes (verifyOtp rate limit) from the earlier full-suite run.
