@@ -46,6 +46,7 @@ import { getOrgMembers } from '@/actions/assignments'
 import { resolveNextStepIndex, stepMatchesCaller, type ChainStep } from '@/lib/governance/approvals'
 import { performPublish } from '@/lib/governance/publish-core'
 import { recordDecision } from '@/lib/decisions/record'
+import { notifyNextApprover } from '@/lib/notifications/write'
 import { approvalChainSchema } from '@/lib/validators/approvals'
 
 export interface ApprovalRow {
@@ -178,7 +179,7 @@ export async function approveStep(
   const supabase = await createClient()
   const { data: sop } = await supabase
     .from('sops')
-    .select('id, version, approval_state, approval_snapshot')
+    .select('id, title, version, approval_state, approval_snapshot')
     .eq('id', sopId)
     .maybeSingle()
 
@@ -229,6 +230,23 @@ export async function approveStep(
       details: { version: sop.version, step_index: nextIndex, comment: comment ?? null },
     })
     logged = rec.ok
+
+    // D-08: the next step is told it is their turn (a fresh approval only; never fails it).
+    if (nextIndex < steps.length - 1) {
+      try {
+        await notifyNextApprover({
+          organisationId: ctx.organisationId,
+          sopId,
+          sopTitle: sop.title ?? 'a SOP',
+          version: sop.version,
+          stepIndex: nextIndex + 1,
+          step: steps[nextIndex + 1],
+          actorId: ctx.userId,
+        })
+      } catch (err) {
+        console.error('[approveStep] next approver notification failed', err)
+      }
+    }
   }
 
   let published = false

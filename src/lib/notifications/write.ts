@@ -1,7 +1,8 @@
 import 'server-only'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { isSafePlace } from '@/lib/notifications/places'
-import type { NotificationKind } from '@/lib/notifications/kinds'
+import { isSafePlace, notificationPlace } from '@/lib/notifications/places'
+import { dedupeKey, notificationTitle, type NotificationKind } from '@/lib/notifications/kinds'
+import type { ChainStep } from '@/lib/governance/approvals'
 
 /**
  * Phase 60 (D-07) -- the one notification writer.
@@ -57,6 +58,38 @@ export async function notify(organisationId: string, rows: NotifyRow[]): Promise
     return keep.length
   } catch (err) {
     console.error('[notify] FAILED', err)
+    return 0
+  }
+}
+
+/**
+ * D-08 trigger 1: tell whoever the chain step names that it is their turn.
+ * The caller passes the SESSION org and the actor (never told of their own act).
+ * Never throws; returns the number written.
+ */
+export async function notifyNextApprover(a: {
+  organisationId: string
+  sopId: string
+  sopTitle: string
+  version: number
+  stepIndex: number
+  step: ChainStep | undefined
+  actorId: string
+}): Promise<number> {
+  try {
+    if (!a.step) return 0
+    const ids = a.step.userId ? [a.step.userId] : a.step.role ? await membersWithRole(a.organisationId, a.step.role) : []
+    const title = notificationTitle({ kind: 'approve_next', sop: a.sopTitle })
+    const place = notificationPlace('approve_next')
+    const key = dedupeKey({ kind: 'approve_next', sopId: a.sopId, version: a.version, step: a.stepIndex })
+    return await notify(
+      a.organisationId,
+      [...new Set(ids)]
+        .filter((id) => id !== a.actorId)
+        .map((userId) => ({ userId, kind: 'approve_next' as const, title, place, subjectType: 'sop', subjectId: a.sopId, dedupeKey: key })),
+    )
+  } catch (err) {
+    console.error('[notifyNextApprover] FAILED', err)
     return 0
   }
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionContext } from '@/lib/auth/session-context'
 import { performPublish, assertPublishGates } from '@/lib/governance/publish-core'
+import { notifyNextApprover } from '@/lib/notifications/write'
 
 // POST /api/sops/[sopId]/publish — transition draft -> published
 //
@@ -45,7 +46,7 @@ export async function POST(
 
   const { data: sopRow } = await supabase
     .from('sops')
-    .select('category_slug, approval_state')
+    .select('category_slug, approval_state, title, version')
     .eq('id', sopId)
     .maybeSingle()
 
@@ -80,6 +81,20 @@ export async function POST(
 
     if (!updated || updated.length === 0) {
       return NextResponse.json({ success: true, pendingApproval: true, alreadyPending: true })
+    }
+    // D-08: step one is told it is their turn. After the divert write; never fails the request.
+    try {
+      await notifyNextApprover({
+        organisationId,
+        sopId,
+        sopTitle: sopRow?.title ?? 'a SOP',
+        version: sopRow?.version ?? 1,
+        stepIndex: 0,
+        step: chainRow.steps[0],
+        actorId: userId,
+      })
+    } catch (err) {
+      console.error('[publish] approver notification failed', err)
     }
     return NextResponse.json({ success: true, pendingApproval: true })
   }

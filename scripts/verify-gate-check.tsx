@@ -104,6 +104,17 @@ Module._load = function (request: string, parent: unknown, isMain: boolean) {
   }
   // Phase 58 D-18: performPublish notifies workers of a new version through a
   // session-scoped server action; the harness has no predecessor, so it is inert.
+  // Phase 60 (A-11): the publish route tells the first approver it is their turn
+  // through the notification writer, which is server-only and not loadable under
+  // tsx. The harness proves the gate, not the inbox, so every writer here is inert.
+  if (request.includes('lib/notifications/write')) {
+    return {
+      notify: async () => 0,
+      notifyNextApprover: async () => 0,
+      membersWithRole: async () => [],
+      signOffRecipients: async () => [],
+    }
+  }
   if (request.includes('actions/versioning')) {
     return {
       notifyAssignedWorkers: async (...args: string[]) => {
