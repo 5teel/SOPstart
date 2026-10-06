@@ -1,15 +1,142 @@
 /**
- * Phase 60 -- Overview (stub; Wave 0 / 60-01).
- * Requirements: SHL-03, NTF-01. Decisions: D-13, A-06. Owning plan: 60-15.
- * Each case below is a test.fixme the owning plan turns live with real assertions.
+ * Phase 60 -- the site overview body (60-15). Requirements: SHL-03, NTF-01, RQS-01, RQS-03.
+ * Decisions: D-13, A-06, A-07. Source-contract guards over SiteOverview.tsx and overview-focus.ts;
+ * the screen itself is judged by the deployed eval (60-16 mounts it).
  * Registration: playwright.config.ts `phase60` project.
  */
-import { test } from '@playwright/test'
+import { test, expect } from '@playwright/test'
+import fs from 'node:fs'
+import path from 'node:path'
 
-test.describe("Overview (60-15)", () => {
-  test.fixme("SiteOverview renders counts card, objectives, notifications, my requests in that order", () => {})
-  test.fixme("each section hides when empty", () => {})
-  test.fixme("the admin Office line reads \"Open requests in the Office - N\"", () => {})
-  test.fixme("SiteOverview is lazy with a forbidden marker, and /page carries it", () => {})
-  test.fixme("overview-focus opens a place by select() or a Link, never router.push after a server action", () => {})
+const ROOT = process.cwd()
+const read = (p: string) => fs.readFileSync(path.join(ROOT, p), 'utf8').replace(/\r\n/g, '\n')
+const strip = (s: string) => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')
+
+const SRC = strip(read('src/components/shell/SiteOverview.tsx'))
+const FOCUS = strip(read('src/lib/shell/overview-focus.ts'))
+
+function walk(dir: string, out: string[] = []): string[] {
+  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+    const p = path.join(dir, e.name)
+    if (e.isDirectory()) walk(p, out)
+    else if (/\.(ts|tsx)$/.test(e.name)) out.push(p)
+  }
+  return out
+}
+
+/** Bodies of every useEffect callback, by brace matching from the opening call. */
+function effectBodies(src: string): string[] {
+  const out: string[] = []
+  let at = src.indexOf('useEffect(')
+  while (at !== -1) {
+    let depth = 0
+    let i = src.indexOf('{', at)
+    const start = i
+    for (; i < src.length; i++) {
+      if (src[i] === '{') depth++
+      if (src[i] === '}' && --depth === 0) break
+    }
+    out.push(src.slice(start, i + 1))
+    at = src.indexOf('useEffect(', i)
+  }
+  return out
+}
+
+test.describe('Overview (60-15)', () => {
+  test('sections render in the order objectives, notifications, requests, office line', () => {
+    const at = ['overview-objectives', 'overview-notifications', 'overview-requests', 'overview-office-link'].map((id) =>
+      SRC.indexOf(`data-testid="${id}"`),
+    )
+    expect(at.every((n) => n > -1)).toBe(true)
+    expect([...at].sort((a, b) => a - b)).toEqual(at)
+    expect(SRC).toContain('data-testid="overview-body"')
+  })
+
+  test('each section hides on its own emptiness; only the admin Objectives section always shows', () => {
+    expect(SRC).toMatch(/\(isAdmin \|\| siteObjective \|\| deptObjectives\.length > 0\) && \(\s*<section data-testid="overview-objectives"/)
+    expect(SRC).toMatch(/\{anyNotifications && \(\s*<section\s+data-testid="overview-notifications"/)
+    expect(SRC).toMatch(/\{anyRequests && groups && \(\s*<section\s+data-testid="overview-requests"/)
+    expect(SRC).toMatch(/\{canAnswer && officeCount > 0 && \(\s*<button\s+type="button"\s+data-testid="overview-office-link"/)
+    expect(SRC).toContain('Open requests in the Office · {officeCount}')
+    expect(SRC).toContain("select({ kind: 'room', id: 'office', tab: 'requests' })")
+  })
+
+  test('notifications use the browser client; no server action; mark-read writes read_at only', () => {
+    expect(SRC).toContain("from '@/lib/supabase/client'")
+    expect(SRC).toContain(".from('notifications')")
+    expect(SRC).not.toMatch(/from '@\/actions\/notifications'/)
+    expect(SRC).not.toMatch(/from '@\/lib\/supabase\/(server|admin)'/)
+    const updates = SRC.match(/\.update\(\{[^}]*\}/g) ?? []
+    expect(updates).toHaveLength(1)
+    expect(updates[0]).toMatch(/^\.update\(\{ read_at: /)
+    expect(SRC).toMatch(/\.is\('read_at', null\)/) // the unread filter lives in the queryFn
+    expect(SRC).toContain('.limit(50)')
+    expect(SRC).toContain('refetchOnWindowFocus: true')
+    expect(SRC).not.toContain('refetchInterval')
+  })
+
+  test('opening a notification goes through placeTarget; router push only in the click path, never an effect', () => {
+    expect(SRC).toContain('placeTarget(n.place)')
+    expect(SRC).toMatch(/target\.type === 'href'/)
+    expect(SRC).not.toMatch(/router\.replace/)
+    expect(SRC.match(/router\.push\(/g)).toHaveLength(1)
+    expect(SRC).toMatch(/onClick=\{\(\) => void open\(n\)\}/)
+    for (const body of effectBodies(SRC)) {
+      expect(body).not.toMatch(/router\./)
+      expect(body).not.toMatch(/\bselect\(/)
+    }
+    expect(SRC).toContain("requestOverviewSection('requests')")
+    expect(SRC).toContain('takeOverviewSection()')
+  })
+
+  test('no stylesheet import, no shell refresh, no static importer of the overview', () => {
+    expect(SRC).not.toMatch(/import\s+['"][^'"]*\.css['"]/)
+    expect(SRC).not.toMatch(/SHELL_KEY/)
+    const importers = [...walk(path.join(ROOT, 'src')), ...walk(path.join(ROOT, 'tests/phase60'))].filter((f) => {
+      if (/SiteOverview\.tsx$/.test(f) || /overview-structure\.spec\.ts$/.test(f)) return false
+      return /import[^;\n]*from\s+['"]@\/components\/shell\/SiteOverview['"]/.test(fs.readFileSync(f, 'utf8'))
+    })
+    expect(importers).toEqual([])
+  })
+
+  test('withdraw, decline and stop asking are the right actions; the last two go through the reason dialog', () => {
+    expect(SRC).toContain("from '@/actions/requests'")
+    expect(SRC).toMatch(/withdrawRequest\(\{ requestId: r\.id \}\)/)
+    expect(SRC).toMatch(/declineAsk\(\{ requestId: d\.req\.id, note \}\)/)
+    expect(SRC).toMatch(/stopAsking\(\{ requestId: d\.req\.id, note \}\)/)
+    expect(SRC).toContain('data-testid="request-withdraw"')
+    expect(SRC).toContain('data-testid="ask-decline"')
+    expect(SRC).toContain("'ask-row'")
+    expect(SRC).toContain("from '@/components/office/ReasonDialog'")
+    expect(SRC).toMatch(/<ReasonDialog[\s\S]*onConfirm=\{\(note\) => void answer\(dialog, note\)\}/)
+    expect(SRC).toContain('Declined')
+    expect(SRC).toContain('Stopped asking')
+    expect(SRC).toContain('logged in the decision ledger')
+    expect(SRC).toContain("Withdrawn.")
+    // Withdraw has no dialog and no ledger suffix.
+    expect(SRC).not.toMatch(/Withdrawn\. ?·/)
+  })
+
+  test("the person's assignments refresh after a decline and for unread asked rows", () => {
+    expect(SRC.match(/\['user-sop-assignments'\]/g)!.length).toBeGreaterThanOrEqual(3)
+    expect(SRC).toMatch(/n\.kind === 'asked'/)
+    expect(SRC).toMatch(/askedIds === askedSeen\.current/) // once per new set of ids
+  })
+
+  test('the editor and composer arrive lazily; the groups come from the shared model', () => {
+    expect(SRC).toMatch(/dynamic\(\(\) => import\('@\/components\/shell\/ObjectiveSlot'\)/)
+    expect(SRC).toMatch(/dynamic\(\s*\(\) => import\('@\/components\/requests\/RequestComposer'\)/)
+    expect(SRC).not.toMatch(/^import [^\n]*from '@\/components\/requests\/(RequestComposer|ObjectiveEditor)'/m)
+    expect(SRC).toContain('groupMyRequests(')
+    expect(SRC).toContain('canAnswerRequests(role)')
+    expect(SRC).toContain('Ask for a new SOP')
+  })
+
+  test('overview-focus is plain, stores one pending section, and only dispatches an event', () => {
+    expect(FOCUS).not.toMatch(/^['"]use (client|server)['"]/m)
+    expect(FOCUS).toContain('export function requestOverviewSection')
+    expect(FOCUS).toContain('export function takeOverviewSection')
+    expect(FOCUS).toContain('export const OVERVIEW_SECTION_EVENT')
+    expect(FOCUS).not.toMatch(/router|navigate|location\./)
+  })
 })
