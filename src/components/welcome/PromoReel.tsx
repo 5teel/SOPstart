@@ -3,17 +3,21 @@
 /**
  * The signed-out promo reel at /welcome: one site picture (the bottling
  * template, ADR-0003) with a camera that glides between places while each
- * scene's caption and panel animate in. Illustrative content only -- no org
- * data, nothing fetched.
+ * scene's caption and panel animate in. Storyboard and the rules it follows:
+ * brag-output/brag-plan.md (hook -> reveal -> highlights -> 20 s Sign in).
+ * The walk and step kinds reuse the app's own copy and colours (KindChip,
+ * primaryLabel, the Sent for sign-off panel). Nothing is fetched.
  *
  * Playback is driven by the active progress bar's CSS animation: its
  * animationend advances the scene, so pause is just animation-play-state and
- * reduced motion (animations off) means no autoplay, with the dots to step.
+ * reduced motion (animations off) means no autoplay, with the bars to step.
  */
 import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from 'react'
 import Link from 'next/link'
-import { Camera, Check, FileText, Pause, Play, Sparkles, TriangleAlert } from 'lucide-react'
+import { Camera, CheckCircle, FileText, Pause, Play, Sparkles } from 'lucide-react'
 import { SITE_PRESETS, PRESET_ROOMS, presetImagePath } from '@/lib/site/presets'
+import { KindChip, KIND_EDGE } from '@/components/focus/KindChip'
+import { primaryLabel, type FocusKind } from '@/lib/sop/focus'
 
 type Frac = ReadonlyArray<readonly [number, number]>
 
@@ -36,11 +40,13 @@ interface Cam {
   zoom: number
 }
 
+type SceneId = 'hook' | 'reveal' | 'machines' | 'structure' | 'walk' | 'ai' | 'outro'
+
 interface Scene {
-  id: 'intro' | 'machines' | 'structure' | 'visual' | 'ai' | 'outro'
+  id: SceneId
+  label: string
   eyebrow: string
   title: string
-  body: string
   cam: Cam
   ms: number
 }
@@ -48,65 +54,59 @@ interface Scene {
 const [FX, FY] = centre(FILLER)
 const [LX, LY] = centre(LABELLER)
 const [OX, OY] = centre(OFFICE)
+const WIDE: Cam = { fx: 0.5, fy: 0.42, zoom: 1.05 }
 
+// One headline per scene, each settled for at least 0.3 s a word.
 const SCENES: Scene[] = [
-  {
-    id: 'intro',
-    eyebrow: 'SOPstart',
-    title: 'Every procedure, where the work happens.',
-    body: 'A live map of your site. Every machine knows its standard operating procedures.',
-    cam: { fx: 0.5, fy: 0.42, zoom: 1.05 },
-    ms: 6500,
-  },
-  {
-    id: 'machines',
-    eyebrow: 'Machines and SOPs',
-    title: 'Tap a machine. Get its procedures.',
-    body: 'SOPs are linked to the machines they run on, so the right one is always one tap away.',
-    cam: { fx: FX, fy: FY, zoom: 2.1 },
-    ms: 7000,
-  },
-  {
-    id: 'structure',
-    eyebrow: 'Consistent structure',
-    title: 'Every SOP reads the same way.',
-    body: 'Hazards and PPE first, then steps, checks and sign-off. Same shape on every machine, every site.',
-    cam: { fx: FX + 0.05, fy: FY + 0.04, zoom: 1.8 },
-    ms: 7000,
-  },
-  {
-    id: 'visual',
-    eyebrow: 'Visual focus',
-    title: "Show it, don't describe it.",
-    body: 'Photos, markup and one step at a time. Built for phones and gloved hands.',
-    cam: { fx: LX, fy: LY, zoom: 2.6 },
-    ms: 7500,
-  },
-  {
-    id: 'ai',
-    eyebrow: 'AI-supported building',
-    title: 'Upload the old SOP. Get a structured one.',
-    body: 'AI reads Word and PDF, drafts the steps and flags what is missing. A person always approves.',
-    cam: { fx: OX, fy: OY, zoom: 2.1 },
-    ms: 8500,
-  },
-  {
-    id: 'outro',
-    eyebrow: '',
-    title: 'Safe work, one step at a time.',
-    body: 'Standard operating procedures your people actually follow.',
-    cam: { fx: 0.5, fy: 0.42, zoom: 1.05 },
-    ms: 20000,
-  },
+  { id: 'hook', label: 'The old way', eyebrow: '', title: 'Your SOPs live in a Word doc.', cam: WIDE, ms: 3000 },
+  { id: 'reveal', label: 'SOPstart', eyebrow: 'SOPstart', title: 'We put them on the floor.', cam: WIDE, ms: 3500 },
+  { id: 'machines', label: 'Machines and SOPs', eyebrow: 'Machines and SOPs', title: 'Tap a machine. Get its SOPs.', cam: { fx: FX, fy: FY, zoom: 2.1 }, ms: 4500 },
+  { id: 'structure', label: 'Consistent structure', eyebrow: 'Consistent structure', title: 'Every SOP reads the same way.', cam: { fx: FX + 0.05, fy: FY + 0.04, zoom: 1.8 }, ms: 4000 },
+  { id: 'walk', label: 'Visual focus', eyebrow: 'Visual focus', title: "Show it, don't describe it.", cam: { fx: LX, fy: LY, zoom: 2.6 }, ms: 4500 },
+  { id: 'ai', label: 'AI-supported building', eyebrow: 'AI-supported building', title: 'Upload the old SOP. Get a structured one.', cam: { fx: OX, fy: OY, zoom: 2.1 }, ms: 5000 },
+  { id: 'outro', label: 'Sign in', eyebrow: '', title: 'Safe work, one step at a time.', cam: WIDE, ms: 20000 },
 ]
 
 /** Fade-and-rise in, after `delay` seconds. */
-const enter = (delay: number): CSSProperties => ({ animation: `reel-in 0.6s ease-out ${delay}s both` })
+const enter = (delay: number): CSSProperties => ({ animation: `reel-in 0.5s ease-out ${delay}s both` })
+/** Fade-and-lift out, after `delay` seconds. */
+const leave = (delay: number): CSSProperties => ({ animation: `reel-out 0.3s ease-in ${delay}s both` })
+
+/** A simulated tap: a ring that lands and spreads at `at` seconds. */
+function Tap({ at, style }: { at: number; style?: CSSProperties }) {
+  return (
+    <span
+      aria-hidden="true"
+      className="pointer-events-none absolute h-12 w-12 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-ink-900 bg-ink-900/15"
+      style={{ animation: `reel-tap 0.8s ease-out ${at}s both`, ...style }}
+    />
+  )
+}
 
 // -- Panels ------------------------------------------------------------------
 
-function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
-  return <div className={`rounded-2xl border border-ink-200 bg-paper p-4 shadow-lg ${className}`}>{children}</div>
+function Card({ children, className = '', style }: { children: ReactNode; className?: string; style?: CSSProperties }) {
+  return (
+    <div className={`rounded-2xl border border-ink-200 bg-paper p-4 shadow-lg ${className}`} style={style}>
+      {children}
+    </div>
+  )
+}
+
+function DocCard({ big = false, style }: { big?: boolean; style?: CSSProperties }) {
+  return (
+    <Card className={`flex items-center gap-3 ${big ? 'w-80 p-5' : 'p-3'}`} style={style}>
+      <FileText size={big ? 40 : 28} className="shrink-0 text-ink-500" style={{ animation: 'reel-doc 1s ease-in-out 0.5s both' }} />
+      <span className="min-w-0 flex-1 text-left">
+        <span className="block truncate text-ui font-medium text-ink-900">Labeller SOP (2019).docx</span>
+        <span className="mt-2 flex flex-col gap-1">
+          {[100, 90, 95, 70, ...(big ? [85, 60] : [])].map((w, i) => (
+            <span key={i} className="h-1.5 rounded-full bg-ink-200" style={{ width: `${w}%` }} />
+          ))}
+        </span>
+      </span>
+    </Card>
+  )
 }
 
 function MachinePanel() {
@@ -116,19 +116,12 @@ function MachinePanel() {
     { title: 'Capper torque check', meta: '5 steps · v3', status: 'Review due' },
   ]
   return (
-    <Card>
-      <p className="mono text-meta text-ink-500" style={enter(1.4)}>
-        MACHINE · K7M2QX
-      </p>
-      <h3 className="mt-1 text-lg font-semibold text-ink-900" style={enter(1.5)}>
-        Line 1 filler-capper
-      </h3>
-      <p className="mt-1 flex items-center gap-2 text-meta text-ink-500" style={enter(1.6)}>
-        <span className="h-2 w-2 rounded-full bg-accent-step" /> Line 1
-      </p>
+    <Card style={enter(1.6)}>
+      <p className="mono text-meta text-ink-500">MACHINE · K7M2QX</p>
+      <h3 className="mt-1 text-lg font-semibold text-ink-900">Line 1 filler-capper</h3>
       <ul className="mt-3 flex flex-col gap-2">
         {sops.map((s, i) => (
-          <li key={s.title} className="flex items-center gap-3 rounded-lg border border-ink-200 bg-paper-1 p-3" style={enter(2 + i * 0.35)}>
+          <li key={s.title} className="flex items-center gap-3 rounded-lg border border-ink-200 bg-paper-1 p-3" style={enter(1.9 + i * 0.25)}>
             <FileText size={18} className="shrink-0 text-ink-500" />
             <span className="min-w-0 flex-1">
               <span className="block truncate text-ui font-medium text-ink-900">{s.title}</span>
@@ -148,37 +141,36 @@ function MachinePanel() {
   )
 }
 
-const PARTS = [
-  { label: 'Hazards', tone: 'bg-accent-escalate', a: '2 hazards', b: '1 hazard' },
-  { label: 'PPE', tone: 'bg-accent-decision', a: 'Gloves, glasses', b: 'Gloves, ear muffs' },
-  { label: 'Steps', tone: 'bg-accent-step', a: '9 steps', b: '6 steps' },
-  { label: 'Checks', tone: 'bg-accent-inspect', a: '2 checks', b: '3 checks' },
-  { label: 'Sign-off', tone: 'bg-accent-signoff', a: 'Supervisor', b: 'Supervisor' },
-]
+const KINDS: FocusKind[] = ['hazard', 'ppe', 'step', 'check']
+const STRUCTURE = [
+  {
+    title: 'Filler changeover',
+    where: 'Line 1 filler-capper',
+    text: { hazard: 'Rotating filler turret', ppe: 'Gloves, safety glasses', step: 'Swap the change parts', check: 'Fill height on 10 bottles' },
+  },
+  {
+    title: 'Labeller jam clearance',
+    where: 'Line 2 labeller',
+    text: { hazard: 'Pinch point at the peel plate', ppe: 'Cut-resistant gloves', step: 'Clear the web at the peel plate', check: 'Labels feeding square' },
+  },
+] as const
 
 function StructurePanel() {
   return (
     <div className="grid grid-cols-2 gap-3">
-      {(['a', 'b'] as const).map((k, c) => (
-        <Card key={k} className="p-3">
-          <p className="text-ui font-semibold text-ink-900" style={enter(0.8 + c * 0.2)}>
-            {k === 'a' ? 'Filler changeover' : 'Labeller jam clearance'}
-          </p>
-          <p className="text-meta text-ink-500" style={enter(0.9 + c * 0.2)}>
-            {k === 'a' ? 'Line 1 filler-capper' : 'Line 2 labeller'}
-          </p>
+      {STRUCTURE.map((sop, c) => (
+        <Card key={sop.title} className="p-3" style={enter(0.4 + c * 0.15)}>
+          <p className="truncate text-ui font-semibold text-ink-900">{sop.title}</p>
+          <p className="truncate text-meta text-ink-500">{sop.where}</p>
           <ol className="mt-3 flex flex-col gap-1.5">
-            {PARTS.map((p, i) => (
+            {KINDS.map((k, i) => (
               <li
-                key={p.label}
-                className="flex items-center gap-2 rounded-lg border border-ink-200 p-2"
-                style={{ animation: `reel-light 0.5s ease-out ${1.6 + i * 0.55}s both` }}
+                key={k}
+                className={`flex flex-col items-start gap-1 rounded-lg border border-l-4 border-ink-200 p-2 ${KIND_EDGE[k]}`}
+                style={{ animation: `reel-light 0.6s ease-out ${0.9 + i * 0.45}s both` }}
               >
-                <span className={`h-6 w-1 shrink-0 rounded-full ${p.tone}`} />
-                <span className="min-w-0">
-                  <span className="block text-meta font-semibold text-ink-900">{p.label}</span>
-                  <span className="block truncate text-micro text-ink-500">{p[k]}</span>
-                </span>
+                <KindChip kind={k} />
+                <span className="w-full truncate text-meta text-ink-900">{sop.text[k]}</span>
               </li>
             ))}
           </ol>
@@ -188,7 +180,7 @@ function StructurePanel() {
   )
 }
 
-// The photo is a crop of the site picture around the Line 2 labeller.
+// The step photo is a crop of the site picture around the Line 2 labeller.
 const CROP = { x0: 0.47, y0: 0.23, x1: 0.58, y1: 0.37 }
 const cropW = CROP.x1 - CROP.x0
 const cropH = CROP.y1 - CROP.y0
@@ -199,107 +191,106 @@ const cropStyle: CSSProperties = {
   aspectRatio: `${cropW * IW} / ${cropH * IH}`,
 }
 
-function VisualPanel() {
+// Mirrors WalkStep: progress, "Step N of M", group label, kind chip, step
+// text, photo, primary button; then the real SentPanel copy.
+function WalkPanel() {
   return (
-    <div className="mx-auto w-full max-w-72 rounded-2xl border-4 border-ink-900 bg-paper p-3 shadow-lg" style={enter(1.2)}>
-      <p className="text-meta text-ink-500">Labeller jam clearance</p>
-      <div className="mt-1 flex items-center justify-between">
-        <p className="text-ui font-semibold text-ink-900">Step 3 of 7</p>
-        <span className="flex gap-1">
-          {Array.from({ length: 7 }, (_, i) => (
-            <span key={i} className={`h-1.5 w-3 rounded-full ${i < 3 ? 'bg-accent-step' : 'bg-ink-200'}`} />
-          ))}
-        </span>
-      </div>
-      <div className="relative mt-2 w-full overflow-hidden rounded-lg border border-ink-200" style={cropStyle}>
-        <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
-          <ellipse
-            cx="50"
-            cy="52"
-            rx="17"
-            ry="21"
-            pathLength={1}
-            fill="none"
-            vectorEffect="non-scaling-stroke"
-            className="stroke-accent-escalate"
-            style={{ strokeWidth: 3, strokeDasharray: 1, animation: 'reel-draw 1s ease-in-out 2.2s both' }}
-          />
-        </svg>
-        <span
-          className="absolute left-2 top-2 rounded bg-accent-escalate px-2 py-0.5 text-micro font-semibold text-white"
-          style={enter(3)}
-        >
-          Jam point
-        </span>
-      </div>
-      <p className="mt-2 text-ui text-ink-900" style={enter(1.8)}>
-        Open the guard and clear the label web at the peel plate. Never reach past the yellow line.
-      </p>
-      <div className="mt-2 flex flex-wrap gap-1.5" style={enter(2.6)}>
-        <span className="flex items-center gap-1 rounded bg-accent-escalate/10 px-2 py-0.5 text-micro font-semibold text-accent-escalate">
-          <TriangleAlert size={12} /> Pinch point
-        </span>
-        <span className="flex items-center gap-1 rounded bg-accent-step/10 px-2 py-0.5 text-micro font-semibold text-accent-step">
-          <Camera size={12} /> Photo required
-        </span>
-      </div>
-      <div
-        className="mt-3 flex min-h-tap items-center justify-center gap-2 rounded-lg bg-ink-900 text-ui font-semibold text-white"
-        style={enter(3.6)}
-      >
-        <Check size={16} /> Done, next step
+    <div className="mx-auto w-full max-w-72 rounded-2xl border-4 border-ink-900 bg-paper p-3 shadow-lg" style={enter(1.3)}>
+      <div className="grid">
+        <div className="reel-gone col-start-1 row-start-1 flex flex-col gap-2" style={leave(3.4)}>
+          <div className="h-1 rounded-full bg-ink-100">
+            <div className="h-1 w-full rounded-full bg-accent-step" />
+          </div>
+          <p className="mono text-meta text-ink-500">Step 7 of 7</p>
+          <p className="mono flex items-center gap-2 text-meta uppercase text-ink-500">
+            Clear a jam <KindChip kind="step" />
+          </p>
+          <p className="text-reading font-semibold text-ink-900">Clear the label web at the peel plate.</p>
+          <div className="relative w-full overflow-hidden rounded-lg border border-ink-200" style={cropStyle}>
+            <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
+              <ellipse
+                cx="50"
+                cy="52"
+                rx="17"
+                ry="21"
+                pathLength={1}
+                fill="none"
+                vectorEffect="non-scaling-stroke"
+                className="stroke-accent-hazard"
+                style={{ strokeWidth: 3, strokeDasharray: 1, animation: 'reel-draw 0.9s ease-in-out 1.8s both' }}
+              />
+            </svg>
+            <span className="absolute left-2 top-2 rounded bg-accent-hazard px-2 py-0.5 text-micro font-semibold text-white" style={enter(2.4)}>
+              Jam point
+            </span>
+            <span className="absolute bottom-2 right-2 flex items-center gap-1 rounded bg-paper/90 px-2 py-0.5 text-micro font-semibold text-ink-900" style={enter(2.6)}>
+              <Camera size={12} /> Photo added
+            </span>
+          </div>
+          <span className="relative flex min-h-tap-glove w-full items-center justify-center rounded-lg bg-ink-900 text-reading font-semibold text-paper">
+            {primaryLabel('step', true)}
+            <Tap at={3} style={{ left: '50%', top: '50%' }} />
+          </span>
+        </div>
+        <div className="col-start-1 row-start-1 flex flex-col items-center justify-center gap-3 text-center" style={enter(3.6)}>
+          <CheckCircle className="size-12 text-accent-ok" aria-hidden="true" />
+          <p className="text-lg font-semibold text-ink-900">Sent for sign-off</p>
+          <p className="text-reading text-ink-700">Your supervisor will check it.</p>
+        </div>
       </div>
     </div>
   )
 }
 
-const DRAFT = [
-  ['Hazards', 'Pinch point at the peel plate', 'bg-accent-escalate'],
-  ['PPE', 'Cut-resistant gloves, safety glasses', 'bg-accent-decision'],
-  ['Step 1', 'Isolate and lock out the labeller', 'bg-accent-step'],
-  ['Step 2', 'Open the guard and clear the web', 'bg-accent-step'],
-  ['Check', 'Guard closed, labels feeding square', 'bg-accent-inspect'],
-] as const
+const DRAFT: ReadonlyArray<[FocusKind, string]> = [
+  ['hazard', 'Pinch point at the peel plate'],
+  ['ppe', 'Cut-resistant gloves, safety glasses'],
+  ['step', 'Isolate and lock out the labeller'],
+  ['step', 'Open the guard and clear the web'],
+  ['check', 'Guard closed, labels feeding square'],
+]
 
 function AiPanel() {
   return (
     <div className="flex flex-col gap-3">
-      <Card className="hidden items-center gap-3 p-3 sm:flex">
-        <FileText size={28} className="shrink-0 text-ink-500" style={{ animation: 'reel-doc 1.2s ease-in-out 1.4s both' }} />
-        <span className="min-w-0 flex-1">
-          <span className="block text-ui font-medium text-ink-900">Labeller SOP (2019).docx</span>
-          <span className="mt-1 flex flex-col gap-1">
-            {[100, 90, 95, 70].map((w, i) => (
-              <span key={i} className="h-1.5 rounded-full bg-ink-200" style={{ width: `${w}%` }} />
-            ))}
-          </span>
-        </span>
-        <Sparkles size={18} className="shrink-0 text-ai" style={enter(1.6)} />
-      </Card>
-      <Card className="p-3">
-        <ul className="flex flex-col gap-1.5">
-          {DRAFT.map(([label, text, tone], i) => (
+      <div className="hidden sm:block">
+        <DocCard style={enter(0.2)} />
+      </div>
+      <Card className="p-3" style={enter(0.9)}>
+        <p className="flex items-center gap-1.5 text-meta font-semibold text-ai">
+          <Sparkles size={14} /> Drafted from your document
+        </p>
+        <ul className="mt-2 flex flex-col gap-1.5">
+          {DRAFT.map(([kind, text], i) => (
             <li
-              key={label}
-              className="flex items-center gap-2 rounded-lg p-2"
-              style={{ animation: `reel-in 0.5s ease-out ${2.4 + i * 0.4}s both, reel-shimmer 1.2s ease-out ${2.4 + i * 0.4}s both` }}
+              key={text}
+              className="flex items-center gap-2 rounded-lg p-1.5"
+              style={{ animation: `reel-in 0.4s ease-out ${1.2 + i * 0.3}s both, reel-shimmer 1s ease-out ${1.2 + i * 0.3}s both` }}
             >
-              <span className={`h-5 w-1 shrink-0 rounded-full ${tone}`} />
-              <span className="w-14 shrink-0 text-meta font-semibold text-ink-900">{label}</span>
-              <span className="min-w-0 truncate text-meta text-ink-600">{text}</span>
+              <KindChip kind={kind} />
+              <span className="min-w-0 truncate text-meta text-ink-900">{text}</span>
             </li>
           ))}
         </ul>
       </Card>
-      <div className="rounded-2xl border border-[var(--tint-ai-border)] bg-[var(--tint-ai-bg)] p-3 shadow-lg" style={enter(5)}>
+      <div className="rounded-2xl border border-[var(--tint-ai-border)] bg-[var(--tint-ai-bg)] p-3 shadow-lg" style={enter(2.9)}>
         <p className="flex items-center gap-1.5 text-meta font-semibold text-ai">
           <Sparkles size={14} /> AI reviewer
         </p>
-        <p className="mt-1 text-ui text-ink-900">
-          The old SOP cleared jams without isolating first. Isolation is now step 1. Approve or change it.
-        </p>
+        <p className="mt-1 text-ui text-ink-900">The old SOP cleared jams without isolating first. Isolation is now step 1.</p>
         <div className="mt-2 flex gap-2">
-          <span className="rounded-lg bg-ink-900 px-3 py-1.5 text-meta font-semibold text-white">Approve</span>
+          <span
+            className="relative grid rounded-lg bg-ink-900 px-3 py-1.5 text-meta font-semibold text-white"
+            style={{ animation: 'reel-approve 0.3s ease-out 3.9s both' }}
+          >
+            <span className="reel-gone col-start-1 row-start-1" style={leave(3.9)}>
+              Approve
+            </span>
+            <span className="col-start-1 row-start-1 flex items-center gap-1" style={enter(4)}>
+              <CheckCircle size={12} /> Approved
+            </span>
+            <Tap at={3.6} style={{ left: '50%', top: '50%' }} />
+          </span>
           <span className="rounded-lg border border-ink-300 px-3 py-1.5 text-meta font-semibold text-ink-900">Change</span>
         </div>
       </div>
@@ -307,10 +298,10 @@ function AiPanel() {
   )
 }
 
-const PANELS: Partial<Record<Scene['id'], () => ReactNode>> = {
+const PANELS: Partial<Record<SceneId, () => ReactNode>> = {
   machines: MachinePanel,
   structure: StructurePanel,
-  visual: VisualPanel,
+  walk: WalkPanel,
   ai: AiPanel,
 }
 
@@ -318,7 +309,7 @@ const PANELS: Partial<Record<Scene['id'], () => ReactNode>> = {
 
 const points = (frac: Frac) => frac.map(([x, y]) => `${x},${y}`).join(' ')
 
-function SiteMarks({ scene }: { scene: Scene['id'] }) {
+function SiteMarks({ scene }: { scene: SceneId }) {
   const all = SITE.machines.map((m) => m.frac)
   const outline = (frac: Frac, i: number, className: string, style?: CSSProperties) => (
     <polygon
@@ -331,21 +322,19 @@ function SiteMarks({ scene }: { scene: Scene['id'] }) {
       style={{ strokeWidth: 2, ...style }}
     />
   )
+  const pulse = 'reel-pulse 1.6s ease-in-out 1s infinite'
   return (
     <svg viewBox="0 0 1 1" preserveAspectRatio="none" className="absolute inset-0 h-full w-full" key={scene}>
-      {scene === 'intro' &&
-        all.map((f, i) =>
-          outline(f, i, 'stroke-accent-step', { strokeDasharray: 1, animation: `reel-draw 0.8s ease-out ${0.8 + i * 0.12}s both` })
-        )}
+      {scene === 'reveal' &&
+        all.map((f, i) => outline(f, i, 'stroke-accent-step', { strokeDasharray: 1, animation: `reel-draw 0.6s ease-out ${0.5 + i * 0.05}s both` }))}
       {(scene === 'machines' || scene === 'structure') && (
         <>
           {all.map((f, i) => outline(f, i, 'stroke-ink-400', { opacity: 0.35 }))}
-          {outline(FILLER, 99, 'stroke-accent-step', { strokeWidth: 4, animation: 'reel-pulse 1.6s ease-in-out 1s infinite' })}
+          {outline(FILLER, 99, 'stroke-accent-step', { strokeWidth: 4, animation: pulse })}
         </>
       )}
-      {scene === 'visual' &&
-        outline(LABELLER, 0, 'stroke-accent-escalate', { strokeWidth: 4, animation: 'reel-pulse 1.6s ease-in-out 1s infinite' })}
-      {scene === 'ai' && outline(OFFICE, 0, 'stroke-ai', { strokeWidth: 4, animation: 'reel-pulse 1.6s ease-in-out 1s infinite' })}
+      {scene === 'walk' && outline(LABELLER, 0, 'stroke-accent-hazard', { strokeWidth: 4, animation: pulse })}
+      {scene === 'ai' && outline(OFFICE, 0, 'stroke-ai', { strokeWidth: 4, animation: pulse })}
     </svg>
   )
 }
@@ -354,23 +343,31 @@ function SiteMarks({ scene }: { scene: Scene['id'] }) {
 
 const STYLES = `
 @keyframes reel-in { from { opacity: 0; transform: translateY(0.5rem) } to { opacity: 1; transform: none } }
+@keyframes reel-out { from { opacity: 1; transform: none } to { opacity: 0; transform: translateY(-0.25rem) } }
 @keyframes reel-draw { from { stroke-dashoffset: 1 } to { stroke-dashoffset: 0 } }
 @keyframes reel-pulse { 0%, 100% { opacity: 1 } 50% { opacity: 0.35 } }
 @keyframes reel-fill { from { transform: scaleX(0) } to { transform: scaleX(1) } }
 @keyframes reel-drift { from { transform: scale(1) } to { transform: scale(1.04) } }
-@keyframes reel-light {
-  from { border-color: var(--ink-200); background: transparent }
-  40% { border-color: var(--accent-step); background: var(--tint-step-bg) }
-  to { border-color: var(--ink-200); background: var(--paper-1) }
+@keyframes reel-tap {
+  0% { opacity: 0; transform: scale(0.4) }
+  30% { opacity: 1; transform: scale(0.8) }
+  100% { opacity: 0; transform: scale(1.7) }
 }
-@keyframes reel-doc { 0% { transform: none } 50% { transform: scale(1.15) rotate(-6deg) } 100% { transform: none } }
-@keyframes reel-shimmer {
-  from { background: linear-gradient(90deg, var(--tint-ai-bg), var(--paper) 60%) }
+@keyframes reel-light {
+  from { background: transparent }
+  40% { background: var(--tint-step-bg) }
   to { background: var(--paper-1) }
 }
-.reel-cam { transition: transform 1.8s cubic-bezier(0.65, 0, 0.35, 1) }
+@keyframes reel-doc { 0%, 100% { transform: none } 50% { transform: scale(1.12) rotate(-6deg) } }
+@keyframes reel-shimmer {
+  from { background: linear-gradient(90deg, var(--tint-ai-bg), var(--paper) 70%) }
+  to { background: transparent }
+}
+@keyframes reel-approve { from { background: var(--ink-900) } to { background: var(--accent-ok) } }
+.reel-cam { transition: transform 1.2s cubic-bezier(0.65, 0, 0.35, 1), filter 0.9s ease }
 @media (prefers-reduced-motion: reduce) {
   .reel *, .reel-cam { animation: none !important; transition: none !important }
+  .reel-gone { visibility: hidden }
 }
 `
 
@@ -414,9 +411,9 @@ export function PromoReel() {
   }
 
   // Camera: the focus point lands centred in the space left of the panel
-  // column (desktop) or in the top third (phone, where the panel sits below).
+  // column (desktop) or in the top quarter (phone, where the panel sits below).
   const lg = size.w >= 1024
-  const column = scene.id !== 'outro'
+  const column = scene.id !== 'hook' && scene.id !== 'outro'
   const cover = Math.max(size.w / IW, size.h / IH) || 1
   const s = cover * scene.cam.zoom
   const tx = lg && column ? (size.w - 480) / 2 : size.w / 2
@@ -433,7 +430,13 @@ export function PromoReel() {
       {/* Camera */}
       <div
         className={`${ready ? 'reel-cam' : ''} absolute left-0 top-0 origin-top-left`}
-        style={{ width: IW, height: IH, transform: `translate(${x}px, ${y}px) scale(${s})`, opacity: size.w ? 1 : 0 }}
+        style={{
+          width: IW,
+          height: IH,
+          transform: `translate(${x}px, ${y}px) scale(${s})`,
+          filter: scene.id === 'hook' ? 'blur(6px) saturate(0.5)' : 'none',
+          opacity: size.w ? 1 : 0,
+        }}
       >
         <div key={run} className="relative h-full w-full" style={{ animation: `reel-drift ${scene.ms}ms linear both` }}>
           {/* eslint-disable-next-line @next/next/no-img-element -- static site picture from public/ */}
@@ -441,6 +444,9 @@ export function PromoReel() {
           <SiteMarks scene={scene.id} />
         </div>
       </div>
+
+      {/* The machine tap lands on the filler once the camera has arrived. */}
+      {scene.id === 'machines' && size.w > 0 && <Tap key={run} at={1.3} style={{ left: x + FX * IW * s, top: y + FY * IH * s }} />}
 
       {/* Header */}
       <header className="absolute inset-x-0 top-0 z-10 flex items-center justify-between p-4">
@@ -453,35 +459,46 @@ export function PromoReel() {
         </Link>
       </header>
 
-      {/* Caption + panel */}
-      {column ? (
+      {scene.id === 'hook' && (
+        <section key={run} className="absolute inset-0 flex items-center justify-center bg-paper/40 p-6">
+          <div className="flex flex-col items-center gap-6 text-center">
+            <h1 className="text-2xl font-semibold text-ink-900 lg:text-4xl" style={enter(0.1)}>
+              {scene.title}
+            </h1>
+            <DocCard big style={enter(0.4)} />
+          </div>
+        </section>
+      )}
+
+      {column && (
         <section
           key={run}
-          className="absolute inset-x-3 bottom-20 flex max-h-[60dvh] flex-col gap-3 overflow-hidden lg:inset-x-auto lg:bottom-20 lg:right-6 lg:top-20 lg:max-h-none lg:w-112 lg:justify-center"
+          className="absolute inset-x-3 bottom-20 flex max-h-[62dvh] flex-col gap-3 overflow-hidden lg:inset-x-auto lg:bottom-20 lg:right-6 lg:top-20 lg:max-h-none lg:w-112 lg:justify-center"
         >
-          <div className="rounded-2xl bg-paper/90 p-4 shadow-lg backdrop-blur" style={enter(0.3)}>
+          <div className="rounded-2xl bg-paper/90 p-4 shadow-lg backdrop-blur" style={enter(0.2)}>
             <p className="mono text-meta font-semibold uppercase text-accent-step">{scene.eyebrow}</p>
             <h1 className="mt-1 text-xl font-semibold text-ink-900 lg:text-2xl">{scene.title}</h1>
-            <p className="mt-1 hidden text-reading text-ink-600 sm:block">{scene.body}</p>
           </div>
           {Panel && <Panel />}
         </section>
-      ) : (
+      )}
+
+      {scene.id === 'outro' && (
         <section key={run} className="absolute inset-0 flex items-center justify-center bg-paper/70 p-6 backdrop-blur-sm">
           <div className="flex max-w-xl flex-col items-center text-center">
-            <p className="text-2xl font-bold text-ink-900" style={enter(0.6)}>
+            <p className="text-2xl font-bold text-ink-900" style={enter(0.4)}>
               SOPstart
             </p>
-            <h1 className="mt-2 text-2xl font-semibold text-ink-900 lg:text-4xl" style={enter(0.9)}>
+            <h1 className="mt-2 text-2xl font-semibold text-ink-900 lg:text-4xl" style={enter(0.7)}>
               {scene.title}
             </h1>
-            <p className="mt-3 text-reading text-ink-600" style={enter(1.2)}>
-              {scene.body}
+            <p className="mt-3 text-reading text-ink-600" style={enter(1)}>
+              Tap a machine, walk the steps, send for sign-off.
             </p>
             <Link
               href="/login"
               className="mt-6 flex min-h-tap-row items-center rounded-lg bg-ink-900 px-8 text-reading font-semibold text-white hover:opacity-90"
-              style={enter(1.6)}
+              style={enter(1.4)}
             >
               Sign in
             </Link>
@@ -490,7 +507,7 @@ export function PromoReel() {
       )}
 
       {/* Controls */}
-      <nav aria-label="Reel scenes" className="absolute inset-x-3 bottom-4 flex items-center gap-3 lg:inset-x-6 lg:w-96">
+      <nav aria-label="Reel scenes" className="absolute inset-x-3 bottom-4 z-10 flex items-center gap-3 lg:inset-x-6 lg:w-96">
         {!still && (
           <button
             type="button"
@@ -508,7 +525,7 @@ export function PromoReel() {
               type="button"
               data-testid="reel-dot"
               onClick={() => go(i)}
-              aria-label={sc.eyebrow || 'Sign in'}
+              aria-label={sc.label}
               aria-current={i === idx}
               className="flex h-10 flex-1 items-center"
             >
