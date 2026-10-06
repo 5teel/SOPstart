@@ -568,10 +568,14 @@ export const JOURNEYS: Journey[] = [
         { label: 'Select a machine', to: 'machine' },
         { label: 'Edit site', to: 'edit' },
       ] },
-      { id: 'office', type: 'screen', label: 'Office - Inbox tab', route: '/', detail: 'The Office opens on the Inbox (/?place=office), seen by admins, safety managers and supervisors. One action per row: sign a walk off, approve a step, mark your own SOP reviewed, assign an owner, retry a stuck conversion. Sign-off and approve expand in place. Empty is the goal. A supervisor sees the Inbox only: no tab control, no chips, and any tab address falls back to the Inbox.', branches: [
+      { id: 'office', type: 'screen', label: 'Office - Inbox tab', route: '/', detail: 'The Office opens on the Inbox (/?place=office), seen by admins, safety managers and supervisors. One action per row: sign a walk off, approve a step, mark your own SOP reviewed, assign an owner, retry a stuck conversion. Sign-off and approve expand in place. Empty is the goal. A supervisor sees the Inbox and Requests tabs: no chips, and any other tab address falls back to the Inbox.', branches: [
+        { label: 'Requests', to: 'requests' },
         { label: 'Decisions', to: 'decisions' },
         { label: 'People & roles', to: 'people' },
         { label: 'Access', to: 'access' },
+        { label: 'Done', to: 'e' },
+      ] },
+      { id: 'requests', type: 'screen', label: 'Office - Requests tab', route: '/', detail: 'Office → Requests tab (/?place=office&tab=requests): open requests newest first, Accept or Decline with a reason; agent-raised rows carry the agent chip; the answer is logged and the asker told. Admins, safety managers and supervisors.', branches: [
         { label: 'Done', to: 'e' },
       ] },
       { id: 'decisions', type: 'screen', label: 'Office - Decisions tab', route: '/', detail: '/?place=office&tab=decisions, admins and safety managers only. The ledger of who decided what: sign-offs, approvals, owner changes, role changes, invites and removals, with a cleared-today line.', branches: [

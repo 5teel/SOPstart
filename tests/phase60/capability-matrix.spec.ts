@@ -66,6 +66,10 @@ test.describe("Capability matrix rows (60-02 / 60-04 / 60-06 / 60-09 / 60-11 / 6
     for (const name of ['objective.*', 'setObjectiveCore()', 'ai_field_write', 'unconfirmed']) expect(agent).toContain(name)
     expect(row('Read objectives')).toContain('listObjectives()')
   })
-  test.fixme("60-11: Office Requests tab rows (existing labels are never renamed, phase46 pins them)", () => {})
+  test('60-11: Office Requests tab row: worker none, supervisor, admin and safety manager yes', () => {
+    const r = row('Office -- Requests tab')
+    expect(r.split('|').map((c) => c.trim()).slice(2, 6)).toEqual(['—', '✅', '✅', '✅'])
+    for (const name of ['tabsForRole()', 'getOfficeInbox()', 'requests_read', 'answerRequest()', 'browse address']) expect(r).toContain(name)
+  })
   test.fixme("60-17: the four removed assign rows are gone and the reassignment path is described as a request", () => {})
 })

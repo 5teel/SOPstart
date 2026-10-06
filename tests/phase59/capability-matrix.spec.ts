@@ -62,7 +62,7 @@ test.describe('capability matrix', () => {
       expect(r).toContain(name)
     }
   })
-  test('Office tab rows: worker none, supervisor the Inbox only, admin and safety manager all four; the training bridge and the redirects are named (59-13)', () => {
+  test('Office tab rows: worker none, supervisor the Inbox and Requests, admin and safety manager all five; the training bridge and the redirects are named (59-13)', () => {
     const cells = (label: string) => row(label).split('|').map((c) => c.trim())
     expect(cells('Office -- Inbox tab').slice(2, 6)).toEqual(['—', expect.stringContaining('✅'), '✅', '✅'])
     for (const label of ['Office -- Decisions tab', 'Office -- People & roles tab', 'Office -- Access tab']) {
@@ -71,6 +71,7 @@ test.describe('capability matrix', () => {
       expect(row(label), label).toContain('tabsForRole()')
     }
     expect(row('Office -- Inbox tab')).toContain('falls back to the Inbox')
+    expect(row('Office -- Inbox tab')).toContain('Inbox and Requests tabs')
     expect(row('Office -- Access tab')).toContain('listAdminAccessData()')
     expect(row('Office -- People & roles tab')).toContain('/admin/team')
     expect(row('Training matrix')).toContain('/admin/training')

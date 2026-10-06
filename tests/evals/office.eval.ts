@@ -473,11 +473,13 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       await page.close()
     })
 
-    test('idle supervisor: a true empty inbox reads "Nothing needs you. That\'s the goal." with no tab control, chips or cleared-today line (59-09)', async () => {
+    test('idle supervisor: a true empty inbox reads "Nothing needs you. That\'s the goal." with a two-segment tab control (Inbox, Requests) and no chips or cleared-today line (59-09, 60-11)', async () => {
       const page = await idleCtx.newPage()
       await openOffice(page)
       await expect(page.getByTestId('office-empty')).toHaveText("Nothing needs you. That's the goal.", SLOW)
-      await expect(page.getByRole('tablist')).toHaveCount(0)
+      await expect(page.getByRole('tablist', { name: 'Office' })).toHaveCount(1)
+      await expect(page.getByRole('tab')).toHaveCount(2)
+      await expect(page.getByTestId('office-tab-requests')).toHaveCount(1)
       await expect(page.getByTestId('office-chip')).toHaveCount(0)
       await expect(page.getByTestId('office-cleared-today')).toHaveCount(0)
       await shot(page, '59-inbox-empty')
@@ -552,8 +554,8 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       const errors = watchConsole(page)
       await openOffice(page)
 
-      // A supervisor has the Inbox alone: no tab control, no chips, no cleared-today line.
-      await expect(page.getByRole('tablist')).toHaveCount(0)
+      // A supervisor has the Inbox and Requests: a two-segment tab control, no chips, no cleared-today line.
+      await expect(page.getByRole('tab')).toHaveCount(2, SLOW)
       await expect(page.getByTestId('office-chip')).toHaveCount(0)
       await expect(page.getByTestId('office-cleared-today')).toHaveCount(0)
 
@@ -874,14 +876,14 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       expect(errors).toEqual([])
       await page.close()
     })
-    test('supervisor Office: inbox tab only, a people tab address falls back to the inbox (59-13)', async () => {
+    test('supervisor Office: Inbox and Requests only, a people tab address falls back to the inbox (59-13, 60-11)', async () => {
       const page = await supervisorCtx.newPage()
       const errors = watchConsole(page)
       for (const address of ['/?place=office', '/?place=office&tab=people', '/?place=office&tab=access', '/?place=office&tab=decisions']) {
         await page.goto(address)
         await expect(page.getByTestId('office-pane'), address).toHaveCount(1, SLOW)
         await expect(page.getByTestId('office-pane'), address).toHaveAttribute('data-tab', 'inbox', SLOW)
-        await expect(page.getByRole('tablist'), address).toHaveCount(0)
+        await expect(page.getByRole('tab'), address).toHaveCount(2)
         await expect(page.getByTestId('office-chip'), address).toHaveCount(0)
         await expect(page.getByTestId('people-tab'), address).toHaveCount(0)
       }
