@@ -84,6 +84,16 @@ SafeStart is a multi-tenant SaaS progressive web app that helps blue-collar trad
 - Database migrations in `supabase/migrations/` (numbered sequentially)
 - **Living source-of-truth maps** — `src/lib/journeys/journeys.ts` (UX pathways → `/pathways`) and `src/lib/uat/tests.ts` (UAT/design feedback → `/uat`) render their pages entirely from config. Treat them like the route tree: when a flow/screen/feature changes, update the config in the **same change**. See `## Pathways Map Maintenance` below.
 
+## Architecture Decisions (ADRs)
+
+`docs/adr/` holds numbered Architecture Decision Records; `docs/adr/README.md` is the index and the rules. **Accepted ADRs are binding.**
+
+1. Every `/gsd-plan-phase`, `/gsd-execute-phase`, `/gsd-quick` and executor reads `docs/adr/README.md` before planning or building. A plan or change that contradicts an accepted ADR **stops and asks Simon** — never proceed, never work around it.
+2. A structural choice (where work runs and what triggers it, data ownership, security boundaries, external services, infrastructure) gets a new ADR **in the same commit** as the change; a mechanically checkable one also gets a guard under `tests/lint/` named in its `Enforced by` line.
+3. Never edit an accepted ADR's decision — supersede it with a new one.
+
+Current: ADR-0001 (record decisions) · **ADR-0002 (no scheduled jobs — work runs on the event that causes it or the read that needs it; no cron routes, no cron services)**.
+
 ## Commands
 
 ```bash

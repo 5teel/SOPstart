@@ -179,3 +179,7 @@ Two config files are the single source of truth for their pages and MUST be kept
 ---
 
 *Convention analysis: 2026-06-01 (Living-maps rule added 2026-06-09)*
+
+## Architecture Decision Records
+
+Read `docs/adr/README.md` before planning or executing. Accepted ADRs are binding; a plan that contradicts one stops and asks Simon. Structural choices add an ADR in the same commit. ADR-0002: no scheduled jobs (no cron routes/services) — work runs on the triggering event or the read that needs it.
