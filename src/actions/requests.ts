@@ -12,7 +12,7 @@
 import { z } from 'zod'
 import { getSessionContext } from '@/lib/auth/session-context'
 import { recordDecision } from '@/lib/decisions/record'
-import { memberLabel, userLabels } from '@/lib/members/labels'
+import { nameForWorker, userLabels } from '@/lib/members/labels'
 import { notify } from '@/lib/notifications/write'
 import { dedupeKey, notificationTitle, type TitleInput } from '@/lib/notifications/kinds'
 import { notificationPlace } from '@/lib/notifications/places'
@@ -130,7 +130,7 @@ export async function answerRequest(
     let title: TitleInput = { kind: 'request_answered', outcome: state, about: aboutTitle }
     if (claimed.kind === 'observe_me' && answer === 'accept') {
       const labels = await userLabels([userId])
-      title = { kind: 'request_answered', outcome: 'observe_accepted', sop: aboutTitle, name: memberLabel(labels.get(userId)) }
+      title = { kind: 'request_answered', outcome: 'observe_accepted', sop: aboutTitle, name: nameForWorker(labels.get(userId)) }
     }
     await notify(organisationId, [
       {
@@ -175,8 +175,13 @@ export async function listMyRequests(): Promise<{ me: string; rows: MyRequest[] 
     },
     note: r.note ?? '',
     answerNote: r.answer_note,
-    answeredByLabel: r.answered_by ? memberLabel(labels.get(r.answered_by)) : null,
-    targetLabel: r.target_user_id ? memberLabel(labels.get(r.target_user_id)) : r.target_role ? ROLE_PLURAL[r.target_role] : null,
+    // the raiser may be a worker: a name or a role word, never an email (WR-02)
+    answeredByLabel: r.answered_by ? (nameForWorker(labels.get(r.answered_by)) ?? 'an admin') : null,
+    targetLabel: r.target_user_id
+      ? (nameForWorker(labels.get(r.target_user_id)) ?? 'a team member')
+      : r.target_role
+        ? ROLE_PLURAL[r.target_role]
+        : null,
     targetRole: r.target_role,
     targetUserId: r.target_user_id,
     raisedByMe: r.raised_by_user === userId,

@@ -31,3 +31,8 @@ export async function userLabels(userIds: string[]): Promise<Map<string, UserLab
 export function memberLabel(entry: UserLabel | null | undefined): string {
   return entry?.fullName ?? entry?.email ?? 'someone who has left'
 }
+
+/** For anything a worker reads: the full name or nothing -- an email never reaches a worker (T-60-12). */
+export function nameForWorker(entry: UserLabel | null | undefined): string | null {
+  return entry?.fullName ?? null
+}

@@ -13,6 +13,7 @@ import {
   dedupeKey,
 } from '@/lib/notifications/kinds'
 import { notificationPlace, isSafePlace, placeTarget } from '@/lib/notifications/places'
+import { nameForWorker } from '@/lib/members/labels'
 import { OBJECTIVES_KEY, MY_REQUESTS_KEY, NOTIFICATIONS_KEY } from '@/lib/shell/query-keys'
 
 const NOW = new Date('2026-10-06T03:00:00Z')
@@ -47,6 +48,19 @@ test.describe('Notification kinds, titles and places (60-03)', () => {
     expect(t({ kind: 'request_answered', outcome: 'ask_declined', sop: T, name: null })).toBe(`Someone can't do ${T}.`)
     expect(t({ kind: 'new_version', sop: T, version: 4 })).toBe(`${T} has a new version (v4).`)
     expect(t({ kind: 'asked', sop: T })).toBe(`You've been asked to do ${T}.`)
+  })
+
+  test('a worker-facing name is a full name or nothing, never an email (WR-02, T-60-12)', () => {
+    expect(nameForWorker({ email: 'jane@x.nz', fullName: 'Jane Smith' })).toBe('Jane Smith')
+    expect(nameForWorker({ email: 'jane@x.nz', fullName: null })).toBeNull()
+    expect(nameForWorker(undefined)).toBeNull()
+    const src = (f: string) => fs.readFileSync(path.resolve(__dirname, '..', '..', f), 'utf-8')
+    const requests = src('src/actions/requests.ts')
+    const asks = src('src/actions/asks.ts')
+    for (const s of [requests, asks]) expect(s).toMatch(/name: nameForWorker\(labels\.get\(userId\)\)/)
+    expect(requests).toContain("answeredByLabel: r.answered_by ? (nameForWorker(labels.get(r.answered_by)) ?? 'an admin') : null")
+    expect(requests).toContain("(nameForWorker(labels.get(r.target_user_id)) ?? 'a team member')")
+    expect(requests).not.toContain('memberLabel(')
   })
 
   test('a title never runs past 200 characters', () => {

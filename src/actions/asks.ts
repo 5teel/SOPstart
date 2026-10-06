@@ -14,7 +14,7 @@
 import { z } from 'zod'
 import { getSessionContext } from '@/lib/auth/session-context'
 import { recordDecision } from '@/lib/decisions/record'
-import { memberLabel, userLabels } from '@/lib/members/labels'
+import { memberLabel, nameForWorker, userLabels } from '@/lib/members/labels'
 import { notify } from '@/lib/notifications/write'
 import { dedupeKey, notificationTitle } from '@/lib/notifications/kinds'
 import { notificationPlace } from '@/lib/notifications/places'
@@ -129,7 +129,7 @@ export async function declineAsk(input: unknown): Promise<{ logged: boolean } | 
       {
         userId: claimed.raised_by_user,
         kind: 'request_answered',
-        title: notificationTitle({ kind: 'request_answered', outcome: 'ask_declined', sop: aboutTitle, name: memberLabel(labels.get(userId)) }),
+        title: notificationTitle({ kind: 'request_answered', outcome: 'ask_declined', sop: aboutTitle, name: nameForWorker(labels.get(userId)) }),
         place: notificationPlace('request_answered'),
         subjectType: 'request',
         subjectId: claimed.id,
