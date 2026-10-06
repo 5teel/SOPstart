@@ -6,6 +6,7 @@
  * decides whether to pass it. Text renders as plain React children only.
  */
 import type { ReactNode } from 'react'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { History, Lightbulb } from 'lucide-react'
 import { BEFORE_YOU_START, type WalkEntry } from '@/lib/sop/focus'
@@ -13,7 +14,14 @@ import type { FocusSop, FocusStepRow } from '@/lib/sop/focus-read'
 import { focusHref } from '@/lib/sop/focus-path'
 import { KindChip, KIND_EDGE } from '@/components/focus/KindChip'
 import { StandardLabels } from '@/components/sop/StandardLabels'
+import { ObjectiveLine } from '@/components/shell/ObjectiveLine'
 import { placementLabel, placementSummary } from '@/lib/sop/placement'
+
+// Make a request: a lazy module (60 A-07), live SOPs only, never in the walk state.
+const RequestTrigger = dynamic(() => import('@/components/requests/RequestComposer').then((m) => m.RequestComposerTrigger), {
+  ssr: false,
+  loading: () => null,
+})
 
 export interface BrowseDocumentProps {
   data: FocusSop
@@ -60,7 +68,7 @@ export function BrowseDocument({ data, order, from, supersededBy, updatedSinceLa
           <p data-testid="sop-meta" className="text-ui text-ink-500">
             {placementLabel(placementSummary(sop.placement, data.machines.map((m) => ({ name: m.name, department: m.department }))))}
           </p>
-          {sop.objective && <p className="text-reading text-ink-700">{sop.objective}</p>}
+          {data.objective && <ObjectiveLine view={data.objective} />}
           {updatedSinceLastWalk && (
             <p data-testid="focus-updated" className="flex items-center gap-2 text-ui text-ink-700">
               <span className="mono rounded bg-accent-measure/14 px-1.5 py-0.5 text-micro font-semibold uppercase tracking-wide text-accent-measure">
@@ -72,6 +80,15 @@ export function BrowseDocument({ data, order, from, supersededBy, updatedSinceLa
           {data.standards.sop.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
               <StandardLabels names={data.standards.sop.map((s) => s.name)} />
+            </div>
+          )}
+          {sop.status === 'published' && !supersededBy && (
+            <div className="self-start">
+              <RequestTrigger
+                kinds={['change_sop', 'observe_me']}
+                about={{ sops: [{ id: sop.id, title: sop.title ?? 'this SOP' }] }}
+                triggerStyle="text"
+              />
             </div>
           )}
         </div>

@@ -85,7 +85,8 @@ test.describe('FOC-01/FOC-03 focus frame', () => {
 
   test('no focus file imports the shell, the map, the list, the inbox or notifications (58-10)', () => {
     for (const { f, code } of focusFiles()) {
-      expect(code, f).not.toMatch(/@\/components\/shell/)
+      // 60-14: the objective line and its editor seam are the two shell files a SOP surface may import (A-01)
+      expect(code, f).not.toMatch(/@\/components\/shell(?!\/Objective(Line|Slot)')/)
       for (const banned of ['PlantStage', ['Notification', 'Badge'].join(''), 'AccountControl', 'loadInbox', 'BackToSite', '@/components/admin']) {
         expect(code, `${f} imports ${banned}`).not.toContain(banned)
       }
