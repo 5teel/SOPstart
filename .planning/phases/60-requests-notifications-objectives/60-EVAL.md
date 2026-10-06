@@ -125,3 +125,7 @@ Screenshots read by eye (all 23 `60-*.png`):
 - 60-overview-worker: ok (seen in the loop frames).
 
 Cron schedules (Task 2) remain a Railway dashboard action for Simon; the eval calls the routes directly with the bearer.
+
+## Re-run after the code-review fixes — 2026-10-06, commit `360f6312` (orchestrator)
+
+`npm run eval -- --phase 60` at the deployed `360f6312` (WR-01..07 from `60-REVIEW-FIX.md`): **78 passed / 2 failed / 6 skipped**. Every Phase 60 case green (incl. 60-16 a–f and 60-17). The two failures are the same non-Phase-60 pair as the earlier run: the Phase 59 People invite hit Supabase's hourly email limit (environmental), and 58-annotate failed on fixture residue; the 6 skips are the office cases queued behind the People failure (passed 6/6 directly in the earlier pass).
