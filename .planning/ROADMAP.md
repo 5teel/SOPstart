@@ -2052,7 +2052,7 @@ Plans:
   4. The bell in the list shows a count, and a person is notified when they are next to approve a SOP, when a SOP they own is due for review, when a completion waits for their sign-off, when a request they raised is answered and when a SOP they do has a new version; opening a notification goes to the place it is about
   5. An admin sets, changes and removes an objective on the site, a department, a machine, a SOP or a person, and it shows as quiet metadata saying who set it; an AI agent's request appears in the Office marked as from an agent, and an objective an agent set stays marked until a person confirms it
 
-**Plans:** 16/18 plans executed
+**Plans:** 17/18 plans executed
 Plans:
 **Wave 1**
 
@@ -2102,7 +2102,7 @@ Plans:
 
 **Wave 11** *(blocked on Wave 10 completion)*
 
-- [ ] 60-17-PLAN.md — Delete the assign screen, its writers and the old notifications hook; assign address 307s to the SOP; assign-page dropped feature
+- [x] 60-17-PLAN.md — Delete the assign screen, its writers and the old notifications hook; assign address 307s to the SOP; assign-page dropped feature
 
 **Wave 12** *(blocked on Wave 11 completion)*
 
