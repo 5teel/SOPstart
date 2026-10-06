@@ -2052,7 +2052,7 @@ Plans:
   4. The bell in the list shows a count, and a person is notified when they are next to approve a SOP, when a SOP they own is due for review, when a completion waits for their sign-off, when a request they raised is answered and when a SOP they do has a new version; opening a notification goes to the place it is about
   5. An admin sets, changes and removes an objective on the site, a department, a machine, a SOP or a person, and it shows as quiet metadata saying who set it; an AI agent's request appears in the Office marked as from an agent, and an objective an agent set stays marked until a person confirms it
 
-**Plans:** 4/18 plans executed
+**Plans:** 8/18 plans executed
 Plans:
 **Wave 1**
 
@@ -2069,10 +2069,10 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 60-05-PLAN.md — Office data: open requests as the second list, one pin helper everywhere, Machines inbox kind retired, stale-department row opens the SOP
-- [ ] 60-06-PLAN.md — Asks server: ask core (assignment first, request second, undo on failure), ask / decline / stop / targets actions; registry; matrix
-- [ ] 60-07-PLAN.md — In-flow notification triggers (next approver at the divert and after a non-final approval, sign-off waiting, new version) + gate-harness stub
-- [ ] 60-08-PLAN.md — Cron routes: review-due and machines-without-SOPs (agent producer), shared bearer check, CRON_PATHS proxy exemption
+- [x] 60-05-PLAN.md — Office data: open requests as the second list, one pin helper everywhere, Machines inbox kind retired, stale-department row opens the SOP
+- [x] 60-06-PLAN.md — Asks server: ask core (assignment first, request second, undo on failure), ask / decline / stop / targets actions; registry; matrix
+- [x] 60-07-PLAN.md — In-flow notification triggers (next approver at the divert and after a non-final approval, sign-off waiting, new version) + gate-harness stub
+- [x] 60-08-PLAN.md — Cron routes: review-due and machines-without-SOPs (agent producer), shared bearer check, CRON_PATHS proxy exemption
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
