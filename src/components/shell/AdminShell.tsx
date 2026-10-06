@@ -20,6 +20,8 @@ import { SiteWorkspace } from '@/components/admin/site/SiteWorkspace'
 import { AccountControl } from '@/components/shell/AccountControl'
 import { AdminNoticeboardBody, AdminWorkshopBody } from '@/components/shell/AdminRoomBodies'
 import { OfficeCard } from '@/components/shell/OfficeCard'
+import { useObjectives } from '@/components/shell/ObjectiveLine'
+import { ObjectiveSlot } from '@/components/shell/ObjectiveSlot'
 import { ShellFrame, type ShellSite } from '@/components/shell/ShellFrame'
 import { SmokoBody } from '@/components/shell/RoomBodies'
 import { SiteSummary } from '@/components/shell/SiteSummary'
@@ -108,6 +110,8 @@ export function AdminShell({ siteName, userEmail, initialPlace, initialTab, init
     staleTime: 30 * 60 * 1000,
   })
 
+  const objectives = useObjectives()
+
   const data = shell && !('error' in shell) ? shell : null
   const loadError = isError
     ? 'Could not load the site.'
@@ -133,6 +137,14 @@ export function AdminShell({ siteName, userEmail, initialPlace, initialTab, init
         const dept = site.departments.find((d) => d.id === machine.department_id)
         return (
           <AdminMachineBody
+            objective={
+              <ObjectiveSlot
+                subject={{ type: 'machine', id: machine.id }}
+                current={objectives.find('machine', machine.id)}
+                emptyLabel="Set an objective"
+                emptyStyle="dashed"
+              />
+            }
             machine={{ id: machine.id, name: machine.name, spriteUrl: machine.spriteUrl }}
             department={dept ? { name: dept.name, colour: colourByDept.get(dept.id) ?? 'var(--ink-500)' } : null}
             sops={machinePanelSops(machine.id, site.links, rowsById)}
@@ -199,6 +211,14 @@ export function AdminShell({ siteName, userEmail, initialPlace, initialTab, init
         )
       }
       renderDetail={renderDetail}
+      deptMeta={(id) => (
+        <ObjectiveSlot
+          subject={{ type: 'department', id }}
+          current={objectives.find('department', id)}
+          emptyLabel="Set an objective"
+          emptyStyle="dashed"
+        />
+      )}
       renderEdit={(exit) => <SiteEditSurface exit={exit} />}
       account={<AccountControl email={userEmail} isAdmin />}
     />

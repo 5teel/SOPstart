@@ -6,6 +6,7 @@
  * Renders what it is handed (order comes from machinePanelSops) -- these
  * components never classify or fetch. The frame owns the close button.
  */
+import type { ReactNode } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import type { AdminPanelSop, AdminSopBadge } from '@/lib/sop/admin-health'
@@ -85,10 +86,13 @@ export function AdminMachineBody({
   machine,
   department,
   sops,
+  objective,
 }: {
   machine: { id: string; name: string; spriteUrl: string | null }
   department: { name: string; colour: string } | null
   sops: AdminPanelSop[]
+  /** The machine's objective line or editor, supplied by the shell. */
+  objective?: ReactNode
 }) {
   return (
     <div data-testid="admin-panel">
@@ -107,6 +111,7 @@ export function AdminMachineBody({
           </span>
         )}
         <h2 className="mb-2.5 text-xl font-semibold leading-tight text-[var(--ink-900)]">{machine.name}</h2>
+        {objective && <div className="mb-3">{objective}</div>}
         <AdminSopRows sops={sops} empty="No procedures for this machine yet." from={machine.id} />
         <Link
           href={`/admin/sops/new/blank?machine=${machine.id}`}

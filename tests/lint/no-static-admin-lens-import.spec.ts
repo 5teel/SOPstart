@@ -40,6 +40,8 @@ const ALLOWED_IMPORTERS: Record<string, string[]> = {
   // Phase 60: the composer and the ask picker are only ever reached through next/dynamic (A-07).
   RequestComposer: [],
   AskPicker: [],
+  // Phase 60: the objective editor is only ever reached through the lazy ObjectiveSlot seam (A-07).
+  ObjectiveEditor: [],
 }
 
 const WORKER_SHELL_FILES = [

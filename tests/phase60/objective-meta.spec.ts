@@ -70,7 +70,51 @@ test.describe('Objective line (60-13)', () => {
     expect(EDITOR).toContain('e.stopPropagation()')
   })
 
-  test.fixme('ObjectiveLine is mounted on both machine panels, the department panel and the People row', () => {})
+  test('the line is placed on both machine panels, the department panel and the People row', () => {
+    const worker = read('src/components/shell/WorkerShell.tsx')
+    const admin = read('src/components/shell/AdminShell.tsx')
+    const frame = read('src/components/shell/ShellFrame.tsx')
+    const people = read('src/components/office/PeopleTab.tsx')
+    const panel = read('src/components/sop/plant/MachinePanel.tsx')
+    const adminPanel = read('src/components/admin/governance/AdminMachinePanel.tsx')
+
+    // machine panels: directly under the name, above the rows
+    expect(panel).toMatch(/\{machine\.name\}<\/h2>\s*\{objective && <div className="mb-3">/)
+    expect(adminPanel).toMatch(/\{machine\.name\}<\/h2>\s*\{objective && <div className="mb-3">/)
+    // department panel: one slot under the name; the frame stays one writer, no router
+    expect(frame).toMatch(/deptMeta\?\(deptId: string\): ReactNode/)
+    expect(frame).toContain('deptMeta(dept.id)')
+    expect(frame).not.toContain('next/navigation')
+    // worker: the line reaches the home route only through its own lazy module (the static line broke the gate)
+    expect(worker).toContain('<WorkerObjective type="machine" id={machine.id} />')
+    expect(worker).toContain('<WorkerObjective type="department" id={id} />')
+    expect(worker).toMatch(/dynamic\(\(\) => import\('@\/components\/shell\/WorkerObjective'\)/)
+    expect(worker).not.toMatch(/from '@\/components\/shell\/(ObjectiveLine|WorkerObjective|ObjectiveSlot)'/)
+    expect(worker).not.toContain('ObjectiveSlot')
+    expect(read('src/components/shell/WorkerObjective.tsx')).toContain('useObjectives()')
+    // admin and People: the lazy editor seam
+    expect(admin).toContain("subject={{ type: 'machine', id: machine.id }}")
+    expect(admin).toContain("subject={{ type: 'department', id }}")
+    expect(people).toContain("subject={{ type: 'person', id: m.user_id }}")
+    expect(people).toContain('emptyStyle="text"')
+    expect(people).toContain('data-testid="people-objective"')
+    // one shared read
+    for (const src of [admin, people]) expect(src).toContain('useObjectives()')
+    expect(LINE).toContain('queryKey: OBJECTIVES_KEY')
+  })
+
+  test('the editor is reached only through the slot, and both gated routes carry its marker', () => {
+    for (const rel of ['src/components/shell/WorkerShell.tsx', 'src/components/shell/AdminShell.tsx', 'src/components/office/PeopleTab.tsx', 'src/components/shell/ShellFrame.tsx']) {
+      expect(read(rel)).not.toMatch(/from\s+'@\/components\/requests\/ObjectiveEditor'/)
+    }
+    const bundle = read('scripts/check-bundle-size.ts')
+    expect(bundle.split("markers: ['By (optional)']").length - 1).toBe(2)
+    // only the admin shell and the People tab import the slot
+    for (const rel of ['src/components/shell/WorkerShell.tsx', 'src/components/shell/ShellFrame.tsx', 'src/components/sop/plant/MachinePanel.tsx']) {
+      expect(read(rel)).not.toContain('ObjectiveSlot')
+    }
+  })
+
   test.fixme('the SOP objective is read from objectives (lineage root) in loadFocusSop, BrowseDocument and This SOP', () => {})
   test.fixme('browse offers "Make a request"', () => {})
 })

@@ -24,6 +24,8 @@ import { listDepartments } from '@/actions/departments'
 import { DChip } from '@/components/admin/departments/DChip'
 import { DepartmentPicker } from '@/components/admin/departments/DepartmentPicker'
 import { useRole } from '@/components/providers/RoleProvider'
+import { useObjectives } from '@/components/shell/ObjectiveLine'
+import { ObjectiveSlot } from '@/components/shell/ObjectiveSlot'
 import type { AppRole } from '@/types/auth'
 import type { RowDone } from './InboxRow'
 
@@ -128,6 +130,7 @@ export function PeopleTab({ onReceipt }: { onReceipt(r: RowDone): void }) {
   const role = useRole()
   const isAdmin = role === 'admin'
   const qc = useQueryClient()
+  const objectives = useObjectives()
 
   const team = useQuery({ queryKey: PEOPLE_KEY, queryFn: () => getTeamMembersWithEmails() })
   const depts = useQuery({ queryKey: ['office-people-departments'], queryFn: () => listDepartments() })
@@ -451,6 +454,14 @@ export function PeopleTab({ onReceipt }: { onReceipt(r: RowDone): void }) {
                       </button>
                     )}
                   </div>
+                </div>
+                <div data-testid="people-objective" className="pt-1">
+                  <ObjectiveSlot
+                    subject={{ type: 'person', id: m.user_id }}
+                    current={objectives.find('person', m.user_id)}
+                    emptyLabel="+ Objective"
+                    emptyStyle="text"
+                  />
                 </div>
                 {openPicker === m.id && (
                   <div className="mt-2">

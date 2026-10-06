@@ -90,6 +90,7 @@ const GATED_ROUTES: GatedRoute[] = [
       // seam was bypassed with a static import.
       { label: 'focus editor (lazy admin chunk, 58-13)', markers: ['I have checked this', 'Run the AI check'] },
       { label: 'request composer + ask picker (lazy, 60 A-07)', markers: ['What do you need?', 'Find a person…'] },
+      { label: 'objective editor (lazy, 60 A-07)', markers: ['By (optional)'] },
     ],
   },
   {
@@ -110,6 +111,7 @@ const GATED_ROUTES: GatedRoute[] = [
       // set means a static import slipped in.
       { label: 'office pane (lazy, 59 A-11)', markers: ['Nothing needs you', 'Nothing here can be edited or deleted', 'No requests waiting.'] },
       { label: 'request composer + ask picker (lazy, 60 A-07)', markers: ['What do you need?', 'Find a person…'] },
+      { label: 'objective editor (lazy, 60 A-07)', markers: ['By (optional)'] },
     ],
   },
 ]

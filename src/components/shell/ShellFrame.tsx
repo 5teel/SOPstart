@@ -48,6 +48,8 @@ export interface ShellFrameProps {
   renderCard(select: (p: Place) => void): ReactNode
   renderDetail(place: Place, ctx: { select: (p: Place) => void; query: string }): ReactNode
   renderEdit?(exit: () => void): ReactNode
+  /** The department's objective line, directly under its name (60 D-11). */
+  deptMeta?(deptId: string): ReactNode
   account: ReactNode
 }
 
@@ -104,6 +106,7 @@ export function ShellFrame({
   renderCard,
   renderDetail,
   renderEdit,
+  deptMeta,
   account,
 }: ShellFrameProps) {
   const [place, setPlace] = useState<Place>(() => parsePlace(initialPlace, initialTab))
@@ -388,6 +391,7 @@ export function ShellFrame({
                 <span className="h-2.5 w-2.5 rounded" style={{ background: colourByDept.get(dept.id) }} />
                 {dept.name}
               </h2>
+              {deptMeta && <div className="mt-1">{deptMeta(dept.id)}</div>}
               <div className="mt-3 flex flex-col">
                 {machines
                   .filter((m) => m.department_id === dept.id)

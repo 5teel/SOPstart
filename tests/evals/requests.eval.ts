@@ -219,7 +219,102 @@ test.describe('Phase 60 -- requests, notifications and objectives (deployed)', (
       await page.getByTestId('composer-cancel').click()
       await ctx.close()
     })
-    test.fixme('objective on a machine, a department and a person; an agent-set objective is confirmed (60-13)', async () => {})
+    test('objective on a machine, a department and a person; an agent-set objective is confirmed (60-13)', async ({ browser }) => {
+      test.setTimeout(300_000)
+      const typed = `EVAL objective ${runId}`
+      const agentText = `EVAL agent objective ${runId}`
+      const { data: dept } = await db.from('departments').select('id').eq('organisation_id', siteOrgId).eq('name', 'Forming').limit(1).single()
+      if (!dept) throw new Error('eval-site Forming department missing -- run node scripts/eval-fixtures.mjs')
+      await db.from('objectives').delete().eq('organisation_id', siteOrgId)
+
+      const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } })
+      await signInAs(ctx, 'siteAdmin')
+      const page = await ctx.newPage()
+
+      // Machine: set, with a date.
+      await page.goto(`/?place=${pressId}`)
+      const set = page.getByRole('button', { name: 'Set an objective' })
+      await expect(set).toHaveCount(1, SLOW)
+      await set.click()
+      await expect(page.getByTestId('objective-editor')).toHaveCount(1, SLOW)
+      await page.getByLabel('Objective', { exact: true }).fill(typed)
+      await page.getByLabel('By (optional)').fill('2030-11-12')
+      await page.getByRole('button', { name: 'Save objective' }).click()
+      await expect(page.getByTestId('objective-line')).toContainText(typed, SLOW)
+      await expect(page.getByRole('status')).toContainText('Objective set · logged in the decision ledger', SLOW)
+      await expect(page.getByTestId('objective-line')).toHaveAttribute('data-agent', 'false')
+
+      // Change it: the editor opens with the text and Remove in red (look at the shot).
+      await page.getByRole('button', { name: 'Change' }).click()
+      await expect(page.getByTestId('objective-editor')).toHaveCount(1, SLOW)
+      await expect(page.getByLabel('Objective', { exact: true })).toHaveValue(typed)
+      await shot(page, '60-objective-editor')
+      await page.getByRole('button', { name: "Don't change it" }).click()
+
+      // Agent path: an agent sets the machine objective; it reads as unconfirmed until confirmed.
+      const body = {
+        fieldId: 'objective.machine',
+        context: { organisationId: siteOrgId, subjectId: pressId },
+        newValue: { text: agentText },
+        agentName: 'SOPstart assistant',
+      }
+      const wrote = await page.request.post('/api/ai-fields/write', { data: body })
+      expect(wrote.status(), await wrote.text()).toBe(200)
+      await page.goto(`/?place=${pressId}`)
+      const line = page.getByTestId('objective-line')
+      await expect(line).toContainText(agentText, SLOW)
+      await expect(line).toHaveAttribute('data-agent', 'true')
+      await expect(line).toHaveAttribute('data-confirmed', 'false')
+      await expect(line.getByText('agent', { exact: true })).toHaveCount(1)
+      await expect(line.getByText('Unconfirmed')).toHaveCount(1)
+      await page.getByTestId('objective-confirm').click()
+      await expect(page.getByRole('status')).toContainText('Confirmed · logged in the decision ledger', SLOW)
+      await expect(page.getByTestId('objective-line')).toHaveAttribute('data-confirmed', 'true', SLOW)
+      const { data: machineObjective } = await db.from('objectives').select('id').eq('organisation_id', siteOrgId).eq('subject_type', 'machine').eq('subject_id', pressId).single()
+      const { count } = await db
+        .from('decisions')
+        .select('id', { count: 'exact', head: true })
+        .eq('organisation_id', siteOrgId)
+        .eq('kind', 'objective_confirmed')
+        .eq('subject_id', machineObjective?.id ?? '')
+      expect(count).toBe(1)
+      await shot(page, '60-objective-meta')
+
+      // Department: set from the department panel.
+      await page.goto(`/?place=dept:${dept.id}`)
+      await page.getByRole('button', { name: 'Set an objective' }).click()
+      await page.getByLabel('Objective', { exact: true }).fill(`${typed} dept`)
+      await page.getByRole('button', { name: 'Save objective' }).click()
+      await expect(page.getByTestId('objective-line')).toContainText(`${typed} dept`, SLOW)
+      await shot(page, '60-objective-meta-dept')
+
+      // Person: the People row of the eval-site worker; removal is two-step.
+      await page.goto('/?place=office&tab=people')
+      const row = page.getByTestId('people-row').filter({ hasText: EVAL_USERS.siteWorker })
+      await expect(row).toHaveCount(1, SLOW)
+      await row.getByRole('button', { name: '+ Objective' }).click()
+      await row.getByLabel('Objective', { exact: true }).fill(`${typed} person`)
+      await row.getByRole('button', { name: 'Save objective' }).click()
+      await expect(row.getByTestId('objective-line')).toContainText(`${typed} person`, SLOW)
+      await shot(page, '60-objective-meta-person')
+      await row.getByRole('button', { name: 'Change' }).click()
+      await row.getByRole('button', { name: 'Remove objective' }).click()
+      await expect(row.getByText('Remove this objective?')).toHaveCount(1)
+      await row.getByRole('button', { name: 'Keep it' }).click()
+      await row.getByRole('button', { name: 'Remove objective' }).click()
+      await row.getByRole('button', { name: 'Yes, remove it' }).click()
+      await expect(row.getByTestId('objective-line')).toHaveCount(0, SLOW)
+      await ctx.close()
+
+      // Worker: the same machine and department show the line, read-only.
+      const wctx = await browser.newContext({ viewport: { width: 1440, height: 900 } })
+      await signInAs(wctx, 'siteWorker')
+      const worker = await wctx.newPage()
+      await worker.goto(`/?place=${pressId}`)
+      await expect(worker.getByTestId('objective-line')).toContainText(agentText, SLOW)
+      await expect(worker.getByRole('button', { name: /Change|Set an objective|Confirm/ })).toHaveCount(0)
+      await wctx.close()
+    })
     test.fixme('SOP objective in browse and This SOP; a second request raised from browse (60-14)', async () => {})
     test.fixme('worker raises, admin accepts, bell count shows, the notification opens its place, mark-read clears it; a second round (60-16)', async () => {})
     test.fixme('decline with a note; the asker sees the answer (60-16)', async () => {})

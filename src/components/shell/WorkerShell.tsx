@@ -63,6 +63,12 @@ const AskTrigger = dynamic(() => import('@/components/requests/AskPicker').then(
   loading: () => null,
 })
 
+// The objective line is a lazy module: the static line cost the home download past its gate (60-13).
+const WorkerObjective = dynamic(() => import('@/components/shell/WorkerObjective').then((m) => m.WorkerObjective), {
+  ssr: false,
+  loading: () => null,
+})
+
 const EMPTY_SITE: ShellSite = { layout: null, machines: [], links: [], departments: [] }
 
 export function WorkerShell({ siteName, userEmail, initialPlace, initialTab, initialSop }: ShellProps) {
@@ -123,6 +129,7 @@ export function WorkerShell({ siteName, userEmail, initialPlace, initialTab, ini
         const rows = machineSops(machine.id, site.links, sopsById)
         return (
           <MachineBody
+            objective={<WorkerObjective type="machine" id={machine.id} />}
             machine={{ id: machine.id, name: machine.name, spriteUrl: machine.spriteUrl }}
             department={dept ? { name: dept.name, colour: colourByDept.get(dept.id) ?? 'var(--ink-500)' } : null}
             sops={narrowForAsk(ctx.query, machine.name, rows)}
@@ -198,6 +205,7 @@ export function WorkerShell({ siteName, userEmail, initialPlace, initialTab, ini
         )
       }}
       renderDetail={renderDetail}
+      deptMeta={(id) => <WorkerObjective type="department" id={id} />}
       account={<AccountControl email={userEmail} isAdmin={false} />}
     />
   )

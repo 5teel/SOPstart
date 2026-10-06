@@ -81,11 +81,14 @@ export function MachineBody({
   onClose,
   rowAction,
   footer,
+  objective,
 }: {
   machine: { id: string; name: string; spriteUrl: string | null }
   department: { name: string; colour: string } | null
   sops: WorkerSop[]
   onClose?(): void
+  /** The machine's objective line, supplied by the shell. */
+  objective?: ReactNode
   rowAction?: (sop: WorkerSop) => ReactNode
   /** Under the rows, supplied by the shell (a lazy module). */
   footer?: ReactNode
@@ -118,6 +121,7 @@ export function MachineBody({
           </span>
         )}
         <h2 className="mb-2.5 text-xl font-semibold leading-tight text-[var(--ink-900)]">{machine.name}</h2>
+        {objective && <div className="mb-3">{objective}</div>}
         <SopRows sops={sops} empty="No procedures for this machine yet." from={machine.id} rowAction={rowAction} />
         {footer}
       </div>
