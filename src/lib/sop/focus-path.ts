@@ -30,7 +30,7 @@ export function legacyRedirectFor(pathname: string, search: string): string | nu
     const tab = params.get('tab')
     return tab === 'walk' || tab === 'read' ? focusHref(tabbed[1], { from: params.get('from') }) : null
   }
-  const admin = /^\/admin\/sops\/(?:builder\/([^/]+)|([^/]+)\/versions)$/.exec(pathname)
+  const admin = /^\/admin\/sops\/(?:builder\/([^/]+)|([^/]+)\/(?:versions|assign))$/.exec(pathname)
   const id = admin?.[1] ?? admin?.[2]
   return id && UUID.test(id) ? focusHref(id, { mode: 'edit' }) : null
 }

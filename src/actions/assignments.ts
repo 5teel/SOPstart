@@ -2,16 +2,9 @@
 
 import { getSessionContext } from '@/lib/auth/session-context'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { z } from 'zod'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { AppRole } from '@/types/auth'
-import { recordDecision } from '@/lib/decisions/record'
 import { userLabels } from '@/lib/members/labels'
-
-// ─── Schemas ────────────────────────────────────────────────────────────────
-
-const APP_ROLES = ['worker', 'supervisor', 'admin', 'safety_manager'] as const
-const roleSchema = z.enum(APP_ROLES)
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -33,158 +26,6 @@ async function getAdminContext(): Promise<AdminContext> {
 }
 
 // ─── Actions ────────────────────────────────────────────────────────────────
-
-export async function assignSopToRole(
-  sopId: string,
-  role: string
-): Promise<{ success: true; id: string } | { success: false; error: string }> {
-  const parsed = roleSchema.safeParse(role)
-  if (!parsed.success) {
-    return { success: false, error: 'Invalid role value' }
-  }
-
-  const ctx = await getAdminContext()
-  if ('error' in ctx) return { success: false, error: ctx.error }
-  const { supabase, user, organisationId } = ctx
-
-  const { data, error } = await supabase
-    .from('sop_assignments')
-    .insert({
-      organisation_id: organisationId,
-      sop_id: sopId,
-      assignment_type: 'role',
-      role: parsed.data as AppRole,
-      assigned_by: user.id,
-    })
-    .select('id')
-    .single()
-
-  if (error) {
-    // Unique constraint violation — already assigned
-    if (error.code === '23505') {
-      return { success: false, error: 'This role is already assigned to this SOP.' }
-    }
-    console.error('assignSopToRole error:', error)
-    return { success: false, error: 'Failed to assign role. Please try again.' }
-  }
-
-  await recordDecision({
-    kind: 'assign',
-    subject: { kind: 'assignment', id: data.id },
-    sopId,
-    summary: `Assigned the SOP to the ${parsed.data} role`,
-    details: { assignment_type: 'role', role: parsed.data },
-  })
-
-  return { success: true, id: data.id }
-}
-
-export async function assignSopToUser(
-  sopId: string,
-  userId: string
-): Promise<{ success: true; id: string } | { success: false; error: string }> {
-  if (!userId || typeof userId !== 'string') {
-    return { success: false, error: 'Invalid user ID' }
-  }
-
-  const ctx = await getAdminContext()
-  if ('error' in ctx) return { success: false, error: ctx.error }
-  const { supabase, user, organisationId } = ctx
-
-  const { data, error } = await supabase
-    .from('sop_assignments')
-    .insert({
-      organisation_id: organisationId,
-      sop_id: sopId,
-      assignment_type: 'individual',
-      user_id: userId,
-      assigned_by: user.id,
-    })
-    .select('id')
-    .single()
-
-  if (error) {
-    if (error.code === '23505') {
-      return { success: false, error: 'This worker is already individually assigned to this SOP.' }
-    }
-    console.error('assignSopToUser error:', error)
-    return { success: false, error: 'Failed to assign worker. Please try again.' }
-  }
-
-  await recordDecision({
-    kind: 'assign',
-    subject: { kind: 'assignment', id: data.id },
-    sopId,
-    summary: 'Assigned the SOP to a person',
-    details: { assignment_type: 'individual', user_id: userId },
-  })
-
-  return { success: true, id: data.id }
-}
-
-export async function removeAssignment(
-  assignmentId: string
-): Promise<{ success: true } | { success: false; error: string }> {
-  if (!assignmentId || typeof assignmentId !== 'string') {
-    return { success: false, error: 'Invalid assignment ID' }
-  }
-
-  const ctx = await getAdminContext()
-  if ('error' in ctx) return { success: false, error: ctx.error }
-  const { supabase } = ctx
-
-  // Read first (same RLS-scoped client) so the decision can name what was removed.
-  const { data: before } = await supabase
-    .from('sop_assignments')
-    .select('sop_id, assignment_type, role, user_id')
-    .eq('id', assignmentId)
-    .maybeSingle()
-
-  const { data: deleted, error } = await supabase
-    .from('sop_assignments')
-    .delete()
-    .eq('id', assignmentId)
-    .select('id')
-
-  if (error) {
-    console.error('removeAssignment error:', error)
-    return { success: false, error: 'Failed to remove assignment. Please try again.' }
-  }
-
-  if (deleted && deleted.length > 0) {
-    await recordDecision({
-      kind: 'unassign',
-      subject: { kind: 'assignment', id: assignmentId },
-      sopId: before?.sop_id ?? null,
-      summary: 'Removed an assignment',
-      details: { ...(before ?? {}) },
-    })
-  }
-
-  return { success: true }
-}
-
-export async function getAssignments(
-  sopId: string
-): Promise<{ success: true; assignments: SopAssignment[] } | { success: false; error: string }> {
-  if (!sopId) return { success: false, error: 'Invalid SOP ID' }
-
-  const { supabase, userId } = await getSessionContext()
-  if (!userId) return { success: false, error: 'Not authenticated' }
-
-  const { data, error } = await supabase
-    .from('sop_assignments')
-    .select('id, sop_id, assignment_type, role, user_id, assigned_by, created_at, organisation_id')
-    .eq('sop_id', sopId)
-    .order('created_at', { ascending: true })
-
-  if (error) {
-    console.error('getAssignments error:', error)
-    return { success: false, error: 'Failed to load assignments.' }
-  }
-
-  return { success: true, assignments: (data ?? []) as SopAssignment[] }
-}
 
 export async function getOrgMembers(): Promise<
   { success: true; members: OrgMemberWithProfile[] } | { success: false; error: string }
@@ -276,58 +117,7 @@ export async function selfRemoveSop(sopId: string) {
 }
 
 /**
- * Request removal of a manager-assigned SOP.
- * Creates a notification to the assigning manager (or all admins for role-based).
- */
-export async function requestRemoveAssignment(sopId: string) {
-  const ctx = await getWorkerContext()
-  if ('error' in ctx) return { success: false, error: ctx.error }
-
-  // Check for individual assignment by a manager
-  const { data: assignment } = await ctx.supabase
-    .from('sop_assignments')
-    .select('id, assigned_by')
-    .eq('sop_id', sopId)
-    .eq('user_id', ctx.user.id)
-    .eq('assignment_type', 'individual')
-    .neq('assigned_by', ctx.user.id)
-    .maybeSingle()
-
-  const admin = createAdminClient()
-
-  if (assignment) {
-    // Notify the specific manager who assigned it
-    await admin.from('worker_notifications').insert({
-      organisation_id: ctx.organisationId,
-      user_id: assignment.assigned_by,
-      sop_id: sopId,
-      type: 'removal_request',
-    })
-  } else {
-    // Role-based assignment — notify all admins/safety_managers
-    const { data: managers } = await admin
-      .from('organisation_members')
-      .select('user_id')
-      .eq('organisation_id', ctx.organisationId)
-      .in('role', ['admin', 'safety_manager'])
-
-    if (managers && managers.length > 0) {
-      await admin.from('worker_notifications').insert(
-        managers.map((m) => ({
-          organisation_id: ctx.organisationId,
-          user_id: m.user_id,
-          sop_id: sopId,
-          type: 'removal_request',
-        }))
-      )
-    }
-  }
-
-  return { success: true }
-}
-
-/**
- * Get all SOP assignments for the current user (self + manager + role-based).
+ * Get all SOP assignments for the current user (self + ask + role-based).
  */
 export async function getUserSopAssignments() {
   const ctx = await getWorkerContext()
