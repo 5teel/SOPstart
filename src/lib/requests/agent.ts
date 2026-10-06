@@ -7,9 +7,9 @@ import { subjectInOrg, type SubjectRef } from '@/lib/requests/core'
  * Phase 60 (D-05, RQS-04) -- an agent raising a new-SOP request.
  *
  * Plain server module, no directive: nothing a browser can call reaches it. Its
- * only caller is the cron route behind CRON_SECRET (60-08), which has no session,
- * so the organisation is passed in and every query carries it. No ledger row:
- * there is no session to record under and raising is a request, not a decision.
+ * only caller is machine-requests.ts, which passes the SESSION organisation and
+ * every query here carries it. No ledger row: raising is a request, not a decision,
+ * and the agent is not a session to record under.
  */
 const RECENT_DAYS = 30
 

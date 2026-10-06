@@ -5,12 +5,6 @@ import { safeNextPath } from '@/lib/auth/next-redirect'
 import { legacyRedirectFor } from '@/lib/sop/focus-path'
 import { officeRedirectFor } from '@/lib/shell/place'
 
-const CRON_PATHS = [
-  '/api/agent-layer/synthesis-sweep',
-  '/api/cron/review-due',
-  '/api/cron/machines-without-sops',
-]
-
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request })
   const supabase = createServerClient(
@@ -41,17 +35,13 @@ export async function updateSession(request: NextRequest) {
   // JSON-Schema for layout_data) for AI agents and external integrations.
   // No tenant data, no RLS concerns - deliberately public.
   const isSchemaIntrospection = path === '/api/schema'
-  // Cron-invoked routes: no session cookies by design. Each handler enforces its
-  // own CRON_SECRET bearer auth (timing-safe, fails closed 401). Exact paths
-  // only, never a prefix match.
-  const isCronRoute = CRON_PATHS.includes(path)
   // Build identity for the deployed-site eval runner (scripts/run-evals.mjs):
   // returns only the git SHA Railway injected at build time. No tenant data.
   const isVersionRoute = path === '/api/version'
   // The kill-switch worker must reach signed-out browsers: a redirected
   // service-worker script fails the update check and the old worker stays.
   const isServiceWorkerScript = path === '/sw.js'
-  const isPublicRoute = path === '/' || isAuthRoute || isSchemaIntrospection || isCronRoute || isVersionRoute || isServiceWorkerScript
+  const isPublicRoute = path === '/' || isAuthRoute || isSchemaIntrospection || isVersionRoute || isServiceWorkerScript
 
   if (!isPublicRoute && !claims) {
     // Phase 53 PHN-02: preserve the requested path (e.g. a scanned /m/<code>

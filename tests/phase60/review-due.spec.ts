@@ -3,8 +3,6 @@
  * Registration: playwright.config.ts `phase60` project.
  */
 import { test, expect } from '@playwright/test'
-import fs from 'node:fs'
-import path from 'node:path'
 import { reviewDueTargets, type ReviewDueRow } from '@/lib/notifications/review-due'
 import { DUE_SOON_WINDOW_DAYS } from '@/lib/governance/classify'
 
@@ -50,11 +48,6 @@ test.describe('Review-due selection (60-08)', () => {
       row({ id: 'v2', version: 2, parent_sop_id: 'v1', review_due_at: null }),
     ]
     expect(reviewDueTargets(rows, NOW)).toEqual([])
-    // so the sweep must hand every published row to the pure function, not pre-filter on the date
-    const sweep = fs.readFileSync(path.resolve(__dirname, '..', '..', 'src/lib/cron/sweeps.ts'), 'utf-8')
-    const fn = sweep.slice(sweep.indexOf('export async function runReviewDueSweep'), sweep.indexOf('export async function runMachinesWithoutSopsSweep'))
-    expect(fn).not.toContain(".not('review_due_at', 'is', null)")
-    expect(fn).toContain(".eq('status', 'published')")
   })
 
   test('a SOP with no owner is skipped', () => {
