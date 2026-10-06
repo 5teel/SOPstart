@@ -72,6 +72,32 @@ test.describe('Agent requests (60-04 helper)', () => {
 })
 
 test.describe('Agent requests (ADR-0002 producer)', () => {
+  const MACHINES = strip(read('src/lib/requests/machine-requests.ts'))
+
+  test('machines without a SOP raise as the default agent, on the event and on read, never via the ledger', () => {
+    expect(MACHINES.trimStart().startsWith("import 'server-only'")).toBe(true)
+    expect(MACHINES).not.toMatch(/['"]use server['"]/)
+    expect(MACHINES).toContain('machinesWithoutSops(')
+    expect(MACHINES).toContain('raiseRequestAsAgent({')
+    expect(MACHINES).toContain('agent: DEFAULT_AGENT_NAME')
+    expect(MACHINES).toContain("type: 'machine'")
+    expect(MACHINES).toContain('This machine has no SOPs yet.')
+    expect(MACHINES).not.toContain('recordDecision')
+    expect(MACHINES).toMatch(/catch \(err\)/)
+    expect(strip(read('src/actions/site.ts'))).toContain('reconcileMachineRequests(orgId, [(inserted as SiteMachine).id])')
+    expect(strip(read('src/actions/site.ts'))).toContain('reconcileMachineRequests(orgId, [...new Set([...prior, ...validIds])])')
+    expect(strip(read('src/actions/office.ts'))).toContain('reconcileMachineRequests(organisationId)')
+  })
+
+  test('both reads carry the session organisation; a machine that gained a SOP has its open agent request withdrawn', () => {
+    expect(MACHINES).toContain(".from('site_machines').select('id').eq('organisation_id', organisationId)")
+    expect(MACHINES).toContain(".from('sop_machines').select('machine_id').eq('organisation_id', organisationId)")
+    expect(MACHINES).toContain("state: 'withdrawn'")
+    expect(MACHINES).toContain(".not('raised_by_agent', 'is', null)")
+    // the read path (no ids) never withdraws
+    expect(MACHINES).toContain('if (!machineIds) return')
+  })
+
   test('a declined request is not re-raised on the next read (the helper skips an answered one for 30 days)', () => {
     expect(AGENT).toContain("in('state', ['accepted', 'declined'])")
     expect(AGENT).toContain('RECENT_DAYS = 30')

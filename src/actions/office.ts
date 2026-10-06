@@ -24,6 +24,7 @@ import { deriveInbox, type InboxItem } from '@/lib/governance/inbox'
 import { listMyReviewRows, listOpenRequests, listPendingSignOffs, loadInbox } from '@/lib/governance/load-inbox'
 import { memberLabel, userLabels } from '@/lib/members/labels'
 import { ensureReviewDueNotifications } from '@/lib/notifications/ensure-review-due'
+import { reconcileMachineRequests } from '@/lib/requests/machine-requests'
 import type { OfficeRequest } from '@/lib/requests/model'
 
 export type OfficeInbox = { role: 'admin' | 'safety_manager' | 'supervisor'; items: InboxItem[]; requests: OfficeRequest[] }
@@ -31,6 +32,12 @@ export type OfficeInbox = { role: 'admin' | 'safety_manager' | 'supervisor'; ite
 export async function getOfficeInbox(): Promise<OfficeInbox | { error: string }> {
   const { userId, role, organisationId } = await getSessionContext()
   if (!userId) return { error: 'Not authenticated' }
+
+  // ADR-0002: the agent's "no SOPs yet" asks for machines that already existed are written when an answerer
+  // loads the Office, before the requests below are read. Idempotent; never throws.
+  if (organisationId && (role === 'admin' || role === 'safety_manager' || role === 'supervisor')) {
+    await reconcileMachineRequests(organisationId)
+  }
 
   if (role === 'admin' || role === 'safety_manager') {
     const inbox = await loadInbox()

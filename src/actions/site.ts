@@ -29,6 +29,7 @@ import { z } from 'zod'
 import sharp from 'sharp'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { requireAdminContext } from '@/lib/auth/guards'
+import { reconcileMachineRequests } from '@/lib/requests/machine-requests'
 import {
   SCENE_MAX_BYTES,
   upsertSiteMachineSchema,
@@ -357,7 +358,11 @@ export async function upsertSiteMachine(
       })
       .select('*')
       .single()
-    if (!insertErr) return { machine: inserted as SiteMachine }
+    if (!insertErr) {
+      // ADR-0002: a new machine has no SOP yet, so the agent asks for one now (never throws).
+      await reconcileMachineRequests(orgId, [(inserted as SiteMachine).id])
+      return { machine: inserted as SiteMachine }
+    }
     if (insertErr.code !== '23505') {
       console.error('[upsertSiteMachine] insert error', insertErr)
       return { error: insertErr.message }
@@ -423,6 +428,13 @@ export async function setSopMachines(
   }
   if (!sopRow) return { error: 'SOP not found in your organisation' }
 
+  // The machines this SOP was linked to before the write: any of them may now be bare.
+  const { data: priorRows } = await db
+    .from('sop_machines')
+    .select('machine_id')
+    .eq('sop_id', sopId)
+    .eq('organisation_id', orgId)
+
   let validIds: string[] = []
   if (machineIds.length > 0) {
     const { data: machineRows, error: machineErr } = await db
@@ -459,6 +471,10 @@ export async function setSopMachines(
     console.error('[setSopMachines] prune error', pruneErr)
     return { error: pruneErr.message }
   }
+
+  // ADR-0002: a machine left with no SOP is asked about; one that gained a SOP has its open ask withdrawn.
+  const prior = ((priorRows ?? []) as Array<{ machine_id: string }>).map((r) => r.machine_id)
+  await reconcileMachineRequests(orgId, [...new Set([...prior, ...validIds])])
 
   return { machineIds: validIds }
 }
