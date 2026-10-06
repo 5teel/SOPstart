@@ -87,6 +87,8 @@ test.describe('Agent requests (ADR-0002 producer)', () => {
     expect(strip(read('src/actions/site.ts'))).toContain('reconcileMachineRequests(orgId, [(inserted as SiteMachine).id])')
     expect(strip(read('src/actions/site.ts'))).toContain('reconcileMachineRequests(orgId, [...new Set([...prior, ...validIds])])')
     expect(strip(read('src/actions/office.ts'))).toContain('reconcileMachineRequests(organisationId)')
+    // the shell read reconciles too, so the Office pin and the pane count the same requests
+    expect(strip(read('src/actions/shell.ts'))).toContain('reconcileMachineRequests(ctx.organisationId)')
   })
 
   test('both reads carry the session organisation; a machine that gained a SOP has its open agent request withdrawn', () => {

@@ -367,8 +367,11 @@ test.describe('Phase 57 — the one screen (deployed)', () => {
     await expect(detail(page)).toHaveAttribute('data-place', '/?place=office', SLOW)
     await expect(page.getByTestId('office-pane')).toBeVisible(SLOW)
     // pin = Inbox count + Requests count (60-05, D-03)
-    const inInbox = count - (await requestsInTab(page))
-    await expect(page.getByTestId('office-tab-inbox')).toHaveText(new RegExp(`Inbox\\s*${inInbox}`), SLOW)
+    // the Requests count lands with the pane's own read, so re-read it on every try
+    await expect(async () => {
+      const inInbox = count - (await requestsInTab(page))
+      await expect(page.getByTestId('office-tab-inbox')).toHaveText(new RegExp(`Inbox\\s*${inInbox}`), { timeout: 2_000 })
+    }).toPass(SLOW)
     await shot(page, '57-admin-office')
   })
 
