@@ -65,7 +65,7 @@ export function notificationTitle(input: TitleInput, now: Date = new Date()): st
 
 export type DedupeInput =
   | { kind: 'review_due'; sopId: string; dueAt: string }
-  | { kind: 'approve_next'; sopId: string; version: number; step: number }
+  | { kind: 'approve_next'; sopId: string; version: number; cycle: number; step: number }
   | { kind: 'signoff'; completionId: string }
   | { kind: 'request_answered' | 'asked'; requestId: string }
   | { kind: 'new_version'; sopId: string }
@@ -76,7 +76,8 @@ export function dedupeKey(input: DedupeInput): string {
     case 'review_due':
       return `review_due:${input.sopId}:${input.dueAt.slice(0, 10)}`
     case 'approve_next':
-      return `approve_next:${input.sopId}:${input.version}:${input.step}`
+      // cycle = send-backs so far on this version, so a re-request after changes tells the step again
+      return `approve_next:${input.sopId}:${input.version}:${input.cycle}:${input.step}`
     case 'signoff':
       return `signoff:${input.completionId}`
     case 'request_answered':

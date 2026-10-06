@@ -55,7 +55,11 @@ test.describe('Notification kinds, titles and places (60-03)', () => {
 
   test('dedupe keys are per event, stable, and differ across subjects', () => {
     expect(dedupeKey({ kind: 'review_due', sopId: SOP, dueAt: '2026-11-12T00:00:00Z' })).toBe(`review_due:${SOP}:2026-11-12`)
-    expect(dedupeKey({ kind: 'approve_next', sopId: SOP, version: 3, step: 1 })).toBe(`approve_next:${SOP}:3:1`)
+    expect(dedupeKey({ kind: 'approve_next', sopId: SOP, version: 3, cycle: 0, step: 1 })).toBe(`approve_next:${SOP}:3:0:1`)
+    // a send-back then re-request is a new cycle: the same step is told again (WR-01)
+    expect(dedupeKey({ kind: 'approve_next', sopId: SOP, version: 3, cycle: 1, step: 1 })).not.toBe(
+      dedupeKey({ kind: 'approve_next', sopId: SOP, version: 3, cycle: 0, step: 1 }),
+    )
     expect(dedupeKey({ kind: 'signoff', completionId: 'c1' })).toBe('signoff:c1')
     expect(dedupeKey({ kind: 'request_answered', requestId: 'r1' })).toBe('request_answered:r1')
     expect(dedupeKey({ kind: 'asked', requestId: 'r1' })).toBe('asked:r1')

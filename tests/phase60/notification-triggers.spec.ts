@@ -44,6 +44,13 @@ test.describe('Notification writers (60-07)', () => {
     const fn = WRITE.slice(WRITE.indexOf('export async function notifyNextApprover'), WRITE.indexOf('export async function membersWithRole'))
     expect(fn).toContain('id !== a.actorId')
     expect(fn).toContain("dedupeKey({ kind: 'approve_next'")
+    // WR-01: the key carries the send-back count for this version, read under the session org
+    expect(fn).toContain('const cycle = await sendBackCount(a.organisationId, a.sopId, a.version)')
+    expect(fn).toContain('cycle, step: a.stepIndex')
+    const counter = WRITE.slice(WRITE.indexOf('async function sendBackCount'), WRITE.indexOf('export async function signOffRecipients'))
+    expect(counter).toContain(".from('sop_approvals')")
+    expect(counter).toContain(".eq('organisation_id', organisationId)")
+    expect(counter).toContain(".eq('action', 'changes_requested')")
     expect(fn).toContain('a.step.userId')
     expect(fn).toContain('membersWithRole(a.organisationId, a.step.role)')
     expect(fn).toContain('catch (err)')

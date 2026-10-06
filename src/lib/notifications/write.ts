@@ -81,7 +81,8 @@ export async function notifyNextApprover(a: {
     const ids = a.step.userId ? [a.step.userId] : a.step.role ? await membersWithRole(a.organisationId, a.step.role) : []
     const title = notificationTitle({ kind: 'approve_next', sop: a.sopTitle })
     const place = notificationPlace('approve_next')
-    const key = dedupeKey({ kind: 'approve_next', sopId: a.sopId, version: a.version, step: a.stepIndex })
+    const cycle = await sendBackCount(a.organisationId, a.sopId, a.version)
+    const key = dedupeKey({ kind: 'approve_next', sopId: a.sopId, version: a.version, cycle, step: a.stepIndex })
     return await notify(
       a.organisationId,
       [...new Set(ids)]
@@ -92,6 +93,28 @@ export async function notifyNextApprover(a: {
     console.error('[notifyNextApprover] FAILED', err)
     return 0
   }
+}
+
+/**
+ * Send-backs recorded on this version so far. requestChanges keeps the version
+ * number, so without this the key would collide across reject / re-request
+ * cycles and the second-round approver would never be told.
+ */
+async function sendBackCount(organisationId: string, sopId: string, version: number): Promise<number> {
+  // sop_approvals is not in database.types (same cast as approvals.ts)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { count, error } = await (createAdminClient() as any)
+    .from('sop_approvals')
+    .select('id', { count: 'exact', head: true })
+    .eq('organisation_id', organisationId)
+    .eq('sop_id', sopId)
+    .eq('version', version)
+    .eq('action', 'changes_requested')
+  if (error) {
+    console.error('[sendBackCount] read error', error)
+    return 0
+  }
+  return (count as number | null) ?? 0
 }
 
 /**
