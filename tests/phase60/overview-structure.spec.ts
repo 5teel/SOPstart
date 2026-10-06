@@ -70,6 +70,11 @@ test.describe('Overview (60-15)', () => {
     expect(updates).toHaveLength(1)
     expect(updates[0]).toMatch(/^\.update\(\{ read_at: /)
     expect(SRC).toMatch(/\.is\('read_at', null\)/) // the unread filter lives in the queryFn
+    // WR-07: the browser client resolves { error }; a denied or timed-out mark-read undims the row
+    const open = SRC.slice(SRC.indexOf('async function open('), SRC.indexOf('const target = placeTarget(n.place)'))
+    expect(open).toContain('const { error } = await Promise.race([')
+    expect(open).toContain('failed = !!error')
+    expect(open).toMatch(/if \(failed\)\s+setDimmed\(\(s\) => \{\s+const next = new Set\(s\)\s+next\.delete\(n\.id\)/)
     expect(SRC).toContain('.limit(50)')
     expect(SRC).toContain('refetchOnWindowFocus: true')
     expect(SRC).not.toContain('refetchInterval')

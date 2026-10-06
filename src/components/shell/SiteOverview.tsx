@@ -139,16 +139,29 @@ export function SiteOverview({ role, select, machines, departments }: SiteOvervi
   async function open(n: NotificationRow) {
     setDimmed((s) => new Set(s).add(n.id))
     if (!n.read_at) {
+      // supabase-js resolves { error } rather than throwing; a denied or timed-out
+      // update undims the row (it is still unread) and still opens the place (WR-07).
+      let failed = false
       try {
         // The hand-extended table types resolve this Update to never; the column is read_at only (RLS grants no other).
         const patch = createClient()
           .from('notifications')
           .update({ read_at: new Date().toISOString() } as never)
           .eq('id', n.id)
-        await Promise.race([patch, new Promise((resolve) => setTimeout(resolve, 3000))])
+        const { error } = await Promise.race([
+          patch,
+          new Promise<{ error: Error }>((resolve) => setTimeout(() => resolve({ error: new Error('timeout') }), 3000)),
+        ])
+        failed = !!error
       } catch {
-        // a failed mark-read still opens the place
+        failed = true
       }
+      if (failed)
+        setDimmed((s) => {
+          const next = new Set(s)
+          next.delete(n.id)
+          return next
+        })
       void queryClient.invalidateQueries({ queryKey: NOTIFICATIONS_KEY })
       void queryClient.invalidateQueries({ queryKey: READ_KEY })
       if (n.kind === 'asked')
