@@ -96,7 +96,7 @@ const SCENES: Scene[] = [
     title: 'Safe work, one step at a time.',
     body: 'Standard operating procedures your people actually follow.',
     cam: { fx: 0.5, fy: 0.42, zoom: 1.05 },
-    ms: 6000,
+    ms: 20000,
   },
 ]
 
@@ -485,9 +485,6 @@ export function PromoReel() {
             >
               Sign in
             </Link>
-            <p className="mt-4 text-meta text-ink-500" style={enter(2)}>
-              Proof-of-concept demo
-            </p>
           </div>
         </section>
       )}
