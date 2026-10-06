@@ -108,7 +108,7 @@ test.describe('Notification kinds, titles and places (60-03)', () => {
   test('placeTarget selects the overview and ?place= strings, links a SOP, and sends anything unsafe to the overview', () => {
     expect(placeTarget('/')).toEqual({ type: 'select', place: { kind: 'overview' } })
     expect(placeTarget('/?place=office')).toEqual({ type: 'select', place: { kind: 'room', id: 'office' } })
-    expect(placeTarget('/?place=office&tab=requests')).toEqual({ type: 'select', place: { kind: 'room', id: 'office' } }) // tab not whitelisted until 60-11
+    expect(placeTarget('/?place=office&tab=requests')).toEqual({ type: 'select', place: { kind: 'room', id: 'office', tab: 'requests' } }) // whitelisted by 60-11
     expect(placeTarget(`/sops/${SOP}`)).toEqual({ type: 'href', href: `/sops/${SOP}` })
     expect(placeTarget('//evil.com')).toEqual({ type: 'select', place: { kind: 'overview' } })
     expect(placeTarget('https://x')).toEqual({ type: 'select', place: { kind: 'overview' } })

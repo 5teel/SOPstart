@@ -205,6 +205,7 @@ type LedgerRow = {
   subject_id: string | null
   sop_id: string | null
   summary: string
+  details: Record<string, unknown> | null
   created_at: string
 }
 
@@ -228,7 +229,7 @@ export async function listDecisions(input: unknown): Promise<DecisionPage | { er
 
   let q = supabase
     .from('decisions')
-    .select('id, kind, actor_kind, actor_id, actor_name, subject_kind, subject_id, sop_id, summary, created_at')
+    .select('id, kind, actor_kind, actor_id, actor_name, subject_kind, subject_id, sop_id, summary, details, created_at')
     .order('created_at', { ascending: false })
     .order('id', { ascending: false })
     .limit(PAGE_SIZE + 1)
@@ -260,6 +261,10 @@ export async function listDecisions(input: unknown): Promise<DecisionPage | { er
   const personIds = new Set<string>()
   for (const r of page) if ((r.subject_kind === 'member' || r.subject_kind === 'worker') && r.subject_id) personIds.add(r.subject_id)
   for (const c of completions.values()) personIds.add(c.worker_id)
+  for (const r of page) {
+    const asker = r.subject_kind === 'request' ? r.details?.asker_user_id : null
+    if (typeof asker === 'string') personIds.add(asker)
+  }
   const labels = await userLabels([...personIds])
 
   const rows: DecisionListRow[] = page.map((r) => {
@@ -271,6 +276,11 @@ export async function listDecisions(input: unknown): Promise<DecisionPage | { er
       about = { type: 'text', text: `${memberLabel(labels.get(c.worker_id))}'s walk of ${titles.get(c.sop_id) ?? 'a SOP'}` }
     } else if ((r.subject_kind === 'member' || r.subject_kind === 'worker') && r.subject_id) {
       about = { type: 'text', text: memberLabel(labels.get(r.subject_id)) }
+    } else if (r.subject_kind === 'request') {
+      // "<asker>'s request about <SOP or machine>"; a ledger row with no details keeps its summary.
+      const d = r.details ?? {}
+      const asker = typeof d.asker_user_id === 'string' ? memberLabel(labels.get(d.asker_user_id)) : typeof d.asker_agent === 'string' ? d.asker_agent : null
+      if (asker && typeof d.about_title === 'string') about = { type: 'text', text: `${asker}'s request about ${d.about_title}` }
     }
     return {
       id: r.id,

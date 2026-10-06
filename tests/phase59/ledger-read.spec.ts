@@ -103,8 +103,11 @@ test.describe('ledger read', () => {
       expect(ACTIONS).toContain('.strict()')
       expect(ACTIONS).toContain('z.enum(GROUP_KEYS)')
       expect(ACTIONS).not.toMatch(/organisationId\s*:\s*z\./)
-      // Free text from details never leaves the server.
-      expect(body).not.toContain('details')
+      // Free text from details never leaves the server. 60-11 reads two fixed fields of a request row
+      // (asker, about_title) to build the about-line; the notes and the row's details object are never returned.
+      expect(body).not.toMatch(/details\.(note|answer_note)|d\.(note|answer_note)/)
+      expect(body).not.toMatch(/details:\s*r\.details/)
+      expect(body).toContain('d.about_title')
       const cleared = ACTIONS.slice(ACTIONS.indexOf('export async function countClearedToday('))
       expect(cleared).toContain('ledgerReader()')
       expect(cleared).toContain(".in('kind', [...CLEARED_KINDS])")

@@ -25,7 +25,8 @@ import { focusHref } from '@/lib/sop/focus-path'
 import { ApprovePanel } from './ApprovePanel'
 import { SignOffPanel } from './SignOffPanel'
 
-export type RowDone = { receipt: string; logged: boolean | null }
+/** `link` and `hold` are for a receipt that points somewhere: it stays until the next action (60-11). */
+export type RowDone = { receipt: string; logged: boolean | null; link?: { href: string; label: string }; hold?: boolean; after?: string }
 
 const FAILED_COPY = "That didn't work. Nothing was changed — try again."
 

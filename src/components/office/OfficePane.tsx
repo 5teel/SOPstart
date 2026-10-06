@@ -9,18 +9,21 @@
  * address bar, never calls the router and never navigates from an effect.
  */
 import { useEffect, useRef, useState } from 'react'
+import Link from 'next/link'
 import { Check } from 'lucide-react'
 import { useRole } from '@/components/providers/RoleProvider'
 import { OFFICE_TABS, tabsForRole, type OfficeTab } from '@/lib/shell/office-tabs'
 import type { Place } from '@/lib/shell/place'
 import { AdminAccessLens } from '@/components/sop/lenses/AdminAccessLens'
 import { DecisionsTab } from './DecisionsTab'
+import { RequestsTab } from './RequestsTab'
 import { InboxChips, InboxTab, inboxItemsOf, useOfficeInbox, type ChipKey } from './InboxTab'
 import type { RowDone } from './InboxRow'
 import { PeopleTab } from './PeopleTab'
 
 const TAB_LABEL: Record<OfficeTab, string> = {
   inbox: 'Inbox',
+  requests: 'Requests',
   decisions: 'Decisions',
   people: 'People & roles',
   access: 'Access',
@@ -32,7 +35,9 @@ type Receipt = RowDone & { tab: OfficeTab }
 
 /** The words under the header. "logged" is said only when the ledger write succeeded. */
 function receiptWords(r: RowDone): { text: string; failed: boolean } {
-  if (r.logged === true) return { text: `${r.receipt} · logged in the decision ledger`, failed: false }
+  if (r.logged === true) {
+    return { text: `${r.receipt} · logged in the decision ledger${r.after ? `. ${r.after}` : ''}`, failed: false }
+  }
   if (r.logged === false) {
     return { text: `${r.receipt}, but it didn't reach the decision ledger. Tell an admin.`, failed: true }
   }
@@ -57,13 +62,15 @@ export function OfficePane({
 
   const inbox = useOfficeInbox()
   const inboxCount = inboxItemsOf(inbox.data)?.length ?? 0
+  const requestCount = inbox.data && !('error' in inbox.data) ? inbox.data.requests.length : 0
   const [chip, setChip] = useState<ChipKey>('all')
   const [receipt, setReceipt] = useState<Receipt | null>(null)
-  const shownReceipt = receipt && receipt.tab === tab ? receiptWords(receipt) : null
+  const shownReceipt = receipt && receipt.tab === tab ? { ...receiptWords(receipt), link: receipt.link } : null
 
   // A receipt holds for 10 s, or until the next action; a tab change hides it (it is tagged with its tab).
+  // One carrying a link (`hold`) stays until the next receipt or a tab change.
   useEffect(() => {
-    if (!receipt) return
+    if (!receipt || receipt.hold) return
     const t = setTimeout(() => setReceipt(null), RECEIPT_MS)
     return () => clearTimeout(t)
   }, [receipt])
@@ -119,8 +126,10 @@ export function OfficePane({
                     }`}
                   >
                     {TAB_LABEL[t]}
-                    {t === 'inbox' && inboxCount > 0 && (
-                      <span className={`mono text-meta ${active ? 'text-paper' : 'text-ink-500'}`}>{inboxCount}</span>
+                    {(t === 'inbox' ? inboxCount : t === 'requests' ? requestCount : 0) > 0 && (
+                      <span className={`mono text-meta ${active ? 'text-paper' : 'text-ink-500'}`}>
+                        {t === 'inbox' ? inboxCount : requestCount}
+                      </span>
                     )}
                   </button>
                 )
@@ -140,6 +149,15 @@ export function OfficePane({
               <>
                 {!shownReceipt.failed && <Check className="size-4 shrink-0 text-accent-ok" aria-hidden />}
                 <span>{shownReceipt.text}</span>
+                {shownReceipt.link && (
+                  <Link
+                    data-testid="office-receipt-link"
+                    href={shownReceipt.link.href}
+                    className="font-semibold text-ink-900 underline focus-visible:outline-2 focus-visible:outline-accent-step"
+                  >
+                    {shownReceipt.link.label}
+                  </Link>
+                )}
               </>
             )}
           </div>
@@ -148,6 +166,7 @@ export function OfficePane({
         <div id="office-tabpanel" role={tabs.length > 1 ? 'tabpanel' : undefined} className="px-4 pb-8">
           {tab === 'decisions' && <DecisionsTab />}
           {tab === 'people' && <PeopleTab onReceipt={(r) => setReceipt({ ...r, tab })} />}
+          {tab === 'requests' && <RequestsTab onReceipt={(r) => setReceipt({ ...r, tab })} />}
           {tab === 'inbox' && (
             <InboxTab chip={chip} onChip={setChip} onReceipt={(r) => setReceipt({ ...r, tab })} />
           )}

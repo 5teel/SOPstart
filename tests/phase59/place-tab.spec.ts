@@ -11,6 +11,7 @@ test.describe('place tab', () => {
   test('parsePlace reads a tab for the office place and drops an unknown tab', () => {
     expect(parsePlace('office', 'people')).toEqual({ kind: 'room', id: 'office', tab: 'people' })
     expect(parsePlace('office', 'inbox')).toEqual({ kind: 'room', id: 'office' })
+    expect(parsePlace('office', 'requests')).toEqual({ kind: 'room', id: 'office', tab: 'requests' })
     expect(parsePlace('office', 'bogus')).toEqual({ kind: 'room', id: 'office' })
     expect('tab' in parsePlace('office', 'bogus')).toBe(false)
     expect(parsePlace('smoko', 'people')).toEqual({ kind: 'room', id: 'smoko' })
@@ -27,11 +28,11 @@ test.describe('place tab', () => {
     expect(backHref('office')).toBe('/?place=office')
   })
 
-  test('tabsForRole: admin and safety manager get all four; supervisor gets the inbox only (A-04); worker gets none', () => {
-    const all = ['inbox', 'decisions', 'people', 'access']
+  test('tabsForRole: admin and safety manager get all five; supervisor gets the inbox and requests (A-04, 60 D-03); worker gets none', () => {
+    const all = ['inbox', 'requests', 'decisions', 'people', 'access']
     expect(tabsForRole('admin')).toEqual(all)
     expect(tabsForRole('safety_manager')).toEqual(all)
-    expect(tabsForRole('supervisor')).toEqual(['inbox'])
+    expect(tabsForRole('supervisor')).toEqual(['inbox', 'requests'])
     expect(tabsForRole('worker')).toEqual([])
     expect(tabsForRole(null)).toEqual([])
   })
@@ -40,6 +41,7 @@ test.describe('place tab', () => {
     for (const tab of ['decisions', 'people', 'access'] as const) {
       expect(isWidePlace({ kind: 'room', id: 'office', tab })).toBe(true)
     }
+    expect(isWidePlace({ kind: 'room', id: 'office', tab: 'requests' })).toBe(false) // normal width (60 UI-SPEC)
     expect(isWidePlace({ kind: 'room', id: 'office' })).toBe(false)
     expect(isWidePlace({ kind: 'room', id: 'smoko' })).toBe(false)
     expect(isWidePlace({ kind: 'overview' })).toBe(false)

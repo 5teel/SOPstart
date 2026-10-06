@@ -86,6 +86,10 @@ const TAB = strip(read('src/components/office/InboxTab.tsx'))
 test.describe('office pane and inbox tab (59-09)', () => {
   test('the pane has a header, a tab bar, a receipt slot, chips and the empty-state sentence', () => {
     expect(PANE).toContain('role="tablist"')
+    // 60-11: a supervisor now has two tabs, so the bar renders for any role with more than one.
+    expect(PANE).toContain('tabs.length > 1 && (')
+    expect(PANE).toContain("tab === 'requests' && <RequestsTab")
+    expect(PANE).toContain('if (!receipt || receipt.hold) return')
     expect(PANE).toContain('data-testid="office-receipt"')
     expect(PANE).toContain('data-testid="office-pane"')
     expect(PANE).toContain('<InboxChips')
@@ -118,7 +122,7 @@ test.describe('office pane and inbox tab (59-09)', () => {
   })
 
   test('the ledger suffix is said only when the action says it was logged', () => {
-    expect(PANE).toMatch(/r\.logged === true\) return \{ text: `\$\{r\.receipt\} · logged in the decision ledger`/)
+    expect(PANE).toMatch(/r\.logged === true\) \{\s*return \{ text: `\$\{r\.receipt\} · logged in the decision ledger/)
     expect(PANE).toMatch(/r\.logged === false/)
     expect(PANE).toContain("didn't reach the decision ledger")
     // The suffix literal appears exactly once, inside the logged === true branch.
