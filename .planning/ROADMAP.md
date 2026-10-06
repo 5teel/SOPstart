@@ -1716,7 +1716,7 @@ Executes 55 → 56 → 57 → 58 → 59 → 60 → 61 → 62, strictly sequentia
 - [x] **Phase 57: The One Screen & Its Places** - List · isometric site · detail panel as the landing screen, four signposted rooms, search, "next for you" card, pins, site edit mode; no header navigation (completed 2026-10-04)
 - [x] **Phase 58: The SOP Focus Screen — Walk & Edit** - Opening a SOP removes the map and the list; walk one step at a time to a sign-off, or edit with the AI check and tick-each-step before publish; new versions (completed 2026-10-05)
 - [x] **Phase 59: The Office** - Inbox that drains, sign-off and approvals, decision ledger, people and roles, the existing access wiring — one room, with the detail panel widening for tables (completed 2026-10-05)
-- [ ] **Phase 60: Requests, Notifications & Objectives** - People and agents raise requests the Office answers; notifications with a bell; objectives as quiet metadata; the site overview fills in
+- [x] **Phase 60: Requests, Notifications & Objectives** - People and agents raise requests the Office answers; notifications with a bell; objectives as quiet metadata; the site overview fills in (completed 2026-10-06)
 - [ ] **Phase 61: The Workshop & the Smoko Room** - Four ways to start a SOP, in-progress list, AI model choice, worker change requests; training matrix, simple observations, my record
 - [ ] **Phase 62: Removal Certified, Addresses & Maps** - Every old address redirects, every place has an address, a guard fails the build if a dropped route or package returns, pathways map and feedback page rebuilt
 
@@ -2052,7 +2052,7 @@ Plans:
   4. The bell in the list shows a count, and a person is notified when they are next to approve a SOP, when a SOP they own is due for review, when a completion waits for their sign-off, when a request they raised is answered and when a SOP they do has a new version; opening a notification goes to the place it is about
   5. An admin sets, changes and removes an objective on the site, a department, a machine, a SOP or a person, and it shows as quiet metadata saying who set it; an AI agent's request appears in the Office marked as from an agent, and an objective an agent set stays marked until a person confirms it
 
-**Plans:** 17/18 plans executed
+**Plans:** 18/18 plans complete
 Plans:
 **Wave 1**
 
@@ -2106,7 +2106,7 @@ Plans:
 
 **Wave 12** *(blocked on Wave 11 completion)*
 
-- [ ] 60-18-PLAN.md — Deployed eval with every screenshot read and every trigger proven, Railway cron schedules (human action, same CRON_SECRET), build + full suite once, sign-off, requirements, Learnings
+- [x] 60-18-PLAN.md — Deployed eval with every screenshot read and every trigger proven, Railway cron schedules (human action, same CRON_SECRET), build + full suite once, sign-off, requirements, Learnings
 
 **UI hint**: yes
 
