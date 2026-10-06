@@ -154,7 +154,7 @@ export function AskTrigger({
       {open && (
         <div
           data-testid="ask-picker"
-          className={`absolute z-10 mt-1 w-72 max-w-full rounded-lg border border-ink-200 bg-paper-1 p-2 shadow-lg ${
+          className={`absolute z-10 mt-1 w-72 rounded-lg border border-ink-200 bg-paper-1 p-2 shadow-lg ${
             align === 'end' ? 'right-0' : 'left-0'
           }`}
         >
