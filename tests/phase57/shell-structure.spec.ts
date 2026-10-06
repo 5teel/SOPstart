@@ -193,7 +193,7 @@ test.describe('SHL-01 one screen structure', () => {
     expect(found.has('/')).toBe(true)
     // Phase 59: the governance, team and access pages only redirect to the Office; 59-14 deletes them.
     // Phase 60: the assign page is no longer reachable from any screen (asking replaced it); 60-17 deletes it.
-    const REDIRECT_ONLY = new Set(['/governance', '/admin/team', '/admin/access', '/admin/sops/[sopId]/assign'])
+    const REDIRECT_ONLY = new Set(['/governance', '/admin/team', '/admin/access'])
     expect([...found].filter((r) => !mapped.has(r) && !REDIRECT_ONLY.has(r)).sort()).toEqual([])
   })
 })

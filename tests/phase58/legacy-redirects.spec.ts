@@ -52,13 +52,14 @@ test.describe('FOC-03 legacy redirects', () => {
     for (const f of files) expect(fs.readFileSync(f, 'utf-8'), f).not.toMatch(/router\.replace\(/)
   })
 
-  test('builder and versions addresses map to the edit address; nothing else under /admin/sops does (58-14)', () => {
+  test('builder, versions and the retired assign addresses map to the edit address; nothing else under /admin/sops does (58-14)', () => {
     const edit = `/sops/${ID}?mode=edit`
     expect(legacyRedirectFor(`/admin/sops/builder/${ID}`, '')).toBe(edit)
     expect(legacyRedirectFor(`/admin/sops/${ID}/versions`, '?x=1')).toBe(edit)
     expect(legacyRedirectFor('/admin/sops/builder/not-a-uuid', '')).toBeNull()
     expect(legacyRedirectFor('/admin/sops/builder', '')).toBeNull()
-    expect(legacyRedirectFor(`/admin/sops/${ID}/assign`, '')).toBeNull()
+    expect(legacyRedirectFor(`/admin/sops/${ID}/assign`, '')).toBe(edit)
+    expect(legacyRedirectFor('/admin/sops/not-a-uuid/assign', '')).toBeNull()
     expect(legacyRedirectFor('/admin/sops/new', '')).toBeNull()
     expect(legacyRedirectFor(`/admin/sops/${ID}/versions/diff`, '')).toBeNull()
   })
