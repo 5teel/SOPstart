@@ -36,6 +36,7 @@ export interface ClaimedAsk {
   target_role: AppRole | null
   target_user_id: string | null
   note: string | null
+  created_at: string
 }
 
 /** Every version of the SOP's lineage, inside the organisation (a lineage is flat, F-20). */
@@ -188,7 +189,19 @@ async function dropAskedAssignments(organisationId: string, row: ClaimedAsk): Pr
   return !error
 }
 
-const CLAIM_COLUMNS = 'id, subject_id, raised_by_user, target_role, target_user_id, note'
+const CLAIM_COLUMNS = 'id, subject_id, raised_by_user, target_role, target_user_id, note, created_at'
+
+/**
+ * Put a claimed ask back as it was: accepted on the asker's authority at the
+ * time it was raised (A-05), not by whoever just tried to close it.
+ */
+async function restoreAccepted(organisationId: string, claimed: ClaimedAsk): Promise<void> {
+  await createAdminClient()
+    .from('requests')
+    .update({ state: 'accepted', answered_by: claimed.raised_by_user, answer_note: null, decided_at: claimed.created_at })
+    .eq('id', claimed.id)
+    .eq('organisation_id', organisationId)
+}
 
 /**
  * A person declines an ask that names them. The claim only matches an accepted
@@ -215,11 +228,7 @@ export async function declineAskCore(ctx: AskCtx, input: { requestId: string; no
   if (!claimed) return null
   if (!(await dropAskedAssignments(organisationId, claimed))) {
     // The SOP is still due, so the ask stays in force.
-    await admin
-      .from('requests')
-      .update({ state: 'accepted', answered_by: userId, answer_note: null })
-      .eq('id', claimed.id)
-      .eq('organisation_id', organisationId)
+    await restoreAccepted(organisationId, claimed)
     return null
   }
   return claimed
@@ -247,11 +256,7 @@ export async function stopAskingCore(
   const claimed = (data?.[0] as ClaimedAsk | undefined) ?? null
   if (!claimed) return null
   if (!(await dropAskedAssignments(organisationId, claimed))) {
-    await admin
-      .from('requests')
-      .update({ state: 'accepted', answered_by: userId, answer_note: null })
-      .eq('id', claimed.id)
-      .eq('organisation_id', organisationId)
+    await restoreAccepted(organisationId, claimed)
     return null
   }
   return claimed

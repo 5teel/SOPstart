@@ -128,6 +128,18 @@ test.describe('Ask someone to do a SOP (60-06)', () => {
     expect(c).toContain('canStopAny ? claim : claim.eq(\'raised_by_user\', userId)')
   })
 
+  test('a failed assignment drop puts the ask back as the asker accepted it, not as the decliner or stopper (WR-04)', () => {
+    const r = CORE.slice(CORE.indexOf('async function restoreAccepted'), CORE.indexOf('export async function declineAskCore'))
+    expect(r).toContain("state: 'accepted', answered_by: claimed.raised_by_user, answer_note: null, decided_at: claimed.created_at")
+    expect(r).toContain(".eq('organisation_id', organisationId)")
+    expect(CORE).toContain("const CLAIM_COLUMNS = 'id, subject_id, raised_by_user, target_role, target_user_id, note, created_at'")
+    for (const name of ['declineAskCore', 'stopAskingCore']) {
+      const c = body(CORE, name)
+      expect(c, name).toContain('await restoreAccepted(organisationId, claimed)')
+      expect(c, name).not.toContain("state: 'accepted', answered_by: userId")
+    }
+  })
+
   test('listAskTargets is guarded and returns labels, role and hasIt only', () => {
     const c = body(CORE, 'listAskTargetsCore')
     expect(c).toContain('userLabels(')
