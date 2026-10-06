@@ -43,7 +43,7 @@ test.describe('SHL-04 frame', () => {
     expect(FRAME).toContain('highlighted: machineHits.has(m.id)')
     expect(FRAME).toContain('highlighted: roomHits.has(r.id)')
     expect(FRAME).toContain('shownMachines = searching ? machines.filter((m) => machineHits.has(m.id))')
-    expect(FRAME).toContain('shownRooms = searching ? ROOMS.filter((r) => roomHits.has(r.id))')
+    expect(FRAME).toContain('shownRooms = searching ? rooms.filter((r) => roomHits.has(r.id))')
     expect(FRAME).toContain('Nothing matches')
   })
 

@@ -33,6 +33,8 @@ const EXPECTED_EXPORTS = [
   'listSopMachines',
   // Phase 54 (D-04): admin floor-health read, composed on top of listSiteForOrg.
   'listSiteHealthForOrg',
+  // ADR-0003: start an empty site from a template.
+  'applySitePreset',
 ]
 
 /** Splits the file into per-export bodies at each `export async function` boundary. */

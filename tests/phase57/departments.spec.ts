@@ -170,7 +170,7 @@ test.describe('PLC-05 strip', () => {
 
   test('the empty state hands control back through onDone', () => {
     expect(EMPTY).toContain('onDone?: () => void')
-    expect((EMPTY.match(/if \(onDone\) onDone\(\)\s*\n\s*else router\.refresh\(\)/g) ?? []).length).toBe(2)
+    expect((EMPTY.match(/if \(onDone\) onDone\(\)\s*\n\s*else router\.refresh\(\)/g) ?? []).length).toBe(3)
   })
 
 })

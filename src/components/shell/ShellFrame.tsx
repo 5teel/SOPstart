@@ -172,7 +172,8 @@ export function ShellFrame({
         machines.some((m) => m.department_id === d.id && machineHits.has(m.id))
     )
   const shownMachines = searching ? machines.filter((m) => machineHits.has(m.id)) : machines
-  const shownRooms = searching ? ROOMS.filter((r) => roomHits.has(r.id)) : ROOMS
+  const rooms = layout?.rooms ?? ROOMS
+  const shownRooms = searching ? rooms.filter((r) => roomHits.has(r.id)) : rooms
   const nothing = searching && shownRooms.length === 0 && shownDepartments.length === 0 && shownMachines.length === 0
 
   const listPane = (
@@ -322,10 +323,10 @@ export function ShellFrame({
               zoned: effective.kind === 'dept' && m.department_id === effective.id,
               zoneColour: colourByDept.get(m.department_id ?? '') ?? 'var(--ink-500)',
             }))}
-            rooms={ROOMS.map((r) => ({
+            rooms={rooms.map((r) => ({
               id: r.id,
               name: r.name,
-              polygon: roomPolygon(r.id, layout.sceneWidth, layout.sceneHeight),
+              polygon: roomPolygon(r.id, layout.sceneWidth, layout.sceneHeight, rooms),
               pin: roomPins[r.id] ?? 0,
               highlighted: roomHits.has(r.id),
               selected: effective.kind === 'room' && effective.id === r.id,

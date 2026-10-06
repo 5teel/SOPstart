@@ -608,7 +608,7 @@ export const JOURNEYS: Journey[] = [
       { id: 'machine', type: 'screen', label: 'Machine - SOPs and New SOP for this machine', route: '/admin/sops/new/blank', detail: 'New SOP for this machine opens the blank wizard with the machine already chosen; the new SOP is linked to it when it is created.', branches: [
         { label: 'Done', to: 'e' },
       ] },
-      { id: 'edit', type: 'action', label: 'Edit site', detail: 'The site editor replaces the stage and detail panes, with the departments strip above it. Done returns to the overview with fresh marks.', branches: [
+      { id: 'edit', type: 'action', label: 'Edit site', detail: 'The site editor replaces the stage and detail panes, with the departments strip above it. With no site yet it offers four templates (railway maintenance, trades training centre, food-safety training kitchen, bottling factory) that set up the picture, departments, machines and rooms in one tap, or a generated or uploaded picture. Done returns to the overview with fresh marks.', branches: [
         { label: 'Done', to: 'e' },
       ] },
       { id: 'e', type: 'end', label: 'Back on the site' },

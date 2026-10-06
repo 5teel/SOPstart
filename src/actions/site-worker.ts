@@ -17,6 +17,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { getSessionContext } from '@/lib/auth/session-context'
 import type { SopMachineLink, SiteDepartment, WorkerSiteData, WorkerSiteMachine } from '@/lib/validators/site'
 import { SCENE_BUCKET, SCENE_SIGNED_TTL_SEC } from '@/lib/site/scene'
+import { roomsFor } from '@/lib/site/presets'
 import { latestPublished, type LineageRow } from '@/lib/sop/lineage-current'
 
 export async function listSiteForWorker(): Promise<WorkerSiteData | { error: string }> {
@@ -29,7 +30,7 @@ export async function listSiteForWorker(): Promise<WorkerSiteData | { error: str
   // 1. The org's site layout — oldest first, same as listSiteForOrg (D-04).
   const { data: layoutRow, error: layoutErr } = await db
     .from('site_layouts')
-    .select('id, scene_path, scene_width, scene_height')
+    .select('id, scene_path, scene_width, scene_height, preset')
     .eq('organisation_id', orgId)
     .order('created_at', { ascending: true })
     .limit(1)
@@ -38,7 +39,7 @@ export async function listSiteForWorker(): Promise<WorkerSiteData | { error: str
     console.error('[listSiteForWorker] layout error', layoutErr)
     return { error: layoutErr.message }
   }
-  const layout = layoutRow as { id: string; scene_path: string | null; scene_width: number | null; scene_height: number | null } | null
+  const layout = layoutRow as { id: string; scene_path: string | null; scene_width: number | null; scene_height: number | null; preset: string | null } | null
   if (!layout || !layout.scene_path || !layout.scene_width || !layout.scene_height) {
     // No layout, or an incomplete one — the page falls back to the list (D-04).
     return { layout: null, machines: [], links: [], departments: [] }
@@ -76,7 +77,7 @@ export async function listSiteForWorker(): Promise<WorkerSiteData | { error: str
 
   if (machineData.length === 0) {
     return {
-      layout: { id: layout.id, sceneUrl: signedScene.signedUrl, sceneWidth: layout.scene_width, sceneHeight: layout.scene_height },
+      layout: { id: layout.id, sceneUrl: signedScene.signedUrl, sceneWidth: layout.scene_width, sceneHeight: layout.scene_height, rooms: roomsFor(layout.preset) },
       machines: [],
       links: [],
       departments: [],
@@ -134,7 +135,7 @@ export async function listSiteForWorker(): Promise<WorkerSiteData | { error: str
   }
 
   return {
-    layout: { id: layout.id, sceneUrl: signedScene.signedUrl, sceneWidth: layout.scene_width, sceneHeight: layout.scene_height },
+    layout: { id: layout.id, sceneUrl: signedScene.signedUrl, sceneWidth: layout.scene_width, sceneHeight: layout.scene_height, rooms: roomsFor(layout.preset) },
     machines,
     links,
     departments: (deptRows ?? []) as SiteDepartment[],

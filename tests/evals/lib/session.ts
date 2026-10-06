@@ -37,6 +37,8 @@ export const EVAL_USERS = {
   siteSupervisorIdle: 'eval-site-supervisor-idle@sopstart.com',
   // Phase 60: safety manager member of the eval-site org -- the second approver of a two-step chain.
   siteSafety: 'eval-site-safety@sopstart.com',
+  // ADR-0003: sole admin of a throwaway org the site-templates eval recreates every run.
+  templateAdmin: 'eval-template-admin@sopstart.com',
 } as const
 // Phase 59: a worker nobody supervises. No session is minted for it; the eval only seeds rows for it.
 export const EVAL_SITE_WORKER2_EMAIL = 'eval-site-worker2@sopstart.com'

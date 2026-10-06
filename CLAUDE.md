@@ -92,7 +92,7 @@ SafeStart is a multi-tenant SaaS progressive web app that helps blue-collar trad
 2. A structural choice (where work runs and what triggers it, data ownership, security boundaries, external services, infrastructure) gets a new ADR **in the same commit** as the change; a mechanically checkable one also gets a guard under `tests/lint/` named in its `Enforced by` line.
 3. Never edit an accepted ADR's decision — supersede it with a new one.
 
-Current: ADR-0001 (record decisions) · **ADR-0002 (no scheduled jobs — work runs on the event that causes it or the read that needs it; no cron routes, no cron services)**.
+Current: ADR-0001 (record decisions) · **ADR-0002 (no scheduled jobs — work runs on the event that causes it or the read that needs it; no cron routes, no cron services)** · ADR-0003 (site templates are code in `src/lib/site/presets.ts`; `site_layouts.preset` picks the picture's rooms, resolved server-side via `roomsFor()` into `layout.rooms`).
 
 ## Commands
 

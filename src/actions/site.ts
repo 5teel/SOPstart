@@ -15,6 +15,8 @@
  *                             sprites, unfiltered links — drafts included) for the
  *                             admin health repaint; reshapes listSiteForOrg, never
  *                             a second admin-health classifier (CLAUDE.md 2026-09-27)
+ *  - applySitePreset()      — ADR-0003: start an empty site from a template
+ *                             (picture + departments + machines; rooms by preset)
  *
  * All functions return a discriminated union `{ ... } | { error }` — never throw.
  * requireAdminContext() runs first in every export; the session client carries the
@@ -27,6 +29,8 @@
  */
 import { z } from 'zod'
 import sharp from 'sharp'
+import { readFile } from 'node:fs/promises'
+import path from 'node:path'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { requireAdminContext } from '@/lib/auth/guards'
 import { reconcileMachineRequests } from '@/lib/requests/machine-requests'
@@ -48,6 +52,8 @@ import type {
   WorkerSiteMachine,
 } from '@/lib/validators/site'
 import { scenePath, polygonWithinScene, newMachineCode, SCENE_BUCKET, SCENE_SIGNED_TTL_SEC } from '@/lib/site/scene'
+import { SITE_PRESETS, SITE_PRESET_IDS, presetImagePath, roomsFor } from '@/lib/site/presets'
+import { deriveDepartmentCode } from '@/lib/site/departments'
 
 // ---------------------------------------------------------------------------
 // 1. listSiteForOrg
@@ -582,9 +588,124 @@ export async function listSiteHealthForOrg(): Promise<AdminSiteFloor | { error: 
       sceneUrl: site.layout.sceneUrl,
       sceneWidth: site.layout.scene_width,
       sceneHeight: site.layout.scene_height,
+      rooms: roomsFor(site.layout.preset),
     },
     machines,
     links: site.links,
     departments: site.departments,
   }
+}
+
+// ---------------------------------------------------------------------------
+// 9. applySitePreset — ADR-0003. One template onto an org with no site yet:
+//    copies the template picture into the org's scene path, records it through
+//    upsertSiteLayout (the single natural-size probe), stamps `preset` so the
+//    shell uses that picture's rooms, then reuses-or-creates departments by
+//    name and draws every machine through upsertSiteMachine.
+// ---------------------------------------------------------------------------
+
+export async function applySitePreset(presetId: string): Promise<{ layoutId: string } | { error: string }> {
+  const ctx = await requireAdminContext()
+  if ('error' in ctx) return { error: ctx.error }
+  const orgId = ctx.organisationId
+  if (!orgId) return { error: 'No organisation' }
+  const db = ctx.supabase as unknown as SupabaseClient
+
+  const parsedId = z.enum(SITE_PRESET_IDS).safeParse(presetId)
+  if (!parsedId.success) return { error: 'Unknown template' }
+  const preset = SITE_PRESETS.find((p) => p.id === parsedId.data)
+  if (!preset) return { error: 'Unknown template' }
+
+  const { data: existing, error: existingErr } = await db
+    .from('site_layouts')
+    .select('id')
+    .eq('organisation_id', orgId)
+    .limit(1)
+    .maybeSingle()
+  if (existingErr) {
+    console.error('[applySitePreset] existing check error', existingErr)
+    return { error: existingErr.message }
+  }
+  if (existing) return { error: 'This organisation already has a site' }
+
+  // The picture ships in public/ — read from disk, never fetched by URL.
+  let buf: Buffer
+  try {
+    buf = await readFile(path.join(process.cwd(), 'public', presetImagePath(preset.id)))
+  } catch (err) {
+    console.error('[applySitePreset] read error', err)
+    return { error: 'Could not load the template picture' }
+  }
+
+  const layoutId = crypto.randomUUID()
+  const { error: uploadErr } = await db.storage
+    .from(SCENE_BUCKET)
+    .upload(scenePath(orgId, layoutId, 'jpg'), buf, { contentType: 'image/jpeg' })
+  if (uploadErr) {
+    console.error('[applySitePreset] upload error', uploadErr)
+    return { error: 'Could not save the template picture' }
+  }
+
+  const recorded = await upsertSiteLayout({ id: layoutId, ext: 'jpg', name: preset.name })
+  if ('error' in recorded) return recorded
+  const { scene_width: w, scene_height: h } = recorded.layout
+  if (!w || !h) return { error: 'Could not read the template picture' }
+
+  const { data: stamped, error: stampErr } = await db
+    .from('site_layouts')
+    .update({ preset: preset.id })
+    .eq('id', layoutId)
+    .eq('organisation_id', orgId)
+    .select('id')
+  if (stampErr || !stamped || stamped.length === 0) {
+    console.error('[applySitePreset] preset stamp error', stampErr)
+    return { error: stampErr?.message ?? 'Could not save the template' }
+  }
+
+  // Departments: reuse an active one with the same name, else create it.
+  const { data: deptRows, error: deptErr } = await db
+    .from('departments')
+    .select('id, name, code, archived')
+    .eq('organisation_id', orgId)
+  if (deptErr) {
+    console.error('[applySitePreset] departments error', deptErr)
+    return { error: deptErr.message }
+  }
+  const allDepts = (deptRows ?? []) as Array<{ id: string; name: string; code: string; archived: boolean }>
+  const codes = allDepts.map((d) => d.code)
+  const deptIds: string[] = []
+  for (const d of preset.departments) {
+    const found = allDepts.find((x) => !x.archived && x.name.trim().toLowerCase() === d.name.toLowerCase())
+    if (found) {
+      deptIds.push(found.id)
+      continue
+    }
+    const code = deriveDepartmentCode(d.name, codes)
+    codes.push(code)
+    const { data: created, error: createErr } = await db
+      .from('departments')
+      .insert({ organisation_id: orgId, name: d.name, code, colour: d.colour })
+      .select('id')
+      .single()
+    if (createErr || !created) {
+      console.error('[applySitePreset] department insert error', createErr)
+      return { error: createErr?.message ?? 'Could not create a department' }
+    }
+    deptIds.push((created as { id: string }).id)
+  }
+
+  // ponytail: sequential, ~20 machines; a failure part-way leaves a usable
+  // site with the machines drawn so far, which the admin can finish by hand.
+  for (const [i, m] of preset.machines.entries()) {
+    const result = await upsertSiteMachine({
+      siteLayoutId: layoutId,
+      name: m.name,
+      departmentId: deptIds[m.dept] ?? null,
+      polygon: m.frac.map(([fx, fy]) => [Math.round(fx * w), Math.round(fy * h)] as [number, number]),
+      sort: i,
+    })
+    if ('error' in result) return { error: `${m.name}: ${result.error}` }
+  }
+
+  return { layoutId }
 }

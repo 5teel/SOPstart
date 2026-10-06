@@ -1,23 +1,27 @@
 'use client'
 
 /**
- * Phase 51 — D-11 empty state for the site edit mode: two large choices, Generate
- * (only when GEMINI_API_KEY is configured, D-06) and Upload (always).
- * Both on-ramps record the scene through the single upsertSiteLayout path.
+ * Phase 51 — D-11 empty state for the site edit mode: start from a template
+ * (ADR-0003), Generate (only when GEMINI_API_KEY is configured, D-06) or Upload.
+ * Every on-ramp records the scene through the single upsertSiteLayout path.
  */
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Loader2, Sparkles, Upload as UploadIcon } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import { createSceneUploadUrl, upsertSiteLayout } from '@/actions/site'
+import { applySitePreset, createSceneUploadUrl, upsertSiteLayout } from '@/actions/site'
 import { SCENE_MAX_BYTES, SCENE_MIME_TYPES } from '@/lib/validators/site'
 import { extForMime } from '@/lib/site/scene'
+import { SITE_PRESETS, presetImagePath } from '@/lib/site/presets'
 
 export function SiteEmptyState({ canGenerate, onDone }: { canGenerate: boolean; onDone?: () => void }) {
   const router = useRouter()
   const [description, setDescription] = useState('')
   const [generating, setGenerating] = useState(false)
   const [generateError, setGenerateError] = useState<string | null>(null)
+
+  const [applying, setApplying] = useState<string | null>(null)
+  const [presetError, setPresetError] = useState<string | null>(null)
 
   const [uploading, setUploading] = useState(false)
   const [uploadStage, setUploadStage] = useState<string | null>(null)
@@ -45,6 +49,19 @@ export function SiteEmptyState({ canGenerate, onDone }: { canGenerate: boolean; 
       setGenerateError('Scene generation failed — try again or upload an image.')
       setGenerating(false)
     }
+  }
+
+  async function handlePreset(id: string) {
+    setPresetError(null)
+    setApplying(id)
+    const result = await applySitePreset(id)
+    if ('error' in result) {
+      setPresetError(result.error)
+      setApplying(null)
+      return
+    }
+    if (onDone) onDone()
+    else router.refresh()
   }
 
   async function handleUpload(file: File) {
@@ -106,7 +123,36 @@ export function SiteEmptyState({ canGenerate, onDone }: { canGenerate: boolean; 
         Describe the site once — every machine you draw on it becomes a place SOPs belong to.
       </p>
 
-      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <h2 className="mt-8 text-ui font-medium text-ink-900">Start from a template</h2>
+      <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {SITE_PRESETS.map((p) => (
+          <button
+            key={p.id}
+            type="button"
+            data-testid="site-preset"
+            data-preset-id={p.id}
+            onClick={() => void handlePreset(p.id)}
+            disabled={applying !== null}
+            className="flex flex-col overflow-hidden rounded-lg border border-ink-200 bg-paper-1 text-left hover:border-ink-900 disabled:opacity-60"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element -- static thumbnail from public/ */}
+            <img src={presetImagePath(p.id)} alt="" className="aspect-video w-full object-cover" />
+            <span className="flex items-center gap-2 px-3 pt-3 text-ui font-medium text-ink-900">
+              {applying === p.id && <Loader2 className="h-4 w-4 animate-spin" />}
+              {applying === p.id ? 'Setting up the site…' : p.name}
+            </span>
+            <span className="px-3 pb-3 pt-1 text-meta text-ink-500">{p.blurb}</span>
+          </button>
+        ))}
+      </div>
+      {presetError && (
+        <p role="alert" aria-live="polite" className="mt-2 text-meta text-accent-hazard">
+          {presetError}
+        </p>
+      )}
+
+      <h2 className="mt-8 text-ui font-medium text-ink-900">Or draw your own</h2>
+      <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
         {canGenerate && (
           <div className="rounded-lg border border-ink-200 bg-paper-1 p-4">
             <div className="flex items-center gap-2">

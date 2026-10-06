@@ -3,9 +3,10 @@
  *
  * Plain module, no directive, no React/Konva/node: imports -- importable from
  * client and server code. Rooms are FIXED hit-areas on the isometric scene,
- * stored as fractions (0-1) of the scene size so one table fits every org's
- * picture (real org 2752x1536, eval-site org 1600x900). There is no table, no
- * column and no admin UI behind them.
+ * stored as fractions (0-1) of the scene size (real org 2752x1536, eval-site
+ * org 1600x900). There is no room table and no admin UI behind them; a layout
+ * made from a site template (ADR-0003) uses that picture's rooms
+ * (presets.ts PRESET_ROOMS, resolved on the server).
  */
 import type { Point } from '@/lib/validators/site'
 
@@ -32,8 +33,8 @@ export const ROOMS: ReadonlyArray<Room> = [
 ]
 
 /** A room's polygon in scene pixels. */
-export function roomPolygon(id: RoomId, sceneWidth: number, sceneHeight: number): Point[] {
-  const room = ROOMS.find((r) => r.id === id)
+export function roomPolygon(id: RoomId, sceneWidth: number, sceneHeight: number, rooms: ReadonlyArray<Room> = ROOMS): Point[] {
+  const room = rooms.find((r) => r.id === id)
   if (!room) return []
   return room.frac.map(([fx, fy]) => [Math.round(fx * sceneWidth), Math.round(fy * sceneHeight)] as Point)
 }

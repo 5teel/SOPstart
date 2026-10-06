@@ -5,6 +5,7 @@
  * House style: `z.string().uuid()`, not `z.uuid()`.
  */
 import { z } from 'zod'
+import type { Room } from '@/lib/site/rooms'
 
 // -- Storage constants (D-05) --------------------------------------------
 export const SCENE_MAX_BYTES = 15 * 1024 * 1024
@@ -62,6 +63,8 @@ export interface SiteLayout {
   scene_path: string | null
   scene_width: number | null
   scene_height: number | null
+  /** Template id (src/lib/site/presets.ts), null for an uploaded/generated scene. */
+  preset: string | null
   created_at: string
   updated_at: string
 }
@@ -113,6 +116,8 @@ export interface WorkerSiteLayout {
   sceneUrl: string
   sceneWidth: number
   sceneHeight: number
+  /** Resolved on the server from site_layouts.preset (ADR-0003). */
+  rooms: ReadonlyArray<Room>
 }
 
 export interface WorkerSiteMachine {

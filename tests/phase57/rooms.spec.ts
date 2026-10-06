@@ -11,6 +11,7 @@ import { test, expect } from '@playwright/test'
 import fs from 'node:fs'
 import path from 'node:path'
 import { ROOMS, ROOM_IDS, roomPolygon } from '@/lib/site/rooms'
+import { SITE_PRESETS, PRESET_ROOMS, SITE_PRESET_IDS, roomsFor } from '@/lib/site/presets'
 
 type P = readonly [number, number]
 
@@ -84,5 +85,42 @@ test.describe('PLC-01 rooms', () => {
     const src = fs.readFileSync(path.join(process.cwd(), 'src', 'lib', 'site', 'rooms.ts'), 'utf-8').replace(/\r\n/g, '\n')
     expect(src).not.toContain('use server')
     expect(src.toLowerCase()).not.toContain('supabase')
+  })
+})
+
+// ADR-0003: each site template carries its own picture, rooms and machines.
+test.describe('ADR-0003 site templates', () => {
+  const inRange = ([x, y]: P) => x >= 0 && x <= 1 && y >= 0 && y <= 1
+
+  test('every template id has a preset, rooms, a picture and a database check value', () => {
+    const migration = fs.readFileSync(path.join(process.cwd(), 'supabase', 'migrations', '00075_site_layout_preset.sql'), 'utf-8')
+    expect(SITE_PRESETS.map((p) => p.id)).toEqual([...SITE_PRESET_IDS])
+    for (const id of SITE_PRESET_IDS) {
+      expect(PRESET_ROOMS[id].map((r) => r.id), id).toEqual([...ROOM_IDS])
+      expect(fs.existsSync(path.join(process.cwd(), 'public', 'site-presets', `${id}.jpg`)), id).toBe(true)
+      expect(migration, id).toContain(`'${id}'`)
+    }
+  })
+
+  test('roomsFor picks the template rooms and falls back to the default table', () => {
+    expect(roomsFor(null)).toBe(ROOMS)
+    expect(roomsFor('nope')).toBe(ROOMS)
+    expect(roomsFor('railway')).toBe(PRESET_ROOMS.railway)
+  })
+
+  test('outlines are in range, departments resolve, and no room or machine corner sits inside a room', () => {
+    for (const p of SITE_PRESETS) {
+      const rooms = PRESET_ROOMS[p.id]
+      for (const m of p.machines) {
+        expect(p.departments[m.dept], `${p.id} ${m.name}`).toBeTruthy()
+        expect(m.frac.every(inRange), `${p.id} ${m.name}`).toBe(true)
+        for (const r of rooms) for (const v of m.frac) expect(inside(v, r.frac), `${p.id} ${m.name} in ${r.id}`).toBe(false)
+      }
+      for (const a of rooms) {
+        expect(a.frac.every(inRange), `${p.id} ${a.id}`).toBe(true)
+        for (const b of rooms) if (a.id !== b.id) for (const v of a.frac) expect(inside(v, b.frac), `${p.id} ${a.id} in ${b.id}`).toBe(false)
+      }
+      expect(new Set(p.machines.map((m) => m.name)).size, p.id).toBe(p.machines.length)
+    }
   })
 })
