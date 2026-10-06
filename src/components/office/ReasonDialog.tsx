@@ -7,6 +7,7 @@
  */
 import { useEffect, useRef, useState } from 'react'
 import { Loader2 } from 'lucide-react'
+import { DialogShell } from '@/components/requests/DialogShell'
 
 export interface ReasonDialogProps {
   title: string
@@ -38,42 +39,25 @@ export function ReasonDialog({
   const [reason, setReason] = useState('')
   const [touched, setTouched] = useState(false)
   const fieldRef = useRef<HTMLTextAreaElement>(null)
-  const cancelRef = useRef(onCancel)
-  useEffect(() => {
-    cancelRef.current = onCancel
-  })
-
   const trimmed = reason.trim()
   const valid = trimmed.length >= MIN
 
-  // Focus lands in the field and goes back to whatever opened the dialog.
+  // Focus lands in the field; the shell hands it back to whatever opened the dialog.
   useEffect(() => {
-    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null
     fieldRef.current?.focus()
-    return () => {
-      if (opener && opener.isConnected) opener.focus()
-    }
   }, [])
-
-  function onKeyDown(e: React.KeyboardEvent) {
-    if (e.key !== 'Escape') return
-    e.preventDefault()
-    e.stopPropagation()
-    if (!pending) cancelRef.current()
-  }
 
   const confirmClass =
     confirmTone === 'escalate' ? 'bg-accent-escalate text-white' : 'bg-ink-900 text-paper'
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-ink-900/40 p-4" onKeyDown={onKeyDown}>
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="reason-dialog-title"
-        data-testid="reason-dialog"
-        className="flex w-full max-w-md flex-col gap-4 rounded-2xl bg-paper-1 p-6"
-      >
+    <DialogShell
+      labelledBy="reason-dialog-title"
+      testId="reason-dialog"
+      onEscape={() => {
+        if (!pending) onCancel()
+      }}
+    >
         <h2 id="reason-dialog-title" className="text-lg font-semibold text-ink-900">
           {title}
         </h2>
@@ -124,7 +108,6 @@ export function ReasonDialog({
             {cancelLabel}
           </button>
         </div>
-      </div>
-    </div>
+    </DialogShell>
   )
 }
