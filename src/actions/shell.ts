@@ -11,6 +11,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { requireAdminContext } from '@/lib/auth/guards'
 import { loadInbox } from '@/lib/governance/load-inbox'
 import { inboxCounts, type InboxChip } from '@/lib/governance/inbox'
+import { ensureReviewDueNotifications } from '@/lib/notifications/ensure-review-due'
 import { officePinCount } from '@/lib/requests/model'
 import type { GovernanceRow } from '@/actions/governance'
 import type { AdminSiteFloor } from '@/lib/validators/site'
@@ -39,7 +40,9 @@ export async function getAdminShell(): Promise<AdminShellData | { error: string 
   if ('error' in ctx) return { error: ctx.error }
   if (!ctx.organisationId) return { error: 'No organisation' }
 
-  const inbox = await loadInbox()
+  // ADR-0002: due reviews are written when the owner loads the screen, so the bell
+  // and the overview show them on this same load. Never throws.
+  const [inbox] = await Promise.all([loadInbox(), ensureReviewDueNotifications(ctx.organisationId, ctx.user.id)])
   if ('error' in inbox) return { error: inbox.error }
 
   const db = ctx.supabase as unknown as SupabaseClient

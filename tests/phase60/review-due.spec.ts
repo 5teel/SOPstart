@@ -3,6 +3,8 @@
  * Registration: playwright.config.ts `phase60` project.
  */
 import { test, expect } from '@playwright/test'
+import fs from 'node:fs'
+import path from 'node:path'
 import { reviewDueTargets, type ReviewDueRow } from '@/lib/notifications/review-due'
 import { DUE_SOON_WINDOW_DAYS } from '@/lib/governance/classify'
 
@@ -48,6 +50,22 @@ test.describe('Review-due selection (60-08)', () => {
       row({ id: 'v2', version: 2, parent_sop_id: 'v1', review_due_at: null }),
     ]
     expect(reviewDueTargets(rows, NOW)).toEqual([])
+  })
+
+  test('ensureReviewDueNotifications: this user only, latest-first, idempotent, never throws, called from the shell reads (ADR-0002)', () => {
+    const src = fs.readFileSync(path.resolve(__dirname, '..', '..', 'src/lib/notifications/ensure-review-due.ts'), 'utf-8')
+    expect(src.trimStart().startsWith("import 'server-only'")).toBe(true)
+    expect(src).not.toMatch(/['"]use server['"]/)
+    expect(src).toContain(".eq('organisation_id', organisationId)")
+    expect(src).toContain(".eq('status', 'published')")
+    // every published row goes to the pure function; a date filter here would flag a superseded version (WR-06)
+    expect(src).not.toContain(".not('review_due_at', 'is', null)")
+    expect(src).toContain('.filter((t) => t.ownerId === userId)')
+    expect(src).toContain("dedupeKey({ kind: 'review_due', sopId: t.sopId, dueAt: t.reviewDueAt })")
+    expect(src).toMatch(/catch \(err\)[\s\S]*return 0/)
+    const root = path.resolve(__dirname, '..', '..')
+    expect(fs.readFileSync(path.join(root, 'src/actions/shell.ts'), 'utf-8')).toContain('ensureReviewDueNotifications(ctx.organisationId, ctx.user.id)')
+    expect(fs.readFileSync(path.join(root, 'src/actions/office.ts'), 'utf-8')).toContain('ensureReviewDueNotifications(organisationId, userId)')
   })
 
   test('a SOP with no owner is skipped', () => {

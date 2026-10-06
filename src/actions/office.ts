@@ -23,12 +23,13 @@ import { nzStartOfDayIso } from '@/lib/office/format'
 import { deriveInbox, type InboxItem } from '@/lib/governance/inbox'
 import { listMyReviewRows, listOpenRequests, listPendingSignOffs, loadInbox } from '@/lib/governance/load-inbox'
 import { memberLabel, userLabels } from '@/lib/members/labels'
+import { ensureReviewDueNotifications } from '@/lib/notifications/ensure-review-due'
 import type { OfficeRequest } from '@/lib/requests/model'
 
 export type OfficeInbox = { role: 'admin' | 'safety_manager' | 'supervisor'; items: InboxItem[]; requests: OfficeRequest[] }
 
 export async function getOfficeInbox(): Promise<OfficeInbox | { error: string }> {
-  const { userId, role } = await getSessionContext()
+  const { userId, role, organisationId } = await getSessionContext()
   if (!userId) return { error: 'Not authenticated' }
 
   if (role === 'admin' || role === 'safety_manager') {
@@ -43,6 +44,8 @@ export async function getOfficeInbox(): Promise<OfficeInbox | { error: string }>
       listPendingSignOffs(),
       listMyReviewRows(),
       listOpenRequests(),
+      // ADR-0002: admins get this on the shell read; a supervisor never loads it, so it runs here.
+      organisationId ? ensureReviewDueNotifications(organisationId, userId) : 0,
     ])
     if ('error' in signOffs) return { error: signOffs.error }
     if ('error' in ownedReviews) return { error: ownedReviews.error }
