@@ -61,13 +61,16 @@ test.describe('signoff panel', () => {
   })
 
   test('ReasonDialog is modal, gates on 10 characters and closes only itself on Escape', () => {
-    expect(DIALOG).toContain('aria-modal="true"')
-    expect(DIALOG).toContain('role="dialog"')
+    // 60-12: scrim, panel and Esc live in the shared DialogShell the reason dialog renders through.
+    const shell = strip(read('src/components/requests/DialogShell.tsx'))
+    expect(DIALOG).toContain('<DialogShell')
+    expect(shell).toContain('aria-modal="true"')
+    expect(shell).toContain('role="dialog"')
     expect(DIALOG).toContain('const MIN = 10')
     expect(DIALOG).toContain('trimmed.length >= MIN')
     expect(DIALOG).toMatch(/disabled=\{!valid \|\| pending\}/)
     expect(DIALOG).toContain('onClick={() => onConfirm(trimmed)}')
-    const esc = DIALOG.slice(DIALOG.indexOf('function onKeyDown'))
+    const esc = shell.slice(shell.indexOf('function onKeyDown'))
     expect(esc).toContain("e.key !== 'Escape'")
     expect(esc).toContain('e.preventDefault()')
     expect(esc).toContain('e.stopPropagation()')
