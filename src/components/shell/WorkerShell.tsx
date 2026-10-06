@@ -12,6 +12,7 @@ import { useQuery } from '@tanstack/react-query'
 import { getOfficeInbox } from '@/actions/office'
 import { listSiteForWorker } from '@/actions/site-worker'
 import { AccountControl } from '@/components/shell/AccountControl'
+import { NotificationBell } from '@/components/shell/NotificationBell'
 import { OfficeCard } from '@/components/shell/OfficeCard'
 import { ShellFrame, type ShellSite } from '@/components/shell/ShellFrame'
 import {
@@ -30,6 +31,7 @@ import type { Place } from '@/lib/shell/place'
 import { tabsForRole } from '@/lib/shell/office-tabs'
 import { officePinCount } from '@/lib/requests/model'
 import { OFFICE_INBOX_KEY } from '@/lib/shell/query-keys'
+import { requestOverviewSection } from '@/lib/shell/overview-focus'
 import {
   compareToDoFirst,
   derivePlantPins,
@@ -64,6 +66,10 @@ const AskTrigger = dynamic(() => import('@/components/requests/AskPicker').then(
 })
 
 // The objective line is a lazy module: the static line cost the home download past its gate (60-13).
+const SiteOverview = dynamic(() => import('@/components/shell/SiteOverview').then((m) => m.SiteOverview), {
+  ssr: false,
+  loading: () => null,
+})
 const WorkerObjective = dynamic(() => import('@/components/shell/WorkerObjective').then((m) => m.WorkerObjective), {
   ssr: false,
   loading: () => null,
@@ -153,7 +159,12 @@ export function WorkerShell({ siteName, userEmail, initialPlace, initialTab, ini
         return isSupervisor ? (
           <OfficePane place={place} select={ctx.select} initialSop={initialSop} />
         ) : (
-          <OfficeWorkerBody />
+          <OfficeWorkerBody
+            onMyRequests={() => {
+              ctx.select({ kind: 'overview' })
+              requestOverviewSection('requests')
+            }}
+          />
         )
       }
       if (place.id === 'smoko') return <SmokoBody />
@@ -161,16 +172,24 @@ export function WorkerShell({ siteName, userEmail, initialPlace, initialTab, ini
       return libraryError ? loadError : <NoticeboardWorkerBody sops={siteSops} />
     }
     return (
-      <SiteSummary
-        siteName={siteName}
-        machines={site.machines.length}
-        published={workerSops.length}
-        roleLine={
-          isSupervisor
-            ? `${signOffs} ${signOffs === 1 ? 'walk is' : 'walks are'} waiting for your sign-off.`
-            : `${dueTotal} ${dueTotal === 1 ? 'SOP is' : 'SOPs are'} due for you.`
-        }
-      />
+      <>
+        <SiteSummary
+          siteName={siteName}
+          machines={site.machines.length}
+          published={workerSops.length}
+          roleLine={
+            isSupervisor
+              ? `${signOffs} ${signOffs === 1 ? 'walk is' : 'walks are'} waiting for your sign-off.`
+              : `${dueTotal} ${dueTotal === 1 ? 'SOP is' : 'SOPs are'} due for you.`
+          }
+        />
+        <SiteOverview
+          role={role}
+          select={ctx.select}
+          machines={site.machines.map((m) => ({ id: m.id, name: m.name }))}
+          departments={site.departments.map((d) => ({ id: d.id, name: d.name }))}
+        />
+      </>
     )
   }
 
@@ -206,6 +225,14 @@ export function WorkerShell({ siteName, userEmail, initialPlace, initialTab, ini
       }}
       renderDetail={renderDetail}
       deptMeta={(id) => <WorkerObjective type="department" id={id} />}
+      renderBell={(select) => (
+        <NotificationBell
+          onOpen={() => {
+            select({ kind: 'overview' })
+            requestOverviewSection('notifications')
+          }}
+        />
+      )}
       account={<AccountControl email={userEmail} isAdmin={false} />}
     />
   )

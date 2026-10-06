@@ -19,6 +19,7 @@ import { SiteEmptyState } from '@/components/admin/site/SiteEmptyState'
 import { SiteWorkspace } from '@/components/admin/site/SiteWorkspace'
 import { AccountControl } from '@/components/shell/AccountControl'
 import { AdminNoticeboardBody, AdminWorkshopBody } from '@/components/shell/AdminRoomBodies'
+import { NotificationBell } from '@/components/shell/NotificationBell'
 import { OfficeCard } from '@/components/shell/OfficeCard'
 import { useObjectives } from '@/components/shell/ObjectiveLine'
 import { ObjectiveSlot } from '@/components/shell/ObjectiveSlot'
@@ -30,10 +31,15 @@ import { healthPinCount, machineHealth, machinePanelSops, noticeboardSops } from
 import type { Place } from '@/lib/shell/place'
 import { tabsForRole } from '@/lib/shell/office-tabs'
 import { SHELL_KEY } from '@/lib/shell/query-keys'
+import { requestOverviewSection } from '@/lib/shell/overview-focus'
 import { useRole } from '@/components/providers/RoleProvider'
 import { zoneColour } from '@/lib/site/scene'
 
 // The Office pane is its own chunk, reached only here and in WorkerShell (59 A-11).
+const SiteOverview = dynamic(() => import('@/components/shell/SiteOverview').then((m) => m.SiteOverview), {
+  ssr: false,
+  loading: () => null,
+})
 const OfficePane = dynamic(() => import('@/components/office/OfficePane').then((m) => m.OfficePane), {
   ssr: false,
   loading: () => (
@@ -173,13 +179,21 @@ export function AdminShell({ siteName, userEmail, initialPlace, initialTab, init
       return <AdminNoticeboardBody sops={q ? siteSops.filter((s) => s.title.toLowerCase().includes(q)) : siteSops} />
     }
     return (
-      <SiteSummary
-        siteName={siteName}
-        machines={site.machines.length}
-        published={published}
-        drafts={drafts.length}
-        roleLine={`${data?.inboxChips.owner ?? 0} no owner · ${data?.inboxChips.overdue ?? 0} review overdue · ${data?.inboxChips.signoff ?? 0} waiting for sign-off`}
-      />
+      <>
+        <SiteSummary
+          siteName={siteName}
+          machines={site.machines.length}
+          published={published}
+          drafts={drafts.length}
+          roleLine={`${data?.inboxChips.owner ?? 0} no owner · ${data?.inboxChips.overdue ?? 0} review overdue · ${data?.inboxChips.signoff ?? 0} waiting for sign-off`}
+        />
+        <SiteOverview
+          role={role}
+          select={ctx.select}
+          machines={site.machines.map((m) => ({ id: m.id, name: m.name }))}
+          departments={site.departments.map((d) => ({ id: d.id, name: d.name }))}
+        />
+      </>
     )
   }
 
@@ -217,6 +231,14 @@ export function AdminShell({ siteName, userEmail, initialPlace, initialTab, init
           current={objectives.find('department', id)}
           emptyLabel="Set an objective"
           emptyStyle="dashed"
+        />
+      )}
+      renderBell={(select) => (
+        <NotificationBell
+          onOpen={() => {
+            select({ kind: 'overview' })
+            requestOverviewSection('notifications')
+          }}
         />
       )}
       renderEdit={(exit) => <SiteEditSurface exit={exit} />}

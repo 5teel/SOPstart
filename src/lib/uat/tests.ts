@@ -660,6 +660,30 @@ export const UAT_TESTS: UatTest[] = [
   },
 
   {
+    id: 'p60-site-overview',
+    dateAdded: '2026-10-06',
+    category: 'The one screen',
+    title: 'Requests, notifications and objectives on the site overview',
+    status: 'active',
+    summary:
+      'With nothing selected, the site now shows what you have been told, what you have asked for and what the site is aiming for. A bell beside search counts what is new.',
+    tryIt: [
+      'Open the site and select nothing. Look under the counts card.',
+      'Look at the bell beside the search box, then press it.',
+      'Open a notification and check it takes you to the right place.',
+      'Find My requests and look at what you asked and what was answered.',
+    ],
+    links: [{ label: 'The site', href: '/' }],
+    questions: [
+      { id: 'bell-clear', text: 'Was it obvious what the bell number meant?' },
+      { id: 'opens-right', text: 'Did opening a notification take you somewhere that made sense?' },
+      { id: 'requests-found', text: 'Could you find your requests and see what happened to them?' },
+    ],
+    background:
+      'Phase 60: bell (browser-client unread count, no polling) opens the lazy SiteOverview; notifications, requests and objectives live there. Evals: tests/evals/requests.eval.ts.',
+  },
+
+  {
     id: 'example-direction-template',
     dateAdded: '2026-06-09',
     category: 'Examples',

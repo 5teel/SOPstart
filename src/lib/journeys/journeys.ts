@@ -551,6 +551,10 @@ export const JOURNEYS: Journey[] = [
     steps: [
       { id: 's', type: 'start', label: 'Opens the site' },
       { id: 'screen', type: 'screen', label: 'The one screen - list, site, detail', route: '/', detail: 'Rooms are always signposted on the site. Selecting a machine or the Noticeboard lists its SOPs with Walk. Searching lights the matching shapes. Esc returns to the overview. Every place has an address, /?place=... A visitor who is not signed in sees the landing with Log In instead; a member with no role goes to the holding screen.' },
+      { id: 'overview', type: 'screen', label: 'Site overview - nothing selected', route: '/', detail: 'With nothing selected the detail pane shows the counts card, then Objectives, Notifications, My requests and a line to the Office. Sections with nothing in them are absent.' },
+      { id: 'bell', type: 'action', label: 'Bell beside search', route: '/', detail: 'The bell shows how many notifications are unread (nothing at 0, 99+ above 99). Pressing it selects the overview and brings the Notifications section into view. It is not shown while the site is being drawn.' },
+      { id: 'notif', type: 'action', label: 'Open a notification', route: '/sops/[sopId]', detail: 'Opening a row marks it read and goes to its place: a machine, the Office, the overview, or the SOP.' },
+      { id: 'myreq', type: 'action', label: 'My requests', route: '/', detail: 'Asked of you, You asked and Answered. Withdraw a request you raised, decline an ask with a reason, or stop asking. The worker Office card has Go to my requests.' },
       { id: 'walk', type: 'action', label: 'Walk a SOP', detail: 'Walk beside a SOP row, or Walk it on the Now card.' },
       { id: 'sop', type: 'screen', label: 'Procedure', route: '/sops/[sopId]' },
       { id: 'smoko', type: 'screen', label: 'Smoko room - my record', route: '/activity', detail: 'The Smoko room bridges to My sign-offs: every role sees their own record.' },

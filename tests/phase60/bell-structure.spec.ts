@@ -51,4 +51,25 @@ test.describe('Notification bell (60-16)', () => {
     const b = bell()
     expect(b).toContain('onClick={onOpen}')
   })
+
+  test('NotificationBell mounts in both shells and opens the overview at Notifications', () => {
+    for (const rel of ['src/components/shell/WorkerShell.tsx', 'src/components/shell/AdminShell.tsx']) {
+      const s = read(rel)
+      expect(s, rel).toContain('<NotificationBell')
+      expect(s, rel).toContain("requestOverviewSection('notifications')")
+      expect(s, rel).toContain("select({ kind: 'overview' })")
+      expect(s, rel).toContain('renderBell=')
+      expect(s, rel).toContain("import('@/components/shell/SiteOverview')")
+      expect(s, rel).not.toMatch(/from '@\/components\/shell\/SiteOverview'/)
+    }
+  })
+
+  test('the worker Office card points at the overview instead of promising a later update', () => {
+    const r = read('src/components/shell/RoomBodies.tsx')
+    expect(r).toContain('Your requests are on the site overview.')
+    expect(r).toContain('Go to my requests')
+    expect(r).not.toContain('Your requests will show here')
+    const w = read('src/components/shell/WorkerShell.tsx')
+    expect(w).toContain("requestOverviewSection('requests')")
+  })
 })

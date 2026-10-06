@@ -20,6 +20,7 @@ import { getOfficeInbox } from '@/actions/office'
 import { listMyRequests, withdrawRequest } from '@/actions/requests'
 import { ReasonDialog } from '@/components/office/ReasonDialog'
 import { ObjectiveLine, useObjectives } from '@/components/shell/ObjectiveLine'
+import { ObjectiveSlot } from '@/components/shell/ObjectiveSlot'
 import { createClient } from '@/lib/supabase/client'
 import { NOTIFICATION_KIND_WORDS, type NotificationKind } from '@/lib/notifications/kinds'
 import { placeTarget } from '@/lib/notifications/places'
@@ -37,10 +38,6 @@ import type { Place } from '@/lib/shell/place'
 import { MY_REQUESTS_KEY, NOTIFICATIONS_KEY, OFFICE_INBOX_KEY } from '@/lib/shell/query-keys'
 import { focusHref } from '@/lib/sop/focus-path'
 
-const ObjectiveSlot = dynamic(() => import('@/components/shell/ObjectiveSlot').then((m) => m.ObjectiveSlot), {
-  ssr: false,
-  loading: () => null,
-})
 const RequestComposerTrigger = dynamic(() => import('@/components/requests/RequestComposer').then((m) => m.RequestComposerTrigger), {
   ssr: false,
   loading: () => null,

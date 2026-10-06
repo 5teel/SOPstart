@@ -26,7 +26,7 @@ function day(iso: string): string {
   return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
-export function OfficeWorkerBody() {
+export function OfficeWorkerBody({ onMyRequests }: { onMyRequests?(): void } = {}) {
   const { data: completions = [] } = useWorkerCompletions()
   const counts = (Object.keys(STATUS_WORDS) as CompletionStatus[]).map((s) => ({
     status: s,
@@ -35,7 +35,12 @@ export function OfficeWorkerBody() {
   return (
     <div data-testid="room-body" data-room-id="office" className="flex flex-col gap-3 p-4 pr-16">
       <h2 className={TITLE}>Office</h2>
-      <p className="text-ui text-ink-500">Your requests will show here in a later update.</p>
+      <p className="text-ui text-ink-500">Your requests are on the site overview.</p>
+      {onMyRequests && (
+        <button type="button" onClick={onMyRequests} className={`min-h-tap self-start ${LINK}`}>
+          Go to my requests
+        </button>
+      )}
       <ul className="flex flex-col gap-1 text-ui text-ink-900">
         {counts.map((c) => (
           <li key={c.status}>

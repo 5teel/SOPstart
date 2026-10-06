@@ -124,7 +124,8 @@ test.describe('Overview (60-15)', () => {
   })
 
   test('the editor and composer arrive lazily; the groups come from the shared model', () => {
-    expect(SRC).toMatch(/dynamic\(\(\) => import\('@\/components\/shell\/ObjectiveSlot'\)/)
+    // the slot is the lazy seam (it loads the editor itself); imported plainly so it does not add a chunk
+    expect(SRC).toContain("from '@/components/shell/ObjectiveSlot'")
     expect(SRC).toMatch(/dynamic\(\s*\(\) => import\('@\/components\/requests\/RequestComposer'\)/)
     expect(SRC).not.toMatch(/^import [^\n]*from '@\/components\/requests\/(RequestComposer|ObjectiveEditor)'/m)
     expect(SRC).toContain('groupMyRequests(')

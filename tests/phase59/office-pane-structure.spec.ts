@@ -174,7 +174,7 @@ test.describe('office pane mount seams (59-12)', () => {
     expect(ADMIN).toMatch(DYNAMIC)
     expect(WORKER).toMatch(DYNAMIC)
     expect(ADMIN).toContain('<OfficePane place={place} select={ctx.select} initialSop={initialSop} />')
-    expect(WORKER).toMatch(/isSupervisor \? \(\s*<OfficePane place=\{place\} select=\{ctx\.select\} initialSop=\{initialSop\} \/>\s*\) : \(\s*<OfficeWorkerBody \/>/)
+    expect(WORKER).toMatch(/isSupervisor \? \(\s*<OfficePane place=\{place\} select=\{ctx\.select\} initialSop=\{initialSop\} \/>\s*\) : \(\s*<OfficeWorkerBody\b/)
   })
 
   test('the old Office card body and the pending-count hook are gone', () => {

@@ -112,6 +112,7 @@ const GATED_ROUTES: GatedRoute[] = [
       { label: 'office pane (lazy, 59 A-11)', markers: ['Nothing needs you', 'Nothing here can be edited or deleted', 'No requests waiting.'] },
       { label: 'request composer + ask picker (lazy, 60 A-07)', markers: ['What do you need?', 'Find a person…'] },
       { label: 'objective editor (lazy, 60 A-07)', markers: ['By (optional)'] },
+      { label: 'site overview (lazy, 60 A-07)', markers: ['Nothing unread.'] },
     ],
   },
 ]
