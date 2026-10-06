@@ -1717,8 +1717,8 @@ Executes 55 → 56 → 57 → 58 → 59 → 60 → 61 → 62, strictly sequentia
 - [x] **Phase 58: The SOP Focus Screen — Walk & Edit** - Opening a SOP removes the map and the list; walk one step at a time to a sign-off, or edit with the AI check and tick-each-step before publish; new versions (completed 2026-10-05)
 - [x] **Phase 59: The Office** - Inbox that drains, sign-off and approvals, decision ledger, people and roles, the existing access wiring — one room, with the detail panel widening for tables (completed 2026-10-05)
 - [x] **Phase 60: Requests, Notifications & Objectives** - People and agents raise requests the Office answers; notifications with a bell; objectives as quiet metadata; the site overview fills in (completed 2026-10-06)
-- [ ] **Phase 61: The Workshop & the Smoko Room** - Four ways to start a SOP, in-progress list, AI model choice, worker change requests; training matrix, simple observations, my record
-- [ ] **Phase 62: Removal Certified, Addresses & Maps** - Every old address redirects, every place has an address, a guard fails the build if a dropped route or package returns, pathways map and feedback page rebuilt
+- [~] **Phase 61: The Workshop & the Smoko Room** - MOVED OUT OF GSD 2026-10-06: tracked as todo pieces A-H in the Claude Doc https://claude.ai/code/artifact/16b59e56-b699-4972-81e8-d946f140234f
+- [~] **Phase 62: Removal Certified, Addresses & Maps** - MOVED OUT OF GSD 2026-10-06: tracked as clean-up todos in the Claude Doc https://claude.ai/code/artifact/16b59e56-b699-4972-81e8-d946f140234f
 
 ### Phase 55: Cut the Dropped Features & One Organisation
 
@@ -2124,7 +2124,7 @@ Plans:
   4. In the Smoko room a supervisor or admin sees a matrix of people against SOPs (not started, read, done, seen doing it right) in a widened panel, and can record that they watched someone do a SOP — done right or needs support — as one simple record that also appears in the decision ledger
   5. Any user sees their own training record and what has been recorded about them in the Smoko room
 
-**Plans**: TBD
+**Plans**: none -- moved out of GSD 2026-10-06, see https://claude.ai/code/artifact/16b59e56-b699-4972-81e8-d946f140234f
 **UI hint**: yes
 
 ### Phase 62: Removal Certified, Addresses & Maps
@@ -2140,7 +2140,7 @@ Plans:
   3. There is no refresher cadence, CSV export, departments screen or org-chart view anywhere in the app; the app builds and lints clean without the dropped code, and putting a dropped route or package back fails the build
   4. The pathways map describes the one-screen app with no screen flagged as not mapped and no screen that no longer exists, and the feedback page lists only checks that describe the one-screen app
 
-**Plans**: TBD
+**Plans**: none -- moved out of GSD 2026-10-06, see https://claude.ai/code/artifact/16b59e56-b699-4972-81e8-d946f140234f
 **UI hint**: yes
 
 ## Progress

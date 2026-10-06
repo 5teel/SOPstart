@@ -1091,14 +1091,14 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 | SHL-03 | Phase 60 | Complete |
 | SHL-04..05 (2) | Phase 57 | Pending |
 | SHL-06 | Phase 59 | Complete |
-| SHL-07 | Phase 62 | Pending |
+| SHL-07 | Phase 62 | Moved out of GSD (Claude Doc) |
 | PLC-01..05 (5) | Phase 57 | Pending |
 | FOC-01..04 (4) | Phase 58 | Complete |
 | SOP-01..03 (3) | Phase 56 | Complete |
 | SOP-04 | Phase 58 | Complete |
-| WRK-01..02 (2) | Phase 61 | Pending |
+| WRK-01..02 (2) | Phase 61 | Moved out of GSD (Claude Doc) |
 | WRK-03..04 (2) | Phase 58 | Complete |
-| WRK-05..07 (3) | Phase 61 | Pending |
+| WRK-05..07 (3) | Phase 61 | Moved out of GSD (Claude Doc) |
 | OFF-01..06 (6) | Phase 59 | Complete |
 | DEC-01 | Phase 56 | Complete |
 | DEC-02 | Phase 59 | Complete |
@@ -1106,10 +1106,10 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 | RQS-01..04 (4) | Phase 60 | Complete |
 | NTF-01..02 (2) | Phase 60 | complete (60-18 eval legs all proven) |
 | OBJ-01..03 (3) | Phase 60 | Complete |
-| SMK-01..03 (3) | Phase 61 | Pending |
+| SMK-01..03 (3) | Phase 61 | Moved out of GSD (Claude Doc) |
 | ORG-01 | Phase 55 | Complete |
 | CUT-01..02 (2) | Phase 55 | Pending |
-| CUT-03..05 (3) | Phase 62 | Pending |
+| CUT-03..05 (3) | Phase 62 | Moved out of GSD (Claude Doc) |
 
 **v11.0 Coverage:** 55 requirements — SHL 7 · PLC 5 · FOC 4 · SOP 4 · WRK 7 · OFF 6 · DEC 4 · RQS 4 · NTF 2 · OBJ 3 · SMK 3 · ORG 1 · CUT 5.
 
@@ -1117,3 +1117,5 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 
 ---
 *v11.0 requirements added: 2026-10-03*
+
+Phases 61 and 62 moved out of GSD on 2026-10-06; the work is tracked in https://claude.ai/code/artifact/16b59e56-b699-4972-81e8-d946f140234f
