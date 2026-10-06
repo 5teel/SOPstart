@@ -1,12 +1,8 @@
 {
-  "capturedAt": "2026-10-06T00:00:00.000Z",
+  "capturedAt": "2026-10-06T12:00:00.000Z",
   "note": "Phase 55 D-07 moved the worker routes DOWN by hand to the measured post-cut First Load JS and they are never re-captured. Phase 57-04 added /page (the one screen), recorded by hand once. Phase 57-08 retired the list page: /sops/page left the gate (history) and /sops/[sopId]/page moved DOWN by hand to its measured post-deletion value. /page was then set to 831 KB, the first measurement of the worker's real first download on / (signed-off by the phase-57 orchestrator, 2026-10-05; see history). Raising a value needs a signed-off decision recorded in ROADMAP.",
   "previousBaseline": {
-    "/sops/[sopId]/page": {
-      "value": 1059,
-      "capturedAt": "2026-07-29T07:47:04.330Z",
-      "note": "First Load JS baseline for the mobile worker route (/sops/[sopId]). Postbuild check-bundle-size enforces ≤ +2KB delta. DO NOT edit by hand — regenerate via scripts/capture-bundle-baseline.ts after intentional baseline shifts."
-    },
+    "/sops/[sopId]/page": 792,
     "/page": 831
   },
   "history": [
@@ -69,10 +65,16 @@
       "value": 831,
       "capturedAt": "2026-10-06T00:00:00.000Z",
       "note": "Phase 59-12 (orchestrator decision, not the executor): OfficePane mounted lazily from both shells; measured 834 KB against 831 (+3, tolerance 2). Diff of the summed file list against the parent commit: webpack runtime +1.4 KB because SignOffPanel imports the lightbox stylesheet and, once the pane is in the module graph, that becomes an async CSS chunk and pulls the mini-css loader into the shared runtime; react-query shared chunks +0.33 KB; page chunk +0.28 KB. The pane itself is in its own chunk (1362.*.js), not charged to /. Alternatives rejected: route-level lightbox CSS (every worker downloads ~1.9 KB they never use); a lazy seam for the worker room bodies (~0.1 KB). Moved UP by hand from 831 to 834 as the accepted one-time runtime cost of the first lazy CSS chunk; the next lazy stylesheet costs nothing extra."
+    },
+    {
+      "route": "/sops/[sopId]/page",
+      "value": 792,
+      "capturedAt": "2026-10-06T12:00:00.000Z",
+      "note": "Phase 60-16 (orchestrator decision, not the executor): measured 795 KB against 792 (+3, tolerance 2). Summed-file diff against the parent build: only the webpack runtime chunk grew, ~95 bytes, from the additional lazy chunks this phase adds (composer, ask picker, objective editor/line, bell, overview); the raw total went 794.44 -> 794.53 KB and crossed a rounding edge. Fallbacks tried: lazy ObjectiveLine in BrowseDocument (no change, reverted), bell behind next/dynamic (needed for /, kept), one lazy chunk merged (-23 B). Moved UP by hand from 792 to 795 as the accepted runtime cost of the phase's lazy seams; the route's own page chunk is unchanged."
     }
   ],
   "routes": {
-    "/sops/[sopId]/page": 792,
+    "/sops/[sopId]/page": 795,
     "/page": 834
   }
 }
