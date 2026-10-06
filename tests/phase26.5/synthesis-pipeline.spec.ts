@@ -10,16 +10,6 @@ import path from 'node:path'
 
 const REPO_ROOT = path.resolve(__dirname, '..', '..')
 const SYNTHESIS_PATH = path.join(REPO_ROOT, 'src', 'lib', 'agent-layer', 'synthesis.ts')
-const PUBLISH_ROUTE_PATH = path.join(
-  REPO_ROOT,
-  'src',
-  'app',
-  'api',
-  'sops',
-  '[sopId]',
-  'publish',
-  'route.ts',
-)
 
 function readSynthesisSource(): string {
   return fs.readFileSync(SYNTHESIS_PATH, 'utf-8')
@@ -40,19 +30,13 @@ test('D-03/D-16: synthesis.ts uses shared EMBED_MODEL/SYNTHESIS_MODEL constants,
   expect(src).not.toContain("'claude-haiku")
 })
 
-test('D-04: publish route fires triggerAgentSynthesis non-blocking (never awaited, .catch logged)', () => {
-  if (!fs.existsSync(SYNTHESIS_PATH) || !fs.existsSync(PUBLISH_ROUTE_PATH)) {
-    test.skip(true, 'synthesis.ts or publish route not yet created')
-    return
-  }
-  const publishRoute = fs.readFileSync(PUBLISH_ROUTE_PATH, 'utf-8')
-  if (!publishRoute.includes('triggerAgentSynthesis')) {
-    // Publish route wiring is Plan 26.5-05's job, not this plan's.
-    test.skip(true, 'publish route not yet wired to triggerAgentSynthesis — deferred to Plan 26.5-05')
-    return
-  }
-  expect(publishRoute).toContain('triggerAgentSynthesis')
-  expect(publishRoute).not.toContain('await triggerAgentSynthesis')
+test('ADR-0002: performPublish schedules synthesis with after(), never awaited, failures logged not thrown', () => {
+  const core = fs.readFileSync(path.resolve(__dirname, '..', '..', 'src', 'lib', 'governance', 'publish-core.ts'), 'utf-8')
+  expect(core).toContain("import { after } from 'next/server'")
+  expect(core).toContain('after(() => synthesizeSop(sopId, organisationId))')
+  expect(core).not.toMatch(/await\s+(after|synthesizeSop)\(/)
+  const at = core.indexOf('after(() => synthesizeSop')
+  expect(core.slice(at - 40, at + 260)).toMatch(/try \{[\s\S]*\} catch \(err\) \{\s*console\.error/)
 })
 
 test('D-12: synthesis.ts exposes deriveAssessment returning fresh|drifting|needs-review', () => {
@@ -67,17 +51,19 @@ test('D-12: synthesis.ts exposes deriveAssessment returning fresh|drifting|needs
   expect(src).toContain("'needs-review'")
 })
 
-test('Pitfall 5: triggerAgentSynthesis is fire-and-forget — .catch wired, never re-throws', () => {
+test('Pitfall 5: synthesizeSop never throws — it returns { ok: false } and records the error on the row', () => {
   if (!fs.existsSync(SYNTHESIS_PATH)) {
     test.skip(true, 'synthesis.ts not yet created')
     return
   }
   const src = readSynthesisSource()
-  const fnStart = src.indexOf('function triggerAgentSynthesis')
+  const fnStart = src.indexOf('export async function synthesizeSop')
   expect(fnStart).toBeGreaterThan(-1)
-  const fnBody = src.slice(fnStart, fnStart + 400)
-  expect(fnBody).toContain('.catch(')
-  expect(fnBody).not.toContain('throw')
+  const fnBody = src.slice(fnStart)
+  expect(fnBody).toContain('} catch (err) {')
+  expect(fnBody).toContain("last_synthesis_status: 'error'")
+  expect(fnBody).toContain('return { ok: false, error: message }')
+  expect(src).not.toContain('triggerAgentSynthesis')
 })
 
 test('T-26.5-04-01: every DB write in synthesis.ts sets organisation_id; layout_data is never referenced', () => {

@@ -6,8 +6,7 @@
  * signal sources (src/lib/agent-layer/signals.ts), writes free-append
  * agent_memory observations, derives a per-SOP assessment, raises
  * evidence-backed learning proposals where warranted, and upserts
- * sop_agent_metadata. triggerAgentSynthesis is the fire-and-forget wrapper
- * the publish route (Plan 26.5-05) calls.
+ * sop_agent_metadata. performPublish schedules it with Next's after() (ADR-0002).
  *
  * Each step below is independently try/caught (mirrors the ai-reviewer
  * orchestrator's per-job isolation, CLAUDE.md 2026-06-02) — one failing step
@@ -371,14 +370,4 @@ export async function synthesizeSop(sopId: string, organisationId: string): Prom
     }
     return { ok: false, error: message }
   }
-}
-
-/**
- * Fire-and-forget wrapper — callers (the publish route, Plan 26.5-05) never
- * await this and it never throws to the caller (Pitfall 5).
- */
-export function triggerAgentSynthesis(sopId: string, organisationId: string): void {
-  synthesizeSop(sopId, organisationId).catch((err) => {
-    console.error('[agent-layer] synthesis trigger failed:', err instanceof Error ? err.message : err)
-  })
 }

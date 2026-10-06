@@ -31,8 +31,8 @@ test.describe('performPublish shared — publish-core extraction', () => {
     expect(coreSrc).toContain("status: 'published'")
   })
 
-  test('publish-core.ts calls triggerAgentSynthesis', () => {
-    expect(coreSrc).toContain('triggerAgentSynthesis(')
+  test('publish-core.ts schedules synthesizeSop with after() (ADR-0002)', () => {
+    expect(coreSrc).toContain('after(() => synthesizeSop(sopId, organisationId))')
   })
 
   test('exports both performPublish and assertPublishGates', () => {

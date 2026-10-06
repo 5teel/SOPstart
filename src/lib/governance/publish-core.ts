@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database.types'
-import { triggerAgentSynthesis } from '@/lib/agent-layer/synthesis'
+import { after } from 'next/server'
+import { synthesizeSop } from '@/lib/agent-layer/synthesis'
 import { resolveCadenceMonths, computeReviewDueDate } from '@/lib/governance/cadences'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { ensureSopCollectionsForOrg } from '@/lib/org-model/sop-collections'
@@ -251,10 +252,16 @@ export async function performPublish(
     console.error(`[performPublish] ensureSopCollections threw for SOP ${sopId}:`, err)
   }
 
-  // Step 4: Phase 26.5 D-04 — fire-and-forget agent-metadata regeneration.
-  //     Never awaited, never affects the response — a failed synthesis
-  //     never fails the publish.
-  triggerAgentSynthesis(sopId, organisationId)
+  // Step 4: ADR-0002 — agent-metadata regeneration runs on the event that needs it,
+  //     after the response is sent (Next's after()), so it never slows the publish.
+  //     synthesizeSop never throws; a failure is logged and recorded on the metadata
+  //     row, never raised. after() is only legal inside a request, so a caller
+  //     running outside one (a script) skips synthesis rather than failing the publish.
+  try {
+    after(() => synthesizeSop(sopId, organisationId))
+  } catch (err) {
+    console.error(`[performPublish] synthesis not scheduled for SOP ${sopId}:`, err)
+  }
 
   return { success: true }
 }
