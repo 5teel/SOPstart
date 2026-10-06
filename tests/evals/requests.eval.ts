@@ -30,11 +30,14 @@
  *
  * Self-skips without EVAL_BASE_URL, so `npm run test` never hits production.
  */
-import { test, expect, type BrowserContext } from '@playwright/test'
+import { test, expect, type Browser, type BrowserContext, type Page } from '@playwright/test'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { EVAL_BASE_URL, EVAL_ENV_READY, EVAL_SITE_SOP_TITLE, EVAL_USERS, signInAs } from './lib/session'
 import { ensurePlantFixture, REAL_SOPSTART_ORG_ID, shot } from './lib/plant-fixture'
 import { deleteEvalRequestRows, ensureZeroSopMachine } from './lib/requests-fixture'
+import { deleteEvalCompletions } from './lib/completion-cleanup'
+import { startWalking, walkFixture } from './lib/walk'
+import { SOP_CATEGORIES } from '../../src/lib/sop-categories'
 
 export const SLOW = { timeout: 30_000 }
 
@@ -358,13 +361,326 @@ test.describe('Phase 60 -- requests, notifications and objectives (deployed)', (
       await expect(page.getByTestId('request-composer-trigger')).toHaveCount(0)
       await ctx.close()
     })
-    test.fixme('worker raises, admin accepts, bell count shows, the notification opens its place, mark-read clears it; a second round (60-16)', async () => {})
-    test.fixme('decline with a note; the asker sees the answer (60-16)', async () => {})
-    test.fixme('supervisor asks a worker: due on the badge and the Now card; a new version is published and the worker is told; the worker declines (60-16)', async () => {})
-    test.fixme('review-due sweep notifies the SOP owner (60-16)', async () => {})
-    test.fixme('two-step approval chain notifies the next approver at the divert and after a non-final approval (60-16)', async () => {})
-    test.fixme('a sent walk notifies the supervisor (60-16)', async () => {})
-    test.fixme('overview order, empty states and Office line; zoomed bell shot; real-org overview read-only (60-16)', async () => {})
+    // ---- 60-16: the bell, the overview, the loop and every notification trigger (by title, never by count) ----
+    const NOTE_CHANGE = () => `EVAL change request ${runId}: step text is out of date`
+    const NOTE_OBSERVE = () => `EVAL observe request ${runId}`
+    const SEEDED_TITLES: string[] = []
+
+    async function userIdOf(email: string): Promise<string> {
+      const { data, error } = await db.auth.admin.listUsers({ page: 1, perPage: 200 })
+      if (error) throw new Error(`listUsers failed: ${error.message}`)
+      const u = data.users.find((x) => x.email === email)
+      if (!u) throw new Error(`eval user ${email} missing`)
+      return u.id
+    }
+
+    /** A SOP with one section and three verified steps in the eval-site org, in the seedApproveSop shape. */
+    async function seedSop(title: string, o: { status: 'draft' | 'published'; ownerId: string; extra?: Record<string, unknown> }): Promise<string> {
+      if (siteOrgId === REAL_SOPSTART_ORG_ID) throw new Error('refusing to seed the real org')
+      const adminId = await userIdOf(EVAL_USERS.siteAdmin)
+      await db.from('sops').delete().eq('organisation_id', siteOrgId).eq('title', title)
+      const { data: sop, error } = await db
+        .from('sops')
+        .insert({
+          organisation_id: siteOrgId,
+          title,
+          source_file_name: title,
+          source_file_type: 'docx',
+          source_file_path: '',
+          uploaded_by: adminId,
+          source_type: 'blank',
+          status: o.status,
+          version: 1,
+          objective: 'Close the guard.',
+          owner_user_id: o.ownerId,
+          ...(o.status === 'published' ? { published_at: new Date().toISOString() } : {}),
+          ...o.extra,
+        })
+        .select('id')
+        .single()
+      if (error || !sop) throw new Error(`seed ${title} failed: ${error?.message}`)
+      SEEDED_TITLES.push(title)
+      const sec = await db.from('sop_sections').insert({ sop_id: sop.id, section_type: 'procedure', title: 'Procedure', sort_order: 0, approved: true }).select('id').single()
+      if (sec.error || !sec.data) throw new Error(`seed section failed: ${sec.error?.message}`)
+      for (const [i, text] of ['Isolate the press.', 'Fit your own lock.', 'Test the lock.'].entries()) {
+        const ins = await db.from('sop_focus_steps').insert({
+          organisation_id: siteOrgId, sop_id: sop.id, section_id: sec.data.id, source_key: `new:eval-60-16-${i}`,
+          kind: 'step', text, tip: null, photo_required: false, sort_order: i,
+          verified_by_admin_id: adminId, verified_at: new Date().toISOString(),
+        })
+        if (ins.error) throw new Error(`seed step failed: ${ins.error.message}`)
+      }
+      return sop.id as string
+    }
+
+    /** Newest version first, so a v2 never blocks the delete of its v1. */
+    async function dropSops(title: string) {
+      const { data } = await db.from('sops').select('id, version').eq('organisation_id', siteOrgId).eq('title', title).order('version', { ascending: false })
+      for (const r of data ?? []) await db.from('sops').delete().eq('id', r.id as string)
+    }
+
+    async function as(browser: Browser, user: keyof typeof EVAL_USERS) {
+      const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } })
+      await signInAs(ctx, user)
+      return { ctx, page: await ctx.newPage() }
+    }
+
+    const notif = (page: Page, text: string | RegExp) => page.getByTestId('notification-row').filter({ hasText: text })
+    async function openSite(page: Page) {
+      await page.goto('/')
+      await expect(page.getByTestId('overview-body').or(page.getByTestId('room-body')).first()).toBeVisible(SLOW)
+    }
+
+    test.afterAll(async () => {
+      if (!EVAL_ENV_READY || !db || !siteOrgId || siteOrgId === REAL_SOPSTART_ORG_ID) return
+      for (const t of SEEDED_TITLES) await dropSops(t).catch(() => null)
+    })
+
+    test('the loop, twice: accepted, then declined with a reason; bell count, bell click, open to My requests, mark-read (60-16 a)', async ({ browser }) => {
+      test.setTimeout(300_000)
+      // Admin accepts the worker's change-a-SOP request (raised by the 60-12 case).
+      const admin = await as(browser, 'siteAdmin')
+      await admin.page.goto('/?place=office&tab=requests')
+      const changeRow = admin.page.getByTestId('request-row').filter({ hasText: NOTE_CHANGE() })
+      await expect(changeRow).toHaveCount(1, SLOW)
+      await changeRow.getByTestId('request-accept').click()
+      await expect(admin.page.getByTestId('request-row').filter({ hasText: NOTE_CHANGE() })).toHaveCount(0, SLOW)
+
+      const worker = await as(browser, 'siteWorker')
+      const w = worker.page
+      await openSite(w)
+      const accepted = notif(w, /Your request about .* was accepted\./).first()
+      await expect(accepted).toBeVisible(SLOW)
+      await expect(w.getByTestId('shell-bell-count')).toHaveCount(1, SLOW)
+
+      // Select a machine, then press the bell: the overview returns with the Notifications heading focused.
+      await w.getByTestId('shell-search').fill('Press')
+      await w.getByTestId('shell-bell').click()
+      await expect(w.getByTestId('overview-notifications')).toBeVisible(SLOW)
+      await expect(w.locator(':focus')).toContainText('Notifications', SLOW)
+      await shot(w, '60-bell-click')
+
+      // Opening the row marks it read and lands on My requests showing Accepted.
+      await accepted.click()
+      await expect(w.getByTestId('overview-requests')).toContainText('Accepted', SLOW)
+      await shot(w, '60-overview-worker')
+      await expect(notif(w, /Your request about .* was accepted\./).first()).toHaveAttribute('data-unread', 'false', SLOW)
+
+      // Second round in the same session: decline the observe-me request with a reason.
+      await admin.page.goto('/?place=office&tab=requests')
+      const obsRow = admin.page.getByTestId('request-row').filter({ hasText: NOTE_OBSERVE() })
+      await expect(obsRow).toHaveCount(1, SLOW)
+      await obsRow.getByTestId('request-decline').click()
+      const reason = `EVAL declined ${runId}: not this week`
+      await admin.page.getByRole('dialog').getByRole('textbox').fill(reason)
+      await admin.page.getByRole('dialog').getByRole('button', { name: /Decline/ }).last().click()
+      await expect(admin.page.getByTestId('request-row').filter({ hasText: NOTE_OBSERVE() })).toHaveCount(0, SLOW)
+
+      await w.reload()
+      const declined = notif(w, /Your request about .* was declined\./).first()
+      await expect(declined).toBeVisible(SLOW)
+      await expect(w.getByTestId('overview-requests')).toContainText(reason, SLOW)
+      await declined.click()
+      await expect(declined).toHaveAttribute('data-unread', 'false', SLOW)
+      await admin.ctx.close()
+      await worker.ctx.close()
+    })
+
+    test('ask then a new version: due on the badge and Now card, the new version notifies, the decline reaches the supervisor (60-16 b)', async ({ browser }) => {
+      test.setTimeout(480_000)
+      const title = `EVAL ask ${runId}`
+      const adminId = await userIdOf(EVAL_USERS.siteAdmin)
+      const v1 = await seedSop(title, { status: 'published', ownerId: adminId })
+      const link = await db.from('sop_machines').upsert({ organisation_id: siteOrgId, sop_id: v1, machine_id: pressId }, { onConflict: 'sop_id,machine_id' })
+      if (link.error) throw new Error(`link failed: ${link.error.message}`)
+
+      // The supervisor asks the worker (person mode) from Ask > on the row.
+      const sup = await as(browser, 'siteSupervisor')
+      await sup.page.goto(`/?place=${pressId}`)
+      const row = sup.page.getByTestId('plant-panel-row').filter({ hasText: title })
+      await expect(row).toHaveCount(1, SLOW)
+      await row.getByTestId('ask-trigger').click()
+      await sup.page.getByTestId('ask-mode-person').click()
+      await sup.page.getByPlaceholder('Find a person…').fill('worker')
+      await sup.page.getByRole('button', { name: /worker/i }).first().click()
+      await sup.page.getByTestId('ask-confirm').click()
+
+      const worker = await as(browser, 'siteWorker')
+      const w = worker.page
+      await openSite(w)
+      const asked = notif(w, `You've been asked to do ${title}.`)
+      await expect(asked).toHaveCount(1, SLOW)
+      await shot(w, '60-notification-open')
+      await asked.click()
+      await w.waitForURL((u) => u.pathname === `/sops/${v1}`, SLOW)
+      // Due on the site: the Now card names it.
+      await w.goto('/')
+      await expect(w.getByTestId('plant-now-card')).toContainText(title, SLOW)
+
+      // The admin publishes v2 through the real dialog, one tick at a time.
+      const admin = await as(browser, 'siteAdmin')
+      const a = admin.page
+      await a.goto(`/sops/${v1}?mode=edit`)
+      await a.getByTestId('edit-start-editing').click()
+      await a.waitForURL((u) => u.searchParams.get('mode') === 'edit' && !u.pathname.endsWith(v1), SLOW)
+      const v2 = new URL(a.url()).pathname.split('/').pop()!
+      const boxes = a.getByRole('checkbox', { name: /I have checked this/ })
+      const n = await boxes.count()
+      for (let i = 0; i < n; i++) {
+        await boxes.first().click()
+        await expect(boxes).toHaveCount(n - i - 1, SLOW)
+      }
+      await a.getByTestId('publish-button').click()
+      await a.getByTestId('publish-dialog').getByRole('button', { name: 'Publish v2' }).click()
+      await expect(a.getByTestId('edit-version-slot')).toContainText('Published v2', SLOW)
+
+      await w.goto('/')
+      const newVersion = notif(w, `${title} has a new version (v2).`)
+      await expect(newVersion).toHaveCount(1, SLOW)
+      await newVersion.click()
+      await w.waitForURL((u) => u.pathname === `/sops/${v2}`, SLOW)
+
+      // The worker declines the ask from My requests; the lineage resolves it on v2 (F-20).
+      await w.goto('/')
+      const askRow = w.getByTestId('ask-row').filter({ hasText: title })
+      await expect(askRow).toHaveCount(1, SLOW)
+      await shot(w, '60-ask-row')
+      await askRow.getByTestId('ask-decline').click()
+      await w.getByRole('dialog').getByRole('textbox').fill(`EVAL cannot do ${runId}: off site`)
+      await w.getByRole('dialog').getByRole('button', { name: /Decline/ }).last().click()
+      await expect(w.getByTestId('ask-row').filter({ hasText: title })).toHaveCount(0, SLOW)
+      await w.goto('/')
+      await expect(w.getByTestId('plant-now-card')).not.toContainText(title, SLOW)
+
+      await sup.page.goto('/')
+      await expect(notif(sup.page, `can't do ${title}.`)).toHaveCount(1, SLOW)
+      for (const c of [sup, worker, admin]) await c.ctx.close()
+      await dropSops(title)
+    })
+
+    test('review due sweep notifies the SOP owner once (60-16 c)', async ({ browser }) => {
+      test.setTimeout(120_000)
+      const title = `EVAL review-due ${runId}`
+      const adminId = await userIdOf(EVAL_USERS.siteAdmin)
+      await seedSop(title, { status: 'published', ownerId: adminId, extra: { review_due_at: new Date(Date.now() + 5 * 86_400_000).toISOString() } })
+      await postCron('/api/cron/review-due', { organisationId: siteOrgId })
+      const admin = await as(browser, 'siteAdmin')
+      await openSite(admin.page)
+      const text = new RegExp(`${title} is due for you to review by `)
+      await expect(notif(admin.page, text)).toHaveCount(1, SLOW)
+      await postCron('/api/cron/review-due', { organisationId: siteOrgId })
+      await admin.page.reload()
+      await expect(notif(admin.page, text)).toHaveCount(1, SLOW)
+      await admin.ctx.close()
+      await dropSops(title)
+    })
+
+    test('two-step approval chain: the divert and a non-final approval each name the next approver (60-16 d)', async ({ browser }) => {
+      test.setTimeout(300_000)
+      let category: string | null = null
+      for (const c of SOP_CATEGORIES) {
+        const { count } = await db.from('sops').select('id', { count: 'exact', head: true }).eq('organisation_id', siteOrgId).eq('category_slug', c.slug)
+        if (!count) {
+          category = c.slug
+          break
+        }
+      }
+      if (!category) throw new Error('no SOP category is free in the eval-site org')
+      const title = `EVAL chain ${runId}`
+      const adminId = await userIdOf(EVAL_USERS.siteAdmin)
+      try {
+        const chain = await db.from('approval_chains').upsert({
+          organisation_id: siteOrgId,
+          category,
+          created_by: adminId,
+          steps: [
+            { role: 'safety_manager', label: 'Safety review' },
+            { role: 'admin', label: 'Final sign-off' },
+          ],
+        })
+        if (chain.error) throw new Error(`chain insert failed: ${chain.error.message}`)
+        const sopId = await seedSop(title, { status: 'draft', ownerId: adminId, extra: { category_slug: category } })
+
+        const admin = await as(browser, 'siteAdmin')
+        const res = await admin.page.request.post(`/api/sops/${sopId}/publish`, { headers: { 'content-type': 'application/json' } })
+        expect(res.status(), 'the publish route accepted the draft into the chain').toBeLessThan(400)
+        const { data: pending } = await db.from('sops').select('approval_state').eq('id', sopId).single()
+        expect(pending?.approval_state).toBe('pending')
+
+        const safety = await as(browser, 'siteSafety')
+        await openSite(safety.page)
+        await expect(notif(safety.page, `Your approval is next on ${title}.`)).toHaveCount(1, SLOW)
+
+        // Step 1 of 2 approved from the Office Inbox.
+        await safety.page.goto('/?place=office')
+        const row = safety.page.getByTestId('office-row').filter({ hasText: title })
+        await expect(row).toHaveCount(1, SLOW)
+        await row.getByTestId('office-row-action').click()
+        await row.getByTestId('approve-panel').getByTestId('approve-commit').click()
+
+        await admin.page.goto('/')
+        const next = notif(admin.page, `Your approval is next on ${title}.`)
+        await expect(next).toHaveCount(1, SLOW)
+        await next.click()
+        await expect(admin.page.getByTestId('room-body')).toHaveAttribute('data-room-id', 'office', SLOW)
+        await admin.ctx.close()
+        await safety.ctx.close()
+      } finally {
+        await db.from('approval_chains').delete().eq('organisation_id', siteOrgId).eq('category', category)
+        await dropSops(title)
+      }
+    })
+
+    test('a sent walk notifies the supervisor, who finds the sign-off row (60-16 e)', async ({ browser }) => {
+      test.setTimeout(300_000)
+      const { data: sopRow } = await db.from('sops').select('id').eq('organisation_id', siteOrgId).eq('title', EVAL_SITE_SOP_TITLE).single()
+      const sopId = sopRow!.id as string
+      const worker = await as(browser, 'siteWorker')
+      await worker.page.goto(`/sops/${sopId}`)
+      await startWalking(worker.page)
+      await walkFixture(worker.page, false)
+      await worker.ctx.close()
+
+      const sup = await as(browser, 'siteSupervisor')
+      await openSite(sup.page)
+      const row = notif(sup.page, new RegExp(`finished ${EVAL_SITE_SOP_TITLE} and is waiting for you to sign off\\.`)).first()
+      await expect(row).toBeVisible(SLOW)
+      await row.click()
+      await expect(sup.page.getByTestId('room-body')).toHaveAttribute('data-room-id', 'office', SLOW)
+      await expect(sup.page.getByTestId('office-row').filter({ hasText: EVAL_SITE_SOP_TITLE }).first()).toBeVisible(SLOW)
+      await sup.ctx.close()
+      await deleteEvalCompletions(db, sopId)
+    })
+
+    test('overview structure: order, empty states, the Office line, the zoomed bell and the real org read-only (60-16 f)', async ({ browser }) => {
+      test.setTimeout(240_000)
+      const admin = await as(browser, 'siteAdmin')
+      await openSite(admin.page)
+      const ids = await admin.page.locator('[data-testid^="overview-"]').evaluateAll((els) => els.map((e) => e.getAttribute('data-testid') ?? ''))
+      const order = ['overview-objectives', 'overview-notifications', 'overview-requests', 'overview-office-link']
+      expect(ids.filter((i) => order.includes(i))).toEqual(order.filter((i) => ids.includes(i)))
+      await shot(admin.page, '60-overview-admin')
+      // The bell: 44 x 44, search still usable.
+      const box = await admin.page.getByTestId('shell-bell').boundingBox()
+      expect(Math.round(box!.width)).toBe(44)
+      expect(Math.round(box!.height)).toBe(44)
+      await shot(admin.page, '60-bell')
+      await admin.ctx.close()
+
+      const idle = await as(browser, 'siteSupervisorIdle')
+      await openSite(idle.page)
+      await expect(idle.page.getByTestId('overview-notifications')).toHaveCount(0)
+      await expect(idle.page.getByTestId('overview-requests')).toHaveCount(0)
+      await shot(idle.page, '60-overview-empty')
+      await idle.ctx.close()
+
+      // Real org, read-only: look, never click anything that writes.
+      const real = await as(browser, 'admin')
+      await openSite(real.page)
+      await shot(real.page, '60-real-org-overview')
+      await real.ctx.close()
+    })
+
     test.fixme('the old assign address lands on the SOP (assert rendered place, not status) (60-17)', async () => {})
   })
 })
