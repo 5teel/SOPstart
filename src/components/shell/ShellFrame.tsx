@@ -50,6 +50,8 @@ export interface ShellFrameProps {
   renderEdit?(exit: () => void): ReactNode
   /** The department's objective line, directly under its name (60 D-11). */
   deptMeta?(deptId: string): ReactNode
+  /** The notification bell beside search (60 D-09); not rendered while the site is drawn. */
+  renderBell?(select: (p: Place) => void): ReactNode
   account: ReactNode
 }
 
@@ -107,6 +109,7 @@ export function ShellFrame({
   renderDetail,
   renderEdit,
   deptMeta,
+  renderBell,
   account,
 }: ShellFrameProps) {
   const [place, setPlace] = useState<Place>(() => parsePlace(initialPlace, initialTab))
@@ -175,14 +178,15 @@ export function ShellFrame({
   const listPane = (
     <div className="flex w-full shrink-0 flex-col border-ink-200 lg:h-full lg:w-64 lg:border-r">
       <div className="flex-1 overflow-y-auto">
-        <label className="relative flex min-h-tap items-center px-3">
+        <div className="flex items-center pr-2">
+        <label className="relative flex min-h-tap min-w-0 flex-1 items-center px-3">
           <Search size={16} className="pointer-events-none absolute left-6 text-ink-500" aria-hidden="true" />
           <input
             type="search"
             data-testid="shell-search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search machines and SOPs…"
+            placeholder="Search…"
             aria-label="Search the site"
             enterKeyHint="search"
             autoComplete="off"
@@ -202,6 +206,8 @@ export function ShellFrame({
             </button>
           )}
         </label>
+        {!editing && renderBell?.(select)}
+        </div>
 
         {renderCard(select)}
 
