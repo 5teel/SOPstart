@@ -11,6 +11,7 @@
  * caller's org (CLAUDE.md 2026-06-15/2026-06-26).
  */
 import { createAdminClient } from '@/lib/supabase/admin'
+import { lineageRoot } from '@/lib/sop/lineage-current'
 import type { AckTraceEntry } from '@/types/sop'
 import type { ReviewerRunEnvelope } from '@/lib/parsers/ai-reviewer/types'
 
@@ -43,11 +44,18 @@ export type VoiceSignals = {
   error?: string
 }
 
+export type ObjectiveSignals = {
+  /** "Objective · <text> · set by <agent or 'a person'>[ · unconfirmed]" -- no names or emails. */
+  lines: string[]
+  error?: string
+}
+
 export type SignalBundle = {
   completions: CompletionSignals
   reviewer: ReviewerSignals
   verify: VerifySignals
   voice: VoiceSignals
+  objectives: ObjectiveSignals
 }
 
 /** Self-enforced org-scope guard for tables with no direct organisation_id column. */
@@ -190,12 +198,62 @@ export async function readVoiceSignals(
   }
 }
 
+/**
+ * Phase 60 (60-10, F-10): the objectives in force for a SOP -- its own (keyed on the
+ * lineage root), those of the machines it is linked to, and the site's. Delivered as
+ * a signal; the byte-pinned SOP pack is not touched.
+ */
+export async function readObjectiveSignals(
+  organisationId: string,
+  sopId: string,
+): Promise<ObjectiveSignals> {
+  const empty: ObjectiveSignals = { lines: [] }
+  try {
+    const admin = createAdminClient()
+    const { data: sop } = await admin
+      .from('sops')
+      .select('id, parent_sop_id')
+      .eq('id', sopId)
+      .eq('organisation_id', organisationId)
+      .maybeSingle()
+    if (!sop) return { ...empty, error: 'sop not found in organisation' }
+    // ponytail: sop_machines is not in database.types, so this one read goes through an untyped client.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: links } = await (admin as any)
+      .from('sop_machines')
+      .select('machine_id')
+      .eq('organisation_id', organisationId)
+      .eq('sop_id', sopId)
+    const machineIds = ((links ?? []) as { machine_id: string }[]).map((l) => l.machine_id)
+
+    const { data, error } = await admin
+      .from('objectives')
+      .select('subject_type, subject_id, text, set_by_agent, confirmed_by')
+      .eq('organisation_id', organisationId)
+      .in('subject_type', ['site', 'machine', 'sop'])
+    if (error) return { ...empty, error: error.message }
+
+    const mine = new Set<string>([lineageRoot(sop), ...machineIds])
+    const lines = (data ?? [])
+      .filter((o) => o.subject_type === 'site' || (o.subject_id !== null && mine.has(o.subject_id)))
+      .map((o) => {
+        const by = o.set_by_agent ?? 'a person'
+        const open = o.set_by_agent && !o.confirmed_by ? ' · unconfirmed' : ''
+        return `Objective · ${o.text} · set by ${by}${open}`
+      })
+    return { lines }
+  } catch (err) {
+    return { ...empty, error: err instanceof Error ? err.message : 'unknown' }
+  }
+}
+
 export async function readAllSignals(organisationId: string, sopId: string): Promise<SignalBundle> {
-  const [completions, reviewer, verify, voice] = await Promise.all([
+  const [completions, reviewer, verify, voice, objectives] = await Promise.all([
     readCompletionSignals(organisationId, sopId),
     readReviewerSignals(organisationId, sopId),
     readVerifySignals(organisationId, sopId),
     readVoiceSignals(organisationId, sopId),
+    readObjectiveSignals(organisationId, sopId),
   ])
-  return { completions, reviewer, verify, voice }
+  return { completions, reviewer, verify, voice, objectives }
 }

@@ -204,6 +204,15 @@ async function writeMemoryFromSignals(
         metadata: { recentQuestions: bundle.voice.recentQuestions },
       })
     }
+    if (bundle.objectives.lines.length > 0) {
+      await appendMemory(organisationId, {
+        sopId,
+        scope: 'sop',
+        observation: `Objectives in force: ${bundle.objectives.lines.join('; ')}`,
+        signalSource: 'objectives',
+        metadata: { count: bundle.objectives.lines.length },
+      })
+    }
     if (bundle.completions.totalCompletions > 0) {
       await appendMemory(organisationId, {
         sopId,
