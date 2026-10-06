@@ -63,7 +63,7 @@ const SCENES: Scene[] = [
     eyebrow: 'Machines and SOPs',
     title: 'Tap a machine. Get its procedures.',
     body: 'SOPs are linked to the machines they run on, so the right one is always one tap away.',
-    cam: { fx: FX, fy: FY, zoom: 2.6 },
+    cam: { fx: FX, fy: FY, zoom: 2.1 },
     ms: 7000,
   },
   {
@@ -71,7 +71,7 @@ const SCENES: Scene[] = [
     eyebrow: 'Consistent structure',
     title: 'Every SOP reads the same way.',
     body: 'Hazards and PPE first, then steps, checks and sign-off. Same shape on every machine, every site.',
-    cam: { fx: FX + 0.05, fy: FY + 0.04, zoom: 2.1 },
+    cam: { fx: FX + 0.05, fy: FY + 0.04, zoom: 1.8 },
     ms: 7000,
   },
   {
@@ -79,7 +79,7 @@ const SCENES: Scene[] = [
     eyebrow: 'Visual focus',
     title: "Show it, don't describe it.",
     body: 'Photos, markup and one step at a time. Built for phones and gloved hands.',
-    cam: { fx: LX, fy: LY, zoom: 3.4 },
+    cam: { fx: LX, fy: LY, zoom: 2.6 },
     ms: 7500,
   },
   {
@@ -87,7 +87,7 @@ const SCENES: Scene[] = [
     eyebrow: 'AI-supported building',
     title: 'Upload the old SOP. Get a structured one.',
     body: 'AI reads Word and PDF, drafts the steps and flags what is missing. A person always approves.',
-    cam: { fx: OX, fy: OY, zoom: 2.4 },
+    cam: { fx: OX, fy: OY, zoom: 2.1 },
     ms: 8500,
   },
   {
@@ -264,7 +264,7 @@ const DRAFT = [
 function AiPanel() {
   return (
     <div className="flex flex-col gap-3">
-      <Card className="flex items-center gap-3 p-3">
+      <Card className="hidden items-center gap-3 p-3 sm:flex">
         <FileText size={28} className="shrink-0 text-ink-500" style={{ animation: 'reel-doc 1.2s ease-in-out 1.4s both' }} />
         <span className="min-w-0 flex-1">
           <span className="block text-ui font-medium text-ink-900">Labeller SOP (2019).docx</span>
@@ -421,8 +421,9 @@ export function PromoReel() {
   const s = cover * scene.cam.zoom
   const tx = lg && column ? (size.w - 480) / 2 : size.w / 2
   const ty = !column ? size.h / 2 : lg ? size.h * 0.46 : size.h * 0.24
-  const x = tx - scene.cam.fx * IW * s
-  const y = ty - scene.cam.fy * IH * s
+  // Clamped so the picture always covers the screen (no bare edges).
+  const x = Math.min(0, Math.max(size.w - IW * s, tx - scene.cam.fx * IW * s))
+  const y = Math.min(0, Math.max(size.h - IH * s, ty - scene.cam.fy * IH * s))
   const Panel = PANELS[scene.id]
 
   return (
@@ -442,7 +443,7 @@ export function PromoReel() {
       </div>
 
       {/* Header */}
-      <header className="absolute inset-x-0 top-0 flex items-center justify-between p-4">
+      <header className="absolute inset-x-0 top-0 z-10 flex items-center justify-between p-4">
         <span className="rounded-lg bg-paper/90 px-3 py-2 text-lg font-bold text-ink-900 shadow-lg backdrop-blur">SOPstart</span>
         <Link
           href="/login"
