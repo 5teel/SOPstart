@@ -794,8 +794,8 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       await expect(row).toHaveCount(1, SLOW)
       await expect(row.getByTestId('people-role-select')).toBeVisible()
       await expect(row.getByText('No department')).toBeVisible()
-      // One line at 1440: nowhere near two stacked lines of tap height.
-      expect(await row.evaluate((el) => el.getBoundingClientRect().height)).toBeLessThan(120)
+      // One row line plus the quiet objective line (60-13 added it under every person): still one line of controls, not two stacked.
+      expect(await row.evaluate((el) => el.getBoundingClientRect().height)).toBeLessThan(150)
       await shot(page, '59-people')
 
       // Invite: Send is disabled until the email is valid.

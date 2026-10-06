@@ -110,9 +110,9 @@ test.describe('Phase 60 -- requests, notifications and objectives (deployed)', (
       await shot(page, '60-requests-supervisor')
 
       // The pin is the Inbox segment count plus the Requests segment count (the supervisor's pin reads the same query).
-      const seg = async (id: string) => Number(((await page.getByTestId(id).locator('.mono').first().textContent().catch(() => '')) ?? '').trim()) || 0
+      const seg = async (id: string) => Number(((await page.getByTestId(id).locator('.mono').first().textContent({ timeout: 1000 }).catch(() => '')) ?? '').trim()) || 0
       await expect(async () => {
-        const pin = Number(((await page.locator('[data-testid="shell-room-row"][data-room-id="office"] .mono').first().textContent().catch(() => '')) ?? '').trim()) || 0
+        const pin = Number(((await page.locator('[data-testid="shell-room-row"][data-room-id="office"] .mono').first().textContent({ timeout: 1000 }).catch(() => '')) ?? '').trim()) || 0
         expect(pin).toBe((await seg('office-tab-inbox')) + (await seg('office-tab-requests')))
       }).toPass(SLOW)
 
