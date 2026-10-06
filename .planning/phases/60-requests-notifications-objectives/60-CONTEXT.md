@@ -143,5 +143,6 @@ Binding on the planner; see `60-RESEARCH.md` F-01..F-23 for the evidence.
 - **A-10 — New tables carry no foreign key to `sops`** (the fork-draft census would fail), only `subject_id uuid`; `deleteSop` clears `requests`, `notifications`, `objectives` rows about that SOP.
 - **A-11 — `scripts/verify-gate-check.tsx` gets a stub** for the new server-only notification module the publish route will import.
 - **A-12 — The "fix assignment" inbox row (stale department reference) re-points its link** from the deleted assign page to the SOP's focus address with the This SOP block open; SOP sub-trade tagging (only on the assign page, 0 live rows, already cut by D-A10) is deleted with it.
+- **Superseded by ADR-0002 (2026-10-06):** D-08 sweep and A-08 cron routes replaced by on-read / on-event triggers.
 
 </amendments>
