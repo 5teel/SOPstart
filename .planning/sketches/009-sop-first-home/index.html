@@ -1,0 +1,509 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>009 · SOP-first home</title>
+<link rel="stylesheet" href="../themes/default.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  body { overflow: hidden; }
+  #variant-nav { flex-wrap: wrap; }
+  #variant-nav .grp { display: flex; gap: 6px; align-items: center; margin-left: 14px; }
+  #variant-nav label { color: rgba(255,255,255,.5); font-size: 10px; text-transform: uppercase; letter-spacing: .08em; }
+  #variant-nav select { font-family: var(--mono); font-size: 11px; background: transparent; color: #fff; border: 1px solid rgba(255,255,255,.25); border-radius: 2px; padding: 4px 6px; }
+  #variant-nav select option { color: #000; }
+  #stage { position: fixed; inset: 44px 0 0 0; display: flex; align-items: center; justify-content: center; background: var(--paper-2); }
+  #frame { position: relative; width: 100%; height: 100%; background: var(--paper); overflow: hidden; }
+  #stage.phone #frame { width: 390px; height: 844px; max-height: calc(100vh - 64px); border-radius: 28px; border: 10px solid var(--ink-900); box-shadow: 0 20px 60px rgba(0,0,0,.25); }
+  #app { position: absolute; inset: 0; overflow: hidden; }
+
+  /* ---------- wordmark ---------- */
+  .wm { display: inline-flex; align-items: baseline; font-family: var(--sans); font-weight: 800; letter-spacing: -0.02em; color: var(--ink-900); position: relative; white-space: nowrap; line-height: 1.1; }
+  .wm .b { font-weight: 500; }
+  .wm::after { content: ''; position: absolute; left: 0; bottom: -0.12em; height: 0.12em; width: 100%; background: var(--brand-yellow); border-radius: 2px; }
+  .wm.sweep::after { width: 0; transition: width .25s ease-out; }
+  .wm.sweep.on::after { width: 100%; }
+
+  /* ---------- shared bits ---------- */
+  button { font: inherit; color: inherit; cursor: pointer; }
+  .btn { border: 1px solid var(--ink-300); background: var(--paper-1); border-radius: 8px; padding: 9px 14px; font-weight: 600; font-size: 13px; }
+  .btn.primary { background: var(--ink-900); color: #fff; border-color: var(--ink-900); }
+  .start-btn { height: 60px; min-width: 180px; padding: 0 28px; border-radius: 10px; background: var(--ink-900); color: #fff; border: 0; font-size: 18px; font-weight: 700; }
+  .sop-chip { display: inline-flex; align-items: center; height: 26px; padding: 0 9px; border-radius: 5px; background: var(--ink-900); color: #fff; font-family: var(--sans); font-weight: 800; font-size: 13px; letter-spacing: -0.01em; }
+  .label { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-500); margin: 22px 0 6px; }
+  .search { display: flex; align-items: center; gap: 8px; border: 1px solid var(--ink-300); background: var(--paper-1); border-radius: 10px; padding: 0 12px; height: 44px; }
+  .search input { border: 0; outline: 0; flex: 1; font: inherit; font-size: 15px; background: transparent; }
+  .search .x { border: 0; background: none; color: var(--ink-500); font-size: 16px; }
+  .row { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; border: 0; background: transparent; padding: 11px 10px; border-radius: 8px; min-height: 56px; }
+  .row:hover { background: var(--paper-2); }
+  .row.sel { background: var(--ink-900); color: #fff; }
+  .row.sel .meta, .row.sel .st { color: rgba(255,255,255,.7); }
+  .row .main { flex: 1; min-width: 0; }
+  .row .ttl { font-weight: 600; font-size: 14.5px; }
+  .row .meta { font-family: var(--mono); font-size: 11px; color: var(--ink-500); }
+  .st { font-size: 12px; color: var(--ink-600); display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .dot { width: 7px; height: 7px; border-radius: 99px; display: inline-block; }
+  .d-ok { background: var(--accent-ok); } .d-upd { background: var(--accent-step); } .d-wait { background: var(--accent-decision); } .d-prog { background: var(--ink-900); border: 1px solid #fff; outline: 1px solid var(--ink-900); }
+  .tg { font-family: var(--mono); font-size: 10px; color: var(--accent-inspect); background: rgba(124,58,237,.08); border-radius: 3px; padding: 1px 6px; }
+  .seg { display: inline-flex; border: 1px solid var(--ink-300); border-radius: 7px; overflow: hidden; }
+  .seg button { border: 0; background: var(--paper-1); padding: 5px 10px; font-size: 12px; }
+  .seg button.on { background: var(--ink-900); color: #fff; }
+  .grp-h { font-family: var(--mono); font-size: 11px; color: var(--ink-600); padding: 12px 10px 2px; display: flex; justify-content: space-between; }
+  .toast { position: absolute; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--ink-900); color: #fff; padding: 10px 16px; border-radius: 8px; font-size: 13px; z-index: 50; }
+  .empty { color: var(--ink-500); text-align: center; padding: 60px 20px; }
+  .scroll { overflow-y: auto; }
+
+  /* ---------- Variant A: library + reader ---------- */
+  .A { display: grid; grid-template-columns: 220px 400px 1fr; height: 100%; }
+  .A .side { border-right: 1px solid var(--ink-200); display: flex; flex-direction: column; padding: 18px 12px; background: var(--paper); }
+  .A .side .wm { font-size: 20px; margin: 0 8px 26px; }
+  .A .side nav button { display: block; width: 100%; text-align: left; border: 0; background: none; padding: 10px; border-radius: 8px; font-size: 14px; }
+  .A .side nav button.on { background: var(--paper-2); font-weight: 700; }
+  .A .side nav button.quiet { color: var(--ink-500); font-size: 13px; }
+  .A .side .who { margin-top: auto; font-family: var(--mono); font-size: 11px; color: var(--ink-500); padding: 8px; }
+  .A .list { border-right: 1px solid var(--ink-200); padding: 18px 14px; }
+  .A .pane { background: var(--paper-1); }
+
+  /* ---------- Variant B: search-first column ---------- */
+  .B { height: 100%; display: flex; flex-direction: column; }
+  .B .top { display: flex; align-items: center; gap: 22px; padding: 14px 28px; border-bottom: 1px solid var(--ink-200); }
+  .B .top .wm { font-size: 20px; }
+  .B .top nav { display: flex; gap: 4px; }
+  .B .top nav button { border: 0; background: none; padding: 7px 10px; border-radius: 7px; font-size: 13.5px; }
+  .B .top nav button.on { background: var(--paper-2); font-weight: 700; }
+  .B .top nav button.quiet { color: var(--ink-500); }
+  .B .top .who { margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--ink-500); }
+  .B .col { max-width: 780px; margin: 0 auto; padding: 34px 24px 80px; }
+  .B .search { height: 56px; border-radius: 14px; font-size: 17px; }
+  .B .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .B .card .st { white-space: normal; align-items: baseline; }
+  .B .card { text-align: left; border: 1px solid var(--ink-200); background: var(--paper-1); border-radius: 10px; padding: 12px 14px; min-height: 104px; display: flex; flex-direction: column; gap: 6px; }
+  .B .card:hover { border-color: var(--ink-400); }
+  .B .card .ttl { font-weight: 700; font-size: 14.5px; }
+  .B .card .meta { font-family: var(--mono); font-size: 11px; color: var(--ink-500); }
+  .B .card .st { margin-top: auto; }
+
+  /* ---------- read view ---------- */
+  .read { max-width: 760px; margin: 0 auto; padding: 30px 32px 80px; }
+  .read .back { display: block; border: 0; background: none; color: var(--ink-600); padding: 0; margin-bottom: 18px; font-size: 13px; }
+  .read h1 { font-size: 28px; line-height: 1.15; margin: 10px 0 6px; letter-spacing: -0.01em; }
+  .read .meta { font-family: var(--mono); font-size: 11.5px; color: var(--ink-500); }
+  .read .act { display: flex; align-items: center; gap: 14px; margin: 22px 0 6px; flex-wrap: wrap; }
+  .read .act .note { font-size: 13px; color: var(--ink-600); }
+  .read .tags { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+  .read .stline { margin-top: 12px; }
+  .read ol { padding: 0; margin: 0; list-style: none; counter-reset: s; }
+  .read li { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--ink-200); font-size: 14.5px; }
+  .read li::before { counter-increment: s; content: counter(s); font-family: var(--mono); font-size: 11px; color: var(--ink-500); width: 22px; padding-top: 3px; }
+  .kind { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: .08em; padding: 2px 7px; border-radius: 3px; border: 1px solid currentColor; height: fit-content; white-space: nowrap; }
+  .k-hazard { color: var(--accent-hazard); } .k-ppe { color: var(--accent-decision); } .k-step { color: var(--accent-step); } .k-check { color: var(--accent-measure); }
+
+  /* ---------- steps screen (the SOP owns the frame) ---------- */
+  .run { position: absolute; inset: 0; display: grid; grid-template-rows: 60px 3px 1fr; background: var(--paper); }
+  .run .hd { display: flex; align-items: center; gap: 16px; padding: 0 22px; border-bottom: 1px solid var(--ink-200); background: var(--paper-1); }
+  .run .hd .wm { font-size: 20px; }
+  .run .hd .sep { width: 1px; height: 24px; background: var(--ink-300); }
+  .run .hd .t { font-weight: 600; font-size: 14.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+  .run .hd .x { border: 1px solid var(--ink-300); background: var(--paper-1); border-radius: 8px; padding: 7px 12px; font-size: 13px; }
+  .run .bar { background: var(--ink-200); } .run .bar i { display: block; height: 100%; background: var(--ink-900); transition: width .3s; }
+  .run .body { display: grid; grid-template-columns: 280px 1fr; min-height: 0; }
+  .run .rail { border-right: 1px solid var(--ink-200); padding: 16px 10px; overflow-y: auto; }
+  .run .rail button { display: flex; gap: 10px; width: 100%; text-align: left; border: 0; background: none; padding: 8px 10px; border-radius: 7px; font-size: 13px; color: var(--ink-600); }
+  .run .rail button.cur { background: var(--paper-2); color: var(--ink-900); font-weight: 600; }
+  .run .rail button.done { color: var(--ink-400); }
+  .run .rail button .n { font-family: var(--mono); font-size: 11px; width: 18px; }
+  .run .wc { overflow-y: auto; display: flex; justify-content: center; align-items: flex-start; padding: 40px 32px; }
+  .run .card { width: 100%; max-width: 760px; }
+  .run .card .stepno { font-family: var(--mono); font-size: 12px; color: var(--ink-500); margin-left: 10px; }
+  .run .card .txt { font-size: 28px; line-height: 1.3; font-weight: 600; margin: 18px 0 24px; letter-spacing: -0.01em; }
+  .run .card .photo { border: 1.5px dashed var(--ink-400); border-radius: 10px; height: 120px; display: flex; align-items: center; justify-content: center; color: var(--ink-600); background: var(--paper-1); width: 100%; margin-bottom: 18px; font-size: 14px; }
+  .run .card .photo.got { border-style: solid; border-color: var(--accent-ok); color: var(--accent-ok); }
+  .run .card .go { width: 100%; height: 60px; border: 0; border-radius: 10px; background: var(--ink-900); color: #fff; font-size: 17px; font-weight: 700; }
+  .run .card .go:disabled { background: var(--ink-300); cursor: not-allowed; }
+  .run .card .prev { border: 0; background: none; color: var(--ink-600); margin-top: 14px; font-size: 13px; }
+  .run .card.k-hz { border-left: 4px solid var(--accent-hazard); padding-left: 22px; }
+  .run .card.k-pp { border-left: 4px solid var(--accent-decision); padding-left: 22px; }
+  .run .finish { text-align: center; padding-top: 40px; }
+  .run .finish .big { font-size: 40px; font-weight: 800; }
+
+  /* ---------- fusion overlay ---------- */
+  .fuse-bg { position: absolute; inset: 0; background: var(--paper); z-index: 40; pointer-events: none; }
+  .fuse-wm { position: absolute; left: 50%; top: 50%; z-index: 41; transform: translate(-50%, -50%); font-size: 52px; pointer-events: none; }
+  .fuse-wm.free { transform: none; }
+  .fuse-wm span { display: inline-block; transform-origin: 0 0; border-radius: 5px; }
+
+  /* ---------- map ---------- */
+  .map { position: relative; border-radius: 10px; overflow: hidden; border: 1px solid var(--ink-200); margin-top: 8px; }
+  .map img { display: block; width: 100%; }
+  .map .hs { position: absolute; transform: translate(-50%, -50%); border: 0; background: var(--ink-900); color: #fff; font-family: var(--mono); font-size: 10.5px; padding: 3px 8px; border-radius: 5px; }
+  .map .hs:hover { background: var(--brand-yellow); color: var(--ink-900); }
+  .filterchip { display: inline-flex; gap: 8px; align-items: center; background: var(--paper-2); border-radius: 99px; padding: 4px 10px; font-size: 12.5px; margin-top: 10px; }
+  .filterchip button { border: 0; background: none; }
+
+  /* ---------- tables for other sections ---------- */
+  .sec { padding: 28px 32px; max-width: 880px; }
+  .sec h2 { margin: 0 0 4px; font-size: 22px; }
+  .sec .sub { color: var(--ink-600); font-size: 13px; margin-bottom: 18px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  th { text-align: left; font-family: var(--mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-500); font-weight: 600; padding: 8px; border-bottom: 1px solid var(--ink-300); }
+  td { padding: 10px 8px; border-bottom: 1px solid var(--ink-200); }
+  td.c { text-align: center; }
+
+  /* ---------- phone ---------- */
+  .phone .A, .phone .B { display: flex; flex-direction: column; }
+  .phone .A .side, .phone .B .top { display: none; }
+  .phone .A .list { border: 0; flex: 1; }
+  .phone .B .col { padding: 18px 14px 90px; }
+  .phone .B .cards { grid-template-columns: 1fr; }
+  .phone .read { padding: 16px 16px 90px; }
+  .phone .read h1 { font-size: 23px; }
+  .phone .start-btn { width: 100%; }
+  .phone .sec { padding: 18px 14px 90px; }
+  .phone .ptop { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px 4px; }
+  .phone .ptop .wm { font-size: 19px; }
+  .tabs { display: none; }
+  .phone .tabs { display: flex; position: absolute; left: 0; right: 0; bottom: 0; background: var(--paper-1); border-top: 1px solid var(--ink-200); z-index: 5; }
+  .phone .tabs button { flex: 1; border: 0; background: none; padding: 12px 2px 16px; font-size: 11.5px; color: var(--ink-500); }
+  .phone .tabs button.on { color: var(--ink-900); font-weight: 700; }
+  .phone .run { grid-template-rows: 54px 3px 1fr; }
+  .phone .run .hd { padding: 0 12px; gap: 10px; }
+  .phone .run .hd .wm { font-size: 17px; }
+  .phone .run .body { grid-template-columns: 1fr; }
+  .phone .run .rail { display: none; }
+  .phone .run .wc { padding: 22px 16px; }
+  .phone .run .card .txt { font-size: 23px; }
+  .phone .run .card.k-hz, .phone .run .card.k-pp { padding-left: 14px; }
+</style>
+</head>
+<body>
+
+<div id="variant-nav">
+  <span class="sketch-title">009 · SOP-first home</span>
+  <button class="variant-tab active" data-v="A">A: Library + reader</button>
+  <button class="variant-tab" data-v="B">B: Search-first column</button>
+  <div class="grp"><label>View</label>
+    <select id="vp"><option value="desk">Desktop</option><option value="phone">Phone</option></select></div>
+  <div class="grp"><label>Role</label>
+    <select id="role"><option value="worker">Worker</option><option value="supervisor">Supervisor</option><option value="admin">SOP admin</option></select></div>
+  <div class="grp"><label>Start motion</label>
+    <select id="motion"><option value="auto">Auto (full first today)</option><option value="full">Full ~1s</option><option value="short">Short ~0.3s</option><option value="off">Off (reduced motion)</option></select></div>
+</div>
+
+<div id="stage"><div id="frame"><div id="app"></div></div></div>
+
+<script>
+/* ---------------- data ---------------- */
+const gen = (t) => [
+  { k: 'hazard', t: 'Moving parts and stored energy. Isolate before reaching in.' },
+  { k: 'ppe', t: 'Safety glasses, cut-resistant gloves, safety boots.' },
+  { k: 'step', t: 'Confirm the area is clear and tell the operator you are starting.' },
+  { k: 'step', t: 'Follow the isolation points on the tag board for ' + t.toLowerCase() + '.' },
+  { k: 'step', t: 'Carry out the task as set out in the drawing on the board.', photo: true },
+  { k: 'check', t: 'Guards back on, tags removed, area handed back.' },
+];
+const SOPS = [
+  { id: 'fork', t: 'Forklift pre-start check', dept: 'Warehouse', type: 'Inspection', place: 'Warehouse', v: 4, owner: 'Hemi Walker', min: 6, std: ['Traffic management'],
+    st: { k: 'upd', txt: 'Updated 2 Oct · changed since you last did it' },
+    steps: [
+      { k: 'hazard', t: 'Pedestrians share the aisles. Sound the horn at every intersection and blind corner.' },
+      { k: 'ppe', t: 'Hi-vis vest and safety boots. Seatbelt fastened before the forklift moves.' },
+      { k: 'step', t: 'Go around the forklift and look underneath for oil or hydraulic leaks.' },
+      { k: 'step', t: 'Check both forks for cracks, bends and uneven wear at the heels.', photo: true },
+      { k: 'check', t: 'Tyres: no cuts, missing chunks or flat spots.' },
+      { k: 'step', t: 'Sit in, belt on, key on. Test the horn, lights and reversing beeper.' },
+      { k: 'check', t: 'Service brake and parking brake both hold on the ramp.' },
+      { k: 'step', t: 'Record the hour-meter reading and park ready for the shift.' },
+    ] },
+  { id: 'loto', t: 'Lockout / tagout isolation', dept: 'Site-wide', type: 'Process', place: null, v: 7, owner: 'Safety team', min: 10, std: ['LOTO', 'AS/NZS 4836'], st: { k: 'ok', txt: 'Signed off 12 Sep · R. Patel' } },
+  { id: 'ism', t: 'IS machine job change', dept: 'Forming', type: 'Machine', place: 'IS Machine 1', v: 3, owner: 'Tama Ngata', min: 35, std: ['LOTO'], st: { k: 'prog', txt: 'You stopped at step 4 yesterday' }, at: 3 },
+  { id: 'swab', t: 'Mould swabbing', dept: 'Forming', type: 'Machine', place: 'IS Machine 1', v: 5, owner: 'Tama Ngata', min: 4, std: ['Hot work'], st: { k: 'ok', txt: 'Signed off 28 Aug · S. Fale' } },
+  { id: 'lehr', t: 'Annealing lehr start-up', dept: 'Forming', type: 'Order of operations', place: 'Annealing lehr', v: 2, owner: 'Tama Ngata', min: 20, std: [] },
+  { id: 'hand', t: 'Shift handover', dept: 'Site-wide', type: 'Process', place: null, v: 3, owner: 'Ops manager', min: 8, std: [], st: { k: 'wait', txt: 'Done 6 Oct · waiting for sign-off' } },
+  { id: 'batch', t: 'Batch changeover order', dept: 'Batch house', type: 'Order of operations', place: null, v: 6, owner: 'Mei Lin', min: 15, std: [] },
+  { id: 'cold', t: 'Reject check at the cold end', dept: 'Cold end', type: 'Inspection', place: 'Cold-end inspection', v: 2, owner: 'Ben Kerr', min: 5, std: [] },
+  { id: 'pall', t: 'Palletiser jam clearing', dept: 'Cold end', type: 'Machine', place: 'Palletiser', v: 4, owner: 'Ben Kerr', min: 7, std: ['LOTO'], st: { k: 'ok', txt: 'Signed off 3 Sep · R. Patel' } },
+  { id: 'tank', t: 'Alkaline cleaning tank top-up', dept: 'Engineering', type: 'Machine', place: 'Cleaning tank', v: 1, owner: 'Hemi Walker', min: 12, std: ['Hazardous substances'] },
+  { id: 'spill', t: 'Chemical spill response', dept: 'Site-wide', type: 'Emergency', place: null, v: 2, owner: 'Safety team', min: 5, std: ['Hazardous substances'] },
+  { id: 'hot', t: 'Hot glass handling', dept: 'Forming', type: 'Process', place: null, v: 3, owner: 'Tama Ngata', min: 3, std: ['Hot work'], st: { k: 'ok', txt: 'Signed off 1 Aug · S. Fale' } },
+];
+SOPS.forEach(s => { s.steps = s.steps || gen(s.t); });
+const byId = Object.fromEntries(SOPS.map(s => [s.id, s]));
+const RECENT = ['fork', 'ism', 'hand', 'loto'];
+const MOST = [['loto', 14], ['swab', 11], ['fork', 9]];
+const PLACES = [ // ponytail: hand-placed on the 007 scene; the real map comes from site_machines
+  { n: 'IS Machine 1', x: 34, y: 58 }, { n: 'Annealing lehr', x: 45, y: 36 }, { n: 'Cold-end inspection', x: 58, y: 52 },
+  { n: 'Palletiser', x: 66, y: 66 }, { n: 'Cleaning tank', x: 72, y: 28 }, { n: 'Warehouse', x: 86, y: 52 },
+];
+
+/* ---------------- state ---------------- */
+const S = { v: 'A', phone: false, role: 'worker', sec: 'sops', sop: null, q: '', group: 'dept', place: null, showMap: false, run: null };
+const app = document.getElementById('app'), frame = document.getElementById('frame');
+const esc = (x) => String(x).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const WM = (cls = '') => `<span class="wm ${cls}"><span class="a">SOP</span><span class="b">start</span></span>`;
+
+function sections() {
+  const s = [['sops', 'My SOPs'], ['record', 'My record']];
+  if (S.role !== 'worker') s.push(['training', 'Training'], ['signoffs', 'Sign-offs']);
+  if (S.role === 'admin') s.push(['manage', 'Manage SOPs', 'quiet']);
+  return s;
+}
+const navBtns = () => sections().map(([k, l, q]) => `<button class="${S.sec === k ? 'on' : ''} ${q || ''}" data-sec="${k}">${l}</button>`).join('');
+
+function stHtml(s) {
+  if (!s.st) return '';
+  return `<span class="st"><i class="dot d-${s.st.k}"></i>${esc(s.st.txt)}</span>`;
+}
+function row(s, extra = '') {
+  return `<button class="row ${S.sop === s.id && S.v === 'A' && !S.phone ? 'sel' : ''}" data-open="${s.id}">
+    <div class="main"><div class="ttl">${esc(s.t)}</div><div class="meta">${esc(s.dept)} · ${esc(s.type)} · ~${s.min} min${extra}</div>
+    ${s.st ? `<div style="margin-top:3px">${stHtml(s)}</div>` : ''}</div></button>`;
+}
+
+function matches() {
+  const q = S.q.trim().toLowerCase();
+  return SOPS.filter(s => (!S.place || s.place === S.place) &&
+    (!q || (s.t + ' ' + s.dept + ' ' + s.type + ' ' + (s.place || '') + ' ' + s.steps.map(x => x.t).join(' ')).toLowerCase().includes(q)));
+}
+
+function allGrouped() {
+  const key = S.group === 'dept' ? 'dept' : 'type';
+  const g = {};
+  SOPS.forEach(s => (g[s[key]] = g[s[key]] || []).push(s));
+  return Object.keys(g).sort().map(k => `<div class="grp-h"><span>${esc(k)}</span><span>${g[k].length}</span></div>${g[k].map(s => row(s)).join('')}`).join('');
+}
+
+function mapHtml() {
+  return `<div class="map"><img src="../007-plant-floor-navigation/assets/plant.jpg" alt="Site">
+    ${PLACES.map(p => `<button class="hs" style="left:${p.x}%;top:${p.y}%" data-place="${esc(p.n)}">${esc(p.n)}</button>`).join('')}</div>
+    <div class="meta" style="font-family:var(--mono);font-size:11px;color:var(--ink-500);margin-top:6px">Processes and site-wide SOPs have no place. They stay in the list.</div>`;
+}
+
+function homeBody(cardsStyle) {
+  const searching = S.q.trim() || S.place;
+  let h = `<div class="search">⌕<input id="q" placeholder="Search all SOPs, steps and tools" value="${esc(S.q)}">${S.q ? '<button class="x" data-clear>✕</button>' : ''}</div>`;
+  if (S.place) h += `<div class="filterchip">At ${esc(S.place)} <button data-place="">✕</button></div>`;
+  if (searching) {
+    const m = matches();
+    h += `<div class="label">${m.length} result${m.length === 1 ? '' : 's'}</div>`;
+    h += m.length ? m.map(s => row(s)).join('') :
+      `<div class="empty">No SOP for “${esc(S.q)}”.<br><br><button class="btn primary" data-toast="Request sent to the SOP admins · logged">Ask for one</button>
+       ${S.role === 'admin' ? ' <button class="btn" data-toast="Opens the new-SOP editor with this title">Write it</button>' : ''}</div>`;
+    return h;
+  }
+  h += `<div class="label">Recent</div>`;
+  h += cardsStyle ? `<div class="cards">${RECENT.slice(0, 3).map(id => card(byId[id])).join('')}</div>` : RECENT.map(id => row(byId[id])).join('');
+  h += `<div class="label">Most used</div>` + MOST.map(([id, n]) => row(byId[id], ` · done ${n}×`)).join('');
+  h += `<div class="label" style="display:flex;justify-content:space-between;align-items:center">All SOPs · ${SOPS.length}
+        <span class="seg"><button class="${S.group === 'dept' ? 'on' : ''}" data-group="dept">Department</button><button class="${S.group === 'type' ? 'on' : ''}" data-group="type">Type</button></span></div>`;
+  h += `<div style="margin:4px 0 6px"><button class="btn" data-map>${S.showMap ? 'Hide' : 'Find by place'} ▸</button></div>`;
+  if (S.showMap) h += mapHtml();
+  h += allGrouped();
+  return h;
+}
+function card(s) {
+  return `<button class="card" data-open="${s.id}"><div class="ttl">${esc(s.t)}</div><div class="meta">${esc(s.dept)} · ~${s.min} min</div>${stHtml(s)}</button>`;
+}
+
+function readHtml(s, withBack) {
+  const prog = s.st && s.st.k === 'prog';
+  return `<div class="read">
+    ${withBack ? '<button class="back" data-close>‹ My SOPs</button>' : ''}
+    <span class="sop-chip" id="chip">SOP</span>
+    <h1>${esc(s.t)}</h1>
+    <div class="meta">${esc(s.dept)} · ${esc(s.type)}${s.place ? ' · ' + esc(s.place) : ''} · v${s.v} · owner ${esc(s.owner)} · ~${s.min} min</div>
+    ${s.std.length ? `<div class="tags">${s.std.map(x => `<span class="tg">${esc(x)}</span>`).join('')}</div>` : ''}
+    ${s.st ? `<div class="stline">${stHtml(s)}</div>` : ''}
+    <div class="act"><button class="start-btn" id="startBtn" data-start="${s.id}">Start</button>
+      <span class="note">${prog ? 'Picks up at step ' + (s.at + 1) + ' of ' + s.steps.length + ' · <a href="#" data-start="' + s.id + '" data-fresh>or begin from step 1</a>' : s.steps.length + ' steps'}</span></div>
+    <div class="label">What you'll do</div>
+    <ol>${s.steps.map(x => `<li><span style="flex:1">${esc(x.t)}${x.photo ? ' <span class="meta">· photo</span>' : ''}</span><span class="kind k-${x.k}">${x.k === 'ppe' ? 'PPE' : x.k}</span></li>`).join('')}</ol>
+  </div>`;
+}
+
+function secHtml() {
+  if (S.sec === 'record') return `<div class="sec"><h2>My record</h2><div class="sub">What you've done and who signed it off.</div>
+    <table><tr><th>SOP</th><th>Last done</th><th>Status</th></tr>
+    <tr><td>Lockout / tagout isolation</td><td>12 Sep</td><td><span class="st"><i class="dot d-ok"></i>Signed off · R. Patel</span></td></tr>
+    <tr><td>Shift handover</td><td>6 Oct</td><td><span class="st"><i class="dot d-wait"></i>Waiting for sign-off</span></td></tr>
+    <tr><td>Mould swabbing</td><td>28 Aug</td><td><span class="st"><i class="dot d-ok"></i>Signed off · S. Fale</span></td></tr>
+    <tr><td>Forklift pre-start check</td><td>19 Sep</td><td><span class="st"><i class="dot d-upd"></i>Signed off on v3 · now v4</span></td></tr>
+    <tr><td>Palletiser jam clearing</td><td>3 Sep</td><td><span class="st"><i class="dot d-ok"></i>Signed off · R. Patel</span></td></tr></table></div>`;
+  if (S.sec === 'training') {
+    const ppl = ['Aroha T.', 'Ben K.', 'Sione F.', 'Mei L.'], cols = ['loto', 'fork', 'swab', 'pall', 'hand'];
+    const cell = (i, j) => ['✓', '✓', '●', '', '✓', '', '✓', '●', '', '✓', '✓', '✓', '', '✓', '●', '✓', '', '✓', '✓', ''][i * 5 + j];
+    return `<div class="sec"><h2>Training</h2><div class="sub">Who is signed off on what. ✓ signed off · ● done, waiting for sign-off. A record to look up, not a to-do list.</div>
+      <table><tr><th>Person</th>${cols.map(c => `<th>${esc(byId[c].t)}</th>`).join('')}</tr>
+      ${ppl.map((p, i) => `<tr><td>${p}</td>${cols.map((c, j) => `<td class="c" style="color:${cell(i, j) === '✓' ? 'var(--accent-ok)' : 'var(--accent-decision)'}">${cell(i, j)}</td>`).join('')}</tr>`).join('')}</table></div>`;
+  }
+  if (S.sec === 'signoffs') return `<div class="sec"><h2>Sign-offs</h2><div class="sub">Completed SOPs from your team. Each sign-off is logged in the decision ledger.</div>
+    <table id="so"><tr><th>Who</th><th>SOP</th><th>Done</th><th></th></tr>
+    ${[['Aroha T.', 'Shift handover', '6 Oct · 2 photos'], ['Sione F.', 'Mould swabbing', '6 Oct'], ['Mei L.', 'Batch changeover order', '5 Oct · 1 photo']].map(r =>
+      `<tr><td>${r[0]}</td><td>${r[1]}</td><td class="meta" style="font-family:var(--mono);font-size:11px;color:var(--ink-500)">${r[2]}</td>
+      <td style="text-align:right;white-space:nowrap"><button class="btn" data-toast="Sent back · logged in the decision ledger" data-rm>Send back</button> <button class="btn primary" data-toast="Signed off · logged in the decision ledger" data-rm>Sign off</button></td></tr>`).join('')}</table></div>`;
+  if (S.sec === 'manage') return `<div class="sec"><h2>Manage SOPs</h2><div class="sub">Write, convert and fix SOPs. Every way in ends in the same editor.</div>
+    <button class="btn primary" data-toast="New SOP: upload a document · describe it to AI · record a video · start blank">New SOP</button>
+    <div class="label">Your drafts</div>
+    <table><tr><th>Draft</th><th>Checked</th><th></th></tr>
+    <tr><td>Press changeover</td><td>12 of 30 steps</td><td style="text-align:right"><button class="btn" data-toast="Opens the editor at step 13, the next unchecked one">Carry on</button></td></tr>
+    <tr><td>Forming area isolation</td><td>0 of 18 steps</td><td style="text-align:right"><button class="btn" data-toast="Opens the editor at step 1">Carry on</button></td></tr></table>
+    <div class="label">Change requests</div>
+    <table><tr><td>Forklift pre-start check · “step 6: add the fire extinguisher check”</td><td style="text-align:right"><button class="btn" data-toast="Opens the editor at step 6">Make this change</button></td></tr></table></div>`;
+}
+
+/* ---------------- render ---------------- */
+function render() {
+  frame.parentElement.classList.toggle('phone', S.phone);
+  app.className = S.phone ? 'phone' : '';
+  if (S.run) return renderRun();
+  const tabs = `<div class="tabs">${sections().map(([k, l]) => `<button class="${S.sec === k ? 'on' : ''}" data-sec="${k}">${l === 'My SOPs' ? 'SOPs' : l === 'Manage SOPs' ? 'Manage' : l}</button>`).join('')}</div>`;
+  const ptop = `<div class="ptop">${WM()}<span style="font-family:var(--mono);font-size:11px;color:var(--ink-500)">${S.role}</span></div>`;
+  const s = S.sop && byId[S.sop];
+  let h;
+  if (S.v === 'A') {
+    let mid, pane;
+    if (S.sec !== 'sops') { mid = ''; pane = secHtml(); }
+    else { mid = homeBody(false); pane = s ? readHtml(s, false) : `<div class="empty" style="padding-top:30vh">Pick a SOP to read it.</div>`; }
+    if (S.phone) {
+      h = `<div class="A">${S.sec === 'sops' && !s ? ptop : ''}<div class="list scroll" style="padding-bottom:90px">${S.sec !== 'sops' ? secHtml() : s ? readHtml(s, true) : mid}</div></div>${tabs}`;
+    } else {
+      h = `<div class="A"><aside class="side">${WM()}<nav>${navBtns()}</nav><div class="who">${S.role} · Visy Penrose</div></aside>
+        ${S.sec === 'sops' ? `<div class="list scroll">${mid}</div><div class="pane scroll">${pane}</div>` : `<div class="pane scroll" style="grid-column:2 / 4">${pane}</div>`}</div>`;
+    }
+  } else {
+    const inner = S.sec !== 'sops' ? secHtml() : s ? readHtml(s, true) : `<div class="col">${homeBody(true)}</div>`;
+    h = `<div class="B"><div class="top">${WM()}<nav>${navBtns()}</nav><span class="who">${S.role} · Visy Penrose</span></div>
+      ${S.phone && S.sec === 'sops' && !s ? ptop : ''}<div class="scroll" style="flex:1">${inner}</div></div>${tabs}`;
+  }
+  app.innerHTML = h;
+  const q = document.getElementById('q');
+  if (q && S._focus) { q.focus(); q.setSelectionRange(q.value.length, q.value.length); }
+}
+
+function renderRun() {
+  const s = byId[S.run.id], i = S.run.i, n = s.steps.length;
+  let body;
+  if (i >= n) {
+    body = `<div class="card finish"><div class="big">Done</div><p style="color:var(--ink-600)">${esc(s.t)} is recorded and sent to your supervisor for sign-off.</p>
+      <button class="go" data-exit style="max-width:320px">Back to my SOPs</button></div>`;
+  } else {
+    const st = s.steps[i];
+    const lbl = st.k === 'hazard' ? 'I understand — continue' : st.k === 'ppe' ? "I'm wearing it — continue" : i === n - 1 ? 'Done' : 'Next';
+    const need = st.photo && !S.run.photos[i];
+    body = `<div class="card ${st.k === 'hazard' ? 'k-hz' : st.k === 'ppe' ? 'k-pp' : ''}">
+      <span class="kind k-${st.k}">${st.k === 'ppe' ? 'PPE' : st.k}</span><span class="stepno">Step ${i + 1} of ${n}</span>
+      <div class="txt">${esc(st.t)}</div>
+      ${st.photo ? `<button class="photo ${S.run.photos[i] ? 'got' : ''}" data-photo>${S.run.photos[i] ? '✓ Photo added' : '＋ Add a photo (this step asks for one)'}</button>` : ''}
+      <button class="go" data-next ${need ? 'disabled' : ''}>${lbl}</button>
+      ${i > 0 ? '<button class="prev" data-prev>‹ Back a step</button>' : ''}</div>`;
+  }
+  app.innerHTML = `<div class="run">
+    <div class="hd">${WM('hdwm')}<span class="sep"></span><span class="t">${esc(s.t)}</span><button class="x" data-exit>${i >= n ? 'Close' : 'Stop'}</button></div>
+    <div class="bar"><i style="width:${Math.min(100, (i / n) * 100)}%"></i></div>
+    <div class="body"><div class="rail"><div class="label" style="margin:0 10px 8px">Steps</div>
+      ${s.steps.map((x, j) => `<button class="${j === i ? 'cur' : j < i ? 'done' : ''}" ${j <= S.run.max ? `data-jump="${j}"` : 'disabled'}><span class="n">${j < i ? '✓' : j + 1}</span>${esc(x.t)}</button>`).join('')}
+      <div class="label" style="margin:20px 10px 6px">This SOP</div><div style="font-family:var(--mono);font-size:11px;color:var(--ink-500);padding:0 10px">v${s.v} · owner ${esc(s.owner)}<br>${s.std.map(x => `<span class="tg">${esc(x)}</span>`).join(' ')}</div></div>
+      <div class="wc">${body}</div></div></div>`;
+}
+
+/* ---------------- the fusion ---------------- */
+function motionMode() {
+  const m = document.getElementById('motion').value;
+  if (m !== 'auto') return m;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return 'off';
+  const today = new Date().toDateString();
+  try { if (localStorage.getItem('sopstart-fuse-day') === today) return 'short'; localStorage.setItem('sopstart-fuse-day', today); } catch (e) {}
+  return 'full';
+}
+const rel = (el) => { const r = el.getBoundingClientRect(), f = frame.getBoundingClientRect(); return { l: r.left - f.left - frame.clientLeft, t: r.top - f.top - frame.clientTop, w: r.width, h: r.height }; };
+
+async function startSop(id, fresh) {
+  const s = byId[id];
+  const at = !fresh && s.st && s.st.k === 'prog' ? s.at : 0;
+  const go = () => { S.run = { id, i: at, max: at, photos: {} }; render(); };
+  const mode = motionMode();
+  const chip = document.getElementById('chip'), btn = document.getElementById('startBtn');
+  if (mode === 'off' || !chip || !btn || !Element.prototype.animate) return go();
+
+  const T = mode === 'full' ? { a: 460, hold: 160, b: 420 } : { a: 150, hold: 0, b: 150 };
+  const src1 = rel(chip), src2 = rel(btn), btnLabel = btn.textContent;
+
+  const bg = document.createElement('div'); bg.className = 'fuse-bg';
+  const wm = document.createElement('div'); wm.className = 'fuse-wm wm sweep';
+  wm.innerHTML = `<span class="a">SOP</span><span class="b">start</span>`;
+  frame.append(bg, wm);
+  const [sa, sb] = wm.children;
+  sb.textContent = btnLabel;
+  const d1 = rel(sa), d2 = rel(sb);
+  // ponytail: FLIP by hand (WAAPI) so the two parts meet in the middle; View Transitions can't hold a mid-point. Real build can try VT + a keyframed midpoint.
+  const ease = 'cubic-bezier(.5,0,.2,1)';
+  // the pieces fly as solid black chips and only turn into ink-on-paper as they meet
+  const fly = (el, src, dst) => {
+    const s = src.h / dst.h;
+    const tx = src.l + src.w / 2 - dst.l - (dst.w * s) / 2, ty = src.t + src.h / 2 - dst.t - (dst.h * s) / 2;
+    el.animate([{ background: '#09090b', color: '#fff', boxShadow: '0 0 0 6px #09090b' }, { background: 'transparent', color: '#09090b', boxShadow: '0 0 0 0 transparent' }],
+      { duration: T.a * 0.4, delay: T.a * 0.6, easing: 'ease-in', fill: 'both' });
+    return el.animate([{ transform: `translate(${tx}px,${ty}px) scale(${s})` }, { transform: 'none' }], { duration: T.a, easing: ease, fill: 'forwards' }).finished;
+  };
+  bg.animate([{ opacity: 0 }, { opacity: 1 }], { duration: T.a, easing: 'ease-out', fill: 'forwards' });
+  await Promise.all([fly(sa, src1, d1), fly(sb, src2, d2)]);
+  sb.textContent = 'start';
+  wm.classList.add('on');
+  wm.animate([{ transform: 'translate(-50%,-50%) scale(1)' }, { transform: 'translate(-50%,-50%) scale(1.06)' }, { transform: 'translate(-50%,-50%) scale(1)' }], { duration: Math.max(T.hold, 120) });
+  await new Promise(r => setTimeout(r, T.hold || 60));
+
+  go(); // the steps screen is now under the paper veil
+  const target = app.querySelector('.hdwm');
+  target.style.visibility = 'hidden';
+  const cur = rel(wm), tgt = rel(target);
+  wm.classList.add('free');
+  Object.assign(wm.style, { left: cur.l + 'px', top: cur.t + 'px' });
+  const k = tgt.h / cur.h;
+  bg.animate([{ opacity: 1 }, { opacity: 0 }], { duration: T.b, easing: 'ease-in', fill: 'forwards' });
+  await wm.animate([{ transform: 'none' }, { transform: `translate(${tgt.l - cur.l}px,${tgt.t - cur.t}px) scale(${k})` }],
+    { duration: T.b, easing: ease, fill: 'forwards' }).finished;
+  target.style.visibility = '';
+  bg.remove(); wm.remove();
+}
+
+/* ---------------- events ---------------- */
+function toast(t) {
+  const d = document.createElement('div'); d.className = 'toast'; d.textContent = t; frame.append(d);
+  setTimeout(() => d.remove(), 2400);
+}
+app.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-open],[data-sec],[data-close],[data-start],[data-next],[data-prev],[data-jump],[data-exit],[data-photo],[data-group],[data-map],[data-place],[data-clear],[data-toast]');
+  if (!b) return;
+  const d = b.dataset;
+  S._focus = false;
+  if ('start' in d) { e.preventDefault(); return startSop(d.start, 'fresh' in d); }
+  if ('toast' in d) { toast(d.toast); if ('rm' in d) b.closest('tr').remove(); return; }
+  if (d.open) S.sop = d.open;
+  if (d.sec) { S.sec = d.sec; S.sop = null; }
+  if ('close' in d) S.sop = null;
+  if ('group' in d) S.group = d.group;
+  if ('map' in d) S.showMap = !S.showMap;
+  if ('place' in d) { S.place = d.place || null; S.showMap = false; }
+  if ('clear' in d) S.q = '';
+  if (S.run) {
+    const s = byId[S.run.id];
+    if ('next' in d) { S.run.i++; S.run.max = Math.max(S.run.max, S.run.i); if (S.run.i >= s.steps.length) s.st = { k: 'wait', txt: 'Done today · waiting for sign-off' }; }
+    if ('prev' in d) S.run.i--;
+    if (d.jump) S.run.i = +d.jump;
+    if ('photo' in d) S.run.photos[S.run.i] = true;
+    if ('exit' in d) { if (S.run.i > 0 && S.run.i < s.steps.length) { s.st = { k: 'prog', txt: 'You stopped at step ' + (S.run.i + 1) + ' today' }; s.at = S.run.i; } S.run = null; }
+  }
+  render();
+});
+app.addEventListener('input', (e) => { if (e.target.id === 'q') { S.q = e.target.value; S._focus = true; render(); } });
+document.querySelectorAll('.variant-tab').forEach(t => t.onclick = () => {
+  document.querySelectorAll('.variant-tab').forEach(x => x.classList.toggle('active', x === t)); S.v = t.dataset.v; S.run = null; render();
+});
+document.getElementById('vp').onchange = (e) => { S.phone = e.target.value === 'phone'; render(); };
+document.getElementById('role').onchange = (e) => { S.role = e.target.value; if (!sections().some(([k]) => k === S.sec)) S.sec = 'sops'; S.run = null; render(); };
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (S.run) S.run = null; else S.sop = null; render(); } });
+render();
+</script>
+</body>
+</html>

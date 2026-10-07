@@ -22,8 +22,11 @@ Paper/ink engineering-drawing system (established in the blueprint-redesign expl
 | 006 | sop-navigation-model | How does /sops answer "which procedure do I need?" for a worker AND stay useful to an admin, without a scope column that mixes role, obligation, catalogue and facet? | superseded by 007 | navigation, information-architecture, library, governance, worker, admin, phone |
 | 007 | plant-floor-navigation | What if the plant itself is the navigation — an isometric site with tappable machines, pins for what is due (worker) or what is sick (admin) — and the library is never the home? | Plant (scene as worker home + phone QR + admin inbox; shared terminal dropped) | navigation, spatial, isometric, worker, kiosk, phone, admin, generated-assets |
 | 008 | one-screen-site | If the whole app is one screen (isometric site + sidebar), where does the real work render — docked panel, sheet over the map, or step inside the room? | A (three panes; an open SOP takes the whole screen — map and list removed) | mvp, simplification, navigation, isometric, one-screen, data-model |
+| 009 | sop-first-home | If safe SOP use is the whole point, what is the home, and how does starting a SOP feel? | pending | home, navigation, brand, motion, worker, phone |
 
 ## Decisions
+
+- **2026-10-07 — Attention follows the objectives (Simon).** Ranked: safe, competent SOP use > sign-off/training records > SOP creation (rare, quiet, frictionless once started). The room metaphor is dropped as a fuzzy semantic; machines and places stop organising SOPs (processes and orders of operation have no place); no Next-for-you card and no due queues -- the app manages SOPs, safety, training and records, not workflows or time. Home = search, Recent, Most used, All SOPs. "Walk" is replaced by Read / Start / Done. Starting fuses the SOP chip and the Start button into the SOPstart wordmark. Sketch 009 explores it.
 
 - **2026-10-03 — Sketch 008: A wins, with a focus rule.** Three panes (list · map · detail) is the whole app. Opening a SOP to walk or edit it removes the list and the map entirely; the SOP, its sections and its steps own the screen, and nothing else from the site shares it. Back/Esc returns to the three panes at the place you came from. B (sheets over the map) and C (step inside) kept in the file, not chosen.
 
