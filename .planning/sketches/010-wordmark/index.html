@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>010 · SOPstart wordmark</title>
+<link rel="stylesheet" href="../themes/default.css">
+<!-- the app's own tokens: the wordmark is designed against the values that ship (ADR-0004) -->
+<link rel="stylesheet" href="../../../src/styles/blueprint-theme.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&family=Archivo:wdth,wght@62..125,400..900&family=Big+Shoulders+Stencil+Display:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+  body { padding-top: 44px; background: var(--paper); }
+  main { max-width: 1240px; margin: 0 auto; padding: 28px 24px 80px; }
+  .dir { margin-bottom: 56px; }
+  .dir h2 { font-size: 20px; margin: 0 0 4px; }
+  .dir .why { color: var(--ink-600); font-size: 13.5px; max-width: 760px; margin: 0 0 16px; }
+  .row { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 0.8fr); gap: 12px; }
+  .tile { border: 1px solid var(--ink-200); border-radius: 10px; min-height: 150px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 18px; position: relative; }
+  .tile.paper { background: var(--paper-1); }
+  .tile.ink { background: var(--ink-900); border-color: var(--ink-900); }
+  .tile .cap { position: absolute; left: 10px; top: 8px; font-family: var(--mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-500); }
+  .tile.ink .cap { color: var(--ink-400); }
+  .hero { font-size: clamp(28px, 3.4vw, var(--wm-size-hero)); }
+  .tile { overflow: hidden; }
+  .hbar { width: 100%; display: flex; align-items: center; gap: 10px; border: 1px solid var(--ink-200); border-radius: 8px; padding: 10px 12px; background: var(--paper-1); }
+  .hbar .t { font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hbar .sep { width: 1px; height: 18px; background: var(--ink-300); flex: none; }
+  .marks { display: flex; align-items: flex-end; gap: 14px; }
+  .marks small { display: block; text-align: center; font-family: var(--mono); font-size: 10px; color: var(--ink-500); margin-top: 4px; }
+
+  /* ---------------- the wordmark, four directions ---------------- */
+  .wm { display: inline-flex; align-items: baseline; white-space: nowrap; line-height: 1; color: var(--wm-ink); position: relative; }
+  .wm .p1, .wm .p2 { display: inline-block; transform-origin: 0 0; }
+  .wm::after { transform-origin: left center; transition: transform 220ms var(--ease-fuse); }
+  .wm.pre::after { transform: scaleX(0); }
+  .wm.dark { color: #fff; }
+
+  /* A · chip + word: SOP stays the chip it was, start is the word the button said */
+  .wmA { font-family: Inter, sans-serif; letter-spacing: -0.02em; }
+  .wmA .p1 { font-weight: 800; background: var(--wm-ink); color: #fff; padding: .07em .2em .05em; border-radius: .14em; box-shadow: inset 0 -.1em 0 var(--wm-accent); }
+  .wmA .p2 { font-weight: 600; margin-left: .1em; }
+  .wmA.dark .p1 { background: #fff; color: var(--wm-ink); }
+
+  /* B · seam: one word, a yellow seam where the two halves met */
+  .wmB { font-family: Archivo, sans-serif; font-stretch: 112%; letter-spacing: -0.015em; }
+  .wmB .p1 { font-weight: 800; }
+  .wmB .p2 { font-weight: 500; }
+  .wmB .seam { display: inline-block; width: .09em; height: .74em; background: var(--wm-accent); transform: skewX(-14deg); margin: 0 .05em; transform-origin: bottom; transition: transform 220ms var(--ease-fuse); }
+  .wmB.pre .seam { transform: skewX(-14deg) scaleY(0); }
+
+  /* C · stencil: safety-label lettering, hazard-stripe rule */
+  .wmC { font-family: 'Big Shoulders Stencil Display', sans-serif; font-weight: 800; letter-spacing: .03em; }
+  .wmC .p1 { font-weight: 900; }
+  .wmC .p2 { margin-left: .14em; }
+  .wmC::after { content: ''; position: absolute; left: 0; right: 0; bottom: -.17em; height: .1em; background: repeating-linear-gradient(-45deg, var(--wm-accent) 0 .14em, var(--wm-ink) .14em .28em); }
+  .wmC.dark::after { background: repeating-linear-gradient(-45deg, var(--wm-accent) 0 .14em, transparent .14em .28em); }
+
+  /* D · underline: plain type, the underline draws as they merge */
+  .wmD { font-family: Inter, sans-serif; letter-spacing: -0.025em; }
+  .wmD .p1 { font-weight: 800; }
+  .wmD .p2 { font-weight: 500; }
+  .wmD::after { content: ''; position: absolute; left: 0; right: 0; bottom: -.13em; height: .11em; border-radius: .05em; background: var(--wm-accent); }
+
+  /* marks (app icon / favicon) */
+  .mk { display: flex; align-items: center; justify-content: center; border-radius: 22%; font-weight: 800; line-height: 1; position: relative; overflow: hidden; }
+  .mkA { background: var(--wm-ink); color: #fff; font-family: Inter; box-shadow: inset 0 -0.12em 0 var(--wm-accent); }
+  .mkB { background: var(--paper-1); color: var(--wm-ink); font-family: Archivo; font-stretch: 112%; border: 1px solid var(--ink-200); }
+  .mkB i { display: inline-block; width: .1em; height: .62em; background: var(--wm-accent); transform: skewX(-14deg); margin-left: .05em; }
+  .mkC { background: var(--wm-ink); color: var(--wm-accent); font-family: 'Big Shoulders Stencil Display'; font-weight: 900; }
+  .mkD { background: var(--wm-ink); color: #fff; font-family: Inter; }
+  .mkD::after { content: ''; position: absolute; left: 24%; right: 24%; bottom: 18%; height: 9%; background: var(--wm-accent); border-radius: 2px; }
+
+  /* ---------------- the Start stage ---------------- */
+  .stage { position: relative; height: 420px; margin-top: 12px; border: 1px solid var(--ink-200); border-radius: 12px; background: var(--paper); overflow: hidden; }
+  .stage .ctl { position: absolute; right: 12px; bottom: 12px; display: flex; gap: 8px; z-index: 60; }
+  .stage .ctl button, .stage .ctl select { font: 600 12px var(--sans); border: 1px solid var(--ink-300); background: var(--paper-1); border-radius: 8px; padding: 7px 12px; cursor: pointer; }
+  .stage .ctl button.go { background: var(--ink-900); color: #fff; border-color: var(--ink-900); }
+  .readcard { position: absolute; left: 40px; top: 36px; right: 40px; }
+  .readcard .srcchip { display: inline-flex; align-items: center; height: 26px; padding: 0 9px; border-radius: 5px; background: var(--wm-ink); color: #fff; font-weight: 800; font-size: 13px; }
+  .readcard h3 { font-family: Inter, sans-serif; font-size: 26px; margin: 10px 0 4px; }
+  .readcard .meta { font-family: var(--mono); font-size: 11px; color: var(--ink-500); }
+  .readcard .startbtn { margin-top: 22px; height: var(--spacing-tap-glove, 60px); /* @theme tokens only exist once Tailwind compiles; fallback for the raw sketch */ min-width: 180px; padding: 0 28px; border-radius: 10px; background: var(--wm-ink); color: #fff; border: 0; font-size: 18px; font-weight: 700; cursor: pointer; }
+  .run { position: absolute; inset: 0; display: none; }
+  .stage.running .run { display: block; }
+  .stage.running .readcard { display: none; }
+  .run .shd { height: 56px; display: flex; align-items: center; gap: 14px; padding: 0 18px; background: var(--paper-1); border-bottom: 1px solid var(--ink-200); }
+  .run .shd .wm { font-size: var(--wm-size-header); }
+  .run .shd .sep { width: 1px; height: 22px; background: var(--ink-300); }
+  .run .shd .t { font-weight: 600; font-size: 14px; flex: 1; }
+  .run .stp { max-width: 640px; margin: 36px auto; padding: 0 24px; border-left: 4px solid var(--accent-hazard); }
+  .run .stp .k { font-family: var(--mono); font-size: 10px; letter-spacing: .08em; color: var(--accent-hazard); border: 1px solid currentColor; border-radius: 3px; padding: 2px 7px; }
+  .run .stp p { font-size: var(--text-step, 28px); font-weight: 600; line-height: 1.3; margin: 16px 0; }
+  .veil { position: absolute; inset: 0; background: var(--paper); z-index: 40; pointer-events: none; }
+  .fly { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 41; font-size: var(--wm-size-hero); pointer-events: none; }
+  .fly.free { transform: none; }
+</style>
+</head>
+<body>
+<div id="variant-nav">
+  <span class="sketch-title">010 · SOPstart wordmark</span>
+  <button class="variant-tab active" data-v="all">All four</button>
+  <button class="variant-tab" data-v="A">A: Chip + word</button>
+  <button class="variant-tab" data-v="B">B: Seam</button>
+  <button class="variant-tab" data-v="C">C: Stencil</button>
+  <button class="variant-tab" data-v="D">D: Underline</button>
+</div>
+<main id="main"></main>
+
+<script>
+const DIRS = {
+  A: { name: 'Chip + word', p2: 'start', btn: 'Start', font: 'Inter',
+       why: 'The SOP chip survives inside the logo: what you tapped is what the brand is made of. Strongest link to the animation; heaviest at small sizes.' },
+  B: { name: 'Seam', p2: 'start', btn: 'Start', font: 'Archivo',
+       why: 'One wide industrial word with a yellow seam where SOP and Start met. The seam is the mark: it can stand alone as the icon and as a loading tick.' },
+  C: { name: 'Stencil', p2: 'START', btn: 'START', font: 'Big Shoulders Stencil Display',
+       why: 'Safety-label stencil lettering with a hazard-stripe rule. All caps, so the button already says START and nothing changes case at the merge. Most "site", least "software".' },
+  D: { name: 'Underline', p2: 'start', btn: 'Start', font: 'Inter',
+       why: 'Plain type; the yellow underline draws in as the halves meet. The quietest and most legible at 17 px; the brand moment is carried by the motion, not the shape.' },
+};
+const L = (d, cls = '') => `<span class="wm wm${d} ${cls}"><span class="p1">SOP</span>${d === 'B' ? '<i class="seam"></i>' : ''}<span class="p2">${DIRS[d].p2}</span></span>`;
+const MK = (d, px) => `<div class="mk mk${d}" style="width:${px}px;height:${px}px;font-size:${px * (d === 'C' ? 0.78 : 0.62)}px">${d === 'D' ? 's' : 'S'}${d === 'B' ? '<i></i>' : ''}</div>`;
+
+function section(d) {
+  const D = DIRS[d];
+  return `<section class="dir" data-d="${d}">
+    <h2>${d} · ${D.name}</h2><p class="why">${D.why}</p>
+    <div class="row">
+      <div class="tile paper"><span class="cap">Hero · 52 px</span>${L(d, 'hero')}</div>
+      <div class="tile ink"><span class="cap">On ink</span>${L(d, 'hero dark')}</div>
+      <div class="tile paper"><span class="cap">Headers · 20 / 17 px</span>
+        <div class="hbar">${L(d).replace('class="wm', 'style="font-size:var(--wm-size-header)" class="wm')}<span class="sep"></span><span class="t">Forklift pre-start check</span></div>
+        <div class="hbar" style="width:78%">${L(d).replace('class="wm', 'style="font-size:var(--wm-size-phone)" class="wm')}<span class="sep"></span><span class="t">Forklift pre-start…</span></div></div>
+      <div class="tile paper"><span class="cap">Mark</span><div class="marks">
+        <div>${MK(d, 64)}<small>64</small></div><div>${MK(d, 32)}<small>32</small></div><div>${MK(d, 16)}<small>16</small></div></div></div>
+    </div>
+    <div class="stage" id="st-${d}">
+      <div class="readcard"><span class="srcchip" style="font-family:'${D.font}'">SOP</span><h3>Forklift pre-start check</h3>
+        <div class="meta">Warehouse &amp; dispatch · Inspection · v4 · ~6 min</div>
+        <button class="startbtn" style="font-family:'${D.font}'" data-play="${d}">${D.btn}</button></div>
+      <div class="run"><div class="shd"><span class="slot">${L(d)}</span><span class="sep"></span><span class="t">Forklift pre-start check</span></div>
+        <div class="stp"><span class="k">HAZARD</span><p>Pedestrians share the aisles. Sound the horn at every intersection and blind corner.</p></div></div>
+      <div class="ctl"><select data-speed><option value="full">Full</option><option value="short">Short</option><option value="off">Reduced motion</option></select>
+        <button class="go" data-play="${d}">▶ Start</button><button data-reset="${d}">Reset</button></div>
+    </div></section>`;
+}
+
+const tok = (n) => parseFloat(getComputedStyle(document.documentElement).getPropertyValue(n)) || 0;
+const ease = () => getComputedStyle(document.documentElement).getPropertyValue('--ease-fuse').trim() || 'ease';
+const relTo = (el, box) => { const r = el.getBoundingClientRect(), b = box.getBoundingClientRect(); return { l: r.left - b.left, t: r.top - b.top, w: r.width, h: r.height }; };
+
+async function play(d) {
+  const st = document.getElementById('st-' + d);
+  if (st.classList.contains('running') || st.dataset.busy) return;
+  const mode = st.querySelector('[data-speed]').value;
+  if (mode === 'off') { st.classList.add('running'); return; }
+  st.dataset.busy = 1;
+  const T = mode === 'full'
+    ? { a: tok('--dur-fuse-meet'), hold: tok('--dur-fuse-hold'), b: tok('--dur-fuse-rise') }
+    : { a: tok('--dur-fuse-short'), hold: 0, b: tok('--dur-fuse-short') };
+  const chip = st.querySelector('.srcchip'), btn = st.querySelector('.startbtn');
+  const s1 = relTo(chip, st), s2 = relTo(btn, st);
+  const veil = document.createElement('div'); veil.className = 'veil';
+  const fly = document.createElement('div'); fly.className = 'fly';
+  fly.innerHTML = L(d, 'pre');
+  st.append(veil, fly);
+  const wm = fly.firstElementChild, [p1] = wm.getElementsByClassName('p1'), [p2] = wm.getElementsByClassName('p2');
+  const finalText = p2.textContent; p2.textContent = DIRS[d].btn;
+  const d1 = relTo(p1, st), d2 = relTo(p2, st);
+  const E = ease();
+  const flyPart = (el, src, dst) => {
+    const cs = getComputedStyle(el), s = src.h / dst.h;
+    const tx = src.l + src.w / 2 - dst.l - (dst.w * s) / 2, ty = src.t + src.h / 2 - dst.t - (dst.h * s) / 2;
+    el.animate([{ background: '#09090b', color: '#fff', boxShadow: '0 0 0 6px #09090b' }, { background: cs.backgroundColor, color: cs.color, boxShadow: cs.boxShadow === 'none' ? '0 0 0 0 transparent' : cs.boxShadow }],
+      { duration: T.a * 0.4, delay: T.a * 0.6, easing: 'ease-in', fill: 'both' });
+    return el.animate([{ transform: `translate(${tx}px,${ty}px) scale(${s})` }, { transform: 'none' }], { duration: T.a, easing: E, fill: 'forwards' }).finished;
+  };
+  veil.animate([{ opacity: 0 }, { opacity: 1 }], { duration: T.a, fill: 'forwards' });
+  await Promise.all([flyPart(p1, s1, d1), flyPart(p2, s2, d2)]);
+  p2.textContent = finalText;
+  wm.classList.remove('pre');
+  await new Promise(r => setTimeout(r, T.hold || 60));
+
+  st.classList.add('running');
+  const slot = st.querySelector('.slot');
+  slot.style.visibility = 'hidden';
+  const cur = relTo(fly, st), tgt = relTo(slot, st);
+  fly.classList.add('free'); Object.assign(fly.style, { left: cur.l + 'px', top: cur.t + 'px' });
+  veil.animate([{ opacity: 1 }, { opacity: 0 }], { duration: T.b, fill: 'forwards' });
+  await fly.animate([{ transform: 'none' }, { transform: `translate(${tgt.l - cur.l}px,${tgt.t - cur.t}px) scale(${tgt.h / cur.h})` }], { duration: T.b, easing: E, fill: 'forwards' }).finished;
+  slot.style.visibility = '';
+  veil.remove(); fly.remove(); delete st.dataset.busy;
+}
+
+const main = document.getElementById('main');
+function show(v) { main.innerHTML = (v === 'all' ? Object.keys(DIRS) : [v]).map(section).join(''); }
+main.addEventListener('click', (e) => {
+  const p = e.target.closest('[data-play]'), r = e.target.closest('[data-reset]');
+  if (p) play(p.dataset.play);
+  if (r) document.getElementById('st-' + r.dataset.reset).classList.remove('running');
+});
+document.querySelectorAll('.variant-tab').forEach(t => t.onclick = () => {
+  document.querySelectorAll('.variant-tab').forEach(x => x.classList.toggle('active', x === t)); show(t.dataset.v);
+});
+document.fonts.ready.then(() => show('all'));
+</script>
+</body>
+</html>

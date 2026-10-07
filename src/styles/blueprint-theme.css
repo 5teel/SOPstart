@@ -155,6 +155,38 @@
   --tint-measure-border:  color-mix(in srgb, var(--accent-measure) 45%, white);
   --tint-ai-bg:           color-mix(in srgb, var(--ai) 8%, white);
   --tint-ai-border:       color-mix(in srgb, var(--ai) 45%, white);
+
+  /* ---- Brand, motion and library areas (ADR-0004, sketches 009/010) ----
+   * Brand yellow belongs to the wordmark and nothing else on paper; it never
+   * signals state. The wordmark is two parts that meet at Start: --wm-part-sop
+   * (the SOP chip) and --wm-part-start (the Start button). */
+  --wm-ink:          var(--ink-900);
+  --wm-accent:       var(--brand-yellow);
+  --wm-size-hero:    52px;   /* the fuse, centre screen */
+  --wm-size-header:  20px;   /* desktop header, steps-screen header */
+  --wm-size-phone:   17px;   /* phone steps-screen header */
+
+  /* Motion: only where it shows a change of state, never while the user waits.
+   * Full fuse plays on the first Start of the day, short after; reduced motion = none. */
+  --ease-fuse:        cubic-bezier(.5, 0, .2, 1);
+  --dur-fuse-meet:    460ms;  /* chip + button fly to centre */
+  --dur-fuse-hold:    160ms;  /* the merged wordmark settles */
+  --dur-fuse-rise:    420ms;  /* wordmark rises into the header */
+  --dur-fuse-short:   150ms;  /* each half of the short version */
+  --dur-map-zoom:     520ms;  /* site map: whole site <-> one area */
+  --dur-hover-lift:   160ms;
+
+  /* Library areas on the site map, assigned in order. A data palette, distinct
+   * from the semantic accents: an area colour says WHERE in the library, never
+   * whether something is wrong. */
+  --area-1: #0891b2;
+  --area-2: #2563eb;
+  --area-3: #7c3aed;
+  --area-4: #0d9488;
+  --area-5: #16a34a;
+  --area-6: #475569;
+  --area-7: #d97706;
+  --area-8: #be185d;
 }
 
 /* ---------- SCOPED ONLY UNDER body[data-theme="paper"] ---------- */

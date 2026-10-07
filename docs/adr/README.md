@@ -18,3 +18,4 @@ code, plans and phases follow it until a later ADR supersedes it.
 | [0001](0001-record-architecture-decisions.md) | Record architecture decisions | Accepted | this README · CLAUDE.md § Architecture Decisions |
 | [0002](0002-no-scheduled-jobs.md) | No scheduled jobs — work runs when it is needed | Accepted | `tests/lint/no-scheduled-jobs.spec.ts` |
 | [0003](0003-site-templates.md) | Site templates are code; a layout records which one it came from | Accepted | `tests/phase57/rooms.spec.ts` |
+| [0004](0004-design-principles.md) | Design principles — attention follows the objectives | Accepted | `tests/lint/design-principles.spec.ts` · `tests/lint/design-tokens.spec.ts` |

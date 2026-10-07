@@ -37,7 +37,7 @@ export default defineConfig({
     {
       name: 'phase15-stubs',
       testMatch:
-        /(sub-trade-rls-backward-compat|sub-trade-assignment|no-static-admin-lens-import|version-route-public|no-bulk-verify-ui|no-undefined-css-tokens|design-tokens|sops-select-policies-org-scoped|rls-org-scope|use-viewport|no-dead-internal-hrefs|no-scheduled-jobs)\.spec\.ts$/,
+        /(sub-trade-rls-backward-compat|sub-trade-assignment|no-static-admin-lens-import|version-route-public|no-bulk-verify-ui|no-undefined-css-tokens|design-tokens|sops-select-policies-org-scoped|rls-org-scope|use-viewport|no-dead-internal-hrefs|no-scheduled-jobs|design-principles)\.spec\.ts$/,
       use: { browserName: 'chromium' },
     },
     {
