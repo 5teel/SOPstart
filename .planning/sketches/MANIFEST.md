@@ -22,7 +22,7 @@ Paper/ink engineering-drawing system (established in the blueprint-redesign expl
 | 006 | sop-navigation-model | How does /sops answer "which procedure do I need?" for a worker AND stay useful to an admin, without a scope column that mixes role, obligation, catalogue and facet? | superseded by 007 | navigation, information-architecture, library, governance, worker, admin, phone |
 | 007 | plant-floor-navigation | What if the plant itself is the navigation — an isometric site with tappable machines, pins for what is due (worker) or what is sick (admin) — and the library is never the home? | Plant (scene as worker home + phone QR + admin inbox; shared terminal dropped) | navigation, spatial, isometric, worker, kiosk, phone, admin, generated-assets |
 | 008 | one-screen-site | If the whole app is one screen (isometric site + sidebar), where does the real work render — docked panel, sheet over the map, or step inside the room? | A (three panes; an open SOP takes the whole screen — map and list removed) | mvp, simplification, navigation, isometric, one-screen, data-model |
-| 009 | sop-first-home | If safe SOP use is the whole point, what is the home, and how does starting a SOP feel? | pending | home, navigation, brand, motion, worker, phone |
+| 009 | sop-first-home | If safe SOP use is the whole point, what is the home, and how does starting a SOP feel? | A (library + reader; isometric site map of library areas in the reader pane, one object per SOP) | home, navigation, brand, motion, worker, phone, isometric |
 
 ## Decisions
 

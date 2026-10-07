@@ -43,17 +43,22 @@
   .row .main { flex: 1; min-width: 0; }
   .row .ttl { font-weight: 600; font-size: 14.5px; }
   .row .meta { font-family: var(--mono); font-size: 11px; color: var(--ink-500); }
+  .row .sw { width: 4px; align-self: stretch; border-radius: 2px; }
   .st { font-size: 12px; color: var(--ink-600); display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
-  .dot { width: 7px; height: 7px; border-radius: 99px; display: inline-block; }
+  .dot { width: 7px; height: 7px; border-radius: 99px; display: inline-block; flex: none; }
   .d-ok { background: var(--accent-ok); } .d-upd { background: var(--accent-step); } .d-wait { background: var(--accent-decision); } .d-prog { background: var(--ink-900); border: 1px solid #fff; outline: 1px solid var(--ink-900); }
   .tg { font-family: var(--mono); font-size: 10px; color: var(--accent-inspect); background: rgba(124,58,237,.08); border-radius: 3px; padding: 1px 6px; }
   .seg { display: inline-flex; border: 1px solid var(--ink-300); border-radius: 7px; overflow: hidden; }
   .seg button { border: 0; background: var(--paper-1); padding: 5px 10px; font-size: 12px; }
   .seg button.on { background: var(--ink-900); color: #fff; }
-  .grp-h { font-family: var(--mono); font-size: 11px; color: var(--ink-600); padding: 12px 10px 2px; display: flex; justify-content: space-between; }
+  .grp-h { font-family: var(--mono); font-size: 11px; color: var(--ink-600); padding: 12px 10px 2px; display: flex; justify-content: space-between; align-items: center; width: 100%; border: 0; background: none; text-align: left; }
+  button.grp-h:hover { color: var(--ink-900); }
+  .grp-h .sq { width: 9px; height: 9px; border-radius: 2px; display: inline-block; margin-right: 7px; }
   .toast { position: absolute; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--ink-900); color: #fff; padding: 10px 16px; border-radius: 8px; font-size: 13px; z-index: 50; }
   .empty { color: var(--ink-500); text-align: center; padding: 60px 20px; }
   .scroll { overflow-y: auto; }
+  .filterchip { display: inline-flex; gap: 8px; align-items: center; background: var(--paper-2); border-radius: 99px; padding: 4px 10px; font-size: 12.5px; margin-top: 12px; }
+  .filterchip button { border: 0; background: none; }
 
   /* ---------- Variant A: library + reader ---------- */
   .A { display: grid; grid-template-columns: 220px 400px 1fr; height: 100%; }
@@ -64,7 +69,7 @@
   .A .side nav button.quiet { color: var(--ink-500); font-size: 13px; }
   .A .side .who { margin-top: auto; font-family: var(--mono); font-size: 11px; color: var(--ink-500); padding: 8px; }
   .A .list { border-right: 1px solid var(--ink-200); padding: 18px 14px; }
-  .A .pane { background: var(--paper-1); }
+  .A .pane { background: var(--paper-1); min-height: 0; }
 
   /* ---------- Variant B: search-first column ---------- */
   .B { height: 100%; display: flex; flex-direction: column; }
@@ -78,12 +83,12 @@
   .B .col { max-width: 780px; margin: 0 auto; padding: 34px 24px 80px; }
   .B .search { height: 56px; border-radius: 14px; font-size: 17px; }
   .B .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
-  .B .card .st { white-space: normal; align-items: baseline; }
   .B .card { text-align: left; border: 1px solid var(--ink-200); background: var(--paper-1); border-radius: 10px; padding: 12px 14px; min-height: 104px; display: flex; flex-direction: column; gap: 6px; }
   .B .card:hover { border-color: var(--ink-400); }
   .B .card .ttl { font-weight: 700; font-size: 14.5px; }
   .B .card .meta { font-family: var(--mono); font-size: 11px; color: var(--ink-500); }
-  .B .card .st { margin-top: auto; }
+  .B .card .st { margin-top: auto; white-space: normal; align-items: baseline; }
+  .B .mapbox { height: 440px; border: 1px solid var(--ink-200); border-radius: 10px; overflow: hidden; margin-top: 8px; }
 
   /* ---------- read view ---------- */
   .read { max-width: 760px; margin: 0 auto; padding: 30px 32px 80px; }
@@ -99,6 +104,29 @@
   .read li::before { counter-increment: s; content: counter(s); font-family: var(--mono); font-size: 11px; color: var(--ink-500); width: 22px; padding-top: 3px; }
   .kind { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: .08em; padding: 2px 7px; border-radius: 3px; border: 1px solid currentColor; height: fit-content; white-space: nowrap; }
   .k-hazard { color: var(--accent-hazard); } .k-ppe { color: var(--accent-decision); } .k-step { color: var(--accent-step); } .k-check { color: var(--accent-measure); }
+
+  /* ---------- isometric site map ---------- */
+  .mapwrap { display: flex; flex-direction: column; height: 100%; }
+  .maphd { display: flex; align-items: center; gap: 10px; padding: 14px 20px; border-bottom: 1px solid var(--ink-200); min-height: 54px; }
+  .maphd .crumb { font-weight: 700; font-size: 15px; display: flex; gap: 8px; align-items: center; }
+  .maphd .crumb button { border: 0; background: none; padding: 0; color: var(--ink-500); font-weight: 500; }
+  .maphd .crumb button:hover { color: var(--ink-900); }
+  .maphd .hint { margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--ink-500); }
+  .mapsvg { flex: 1; min-height: 0; width: 100%; display: block; }
+  svg.iso { user-select: none; }
+  svg.iso polygon, svg.iso rect, svg.iso ellipse, svg.iso line { stroke-linejoin: round; }
+  .area { cursor: pointer; transition: transform .16s ease, opacity .2s; }
+  .area:hover { transform: translateY(-6px); }
+  .area:hover .slab-top { stroke-width: 3; }
+  .area.dim { opacity: .32; }
+  .area.dim:hover { opacity: .6; transform: none; }
+  .area.cur { cursor: default; }
+  .area.cur:hover { transform: none; }
+  .ent { cursor: pointer; }
+  .ent:hover { filter: brightness(1.08) drop-shadow(0 2px 3px rgba(0,0,0,.25)); }
+  .ent.sel polygon, .ent.sel rect, .ent.sel ellipse { stroke: #09090b; stroke-width: 1.6; }
+  .sign { pointer-events: none; }
+  .elabel { pointer-events: none; font-family: Inter, sans-serif; paint-order: stroke; stroke: #fff; stroke-width: 4px; stroke-linejoin: round; }
 
   /* ---------- steps screen (the SOP owns the frame) ---------- */
   .run { position: absolute; inset: 0; display: grid; grid-template-rows: 60px 3px 1fr; background: var(--paper); }
@@ -134,14 +162,6 @@
   .fuse-wm.free { transform: none; }
   .fuse-wm span { display: inline-block; transform-origin: 0 0; border-radius: 5px; }
 
-  /* ---------- map ---------- */
-  .map { position: relative; border-radius: 10px; overflow: hidden; border: 1px solid var(--ink-200); margin-top: 8px; }
-  .map img { display: block; width: 100%; }
-  .map .hs { position: absolute; transform: translate(-50%, -50%); border: 0; background: var(--ink-900); color: #fff; font-family: var(--mono); font-size: 10.5px; padding: 3px 8px; border-radius: 5px; }
-  .map .hs:hover { background: var(--brand-yellow); color: var(--ink-900); }
-  .filterchip { display: inline-flex; gap: 8px; align-items: center; background: var(--paper-2); border-radius: 99px; padding: 4px 10px; font-size: 12.5px; margin-top: 10px; }
-  .filterchip button { border: 0; background: none; }
-
   /* ---------- tables for other sections ---------- */
   .sec { padding: 28px 32px; max-width: 880px; }
   .sec h2 { margin: 0 0 4px; font-size: 22px; }
@@ -163,6 +183,13 @@
   .phone .sec { padding: 18px 14px 90px; }
   .phone .ptop { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px 4px; }
   .phone .ptop .wm { font-size: 19px; }
+  .phone .pmap { height: 360px; border: 1px solid var(--ink-200); border-radius: 10px; overflow: hidden; margin-top: 12px; background: var(--paper-1); }
+  .phone .maphd { padding: 10px 12px; min-height: 44px; }
+  .key { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 10px; }
+  .key button { display: flex; align-items: center; gap: 8px; text-align: left; border: 1px solid var(--ink-200); background: var(--paper-1); border-radius: 8px; padding: 10px 8px; font-size: 12.5px; font-weight: 600; min-height: 48px; }
+  .key b { color: #fff; width: 22px; height: 22px; border-radius: 99px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; flex: none; }
+  .key span { margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--ink-500); font-weight: 400; }
+  .phone .maphd .hint { display: none; }
   .tabs { display: none; }
   .phone .tabs { display: flex; position: absolute; left: 0; right: 0; bottom: 0; background: var(--paper-1); border-top: 1px solid var(--ink-200); z-index: 5; }
   .phone .tabs button { flex: 1; border: 0; background: none; padding: 12px 2px 16px; font-size: 11.5px; color: var(--ink-500); }
@@ -181,7 +208,7 @@
 
 <div id="variant-nav">
   <span class="sketch-title">009 · SOP-first home</span>
-  <button class="variant-tab active" data-v="A">A: Library + reader</button>
+  <button class="variant-tab active" data-v="A">★ A: Library + reader</button>
   <button class="variant-tab" data-v="B">B: Search-first column</button>
   <div class="grp"><label>View</label>
     <select id="vp"><option value="desk">Desktop</option><option value="phone">Phone</option></select></div>
@@ -194,17 +221,40 @@
 <div id="stage"><div id="frame"><div id="app"></div></div></div>
 
 <script>
-/* ---------------- data ---------------- */
+/* ---------------- data: Kauri Springs Bottling ---------------- */
+// Areas are the library's sections. Each object drawn on an area is ONE SOP -- the map is the library, not a machine census.
+const AREAS = [
+  { id: 'intake', n: 'Bottle intake',        c: '#0891b2', x: 0,    y: 0,    w: 7,    d: 7 },
+  { id: 'fill',   n: 'Filling hall',         c: '#2563eb', x: 8.5,  y: 0,    w: 9,    d: 7 },
+  { id: 'label',  n: 'Labelling & packing',  c: '#7c3aed', x: 19,   y: 0,    w: 8,    d: 7 },
+  { id: 'util',   n: 'Utilities & CIP',      c: '#0d9488', x: 0,    y: 8.5,  w: 7,    d: 6 },
+  { id: 'lab',    n: 'Quality lab',          c: '#16a34a', x: 8.5,  y: 8.5,  w: 4.25, d: 6 },
+  { id: 'eng',    n: 'Engineering workshop', c: '#475569', x: 14.25, y: 8.5, w: 4.25, d: 6 },
+  { id: 'ware',   n: 'Warehouse & dispatch', c: '#d97706', x: 19,   y: 8.5,  w: 8,    d: 10 },
+  { id: 'site',   n: 'Site-wide',            c: '#be185d', x: 0,    y: 16,   w: 18.5, d: 2.5 },
+];
+const GROUND = [-1, -1, 28, 19.5]; // x0, y0, x1, y1
+const A_BY = Object.fromEntries(AREAS.map(a => [a.id, a]));
 const gen = (t) => [
   { k: 'hazard', t: 'Moving parts and stored energy. Isolate before reaching in.' },
-  { k: 'ppe', t: 'Safety glasses, cut-resistant gloves, safety boots.' },
-  { k: 'step', t: 'Confirm the area is clear and tell the operator you are starting.' },
+  { k: 'ppe', t: 'Safety glasses, cut-resistant gloves, safety boots, hearing protection.' },
+  { k: 'step', t: 'Confirm the area is clear and tell the line lead you are starting.' },
   { k: 'step', t: 'Follow the isolation points on the tag board for ' + t.toLowerCase() + '.' },
   { k: 'step', t: 'Carry out the task as set out in the drawing on the board.', photo: true },
-  { k: 'check', t: 'Guards back on, tags removed, area handed back.' },
+  { k: 'check', t: 'Guards back on, tags removed, area handed back to the line lead.' },
 ];
 const SOPS = [
-  { id: 'fork', t: 'Forklift pre-start check', dept: 'Warehouse', type: 'Inspection', place: 'Warehouse', v: 4, owner: 'Hemi Walker', min: 6, std: ['Traffic management'],
+  { id: 'depal', a: 'intake', e: 'machine', t: 'Depalletiser start-up', type: 'Order of operations', v: 3, owner: 'Ana Tupou', min: 10, std: [] },
+  { id: 'glassjam', a: 'intake', e: 'conveyor', t: 'Clearing a glass jam on the infeed', type: 'Machine', v: 4, owner: 'Ana Tupou', min: 6, std: ['LOTO'], st: { k: 'ok', txt: 'Signed off 2 Sep · R. Patel' } },
+  { id: 'broken', a: 'intake', e: 'board', t: 'Broken glass clean-up', type: 'Process', v: 2, owner: 'Ana Tupou', min: 8, std: [] },
+  { id: 'filler', a: 'fill', e: 'machine', t: 'Filler changeover 330 ml → 750 ml', type: 'Order of operations', v: 5, owner: 'Tama Ngata', min: 40, std: ['LOTO', 'Food safety'], st: { k: 'prog', txt: 'You stopped at step 4 yesterday' }, at: 3 },
+  { id: 'capper', a: 'fill', e: 'machine', t: 'Capper torque check', type: 'Inspection', v: 3, owner: 'Tama Ngata', min: 5, std: ['Food safety'], st: { k: 'ok', txt: 'Signed off 28 Aug · S. Fale' } },
+  { id: 'rinser', a: 'fill', e: 'conveyor', t: 'Rinser nozzle clean', type: 'Machine', v: 2, owner: 'Tama Ngata', min: 15, std: ['Food safety'] },
+  { id: 'co2', a: 'fill', e: 'tank', t: 'CO₂ dosing line isolation', type: 'Process', v: 4, owner: 'Hemi Walker', min: 12, std: ['LOTO', 'Gas'] },
+  { id: 'labeller', a: 'label', e: 'machine', t: 'Labeller reel change', type: 'Machine', v: 6, owner: 'Mei Lin', min: 7, std: [] },
+  { id: 'casepack', a: 'label', e: 'conveyor', t: 'Case packer jam clearing', type: 'Machine', v: 4, owner: 'Mei Lin', min: 7, std: ['LOTO'], st: { k: 'ok', txt: 'Signed off 3 Sep · R. Patel' } },
+  { id: 'datecode', a: 'label', e: 'board', t: 'Date-code check', type: 'Inspection', v: 2, owner: 'Mei Lin', min: 3, std: ['Food safety'], st: { k: 'upd', txt: 'Updated 4 Oct · changed since you last did it' } },
+  { id: 'fork', a: 'ware', e: 'forklift', t: 'Forklift pre-start check', type: 'Inspection', v: 4, owner: 'Ben Kerr', min: 6, std: ['Traffic management'],
     st: { k: 'upd', txt: 'Updated 2 Oct · changed since you last did it' },
     steps: [
       { k: 'hazard', t: 'Pedestrians share the aisles. Sound the horn at every intersection and blind corner.' },
@@ -216,29 +266,151 @@ const SOPS = [
       { k: 'check', t: 'Service brake and parking brake both hold on the ramp.' },
       { k: 'step', t: 'Record the hour-meter reading and park ready for the shift.' },
     ] },
-  { id: 'loto', t: 'Lockout / tagout isolation', dept: 'Site-wide', type: 'Process', place: null, v: 7, owner: 'Safety team', min: 10, std: ['LOTO', 'AS/NZS 4836'], st: { k: 'ok', txt: 'Signed off 12 Sep · R. Patel' } },
-  { id: 'ism', t: 'IS machine job change', dept: 'Forming', type: 'Machine', place: 'IS Machine 1', v: 3, owner: 'Tama Ngata', min: 35, std: ['LOTO'], st: { k: 'prog', txt: 'You stopped at step 4 yesterday' }, at: 3 },
-  { id: 'swab', t: 'Mould swabbing', dept: 'Forming', type: 'Machine', place: 'IS Machine 1', v: 5, owner: 'Tama Ngata', min: 4, std: ['Hot work'], st: { k: 'ok', txt: 'Signed off 28 Aug · S. Fale' } },
-  { id: 'lehr', t: 'Annealing lehr start-up', dept: 'Forming', type: 'Order of operations', place: 'Annealing lehr', v: 2, owner: 'Tama Ngata', min: 20, std: [] },
-  { id: 'hand', t: 'Shift handover', dept: 'Site-wide', type: 'Process', place: null, v: 3, owner: 'Ops manager', min: 8, std: [], st: { k: 'wait', txt: 'Done 6 Oct · waiting for sign-off' } },
-  { id: 'batch', t: 'Batch changeover order', dept: 'Batch house', type: 'Order of operations', place: null, v: 6, owner: 'Mei Lin', min: 15, std: [] },
-  { id: 'cold', t: 'Reject check at the cold end', dept: 'Cold end', type: 'Inspection', place: 'Cold-end inspection', v: 2, owner: 'Ben Kerr', min: 5, std: [] },
-  { id: 'pall', t: 'Palletiser jam clearing', dept: 'Cold end', type: 'Machine', place: 'Palletiser', v: 4, owner: 'Ben Kerr', min: 7, std: ['LOTO'], st: { k: 'ok', txt: 'Signed off 3 Sep · R. Patel' } },
-  { id: 'tank', t: 'Alkaline cleaning tank top-up', dept: 'Engineering', type: 'Machine', place: 'Cleaning tank', v: 1, owner: 'Hemi Walker', min: 12, std: ['Hazardous substances'] },
-  { id: 'spill', t: 'Chemical spill response', dept: 'Site-wide', type: 'Emergency', place: null, v: 2, owner: 'Safety team', min: 5, std: ['Hazardous substances'] },
-  { id: 'hot', t: 'Hot glass handling', dept: 'Forming', type: 'Process', place: null, v: 3, owner: 'Tama Ngata', min: 3, std: ['Hot work'], st: { k: 'ok', txt: 'Signed off 1 Aug · S. Fale' } },
+  { id: 'wrap', a: 'ware', e: 'machine', t: 'Pallet wrapper film change', type: 'Machine', v: 2, owner: 'Ben Kerr', min: 5, std: [] },
+  { id: 'racking', a: 'ware', e: 'rack', t: 'Racking damage inspection', type: 'Inspection', v: 3, owner: 'Ben Kerr', min: 20, std: [] },
+  { id: 'loadout', a: 'ware', e: 'board', t: 'Truck loading order', type: 'Order of operations', v: 5, owner: 'Ben Kerr', min: 25, std: ['Traffic management'] },
+  { id: 'brix', a: 'lab', e: 'bench', t: 'Brix and CO₂ sample test', type: 'Inspection', v: 7, owner: 'Dr. K. Iyer', min: 15, std: ['Food safety'] },
+  { id: 'hold', a: 'lab', e: 'board', t: 'Placing product on QA hold', type: 'Process', v: 3, owner: 'Dr. K. Iyer', min: 5, std: ['Food safety'] },
+  { id: 'cip', a: 'util', e: 'tank', t: 'CIP clean of the filler', type: 'Order of operations', v: 8, owner: 'Hemi Walker', min: 50, std: ['Hazardous substances', 'Food safety'] },
+  { id: 'caustic', a: 'util', e: 'tank', t: 'Caustic tank top-up', type: 'Machine', v: 3, owner: 'Hemi Walker', min: 12, std: ['Hazardous substances'] },
+  { id: 'air', a: 'util', e: 'machine', t: 'Compressed air drain-down', type: 'Machine', v: 2, owner: 'Hemi Walker', min: 6, std: [] },
+  { id: 'loto', a: 'eng', e: 'board', t: 'Lockout / tagout isolation', type: 'Process', v: 7, owner: 'Safety team', min: 10, std: ['LOTO', 'AS/NZS 4836'], st: { k: 'ok', txt: 'Signed off 12 Sep · R. Patel' } },
+  { id: 'hotwork', a: 'eng', e: 'board', t: 'Hot work permit', type: 'Process', v: 4, owner: 'Safety team', min: 10, std: ['Hot work'] },
+  { id: 'grinder', a: 'eng', e: 'machine', t: 'Bench grinder use', type: 'Machine', v: 2, owner: 'Hemi Walker', min: 4, std: [] },
+  { id: 'hand', a: 'site', e: 'board', t: 'Shift handover', type: 'Process', v: 3, owner: 'Ops manager', min: 8, std: [], st: { k: 'wait', txt: 'Done 6 Oct · waiting for sign-off' } },
+  { id: 'spill', a: 'site', e: 'board', t: 'Chemical spill response', type: 'Emergency', v: 2, owner: 'Safety team', min: 5, std: ['Hazardous substances'] },
+  { id: 'evac', a: 'site', e: 'board', t: 'Fire evacuation', type: 'Emergency', v: 4, owner: 'Safety team', min: 5, std: [] },
 ];
-SOPS.forEach(s => { s.steps = s.steps || gen(s.t); });
+SOPS.forEach(s => { s.steps = s.steps || gen(s.t); s.dept = A_BY[s.a].n; });
 const byId = Object.fromEntries(SOPS.map(s => [s.id, s]));
-const RECENT = ['fork', 'ism', 'hand', 'loto'];
-const MOST = [['loto', 14], ['swab', 11], ['fork', 9]];
-const PLACES = [ // ponytail: hand-placed on the 007 scene; the real map comes from site_machines
-  { n: 'IS Machine 1', x: 34, y: 58 }, { n: 'Annealing lehr', x: 45, y: 36 }, { n: 'Cold-end inspection', x: 58, y: 52 },
-  { n: 'Palletiser', x: 66, y: 66 }, { n: 'Cleaning tank', x: 72, y: 28 }, { n: 'Warehouse', x: 86, y: 52 },
-];
+const RECENT = ['fork', 'filler', 'hand', 'loto'];
+const MOST = [['loto', 14], ['capper', 11], ['fork', 9]];
+const ORG = 'Kauri Springs Bottling';
+
+/* ---------------- isometric drawing ---------------- */
+const TS = 20, CO = 0.866;
+const P = (x, y, z = 0) => [(x - y) * TS * CO, (x + y) * TS * 0.5 - z * TS];
+const pts = (a) => a.map(p => P(...p).map(n => n.toFixed(1)).join(',')).join(' ');
+const ED = 'stroke="rgba(9,9,11,.28)" stroke-width=".7"';
+function mix(hex, t) { // t=0 -> white, t=1 -> hex
+  const n = parseInt(hex.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+  const m = (c) => Math.round(255 + (c - 255) * t);
+  return `rgb(${m(r)},${m(g)},${m(b)})`;
+}
+function box(x, y, z, w, d, h, top, right, left, topAttr = ED) {
+  return `<polygon ${ED} fill="${right}" points="${pts([[x + w, y, z], [x + w, y + d, z], [x + w, y + d, z + h], [x + w, y, z + h]])}"/>` +
+    `<polygon ${ED} fill="${left}" points="${pts([[x, y + d, z], [x + w, y + d, z], [x + w, y + d, z + h], [x, y + d, z + h]])}"/>` +
+    `<polygon ${topAttr} fill="${top}" points="${pts([[x, y, z + h], [x + w, y, z + h], [x + w, y + d, z + h], [x, y + d, z + h]])}"/>`;
+}
+const grey = (x, y, z, w, d, h) => box(x, y, z, w, d, h, '#e4e4e7', '#c4c4ca', '#a1a1aa');
+function cyl(cx, cy, z, r, h, side, top, band) {
+  const [bx, by] = P(cx, cy, z), [, ty] = P(cx, cy, z + h), rx = r * TS * 1.2247, ry = r * TS * 0.7071;
+  return `<ellipse ${ED} cx="${bx}" cy="${by}" rx="${rx}" ry="${ry}" fill="${side}"/>
+    <rect x="${bx - rx}" y="${ty}" width="${rx * 2}" height="${by - ty}" fill="${side}"/>
+    <line x1="${bx - rx}" y1="${ty}" x2="${bx - rx}" y2="${by}" stroke="rgba(9,9,11,.28)" stroke-width=".7"/><line x1="${bx + rx}" y1="${ty}" x2="${bx + rx}" y2="${by}" stroke="rgba(9,9,11,.28)" stroke-width=".7"/>
+    ${band ? `<rect x="${bx - rx}" y="${(by + ty) / 2 - 3}" width="${rx * 2}" height="6" fill="${band}"/>` : ''}
+    <ellipse ${ED} cx="${bx}" cy="${ty}" rx="${rx}" ry="${ry}" fill="${top}"/>`;
+}
+const FOOT = { machine: [1.5, 1.2], conveyor: [2.4, 0.7], tank: [1.4, 1.4], board: [1.2, 0.14], rack: [2.2, 0.7], forklift: [1.0, 1.4], bench: [1.6, 0.8] };
+const HEIGHT = { machine: 1.6, conveyor: 0.9, tank: 2.1, board: 1.7, rack: 1.9, forklift: 1.9, bench: 1.2 };
+function entity(kind, x, y, c) { // (x,y) = footprint origin
+  const [w, d] = FOOT[kind], z = 0.3;
+  switch (kind) {
+    case 'machine': return grey(x, y, z, w, d, 1.1) + box(x + 0.15, y + 0.15, z + 1.1, 0.6, 0.45, 0.4, mix(c, .5), mix(c, .8), c) + box(x + w - 0.05, y + 0.3, z + 0.45, 0.05, 0.6, 0.4, '#27272a', '#27272a', '#3f3f46');
+    case 'conveyor': {
+      let s = box(x, y, z, w, d, 0.45, '#a1a1aa', '#71717a', '#52525b');
+      for (let i = 1; i < 6; i++) { const [a1, b1] = P(x + i * w / 6, y, z + 0.45), [a2, b2] = P(x + i * w / 6, y + d, z + 0.45); s += `<line x1="${a1}" y1="${b1}" x2="${a2}" y2="${b2}" stroke="#52525b" stroke-width=".8"/>`; }
+      for (let i = 0; i < 3; i++) s += cyl(x + 0.5 + i * 0.7, y + d / 2, z + 0.45, 0.14, 0.42, mix(c, .45), mix(c, .25));
+      return s;
+    }
+    case 'tank': return cyl(x + 0.7, y + 0.7, z, 0.7, 1.7, '#cfd4dc', '#e8ebef', c);
+    case 'board': return box(x + 0.04, y, z, 0.08, d, 1.6, '#71717a', '#71717a', '#52525b') + box(x + w - 0.12, y, z, 0.08, d, 1.6, '#71717a', '#71717a', '#52525b') +
+      box(x, y, z + 0.7, w, d, 0.85, '#fafafa', '#e4e4e7', '#ffffff') + box(x, y, z + 1.4, w, d, 0.2, mix(c, .6), c, c) +
+      [0.95, 1.1, 1.25].map(h => { const [a1, b1] = P(x + 0.18, y + d, z + h), [a2, b2] = P(x + w - 0.3, y + d, z + h); return `<line x1="${a1}" y1="${b1}" x2="${a2}" y2="${b2}" stroke="#a1a1aa" stroke-width="1"/>`; }).join('');
+    case 'rack': {
+      let s = '';
+      [[0, 0], [w - 0.08, 0], [0, d - 0.08], [w - 0.08, d - 0.08]].forEach(([dx, dy]) => s += box(x + dx, y + dy, z, 0.08, 0.08, 1.8, mix(c, .9), c, c));
+      [0.05, 0.75, 1.45].forEach((h, i) => { s += box(x, y, z + h, w, d, 0.06, '#a1a1aa', '#71717a', '#71717a'); if (i < 2) { s += box(x + 0.15, y + 0.1, z + h + 0.06, 0.8, 0.5, 0.45, '#e7cfa4', '#d4b483', '#bf9c66') + box(x + 1.1, y + 0.1, z + h + 0.06, 0.8, 0.5, 0.45, '#e7cfa4', '#d4b483', '#bf9c66'); } });
+      return s;
+    }
+    case 'forklift': return box(x, y + 0.2, z, w, d - 0.2, 0.7, '#fcd34d', '#f59e0b', '#d97706') + box(x + 0.15, y + 0.55, z + 0.7, 0.5, 0.5, 0.35, '#3f3f46', '#27272a', '#18181b') +
+      box(x + w, y + 0.2, z, 0.12, 1.0, 1.6, '#52525b', '#3f3f46', '#27272a') + box(x + w + 0.12, y + 0.3, z + 0.05, 0.9, 0.12, 0.06, '#71717a', '#52525b', '#3f3f46') + box(x + w + 0.12, y + 0.9, z + 0.05, 0.9, 0.12, 0.06, '#71717a', '#52525b', '#3f3f46');
+    case 'bench': return box(x, y, z, w, d, 0.75, '#ffffff', '#d4d4d8', '#a1a1aa') +
+      [0.3, 0.7, 1.1].map(o => cyl(x + o, y + 0.4, z + 0.75, 0.1, 0.3, mix(c, .35), mix(c, .2))).join('') + box(x + 1.2, y + 0.1, z + 0.75, 0.3, 0.3, 0.35, '#3f3f46', '#27272a', '#18181b');
+  }
+}
+function slots(a) { // lay this area's SOP objects out on its floor
+  const list = SOPS.filter(s => s.a === a.id), m = 0.8, iw = a.w - 2 * m, id = a.d - 2 * m;
+  const cols = Math.max(1, Math.min(list.length, Math.round(Math.sqrt(list.length * iw / id)))), rows = Math.ceil(list.length / cols);
+  return list.map((s, i) => {
+    const [fw, fd] = FOOT[s.e], cx = a.x + m + (i % cols + 0.5) * iw / cols, cy = a.y + m + (Math.floor(i / cols) + 0.5) * id / rows;
+    return { s, x: cx - fw / 2, y: cy - fd / 2, cx, cy };
+  });
+}
+function bounds(list) {
+  let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+  list.forEach(([px, py]) => { x0 = Math.min(x0, px); y0 = Math.min(y0, py); x1 = Math.max(x1, px); y1 = Math.max(y1, py); });
+  return [x0, y0, x1 - x0, y1 - y0];
+}
+const corners = (a, zt) => [[a.x, a.y, 0], [a.x + a.w, a.y, 0], [a.x, a.y + a.d, 0], [a.x + a.w, a.y + a.d, 0], [a.x, a.y, zt], [a.x + a.w, a.y, zt], [a.x, a.y + a.d, zt]].map(p => P(...p));
+function viewFor(areaId) {
+  if (!areaId) { const [gx0, gy0, gx1, gy1] = GROUND, [x, y, w, h] = bounds([...AREAS.flatMap(a => corners(a, 3.6)), P(gx0, gy1), P(gx1, gy0), P(gx1, gy1)]); return [x - 16, y - 16, w + 32, h + 32]; }
+  const [x, y, w, h] = bounds(corners(A_BY[areaId], 3.2)); return [x - 50, y - 30, w + 100, h + 70];
+}
+
+function siteSvg() {
+  const cur = S.area, vb = viewFor(cur), k = vb[2] / 800;
+  let g = `<polygon fill="#e9e9ec" stroke="#d4d4d8" points="${pts([[GROUND[0], GROUND[1], 0], [GROUND[2], GROUND[1], 0], [GROUND[2], GROUND[3], 0], [GROUND[0], GROUND[3], 0]])}"/>`;
+  [...AREAS].sort((p, q) => (p.x + p.y) - (q.x + q.y)).forEach(a => {
+    const sl = slots(a).sort((p, q) => (p.cx + p.cy) - (q.cx + q.cy));
+    const objs = sl.map(o => {
+      const tag = cur === a.id ? `class="ent ${S.sop === o.s.id ? 'sel' : ''}" data-open="${o.s.id}"` : '';
+      return `<g ${tag}>${entity(o.s.e, o.x, o.y, a.c)}<title>${esc(o.s.t)}</title></g>`;
+    }).join('');
+    const state = cur ? (cur === a.id ? 'cur' : 'dim') : '';
+    g += `<g class="area ${state}" ${cur === a.id ? '' : `data-area="${a.id}"`}>
+      ${box(a.x, a.y, 0, a.w, a.d, 0.3, mix(a.c, .14), mix(a.c, .45), mix(a.c, .7), `class="slab-top" stroke="${a.c}" stroke-width="2"`)}
+      ${objs}<title>${esc(a.n)} · ${sl.length} SOPs — click to open</title></g>`;
+  });
+  // signs: the area names on the whole-site view; SOP names once an area is open
+  // phone: the whole site is too small for name signs -- big numbered markers plus a tappable key under the map
+  if (!cur && S.phone) AREAS.forEach((a, i) => {
+    const [sx, sy] = P(a.x + a.w / 2, a.y + a.d / 2, 1.2), r = 9 * k * 2.2;
+    g += `<g class="sign"><circle cx="${sx}" cy="${sy}" r="${r}" fill="${a.c}" stroke="#fff" stroke-width="${r / 6}"/><text x="${sx}" y="${sy + r * 0.38}" text-anchor="middle" fill="#fff" font-family="Inter" font-weight="800" font-size="${r * 1.1}">${i + 1}</text></g>`;
+  });
+  else if (!cur) AREAS.forEach(a => {
+    const [sx, sy] = P(a.x + a.w / 2, a.y + a.d / 2, 3), n = SOPS.filter(s => s.a === a.id).length, w = a.n.length * 7.4 + 54;
+    g += `<g class="sign"><line x1="${sx}" y1="${sy}" x2="${sx}" y2="${P(a.x + a.w / 2, a.y + a.d / 2, 0.3)[1]}" stroke="${a.c}" stroke-width="1.2" stroke-dasharray="2 3"/>
+      <rect x="${sx - w / 2}" y="${sy - 26}" width="${w}" height="26" rx="5" fill="#09090b"/><rect x="${sx - w / 2}" y="${sy - 26}" width="6" height="26" rx="2" fill="${a.c}"/>
+      <text x="${sx - w / 2 + 14}" y="${sy - 9}" fill="#fff" font-family="Inter" font-weight="700" font-size="12.5">${esc(a.n)}</text>
+      <text x="${sx + w / 2 - 10}" y="${sy - 9}" fill="#a1a1aa" font-family="JetBrains Mono" font-size="10.5" text-anchor="end">${n}</text></g>`;
+  });
+  else slots(A_BY[cur]).forEach(o => {
+    const [lx, ly] = P(o.cx, o.cy, HEIGHT[o.s.e] + 0.55), fs = 12.5 * k;
+    g += `<g class="elabel"><text x="${lx}" y="${ly}" text-anchor="middle" font-size="${fs}" font-weight="700" fill="#09090b">${esc(o.s.t)}</text>
+      ${o.s.st ? `<text x="${lx}" y="${ly + fs * 1.15}" text-anchor="middle" font-size="${fs * 0.82}" fill="${{ ok: '#16a34a', upd: '#2563eb', wait: '#d97706', prog: '#27272a' }[o.s.st.k]}">● ${esc(o.s.st.txt.split(' · ')[0])}</text>` : ''}</g>`;
+  });
+  return `<svg class="iso mapsvg" data-vb="${vb.join(' ')}" viewBox="${(S._vb || vb).join(' ')}" preserveAspectRatio="xMidYMid meet">${g}</svg>`;
+}
+function mapView() {
+  const a = S.area && A_BY[S.area];
+  return `<div class="mapwrap"><div class="maphd"><span class="crumb">${a ? `<button data-area="">${ORG}</button> › <span style="color:${a.c}">■</span> ${esc(a.n)}` : `${ORG} · site map`}</span>
+    <span class="hint">${a ? 'click a SOP to read it · Esc for the whole site' : 'click an area to open it'}</span></div>${siteSvg()}</div>`;
+}
+let raf;
+function animateMap() {
+  const svg = app.querySelector('svg.iso'); if (!svg) return;
+  const to = svg.dataset.vb.split(' ').map(Number), from = S._vb || to; S._vb = to;
+  cancelAnimationFrame(raf);
+  if (from.join() === to.join() || matchMedia('(prefers-reduced-motion: reduce)').matches) return svg.setAttribute('viewBox', to.join(' '));
+  const t0 = performance.now(), D = 520;
+  const step = (t) => { const p = Math.min(1, (t - t0) / D), e = p < .5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+    svg.setAttribute('viewBox', from.map((f, i) => f + (to[i] - f) * e).join(' ')); if (p < 1) raf = requestAnimationFrame(step); };
+  raf = requestAnimationFrame(step);
+}
 
 /* ---------------- state ---------------- */
-const S = { v: 'A', phone: false, role: 'worker', sec: 'sops', sop: null, q: '', group: 'dept', place: null, showMap: false, run: null };
+const S = { v: 'A', phone: false, role: 'worker', sec: 'sops', sop: null, q: '', group: 'dept', area: null, showMap: false, pmap: false, run: null };
 const app = document.getElementById('app'), frame = document.getElementById('frame');
 const esc = (x) => String(x).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const WM = (cls = '') => `<span class="wm ${cls}"><span class="a">SOP</span><span class="b">start</span></span>`;
@@ -250,69 +422,60 @@ function sections() {
   return s;
 }
 const navBtns = () => sections().map(([k, l, q]) => `<button class="${S.sec === k ? 'on' : ''} ${q || ''}" data-sec="${k}">${l}</button>`).join('');
-
-function stHtml(s) {
-  if (!s.st) return '';
-  return `<span class="st"><i class="dot d-${s.st.k}"></i>${esc(s.st.txt)}</span>`;
-}
+const stHtml = (s) => s.st ? `<span class="st"><i class="dot d-${s.st.k}"></i>${esc(s.st.txt)}</span>` : '';
 function row(s, extra = '') {
-  return `<button class="row ${S.sop === s.id && S.v === 'A' && !S.phone ? 'sel' : ''}" data-open="${s.id}">
+  return `<button class="row ${S.sop === s.id && S.v === 'A' && !S.phone ? 'sel' : ''}" data-open="${s.id}"><i class="sw" style="background:${A_BY[s.a].c}"></i>
     <div class="main"><div class="ttl">${esc(s.t)}</div><div class="meta">${esc(s.dept)} · ${esc(s.type)} · ~${s.min} min${extra}</div>
     ${s.st ? `<div style="margin-top:3px">${stHtml(s)}</div>` : ''}</div></button>`;
 }
-
 function matches() {
   const q = S.q.trim().toLowerCase();
-  return SOPS.filter(s => (!S.place || s.place === S.place) &&
-    (!q || (s.t + ' ' + s.dept + ' ' + s.type + ' ' + (s.place || '') + ' ' + s.steps.map(x => x.t).join(' ')).toLowerCase().includes(q)));
+  return SOPS.filter(s => (!S.area || s.a === S.area) &&
+    (!q || (s.t + ' ' + s.dept + ' ' + s.type + ' ' + s.steps.map(x => x.t).join(' ')).toLowerCase().includes(q)));
 }
-
 function allGrouped() {
-  const key = S.group === 'dept' ? 'dept' : 'type';
-  const g = {};
-  SOPS.forEach(s => (g[s[key]] = g[s[key]] || []).push(s));
-  return Object.keys(g).sort().map(k => `<div class="grp-h"><span>${esc(k)}</span><span>${g[k].length}</span></div>${g[k].map(s => row(s)).join('')}`).join('');
+  if (S.group === 'type') {
+    const g = {}; SOPS.forEach(s => (g[s.type] = g[s.type] || []).push(s));
+    return Object.keys(g).sort().map(k => `<div class="grp-h"><span>${esc(k)}</span><span>${g[k].length}</span></div>${g[k].map(s => row(s)).join('')}`).join('');
+  }
+  return AREAS.map(a => { const l = SOPS.filter(s => s.a === a.id);
+    return `<button class="grp-h" data-area="${a.id}" title="Open ${esc(a.n)} on the map"><span><i class="sq" style="background:${a.c}"></i>${esc(a.n)}</span><span>${l.length} ›</span></button>${l.map(s => row(s)).join('')}`; }).join('');
 }
-
-function mapHtml() {
-  return `<div class="map"><img src="../007-plant-floor-navigation/assets/plant.jpg" alt="Site">
-    ${PLACES.map(p => `<button class="hs" style="left:${p.x}%;top:${p.y}%" data-place="${esc(p.n)}">${esc(p.n)}</button>`).join('')}</div>
-    <div class="meta" style="font-family:var(--mono);font-size:11px;color:var(--ink-500);margin-top:6px">Processes and site-wide SOPs have no place. They stay in the list.</div>`;
-}
-
 function homeBody(cardsStyle) {
-  const searching = S.q.trim() || S.place;
+  const filtered = S.q.trim() || S.area;
   let h = `<div class="search">⌕<input id="q" placeholder="Search all SOPs, steps and tools" value="${esc(S.q)}">${S.q ? '<button class="x" data-clear>✕</button>' : ''}</div>`;
-  if (S.place) h += `<div class="filterchip">At ${esc(S.place)} <button data-place="">✕</button></div>`;
-  if (searching) {
+  if (S.phone && S.v === 'A') h += `<div style="margin-top:10px"><span class="seg"><button class="${S.pmap ? '' : 'on'}" data-pmap="0">List</button><button class="${S.pmap ? 'on' : ''}" data-pmap="1">Site map</button></span></div>`;
+  if (S.phone && S.v === 'A' && S.pmap) {
+    h += `<div class="pmap">${mapView()}</div>`;
+    if (!S.area) h += `<div class="key">${AREAS.map((a, i) => `<button data-area="${a.id}"><b style="background:${a.c}">${i + 1}</b>${esc(a.n)}<span>${SOPS.filter(s => s.a === a.id).length}</span></button>`).join('')}</div>`;
+  }
+  if (S.area) h += `<div class="filterchip"><i class="dot" style="background:${A_BY[S.area].c}"></i>In ${esc(A_BY[S.area].n)} <button data-area="">✕</button></div>`;
+  if (filtered) {
     const m = matches();
-    h += `<div class="label">${m.length} result${m.length === 1 ? '' : 's'}</div>`;
+    h += `<div class="label">${m.length} SOP${m.length === 1 ? '' : 's'}</div>`;
     h += m.length ? m.map(s => row(s)).join('') :
       `<div class="empty">No SOP for “${esc(S.q)}”.<br><br><button class="btn primary" data-toast="Request sent to the SOP admins · logged">Ask for one</button>
        ${S.role === 'admin' ? ' <button class="btn" data-toast="Opens the new-SOP editor with this title">Write it</button>' : ''}</div>`;
     return h;
   }
+  if (S.phone && S.pmap) return h;
   h += `<div class="label">Recent</div>`;
   h += cardsStyle ? `<div class="cards">${RECENT.slice(0, 3).map(id => card(byId[id])).join('')}</div>` : RECENT.map(id => row(byId[id])).join('');
   h += `<div class="label">Most used</div>` + MOST.map(([id, n]) => row(byId[id], ` · done ${n}×`)).join('');
   h += `<div class="label" style="display:flex;justify-content:space-between;align-items:center">All SOPs · ${SOPS.length}
-        <span class="seg"><button class="${S.group === 'dept' ? 'on' : ''}" data-group="dept">Department</button><button class="${S.group === 'type' ? 'on' : ''}" data-group="type">Type</button></span></div>`;
-  h += `<div style="margin:4px 0 6px"><button class="btn" data-map>${S.showMap ? 'Hide' : 'Find by place'} ▸</button></div>`;
-  if (S.showMap) h += mapHtml();
-  h += allGrouped();
-  return h;
+        <span class="seg"><button class="${S.group === 'dept' ? 'on' : ''}" data-group="dept">Area</button><button class="${S.group === 'type' ? 'on' : ''}" data-group="type">Type</button></span></div>`;
+  if (S.v === 'B') { h += `<div style="margin:4px 0 6px"><button class="btn" data-map>${S.showMap ? 'Hide site map' : 'Site map ▸'}</button></div>`; if (S.showMap) h += `<div class="mapbox">${mapView()}</div>`; }
+  return h + allGrouped();
 }
-function card(s) {
-  return `<button class="card" data-open="${s.id}"><div class="ttl">${esc(s.t)}</div><div class="meta">${esc(s.dept)} · ~${s.min} min</div>${stHtml(s)}</button>`;
-}
+const card = (s) => `<button class="card" data-open="${s.id}"><div class="ttl">${esc(s.t)}</div><div class="meta">${esc(s.dept)} · ~${s.min} min</div>${stHtml(s)}</button>`;
 
-function readHtml(s, withBack) {
+function readHtml(s, back) {
   const prog = s.st && s.st.k === 'prog';
   return `<div class="read">
-    ${withBack ? '<button class="back" data-close>‹ My SOPs</button>' : ''}
+    ${back ? `<button class="back" data-close>‹ ${back}</button>` : ''}
     <span class="sop-chip" id="chip">SOP</span>
     <h1>${esc(s.t)}</h1>
-    <div class="meta">${esc(s.dept)} · ${esc(s.type)}${s.place ? ' · ' + esc(s.place) : ''} · v${s.v} · owner ${esc(s.owner)} · ~${s.min} min</div>
+    <div class="meta"><span style="color:${A_BY[s.a].c}">■</span> ${esc(s.dept)} · ${esc(s.type)} · v${s.v} · owner ${esc(s.owner)} · ~${s.min} min</div>
     ${s.std.length ? `<div class="tags">${s.std.map(x => `<span class="tg">${esc(x)}</span>`).join('')}</div>` : ''}
     ${s.st ? `<div class="stline">${stHtml(s)}</div>` : ''}
     <div class="act"><button class="start-btn" id="startBtn" data-start="${s.id}">Start</button>
@@ -327,27 +490,27 @@ function secHtml() {
     <table><tr><th>SOP</th><th>Last done</th><th>Status</th></tr>
     <tr><td>Lockout / tagout isolation</td><td>12 Sep</td><td><span class="st"><i class="dot d-ok"></i>Signed off · R. Patel</span></td></tr>
     <tr><td>Shift handover</td><td>6 Oct</td><td><span class="st"><i class="dot d-wait"></i>Waiting for sign-off</span></td></tr>
-    <tr><td>Mould swabbing</td><td>28 Aug</td><td><span class="st"><i class="dot d-ok"></i>Signed off · S. Fale</span></td></tr>
+    <tr><td>Capper torque check</td><td>28 Aug</td><td><span class="st"><i class="dot d-ok"></i>Signed off · S. Fale</span></td></tr>
     <tr><td>Forklift pre-start check</td><td>19 Sep</td><td><span class="st"><i class="dot d-upd"></i>Signed off on v3 · now v4</span></td></tr>
-    <tr><td>Palletiser jam clearing</td><td>3 Sep</td><td><span class="st"><i class="dot d-ok"></i>Signed off · R. Patel</span></td></tr></table></div>`;
+    <tr><td>Case packer jam clearing</td><td>3 Sep</td><td><span class="st"><i class="dot d-ok"></i>Signed off · R. Patel</span></td></tr></table></div>`;
   if (S.sec === 'training') {
-    const ppl = ['Aroha T.', 'Ben K.', 'Sione F.', 'Mei L.'], cols = ['loto', 'fork', 'swab', 'pall', 'hand'];
+    const ppl = ['Aroha T.', 'Ben K.', 'Sione F.', 'Mei L.'], cols = ['loto', 'fork', 'capper', 'casepack', 'hand'];
     const cell = (i, j) => ['✓', '✓', '●', '', '✓', '', '✓', '●', '', '✓', '✓', '✓', '', '✓', '●', '✓', '', '✓', '✓', ''][i * 5 + j];
     return `<div class="sec"><h2>Training</h2><div class="sub">Who is signed off on what. ✓ signed off · ● done, waiting for sign-off. A record to look up, not a to-do list.</div>
       <table><tr><th>Person</th>${cols.map(c => `<th>${esc(byId[c].t)}</th>`).join('')}</tr>
       ${ppl.map((p, i) => `<tr><td>${p}</td>${cols.map((c, j) => `<td class="c" style="color:${cell(i, j) === '✓' ? 'var(--accent-ok)' : 'var(--accent-decision)'}">${cell(i, j)}</td>`).join('')}</tr>`).join('')}</table></div>`;
   }
   if (S.sec === 'signoffs') return `<div class="sec"><h2>Sign-offs</h2><div class="sub">Completed SOPs from your team. Each sign-off is logged in the decision ledger.</div>
-    <table id="so"><tr><th>Who</th><th>SOP</th><th>Done</th><th></th></tr>
-    ${[['Aroha T.', 'Shift handover', '6 Oct · 2 photos'], ['Sione F.', 'Mould swabbing', '6 Oct'], ['Mei L.', 'Batch changeover order', '5 Oct · 1 photo']].map(r =>
-      `<tr><td>${r[0]}</td><td>${r[1]}</td><td class="meta" style="font-family:var(--mono);font-size:11px;color:var(--ink-500)">${r[2]}</td>
+    <table><tr><th>Who</th><th>SOP</th><th>Done</th><th></th></tr>
+    ${[['Aroha T.', 'Shift handover', '6 Oct · 2 photos'], ['Sione F.', 'Capper torque check', '6 Oct'], ['Mei L.', 'Date-code check', '5 Oct · 1 photo']].map(r =>
+      `<tr><td>${r[0]}</td><td>${r[1]}</td><td style="font-family:var(--mono);font-size:11px;color:var(--ink-500)">${r[2]}</td>
       <td style="text-align:right;white-space:nowrap"><button class="btn" data-toast="Sent back · logged in the decision ledger" data-rm>Send back</button> <button class="btn primary" data-toast="Signed off · logged in the decision ledger" data-rm>Sign off</button></td></tr>`).join('')}</table></div>`;
   if (S.sec === 'manage') return `<div class="sec"><h2>Manage SOPs</h2><div class="sub">Write, convert and fix SOPs. Every way in ends in the same editor.</div>
     <button class="btn primary" data-toast="New SOP: upload a document · describe it to AI · record a video · start blank">New SOP</button>
     <div class="label">Your drafts</div>
     <table><tr><th>Draft</th><th>Checked</th><th></th></tr>
-    <tr><td>Press changeover</td><td>12 of 30 steps</td><td style="text-align:right"><button class="btn" data-toast="Opens the editor at step 13, the next unchecked one">Carry on</button></td></tr>
-    <tr><td>Forming area isolation</td><td>0 of 18 steps</td><td style="text-align:right"><button class="btn" data-toast="Opens the editor at step 1">Carry on</button></td></tr></table>
+    <tr><td>Filler changeover 330 ml → 1.5 L</td><td>12 of 30 steps</td><td style="text-align:right"><button class="btn" data-toast="Opens the editor at step 13, the next unchecked one">Carry on</button></td></tr>
+    <tr><td>Ammonia refrigeration isolation</td><td>0 of 18 steps</td><td style="text-align:right"><button class="btn" data-toast="Opens the editor at step 1">Carry on</button></td></tr></table>
     <div class="label">Change requests</div>
     <table><tr><td>Forklift pre-start check · “step 6: add the fire extinguisher check”</td><td style="text-align:right"><button class="btn" data-toast="Opens the editor at step 6">Make this change</button></td></tr></table></div>`;
 }
@@ -362,21 +525,21 @@ function render() {
   const s = S.sop && byId[S.sop];
   let h;
   if (S.v === 'A') {
-    let mid, pane;
-    if (S.sec !== 'sops') { mid = ''; pane = secHtml(); }
-    else { mid = homeBody(false); pane = s ? readHtml(s, false) : `<div class="empty" style="padding-top:30vh">Pick a SOP to read it.</div>`; }
     if (S.phone) {
-      h = `<div class="A">${S.sec === 'sops' && !s ? ptop : ''}<div class="list scroll" style="padding-bottom:90px">${S.sec !== 'sops' ? secHtml() : s ? readHtml(s, true) : mid}</div></div>${tabs}`;
+      h = `<div class="A">${S.sec === 'sops' && !s ? ptop : ''}<div class="list scroll" style="padding-bottom:90px">${S.sec !== 'sops' ? secHtml() : s ? readHtml(s, S.pmap ? 'Site map' : 'My SOPs') : homeBody(false)}</div></div>${tabs}`;
     } else {
-      h = `<div class="A"><aside class="side">${WM()}<nav>${navBtns()}</nav><div class="who">${S.role} · Visy Penrose</div></aside>
-        ${S.sec === 'sops' ? `<div class="list scroll">${mid}</div><div class="pane scroll">${pane}</div>` : `<div class="pane scroll" style="grid-column:2 / 4">${pane}</div>`}</div>`;
+      const side = `<aside class="side">${WM()}<nav>${navBtns()}</nav><div class="who">${S.role} · ${ORG}</div></aside>`;
+      h = S.sec === 'sops'
+        ? `<div class="A">${side}<div class="list scroll">${homeBody(false)}</div><div class="pane ${s ? 'scroll' : ''}">${s ? readHtml(s, 'Site map') : mapView()}</div></div>`
+        : `<div class="A">${side}<div class="pane scroll" style="grid-column:2 / 4">${secHtml()}</div></div>`;
     }
   } else {
-    const inner = S.sec !== 'sops' ? secHtml() : s ? readHtml(s, true) : `<div class="col">${homeBody(true)}</div>`;
-    h = `<div class="B"><div class="top">${WM()}<nav>${navBtns()}</nav><span class="who">${S.role} · Visy Penrose</span></div>
+    const inner = S.sec !== 'sops' ? secHtml() : s ? readHtml(s, 'My SOPs') : `<div class="col">${homeBody(true)}</div>`;
+    h = `<div class="B"><div class="top">${WM()}<nav>${navBtns()}</nav><span class="who">${S.role} · ${ORG}</span></div>
       ${S.phone && S.sec === 'sops' && !s ? ptop : ''}<div class="scroll" style="flex:1">${inner}</div></div>${tabs}`;
   }
   app.innerHTML = h;
+  animateMap();
   const q = document.getElementById('q');
   if (q && S._focus) { q.focus(); q.setSelectionRange(q.value.length, q.value.length); }
 }
@@ -427,18 +590,16 @@ async function startSop(id, fresh) {
   if (mode === 'off' || !chip || !btn || !Element.prototype.animate) return go();
 
   const T = mode === 'full' ? { a: 460, hold: 160, b: 420 } : { a: 150, hold: 0, b: 150 };
-  const src1 = rel(chip), src2 = rel(btn), btnLabel = btn.textContent;
-
+  const src1 = rel(chip), src2 = rel(btn);
   const bg = document.createElement('div'); bg.className = 'fuse-bg';
   const wm = document.createElement('div'); wm.className = 'fuse-wm wm sweep';
-  wm.innerHTML = `<span class="a">SOP</span><span class="b">start</span>`;
+  wm.innerHTML = `<span class="a">SOP</span><span class="b">Start</span>`;
   frame.append(bg, wm);
   const [sa, sb] = wm.children;
-  sb.textContent = btnLabel;
   const d1 = rel(sa), d2 = rel(sb);
-  // ponytail: FLIP by hand (WAAPI) so the two parts meet in the middle; View Transitions can't hold a mid-point. Real build can try VT + a keyframed midpoint.
   const ease = 'cubic-bezier(.5,0,.2,1)';
-  // the pieces fly as solid black chips and only turn into ink-on-paper as they meet
+  // ponytail: FLIP by hand (WAAPI) so the two parts meet in the middle; View Transitions can't hold a mid-point.
+  // The pieces fly as solid black chips and only turn into ink-on-paper as they meet.
   const fly = (el, src, dst) => {
     const s = src.h / dst.h;
     const tx = src.l + src.w / 2 - dst.l - (dst.w * s) / 2, ty = src.t + src.h / 2 - dst.t - (dst.h * s) / 2;
@@ -473,7 +634,7 @@ function toast(t) {
   setTimeout(() => d.remove(), 2400);
 }
 app.addEventListener('click', (e) => {
-  const b = e.target.closest('[data-open],[data-sec],[data-close],[data-start],[data-next],[data-prev],[data-jump],[data-exit],[data-photo],[data-group],[data-map],[data-place],[data-clear],[data-toast]');
+  const b = e.target.closest('[data-open],[data-sec],[data-close],[data-start],[data-next],[data-prev],[data-jump],[data-exit],[data-photo],[data-group],[data-map],[data-area],[data-pmap],[data-clear],[data-toast]');
   if (!b) return;
   const d = b.dataset;
   S._focus = false;
@@ -484,7 +645,8 @@ app.addEventListener('click', (e) => {
   if ('close' in d) S.sop = null;
   if ('group' in d) S.group = d.group;
   if ('map' in d) S.showMap = !S.showMap;
-  if ('place' in d) { S.place = d.place || null; S.showMap = false; }
+  if ('pmap' in d) S.pmap = d.pmap === '1';
+  if ('area' in d) { S.area = d.area || null; S.sop = null; if (S.area) { S.showMap = true; S.pmap = true; } }
   if ('clear' in d) S.q = '';
   if (S.run) {
     const s = byId[S.run.id];
@@ -498,11 +660,11 @@ app.addEventListener('click', (e) => {
 });
 app.addEventListener('input', (e) => { if (e.target.id === 'q') { S.q = e.target.value; S._focus = true; render(); } });
 document.querySelectorAll('.variant-tab').forEach(t => t.onclick = () => {
-  document.querySelectorAll('.variant-tab').forEach(x => x.classList.toggle('active', x === t)); S.v = t.dataset.v; S.run = null; render();
+  document.querySelectorAll('.variant-tab').forEach(x => x.classList.toggle('active', x === t)); S.v = t.dataset.v; S.run = null; S.sop = null; render();
 });
-document.getElementById('vp').onchange = (e) => { S.phone = e.target.value === 'phone'; render(); };
+document.getElementById('vp').onchange = (e) => { S.phone = e.target.value === 'phone'; S._vb = null; render(); };
 document.getElementById('role').onchange = (e) => { S.role = e.target.value; if (!sections().some(([k]) => k === S.sec)) S.sec = 'sops'; S.run = null; render(); };
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (S.run) S.run = null; else S.sop = null; render(); } });
+document.addEventListener('keydown', (e) => { if (e.key !== 'Escape') return; if (S.run) S.run = null; else if (S.sop) S.sop = null; else S.area = null; render(); });
 render();
 </script>
 </body>

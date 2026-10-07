@@ -2,7 +2,7 @@
 sketch: 009
 name: sop-first-home
 question: "If safe use of SOPs is the whole point, what is the home — and how does starting a SOP feel?"
-winner: null
+winner: "A"
 tags: [home, navigation, information-architecture, brand, motion, worker, phone]
 ---
 
@@ -29,6 +29,27 @@ Toolbar: variant · Desktop/Phone · role (Worker / Supervisor / SOP admin) · s
 Both share: sections My SOPs · My record · Training + Sign-offs (supervisor up) · Manage SOPs (admin,
 last, greyed, no count) · status as row information only · group All SOPs by Department or Type ·
 "Find by place" as an optional map, never the frame · search miss → "Ask for one" (admin also "Write it").
+
+## Winner: A + the site map (Simon, 2026-10-07)
+A wins. Simon: making SOPs more visual is a big part of making them better, so the site map stays,
+as a **secondary representation of the library**, not as the home's frame and not as a machine census.
+
+- Example org: **Kauri Springs Bottling** (fictional NZ bottler). Eight library areas: Bottle intake ·
+  Filling hall · Labelling & packing · Utilities & CIP · Quality lab · Engineering workshop ·
+  Warehouse & dispatch · Site-wide.
+- Desktop: the reader pane shows the site map whenever no SOP is open. Each area is a coloured,
+  outlined isometric floor plate with a name sign + SOP count; hover lifts it; click zooms into it
+  and filters the list to it.
+- **Every object drawn on an area is one SOP**, not one machine: machine-like objects for machine
+  SOPs, tanks, conveyors, racking, a forklift, a lab bench, and a **noticeboard** for processes,
+  orders of operation and emergencies. So a process is as visible on the map as a machine — no
+  blind spots. Zoomed in, each object carries its SOP title and status; click → Read → Start.
+- The list's area group headers open the same area on the map; Esc / the breadcrumb return to the
+  whole site.
+- Phone: List | Site map toggle; on the whole-site view, numbered markers + a tappable key replace
+  the name signs (they are unreadable at phone width).
+- Drawn in SVG from code (`AREAS` + per-SOP object kind), not a generated image, so every area is an
+  exact hit shape and the map can never disagree with the library.
 
 ## The start moment
 Read view → **Start** → the page fades to paper while the SOP chip and the Start button fly to the
