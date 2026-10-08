@@ -12,7 +12,6 @@ import { requireAdminContext } from '@/lib/auth/guards'
 import { loadInbox } from '@/lib/governance/load-inbox'
 import { inboxCounts, type InboxChip } from '@/lib/governance/inbox'
 import { ensureReviewDueNotifications } from '@/lib/notifications/ensure-review-due'
-import { reconcileMachineRequests } from '@/lib/requests/machine-requests'
 import { officePinCount } from '@/lib/requests/model'
 import type { GovernanceRow } from '@/actions/governance'
 import type { AdminSiteFloor } from '@/lib/validators/site'
@@ -42,11 +41,8 @@ export async function getAdminShell(): Promise<AdminShellData | { error: string 
   if (!ctx.organisationId) return { error: 'No organisation' }
 
   // ADR-0002: due reviews are written when the owner loads the screen, so the bell
-  // and the overview show them on this same load; machines with no SOP get their agent
-  // request before the inbox is read, so this pin and the Office pane count the same
-  // requests. Neither ever throws.
+  // and the overview show them on this same load. Never throws.
   const reviewDue = ensureReviewDueNotifications(ctx.organisationId, ctx.user.id)
-  await reconcileMachineRequests(ctx.organisationId)
   const inbox = await loadInbox()
   await reviewDue
   if ('error' in inbox) return { error: inbox.error }

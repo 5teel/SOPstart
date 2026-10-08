@@ -14,7 +14,6 @@
 import { test, expect } from '@playwright/test'
 import {
   machineHealth,
-  machinesWithoutSops,
   adminSopBadge,
   machinePanelSops,
   type HealthRow,
@@ -81,21 +80,6 @@ test.describe('machineHealth', () => {
     const links: SopMachineLink[] = [{ sop_id: 'ghost', machine_id: 'm1' }]
     const health = machineHealth(machines, links, new Map())
     expect(health.has('m1')).toBe(false)
-  })
-})
-
-test.describe('machinesWithoutSops', () => {
-  test('returns machines with zero links, in input order', () => {
-    const machines = [{ id: 'm1' }, { id: 'm2' }, { id: 'm3' }]
-    const links: SopMachineLink[] = [{ sop_id: 's1', machine_id: 'm2' }]
-    const result = machinesWithoutSops(machines, links)
-    expect(result.map((m) => m.id)).toEqual(['m1', 'm3'])
-  })
-
-  test('a machine with one link is excluded', () => {
-    const machines = [{ id: 'm1' }]
-    const links: SopMachineLink[] = [{ sop_id: 's1', machine_id: 'm1' }]
-    expect(machinesWithoutSops(machines, links)).toEqual([])
   })
 })
 

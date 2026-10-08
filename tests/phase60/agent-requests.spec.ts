@@ -32,7 +32,7 @@ test.describe('Agent requests (60-04 helper)', () => {
     expect(AGENT).toContain('export async function raiseRequestAsAgent')
   })
 
-  test('no component or action imports the agent helper directly (actions go through machine-requests)', () => {
+  test('no component or action imports the agent helper directly (a caller wraps it; none exists today)', () => {
     for (const f of [...walk(path.join(ROOT, 'src/components')), ...walk(path.join(ROOT, 'src/actions'))]) {
       expect(fs.readFileSync(f, 'utf-8'), f).not.toContain('requests/agent')
     }
@@ -71,36 +71,23 @@ test.describe('Agent requests (60-04 helper)', () => {
   })
 })
 
-test.describe('Agent requests (ADR-0002 producer)', () => {
-  const MACHINES = strip(read('src/lib/requests/machine-requests.ts'))
-
-  test('machines without a SOP raise as the default agent, on the event and on read, never via the ledger', () => {
-    expect(MACHINES.trimStart().startsWith("import 'server-only'")).toBe(true)
-    expect(MACHINES).not.toMatch(/['"]use server['"]/)
-    expect(MACHINES).toContain('machinesWithoutSops(')
-    expect(MACHINES).toContain('raiseRequestAsAgent({')
-    expect(MACHINES).toContain('agent: DEFAULT_AGENT_NAME')
-    expect(MACHINES).toContain("type: 'machine'")
-    expect(MACHINES).toContain('This machine has no SOPs yet.')
-    expect(MACHINES).not.toContain('recordDecision')
-    expect(MACHINES).toMatch(/catch \(err\)/)
-    expect(strip(read('src/actions/site.ts'))).toContain('reconcileMachineRequests(orgId, [(inserted as SiteMachine).id])')
-    expect(strip(read('src/actions/site.ts'))).toContain('reconcileMachineRequests(orgId, [...new Set([...prior, ...validIds])])')
-    expect(strip(read('src/actions/office.ts'))).toContain('reconcileMachineRequests(organisationId)')
-    // the shell read reconciles too, so the Office pin and the pane count the same requests
-    expect(strip(read('src/actions/shell.ts'))).toContain('reconcileMachineRequests(ctx.organisationId)')
+test.describe('Agent requests (machine-coverage producer removed, R1 / ADR-0004 rule 4)', () => {
+  test('the producer module is absent and no action, component or lib module imports it', () => {
+    expect(fs.existsSync(path.join(ROOT, 'src/lib/requests/machine-requests.ts'))).toBe(false)
+    for (const f of [...walk(path.join(ROOT, 'src/components')), ...walk(path.join(ROOT, 'src/actions')), ...walk(path.join(ROOT, 'src/lib')), ...walk(path.join(ROOT, 'src/app'))]) {
+      expect(fs.readFileSync(f, 'utf-8'), f).not.toContain('requests/machine-requests')
+    }
   })
 
-  test('both reads carry the session organisation; a machine that gained a SOP has its open agent request withdrawn', () => {
-    expect(MACHINES).toContain(".from('site_machines').select('id').eq('organisation_id', organisationId)")
-    expect(MACHINES).toContain(".from('sop_machines').select('machine_id').eq('organisation_id', organisationId)")
-    expect(MACHINES).toContain("state: 'withdrawn'")
-    expect(MACHINES).toContain(".not('raised_by_agent', 'is', null)")
-    // the read path (no ids) never withdraws
-    expect(MACHINES).toContain('if (!machineIds) return')
+  test('the Requests read does not offer a request the agent raised about a machine; the rows stay', () => {
+    const inbox = strip(read('src/lib/governance/load-inbox.ts'))
+    const list = inbox.slice(inbox.indexOf('export async function listOpenRequests'))
+    expect(list).toContain(".or('raised_by_agent.is.null,subject_type.neq.machine')")
+    expect(list).not.toContain('.delete(')
+    expect(list).not.toContain('.update(')
   })
 
-  test('a declined request is not re-raised on the next read (the helper skips an answered one for 30 days)', () => {
+  test('a declined request is not re-raised by the helper (it skips an answered one for 30 days)', () => {
     expect(AGENT).toContain("in('state', ['accepted', 'declined'])")
     expect(AGENT).toContain('RECENT_DAYS = 30')
     expect(AGENT).toContain("skipped: 'recent'")

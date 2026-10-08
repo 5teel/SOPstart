@@ -52,7 +52,7 @@ test.describe('Review-due selection (60-08)', () => {
     expect(reviewDueTargets(rows, NOW)).toEqual([])
   })
 
-  test('ensureReviewDueNotifications: this user only, latest-first, idempotent, never throws, called from the shell reads (ADR-0002)', () => {
+  test('ensureReviewDueNotifications: this user only, latest-first, idempotent, never throws, called from the home load (ADR-0002)', () => {
     const src = fs.readFileSync(path.resolve(__dirname, '..', '..', 'src/lib/notifications/ensure-review-due.ts'), 'utf-8')
     expect(src.trimStart().startsWith("import 'server-only'")).toBe(true)
     expect(src).not.toMatch(/['"]use server['"]/)
@@ -65,7 +65,7 @@ test.describe('Review-due selection (60-08)', () => {
     expect(src).toMatch(/catch \(err\)[\s\S]*return 0/)
     const root = path.resolve(__dirname, '..', '..')
     expect(fs.readFileSync(path.join(root, 'src/actions/shell.ts'), 'utf-8')).toContain('ensureReviewDueNotifications(ctx.organisationId, ctx.user.id)')
-    expect(fs.readFileSync(path.join(root, 'src/actions/office.ts'), 'utf-8')).toContain('ensureReviewDueNotifications(organisationId, userId)')
+    expect(fs.readFileSync(path.join(root, 'src/app/page.tsx'), 'utf-8')).toContain('ensureReviewDueNotifications(organisationId, userId)')
   })
 
   test('a SOP with no owner is skipped', () => {

@@ -38,15 +38,6 @@ export function machineHealth(
   return health
 }
 
-/** Machines with zero linked SOPs, in input order. */
-export function machinesWithoutSops<M extends { id: string }>(
-  machines: ReadonlyArray<M>,
-  links: ReadonlyArray<SopMachineLink>
-): M[] {
-  const linkedIds = new Set(links.map((l) => l.machine_id))
-  return machines.filter((m) => !linkedIds.has(m.id))
-}
-
 // ---------------------------------------------------------------------------
 // Machine panel (D-05)
 // ---------------------------------------------------------------------------

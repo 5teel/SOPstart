@@ -36,7 +36,7 @@ test.describe("Capability matrix rows (60-02 / 60-04 / 60-06 / 60-09 / 60-11 / 6
     for (const name of ['answerRequest()', "state = 'open'", 'request_accepted', 'request_declined']) expect(answer).toContain(name)
     const agent = row('Agent raises a request')
     expect(cells(agent)).toEqual(['—', '—', '—', '—', '—']) // no client path in any role
-    for (const name of ['raiseRequestAsAgent()', 'reconcileMachineRequests()', 'ADR-0002']) expect(agent).toContain(name)
+    for (const name of ['raiseRequestAsAgent()', 'machine-coverage producer was removed', 'ADR-0004 rule 4']) expect(agent).toContain(name)
   })
   test('60-06: ask, decline, stop asking and list-targets rows', () => {
     const cells = (l: string) => l.split('|').map((c) => c.trim()).slice(2, 7)

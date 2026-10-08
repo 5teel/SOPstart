@@ -76,7 +76,7 @@ export async function listPendingSignOffs(): Promise<PendingSignOff[] | { error:
 /**
  * Open requests the viewer can answer, newest first (Phase 60 D-03). Session client: RLS
  * `requests_read` decides who sees open rows; the raisable kinds exclude asks, which are not
- * the Office's to answer. Asker names and about-titles come from plain modules.
+ * the Office's to answer; agent-raised machine requests are not offered. Asker names and about-titles come from plain modules.
  */
 export async function listOpenRequests(): Promise<OfficeRequest[] | { error: string }> {
   const { supabase, userId, role, organisationId } = await getSessionContext()
@@ -90,6 +90,8 @@ export async function listOpenRequests(): Promise<OfficeRequest[] | { error: str
     .eq('organisation_id', organisationId)
     .eq('state', 'open')
     .in('kind', [...RAISABLE_KINDS])
+    // R1 (ADR-0004 rule 4): the agent no longer asks for a SOP for a bare machine; rows it wrote before stay as data, not offered.
+    .or('raised_by_agent.is.null,subject_type.neq.machine')
     .order('created_at', { ascending: false })
   if (error) {
     console.error('[listOpenRequests]', error)
