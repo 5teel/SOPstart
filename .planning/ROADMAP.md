@@ -2199,7 +2199,7 @@ Plans:
 
 **Wave 9** *(blocked on Wave 8 completion)*
 
-- [ ] 63-20-PLAN.md — Retire rooms: room / shell / plant code deleted with ADR-0005, the ADR index, ADR-0003 status and the no-rooms guard in one commit
+- [x] 63-20-PLAN.md — Retire rooms: room / shell / plant code deleted with ADR-0005, the ADR index, ADR-0003 status and the no-rooms guard in one commit
 
 **Wave 10** *(blocked on Wave 9 completion)*
 

@@ -1143,7 +1143,7 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 ### Words, retirement, gates, maps, evals
 
 - [ ] **WORD-01**: "Walk", "Walk it", "walkthrough" and "Show me" appear on no screen; worker verbs are Read · start · Stop · Next · Back a step · Done; server strings and the client keys that match them change together; a guard keeps it so
-- [ ] **RET-01**: The room metaphor is retired from the code (shell frame, room bodies, pins, Now card, plant stage, machine panels, room tables, place module); the machine-coverage request producer is removed (R1); ADR-0005 supersedes ADR-0003 in the same change, enforced by a guard
+- [x] **RET-01**: The room metaphor is retired from the code (shell frame, room bodies, pins, Now card, plant stage, machine panels, room tables, place module); the machine-coverage request producer is removed (R1); ADR-0005 supersedes ADR-0003 in the same change, enforced by a guard
 - [ ] **GATE-01**: The `/` and `/sops/[sopId]` bundle gates stay within tolerance with the map, section bodies and the merge engine behind lazy seams; markers are re-derived for deleted modules; the baseline is never re-captured or raised by an executor
 - [ ] **DOCS-01**: `journeys.ts`, `uat/tests.ts`, the capability matrix's prose, CLAUDE.md routing and ADR line, and the sketch-findings skill describe the SOP-first home; `/pathways` shows zero unmapped screens
 - [ ] **EVAL-01**: Deployed evals prove the home for every role at desktop and 390 px, the real organisation's map, every legacy address, and the Start (full, short, reduced, resume, second start); every screenshot is read; the one-screen eval is retired into them with a written mapping
@@ -1175,7 +1175,7 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 | FUSE-01 | 63-15 | Complete |
 | FUSE-02 | 63-15 | Complete |
 | WORD-01 | 63-16, 63-17 | Pending |
-| RET-01 | 63-19, 63-20 | Pending |
+| RET-01 | 63-19, 63-20 | Complete |
 | GATE-01 | 63-01, 63-04, 63-11, 63-15, 63-20, 63-21 | Pending |
 | DOCS-01 | 63-17, 63-20, 63-21 | Pending |
 | EVAL-01 | 63-01, 63-12, 63-14, 63-15, 63-18, 63-21 | Pending |

@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v11.0
 milestone_name: — One-Screen MVP
 status: executing
-stopped_at: 63-19 complete (R1: machine-coverage producer removed, agent machine requests hidden from Requests; 15 room specs deleted, 22 repointed; inventory live for 63-11 / 63-13 / 63-15 / 63-16 / 63-18 / 63-19); Wave 9 next: 63-20
-last_updated: "2026-10-08T12:30:00.000Z"
+stopped_at: 63-20 complete (rooms deleted with ADR-0005 superseding ADR-0003 and the no-rooms guard in one commit 7c40f131; bundle gate /page 832, detail 802, baseline untouched; pushed and smoke-checked as worker and admin); Wave 10 next: 63-21
+last_updated: "2026-10-08T14:00:00.000Z"
 last_activity: 2026-10-08
 progress:
   total_phases: 15
   completed_phases: 6
   total_plans: 107
-  completed_plans: 105
+  completed_plans: 106
   percent: 40
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-03)
 ## Current Position
 
 Phase: 63 (SOP-first Home, Library Site Map and the SOPstart Start)
-Plan: 63-19 complete (nothing asks for a SOP because a machine has none; the suite no longer depends on the room code); Wave 9 next: 63-20 (delete the rooms with ADR-0005 in one commit)
+Plan: 63-20 complete (the room code is deleted; ADR-0005 supersedes ADR-0003, guarded by tests/lint/no-rooms.spec.ts); Wave 10 next: 63-21 (full deployed eval, sign-off, requirements, Learnings)
 Status: Executing Phase 63 — sequential on main tree
 Last activity: 2026-10-08
 
