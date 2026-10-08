@@ -107,14 +107,17 @@ export function SopList({
                 <>
                   <p>No SOP for “{q}”.</p>
                   <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
-                    <RequestComposerTrigger
-                      kinds={['new_sop']}
-                      about={{ site: true }}
-                      triggerLabel="Ask for one"
-                      triggerStyle="button"
-                      title="Ask for a SOP"
-                      initialNote={q}
-                    />
+                    {/* The trigger's button has no side padding of its own and its wrapper shrinks to the text. */}
+                    <div className="[&_button]:px-4">
+                      <RequestComposerTrigger
+                        kinds={['new_sop']}
+                        about={{ site: true }}
+                        triggerLabel="Ask for one"
+                        triggerStyle="button"
+                        title="Ask for a SOP"
+                        initialNote={q}
+                      />
+                    </div>
                     {canWrite && (
                       <Link
                         data-testid="write-it"
