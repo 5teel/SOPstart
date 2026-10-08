@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v11.0
 milestone_name: — One-Screen MVP
 status: executing
-stopped_at: 63-12 complete and pushed (fffeb5f9); home eval 12/12 green on the deploy, every screenshot read
+stopped_at: 63-13 complete (address writers; bundle gate 802 / 831); 63-15 next in Wave 5
 last_updated: "2026-10-08T07:30:00.000Z"
 last_activity: 2026-10-08
 progress:
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-10-03)
 ## Current Position
 
 Phase: 63 (SOP-first Home, Library Site Map and the SOPstart Start)
-Plan: 63-12 complete (home deployed eval, 12/12, one product fix); 63-13 next (address writers; it does not push until 63-12 runs are done, which they are)
+Plan: 63-13 complete (notification places, Back bars, proxy + next.config translators, due reviews on home load); 63-15 next (the Start), then Wave 6 63-14
 Status: Executing Phase 63 — sequential on main tree
-Last activity: 2026-10-06
+Last activity: 2026-10-08
 
 ### v11.0 roadmap (created 2026-10-03)
 
