@@ -1115,6 +1115,73 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 
 **v11.0 Mapped:** 55/55 — 0 unmapped, 0 duplicated (Phase 55: 3 · Phase 56: 6 · Phase 57: 9 · Phase 58: 7 · Phase 59: 8 · Phase 60: 10 · Phase 61: 8 · Phase 62: 4). Roadmap created 2026-10-03.
 
+## Phase 63 Requirements — SOP-first Home, Library Site Map and the SOPstart Start
+
+**Source:** 63-CONTEXT.md (sketch 009 variant A + the library site map, sketch 010, ADR-0004; R1–R9 resolved 2026-10-08) and the ID set proposed in 63-RESEARCH.md. Supersedes, where they conflict, the room-shaped v11.0 items SHL-01/02/04/05 and PLC-01..05 (Phase 57) and the room parts of the Phase 61/62 todo doc.
+
+### Home (HOME)
+
+- [ ] **HOME-01**: Signing in lands on the SOP-first home: on desktop a section menu (wordmark at the top; My SOPs, My record, then Training, Sign-offs, People and Manage SOPs as the role allows; Manage last and quiet; no counts), the SOP list and the reader pane; on a phone a bottom tab bar of the same sections. Section visibility follows the capability matrix (R2)
+- [ ] **HOME-02**: My SOPs lists search (titles, steps, tools), Recent, Most used ("done N×") and All SOPs grouped by area or by type; each row shows its area, type, minutes and a status line that is information only; a search with no result offers Ask for one (and Write it for a SOP admin)
+- [ ] **HOME-03**: With a SOP open the reader pane shows Read: the SOP chip, title, area · type · version · owner (supervisor and up, R4) · minutes, standards labels, status, the start button and "What you'll do" with kind chips; an unfinished SOP reads "Picks up at step N of M · or begin from step 1" (begin again asks first, R6)
+- [ ] **HOME-04**: My record, Training, Sign-offs, People and Manage SOPs (with Site & departments, R7) carry the content of the retired rooms and bridged pages, with every server guard and RLS policy unchanged
+- [ ] **HOME-05**: The home has one whitelisted address (section, SOP, area, tab, pin, view); old `?place=` links, stored notification places, old governance / activity / training / site addresses and the focus screen's Back all land on the matching section
+
+### Site map (MAP)
+
+- [ ] **MAP-01**: Each SOP's area (machine's department → department tag → Site-wide, R8), type (Machine · Process · Inspection · Emergency, R3) and map object are derived from existing data in one module; only areas holding a visible published SOP exist
+- [ ] **MAP-02**: The site map is an isometric SVG generated in code from the library: every area an outlined, coloured, raised plate with its name and SOP count, every object exactly one SOP; it lays out 1–12 areas with 1–15 SOPs each without overlap, using design tokens only
+- [ ] **MAP-03**: Clicking an area zooms the map into it and filters the list; other areas dim and switch on click; Esc or the breadcrumb returns; zoomed objects show title and status and open Read; plates and objects are keyboard-reachable; reduced motion cuts instead of animating
+- [ ] **MAP-04**: On a phone, My SOPs has a List | Site map toggle; the whole-site view shows numbered markers and a tappable two-column key of areas
+
+### Brand and the Start (BRAND, FUSE)
+
+- [ ] **BRAND-01**: The SOPstart wordmark (sketch 010: Saira Semi Condensed, ink SOP chip + start, continuous hazard tape, `--wm-*` tokens) replaces the text logo in the section menu, the focus screen's top bar, the sign-in screens and the welcome page; brand yellow appears only in the wordmark
+- [ ] **FUSE-01**: Tapping start plays the merge into the focus screen (button body fades, SOP drops into line, they slide together, tape slides in from the left, the logo rises into the steps header) on the `--dur-fuse-*` tokens; full on the first start of the day, short after, none under reduced motion; input is never blocked
+- [ ] **FUSE-02**: start lands in the running SOP at its current step (autostart), with no server action in the click and navigation that cannot be stranded by an in-flight one (R9)
+
+### Words, retirement, gates, maps, evals
+
+- [ ] **WORD-01**: "Walk", "Walk it", "walkthrough" and "Show me" appear on no screen; worker verbs are Read · start · Stop · Next · Back a step · Done; server strings and the client keys that match them change together; a guard keeps it so
+- [ ] **RET-01**: The room metaphor is retired from the code (shell frame, room bodies, pins, Now card, plant stage, machine panels, room tables, place module); the machine-coverage request producer is removed (R1); ADR-0005 supersedes ADR-0003 in the same change, enforced by a guard
+- [ ] **GATE-01**: The `/` and `/sops/[sopId]` bundle gates stay within tolerance with the map, section bodies and the merge engine behind lazy seams; markers are re-derived for deleted modules; the baseline is never re-captured or raised by an executor
+- [ ] **DOCS-01**: `journeys.ts`, `uat/tests.ts`, the capability matrix's prose, CLAUDE.md routing and ADR line, and the sketch-findings skill describe the SOP-first home; `/pathways` shows zero unmapped screens
+- [ ] **EVAL-01**: Deployed evals prove the home for every role at desktop and 390 px, the real organisation's map, every legacy address, and the Start (full, short, reduced, resume, second start); every screenshot is read; the one-screen eval is retired into them with a written mapping
+
+### Phase 63 Out of Scope
+
+| Item | Why |
+|------|-----|
+| A `sop_type` field and an "Order of operations" type | R3: not derivable truthfully; needs a schema and editor change (decide later) |
+| An editor for arranging areas or objects on the map | Deferred (CONTEXT): auto layout only |
+| App icon / favicon from the wordmark; re-recording the /welcome promo reel | Deferred (CONTEXT) |
+| A supervisor entry point for Record observation | Existing Phase 61 gap (capability matrix row "Record observation"); unchanged |
+| Next.js 16.3+ upgrade | Removes the action-queue hazard structurally; carried debt, not this phase |
+
+### Phase 63 Traceability
+
+| REQ-ID | Plans | Status |
+|--------|-------|--------|
+| HOME-01 | 63-11, 63-12 | Pending |
+| HOME-02 | 63-02, 63-05, 63-12 | Pending |
+| HOME-03 | 63-06, 63-15 | Pending |
+| HOME-04 | 63-07, 63-08, 63-09, 63-12, 63-14 | Pending |
+| HOME-05 | 63-02, 63-11, 63-13, 63-14, 63-15 | Pending |
+| MAP-01 | 63-02 | Pending |
+| MAP-02 | 63-03, 63-10 | Pending |
+| MAP-03 | 63-10, 63-12 | Pending |
+| MAP-04 | 63-10, 63-11, 63-12 | Pending |
+| BRAND-01 | 63-04 | Pending |
+| FUSE-01 | 63-15 | Pending |
+| FUSE-02 | 63-15 | Pending |
+| WORD-01 | 63-16, 63-17 | Pending |
+| RET-01 | 63-19, 63-20 | Pending |
+| GATE-01 | 63-01, 63-04, 63-11, 63-15, 63-20, 63-21 | Pending |
+| DOCS-01 | 63-17, 63-20, 63-21 | Pending |
+| EVAL-01 | 63-01, 63-12, 63-14, 63-15, 63-18, 63-21 | Pending |
+
+**Phase 63 Coverage:** 17 requirements — HOME 5 · MAP 4 · BRAND 1 · FUSE 2 · WORD 1 · RET 1 · GATE 1 · DOCS 1 · EVAL 1; 17/17 mapped to plans. Added 2026-10-08.
+
 ---
 *v11.0 requirements added: 2026-10-03*
 

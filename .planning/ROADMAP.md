@@ -2145,14 +2145,64 @@ Plans:
 ### Phase 63: SOP-first Home, Library Site Map and the SOPstart Start
 
 **Goal**: The home becomes a way to find a SOP, read it and start it, ranked by ADR-0004 (safe SOP use > records > authoring). Sketch 009 variant A: a plain section menu (My SOPs · My record · Training and Sign-offs for supervisor and up · Manage SOPs for SOP admin, last, no count); the SOP list (search, Recent, Most used, All SOPs by area or by type; status shown on the row as information, no "next for you", no due queues); and a reader pane that shows the open SOP in Read with the SOP chip and the start button, or — with no SOP open — an isometric SVG map of the library: every area a clearly outlined clickable floor area, every object on it one SOP (noticeboards for processes, orders of operation and emergencies), click an area to zoom and filter the list, click an object to read it. The room metaphor (Office, Smoko room, Workshop, Noticeboard) is retired and their contents re-homed as the plain sections. The SOPstart wordmark (sketch 010: Saira Semi Condensed, ink SOP chip + start, continuous hazard tape, `--wm-*` tokens) replaces the text logo, and tapping start plays the merge into the focus screen (button body fades, SOP drops into line, they slide together, tape slides in from the left, the logo rises into the steps header; full on the first start of the day, ×0.3 after, none under reduced motion; `--dur-fuse-*` tokens). Worker words: Read · Start · Stop · Next · Done — "walk" never appears on screen. Phone: List | Site map toggle with numbered area markers and a tappable key. Supersedes ADR-0003 (site templates fix room positions) with a new ADR in the same change; `journeys.ts` and the deployed evals follow.
-**Requirements**: TBD (planning derives them from sketches 009/010 and ADR-0004)
+**Requirements**: HOME-01, HOME-02, HOME-03, HOME-04, HOME-05, MAP-01, MAP-02, MAP-03, MAP-04, BRAND-01, FUSE-01, FUSE-02, WORD-01, RET-01, GATE-01, DOCS-01, EVAL-01
 **Depends on**: Phase 60 (Phases 61/62 moved out of GSD 2026-10-06; their room-shaped todos are superseded by this phase where they conflict)
 **Design sources**: `.planning/sketches/009-sop-first-home/`, `.planning/sketches/010-wordmark/`, `docs/adr/0004-design-principles.md`
-**Plans:** 0 plans
+**Plans:** 21 plans
+
+**Execution:** from Wave 2 on, plans run sequentially on the main tree, one push and one deployed eval run at a time; each eval waits for its own HEAD sha at `/api/version`. Wave 5 order: 63-12 → 63-13 → 63-15. Wave 6 order: 63-14 → 63-16.
 
 Plans:
+**Wave 1**
 
-- [ ] TBD (run /gsd-plan-phase 63 to break down)
+- [ ] 63-01-PLAN.md — Wave 0: phase63 project, repoint inventory, bundle + failure baselines, four-area eval fixture, three eval skeletons
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 63-02-PLAN.md — Pure models: library classifier (area R8, type R3, object kind), row status, Recent / Most used, the home address module
+- [ ] 63-03-PLAN.md — Isometric geometry and automatic site layout (TDD)
+- [ ] 63-04-PLAN.md — SOPstart wordmark component, Saira via next/font, wordmark in the focus top bar / sign-in / welcome, Back and Stop
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 63-05-PLAN.md — Library hooks (browser client only) and the SOP list: search, Recent, Most used, All SOPs by area / type, Ask for one / Write it
+- [ ] 63-06-PLAN.md — Read view: shared focus assembly, browser-client read, owner for supervisor and up (R4), Make a request / Ask / Edit
+- [ ] 63-07-PLAN.md — Sign-offs and People sections over a place-free Office pane (R2)
+- [ ] 63-08-PLAN.md — Manage SOPs: drafts, New SOP, Site & departments (R7), objectives list
+- [ ] 63-09-PLAN.md — My record (completions, notifications, my requests) and Training sections
+- [ ] 63-10-PLAN.md — The library site map (lazy SVG), keyboard and phone markers + key; sample renders read
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 63-11-PLAN.md — HomeShell, section menu, tab bar; `/` on the new home; legacy ?place= redirect; focus from / Back; bell dot (R5); bundle markers on /page
+
+**Wave 5** *(blocked on Wave 4 completion; order 63-12 → 63-13 → 63-15)*
+
+- [ ] 63-12-PLAN.md — Home eval cases and the first deployed run, screenshots read
+- [ ] 63-13-PLAN.md — Address writers: notification places, Back bars, proxy and next.config translators; due reviews on home load
+- [ ] 63-15-PLAN.md — The Start: lazy merge engine into a root-layout layer, autostart into the running SOP, resume and browse start words (R6, R9); start eval
+
+**Wave 6** *(blocked on Wave 5 completion; order 63-14 → 63-16)*
+
+- [ ] 63-14-PLAN.md — Address sweep: old-address literals repointed; /activity and /admin/training retired with redirects and pathways routes; address eval
+- [ ] 63-16-PLAN.md — "Walk" off every screen, server strings + STALE_WALK in lockstep, no-walk-words guard (after 63-15)
+
+**Wave 7** *(blocked on Wave 6 completion)*
+
+- [ ] 63-17-PLAN.md — journeys.ts, roles, UAT checks, matrix prose, CLAUDE.md routing, sketch-skill banner
+- [ ] 63-18-PLAN.md — Sibling evals rewritten; one-screen eval retired into the home evals with a mapping; inventory live
+
+**Wave 8** *(blocked on Wave 7 completion)*
+
+- [ ] 63-19-PLAN.md — R1: machine-coverage request producer removed; room specs retired / repointed ahead of the deletion
+
+**Wave 9** *(blocked on Wave 8 completion)*
+
+- [ ] 63-20-PLAN.md — Retire rooms: room / shell / plant code deleted with ADR-0005, the ADR index, ADR-0003 status and the no-rooms guard in one commit
+
+**Wave 10** *(blocked on Wave 9 completion)*
+
+- [ ] 63-21-PLAN.md — Full deployed eval with every screenshot read and a fix round, build + full suite once, sign-off, requirements, Learnings
 
 ## Progress
 
