@@ -2161,7 +2161,7 @@ Plans:
 
 - [x] 63-02-PLAN.md — Pure models: library classifier (area R8, type R3, object kind), row status, Recent / Most used, the home address module
 - [x] 63-03-PLAN.md — Isometric geometry and automatic site layout (TDD)
-- [ ] 63-04-PLAN.md — SOPstart wordmark component, Saira via next/font, wordmark in the focus top bar / sign-in / welcome, Back and Stop
+- [x] 63-04-PLAN.md — SOPstart wordmark component, Saira via next/font, wordmark in the focus top bar / sign-in / welcome, Back and Stop
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
