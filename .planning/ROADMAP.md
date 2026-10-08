@@ -2190,7 +2190,7 @@ Plans:
 
 **Wave 7** *(blocked on Wave 6 completion)*
 
-- [ ] 63-17-PLAN.md — journeys.ts, roles, UAT checks, matrix prose, CLAUDE.md routing, sketch-skill banner
+- [x] 63-17-PLAN.md — journeys.ts, roles, UAT checks, matrix prose, CLAUDE.md routing, sketch-skill banner
 - [ ] 63-18-PLAN.md — Sibling evals rewritten; one-screen eval retired into the home evals with a mapping; inventory live
 
 **Wave 8** *(blocked on Wave 7 completion)*
