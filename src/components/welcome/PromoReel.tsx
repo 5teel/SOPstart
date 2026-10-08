@@ -14,6 +14,7 @@
  */
 import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from 'react'
 import Link from 'next/link'
+import { Wordmark } from '@/components/brand/Wordmark'
 import { Camera, CheckCircle, FileText, Pause, Play, Sparkles } from 'lucide-react'
 import { SITE_PRESETS, PRESET_ROOMS, presetImagePath } from '@/lib/site/presets'
 import { KindChip, KIND_EDGE } from '@/components/focus/KindChip'
@@ -455,7 +456,7 @@ export function PromoReel() {
 
       {/* Header */}
       <header className="absolute inset-x-0 top-0 z-10 flex items-center justify-between p-4">
-        <span className="rounded-lg bg-paper/90 px-3 py-2 text-lg font-bold text-ink-900 shadow-lg backdrop-blur">SOPstart</span>
+        <span className="rounded-lg bg-paper/90 px-3 py-2 shadow-lg backdrop-blur"><Wordmark size="header" /></span>
         <Link
           href="/login"
           className="flex min-h-tap items-center rounded-lg bg-ink-900 px-5 text-ui font-semibold text-white shadow-lg hover:opacity-90"
@@ -491,8 +492,8 @@ export function PromoReel() {
       {scene.id === 'outro' && (
         <section key={run} className="absolute inset-0 flex items-center justify-center bg-paper/70 p-6 backdrop-blur-sm">
           <div className="flex max-w-xl flex-col items-center text-center">
-            <p className="text-2xl font-bold text-ink-900" style={enter(0.4)}>
-              SOPstart
+            <p style={enter(0.4)}>
+              <Wordmark size="hero" />
             </p>
             <h1 className="mt-2 text-2xl font-semibold text-ink-900 lg:text-4xl" style={enter(0.7)}>
               {scene.title}

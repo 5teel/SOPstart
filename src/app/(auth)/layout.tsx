@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { PRODUCT_NAME } from '@/lib/constants'
+import { Wordmark } from '@/components/brand/Wordmark'
 import { RouteTransition } from '@/components/layout/RouteTransition'
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
@@ -7,10 +7,10 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-paper flex flex-col items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-ink-900 tracking-tight">
-            {PRODUCT_NAME}
+          <h1>
+            <Wordmark size="hero" />
           </h1>
-          <p className="mt-1 text-ink-500 text-sm">Step-by-step SOP guidance for your team</p>
+          <p className="mt-3 text-ink-500 text-sm">Step-by-step SOP guidance for your team</p>
         </div>
         <RouteTransition>{children}</RouteTransition>
       </div>

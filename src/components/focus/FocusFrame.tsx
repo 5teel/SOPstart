@@ -122,6 +122,7 @@ export function FocusFrame({
           title={title}
           chip={versionChip}
           stepsLabel={stepsLabel}
+          backLabel={mode === 'walk' || mode === 'review' ? 'Stop' : 'Back'}
           onBack={() => void goBack()}
           onOpenRail={() => setRailOpen(true)}
         >

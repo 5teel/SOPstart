@@ -46,4 +46,18 @@ test.describe('wordmark', () => {
       .filter((f) => /brand-yellow|wm-accent/.test(read(f).replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, '')))
     expect(hits).toEqual([])
   })
+
+  test('the focus top bar leads with the wordmark target and its leave control says Back or Stop', () => {
+    const bar = read('src/components/focus/FocusTopBar.tsx')
+    expect(bar).toMatch(/<Wordmark [^>]*target/)
+    expect(bar.indexOf('<Wordmark')).toBeLessThan(bar.indexOf('<h1'))
+    expect(bar).toContain('onClick={onBack}')
+    expect(bar).toContain("backLabel = 'Back'")
+    expect(read('src/components/focus/FocusFrame.tsx')).toContain("backLabel={mode === 'walk' || mode === 'review' ? 'Stop' : 'Back'}")
+  })
+
+  test('sign-in and welcome show the wordmark where the text logo was', () => {
+    expect(read('src/app/(auth)/layout.tsx')).toContain('<Wordmark size="hero" />')
+    expect(read('src/components/welcome/PromoReel.tsx')).toContain('<Wordmark')
+  })
 })
