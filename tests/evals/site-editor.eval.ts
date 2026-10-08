@@ -158,7 +158,9 @@ test.describe('Phase 51 — site editor (deployed)', () => {
     // rename/department, vertex drag, editor link, unlink/relink) each
     // occasionally take tens of seconds server-side on production.
     test.setTimeout(600_000)
-    await page.setViewportSize({ width: 1440, height: 900 })
+    // Tall on purpose: Site & departments stacks the departments strip above the canvas, so at 900 px the lower
+    // half of the canvas (where the pan drag and the second machine land) is below the fold and mouse events miss it.
+    await page.setViewportSize({ width: 1440, height: 1800 })
     const errors = watchConsole(page)
     await signInAs(context, 'siteAdmin')
 

@@ -563,6 +563,13 @@ test.describe('Phase 58 — the SOP focus screen (deployed)', () => {
     // ---- D-03 (58-17): mark up a step photo; Save bakes it, the tick clears, Esc leaves it alone
     test('D-03 58-annotate: add a photo, Annotate, draw one shape, Save -- the photo changes and the tick clears; Esc on a second open saves nothing', async () => {
       test.setTimeout(300_000)
+      // Start clean: runs that died mid-case left photos on this draft's steps, and the case expects exactly the one it uploads
+      // (found live in 63-18: nine annotate-photo buttons on one step). Eval-site draft fixture only.
+      await db.from('sop_images').delete().eq('sop_id', ids.draft)
+      const { data: withPhotos } = await db.from('sop_focus_steps').select('id, image_paths').eq('sop_id', ids.draft).eq('organisation_id', siteOrgId)
+      for (const s of (withPhotos ?? []).filter((r) => ((r.image_paths as string[] | null) ?? []).length > 0)) {
+        await db.from('sop_focus_steps').update({ image_paths: [] }).eq('id', s.id as string)
+      }
       const page = await adminCtx.newPage()
       const errors = watchConsole(page)
       await page.goto(editUrl(ids.draft))

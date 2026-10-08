@@ -172,7 +172,7 @@ test.describe('Phase 60 -- requests, notifications and objectives (deployed)', (
       await page.getByTestId('composer-cancel').click()
       await ctx.close()
     })
-    test('objectives: the site set in Manage, a machine written by an agent and confirmed, a department and a person; workers read the site and department lines (60-13)', async ({ browser }) => {
+    test('objectives: the site and a department set in Manage, a machine written by an agent and confirmed, a person; workers read the site and department lines (60-13)', async ({ browser }) => {
       test.setTimeout(300_000)
       const typed = `EVAL objective ${runId}`
       const agentText = `EVAL agent objective ${runId}`
@@ -183,12 +183,12 @@ test.describe('Phase 60 -- requests, notifications and objectives (deployed)', (
       await signInAs(ctx, 'siteAdmin')
       const page = await ctx.newPage()
 
-      // Site: set from Manage SOPs > Site & departments, with a date. The first empty slot is the site's (the table was just cleared).
+      // Site: set from Manage SOPs > Site & departments, with a date. Each empty slot names its subject (found in 63-18: three identical "Set an objective" rows told an admin nothing).
       await page.goto('/?s=manage&view=site')
       const list = page.getByTestId('objectives-list')
       await expect(list).toBeVisible(SLOW)
-      const set = list.getByRole('button', { name: 'Set an objective' }).first()
-      await expect(set).toBeVisible(SLOW)
+      const set = list.getByRole('button', { name: 'Set a site objective' })
+      await expect(set).toHaveCount(1, SLOW)
       await set.click()
       await expect(page.getByTestId('objective-editor')).toHaveCount(1, SLOW)
       await page.getByLabel('Objective', { exact: true }).fill(typed)
@@ -235,11 +235,13 @@ test.describe('Phase 60 -- requests, notifications and objectives (deployed)', (
       expect(count).toBe(1)
       await shot(page, '60-objective-meta')
 
-      // Department: written by an agent too (the editor is the same slot component the site line just proved).
-      const deptWrote = await page.request.post('/api/ai-fields/write', {
-        data: { fieldId: 'objective.department', context: { organisationId: siteOrgId, subjectId: formingId }, newValue: { text: deptText }, agentName: 'SOPstart assistant' },
-      })
-      expect(deptWrote.status(), await deptWrote.text()).toBe(200)
+      // Department: set by hand from its own named slot.
+      const deptSet = page.getByTestId('objectives-list').getByRole('button', { name: 'Set an objective for Forming' })
+      await expect(deptSet).toHaveCount(1, SLOW)
+      await deptSet.click()
+      await page.getByLabel('Objective', { exact: true }).fill(deptText)
+      await page.getByRole('button', { name: 'Save objective' }).click()
+      await expect(page.getByTestId('objectives-list').getByTestId('objective-line').filter({ hasText: deptText })).toHaveCount(1, SLOW)
 
       // Person: the People row of the eval-site worker; removal is two-step.
       await page.goto('/?s=people')
