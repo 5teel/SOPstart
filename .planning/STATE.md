@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v11.0
 milestone_name: — One-Screen MVP
 status: executing
-stopped_at: 63-14 complete (address sweep; /activity + /admin/training retired; deployed address eval 5/5 at 80b4b3aa; bundle gate 802 / 832); 63-16 next in Wave 6
+stopped_at: 63-16 complete (walk words off every screen; STALE_WALK in lockstep; no-walk-words guard; bundle gate 802 / 832; deployed at c783dd30); Wave 7 next: 63-17
 last_updated: "2026-10-08T11:00:00.000Z"
 last_activity: 2026-10-08
 progress:
   total_phases: 15
   completed_phases: 6
   total_plans: 107
-  completed_plans: 101
+  completed_plans: 102
   percent: 40
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-03)
 ## Current Position
 
 Phase: 63 (SOP-first Home, Library Site Map and the SOPstart Start)
-Plan: 63-14 complete (old addresses swept, /activity and /admin/training retired into My record and Training with redirects, address eval 5/5 on the deploy); Wave 6 next: 63-16
+Plan: 63-16 complete (walk and Show me off every screen, server strings and STALE_WALK renamed together, no-walk-words guard registered); Wave 7 next: 63-17
 Status: Executing Phase 63 — sequential on main tree
 Last activity: 2026-10-08
 

@@ -2186,7 +2186,7 @@ Plans:
 **Wave 6** *(blocked on Wave 5 completion; order 63-14 → 63-16)*
 
 - [x] 63-14-PLAN.md — Address sweep: old-address literals repointed; /activity and /admin/training retired with redirects and pathways routes; address eval
-- [ ] 63-16-PLAN.md — "Walk" off every screen, server strings + STALE_WALK in lockstep, no-walk-words guard (after 63-15)
+- [x] 63-16-PLAN.md — "Walk" off every screen, server strings + STALE_WALK in lockstep, no-walk-words guard (after 63-15)
 
 **Wave 7** *(blocked on Wave 6 completion)*
 
