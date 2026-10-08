@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v11.0
 milestone_name: — One-Screen MVP
 status: executing
-stopped_at: 63-17 complete (pathways, UAT, matrix prose, CLAUDE.md routing, skill banner; access refusals reworded; bundle gate 802 / 832); Wave 7 next: 63-18
+stopped_at: 63-18 complete (one-screen eval retired with a case mapping; nine sibling evals rewritten and run once each on the deployed site; four small product fixes; inventory live for 63-13 / 63-16 / 63-18); Wave 8 next: 63-19
 last_updated: "2026-10-08T12:30:00.000Z"
 last_activity: 2026-10-08
 progress:
   total_phases: 15
   completed_phases: 6
   total_plans: 107
-  completed_plans: 103
+  completed_plans: 104
   percent: 40
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-03)
 ## Current Position
 
 Phase: 63 (SOP-first Home, Library Site Map and the SOPstart Start)
-Plan: 63-17 complete (journeys, roles, UAT and the matrix prose speak the SOP-first home; the guard also scans src/lib/journeys and src/lib/uat); Wave 7 next: 63-18
+Plan: 63-18 complete (sibling evals speak sections and Read; one-screen eval retired into the home evals; the office invite receipt is the one leg not proven, mailer rate limit); Wave 8 next: 63-19
 Status: Executing Phase 63 — sequential on main tree
 Last activity: 2026-10-08
 
