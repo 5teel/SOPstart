@@ -58,16 +58,3 @@
   }
 }
 
-/* Plant home (Phase 52, D-06/D-07): the pin bob on a machine with something
-   due -- 26px circle per the sketch, counter-scaled by PlantStage so it
-   stays a real 26px regardless of zoom. */
-@keyframes plant-pin-bob {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-4px); }
-}
-.plant-pin-bob {
-  animation: plant-pin-bob 1.6s ease-in-out infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .plant-pin-bob { animation: none !important; }
-}

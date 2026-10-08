@@ -134,7 +134,7 @@ test.describe('signoff actions', () => {
     expect(strip(read('src/lib/governance/load-inbox.ts'))).toContain(".neq('worker_id', userId)")
   })
   test('rejected not done: the worker completion read skips rejected rows (A-06)', () => {
-    const hook = strip(read('src/hooks/useWorkerSops.ts'))
+    const hook = strip(read('src/hooks/useLibrary.ts'))
     expect(hook).toContain(".neq('status', 'rejected')")
     // the filter sits in the queryFn, on the sop_completions read itself
     const q = hook.slice(hook.indexOf(".from('sop_completions')"), hook.indexOf(".from('sop_completions')") + 200)

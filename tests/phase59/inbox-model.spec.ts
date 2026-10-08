@@ -202,7 +202,7 @@ test.describe('inbox model', () => {
     expect(src).toContain(".eq('owner_user_id', userId)")
     expect(src).toContain('ownedReviews')
     expect(read('src', 'lib', 'members', 'labels.ts')).not.toContain('server-only')
-    expect(read('src', 'actions', 'shell.ts')).toContain('inboxCount: officePinCount(inbox.items, inbox.requests)')
+    expect(fs.existsSync(path.join(ROOT, 'src', 'actions', 'shell.ts'))).toBe(false) // 63-20: the admin shell read went with the rooms
   })
 
   test('getOfficeInbox: use server, async exports only, session client only, no parameter, per-role branches', () => {

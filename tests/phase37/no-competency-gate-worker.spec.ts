@@ -44,8 +44,6 @@ const WALK_ACTIONS = path.join(ROOT, 'src', 'actions', 'walk.ts')
 const HOME = (f: string) => path.join(ROOT, 'src', 'components', 'home', f)
 const PROFILE_COMPETENCY_SECTION = path.join(ROOT, 'src', 'components', 'profile', 'CompetencySection.tsx')
 const CLASSIFY = path.join(ROOT, 'src', 'lib', 'competency', 'classify.ts')
-// Phase 53-02: the worker list derivation moved out of page.tsx into this hook.
-const WORKER_SOPS_HOOK = path.join(ROOT, 'src', 'hooks', 'useWorkerSops.ts')
 
 const TARGETS: Array<{ label: string; file: string }> = [
   { label: 'worker SOP detail / walkthrough route page.tsx', file: WORKER_SOP_DETAIL },
@@ -58,7 +56,7 @@ const TARGETS: Array<{ label: string; file: string }> = [
   { label: 'ReadView.tsx (Read)', file: HOME('ReadView.tsx') },
   { label: 'profile CompetencySection.tsx (informational only)', file: PROFILE_COMPETENCY_SECTION },
   { label: 'classify.ts (competency ladder -- must stay assessor-unaware)', file: CLASSIFY },
-  { label: 'useWorkerSops.ts (worker list derivation)', file: WORKER_SOPS_HOOK },
+  { label: 'useLibrary.ts (the list read; 63-20: the old worker list hook is gone)', file: path.join(ROOT, 'src', 'hooks', 'useLibrary.ts') },
 ]
 
 const FORBIDDEN_TOKENS = [

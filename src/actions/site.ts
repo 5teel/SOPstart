@@ -51,7 +51,7 @@ import type {
   WorkerSiteMachine,
 } from '@/lib/validators/site'
 import { scenePath, polygonWithinScene, newMachineCode, SCENE_BUCKET, SCENE_SIGNED_TTL_SEC } from '@/lib/site/scene'
-import { SITE_PRESETS, SITE_PRESET_IDS, presetImagePath, roomsFor } from '@/lib/site/presets'
+import { SITE_PRESETS, SITE_PRESET_IDS, presetImagePath } from '@/lib/site/presets'
 import { deriveDepartmentCode } from '@/lib/site/departments'
 
 // ---------------------------------------------------------------------------
@@ -541,7 +541,7 @@ export async function listSopMachines(
 // 8. listSiteHealthForOrg — Phase 54 (D-04): admin floor read for the health
 //    repaint. Reshapes listSiteForOrg's admin-scoped read into the worker
 //    render shape (signed sprites); links are NOT narrowed to published SOPs
-//    (library health covers drafts too, unlike listSiteForWorker).
+//    (library health covers drafts too).
 // ---------------------------------------------------------------------------
 
 export async function listSiteHealthForOrg(): Promise<AdminSiteFloor | { error: string }> {
@@ -574,7 +574,6 @@ export async function listSiteHealthForOrg(): Promise<AdminSiteFloor | { error: 
       sceneUrl: site.layout.sceneUrl,
       sceneWidth: site.layout.scene_width,
       sceneHeight: site.layout.scene_height,
-      rooms: roomsFor(site.layout.preset),
     },
     machines,
     links: site.links,
@@ -585,8 +584,7 @@ export async function listSiteHealthForOrg(): Promise<AdminSiteFloor | { error: 
 // ---------------------------------------------------------------------------
 // 9. applySitePreset — ADR-0003. One template onto an org with no site yet:
 //    copies the template picture into the org's scene path, records it through
-//    upsertSiteLayout (the single natural-size probe), stamps `preset` so the
-//    shell uses that picture's rooms, then reuses-or-creates departments by
+//    upsertSiteLayout (the single natural-size probe), stamps `preset`, then reuses-or-creates departments by
 //    name and draws every machine through upsertSiteMachine.
 // ---------------------------------------------------------------------------
 

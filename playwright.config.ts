@@ -37,7 +37,7 @@ export default defineConfig({
     {
       name: 'phase15-stubs',
       testMatch:
-        /(sub-trade-rls-backward-compat|sub-trade-assignment|no-static-admin-lens-import|version-route-public|no-bulk-verify-ui|no-undefined-css-tokens|design-tokens|sops-select-policies-org-scoped|rls-org-scope|use-viewport|no-dead-internal-hrefs|no-scheduled-jobs|design-principles|no-walk-words)\.spec\.ts$/,
+        /(sub-trade-rls-backward-compat|sub-trade-assignment|no-static-admin-lens-import|version-route-public|no-bulk-verify-ui|no-undefined-css-tokens|design-tokens|sops-select-policies-org-scoped|rls-org-scope|use-viewport|no-dead-internal-hrefs|no-scheduled-jobs|design-principles|no-walk-words|no-rooms)\.spec\.ts$/,
       use: { browserName: 'chromium' },
     },
     {
@@ -524,14 +524,8 @@ export default defineConfig({
       // (should list all 8 tests/phase52/*.spec.ts files -- zero discovered = FAIL)
       //
       // Files registered here:
-      //   plant-pins (HOM-02, LIVE from 52-01) --
-      //   plant-pins-no-storage (HOM-02, LIVE from 52-01) --
-      //   site-worker-action (HOM-02/HOM-06, LIVE from 52-01) --
-      //   plant-stage (HOM-01, fixme, activates 52-02) --
-      //   plant-panel (HOM-04, fixme, activates 52-02) --
-      //   plant-now-card (HOM-03, fixme, activates 52-03) --
-      //   plant-ask-bar (HOM-05, fixme, activates 52-03) --
-      //   plant-render-seam (HOM-01..06, fixme, activates 52-04)
+      //   The plant specs were retired in 63-19 / 63-20 (ADR-0005); the camera maths
+      //   spec (scene-camera) and any spec dropped into tests/phase52/ run here.
       name: 'phase52',
       testDir: '.',
       testMatch: /tests\/phase52\/.*\.(spec|test)\.ts$/,
@@ -570,7 +564,6 @@ export default defineConfig({
       // (should list all 8 tests/phase54/*.spec.ts files -- zero discovered = FAIL)
       //
       // Files registered here:
-      //   admin-health (ADM-02/ADM-03, LIVE from 54-01) --
       //   library-table-checks (ADM-03, LIVE from 54-01) --
       //   site-health-action (ADM-02, LIVE from 54-01) --
       //   governance-inbox (ADM-01, fixme, activates 54-02) --
@@ -657,7 +650,7 @@ export default defineConfig({
       // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
       // DELIBERATELY BROAD testMatch (tests/phase57/**) so later plans drop
       // specs in with NO further config edit. Unit specs for pure modules
-      // (rooms, place) live here with static `@/` imports. Live-DB specs
+      // live here with static `@/` imports. Live-DB specs
       // self-skip unless PHASE57_LIVE=1, so quick runs never spend the shared
       // OTP budget (CLAUDE.md 2026-09-28).
       //
@@ -665,10 +658,9 @@ export default defineConfig({
       //
       // Files registered here:
       //   repoint-inventory (retire; stale-guard inventory, LIVE from 57-01)
-      //   rooms, place (PLC-01 / SHL-02 unit specs, LIVE from 57-01)
-      //   search (SHL-04; roomMatches LIVE from 57-01, frame fixme until 57-02)
-      //   shell-structure, stage, one-query, departments, machine-body,
-      //   noticeboard, pins, retirement-sweep (fixme stubs, filled by 57-02..09)
+      //   The room specs were retired in 63-19 / 63-20 (ADR-0005, guard:
+      //   tests/lint/no-rooms.spec.ts); what remains is departments, retirement-sweep
+      //   and the other surviving specs.
       name: 'phase57',
       testDir: '.',
       testMatch: /tests\/phase57\/.*\.(spec|test)\.ts$/,
@@ -712,7 +704,7 @@ export default defineConfig({
       //
       // Files registered here (fixme stubs until the owning plan lands):
       //   repoint-inventory (stale-guard inventory, LIVE from 59-01),
-      //   retirement-sweep, place-tab, shell-wide, ledger-read, ledger-rls-live,
+      //   retirement-sweep, place-tab, ledger-read, ledger-rls-live,
       //   inbox-model, people-actions, signoff-actions, approve-actions,
       //   owner-review-meta, signoff-panel, office-pane-structure, people-tab,
       //   access-mount, legacy-redirects, capability-matrix

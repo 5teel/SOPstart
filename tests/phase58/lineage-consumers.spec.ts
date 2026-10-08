@@ -8,7 +8,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { latestPublished } from '../../src/lib/sop/lineage-current'
 
-const FILES = ['src/hooks/useWorkerSops.ts', 'src/actions/site-worker.ts', 'src/actions/observations.ts']
+const FILES = ['src/hooks/useLibrary.ts', 'src/actions/observations.ts']
 
 const strip = (s: string) =>
   s

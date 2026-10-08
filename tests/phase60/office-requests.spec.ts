@@ -48,7 +48,6 @@ test.describe('Office Requests tab (60-11)', () => {
     const src = read('src/lib/shell/office-tabs.ts')
     expect(src).toContain("['inbox', 'requests', 'decisions', 'people', 'access']")
     expect(src).toContain("return ['inbox', 'requests']")
-    expect(src).toContain("WIDE_TABS: ReadonlyArray<OfficeTab> = ['decisions', 'people', 'access']")
   })
 
   test('RequestRow shows the asker, kind and note, and Accept and Decline wired to answerRequest', () => {

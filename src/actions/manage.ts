@@ -3,7 +3,7 @@
 /**
  * Phase 63 (HOME-04, T-63-22): the drafts behind Manage SOPs. Admin-gated, ZERO parameters
  * (org and role come from the session), session client only. A plain read: it deliberately
- * does not run the machine-request reconcile or the review-due write that getAdminShell does
+ * does not run a review-due write (the home load does, once)
  * (ADR-0002 -- those belong to the event that causes them, not to opening a list).
  */
 import { requireAdminContext } from '@/lib/auth/guards'

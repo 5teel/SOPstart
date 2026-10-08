@@ -19,8 +19,7 @@
 // inside these functions, so the derivation stays deterministic and
 // unit-testable.
 //
-// Consumers: src/lib/competency/matrix.ts, src/actions/competency.ts,
-// src/hooks/useWorkerSops.ts.
+// Consumers: src/lib/competency/matrix.ts, src/actions/competency.ts.
 // ------------------------------------------------------------
 
 import { computeReviewDueDate } from '@/lib/governance/cadences'

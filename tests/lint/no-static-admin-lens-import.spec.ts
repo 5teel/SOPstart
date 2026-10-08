@@ -113,7 +113,6 @@ test.describe('T-41-02 — admin lens components cannot leak into the worker imp
       // The admin data layer and the Access lens are the admin shell's.
       'listAdminSopRows',
       '@/actions/admin-sop-list',
-      '@/lib/sop/admin-health',
       'AdminAccessLens',
     ]
     for (const file of WORKER_SHELL_FILES) {

@@ -2,7 +2,7 @@
 
 /**
  * Phase 60 (D-11) -- the worker half of the objective line, as its own lazy chunk. The static
- * line plus its read cost the home download ~4 KB, past the bundle gate, so WorkerShell
+ * line plus its read cost the home download ~4 KB, past the bundle gate, so HomeShell
  * reaches this through next/dynamic and the line arrives with the machine or department panel.
  */
 import { ObjectiveLine, useObjectives } from '@/components/shell/ObjectiveLine'

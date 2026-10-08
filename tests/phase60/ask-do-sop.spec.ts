@@ -7,7 +7,6 @@
 import { test, expect } from '@playwright/test'
 import fs from 'node:fs'
 import path from 'node:path'
-import { execSync } from 'node:child_process'
 
 const read = (rel: string) => fs.readFileSync(path.resolve(__dirname, '..', '..', rel), 'utf-8').replace(/\r\n/g, '\n')
 const strip = (src: string) => src.split('\n').map((l) => (/^\s*(\/\/|\/\*|\*\/|\*)/.test(l) ? '' : l)).join('\n')
@@ -147,10 +146,9 @@ test.describe('Ask someone to do a SOP (60-06)', () => {
     expect(c).not.toMatch(/email/i)
   })
 
-  test('worker-signal and the assignment half of useWorkerSops are unchanged since the phase began (git diff empty)', () => {
+  test('the worker list hook and the plant classifier are gone (63-20)', () => {
     const cwd = path.resolve(__dirname, '..', '..')
-    execSync('git diff --quiet f1b2ff93 -- src/lib/sop/worker-signal.ts', { cwd })
-    // Phase 63-05 (edf20637) deliberately extracted the library query into libraryQueryFn; the pin moves to that commit
-    execSync('git diff --quiet edf20637 -- src/hooks/useWorkerSops.ts', { cwd })
+    expect(fs.existsSync(path.join(cwd, 'src/hooks/useWorkerSops.ts'))).toBe(false)
+    expect(fs.readFileSync(path.join(cwd, 'src/lib/sop/worker-signal.ts'), 'utf-8')).not.toContain('plantRelState')
   })
 })

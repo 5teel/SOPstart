@@ -7,7 +7,7 @@
  * Every value is whitelisted and the raw token is never carried into the
  * result: a hostile string can only ever become the default home. Legacy place
  * tokens (old links, stored notification places, focus `from` tokens) resolve
- * through legacyToHome; place.ts stays for the old shell until it is deleted.
+ * through legacyToHome.
  */
 import { isSafePlace } from '@/lib/notifications/places'
 

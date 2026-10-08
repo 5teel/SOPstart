@@ -37,11 +37,11 @@ function walk(dir: string, out: string[] = []): string[] {
 const OFFLINE = '@/lib/offline'
 
 test.describe('worker list derives from the server (55-02)', () => {
-  test('useWorkerSops takes requestedIds and reads the server', () => {
-    const src = code('src/hooks/useWorkerSops.ts')
-    expect(src).toMatch(/export function useWorkerSops\(\s*requestedIds/)
-    expect(src).not.toMatch(/export function useWorkerSops\([^)]*assignedSops/)
-    expect(src).toContain('getUserSopAssignments')
+  test('the old worker list hook is gone; useLibrary owns the library read and the cache key', () => {
+    // 63-20: the worker list hook was deleted with the rooms.
+    expect(fs.existsSync(path.join(ROOT, 'src/hooks/useWorkerSops.ts'))).toBe(false)
+    const src = code('src/hooks/useLibrary.ts')
+    expect(src).toMatch(/export async function libraryQueryFn/)
     expect(src).toContain("'library-sops'")
     expect(src).not.toContain(OFFLINE)
   })

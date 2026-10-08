@@ -15,8 +15,9 @@
  *              from then on its tokens must be gone from every test file.
  *              63-18 appended 63-13, 63-16 and itself once every test file was clean of their
  *              tokens; 63-19 appended itself with 63-11 and 63-15 once the room specs were retired or
- *              repointed. 63-14 still has one holder (the legacy-address reader test, whose inputs are
- *              the old addresses by nature); 63-20 appends 63-14 and itself with the room deletion.
+ *              repointed. 63-20 appended 63-14 and itself with the room deletion; the one 63-14
+ *              holder (the legacy-address reader test, whose inputs are the old addresses by
+ *              nature) is excluded from the walk as data.
  *
  * A retire row is exempt from the stale-token check until its owner is live (a file
  * slated for deletion is not "stale"); once live it must be gone from disk.
@@ -24,7 +25,7 @@
  * This file necessarily holds the tokens as data, so it is excluded from the walk,
  * as are everything under tests/phase63/, the three new Phase 63 evals, and the two
  * guards that hold retired literals as data (the walk-words guard, 63-16, and the
- * rooms guard, 63-20). Comments here describe the tokens in words only.
+ * rooms guard, 63-20), and the legacy-address reader test. Comments here describe the tokens in words only.
  *
  * Registration: playwright.config.ts phase63 project.
  * Verify: npx playwright test --list --project=phase63
@@ -43,6 +44,7 @@ const EXCLUDED = new Set(
     'tests/evals/start.eval.ts',
     'tests/lint/no-walk-words.spec.ts',
     'tests/lint/no-rooms.spec.ts',
+    'tests/phase60/notification-places.spec.ts', // feeds the old addresses to the legacy-address reader
   ].map((p) => path.normalize(p)),
 )
 
@@ -129,7 +131,6 @@ export const INVENTORY: Row[] = [
   // ---- 63-16: walk words ----
   { file: 'tests/phase58/walk-no-leak.spec.ts', disposition: 'repoint', plan: '63-16' },
   // ---- 63-19: room specs retired / repointed ahead of the deletion (R1 producer specs too) ----
-  { file: 'tests/phase57/rooms.spec.ts', disposition: 'retire', plan: '63-20' }, // ADR-0003's guard; 63-20 supersedes it with ADR-0005
   { file: 'tests/lint/no-static-admin-lens-import.spec.ts', disposition: 'repoint', plan: '63-19' },
   { file: 'tests/phase23/version-indicator.spec.ts', disposition: 'repoint', plan: '63-19' },
   { file: 'tests/phase30/create-entry.spec.ts', disposition: 'repoint', plan: '63-19' },
@@ -139,7 +140,6 @@ export const INVENTORY: Row[] = [
   { file: 'tests/phase41/nav-and-shim.spec.ts', disposition: 'repoint', plan: '63-19' },
   { file: 'tests/phase41/reference-sweep.spec.ts', disposition: 'repoint', plan: '63-19' },
   { file: 'tests/phase51/site-workspace-wiring.spec.ts', disposition: 'repoint', plan: '63-19' },
-  { file: 'tests/phase54/admin-health.spec.ts', disposition: 'repoint', plan: '63-19' }, // machine-coverage producer
   { file: 'tests/phase55/worker-path-contract.spec.ts', disposition: 'repoint', plan: '63-19' },
   { file: 'tests/phase57/retirement-sweep.spec.ts', disposition: 'repoint', plan: '63-19' },
   { file: 'tests/phase58/frame-structure.spec.ts', disposition: 'repoint', plan: '63-19' },
@@ -158,7 +158,7 @@ export const INVENTORY: Row[] = [
 ]
 
 // Each owning plan appends its id when its last commit lands (see header).
-export const LIVE_PLANS: string[] = ['63-11', '63-13', '63-15', '63-16', '63-18', '63-19']
+export const LIVE_PLANS: string[] = ['63-11', '63-13', '63-14', '63-15', '63-16', '63-18', '63-19', '63-20']
 
 function stripComments(src: string): string {
   return src

@@ -1,16 +1,13 @@
 /**
  * Site templates: a ready-made scene picture (public/site-presets/<id>.jpg)
  * plus its departments and machine outlines, applied once to an org with no
- * site by applySitePreset(). The server resolves a layout's rooms with
- * roomsFor() and sends only that list, so the worker bundle never carries
- * these tables.
+ * site by applySitePreset(). A template gives an admin a starting picture,
+ * departments and machines; it never places anything else (ADR-0005).
  *
  * Plain module, no directive -- importable from client and server code.
  * Outlines are fractions (0-1) of the picture, placed on a grid overlay of
  * each picture (CLAUDE.md 2026-10-05: geometry is judged by eye on the scene).
  */
-import { ROOMS, type Room } from '@/lib/site/rooms'
-
 type Frac = readonly [number, number]
 
 const box = (x0: number, y0: number, x1: number, y1: number): Frac[] => [
@@ -20,33 +17,11 @@ const box = (x0: number, y0: number, x1: number, y1: number): Frac[] => [
   [x0, y1],
 ]
 
-// -- Template rooms ------------------------------------------------------------
-// A layout made from a template records its id in site_layouts.preset; its
-// rooms sit on that picture's cabins/rooms instead of rooms.ts ROOMS. Still
-// fixed per picture (D-01): no admin positions a room.
+// -- Template ids --------------------------------------------------------------
+// A layout made from a template records its id in site_layouts.preset (data only:
+// the home does not read it).
 export const SITE_PRESET_IDS = ['railway', 'training', 'kitchen', 'bottling'] as const
 export type SitePresetId = (typeof SITE_PRESET_IDS)[number]
-
-const presetRooms = (office: Room['frac'], smoko: Room['frac'], workshop: Room['frac'], noticeboard: Room['frac']): Room[] => [
-  { id: 'office', name: 'Office', frac: office },
-  { id: 'smoko', name: 'Smoko room', frac: smoko },
-  { id: 'workshop', name: 'Workshop', frac: workshop },
-  { id: 'noticeboard', name: 'Noticeboard', frac: noticeboard },
-]
-
-// Office = site cabin / office, Smoko = crib hut / lunch room, Workshop =
-// tool store / chemical store / maintenance workshop, Noticeboard = the board.
-export const PRESET_ROOMS: Record<SitePresetId, ReadonlyArray<Room>> = {
-  railway: presetRooms(box(0.62, 0.6, 0.745, 0.73), box(0.79, 0.63, 0.87, 0.78), box(0.565, 0.745, 0.695, 0.92), box(0.755, 0.79, 0.83, 0.93)),
-  training: presetRooms(box(0.275, 0.61, 0.44, 0.87), box(0.445, 0.62, 0.635, 0.92), box(0.645, 0.61, 0.82, 0.92), box(0.845, 0.69, 0.93, 0.87)),
-  kitchen: presetRooms(box(0.14, 0.64, 0.28, 0.88), box(0.315, 0.67, 0.475, 0.93), box(0.525, 0.66, 0.62, 0.91), box(0.675, 0.72, 0.775, 0.93)),
-  bottling: presetRooms(box(0.1, 0.7, 0.27, 0.91), box(0.31, 0.7, 0.475, 0.92), box(0.52, 0.7, 0.69, 0.92), box(0.735, 0.72, 0.83, 0.87)),
-}
-
-/** The rooms for a layout: its template's rooms, or the default table. */
-export function roomsFor(preset: string | null | undefined): ReadonlyArray<Room> {
-  return (preset && PRESET_ROOMS[preset as SitePresetId]) || ROOMS
-}
 
 export interface SitePresetMachine {
   name: string

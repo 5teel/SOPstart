@@ -2,7 +2,7 @@
 
 /**
  * Phase 63 (R7) -- Site & departments: the departments strip over the site editor (or the
- * empty state), moved out of AdminShell into its own module. Departments are the library's
+ * empty state), its own module. Departments are the library's
  * areas, so every change also refreshes the areas and the drafts list.
  */
 import { useQuery, useQueryClient } from '@tanstack/react-query'

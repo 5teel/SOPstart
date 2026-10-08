@@ -3,10 +3,8 @@
  * Phase 63 (HOME-02) -- the ONE per-SOP list the home, the map and Read show.
  *
  * Browser Supabase client under RLS only: no server action may fire when the home
- * mounts or a SOP is opened (Next 16.2.1 action-queue hazard, CLAUDE.md 2026-09-29),
- * which is why this does not call useWorkerSops (it fires getUserSopAssignments and
- * carries the retired due / refresher vocabulary). It reuses that hook's library
- * query function so the `library-sops` cache key and shape stay one.
+ * mounts or a SOP is opened (Next 16.2.1 action-queue hazard, CLAUDE.md 2026-09-29).
+ * The `library-sops` cache key and its one query function live here.
  *
  * ponytail: minutes are summed client-side from steps with an estimate -- fine to a
  * few hundred SOPs; a summary view if an org outgrows it.
@@ -14,14 +12,32 @@
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
-import { libraryQueryFn } from '@/hooks/useWorkerSops'
 import { buildAreas, SITE_WIDE, type AreaDepartment, type AreaInputs, type AreaMachine, type LibraryArea } from '@/lib/library/areas'
 import { sopTypeOf, type SopType } from '@/lib/library/sop-type'
 import { objectKindOf, type ObjectKind } from '@/lib/library/object-kind'
 import { rowStatus, type RowStatus } from '@/lib/library/status'
 import { walkOrder, type FocusKind, type WalkEntry } from '@/lib/sop/focus'
-import { lineageRoot, type LineageRow } from '@/lib/sop/lineage-current'
+import { latestPublished, lineageRoot, type LineageRow } from '@/lib/sop/lineage-current'
 import type { WorkerSopRow } from '@/lib/sop/worker-signal'
+
+/** The `['library-sops']` query function: one row per SOP, latest published version. */
+export async function libraryQueryFn(): Promise<WorkerSopRow[]> {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from('sops')
+    .select('id, title, sop_number, category_slug, department, published_at, placement, version, parent_sop_id, status')
+    .eq('status', 'published')
+    .order('title', { ascending: true }) as {
+      data: Array<WorkerSopRow & LineageRow> | null
+      error: { message: string } | null
+    }
+  // A failed read must not look like an empty library.
+  if (error) throw new Error(error.message)
+  // One row per SOP: the latest published version (D-13, D-18), keeping the title order.
+  const rows = data ?? []
+  const keep = new Set(latestPublished(rows).map((r) => r.id))
+  return rows.filter((r) => keep.has(r.id))
+}
 
 export interface LibraryRow {
   id: string

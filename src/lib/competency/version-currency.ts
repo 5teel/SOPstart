@@ -11,8 +11,7 @@
 // (null) also never fabricates a chip. Compares the monotonic `version`
 // INTEGER on sops, never sop UUIDs.
 //
-// Consumers: src/lib/competency/matrix.ts, src/actions/competency.ts,
-// src/hooks/useWorkerSops.ts.
+// Consumers: src/lib/competency/matrix.ts, src/actions/competency.ts.
 // ------------------------------------------------------------
 
 export function isOutdatedVersion(

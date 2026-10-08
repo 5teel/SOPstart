@@ -85,8 +85,8 @@ function extractFirstSignOff(signOffs: CompletionSignOff[] | null): CompletionSi
 //
 // Fetches the current user's OWN completion history. RLS alone is not a
 // self-scope: supervisors read their workers' rows and admins read the org's,
-// so every consumer (Smoko room, worker Office, /activity) filters on the
-// caller's id explicitly (57 review WR-01, same class as useWorkerSops).
+// so every consumer (the record, the home) filters on the
+// caller's id explicitly (57 review WR-01, same class as the retired worker list hook).
 // ---------------------------------------------------------------
 export function useWorkerCompletions() {
   return useQuery<WorkerCompletion[]>({

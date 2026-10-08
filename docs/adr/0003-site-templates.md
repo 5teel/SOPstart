@@ -1,6 +1,6 @@
 # ADR-0003: Site templates are code; a layout records which one it came from
 
-- **Status:** Accepted
+- **Status:** Superseded by ADR-0005
 - **Date:** 2026-10-06
 - **Decided by:** Simon ("make this homepage more generic, with different visual versions": railway maintenance, trades training centre, food-safety training kitchen, bottling factory)
 - **Supersedes:** —

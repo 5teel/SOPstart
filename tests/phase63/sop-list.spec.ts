@@ -34,11 +34,10 @@ test.describe('sop list', () => {
     }
   })
 
-  test('useLibrary does not call useWorkerSops and reuses its query function', () => {
+  test('useLibrary owns the library query function (the old worker list hook is gone)', () => {
     const s = code('src/hooks/useLibrary.ts')
-    expect(s).not.toContain('useWorkerSops(')
-    expect(s).toContain('libraryQueryFn')
-    expect(code('src/hooks/useWorkerSops.ts')).toMatch(/export async function libraryQueryFn|export const libraryQueryFn/)
+    expect(s).not.toContain('useWorkerSops')
+    expect(s).toMatch(/export async function libraryQueryFn/)
   })
 
   test("a person's own completions and walks are filtered on worker_id", () => {

@@ -80,7 +80,7 @@ export default async function SopFocusPage({
       .eq('worker_id', userId)
       .eq('status', 'in_progress')
       .in('sop_id', lineageIds),
-    // A rejected walk is not done (59 A-06), same as useWorkerSops and the competency reads.
+    // A rejected walk is not done (59 A-06), same as the competency reads.
     supabase.from('sop_completions').select('sop_id').neq('status', 'rejected').eq('worker_id', userId).in('sop_id', lineageIds),
     editing && requested.status !== 'published'
       ? supabase

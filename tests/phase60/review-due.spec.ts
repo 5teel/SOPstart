@@ -64,7 +64,6 @@ test.describe('Review-due selection (60-08)', () => {
     expect(src).toContain("dedupeKey({ kind: 'review_due', sopId: t.sopId, dueAt: t.reviewDueAt })")
     expect(src).toMatch(/catch \(err\)[\s\S]*return 0/)
     const root = path.resolve(__dirname, '..', '..')
-    expect(fs.readFileSync(path.join(root, 'src/actions/shell.ts'), 'utf-8')).toContain('ensureReviewDueNotifications(ctx.organisationId, ctx.user.id)')
     expect(fs.readFileSync(path.join(root, 'src/app/page.tsx'), 'utf-8')).toContain('ensureReviewDueNotifications(organisationId, userId)')
   })
 

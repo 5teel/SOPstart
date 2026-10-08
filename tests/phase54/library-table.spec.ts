@@ -12,7 +12,6 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 const ROOT = path.resolve(__dirname, '..', '..')
-const WORKER_SIGNAL_PATH = path.join(ROOT, 'src', 'lib', 'sop', 'worker-signal.ts')
 const CATEGORY_BUTTON_PATH = path.join(
   ROOT, 'src', 'components', 'focus', 'admin', 'CategoryButton.tsx'
 )
@@ -25,10 +24,6 @@ function read(p: string): string {
 }
 
 test.describe('surviving affordances', () => {
-  test('worker-signal.ts exports WorkerScope', () => {
-    expect(read(WORKER_SIGNAL_PATH)).toContain('export type WorkerScope')
-  })
-
   test('CategoryButton calls setSopCategory(sopId, next) and imports SOP_CATEGORIES', () => {
     const code = read(CATEGORY_BUTTON_PATH)
     expect(code).toContain('setSopCategory(sopId, next)')

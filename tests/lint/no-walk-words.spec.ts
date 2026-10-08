@@ -22,10 +22,6 @@ const DIRS = ['src/components', 'src/app', 'src/actions', 'src/hooks', 'src/lib/
 const ALLOW = [
   'src/actions/introspection.ts', // agent descriptions, never shown to a worker
   'src/components/focus/admin/AiCheckBanner.tsx', // "Show me" jumps to a finding in the editor: a different control
-  // 63-20 deletes the next three entries together with the files they name.
-  'src/components/shell/',
-  'src/components/sop/plant/',
-  'src/components/admin/governance/AdminMachinePanel.tsx',
 ]
 
 const WORD = /\b[Ww]alk(?:s|ed|ing|through|throughs)?\b/
@@ -93,9 +89,8 @@ test.describe('no walk words on a screen', () => {
     expect(scan("// 'Could not start the walk' was the old line\n/* Walk it */ const z = 1")).toEqual([])
   })
 
-  test('the allowlist names its removal plan and the guard is registered', () => {
-    const me = fs.readFileSync(__filename, 'utf-8')
-    expect(me).toMatch(/63-20 deletes the next three entries/)
+  test('the allowlist holds two reasoned entries and the guard is registered', () => {
+    expect(ALLOW).toHaveLength(2)
     const cfg = fs.readFileSync(path.join(ROOT, 'playwright.config.ts'), 'utf-8')
     expect(cfg).toContain('no-walk-words')
   })

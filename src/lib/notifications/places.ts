@@ -4,10 +4,9 @@
  * Plain module, no directive. A place is a PATH only, built from fixed
  * templates: a home section (Phase 63) or a UUID-gated SOP address. The client
  * re-checks with isSafePlace before it navigates, so a bad stored value can
- * only ever land on the overview.
+ * only ever land on the home.
  */
 import { focusHref } from '@/lib/sop/focus-path'
-import { parsePlace, type Place } from '@/lib/shell/place'
 import { formatHome, HOME } from '@/lib/shell/home-state'
 import type { NotificationKind } from '@/lib/notifications/kinds'
 
@@ -31,14 +30,4 @@ const SAFE = new RegExp(`^(?:/|/\\?${QUERY}|/sops/${UUID_SRC}(?:\\?${QUERY})?)$`
 
 export function isSafePlace(place: unknown): place is string {
   return typeof place === 'string' && place.length <= 300 && SAFE.test(place)
-}
-
-export type PlaceTarget = { type: 'select'; place: Place } | { type: 'href'; href: string }
-
-/** How the shell opens a stored place: select() for the site, a link for a SOP; unsafe = the overview. */
-export function placeTarget(place: unknown): PlaceTarget {
-  if (!isSafePlace(place)) return { type: 'select', place: { kind: 'overview' } }
-  if (place.startsWith('/sops/')) return { type: 'href', href: place }
-  const q = new URLSearchParams(place.slice(place.indexOf('?') + 1 || place.length))
-  return { type: 'select', place: parsePlace(q.get('place'), q.get('tab')) }
 }

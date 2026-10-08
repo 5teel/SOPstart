@@ -120,24 +120,24 @@ test.describe('retire sweep', () => {
   })
 
   // Survivors moved here from the whole-subject specs deleted in 57-08.
-  test('retire list: the plant is reached only by the shell (survivor of plant-render-seam)', () => {
-    const staticImport = /^\s*import\s+[^;]*from\s+'@\/components\/sop\/plant\//m
+  test('retire list: the plant folder is gone and nothing imports it (63-20)', () => {
+    expect(fs.existsSync(path.join(ROOT, 'src/components/sop/plant'))).toBe(false)
+    const staticImport = /from\s+'@\/components\/sop\/plant\//m
     const violations = walkSrc(path.join(ROOT, 'src'))
       .map((f) => path.relative(ROOT, f).replace(/\\/g, '/'))
-      .filter((f) => !f.startsWith('src/components/sop/plant/') && !f.startsWith('src/components/shell/'))
       .filter((f) => staticImport.test(read(f)))
     expect(violations).toEqual([])
   })
 
-  test('retire list: the worker list is derived in exactly one place (survivor of merged-surface)', () => {
+  test('retire list: the worker list is derived in exactly one place, useLibrary (survivor of merged-surface)', () => {
+    // 63-20: the old per-SOP due / refresher derivation (worker-last-completions) went with the rooms.
     const owners = walkSrc(path.join(ROOT, 'src'))
       .map((f) => path.relative(ROOT, f).replace(/\\/g, '/'))
       .filter((f) => stripComments(read(f)).includes("queryKey: ['worker-last-completions']"))
-    expect(owners).toHaveLength(1)
-    const hook = read(owners[0])
+    expect(owners).toEqual([])
+    const hook = stripComments(read('src/hooks/useLibrary.ts'))
     expect(hook).toContain(".eq('worker_id'")
-    expect(hook).toContain('getUserSopAssignments')
-    expect(hook).toContain('refresherDueDate')
+    expect(hook).not.toContain('getUserSopAssignments')
     expect(hook).toContain('library-sops')
     const shell = stripComments(read('src/components/home/HomeShell.tsx'))
     for (const key of ["queryKey: ['worker-last-completions']", "queryKey: ['sop-refresher-intervals']", "queryKey: ['library-sops']"]) {
@@ -151,9 +151,9 @@ test.describe('retire sweep', () => {
       expect(fs.existsSync(path.join(ROOT, f)), f).toBe(false)
     }
     const rows = read('src/lib/sop-list/admin-rows.ts')
-    const health = read('src/lib/sop/admin-health.ts')
+    expect(fs.existsSync(path.join(ROOT, 'src/lib/sop/admin-health.ts'))).toBe(false)
     for (const name of ['libraryNavToUrl', 'resolveLibraryNav', 'DEFAULT_LIBRARY_NAV', 'deriveChecks', 'tableStatus', 'CHECK_ORDER']) {
-      expect(rows + health, name).not.toContain(name)
+      expect(rows, name).not.toContain(name)
     }
     // the quoted bare list address, with or without a query, outside the proxy
     const bareList = /['"`]\/sops(?:['"`?]|$)/m

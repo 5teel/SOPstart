@@ -16,7 +16,7 @@ import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties, 
 import Link from 'next/link'
 import { Wordmark } from '@/components/brand/Wordmark'
 import { Camera, CheckCircle, FileText, Pause, Play, Sparkles } from 'lucide-react'
-import { SITE_PRESETS, PRESET_ROOMS, presetImagePath } from '@/lib/site/presets'
+import { SITE_PRESETS, presetImagePath } from '@/lib/site/presets'
 import { KindChip, KIND_EDGE } from '@/components/focus/KindChip'
 import { primaryLabel, type FocusKind } from '@/lib/sop/focus'
 
@@ -29,7 +29,9 @@ const SITE = SITE_PRESETS.find((p) => p.id === 'bottling')!
 const machine = (name: string) => SITE.machines.find((m) => m.name === name)!.frac
 const FILLER = machine('Line 1 filler-capper')
 const LABELLER = machine('Line 2 labeller')
-const OFFICE = PRESET_ROOMS.bottling.find((r) => r.id === 'office')!.frac
+// The reel is a recording of the earlier app until its deferred re-record: this is the
+// site-cabin rectangle that app drew on the bottling picture, as fractions of the picture.
+const OFFICE: Frac = [[0.1, 0.7], [0.27, 0.7], [0.27, 0.91], [0.1, 0.91]]
 
 function centre(frac: Frac): [number, number] {
   return [frac.reduce((a, p) => a + p[0], 0) / frac.length, frac.reduce((a, p) => a + p[1], 0) / frac.length]
