@@ -82,7 +82,6 @@ export const INVENTORY: Row[] = [
   { file: 'tests/phase52/plant-now-card.spec.ts', disposition: 'repoint', plan: '58-10' }, // 58-11 edits the tab literal
   { file: 'tests/phase54/admin-machine-panel.spec.ts', disposition: 'repoint', plan: '58-10' }, // 58-14 edits the builder href
   { file: 'tests/phase57/machine-body.spec.ts', disposition: 'repoint', plan: '58-10' }, // 58-11 tab literal, 58-14 builder href
-  { file: 'tests/evals/one-screen.eval.ts', disposition: 'repoint', plan: '58-10' }, // worker half; 58-11 tab literal, 58-14 builder href
   // ---- 58-11 walk and page evals ----
   { file: 'tests/evals/cut-features.eval.ts', disposition: 'repoint', plan: '58-11' }, // 58-14 edits the builder/versions probes
   { file: 'tests/evals/sop-ledger.eval.ts', disposition: 'repoint', plan: '58-11' }, // 58-14 edits the builder href

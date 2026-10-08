@@ -70,7 +70,6 @@ export const INVENTORY: Row[] = [
   { file: 'tests/phase54/governance-inbox.spec.ts', disposition: 'repoint', plan: '60-05' }, // machines rows
   { file: 'tests/phase59/office-pane-structure.spec.ts', disposition: 'repoint', plan: '60-05' }, // stale-department fix link
   { file: 'tests/evals/office.eval.ts', disposition: 'repoint', plan: '60-05' }, // Machines row case; the idle-supervisor "no tab control" case is 60-11's
-  { file: 'tests/evals/one-screen.eval.ts', disposition: 'repoint', plan: '60-05' }, // pin equals Inbox
   // ---- 60-11 Requests tab ----
   { file: 'tests/phase59/place-tab.spec.ts', disposition: 'repoint', plan: '60-11' }, // supervisor tabs
   { file: 'tests/phase59/capability-matrix.spec.ts', disposition: 'repoint', plan: '60-11' }, // Office rows

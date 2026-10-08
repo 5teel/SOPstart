@@ -9,6 +9,27 @@
  * so `npm run test` never hits production.
  *
  * Sessions are minted once per role and replayed as cookies (each mint spends the shared OTP budget).
+ *
+ * Successor of the retired one-screen eval (Phase 57, deleted in 63-18). Every case it held maps here
+ * or is retired by ADR-0004 (no pins, no due-now card, no counts) or ADR-0005 (no rooms):
+ *   one screen with three panes and four signposts ......... HOME-01 (sections per role, no room words)
+ *   map click equals list click, Esc returns ............... MAP-03 (area zoom, Esc, dimmed area, object opens Read)
+ *   second-iteration leak (machine, room, machine) ......... HOME-03 "two SOPs in a row" (added in 63-18)
+ *   search lights matching shapes .......................... HOME-02 search (title, step word, miss)
+ *   the due-now card names the due SOP ..................... retired (ADR-0004 rule 2: nothing shows what is due)
+ *   walk from a machine and from the notice room ........... start.eval FUSE-02 (Read start lands in the running SOP)
+ *   a place deep link; a worker's edit-mode link ........... HOME-05 "?sop= opens Read, a worker section falls back" (added in 63-18)
+ *   bridge page Back returns to its room ................... home-addresses "Back from a bridged page"
+ *   due pins and health pins on machines ................... retired (ADR-0004 rule 2)
+ *   phone list with glove-sized rows ....................... MAP-04 (tab bar, List | Site map, Read full width)
+ *   supervisor and admin room pins equal the inbox counts .. retired (ADR-0004 rule 2: counts); the tabs are HOME-01 / HOME-04
+ *   admin machine panel: open, edit, new SOP for a machine . HOME-03 "admin Read offers Edit" (added in 63-18); new SOP per machine retired (ADR-0004 rule 4)
+ *   drafts room lists drafts and links the new-SOP flow .... HOME-04 Manage SOPs
+ *   edit mode shows the site workspace and departments ..... HOME-04 Site & departments, site-editor.eval
+ *   retired URLs redirect to the one screen ................ home-addresses (old addresses and retired pages)
+ *   real org overview and per-room zoom shots, read only ... EVAL-01 (real org map and list)
+ *   pathways map reports zero unmapped screens ............. DOCS-01
+ *   signed-out root shows the promo reel ................... home-addresses "signed-out root still shows the promo reel"
  */
 import { test, expect, type Browser, type BrowserContext, type Locator, type Page } from '@playwright/test'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
@@ -339,6 +360,52 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
     })
   })
 
+  // ------------------------------------------------------------------ HOME-03 (63-18)
+
+  test('HOME-03 opening two SOPs in a row shows no stale Read (second iteration, same session)', async ({ browser }) => {
+    test.setTimeout(240_000)
+    const meta = (page: Page) => page.locator('[data-testid="read-view"] p.font-mono').first()
+    await asRole(browser, 'siteAdmin', DESKTOP, async (page) => {
+      await page.goto('/')
+      await listReady(page)
+      const h1 = page.getByTestId('read-view').locator('h1')
+
+      await row(page, lib.sopIds.packing).last().click()
+      await expect(h1).toHaveText(EVAL_AREA_SOPS.packing, SLOW)
+      await expect(page.getByTestId('read-steps').locator('> li').first()).toContainText('Moving equipment nearby.', SLOW)
+
+      // The list stays on screen at desktop width: open the second SOP without going back.
+      await row(page, lib.sopIds.lab).last().click()
+      await expect(h1).toHaveText(EVAL_AREA_SOPS.lab, SLOW)
+      await expect(meta(page)).toContainText('EVAL Area Lab', SLOW)
+      await expect(meta(page)).not.toContainText('EVAL Area Packing')
+      await expect(page.getByTestId('read-view')).not.toContainText('Moving equipment nearby.')
+      await expect(page).toHaveURL(new RegExp(`sop=${lib.sopIds.lab}`), SLOW)
+
+      // And back to the first: nothing carried over from the second.
+      await row(page, lib.sopIds.packing).last().click()
+      await expect(h1).toHaveText(EVAL_AREA_SOPS.packing, SLOW)
+      await expect(meta(page)).not.toContainText('EVAL Area Lab')
+      await shot(page, '63-home-two-reads')
+    })
+  })
+
+  test('HOME-03 admin Read offers Edit, which opens the editor on the focus screen', async ({ browser }) => {
+    test.setTimeout(180_000)
+    await asRole(browser, 'siteAdmin', DESKTOP, async (page) => {
+      await page.goto(`/?sop=${plantSopId}`)
+      await expect(page.getByTestId('read-view').locator('h1')).toHaveText(EVAL_PLANT_SOP_TITLE, SLOW)
+      const edit = page.getByTestId('read-edit')
+      await expect(edit).toHaveCount(1, SLOW)
+      await shot(page, '63-home-read-admin')
+      await edit.click()
+      await expect(page).toHaveURL(/\/sops\/[0-9a-f-]{36}\?(?:[^#]*&)?mode=edit/, SLOW)
+      await expect(page.getByTestId('focus-screen')).toBeVisible(SLOW)
+      await expect(page.getByTestId('edit-start-editing').or(page.getByTestId('edit-document')).first()).toBeVisible(SLOW)
+      await expect(page.getByTestId('home')).toHaveCount(0)
+    })
+  })
+
   // ------------------------------------------------------------------ HOME-04
 
   test('HOME-04 Sign-offs, People, Training, Manage SOPs and My record open their bodies', async ({ browser }) => {
@@ -413,6 +480,26 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
       await expect(page.getByTestId('notification-row').filter({ hasText: '63 eval bell dot' })).toBeVisible(SLOW)
       await expect(page).toHaveURL(/[?&]s=record/)
       await shot(page, '63-home-bell-record')
+    })
+  })
+
+  // ------------------------------------------------------------------ HOME-05 (63-18)
+
+  test('HOME-05 a SOP address opens Read on load; an address naming no SOP or a section a worker lacks is the list', async ({ browser }) => {
+    test.setTimeout(240_000)
+    await asRole(browser, 'siteWorker', DESKTOP, async (page) => {
+      await page.goto(`/?sop=${lib.sopIds.packing}`)
+      await expect(page.getByTestId('read-view').locator('h1')).toHaveText(EVAL_AREA_SOPS.packing, SLOW)
+      await expect(page.getByTestId('home-section-sops')).toHaveAttribute('aria-current', 'page')
+
+      await page.goto('/?s=manage')
+      await listReady(page)
+      await expect(page.getByTestId('home-section-sops')).toHaveAttribute('aria-current', 'page', SLOW)
+      await expect(page.getByTestId('section-manage')).toHaveCount(0)
+
+      await page.goto('/?sop=not-an-id')
+      await listReady(page)
+      await expect(page.getByTestId('read-view')).toHaveCount(0)
     })
   })
 

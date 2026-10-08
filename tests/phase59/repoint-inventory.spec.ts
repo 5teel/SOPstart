@@ -81,7 +81,6 @@ export const INVENTORY: Row[] = [
   { file: 'tests/phase28/governance-actions.spec.ts', disposition: 'repoint', plan: '59-07' }, // confirmSopCurrent owner path
   // ---- 59-12 mount ----
   { file: 'tests/phase57/machine-body.spec.ts', disposition: 'repoint', plan: '59-12' }, // Office links
-  { file: 'tests/evals/one-screen.eval.ts', disposition: 'repoint', plan: '59-12' }, // Office bridge, supervisor Office, Office count vs page, retired-URL list
   // ---- 59-13 addresses ----
   { file: 'tests/phase57/place.spec.ts', disposition: 'repoint', plan: '59-13' }, // back-bar Office group
   { file: 'tests/phase54/deletion-sweep.spec.ts', disposition: 'repoint', plan: '59-13' }, // attention view destination
