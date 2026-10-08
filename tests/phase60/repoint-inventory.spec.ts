@@ -87,7 +87,7 @@ export const INVENTORY: Row[] = [
   { file: 'tests/phase58/legacy-redirects.spec.ts', disposition: 'repoint', plan: '60-17' }, // the assign address returns null today
   { file: 'tests/e2e/sub-trade-assignment.spec.ts', disposition: 'repoint', plan: '60-17' }, // assign page integration block
   // ---- kept on purpose ----
-  { file: 'tests/phase57/place.spec.ts', disposition: 'keep', plan: '60-17' }, // placeForPath of the assign address still resolves to the site
+  { file: 'tests/phase57/place.spec.ts', disposition: 'keep', plan: '60-17' }, // back-bar path of the assign address still resolves to the site
 ]
 
 // Each owning plan appends its id (e.g. '60-05') when its last commit lands.

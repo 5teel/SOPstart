@@ -124,7 +124,7 @@ export const INVENTORY: Row[] = [
   { file: 'tests/phase54/library-table.spec.ts', disposition: 'repoint', plan: '58-15' },
   { file: 'tests/phase55/worker-path-contract.spec.ts', disposition: 'repoint', plan: '58-15' },
   { file: 'tests/phase56/decision-writers-sweep.spec.ts', disposition: 'repoint', plan: '58-15' },
-  { file: 'tests/phase57/place.spec.ts', disposition: 'repoint', plan: '58-15' }, // 58-11 makes placeForPath null on /sops/*
+  { file: 'tests/phase57/place.spec.ts', disposition: 'repoint', plan: '58-15' }, // 58-11 makes the back-bar path null on /sops/*
   { file: 'tests/lint/no-bulk-verify-ui.spec.ts', disposition: 'repoint', plan: '58-15' }, // allow-list stays; new code must not use the banned phrases
   { file: 'tests/lint/no-dead-internal-hrefs.spec.ts', disposition: 'repoint', plan: '58-15' },
   // ---- 58-16 retirement: whole-subject deletes and the deletion sweep ----

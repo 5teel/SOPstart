@@ -13,6 +13,7 @@ import {
   dedupeKey,
 } from '@/lib/notifications/kinds'
 import { notificationPlace, isSafePlace, placeTarget } from '@/lib/notifications/places'
+import { homeFromAddress, HOME } from '@/lib/shell/home-state'
 import { nameForWorker } from '@/lib/members/labels'
 import { OBJECTIVES_KEY, MY_REQUESTS_KEY, NOTIFICATIONS_KEY } from '@/lib/shell/query-keys'
 
@@ -84,12 +85,20 @@ test.describe('Notification kinds, titles and places (60-03)', () => {
   })
 
   test('places come from fixed templates; a bad SOP id throws', () => {
-    for (const k of ['approve_next', 'review_due', 'signoff'] as const) expect(notificationPlace(k)).toBe('/?place=office')
-    expect(notificationPlace('request_answered')).toBe('/')
+    for (const k of ['approve_next', 'review_due', 'signoff'] as const) expect(notificationPlace(k)).toBe('/?s=signoffs')
+    expect(notificationPlace('request_answered')).toBe('/?s=record')
     expect(notificationPlace('new_version', { sopId: SOP })).toBe(`/sops/${SOP}`)
     expect(notificationPlace('asked', { sopId: SOP })).toBe(`/sops/${SOP}`)
     expect(() => notificationPlace('asked', { sopId: 'not-a-uuid' })).toThrow()
     expect(() => notificationPlace('new_version')).toThrow()
+  })
+
+  test('every legacy stored place still opens the right section (63-13)', () => {
+    expect(homeFromAddress('/?place=office')).toEqual({ ...HOME, s: 'signoffs' })
+    expect(homeFromAddress('/?place=office&tab=requests')).toEqual({ ...HOME, s: 'signoffs', tab: 'requests' })
+    expect(homeFromAddress('/')).toEqual(HOME)
+    expect(homeFromAddress(`/sops/${SOP}`)).toBeNull()
+    expect(homeFromAddress('//evil.com')).toEqual(HOME)
   })
 
   test('every kind maps to a place that is safe and opens', () => {

@@ -2,12 +2,13 @@
  * Phase 60 -- where a notification opens (D-07, T-60-11).
  *
  * Plain module, no directive. A place is a PATH only, built from fixed
- * templates: the Office, the overview, or a UUID-gated SOP address. The client
+ * templates: a home section (Phase 63) or a UUID-gated SOP address. The client
  * re-checks with isSafePlace before it navigates, so a bad stored value can
  * only ever land on the overview.
  */
 import { focusHref } from '@/lib/sop/focus-path'
-import { formatPlace, parsePlace, type Place } from '@/lib/shell/place'
+import { parsePlace, type Place } from '@/lib/shell/place'
+import { formatHome, HOME } from '@/lib/shell/home-state'
 import type { NotificationKind } from '@/lib/notifications/kinds'
 
 export function notificationPlace(kind: NotificationKind, subject: { sopId?: string | null } = {}): string {
@@ -15,9 +16,9 @@ export function notificationPlace(kind: NotificationKind, subject: { sopId?: str
     case 'approve_next':
     case 'review_due':
     case 'signoff':
-      return formatPlace({ kind: 'room', id: 'office' })
+      return formatHome({ ...HOME, s: 'signoffs' })
     case 'request_answered':
-      return formatPlace({ kind: 'overview' })
+      return formatHome({ ...HOME, s: 'record' })
     case 'new_version':
     case 'asked':
       return focusHref(subject.sopId ?? '') // throws on anything but a UUID
