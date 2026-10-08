@@ -8,7 +8,7 @@
 import { ObjectiveLine, useObjectives } from '@/components/shell/ObjectiveLine'
 import type { ObjectiveSubject } from '@/lib/objectives/model'
 
-export function WorkerObjective({ type, id }: { type: ObjectiveSubject; id: string }) {
+export function WorkerObjective({ type, id }: { type: ObjectiveSubject; id: string | null }) {
   const o = useObjectives().find(type, id)
   return o ? <ObjectiveLine view={o} /> : null
 }

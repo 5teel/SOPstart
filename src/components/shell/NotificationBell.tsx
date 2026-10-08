@@ -3,7 +3,7 @@
 /**
  * Phase 60 (D-09, NTF-01) -- the bell beside search in the list header.
  *
- * Static and tiny: the icon and a count. The count is the person's own unread rows read
+ * Static and tiny: the icon and a dot when anything is unread (R5: never a number). Unread is the person's own rows read
  * through the browser client (RLS is the only filter), never a server action and never on
  * a timer -- it refreshes on window focus and whenever the overview invalidates the
  * notification keys. Pressing it only asks the shell to select the overview.
@@ -57,18 +57,11 @@ export function NotificationBell({ onOpen }: { onOpen(): void }) {
       type="button"
       data-testid="shell-bell"
       onClick={onOpen}
-      aria-label={n > 0 ? `Notifications, ${n} unread` : 'Notifications'}
+      aria-label={n > 0 ? 'Notifications, unread' : 'Notifications'}
       className="relative inline-flex h-tap w-tap shrink-0 items-center justify-center rounded-lg text-ink-700 hover:bg-paper-2 hover:text-ink-900 focus-visible:outline-2 focus-visible:outline-accent-step"
     >
       <Bell className="size-5" aria-hidden="true" />
-      {n > 0 && (
-        <span
-          data-testid="shell-bell-count"
-          className="absolute right-1 top-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-ink-900 px-1 mono text-meta font-semibold text-paper"
-        >
-          {n > 99 ? '99+' : n}
-        </span>
-      )}
+      {n > 0 && <span data-testid="shell-bell-dot" className="absolute right-2 top-2 size-2 rounded-full bg-ink-900" />}
     </button>
   )
 }

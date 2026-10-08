@@ -69,7 +69,8 @@ export function ReadView({
 
   const back = (
     <button type="button" data-testid="read-back" onClick={onBack} className="mb-4 block min-h-tap text-ui text-ink-600">
-      ‹ {backLabel}
+      <span className="lg:hidden">‹ {backLabel}</span>
+      <span className="max-lg:hidden">‹ Site map</span>
     </button>
   )
   if (data === null) {

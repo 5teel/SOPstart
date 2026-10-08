@@ -23,12 +23,12 @@ test.describe('Notification bell (60-16)', () => {
     expect(bell()).not.toMatch(/useRouter|next\/navigation/)
   })
 
-  test('the count is hidden at zero and caps at 99+', () => {
+  test('the bell shows a dot, never a number (63 R5)', () => {
     const b = bell()
-    expect(b).toContain('n > 0 && (')
-    expect(b).toContain("n > 99 ? '99+' : n")
+    expect(b).toContain('n > 0 && <span data-testid="shell-bell-dot"')
     expect(b).toContain('data-testid="shell-bell"')
-    expect(b).toContain('data-testid="shell-bell-count"')
+    expect(b).not.toContain('99+')
+    expect(b).not.toContain('{n}')
   })
 
   test('reads use the browser Supabase client under RLS, never a server action or a timer (A-06)', () => {

@@ -4,7 +4,7 @@
  * SOP grouped by Area or Type. A search that finds nothing offers Ask for one, and a SOP
  * admin also gets Write it. Built unmounted; the shell mounts it.
  */
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { Search, X } from 'lucide-react'
@@ -34,6 +34,7 @@ export function SopList({
   canWrite,
   onOpen,
   onArea,
+  trailing,
 }: {
   rows: readonly LibraryRow[]
   areas: readonly LibraryArea[]
@@ -44,6 +45,8 @@ export function SopList({
   canWrite: boolean
   onOpen(id: string): void
   onArea(id: string | null): void
+  /** Beside the search box (the bell). */
+  trailing?: ReactNode
 }) {
   const [query, setQuery] = useState('')
   const [group, setGroup] = useState<'area' | 'type'>('area')
@@ -61,21 +64,24 @@ export function SopList({
 
   return (
     <div data-testid="sop-list">
-      <div className="flex h-tap items-center gap-2 rounded-lg border border-ink-300 bg-paper-1 px-3">
-        <Search size={16} aria-hidden="true" className="shrink-0 text-ink-500" />
-        <input
-          data-testid="sop-search"
-          aria-label="Search all SOPs, steps and tools"
-          placeholder="Search SOPs, steps and tools"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="min-w-0 flex-1 bg-transparent text-reading outline-none"
-        />
-        {query && (
-          <button type="button" aria-label="Clear search" onClick={() => setQuery('')} className="grid size-8 place-items-center text-ink-500">
-            <X size={16} aria-hidden="true" />
-          </button>
-        )}
+      <div className="flex items-center gap-1">
+        <div className="flex h-tap min-w-0 flex-1 items-center gap-2 rounded-lg border border-ink-300 bg-paper-1 px-3">
+          <Search size={16} aria-hidden="true" className="shrink-0 text-ink-500" />
+          <input
+            data-testid="sop-search"
+            aria-label="Search all SOPs, steps and tools"
+            placeholder="Search SOPs, steps and tools"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="min-w-0 flex-1 bg-transparent text-reading outline-none"
+          />
+          {query && (
+            <button type="button" aria-label="Clear search" onClick={() => setQuery('')} className="grid size-8 place-items-center text-ink-500">
+              <X size={16} aria-hidden="true" />
+            </button>
+          )}
+        </div>
+        {trailing}
       </div>
 
       {area && (
