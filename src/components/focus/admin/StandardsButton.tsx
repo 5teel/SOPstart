@@ -16,7 +16,7 @@ import type { StandardRow, StandardTarget, StandardsPanel } from '@/lib/validato
 /**
  * Phase 56 (56-06, D-12, SOP-02) -- Tools-menu row + portaled modal to manage the
  * organisation's standards and put them on this SOP, a section or a step.
- * Standalone so Phase 61 can mount the same panel in the Workshop. Moved to the
+ * Standalone so Phase 61 can mount the same panel in Manage. Moved to the
  * focus editor in 58-12: the rail, a section menu and a step card each pass a
  * `target`.
  *

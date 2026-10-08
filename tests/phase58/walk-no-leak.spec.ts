@@ -48,7 +48,10 @@ test.describe('FOC-04 walk no-leak', () => {
   })
 
   test('review WR-05: a stale-walk refusal drops the local walk and re-reads the page; a locked step is said in its own words', () => {
-    for (const msg of ['Start the walk again.', 'That step is not part of this SOP.']) expect(HOOK).toContain(`'${msg}':`)
+    for (const msg of ['Start the SOP again.', 'That step is not part of this SOP.']) expect(HOOK).toContain(`'${msg}':`)
+    // lockstep (63-16): the keys equal the strings the server actions return, character for character
+    const server = stripComments(read('src/actions/walk.ts')) + stripComments(read('src/actions/completions.ts'))
+    for (const msg of ['Start the SOP again.', 'That step is not part of this SOP.']) expect(server).toContain(`'${msg}'`)
     expect(HOOK).toContain("export const LOCKED_STEP = 'Finish the steps before this one first.'")
     const fn = HOOK.slice(HOOK.indexOf('const serverError = useCallback('), HOOK.indexOf('const afterWrite'))
     expect(fn).toMatch(/setWalk\(null\)[\s\S]*setPhase\('browse'\)[\s\S]*router\.refresh\(\)/)

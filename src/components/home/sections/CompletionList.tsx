@@ -4,12 +4,12 @@
  * Phase 63 (HOME-04) -- the person's own completions and who signed them off. Moved from the
  * activity page so My record and /activity (until 63-14 retires it) show the same list.
  */
-import Link from 'next/link'
 import { ClipboardList } from 'lucide-react'
 import { useWorkerCompletions } from '@/hooks/useCompletions'
 import { CompletionHistoryCard } from '@/components/activity/CompletionHistoryCard'
+import { HOME, type HomeState } from '@/lib/shell/home-state'
 
-export function CompletionList() {
+export function CompletionList({ onHome }: { onHome(state: HomeState): void }) {
   const { data: completions = [], isLoading } = useWorkerCompletions()
 
   return (
@@ -31,15 +31,16 @@ export function CompletionList() {
           <div>
             <p className="text-base font-semibold text-[var(--ink-700)]">No completions yet</p>
             <p className="text-sm text-[var(--ink-500)] mt-1">
-              Complete an SOP walkthrough to see your history here.
+              Finish a SOP to see your record here.
             </p>
           </div>
-          <Link
-            href="/"
+          <button
+            type="button"
+            onClick={() => onHome(HOME)}
             className="mt-2 px-6 h-12 flex items-center rounded-lg bg-[var(--ink-900)] text-[var(--paper)] font-semibold text-sm hover:opacity-80 transition-opacity"
           >
-            Back to the site
-          </Link>
+            Find a SOP
+          </button>
         </div>
       ) : (
         <div className="flex flex-col gap-3">

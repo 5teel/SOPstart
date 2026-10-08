@@ -28,7 +28,7 @@ export function ModeSwitch({
           onClick={() => m !== value && onChange(m)}
           className={`min-h-tap px-4 text-ui ${value === m ? 'bg-ink-900 font-semibold text-paper' : 'bg-paper text-ink-700'}`}
         >
-          {m === 'walk' ? 'Walk' : 'Edit'}
+          {m === 'walk' ? 'Read' : 'Edit'}
         </button>
       ))}
     </div>

@@ -43,10 +43,10 @@ export async function submitCompletion(
     .eq('organisation_id', organisationId)
     .eq('worker_id', userId)
     .maybeSingle()
-  if (!row) return { success: false, error: 'Start the walk again.' }
+  if (!row) return { success: false, error: 'Start the SOP again.' }
   const walk = toWalkState(row)
   if (row.status === 'submitted') return { success: true, completionId: walk.id }
-  if (row.status !== 'in_progress') return { success: false, error: 'Start the walk again.' }
+  if (row.status !== 'in_progress') return { success: false, error: 'Start the SOP again.' }
 
   const sop = await loadWalkSop(admin, organisationId, walk.sop_id)
   if (!sop || sop.order.length === 0) return { success: false, error: 'This SOP has no steps to send.' }
@@ -242,10 +242,10 @@ export async function signOffCompletion(
   // Nobody signs off their own walk (59 A-03), and a walk already decided is not
   // decided twice -- a double submit must not write a second sign-off or ledger row.
   if (completion.worker_id === userId) {
-    return { success: false, error: 'You cannot sign off your own walk' }
+    return { success: false, error: 'You cannot sign off your own completion' }
   }
   if (completion.status !== 'pending_sign_off') {
-    return { success: false, error: 'This walk has already been decided.' }
+    return { success: false, error: 'This completion has already been decided.' }
   }
 
   // ASR-01 gate (D-03) — the completion sign-off is the strongest
@@ -307,7 +307,7 @@ export async function signOffCompletion(
     return { success: false, error: 'Failed to record sign-off.' }
   }
   if (!claimed?.length) {
-    return { success: false, error: 'This walk has already been decided.' }
+    return { success: false, error: 'This completion has already been decided.' }
   }
 
   // INSERT into completion_sign_offs (second immutable record, D-17)
@@ -415,7 +415,7 @@ export async function getPhotoUploadUrl(input: {
     .eq('worker_id', userId)
     .eq('status', 'in_progress')
     .maybeSingle()
-  if (!walk) return { error: 'Start the walk again.' }
+  if (!walk) return { error: 'Start the SOP again.' }
 
   // Determine file extension from content type
   const ext = parsed.data.contentType === 'image/png' ? 'png' : 'jpg'
@@ -482,7 +482,7 @@ async function recordSignature(input: {
     kind: role === 'supervisor' ? 'countersign' : 'sign_off',
     subject: { kind: 'completion', id: completionId },
     sopId,
-    summary: role === 'supervisor' ? 'Signed off a completion' : 'Sent a walk for sign-off',
+    summary: role === 'supervisor' ? 'Signed off a completion' : 'Sent a SOP for sign-off',
     details: { role, ...details },
   })
 

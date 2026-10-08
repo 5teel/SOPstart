@@ -52,9 +52,9 @@ test.describe('signoff panel', () => {
 
   test('Reject opens the reason dialog and sends decision rejected with the reason', () => {
     expect(PANEL).toMatch(/data-testid="signoff-reject"[\s\S]*?onClick=\{\(\) => setRejectOpen\(true\)\}/)
-    expect(PANEL).toContain('title="Reject this walk?"')
-    expect(PANEL).toContain('need to walk it again.')
-    expect(PANEL).toContain('confirmLabel="Reject walk"')
+    expect(PANEL).toContain('title="Reject this completion?"')
+    expect(PANEL).toContain('need to do it again.')
+    expect(PANEL).toContain('confirmLabel="Reject"')
     const reject = fn(PANEL, 'reject')
     expect(reject).toContain("signOffCompletion({ completionId, decision: 'rejected', reason })")
     expect(PANEL).toContain('onConfirm={(reason) => void reject(reason)}')

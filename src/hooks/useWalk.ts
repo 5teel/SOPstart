@@ -27,10 +27,10 @@ export type WalkPhase = 'browse' | 'walk' | 'review' | 'sent'
 
 export const SAVE_ERROR = "Couldn't save your progress. Check your signal and tap again."
 export const PHOTO_ERROR = "That photo didn't upload. Try again."
-// Server refusals about the walk's STATE, not the signal (review WR-05): tapping again
+// Server refusals about the run's STATE, not the signal (review WR-05): tapping again
 // would never help, so the local walk is dropped and the server page re-read.
 export const STALE_WALK: Record<string, string> = {
-  'Start the walk again.': 'This walk was finished or started over somewhere else. Loading the latest.',
+  'Start the SOP again.': 'This SOP was finished or started again somewhere else. Loading the latest.',
   'That step is not part of this SOP.': 'This SOP changed since you started. Loading the latest.',
 }
 export const LOCKED_STEP = 'Finish the steps before this one first.'

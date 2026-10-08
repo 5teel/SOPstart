@@ -499,7 +499,7 @@ export function PromoReel() {
               {scene.title}
             </h1>
             <p className="mt-3 text-reading text-ink-600" style={enter(1)}>
-              Tap a machine, walk the steps, send for sign-off.
+              Find a SOP, start it, send it for sign-off.
             </p>
             <Link
               href="/login"

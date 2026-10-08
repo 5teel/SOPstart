@@ -20,6 +20,7 @@ import { signOffCompletion } from '@/actions/completions'
 import { requestAssessorReview } from '@/actions/observations'
 import { nzDateTime, relativeWhen } from '@/lib/office/format'
 import { focusHref } from '@/lib/sop/focus-path'
+import { HOME, homeFrom } from '@/lib/shell/home-state'
 import { ReasonDialog } from './ReasonDialog'
 
 // The lightbox and its caption plugin load together, only when a photo is opened.
@@ -241,7 +242,7 @@ function SignOffBody({ review, onDone }: { review: CompletionReview; onDone(r: R
         <dd className="min-w-0 truncate text-ui text-ink-900">{workerLabel}</dd>
         <dt className={LABEL}>SOP</dt>
         <dd className="flex min-w-0 items-center gap-2 text-ui text-ink-900">
-          <Link href={focusHref(sopId, { from: 'office' })} className="min-w-0 truncate underline">
+          <Link href={focusHref(sopId, { from: homeFrom({ ...HOME, s: 'signoffs' }) })} className="min-w-0 truncate underline">
             {review.sopTitle}
           </Link>
           <span className="mono shrink-0 rounded border border-ink-200 bg-paper-2 px-2 text-meta text-ink-500">
@@ -313,7 +314,7 @@ function SignOffBody({ review, onDone }: { review: CompletionReview; onDone(r: R
 
       {review.status !== 'pending_sign_off' ? (
         <p role="status" className="text-ui text-ink-700">
-          This walk has already been {decidedWord}.
+          This completion has already been {decidedWord}.
         </p>
       ) : (
         <>
@@ -386,10 +387,10 @@ function SignOffBody({ review, onDone }: { review: CompletionReview; onDone(r: R
 
       {rejectOpen && (
         <ReasonDialog
-          title="Reject this walk?"
-          body={`${workerLabel} will see your reason and need to walk it again.`}
+          title="Reject this completion?"
+          body={`${workerLabel} will see your reason and need to do it again.`}
           label="Why are you rejecting it?"
-          confirmLabel="Reject walk"
+          confirmLabel="Reject"
           confirmTone="escalate"
           pending={pending === 'reject'}
           error={error}

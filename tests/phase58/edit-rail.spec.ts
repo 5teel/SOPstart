@@ -143,7 +143,7 @@ test.describe('FOC-02 Walk / Edit switch and the lazy seam (D-06, D-11, D-28, 58
   const strip = (src: string) => src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')
 
   test('the switch is Walk / Edit, min-h-tap, and shows for admins only: canEdit is conjoined with a role check (D-06)', () => {
-    expect(bar).toContain("{m === 'walk' ? 'Walk' : 'Edit'}")
+    expect(bar).toContain("{m === 'walk' ? 'Read' : 'Edit'}")
     expect(bar).toContain('min-h-tap')
     const code = strip(page)
     expect(code).toContain("const isAdminRole = ['admin', 'safety_manager'].includes(role ?? '')")

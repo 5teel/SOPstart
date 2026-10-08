@@ -18,7 +18,7 @@ export function MyRecordSection({ role, onHome }: { role: string | null; onHome(
         <h2 className="text-xl font-semibold text-ink-900">My record</h2>
         <p className="text-ui text-ink-500">What you&apos;ve done and who signed it off.</p>
       </div>
-      <CompletionList />
+      <CompletionList onHome={onHome} />
       <NotificationsPanel onOpenAddress={(a) => onHome(homeFromAddress(a) ?? HOME)} />
       <MyRequestsPanel role={role} about={{ site: true }} />
     </section>

@@ -55,7 +55,7 @@ async function openWalk(
     .eq('id', sopId)
     .eq('organisation_id', organisationId)
     .maybeSingle()
-  if (!sop || sop.status !== 'published') return { error: 'This SOP is not available to walk.' }
+  if (!sop || sop.status !== 'published') return { error: 'This SOP is not available to start.' }
 
   const admin = createAdminClient()
   const existing = () =>
@@ -84,7 +84,7 @@ async function openWalk(
     if (raced.data) return { walk: toWalkState(raced.data) }
   }
   console.error('startWalk insert error:', error)
-  return { error: 'Could not start the walk. Please try again.' }
+  return { error: 'Could not start this SOP. Please try again.' }
 }
 
 export async function startWalk(rawInput: unknown): Promise<{ walk: WalkState } | Fail> {
@@ -114,7 +114,7 @@ export async function recordWalkStep(rawInput: unknown): Promise<{ walk: WalkSta
     .eq('worker_id', userId)
     .eq('status', 'in_progress')
     .maybeSingle()
-  if (!row) return { error: 'Start the walk again.' }
+  if (!row) return { error: 'Start the SOP again.' }
   const walk = toWalkState(row)
 
   const sop = await loadWalkSop(supabase, organisationId, walk.sop_id)
@@ -191,7 +191,7 @@ export async function startOverWalk(rawInput: unknown): Promise<{ walk: WalkStat
     .eq('worker_id', userId)
     .eq('status', 'in_progress')
     .maybeSingle()
-  if (!old) return { error: 'Start the walk again.' }
+  if (!old) return { error: 'Start the SOP again.' }
 
   // The latest published version of this walk's lineage (D-12).
   const { data: source } = await supabase
@@ -200,7 +200,7 @@ export async function startOverWalk(rawInput: unknown): Promise<{ walk: WalkStat
     .eq('id', old.sop_id)
     .eq('organisation_id', organisationId)
     .maybeSingle()
-  if (!source) return { error: 'This SOP is not available to walk.' }
+  if (!source) return { error: 'This SOP is not available to start.' }
   const root = source.parent_sop_id ?? source.id
   const { data: family } = await supabase
     .from('sops')
@@ -208,7 +208,7 @@ export async function startOverWalk(rawInput: unknown): Promise<{ walk: WalkStat
     .eq('organisation_id', organisationId)
     .or(`id.eq.${root},parent_sop_id.eq.${root}`)
   const latest = latestPublishedOf((family ?? []) as LineageRow[], old.sop_id)
-  if (!latest) return { error: 'This SOP is not available to walk.' }
+  if (!latest) return { error: 'This SOP is not available to start.' }
 
   const { error: abandonError } = await admin
     .from('sop_walks')

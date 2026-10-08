@@ -13,7 +13,7 @@ const NOTIF = code('src/components/home/panels/NotificationsPanel.tsx')
 
 test.describe('record and training', () => {
   test('MyRecordSection composes the list and both panels and resolves a place through homeFromAddress', () => {
-    expect(RECORD).toContain('<CompletionList />')
+    expect(RECORD).toContain('<CompletionList onHome={onHome} />')
     expect(RECORD).toContain('<NotificationsPanel')
     expect(RECORD).toContain('<MyRequestsPanel')
     expect(RECORD).toContain('homeFromAddress(')

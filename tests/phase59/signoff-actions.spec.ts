@@ -28,8 +28,8 @@ const SIGN_OFF = body(COMPLETIONS, 'signOffCompletion')
 const OFFICE = strip(read('src/actions/office.ts'))
 
 test.describe('signoff actions', () => {
-  test('signOffCompletion refuses the caller own walk (A-03)', () => {
-    const refuse = SIGN_OFF.indexOf('You cannot sign off your own walk')
+  test('signOffCompletion refuses the caller own completion (A-03)', () => {
+    const refuse = SIGN_OFF.indexOf('You cannot sign off your own completion')
     expect(refuse).toBeGreaterThan(-1)
     expect(SIGN_OFF).toMatch(/completion\.worker_id === userId/)
     expect(refuse).toBeLessThan(SIGN_OFF.indexOf("from('completion_sign_offs')"))
@@ -37,7 +37,7 @@ test.describe('signoff actions', () => {
   })
 
   test('a walk that was already decided is refused, so a double submit writes one row (Pitfall 11)', () => {
-    const refuse = SIGN_OFF.indexOf('This walk has already been decided.')
+    const refuse = SIGN_OFF.indexOf('This completion has already been decided.')
     expect(refuse).toBeGreaterThan(-1)
     expect(SIGN_OFF).toContain("completion.status !== 'pending_sign_off'")
     expect(refuse).toBeLessThan(SIGN_OFF.indexOf("from('completion_sign_offs')"))
@@ -128,9 +128,9 @@ test.describe('signoff actions', () => {
     expect(b).toContain('canOverride: role ===')
     expect(b).toContain('isAssessor')
   })
-  test('the review reads exclude the caller own walk', () => {
+  test('the review reads exclude the caller own completion', () => {
     expect(body(OFFICE, 'getCompletionForReview')).toContain('row.worker_id === userId')
-    expect(body(OFFICE, 'getCompletionForReview')).toContain("'You cannot sign off your own walk'")
+    expect(body(OFFICE, 'getCompletionForReview')).toContain("'You cannot sign off your own completion'")
     expect(strip(read('src/lib/governance/load-inbox.ts'))).toContain(".neq('worker_id', userId)")
   })
   test('rejected not done: the worker completion read skips rejected rows (A-06)', () => {

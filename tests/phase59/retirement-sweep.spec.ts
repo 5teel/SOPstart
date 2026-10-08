@@ -148,7 +148,7 @@ test.describe('retire: supervisor activity view and completion supervisor half (
     expect(fs.existsSync(path.join(ROOT, 'src/components/home/sections/CompletionList.tsx'))).toBe(true)
     // 63-14: the page is gone; My record renders the list
     expect(fs.existsSync(path.join(ROOT, 'src/app/(protected)/activity/page.tsx'))).toBe(false)
-    expect(stripComments(read('src/components/home/sections/MyRecordSection.tsx'))).toContain('<CompletionList />')
+    expect(stripComments(read('src/components/home/sections/MyRecordSection.tsx'))).toContain('<CompletionList onHome={onHome} />')
     // the dropped list keeps it out and the Phase 55 sweep runs it live
     expect(read('scripts/dropped-features.json')).toContain('"feature": "supervisor-review"')
     expect(read('tests/phase55/deletion-sweep.spec.ts')).toContain("'supervisor-review'")

@@ -134,7 +134,7 @@ export async function getCompletionForReview(completionId: string): Promise<Comp
     completion_sign_offs: { decision: string; reason: string | null; created_at: string }[] | null
   }
   const row = data as unknown as Row
-  if (row.worker_id === userId) return { error: 'You cannot sign off your own walk' }
+  if (row.worker_id === userId) return { error: 'You cannot sign off your own completion' }
 
   const sop = Array.isArray(row.sops) ? (row.sops[0] ?? null) : row.sops
   const stepData = row.step_data ?? {}
@@ -283,7 +283,7 @@ export async function listDecisions(input: unknown): Promise<DecisionPage | { er
       about = { type: 'sop', sopId: r.subject_id, title: titles.get(r.subject_id) as string }
     } else if (r.subject_kind === 'completion' && r.subject_id && completions.has(r.subject_id)) {
       const c = completions.get(r.subject_id) as { worker_id: string; sop_id: string }
-      about = { type: 'text', text: `${memberLabel(labels.get(c.worker_id))}'s walk of ${titles.get(c.sop_id) ?? 'a SOP'}` }
+      about = { type: 'text', text: `${memberLabel(labels.get(c.worker_id))}'s completion of ${titles.get(c.sop_id) ?? 'a SOP'}` }
     } else if ((r.subject_kind === 'member' || r.subject_kind === 'worker') && r.subject_id) {
       about = { type: 'text', text: memberLabel(labels.get(r.subject_id)) }
     } else if (r.subject_kind === 'request') {
