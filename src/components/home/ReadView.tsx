@@ -82,11 +82,11 @@ export function ReadView({
     const button = e.currentTarget
     const chipEl = document.querySelector('[data-fuse="sop"] .wm-sop')
     const labelEl = button.querySelector('.wm-start')
+    const go = () => (qc.isFetching() + qc.isMutating() === 0 ? router.push(href) : void whenQueriesIdle(qc).then(() => router.push(href)))
     if (mode !== 'off' && typeof Element.prototype.animate === 'function' && chipEl && labelEl && document.fonts.check(`800 22px ${getComputedStyle(chipEl).fontFamily}`)) {
-      playFuse({ chip: chipEl.getBoundingClientRect(), label: labelEl.getBoundingClientRect(), button: button.getBoundingClientRect(), mode, factor: slowFactor() })
-    }
-    if (qc.isFetching() + qc.isMutating() === 0) router.push(href)
-    else void whenQueriesIdle(qc).then(() => router.push(href))
+      // The screen fades to paper first, then the page changes underneath (no loading skeleton shows through).
+      void playFuse({ chip: chipEl.getBoundingClientRect(), label: labelEl.getBoundingClientRect(), button: button.getBoundingClientRect(), mode, factor: slowFactor() }).then(go)
+    } else go()
     setTimeout(() => (starting.current = false), 4000)
   }
 

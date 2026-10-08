@@ -41,7 +41,7 @@ export function ResumeCard({
         <Wordmark variant="start" size="merge" onInk />
       </button>
       <p className="text-ui text-ink-600">Picks up at step {position} of {total}</p>
-      <button type="button" data-testid="walk-start-over" disabled={busy} onClick={() => setAsking(true)} className="min-h-tap text-ui text-ink-700 underline">
+      <button type="button" data-testid="walk-start-over" disabled={busy} onClick={() => setAsking(true)} className="min-h-tap self-start text-ui text-ink-700 underline">
         or begin from step 1
       </button>
 

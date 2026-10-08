@@ -22,7 +22,8 @@ const sleep = (t: number) => new Promise<void>((r) => setTimeout(r, t))
 
 const FIXED = 'position:fixed;pointer-events:none;'
 
-export async function run({ chip, label, button, mode, factor }: FuseInput): Promise<void> {
+/** `onCovered` fires once the screen has faded to paper (stage 1 over): the moment to navigate. */
+export async function run({ chip, label, button, mode, factor }: FuseInput, onCovered: () => void): Promise<void> {
   const root = document.documentElement
   const cs = getComputedStyle(root)
   const layer = document.getElementById('fuse-layer') ?? document.body
@@ -73,7 +74,7 @@ export async function run({ chip, label, button, mode, factor }: FuseInput): Pro
     const o2 = (T.fade + T.drop) / total
     const inkNow = getComputedStyle(p2).color
 
-    veil.animate([{ opacity: 0 }, { opacity: 1 }], { duration: T.fade, fill: 'forwards' })
+    veil.animate([{ opacity: 0 }, { opacity: 1 }], { duration: T.fade, fill: 'forwards' }).finished.then(onCovered, onCovered)
     body.animate([{ opacity: 1 }, { opacity: 0 }], { duration: T.fade, fill: 'forwards' })
     p1.animate(
       [

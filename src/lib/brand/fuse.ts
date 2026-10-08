@@ -18,6 +18,7 @@ export interface FuseInput {
 
 const DAY_KEY = 'sopstart-fuse-day'
 const SLOW_KEY = 'sopstart-fuse-slow'
+const COVER_MAX_MS = 3000
 
 /** off = no animation (reduced motion), full = first start of the day, short = every other. */
 export function motionMode(): 'off' | 'short' | 'full' {
@@ -78,13 +79,24 @@ export function prefetchFuse(): void {
 
 let playing = false
 
-export function playFuse(input: FuseInput): void {
-  if (playing) return
-  playing = true
-  void import('./fuse-engine')
-    .then((m) => m.run(input))
-    .catch(() => undefined)
-    .finally(() => {
-      playing = false
-    })
+/**
+ * Starts the merge. Resolves when the screen has faded to paper (the first stage is over), which is the
+ * moment to navigate: pushing earlier swaps Read for the next page's loading skeleton while it is still
+ * half visible. Always resolves: on an engine failure at once, and after COVER_MAX_MS whatever happens,
+ * so a slow chunk can never strand the start.
+ */
+export function playFuse(input: FuseInput): Promise<void> {
+  return new Promise((resolve) => {
+    if (playing) return resolve()
+    playing = true
+    const guard = setTimeout(resolve, COVER_MAX_MS)
+    void import('./fuse-engine')
+      .then((m) => m.run(input, resolve))
+      .catch(() => undefined)
+      .finally(() => {
+        playing = false
+        clearTimeout(guard)
+        resolve()
+      })
+  })
 }
