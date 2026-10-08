@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
-import { backForPath } from '@/lib/shell/home-state'
+import { backForPath } from '@/lib/shell/back-path'
 
 /** The one way back from a page the site opens (a page the home opens: settings, new SOP, training). */
 export function BackToSite() {

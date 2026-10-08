@@ -55,7 +55,7 @@ test.describe('FOC-01/FOC-03 focus frame', () => {
   })
 
   test('backForPath returns null for every /sops/* path so the focus frame owns the top bar (58-11)', () => {
-    const PLACE = stripComments(read('src/lib/shell/home-state.ts'))
+    const PLACE = stripComments(read('src/lib/shell/back-path.ts'))
     expect(PLACE).toContain("pathname.startsWith('/sops/')) return null")
     // BackToSite renders nothing when backForPath is null (the layout stays unchanged).
     expect(read('src/components/layout/BackToSite.tsx')).toContain('if (!href) return null')

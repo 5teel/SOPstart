@@ -133,16 +133,8 @@ export function homeFromToken(token: string | null | undefined): HomeState {
 
 const at = (s: Section) => formatHome({ ...HOME, s })
 
-/** Where a bridged page's Back goes. null = no Back bar. */
-export function backForPath(pathname: string): string | null {
-  if (pathname === '/pending' || pathname.startsWith('/sops/')) return null
-  if (pathname === '/activity' || pathname.startsWith('/activity/')) return at('record')
-  if (pathname === '/admin/training') return at('training')
-  if (pathname === '/admin/settings' || pathname === '/admin/sops/new' || pathname.startsWith('/admin/sops/new/') || pathname === '/admin/sops/upload') {
-    return at('manage')
-  }
-  return '/'
-}
+// ponytail: lives in its own module so the protected layout's Back bar does not pull this one into a shared chunk (bundle gate, 63-13).
+export { backForPath } from '@/lib/shell/back-path'
 
 /**
  * The old governance, team and access addresses (and the old list views that led

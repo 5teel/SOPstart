@@ -142,6 +142,9 @@ test.describe('home state', () => {
       expect(backForPath(p), p).toBe('/?s=manage')
     }
     expect(backForPath('/anything/else')).toBe('/')
+    for (const [p, sec] of [['/activity', 'record'], ['/admin/training', 'training'], ['/admin/settings', 'manage']] as const) {
+      expect(backForPath(p), p).toBe(formatHome(state({ s: sec }))) // back-path.ts holds literals
+    }
   })
 
   test('legacy paths redirect to fixed templates', () => {
