@@ -1,9 +1,9 @@
 {
-  "capturedAt": "2026-10-06T12:00:00.000Z",
+  "capturedAt": "2026-10-08T00:00:00.000Z",
   "note": "Phase 55 D-07 moved the worker routes DOWN by hand to the measured post-cut First Load JS and they are never re-captured. Phase 57-04 added /page (the one screen), recorded by hand once. Phase 57-08 retired the list page: /sops/page left the gate (history) and /sops/[sopId]/page moved DOWN by hand to its measured post-deletion value. /page was then set to 831 KB, the first measurement of the worker's real first download on / (signed-off by the phase-57 orchestrator, 2026-10-05; see history). Raising a value needs a signed-off decision recorded in ROADMAP.",
   "previousBaseline": {
     "/sops/[sopId]/page": 792,
-    "/page": 831
+    "/page": 834
   },
   "history": [
     {
@@ -71,10 +71,16 @@
       "value": 792,
       "capturedAt": "2026-10-06T12:00:00.000Z",
       "note": "Phase 60-16 (orchestrator decision, not the executor): measured 795 KB against 792 (+3, tolerance 2). Summed-file diff against the parent build: only the webpack runtime chunk grew, ~95 bytes, from the additional lazy chunks this phase adds (composer, ask picker, objective editor/line, bell, overview); the raw total went 794.44 -> 794.53 KB and crossed a rounding edge. Fallbacks tried: lazy ObjectiveLine in BrowseDocument (no change, reverted), bell behind next/dynamic (needed for /, kept), one lazy chunk merged (-23 B). Moved UP by hand from 792 to 795 as the accepted runtime cost of the phase's lazy seams; the route's own page chunk is unchanged."
+    },
+    {
+      "route": "/page",
+      "value": 834,
+      "capturedAt": "2026-10-08T00:00:00.000Z",
+      "note": "Phase 63-04 (orchestrator decision, not the executor): measured 837 KB against 834 (+3, tolerance 2); the untouched tree already read 836. Summed-file diff against the parent build: ~+251 bytes, ~+227 B in app/layout-*.js from next/font (Saira Semi Condensed, the approved SOPstart wordmark face, Simon 2026-10-08, ADR-0004); the Wordmark component is in no /page chunk. Moved UP by hand from 834 to 837 as the accepted cost of the brand typeface in the root layout. Phase 63-11 replaces the home on / behind lazy seams; it is measured against 837."
     }
   ],
   "routes": {
     "/sops/[sopId]/page": 795,
-    "/page": 834
+    "/page": 837
   }
 }
