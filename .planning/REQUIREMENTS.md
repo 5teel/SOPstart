@@ -1122,31 +1122,31 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 ### Home (HOME)
 
 - [x] **HOME-01**: Signing in lands on the SOP-first home: on desktop a section menu (wordmark at the top; My SOPs, My record, then Training, Sign-offs, People and Manage SOPs as the role allows; Manage last and quiet; no counts), the SOP list and the reader pane; on a phone a bottom tab bar of the same sections. Section visibility follows the capability matrix (R2)
-- [ ] **HOME-02**: My SOPs lists search (titles, steps, tools), Recent, Most used ("done N×") and All SOPs grouped by area or by type; each row shows its area, type, minutes and a status line that is information only; a search with no result offers Ask for one (and Write it for a SOP admin)
+- [x] **HOME-02**: My SOPs lists search (titles, steps, tools), Recent, Most used ("done N×") and All SOPs grouped by area or by type; each row shows its area, type, minutes and a status line that is information only; a search with no result offers Ask for one (and Write it for a SOP admin)
 - [x] **HOME-03**: With a SOP open the reader pane shows Read: the SOP chip, title, area · type · version · owner (supervisor and up, R4) · minutes, standards labels, status, the start button and "What you'll do" with kind chips; an unfinished SOP reads "Picks up at step N of M · or begin from step 1" (begin again asks first, R6)
-- [ ] **HOME-04**: My record, Training, Sign-offs, People and Manage SOPs (with Site & departments, R7) carry the content of the retired rooms and bridged pages, with every server guard and RLS policy unchanged
-- [ ] **HOME-05**: The home has one whitelisted address (section, SOP, area, tab, pin, view); old `?place=` links, stored notification places, old governance / activity / training / site addresses and the focus screen's Back all land on the matching section
+- [x] **HOME-04**: My record, Training, Sign-offs, People and Manage SOPs (with Site & departments, R7) carry the content of the retired rooms and bridged pages, with every server guard and RLS policy unchanged
+- [x] **HOME-05**: The home has one whitelisted address (section, SOP, area, tab, pin, view); old `?place=` links, stored notification places, old governance / activity / training / site addresses and the focus screen's Back all land on the matching section
 
 ### Site map (MAP)
 
-- [ ] **MAP-01**: Each SOP's area (machine's department → department tag → Site-wide, R8), type (Machine · Process · Inspection · Emergency, R3) and map object are derived from existing data in one module; only areas holding a visible published SOP exist
-- [ ] **MAP-02**: The site map is an isometric SVG generated in code from the library: every area an outlined, coloured, raised plate with its name and SOP count, every object exactly one SOP; it lays out 1–12 areas with 1–15 SOPs each without overlap, using design tokens only
-- [ ] **MAP-03**: Clicking an area zooms the map into it and filters the list; other areas dim and switch on click; Esc or the breadcrumb returns; zoomed objects show title and status and open Read; plates and objects are keyboard-reachable; reduced motion cuts instead of animating
+- [x] **MAP-01**: Each SOP's area (machine's department → department tag → Site-wide, R8), type (Machine · Process · Inspection · Emergency, R3) and map object are derived from existing data in one module; only areas holding a visible published SOP exist
+- [x] **MAP-02**: The site map is an isometric SVG generated in code from the library: every area an outlined, coloured, raised plate with its name and SOP count, every object exactly one SOP; it lays out 1–12 areas with 1–15 SOPs each without overlap, using design tokens only
+- [x] **MAP-03**: Clicking an area zooms the map into it and filters the list; other areas dim and switch on click; Esc or the breadcrumb returns; zoomed objects show title and status and open Read; plates and objects are keyboard-reachable; reduced motion cuts instead of animating
 - [x] **MAP-04**: On a phone, My SOPs has a List | Site map toggle; the whole-site view shows numbered markers and a tappable two-column key of areas
 
 ### Brand and the Start (BRAND, FUSE)
 
-- [ ] **BRAND-01**: The SOPstart wordmark (sketch 010: Saira Semi Condensed, ink SOP chip + start, continuous hazard tape, `--wm-*` tokens) replaces the text logo in the section menu, the focus screen's top bar, the sign-in screens and the welcome page; brand yellow appears only in the wordmark
+- [x] **BRAND-01**: The SOPstart wordmark (sketch 010: Saira Semi Condensed, ink SOP chip + start, continuous hazard tape, `--wm-*` tokens) replaces the text logo in the section menu, the focus screen's top bar, the sign-in screens and the welcome page; brand yellow appears only in the wordmark
 - [x] **FUSE-01**: Tapping start plays the merge into the focus screen (button body fades, SOP drops into line, they slide together, tape slides in from the left, the logo rises into the steps header) on the `--dur-fuse-*` tokens; full on the first start of the day, short after, none under reduced motion; input is never blocked
 - [x] **FUSE-02**: start lands in the running SOP at its current step (autostart), with no server action in the click and navigation that cannot be stranded by an in-flight one (R9)
 
 ### Words, retirement, gates, maps, evals
 
-- [ ] **WORD-01**: "Walk", "Walk it", "walkthrough" and "Show me" appear on no screen; worker verbs are Read · start · Stop · Next · Back a step · Done; server strings and the client keys that match them change together; a guard keeps it so
+- [x] **WORD-01**: "Walk", "Walk it", "walkthrough" and "Show me" appear on no screen; worker verbs are Read · start · Stop · Next · Back a step · Done; server strings and the client keys that match them change together; a guard keeps it so
 - [x] **RET-01**: The room metaphor is retired from the code (shell frame, room bodies, pins, Now card, plant stage, machine panels, room tables, place module); the machine-coverage request producer is removed (R1); ADR-0005 supersedes ADR-0003 in the same change, enforced by a guard
-- [ ] **GATE-01**: The `/` and `/sops/[sopId]` bundle gates stay within tolerance with the map, section bodies and the merge engine behind lazy seams; markers are re-derived for deleted modules; the baseline is never re-captured or raised by an executor
-- [ ] **DOCS-01**: `journeys.ts`, `uat/tests.ts`, the capability matrix's prose, CLAUDE.md routing and ADR line, and the sketch-findings skill describe the SOP-first home; `/pathways` shows zero unmapped screens
-- [ ] **EVAL-01**: Deployed evals prove the home for every role at desktop and 390 px, the real organisation's map, every legacy address, and the Start (full, short, reduced, resume, second start); every screenshot is read; the one-screen eval is retired into them with a written mapping
+- [x] **GATE-01**: The `/` and `/sops/[sopId]` bundle gates stay within tolerance with the map, section bodies and the merge engine behind lazy seams; markers are re-derived for deleted modules; the baseline is never re-captured or raised by an executor
+- [x] **DOCS-01**: `journeys.ts`, `uat/tests.ts`, the capability matrix's prose, CLAUDE.md routing and ADR line, and the sketch-findings skill describe the SOP-first home; `/pathways` shows zero unmapped screens
+- [x] **EVAL-01**: Deployed evals prove the home for every role at desktop and 390 px, the real organisation's map, every legacy address, and the Start (full, short, reduced, resume, second start); every screenshot is read; the one-screen eval is retired into them with a written mapping
 
 ### Phase 63 Out of Scope
 
@@ -1163,24 +1163,42 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 | REQ-ID | Plans | Status |
 |--------|-------|--------|
 | HOME-01 | 63-11, 63-12 | Complete |
-| HOME-02 | 63-02, 63-05, 63-12 | Pending |
+| HOME-02 | 63-02, 63-05, 63-12 | Complete |
 | HOME-03 | 63-06, 63-15 | Complete |
-| HOME-04 | 63-07, 63-08, 63-09, 63-12, 63-14 | Pending |
-| HOME-05 | 63-02, 63-11, 63-13, 63-14, 63-15 | Pending |
-| MAP-01 | 63-02 | Pending |
-| MAP-02 | 63-03, 63-10 | Pending |
-| MAP-03 | 63-10, 63-12 | Pending |
+| HOME-04 | 63-07, 63-08, 63-09, 63-12, 63-14 | Complete |
+| HOME-05 | 63-02, 63-11, 63-13, 63-14, 63-15 | Complete |
+| MAP-01 | 63-02 | Complete |
+| MAP-02 | 63-03, 63-10 | Complete |
+| MAP-03 | 63-10, 63-12 | Complete |
 | MAP-04 | 63-10, 63-11, 63-12 | Complete |
-| BRAND-01 | 63-04 | Pending |
+| BRAND-01 | 63-04 | Complete |
 | FUSE-01 | 63-15 | Complete |
 | FUSE-02 | 63-15 | Complete |
-| WORD-01 | 63-16, 63-17 | Pending |
+| WORD-01 | 63-16, 63-17 | Complete |
 | RET-01 | 63-19, 63-20 | Complete |
-| GATE-01 | 63-01, 63-04, 63-11, 63-15, 63-20, 63-21 | Pending |
-| DOCS-01 | 63-17, 63-20, 63-21 | Pending |
-| EVAL-01 | 63-01, 63-12, 63-14, 63-15, 63-18, 63-21 | Pending |
+| GATE-01 | 63-01, 63-04, 63-11, 63-15, 63-20, 63-21 | Complete |
+| DOCS-01 | 63-17, 63-20, 63-21 | Complete |
+| EVAL-01 | 63-01, 63-12, 63-14, 63-15, 63-18, 63-21 | Complete |
 
 **Phase 63 Coverage:** 17 requirements — HOME 5 · MAP 4 · BRAND 1 · FUSE 2 · WORD 1 · RET 1 · GATE 1 · DOCS 1 · EVAL 1; 17/17 mapped to plans. Added 2026-10-08.
+
+**Phase 63 evidence (63-21, deployed `07a9f65c`, full run in `63-EVAL.md`):**
+
+- HOME-01: `home.eval` HOME-01 (both cases) + `63-home-worker-desktop`, `63-home-sections-admin`.
+- HOME-02: `home.eval` Recent / area / type, Most used "done N×", search by title and step text, miss offers Ask / Write it. Tool-name search is source-contract only (`useSopSearch` `required_tools`, `tests/phase63/sop-list.spec.ts`); no deployed fixture SOP carries a tool.
+- HOME-03: `home.eval` HOME-03 (three cases), `start.eval` FUSE-02 resume (`63-fuse-resume-read`, `63-fuse-kept-going`: one start).
+- HOME-04: `home.eval` HOME-04 (sections, bell, Manage / Site & departments) + `office.eval` (19) + `requests.eval` (11).
+- HOME-05: `home-addresses.eval` (5) + `home.eval` HOME-05.
+- MAP-01 / MAP-02: `tests/phase63` classifier and iso-layout specs; real organisation `63-real-org-list`, `63-real-org-map` (three plates, one object each, nothing overlapping).
+- MAP-03: `home.eval` MAP-03 (zoom, filter, Esc, dim, open Read). The reduced-motion cut is source-contract (`SiteMap.tsx`, `tests/phase63/site-map.spec.ts`), not exercised on the deploy.
+- MAP-04: `home.eval` MAP-04 + `63-home-phone-*`, `63-real-org-map-phone`.
+- BRAND-01: wordmark in the menu (`63-home-worker-desktop`), focus bar (`63-fuse-landed`), login / sign-up (`cut-login`, `cut-sign-up`), welcome reel; `tests/phase63/wordmark.spec.ts`.
+- FUSE-01 / FUSE-02: `start.eval` (5), six slow-motion frames and the phone frames read.
+- WORD-01: `tests/lint/no-walk-words.spec.ts` (CRLF-proofed in 63-21) + no walk word in any of 205 screenshots; "Show me" in the editor's AI findings is a reasoned allowlist entry.
+- RET-01: 63-19 / 63-20 (`tests/lint/no-rooms.spec.ts`, ADR-0005).
+- GATE-01: `npm run build` gate `/sops/[sopId]/page` 802 (baseline 802), `/page` 832 (baseline 831, tolerance 2); `.bundle-baseline.json` untouched.
+- DOCS-01: `home.eval` DOCS-01 (pathways reports zero unmapped), 63-17, 63-20 (ADR-0005, CLAUDE.md ADR line).
+- EVAL-01: this run; the one-screen eval is retired with its mapping (63-18).
 
 ---
 *v11.0 requirements added: 2026-10-03*

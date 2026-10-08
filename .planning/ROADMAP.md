@@ -1717,7 +1717,7 @@ Executes 55 → 56 → 57 → 58 → 59 → 60 → 61 → 62, strictly sequentia
 - [x] **Phase 60: Requests, Notifications & Objectives** - People and agents raise requests the Office answers; notifications with a bell; objectives as quiet metadata; the site overview fills in (completed 2026-10-06)
 - [~] **Phase 61: The Workshop & the Smoko Room** - MOVED OUT OF GSD 2026-10-06: tracked as todo pieces A-H in the Claude Doc https://claude.ai/code/artifact/16b59e56-b699-4972-81e8-d946f140234f
 - [~] **Phase 62: Removal Certified, Addresses & Maps** - MOVED OUT OF GSD 2026-10-06: tracked as clean-up todos in the Claude Doc https://claude.ai/code/artifact/16b59e56-b699-4972-81e8-d946f140234f
-- [ ] **Phase 63: SOP-first Home, Library Site Map and the SOPstart Start** - The home becomes find · read · start (sketch 009 A + the library site map); rooms retired; the SOPstart wordmark and the start merge (sketch 010); "walk" leaves the screen
+- [x] **Phase 63: SOP-first Home, Library Site Map and the SOPstart Start** - The home becomes find · read · start (sketch 009 A + the library site map); rooms retired; the SOPstart wordmark and the start merge (sketch 010); "walk" leaves the screen
 
 ### Phase 55: Cut the Dropped Features & One Organisation
 
@@ -2203,7 +2203,7 @@ Plans:
 
 **Wave 10** *(blocked on Wave 9 completion)*
 
-- [ ] 63-21-PLAN.md — Full deployed eval with every screenshot read and a fix round, build + full suite once, sign-off, requirements, Learnings
+- [x] 63-21-PLAN.md — Full deployed eval with every screenshot read and a fix round, build + full suite once, sign-off, requirements, Learnings
 
 ## Progress
 
