@@ -1,5 +1,7 @@
 # One-Screen Site — the MVP shell
 
+> **Superseded for the home (2026-10-08) by sketch 009 A + the library site map, sketch 010 and ADR-0004 / ADR-0005: rooms, the picture-as-home, the Now card, pins and to-do counts are retired. The focus rule below still holds.**
+
 **Status: NOT SHIPPED. Design contract, decided 2026-10-02/03 (sketch 008, winner A + focus rule).**
 This is the **simplification contract**: the app is cut to an MVP and collapses onto one
 screen. Where it conflicts with an older reference in this skill, **this file wins** — see

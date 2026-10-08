@@ -86,7 +86,8 @@ supersession table.
 
 | Area | Reference | Key decision |
 |------|-----------|--------------|
-| **One-screen site — MVP shell** ⚠ **not shipped · governs** | references/one-screen-site.md | Three panes (list 256 · site · detail 400, wide for tables); Office/Smoko room/Workshop/Noticeboard/machines are the only destinations; **an open SOP takes the whole screen** (map + list removed); eight-type data model; kept/dropped feature list; supersession table for every older reference |
+| **The SOP-first home** (shipped, Phase 63) | `.planning/sketches/009-sop-first-home/` (variant A + the library site map), `.planning/sketches/010-wordmark/`, ADR-0004 / ADR-0005 | Search and the SOP list beside Read; a section menu (SOPs, My record, Sign-offs, People, Training, Manage SOPs); the library drawn as a site map; the wordmark and the Start. **Governs the home.** |
+| One-screen site — MVP shell ⚠ **superseded for the home (2026-10-08); the focus rule stands** | references/one-screen-site.md | Three panes (list 256 · site · detail 400, wide for tables); Office/Smoko room/Workshop/Noticeboard/machines are the only destinations; **an open SOP takes the whole screen** (map + list removed); eight-type data model; kept/dropped feature list; supersession table for every older reference |
 | Design tokens | references/design-tokens.md | Paper/ink palette + JetBrains Mono + 20px grid-paper bg; 6 semantic accent colors |
 | Layout primitives | references/layout-primitives.md | Pills, tabs, grid-paper bg, card frames, evidence buttons, measurement box, decision buttons |
 | Screen inventory | references/screen-inventory.md | 8 tabs: overview, tools, hazards, flow, model, walkthrough (desktop + mobile), cmdk, voice |
@@ -109,7 +110,8 @@ Original sketch HTML preserved at `sources/blueprint-sketch.html` (2015 lines, a
 <routing>
 ## When reading this skill, also read
 
-- `references/one-screen-site.md` **FIRST, always** — the 2026-10 MVP simplification. It says which parts of every reference below still apply and which are dropped. Do not build from an older reference without checking its row in that file's "What this supersedes" table.
+- **For the home** (`/`, the section menu, the library site map, the wordmark, the Start): `.planning/sketches/009-sop-first-home/` (variant A + the site map), `.planning/sketches/010-wordmark/` and ADR-0004 / ADR-0005 — **first**. Rooms, the picture-as-home, the Now card, pins and to-do counts are retired.
+- `references/one-screen-site.md` — **superseded for the home (2026-10-08); its focus rule still holds** (an open SOP takes the whole screen), and its "What this supersedes" table still says which parts of the older references below apply. Check a row there before building from an older reference.
 - `references/design-tokens.md` if implementing palette, typography, or globals
 - `references/layout-primitives.md` if building reusable components (pills, tabs, cards)
 - `references/screen-inventory.md` if implementing a specific tab / screen

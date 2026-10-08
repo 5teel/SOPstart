@@ -33,7 +33,7 @@ test.describe('capability matrix', () => {
   test('Sign off completion row: self sign-off refused, supervisor scoped to assigned workers (59-06)', () => {
     const r = row('Sign off completion')
     expect(r.split('|').map((c) => c.trim()).slice(2, 6)).toEqual(['—', '✅', '✅', '✅'])
-    for (const name of ['own walk', 'getCompletionForReview()', 'src/actions/office.ts', 'assigned to the worker', 'override reason']) {
+    for (const name of ['own completion', 'getCompletionForReview()', 'src/actions/office.ts', 'assigned to the worker', 'override reason']) {
       expect(r).toContain(name)
     }
     expect(row('Counter-sign completion')).toContain('signOffCompletion()')
@@ -64,21 +64,21 @@ test.describe('capability matrix', () => {
   })
   test('Office tab rows: worker none, supervisor the Inbox and Requests, admin and safety manager all five; the training bridge and the redirects are named (59-13)', () => {
     const cells = (label: string) => row(label).split('|').map((c) => c.trim())
-    expect(cells('Office -- Inbox tab').slice(2, 6)).toEqual(['—', expect.stringContaining('✅'), '✅', '✅'])
-    for (const label of ['Office -- Decisions tab', 'Office -- People & roles tab', 'Office -- Access tab']) {
+    expect(cells('Sign-offs -- Inbox tab').slice(2, 6)).toEqual(['—', expect.stringContaining('✅'), '✅', '✅'])
+    for (const label of ['Sign-offs -- Decisions tab', 'People -- people and roles tab', 'People -- access tab']) {
       expect(cells(label).slice(2, 5), label).toEqual(['—', '—', '✅'])
       expect(cells(label)[5], label).toContain('✅')
       expect(row(label), label).toContain('tabsForRole()')
     }
-    expect(row('Office -- Inbox tab')).toContain('falls back to the Inbox')
-    expect(row('Office -- Inbox tab')).toContain('Inbox and Requests tabs')
-    expect(row('Office -- Access tab')).toContain('listAdminAccessData()')
-    expect(row('Office -- People & roles tab')).toContain('/admin/team')
+    expect(row('Sign-offs -- Inbox tab')).toContain('falls back to the Inbox')
+    expect(row('Sign-offs -- Inbox tab')).toContain('Inbox and Requests tabs')
+    expect(row('People -- access tab')).toContain('listAdminAccessData()')
+    expect(row('People -- people and roles tab')).toContain('/admin/team')
     expect(row('Training matrix')).toContain('/?s=training')
     expect(row('Training matrix')).toContain('requireAdminContext()')
-    expect(row('SOP library table + Access lens (admin)')).toContain('Office Access tab')
-    expect(row('Manage departments')).toContain('People & roles tab')
-    for (const address of ['/?place=office&tab=people', '/?place=office&tab=access']) expect(MATRIX).toContain(address)
+    expect(row('SOP library table + Access lens (admin)')).toContain('People access tab')
+    expect(row('Manage departments')).toContain('People section')
+    for (const address of ['/?s=people', '/?s=people&tab=access']) expect(MATRIX).toContain(address)
   })
   test('Activity row: a non-owner completion address redirects to the Office, with no service-role read by id (59-15)', () => {
     const r = row('Activity -- own completion record')
