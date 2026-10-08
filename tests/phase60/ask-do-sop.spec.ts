@@ -148,6 +148,9 @@ test.describe('Ask someone to do a SOP (60-06)', () => {
   })
 
   test('worker-signal and the assignment half of useWorkerSops are unchanged since the phase began (git diff empty)', () => {
-    execSync('git diff --quiet f1b2ff93 -- src/lib/sop/worker-signal.ts src/hooks/useWorkerSops.ts', { cwd: path.resolve(__dirname, '..', '..') })
+    const cwd = path.resolve(__dirname, '..', '..')
+    execSync('git diff --quiet f1b2ff93 -- src/lib/sop/worker-signal.ts', { cwd })
+    // Phase 63-05 (edf20637) deliberately extracted the library query into libraryQueryFn; the pin moves to that commit
+    execSync('git diff --quiet edf20637 -- src/hooks/useWorkerSops.ts', { cwd })
   })
 })
