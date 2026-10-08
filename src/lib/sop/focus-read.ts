@@ -10,6 +10,7 @@ import type { FocusKind } from '@/lib/sop/focus'
 import { userLabels } from '@/lib/members/labels'
 import { setByWords, type ObjectiveView } from '@/lib/objectives/model'
 import { lineageRoot } from '@/lib/sop/lineage-current'
+import { assembleFocus, type AssembleAttachment } from '@/lib/sop/focus-assemble'
 
 const SIGNED_TTL_SEC = 3600
 
@@ -110,15 +111,16 @@ export async function loadFocusSop(client: SupabaseClient, sopId: string): Promi
     if (r.error) throw new Error(r.error.message)
   }
 
-  const sections = (secRes.data ?? []) as FocusSection[]
-  const rawSteps = (stepRes.data ?? []) as Array<Omit<FocusStepRow, 'image_urls'>>
-
-  // Group by section order first, then step order, so the editor and the walk agree.
-  const sectionRank = new Map(sections.map((s, i) => [s.id, i]))
-  rawSteps.sort(
-    (a, b) =>
-      (sectionRank.get(a.section_id) ?? 0) - (sectionRank.get(b.section_id) ?? 0) || a.sort_order - b.sort_order
-  )
+  // Ordering, standards grouping and minutes are shared with the home's Read view.
+  const assembled = assembleFocus({
+    sopId,
+    sections: (secRes.data ?? []) as FocusSection[],
+    steps: (stepRes.data ?? []) as Array<Omit<FocusStepRow, 'image_urls'>>,
+    standards: (stdRes.data ?? []) as FocusStandard[],
+    attachments: (attRes.data ?? []) as AssembleAttachment[],
+  })
+  const { sections, standards, totalMinutes } = assembled
+  const rawSteps = assembled.steps
 
   // One batched signing call for every image on every step.
   const allPaths = [...new Set(rawSteps.flatMap((s) => s.image_paths ?? []))]
@@ -135,26 +137,6 @@ export async function loadFocusSop(client: SupabaseClient, sopId: string): Promi
     image_urls: (s.image_paths ?? []).flatMap((p) => (signed.has(p) ? [{ path: p, url: signed.get(p)! }] : [])),
   }))
 
-  const names = new Map(((stdRes.data ?? []) as FocusStandard[]).map((s) => [s.id, s]))
-  const stepIds = new Set(steps.map((s) => s.id))
-  const sectionIds = new Set(sections.map((s) => s.id))
-  const standards: FocusSop['standards'] = { sop: [], sections: {}, steps: {} }
-  const push = (map: Record<string, FocusStandard[]>, key: string, std: FocusStandard) => {
-    ;(map[key] ??= []).push(std)
-  }
-  for (const a of (attRes.data ?? []) as Array<{
-    standard_id: string
-    sop_id: string | null
-    section_id: string | null
-    focus_step_id: string | null
-  }>) {
-    const std = names.get(a.standard_id)
-    if (!std) continue
-    if (a.sop_id === sopId) standards.sop.push(std)
-    else if (a.section_id && sectionIds.has(a.section_id)) push(standards.sections, a.section_id, std)
-    else if (a.focus_step_id && stepIds.has(a.focus_step_id)) push(standards.steps, a.focus_step_id, std)
-  }
-
   const machineIds = ((macRes.data ?? []) as Array<{ machine_id: string }>).map((m) => m.machine_id)
   let machines: FocusSop['machines'] = []
   if (machineIds.length > 0) {
@@ -170,9 +152,7 @@ export async function loadFocusSop(client: SupabaseClient, sopId: string): Promi
     }))
   }
 
-  const totalMinutes = steps.reduce((sum, s) => sum + (Number(s.time_estimate_minutes) || 0), 0)
-
-  const o = objRes.data as {
+  const o =objRes.data as {
     id: string
     text: string
     due_on: string | null
