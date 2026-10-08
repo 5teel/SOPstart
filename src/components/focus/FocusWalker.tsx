@@ -5,7 +5,7 @@
  * (58-11). The server page hands over the resolved SOP and the worker's own
  * in-progress walk; useWalk owns everything that changes after that.
  */
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { BEFORE_YOU_START, currentIndex, type WalkEntry } from '@/lib/sop/focus'
 import type { EditorOwner, FocusSop, FocusStepRow } from '@/lib/sop/focus-read'
 import type { WalkState } from '@/lib/sop/walk-read'
@@ -34,9 +34,21 @@ export interface FocusWalkerProps {
   canEdit: boolean
   /** The owner row of the editor's This SOP block; null when the viewer cannot edit. */
   owner?: EditorOwner | null
+  /** ?go=1 from Read's start: begin (or pick up) the walk on arrival, once. */
+  autostart?: boolean
+  /** ?fresh=1 from "or begin from step 1": open the discard confirmation straight away. */
+  askStartOver?: boolean
 }
 
-export function FocusWalker({ data: served, initialWalk, from, versionState: servedState, supersededBy, updatedSinceLastWalk, initialMode, job, canEdit, owner = null }: FocusWalkerProps) {
+/** Drop a single-use flag from the address, keeping the rest (history only, no navigation). */
+function stripFlag(name: string) {
+  const url = new URL(window.location.href)
+  if (!url.searchParams.has(name)) return
+  url.searchParams.delete(name)
+  window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}`)
+}
+
+export function FocusWalker({ data: served, initialWalk, from, versionState: servedState, supersededBy, updatedSinceLastWalk, initialMode, job, canEdit, owner = null, autostart = false, askStartOver = false }: FocusWalkerProps) {
   // Walk / Edit flips in place (D-06): local state plus the address, never a navigation.
   const [editing, setEditing] = useState(initialMode !== 'browse')
   // The editor reports its latest read of the SOP, so Walk after an edit shows the steps as edited.
@@ -57,6 +69,20 @@ export function FocusWalker({ data: served, initialWalk, from, versionState: ser
   const frameMode = editing ? (reading ? 'parsing' : 'edit') : w.phase
   const { order, phase, walk, entry } = w
   const canWalk = versionState === 'live'
+
+  // Start from Read lands in the running SOP, not the browse page. One start per mount; no router call
+  // here (a navigation from a mount effect can strand the next server action, CLAUDE.md 2026-09-29).
+  const started = useRef(false)
+  const canAutostart = autostart && initialMode === 'browse' && canWalk && order.length > 0
+  useEffect(() => {
+    if (!canAutostart || started.current) return
+    started.current = true
+    stripFlag('go')
+    void w.start()
+  }, [canAutostart, w])
+  useEffect(() => {
+    if (askStartOver) stripFlag('fresh')
+  }, [askStartOver])
 
   const chip = versionState === 'superseded' ? `v${data.sop.version} — superseded` : versionState === 'draft' ? 'Draft' : null
 
@@ -105,6 +131,9 @@ export function FocusWalker({ data: served, initialWalk, from, versionState: ser
     )
   } else if (phase === 'sent') {
     body = <SentPanel />
+  } else if (canAutostart && !w.error && !editing) {
+    // The merge is landing here: hold a blank paper page until the first step arrives.
+    body = <div data-testid="focus-autostart" className="min-h-dvh bg-paper" />
   } else {
     body = (
       <BrowseDocument
@@ -120,6 +149,7 @@ export function FocusWalker({ data: served, initialWalk, from, versionState: ser
               position={resumeAt}
               total={order.length}
               busy={w.busy}
+              initialAsking={askStartOver}
               onResume={() => void w.start()}
               onStartOver={() => void w.startOver()}
             />

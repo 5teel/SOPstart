@@ -27,10 +27,13 @@ export default async function SopFocusPage({
   searchParams,
 }: {
   params: Promise<{ sopId: string }>
-  searchParams: Promise<{ from?: string | string[]; mode?: string | string[] }>
+  searchParams: Promise<{ from?: string | string[]; mode?: string | string[]; go?: string | string[]; fresh?: string | string[] }>
 }) {
   const { sopId } = await params
-  const { from: rawFrom, mode: rawMode } = await searchParams
+  const { from: rawFrom, mode: rawMode, go: rawGo, fresh: rawFresh } = await searchParams
+  // Single-use flags from Read (63-15): only the exact value 1 counts; the walker strips them.
+  const go = rawGo === '1'
+  const fresh = rawFresh === '1'
   // Raw; every consumer (Back, the superseded link) passes it through the place whitelist.
   const from = typeof rawFrom === 'string' ? rawFrom : null
 
@@ -66,7 +69,7 @@ export default async function SopFocusPage({
 
   if (editing && requested.status === 'published') {
     const draft = lineage.find((r) => r.status === 'draft')
-    if (draft) redirect(focusHref(draft.id, { mode: 'edit', from }))
+    if (draft) redirect(focusHref(draft.id, { mode: 'edit', from, go, fresh }))
   }
 
   const [walksRes, completionsRes, jobRes] = await Promise.all([
@@ -104,7 +107,7 @@ export default async function SopFocusPage({
     target = { kind: 'open', id: sopId, superseded: !!latestRow && (latestRow.version ?? 0) > (row?.version ?? 0) }
   }
   if (target.kind === 'not_found') notFound()
-  if (target.kind === 'redirect') redirect(focusHref(target.id, { from }))
+  if (target.kind === 'redirect') redirect(focusHref(target.id, { from, go, fresh }))
 
   const data = await loadFocusSop(supabase, target.id)
   if (!data) notFound()
@@ -178,6 +181,8 @@ export default async function SopFocusPage({
       job={job}
       canEdit={canEdit}
       owner={owner}
+      autostart={go}
+      askStartOver={fresh}
     />
   )
 }

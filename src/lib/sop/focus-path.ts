@@ -10,12 +10,15 @@ import { formatHome, homeFrom, homeFromToken } from '@/lib/shell/home-state'
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
-export function focusHref(sopId: string, opts: { mode?: 'edit'; from?: string | null } = {}): string {
+/** `go` starts (or picks up) the walk on arrival; `fresh` opens the begin-again confirmation. Both are single-use: the walker strips them. */
+export function focusHref(sopId: string, opts: { mode?: 'edit'; from?: string | null; go?: boolean; fresh?: boolean } = {}): string {
   if (!UUID.test(sopId)) throw new Error('focusHref: not a SOP id')
   const q: string[] = []
   if (opts.mode === 'edit') q.push('mode=edit')
   const from = homeFrom(homeFromToken(opts.from))
   if (from) q.push(`from=${encodeURIComponent(from)}`)
+  if (opts.go) q.push('go=1')
+  if (opts.fresh) q.push('fresh=1')
   return `/sops/${sopId}${q.length ? `?${q.join('&')}` : ''}`
 }
 

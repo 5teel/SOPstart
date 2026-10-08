@@ -2,7 +2,7 @@
 
 /**
  * Browse state of the focus screen (D-05): every step in walk order, read only.
- * No completion exists here; "Start walking" is the one primary and the page
+ * No completion exists here; "start" is the one primary and the page
  * decides whether to pass it. Text renders as plain React children only.
  */
 import type { ReactNode } from 'react'
@@ -12,6 +12,7 @@ import { History, Lightbulb } from 'lucide-react'
 import { BEFORE_YOU_START, type WalkEntry } from '@/lib/sop/focus'
 import type { FocusSop, FocusStepRow } from '@/lib/sop/focus-read'
 import { focusHref } from '@/lib/sop/focus-path'
+import { Wordmark } from '@/components/brand/Wordmark'
 import { KindChip, KIND_EDGE } from '@/components/focus/KindChip'
 import { StandardLabels } from '@/components/sop/StandardLabels'
 import { ObjectiveLine } from '@/components/shell/ObjectiveLine'
@@ -27,9 +28,9 @@ export interface BrowseDocumentProps {
   data: FocusSop
   order: WalkEntry<FocusStepRow>[]
   from: string | null
-  /** The live version this one was replaced by (D-14). Hides Start walking. */
+  /** The live version this one was replaced by (D-14). Hides start. */
   supersededBy?: { id: string; version: number } | null
-  /** D-12: a newer version was published since this worker last walked it. */
+  /** D-12: a newer version was published since this worker last did it. */
   updatedSinceLastWalk?: boolean
   /** Only passed for a live version a worker may walk. */
   onStartWalking?: () => void
@@ -74,7 +75,7 @@ export function BrowseDocument({ data, order, from, supersededBy, updatedSinceLa
               <span className="mono rounded bg-accent-measure/14 px-1.5 py-0.5 text-micro font-semibold uppercase tracking-wide text-accent-measure">
                 Updated
               </span>
-              Updated since you last walked it
+              Updated since you last did it
             </p>
           )}
           {data.standards.sop.length > 0 && (
@@ -156,9 +157,10 @@ export function BrowseDocument({ data, order, from, supersededBy, updatedSinceLa
               type="button"
               data-testid="focus-start-walking"
               onClick={onStartWalking}
-              className="min-h-tap-glove w-full rounded-lg bg-ink-900 text-reading font-semibold text-paper"
+              aria-label="start"
+              className="flex min-h-tap-glove w-full items-center justify-center rounded-lg bg-ink-900"
             >
-              Start walking
+              <Wordmark variant="start" size="merge" onInk />
             </button>
           </div>
         </div>

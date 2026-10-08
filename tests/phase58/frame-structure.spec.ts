@@ -67,7 +67,7 @@ test.describe('FOC-01/FOC-03 focus frame', () => {
     const code = stripComments(PAGE)
     expect(code).toContain('resolveFocusTarget(')
     expect(code).toContain('notFound()')
-    expect(code).toContain('redirect(focusHref(target.id, { from }))')
+    expect(code).toContain('redirect(focusHref(target.id, { from, go, fresh }))')
     expect(code).toContain('<FocusWalker')
     expect(code).not.toMatch(/useEffect|useRouter|router\./)
     for (const banned of ['BackToSite', 'PlantStage', '@/components/shell', '@/components/admin', 'SopTabNav', 'WalkthroughSwitcher', 'ReadTab', 'useSopDetail']) {
@@ -141,8 +141,9 @@ test.describe('FOC-01/FOC-03 focus frame', () => {
     const BROWSE = read('src/components/focus/BrowseDocument.tsx')
     expect(BROWSE).toContain('const canStart = !!onStartWalking && !supersededBy')
     expect(BROWSE).toMatch(/\{canStart && \(/)
-    expect(BROWSE).toContain('Start walking')
-    expect(BROWSE).toContain('Updated since you last walked it')
+    expect(BROWSE).toContain('aria-label="start"')
+    expect(BROWSE).toContain('data-testid="focus-start-walking"')
+    expect(BROWSE).toContain('Updated since you last did it')
     expect(BROWSE).toContain('This SOP has no steps yet.')
     // Browse creates no completion.
     expect(stripComments(BROWSE)).not.toMatch(/startWalk|submitCompletion|@\/actions/)

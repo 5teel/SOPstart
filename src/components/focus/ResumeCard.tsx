@@ -1,27 +1,31 @@
 'use client'
 
 import { useState } from 'react'
+import { Wordmark } from '@/components/brand/Wordmark'
 import { useRegisterOverlay } from '@/hooks/useFocusBack'
 
 /**
  * Shown over the browse document when the worker has a walk in progress (D-09).
- * "Start over" asks first; the dialog registers with the frame so Esc closes it
+ * "or begin from step 1" asks first; the dialog registers with the frame so Esc closes it
  * before Esc would leave the screen.
  */
 export function ResumeCard({
   position,
   total,
   busy,
+  initialAsking = false,
   onResume,
   onStartOver,
 }: {
   position: number
   total: number
   busy: boolean
+  /** Open the discard confirmation on arrival (?fresh=1 from Read). */
+  initialAsking?: boolean
   onResume(): void
   onStartOver(): void
 }) {
-  const [asking, setAsking] = useState(false)
+  const [asking, setAsking] = useState(initialAsking)
   useRegisterOverlay(asking, () => setAsking(false))
 
   return (
@@ -31,12 +35,14 @@ export function ResumeCard({
         data-testid="walk-resume-button"
         disabled={busy}
         onClick={onResume}
-        className="min-h-tap-glove w-full rounded-lg bg-ink-900 text-reading font-semibold text-paper"
+        aria-label="start"
+        className="flex min-h-tap-glove w-full items-center justify-center rounded-lg bg-ink-900"
       >
-        Resume where you left off (step {position} of {total})
+        <Wordmark variant="start" size="merge" onInk />
       </button>
-      <button type="button" data-testid="walk-start-over" disabled={busy} onClick={() => setAsking(true)} className="min-h-tap text-ui text-ink-700">
-        Start over
+      <p className="text-ui text-ink-600">Picks up at step {position} of {total}</p>
+      <button type="button" data-testid="walk-start-over" disabled={busy} onClick={() => setAsking(true)} className="min-h-tap text-ui text-ink-700 underline">
+        or begin from step 1
       </button>
 
       {asking && (
@@ -45,7 +51,7 @@ export function ResumeCard({
             <h2 id="start-over-title" className="text-reading font-semibold text-ink-900">
               Start over?
             </h2>
-            <p className="text-reading text-ink-700">Your ticks and photos from this walk will be thrown away.</p>
+            <p className="text-reading text-ink-700">Your ticks and photos so far will be thrown away.</p>
             <div className="flex flex-col gap-2">
               <button
                 type="button"
@@ -60,7 +66,7 @@ export function ResumeCard({
                 Start over
               </button>
               <button type="button" onClick={() => setAsking(false)} className="min-h-tap text-ui text-ink-700">
-                Keep walking
+                Keep going
               </button>
             </div>
           </div>

@@ -201,7 +201,7 @@ test.describe('FOC-02 Walk / Edit switch and the lazy seam (D-06, D-11, D-28, 58
     const code = strip(page)
     expect(code).toContain('requireSopEditAccess({ sopId })')
     expect(code).toContain("rawMode === 'edit'")
-    expect(code).toContain("redirect(focusHref(draft.id, { mode: 'edit', from }))")
+    expect(code).toContain("redirect(focusHref(draft.id, { mode: 'edit', from, go, fresh }))")
     // A refusal falls back to the worker resolution (a draft stays not found for a worker).
     expect(code).toContain('if (editing)')
     expect(code).toContain('resolveFocusTarget(')

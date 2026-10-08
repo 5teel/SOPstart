@@ -10,13 +10,14 @@
  * Pitfall 6: the machine panel and browse page this start skips were the entry points
  * for Make a request, Ask and Edit, so Read carries all three, each gated by role.
  */
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { getSopOwner } from '@/actions/sop-owner'
 import { Wordmark } from '@/components/brand/Wordmark'
+import { captureSlowFlag, motionMode, playFuse, prefetchFuse, slowFactor, whenQueriesIdle } from '@/lib/brand/fuse'
 import { KindChip } from '@/components/focus/KindChip'
 import { DOT } from '@/components/home/SopRow'
 import { StandardLabels } from '@/components/sop/StandardLabels'
@@ -62,10 +63,32 @@ export function ReadView({
   })
   const owner = ownerQ.data && 'label' in ownerQ.data ? ownerQ.data.label : null
 
-  const startHref = focusHref(row.id, { from })
+  // Start (63-15): the merge plays in the root layer while the focus screen loads, and the walk starts
+  // there (go). The click runs no server action; if a query is in flight the push waits for it (<= 3 s).
+  const qc = useQueryClient()
+  const starting = useRef(false)
+  const startHref = focusHref(row.id, { from, go: true })
   useEffect(() => {
+    captureSlowFlag()
+    prefetchFuse()
     router.prefetch(startHref)
   }, [router, startHref])
+
+  const onStart = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (starting.current) return
+    starting.current = true
+    const href = focusHref(row.id, { from, go: true })
+    const mode = motionMode()
+    const button = e.currentTarget
+    const chipEl = document.querySelector('[data-fuse="sop"] .wm-sop')
+    const labelEl = button.querySelector('.wm-start')
+    if (mode !== 'off' && typeof Element.prototype.animate === 'function' && chipEl && labelEl && document.fonts.check(`800 22px ${getComputedStyle(chipEl).fontFamily}`)) {
+      playFuse({ chip: chipEl.getBoundingClientRect(), label: labelEl.getBoundingClientRect(), button: button.getBoundingClientRect(), mode, factor: slowFactor() })
+    }
+    if (qc.isFetching() + qc.isMutating() === 0) router.push(href)
+    else void whenQueriesIdle(qc).then(() => router.push(href))
+    setTimeout(() => (starting.current = false), 4000)
+  }
 
   const back = (
     <button type="button" data-testid="read-back" onClick={onBack} className="mb-4 block min-h-tap text-ui text-ink-600">
@@ -114,7 +137,7 @@ export function ReadView({
           data-testid="read-start"
           data-fuse="button"
           aria-label="start"
-          onClick={() => router.push(startHref)}
+          onClick={onStart}
           className="flex min-h-tap-glove w-full items-center justify-center rounded-lg bg-ink-900 lg:w-auto lg:px-10"
         >
           <Wordmark variant="start" size="merge" onInk data-fuse="start" />
@@ -123,7 +146,7 @@ export function ReadView({
           {status?.kind === 'stopped' ? (
             <>
               Picks up at step {status.step} of {status.total} ·{' '}
-              <Link data-testid="read-begin-again" href={startHref} className="underline">
+              <Link data-testid="read-begin-again" href={focusHref(row.id, { from, fresh: true })} className="underline">
                 or begin from step 1
               </Link>
             </>
