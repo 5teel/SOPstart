@@ -747,5 +747,15 @@ export default defineConfig({
       testMatch: /tests\/phase60\/.*\.(spec|test)\.ts$/,
       use: { browserName: 'chromium' },
     },
+    {
+      // Phase 63 -- SOP-first home, library site map and the SOPstart start.
+      // Wave 0 / Plan 63-01. Deliberately broad testMatch (tests/phase63/**) so
+      // later plans drop specs in with no further config edit (CLAUDE.md 2026-05-25).
+      // Verify registration: `npx playwright test --list --project=phase63`
+      name: 'phase63',
+      testDir: '.',
+      testMatch: /tests\/phase63\/.*\.(spec|test)\.ts$/,
+      use: { browserName: 'chromium' },
+    },
   ],
 })
