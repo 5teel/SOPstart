@@ -205,7 +205,7 @@ export function SiteMap({ areas, rows, area, onArea, onOpenSop, orgName, renderO
           {openArea ? 'click a SOP to read it · Esc for the whole site' : 'click an area to open it'}
         </span>
       </div>
-      {renderObjective?.(area)}
+      <div className="px-5 pt-2 empty:hidden">{renderObjective?.(area)}</div>
 
       <svg
         ref={svgRef}

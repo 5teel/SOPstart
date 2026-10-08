@@ -22,7 +22,7 @@ export function ObjectivesList() {
         subject={{ type: 'site', id: null }}
         current={objectives.find('site', null)}
         prefix="Site"
-        emptyLabel="Set an objective"
+        emptyLabel="Set a site objective"
         emptyStyle="dashed"
       />
       {loaded?.departments.map((d) => (
@@ -31,7 +31,7 @@ export function ObjectivesList() {
           subject={{ type: 'department', id: d.id }}
           current={objectives.find('department', d.id)}
           prefix={d.name}
-          emptyLabel="Set an objective"
+          emptyLabel={`Set an objective for ${d.name}`}
           emptyStyle="dashed"
         />
       ))}
@@ -41,7 +41,7 @@ export function ObjectivesList() {
           subject={{ type: 'machine', id: m.id }}
           current={objectives.find('machine', m.id)}
           prefix={m.name}
-          emptyLabel="Set an objective"
+          emptyLabel={`Set an objective for ${m.name}`}
           emptyStyle="dashed"
         />
       ))}

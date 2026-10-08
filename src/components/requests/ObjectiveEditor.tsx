@@ -28,7 +28,7 @@ export function ObjectiveEditor({
   subject: { type: ObjectiveSubject; id: string | null }
   current: ObjectiveView | null
   prefix?: string
-  emptyLabel: 'Set a site objective' | 'Set an objective' | '+ Objective'
+  emptyLabel: string
   emptyStyle: 'dashed' | 'text'
   onChanged?: () => void
 }) {

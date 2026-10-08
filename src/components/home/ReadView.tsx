@@ -160,7 +160,7 @@ export function ReadView({
               </Link>
             </>
           ) : data ? (
-            `${order.length} steps`
+            `${order.length} ${order.length === 1 ? 'step' : 'steps'}`
           ) : null}
         </span>
       </div>
