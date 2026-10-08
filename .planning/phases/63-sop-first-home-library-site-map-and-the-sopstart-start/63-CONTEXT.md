@@ -58,6 +58,17 @@ Replace the room-based one-screen home (Phase 57: list · isometric site picture
 - **ADR-0003 must be superseded** by a new ADR in the same change that retires rooms (site templates fixed room positions; rooms no longer exist and the home map is generated from the library).
 - ADR-0002 (no scheduled jobs) applies to anything Recent/Most used needs.
 
+### Resolved after research (2026-10-08, by the orchestrator under ADR-0004 and existing gates — report to Simon, he may overturn)
+- **R1 Machine-coverage requests removed.** `reconcileMachineRequests` (agent raises "this machine has no SOPs yet") contradicts ADR-0004 rule 4 — remove the raise path and its callers' use of it; existing request rows stay as data.
+- **R2 Gates do not change.** Section visibility follows CAPABILITY-MATRIX.md exactly: Training mounts for the roles that can read the training matrix today (admin, safety manager); supervisors get Sign-offs (and their own My record) — no capability is widened in this phase.
+- **R3 Type = four derived values, no schema change:** Machine (machine-linked) · Inspection / Emergency (from `category_slug` where it says so) · Process (everything else). "Order of operations" is deferred until a `sop_type` field is decided.
+- **R4 Owner hidden from workers** on the Read view (T-59-30 stands); shown to supervisor and up.
+- **R5 Notifications bell stays, as a dot without a number** (information, not a nagging count — ADR-0004 rule 2).
+- **R6 "or begin from step 1" keeps the existing discard confirmation** (it discards a stopped run).
+- **R7 The site editor moves into Manage SOPs as "Site & departments"** — departments are areas, so admins still need it; it no longer appears on the home.
+- **R8 Area = machine's department → else the SOP's `sop_departments` tag → else "Site-wide"**, drawing only areas that hold at least one SOP the viewer can see (per research §2).
+- **R9 The merge crosses the navigation to `/sops/[sopId]`** via a client overlay host mounted in the root layout (WAAPI), started in the same click as `router.push`; no View Transitions (experimental), no server action in the start click (Next 16.2.1 action-queue hang).
+
 ### Claude's Discretion (not discussed with Simon — decide, then state the choice in the plan)
 - **What an "area" is in data.** Recommended: an area = a department (Phase 25 model); SOPs with no department/machine fall in a "Site-wide" area. Confirm against the real org's data shape.
 - **What an object's kind is.** No SOP "type" field may exist; derive (machine-linked → machine-like object; not machine-linked → noticeboard) or add a minimal type field — prefer deriving if it gives a truthful map.
