@@ -10,7 +10,6 @@ const code = (p: string) =>
 const RECORD = code('src/components/home/sections/MyRecordSection.tsx')
 const TRAINING = code('src/components/home/sections/TrainingSection.tsx')
 const NOTIF = code('src/components/home/panels/NotificationsPanel.tsx')
-const PAGE = code('src/app/(protected)/activity/page.tsx')
 
 test.describe('record and training', () => {
   test('MyRecordSection composes the list and both panels and resolves a place through homeFromAddress', () => {
@@ -44,10 +43,14 @@ test.describe('record and training', () => {
     }
   })
 
-  test('the activity list moved: WorkerActivityView is gone and the page renders CompletionList', () => {
+  test('the activity list moved: the page is gone, the old address redirects, My record renders CompletionList', () => {
     expect(fs.existsSync('src/app/(protected)/activity/WorkerActivityView.tsx')).toBe(false)
     expect(fs.existsSync('src/components/home/sections/CompletionList.tsx')).toBe(true)
-    expect(PAGE).toContain("import { CompletionList } from '@/components/home/sections/CompletionList'")
-    expect(PAGE).toContain('<CompletionList />')
+    expect(fs.existsSync('src/app/(protected)/activity/page.tsx')).toBe(false)
+    expect(fs.existsSync('src/app/(protected)/admin/training/page.tsx')).toBe(false)
+    expect(RECORD).toContain("import { CompletionList } from '@/components/home/sections/CompletionList'")
+    const cfg = fs.readFileSync('next.config.ts', 'utf8')
+    expect(cfg).toMatch(/source: '\/activity',\s*destination: '\/\?s=record',\s*permanent: false/)
+    expect(cfg).toMatch(/source: '\/admin\/training',\s*destination: '\/\?s=training',\s*permanent: false/)
   })
 })

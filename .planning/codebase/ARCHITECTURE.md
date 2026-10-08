@@ -144,7 +144,7 @@ SafeStart is a multi-tenant Next.js 16 App Router SaaS web app that implements a
 
 ### Tertiary Path: Supervisor Sign-Off
 
-1. **Activity View** → Supervisor visits `/activity` (TanStack query fetches completions)
+1. **My record** → The person opens My record on the home (`/?s=record`; the old activity address redirects there)
 2. **Review Detail** → Click completion ID to view `/activity/[completionId]`
    - Shows step data (timestamps), photos, ack trace (proof of sequential reading)
 3. **Sign-Off Decision** → Supervisor approves or rejects

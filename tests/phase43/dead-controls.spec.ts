@@ -73,7 +73,7 @@ test.describe('Dead controls: scan-document, wiring lens, dead state (D-02/D-04/
 
     const blankPageSrc = read('src/app/(protected)/admin/sops/new/blank/page.tsx')
     expect(blankPageSrc).not.toContain('listBlockCategories')
-    expect(blankPageSrc).toContain('<WizardClient departments={departments} machineId={machineId} />')
+    expect(blankPageSrc).toContain('<WizardClient departments={departments} machineId={machineId} initialTitle={initialTitle} />')
   })
 
   // 58-15: the versions-page half ("no selectedForCompare state") went with the page --

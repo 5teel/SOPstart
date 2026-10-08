@@ -61,7 +61,7 @@ test.describe('legacy redirects (59-15)', () => {
     const page = fs.readFileSync(path.join(process.cwd(), 'src/app/(protected)/activity/[completionId]/page.tsx'), 'utf-8').replace(/\r\n/g, '\n')
     // role comes from getSessionContext, never a prop or the URL
     expect(page).toMatch(/const \{[^}]*\brole\b[^}]*\} = await getSessionContext\(\)/)
-    expect(page).toContain("role === 'worker' ? '/activity' : '/?place=office'")
+    expect(page).toContain("role === 'worker' ? '/?s=record' : '/?s=signoffs'")
     // the unreadable row and the not-yours row take the same exit, and it is a server redirect
     expect(page).toContain('if (!data || data.worker_id !== userId) redirect(away)')
     expect(page).not.toContain("'use client'")

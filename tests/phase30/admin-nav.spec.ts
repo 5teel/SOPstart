@@ -68,7 +68,7 @@ test.describe('UX-02 — one shared admin nav', () => {
     const src = read(SETTINGS_PAGE)
     expect(src).toContain("['admin', 'safety_manager']")
     expect(src).toContain('/admin/ai-settings')
-    expect(src).toContain('/?place=edit')
+    expect(src).toContain('/?s=manage&view=site')
     expect(src).toContain('/admin/agent')
     // ApprovalChainPanel relocation is 30-08 scope (governance fold) — not asserted here.
   })

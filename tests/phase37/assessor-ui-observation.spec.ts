@@ -8,7 +8,7 @@
  *
  * Flipped LIVE in Plan 37-05 as source-contract assertions over
  * VerdictButtons.tsx, RecordObservationModal.tsx, AssessmentRequestsPanel.tsx
- * and the /admin/training bridge page -- checks wiring (a control's own markup window
+ * and the Training section (the /admin/training page until 63-14) -- checks wiring (a control's own markup window
  * actually references the state/handler), not mere token presence
  * (2026-06-05 dead-feature blind spot; tests/phase37/assessor-ui-signoff.spec.ts
  * idiom).
@@ -37,7 +37,7 @@ const PANEL = readFileSync(
 ).replace(/\r\n/g, '\n')
 
 const TRAINING_PAGE = readFileSync(
-  path.join(process.cwd(), 'src/app/(protected)/admin/training/page.tsx'),
+  path.join(process.cwd(), 'src/components/home/sections/TrainingSection.tsx'),
   'utf8'
 ).replace(/\r\n/g, '\n')
 
@@ -130,8 +130,8 @@ test.describe('ASR-01 -- AssessmentRequestsPanel content + wiring (Pitfall 1 act
   })
 })
 
-test.describe('ASR-01 -- AssessmentRequestsPanel mounted on exactly one page, above the training bridge (59-14)', () => {
-  test('admin/training/page.tsx imports and renders AssessmentRequestsPanel before TrainingBridge', () => {
+test.describe('ASR-01 -- AssessmentRequestsPanel mounted in exactly one place, above the training bridge (59-14; the Training section since 63-14)', () => {
+  test('TrainingSection imports and renders AssessmentRequestsPanel before TrainingBridge', () => {
     expect(TRAINING_PAGE).toContain(
       "import { AssessmentRequestsPanel } from '@/components/observations/AssessmentRequestsPanel'"
     )

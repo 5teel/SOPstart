@@ -197,8 +197,8 @@ export const JOURNEYS: Journey[] = [
         { label: 'Walking the floor — training matrix', to: 'team' },
         { label: 'Just watched a completion (admins only until Phase 61)', to: 'activity' },
       ] },
-      { id: 'team', type: 'screen', label: 'Training matrix — person panel', route: '/admin/training', detail: 'Reached from the Smoko room. Click a matrix cell to open the PersonPanel on that person and SOP; "Record observation" pre-fills the worker.' },
-      { id: 'activity', type: 'screen', label: 'Training matrix bridge (admins)', route: '/admin/training', detail: 'The old Sign-off page entry is gone: supervisors have no Record observation button until Phase 61 puts it in the Smoko room. Admins record from the training matrix bridge.' },
+      { id: 'team', type: 'screen', label: 'Training matrix — person panel', route: '/', detail: 'In the Training section. Reached from the Smoko room. Click a matrix cell to open the PersonPanel on that person and SOP; "Record observation" pre-fills the worker.' },
+      { id: 'activity', type: 'screen', label: 'Training matrix bridge (admins)', route: '/', detail: 'In the Training section. The old Sign-off page entry is gone: supervisors have no Record observation button until Phase 61 puts it in the Smoko room. Admins record from the training matrix bridge.' },
       { id: 'modal', type: 'screen', label: 'Record observation modal', detail: 'Shared modal: worker chip, SOP picker (assigned-first), verdict buttons, optional note. "Permanent record — cannot be edited or deleted after saving" (D-08).' },
       { id: 'assessor-check', type: 'decision', label: 'Recording "performed to SOP"? Is the recorder a signed-off assessor on this SOP? (ASR-01 gate — "needs support" is never gated, D-04)', branches: [
         { label: 'Signed off — proceed as normal', to: 'save' },
@@ -220,7 +220,7 @@ export const JOURNEYS: Journey[] = [
     steps: [
       { id: 's', type: 'start', label: 'Supervisor tapped "Request assessment"' },
       { id: 'notify', type: 'action', label: 'Request sent', detail: 'requestAssessorReview() notifies every admin/safety manager in the org; repeat taps are deduped.' },
-      { id: 'team', type: 'screen', label: 'Training page — assessment requests', route: '/admin/training', detail: 'AssessmentRequestsPanel lists open requests: who asked, which SOP.' },
+      { id: 'team', type: 'screen', label: 'Training page — assessment requests', route: '/', detail: 'In the Training section. AssessmentRequestsPanel lists open requests: who asked, which SOP.' },
       { id: 'assess', type: 'action', label: 'Assess now', detail: 'Opens the same Record observation modal, preset to that person + SOP.' },
       { id: 'save', type: 'action', label: 'Save observation', detail: 'A "performed to SOP" verdict here signs the supervisor off — the assessor gate resolves for them with no further overrides needed (D-05).' },
       { id: 'e', type: 'end', label: 'Request resolved' },
@@ -472,10 +472,10 @@ export const JOURNEYS: Journey[] = [
     summary: 'A supervisor or admin opens the training matrix to see who has read, been observed on, or been signed off for each required SOP, drills into one worker\'s record, and exports a SuccessFactors-shaped CSV for an audit. Workers see their own states too, read-only.',
     steps: [
       { id: 's', type: 'start', label: 'Needs a pre-audit training scan' },
-      { id: 'team', type: 'screen', label: 'Training matrix', route: '/admin/training', detail: 'Phase 35 (D-06), re-homed by Phase 59 (A-05): the matrix is its own page, linked from the Smoko room, until Phase 61.' },
+      { id: 'team', type: 'screen', label: 'Training matrix', route: '/', detail: 'In the Training section. Phase 35 (D-06), re-homed by Phase 59 (A-05): the matrix is its own page, linked from the Smoko room, until Phase 61.' },
       { id: 'toggle', type: 'action', label: 'Read the matrix', detail: 'Department-first cut with labelled state pills + both-axis rollups; MTX-03 department/worker/SOP filters narrow it further.' },
       { id: 'cell', type: 'action', label: 'Click a state pill cell', detail: 'onSelectCell opens the PersonPanel focused on that person + SOP (D-09).' },
-      { id: 'record', type: 'screen', label: 'PersonPanel training record', route: '/admin/training', detail: 'Grouped-by-SOP evidence trail + "Other completed SOPs" section (TRN-01/D-12/D-13).' },
+      { id: 'record', type: 'screen', label: 'PersonPanel training record', route: '/', detail: 'In the Training section. Grouped-by-SOP evidence trail + "Other completed SOPs" section (TRN-01/D-12/D-13).' },
       { id: 'export', type: 'action', label: 'Export CSV', detail: 'Matrix header (filtered cut) or PersonPanel (one worker) — both call the same exportTrainingCsv generator (D-16/TRN-02).' },
       { id: 'own', type: 'screen', label: 'Worker sees their own competency state', route: '/profile', detail: '"My competency" section — read-only, informational, never gates access (CMP-04). Phase 36 (REF-01/CMP-03): each SOP row can also carry an "Outdated version" chip (their last completion predates the current version, but their evidence is never lost or reset) and a "Refresher due"/"Refresher overdue" chip — both passive coaching signals, never a lock.' },
       { id: 'e', type: 'end', label: 'Training status visible, evidence exportable' },
@@ -558,7 +558,7 @@ export const JOURNEYS: Journey[] = [
       { id: 'myreq', type: 'action', label: 'My requests', route: '/', detail: 'Asked of you, You asked and Answered. Withdraw a request you raised, decline an ask with a reason, or stop asking. The worker Office card has Go to my requests.' },
       { id: 'walk', type: 'action', label: 'Walk a SOP', detail: 'Walk beside a SOP row, or Walk it on the Now card.' },
       { id: 'sop', type: 'screen', label: 'Procedure', route: '/sops/[sopId]' },
-      { id: 'smoko', type: 'screen', label: 'Smoko room - my record', route: '/activity', detail: 'The Smoko room bridges to My sign-offs: every role sees their own record.' },
+      { id: 'smoko', type: 'screen', label: 'Smoko room - my record', route: '/', detail: 'In My record. The Smoko room bridges to My sign-offs: every role sees their own record.' },
       { id: 'e', type: 'end', label: 'Back on the site' },
     ],
   },
@@ -596,7 +596,7 @@ export const JOURNEYS: Journey[] = [
       { id: 'access', type: 'screen', label: 'Office - Access tab', route: '/', detail: '/?place=office&tab=access (add &sop= to pin a SOP), admins and safety managers only. Who can see which SOPs. The old /admin/access address redirects here.', branches: [
         { label: 'Done', to: 'e' },
       ] },
-      { id: 'smoko', type: 'screen', label: 'Smoko room - training matrix link', route: '/admin/training', detail: 'The Smoko room carries a Training matrix link (admins and safety managers) to the training page, where the matrix, a person\'s training record and the assessment requests stay until Phase 61. Back to the site returns to the Smoko room.', branches: [
+      { id: 'smoko', type: 'screen', label: 'Smoko room - training matrix link', route: '/', detail: 'In the Training section. The Smoko room carries a Training matrix link (admins and safety managers) to the training page, where the matrix, a person\'s training record and the assessment requests stay until Phase 61. Back to the site returns to the Smoko room.', branches: [
         { label: 'Done', to: 'e' },
       ] },
       { id: 'workshop', type: 'screen', label: 'Workshop - drafts', route: '/sops/[sopId]', detail: 'Every draft in the organisation with its state; Open goes to the focus editor, and Back returns to the Workshop.', branches: [

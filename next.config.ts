@@ -76,6 +76,18 @@ const nextConfig: NextConfig = {
         destination: '/?s=manage&view=site',
         permanent: false,
       },
+      // Phase 63 (HOME-04): the activity list lives in My record, the training screens in Training. Fixed destinations;
+      // /activity/[completionId] stays a page, and the exact source below does not match it.
+      {
+        source: '/activity',
+        destination: '/?s=record',
+        permanent: false,
+      },
+      {
+        source: '/admin/training',
+        destination: '/?s=training',
+        permanent: false,
+      },
       // Phase 57 D-10: the dashboard is gone; old links land on the one screen. Fixed destination.
       {
         source: '/dashboard',

@@ -66,9 +66,13 @@ test.describe('retire: legacy addresses redirect to Office places (59-13)', () =
     }
     // the training bridge is the one new address, linked from the Smoko room (A-05)
     expect(read('src/components/shell/AdminShell.tsx')).toContain('href="/?s=training"')
-    const page = stripComments(read('src/app/(protected)/admin/training/page.tsx'))
-    expect(page.indexOf('requireAdminContext()')).toBeGreaterThan(-1)
-    expect(page.indexOf('requireAdminContext()')).toBeLessThan(page.indexOf('listOrgTree()'))
+    // 63-14: the page is a section now; the admin guard sits in the action the section reads
+    expect(fs.existsSync(path.join(ROOT, 'src/app/(protected)/admin/training/page.tsx'))).toBe(false)
+    const tree = stripComments(read('src/actions/org-model.ts'))
+    const at = tree.indexOf('export async function listOrgTree')
+    expect(at).toBeGreaterThan(-1)
+    expect(tree.slice(at, at + 300)).toContain('await requireAdmin()')
+    expect(tree).toContain('return requireAdminContext()')
   })
 })
 
@@ -142,9 +146,9 @@ test.describe('retire: supervisor activity view and completion supervisor half (
     // the worker's own record survives until Phase 61, for every role
     // 63-09 moved the list to a home section component; the page renders it
     expect(fs.existsSync(path.join(ROOT, 'src/components/home/sections/CompletionList.tsx'))).toBe(true)
-    const page = stripComments(read('src/app/(protected)/activity/page.tsx'))
-    expect(page).toContain('<CompletionList />')
-    expect(page).not.toContain('SupervisorActivityView')
+    // 63-14: the page is gone; My record renders the list
+    expect(fs.existsSync(path.join(ROOT, 'src/app/(protected)/activity/page.tsx'))).toBe(false)
+    expect(stripComments(read('src/components/home/sections/MyRecordSection.tsx'))).toContain('<CompletionList />')
     // the dropped list keeps it out and the Phase 55 sweep runs it live
     expect(read('scripts/dropped-features.json')).toContain('"feature": "supervisor-review"')
     expect(read('tests/phase55/deletion-sweep.spec.ts')).toContain("'supervisor-review'")
@@ -152,7 +156,7 @@ test.describe('retire: supervisor activity view and completion supervisor half (
   test('a non-owner opening a completion address is sent to the Office by the server page, never a client effect', () => {
     const page = stripComments(read('src/app/(protected)/activity/[completionId]/page.tsx'))
     const client = stripComments(read('src/app/(protected)/activity/[completionId]/CompletionDetailClient.tsx'))
-    expect(page).toContain("'/?place=office'")
+    expect(page).toContain("'/?s=signoffs'")
     expect(page).toContain('redirect(away)')
     expect(page).not.toContain('createAdminClient')
     expect(client).not.toMatch(/signOffCompletion|overrideReason|RejectReasonSheet|requestAssessorReview|router\.(push|replace)/)

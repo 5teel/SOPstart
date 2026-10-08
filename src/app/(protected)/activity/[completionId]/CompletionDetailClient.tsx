@@ -71,11 +71,11 @@ export function CompletionDetailClient({
       {/* Sticky header */}
       <div className="sticky top-0 z-20 bg-[var(--paper)] border-b border-[var(--ink-100)] px-4 flex items-center gap-3 h-14">
         <Link
-          href="/activity"
+          href="/?s=record"
           className="flex items-center gap-1.5 text-[var(--ink-500)] hover:text-[var(--ink-900)] transition-colors"
         >
           <ArrowLeft size={18} />
-          <span className="text-sm font-medium">Activity</span>
+          <span className="text-sm font-medium">My record</span>
         </Link>
         <span className="text-[var(--ink-300)] mx-1">|</span>
         <h1 className="text-sm font-semibold text-[var(--ink-900)] truncate">Completion Detail</h1>

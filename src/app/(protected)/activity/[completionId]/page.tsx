@@ -41,7 +41,7 @@ export default async function CompletionDetailPage({ params }: CompletionDetailP
   const { supabase, userId, role, organisationId } = await getSessionContext()
   if (!userId) redirect('/login')
   if (!role) redirect('/')
-  const away = role === 'worker' ? '/activity' : '/?place=office'
+  const away = role === 'worker' ? '/?s=record' : '/?s=signoffs'
   if (!organisationId || !UUID_RE.test(completionId)) redirect(away)
 
   // Session client: RLS decides visibility, and the org filter is the SESSION org (F-05).
