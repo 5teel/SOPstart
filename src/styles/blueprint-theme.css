@@ -789,3 +789,26 @@ body[data-theme="paper"] .strip-slot .done:disabled {
 @media (min-width: 64rem) {
   .wm-bar { font-size: var(--wm-size-header); }
 }
+
+/* ---------- Phase 63: the library site map (src/components/home/map) ----------
+ * Global rules, not a CSS import in the lazy module (CLAUDE.md 2026-10-06). Hover lift and
+ * dimming are CSS so a hover never re-renders the drawing. */
+.map-svg { user-select: none; }
+.map-svg polygon, .map-svg rect, .map-svg ellipse, .map-svg line { stroke-linejoin: round; }
+.map-plate {
+  transition: transform var(--dur-hover-lift) var(--ease-fuse), opacity var(--dur-hover-lift);
+}
+.map-plate[role="button"] { cursor: pointer; }
+.map-plate[role="button"]:hover,
+.map-plate[role="button"]:focus-visible { transform: translateY(-6px); }
+.map-plate[data-state="dim"] { opacity: 0.32; }
+.map-plate[data-state="dim"]:hover { opacity: 0.6; }
+.map-plate:focus-visible,
+.map-object:focus-visible { outline: 2px solid var(--accent-step); outline-offset: 2px; }
+.map-object { cursor: pointer; }
+.map-object:hover { filter: brightness(1.08) drop-shadow(0 2px 3px color-mix(in srgb, var(--ink-900) 25%, transparent)); }
+.map-sign, .map-label { pointer-events: none; }
+.map-label text { paint-order: stroke; stroke: var(--paper-1); stroke-width: 4px; stroke-linejoin: round; }
+@media (prefers-reduced-motion: reduce) {
+  .map-plate { transition: none; }
+}
