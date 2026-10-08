@@ -1123,7 +1123,7 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 
 - [x] **HOME-01**: Signing in lands on the SOP-first home: on desktop a section menu (wordmark at the top; My SOPs, My record, then Training, Sign-offs, People and Manage SOPs as the role allows; Manage last and quiet; no counts), the SOP list and the reader pane; on a phone a bottom tab bar of the same sections. Section visibility follows the capability matrix (R2)
 - [ ] **HOME-02**: My SOPs lists search (titles, steps, tools), Recent, Most used ("done N×") and All SOPs grouped by area or by type; each row shows its area, type, minutes and a status line that is information only; a search with no result offers Ask for one (and Write it for a SOP admin)
-- [ ] **HOME-03**: With a SOP open the reader pane shows Read: the SOP chip, title, area · type · version · owner (supervisor and up, R4) · minutes, standards labels, status, the start button and "What you'll do" with kind chips; an unfinished SOP reads "Picks up at step N of M · or begin from step 1" (begin again asks first, R6)
+- [x] **HOME-03**: With a SOP open the reader pane shows Read: the SOP chip, title, area · type · version · owner (supervisor and up, R4) · minutes, standards labels, status, the start button and "What you'll do" with kind chips; an unfinished SOP reads "Picks up at step N of M · or begin from step 1" (begin again asks first, R6)
 - [ ] **HOME-04**: My record, Training, Sign-offs, People and Manage SOPs (with Site & departments, R7) carry the content of the retired rooms and bridged pages, with every server guard and RLS policy unchanged
 - [ ] **HOME-05**: The home has one whitelisted address (section, SOP, area, tab, pin, view); old `?place=` links, stored notification places, old governance / activity / training / site addresses and the focus screen's Back all land on the matching section
 
@@ -1137,8 +1137,8 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 ### Brand and the Start (BRAND, FUSE)
 
 - [ ] **BRAND-01**: The SOPstart wordmark (sketch 010: Saira Semi Condensed, ink SOP chip + start, continuous hazard tape, `--wm-*` tokens) replaces the text logo in the section menu, the focus screen's top bar, the sign-in screens and the welcome page; brand yellow appears only in the wordmark
-- [ ] **FUSE-01**: Tapping start plays the merge into the focus screen (button body fades, SOP drops into line, they slide together, tape slides in from the left, the logo rises into the steps header) on the `--dur-fuse-*` tokens; full on the first start of the day, short after, none under reduced motion; input is never blocked
-- [ ] **FUSE-02**: start lands in the running SOP at its current step (autostart), with no server action in the click and navigation that cannot be stranded by an in-flight one (R9)
+- [x] **FUSE-01**: Tapping start plays the merge into the focus screen (button body fades, SOP drops into line, they slide together, tape slides in from the left, the logo rises into the steps header) on the `--dur-fuse-*` tokens; full on the first start of the day, short after, none under reduced motion; input is never blocked
+- [x] **FUSE-02**: start lands in the running SOP at its current step (autostart), with no server action in the click and navigation that cannot be stranded by an in-flight one (R9)
 
 ### Words, retirement, gates, maps, evals
 
@@ -1164,7 +1164,7 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 |--------|-------|--------|
 | HOME-01 | 63-11, 63-12 | Complete |
 | HOME-02 | 63-02, 63-05, 63-12 | Pending |
-| HOME-03 | 63-06, 63-15 | Pending |
+| HOME-03 | 63-06, 63-15 | Complete |
 | HOME-04 | 63-07, 63-08, 63-09, 63-12, 63-14 | Pending |
 | HOME-05 | 63-02, 63-11, 63-13, 63-14, 63-15 | Pending |
 | MAP-01 | 63-02 | Pending |
@@ -1172,8 +1172,8 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 | MAP-03 | 63-10, 63-12 | Pending |
 | MAP-04 | 63-10, 63-11, 63-12 | Complete |
 | BRAND-01 | 63-04 | Pending |
-| FUSE-01 | 63-15 | Pending |
-| FUSE-02 | 63-15 | Pending |
+| FUSE-01 | 63-15 | Complete |
+| FUSE-02 | 63-15 | Complete |
 | WORD-01 | 63-16, 63-17 | Pending |
 | RET-01 | 63-19, 63-20 | Pending |
 | GATE-01 | 63-01, 63-04, 63-11, 63-15, 63-20, 63-21 | Pending |
