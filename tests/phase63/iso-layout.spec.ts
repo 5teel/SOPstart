@@ -34,7 +34,7 @@ test.describe('iso layout', () => {
     expect(faces.map((f) => f.role)).toEqual(['plate-right', 'plate-left', 'plate-top'])
     for (const f of faces) {
       expect(f.k).toBe('poly')
-      expect(f.pts).toHaveLength(4)
+      if (f.k === 'poly') expect(f.pts).toHaveLength(4)
     }
   })
 
