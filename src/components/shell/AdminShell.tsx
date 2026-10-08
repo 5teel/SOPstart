@@ -47,7 +47,7 @@ const OfficePane = dynamic(() => import('@/components/office/OfficePane').then((
   ssr: false,
   loading: () => (
     <div data-testid="office-loading" className="p-4 text-ui text-ink-500">
-      Opening the Office…
+      Opening…
     </div>
   ),
 })
@@ -163,7 +163,7 @@ export function AdminShell({ siteName, userEmail, initialPlace, initialTab, init
     }
     if (place.kind === 'room') {
       if (place.id === 'office') {
-        return <OfficePane place={place} select={ctx.select} initialSop={initialSop} />
+        return <OfficePane tab={place.tab ?? null} tabs={tabsForRole(role)} onTab={(t) => ctx.select({ kind: 'room', id: 'office', ...(t === 'inbox' ? {} : { tab: t }) })} initialSop={initialSop} />
       }
       if (place.id === 'smoko') {
         return (

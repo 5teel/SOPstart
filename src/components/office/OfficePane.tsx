@@ -3,17 +3,16 @@
 /**
  * Phase 59 (OFF-01, D-01, D-03) -- the Office detail-pane body.
  *
- * Reached only through next/dynamic from the admin and worker shells (59-12 mounts it);
- * never imported statically, so the home route stays inside its bundle gate. A tab click
- * goes through the shell's one place writer, select(); this file never touches the
- * address bar, never calls the router and never navigates from an effect.
+ * Reached only through next/dynamic (the Sign-offs and People sections, and the old shells
+ * until they are deleted); never imported statically, so the home route stays inside its
+ * bundle gate. Phase 63: the pane knows no places -- the caller hands it the tab, the tab
+ * list and an onTab callback. This file never touches the address bar, never calls the
+ * router and never navigates from an effect.
  */
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { Check } from 'lucide-react'
-import { useRole } from '@/components/providers/RoleProvider'
-import { OFFICE_TABS, tabsForRole, type OfficeTab } from '@/lib/shell/office-tabs'
-import type { Place } from '@/lib/shell/place'
+import { OFFICE_TABS, type OfficeTab } from '@/lib/shell/office-tabs'
 import { AdminAccessLens } from '@/components/sop/lenses/AdminAccessLens'
 import { DecisionsTab } from './DecisionsTab'
 import { RequestsTab } from './RequestsTab'
@@ -45,20 +44,19 @@ function receiptWords(r: RowDone): { text: string; failed: boolean } {
 }
 
 export function OfficePane({
-  place,
-  select,
-  initialSop,
+  tab: requested,
+  tabs,
+  onTab,
+  initialSop = null,
 }: {
-  place: Extract<Place, { kind: 'room' }>
-  select(p: Place): void
+  tab: OfficeTab | null
+  tabs: ReadonlyArray<OfficeTab>
+  onTab(t: OfficeTab): void
   /** Pins the Access tab to one SOP; the page has already UUID-gated it. */
-  initialSop: string | null
+  initialSop?: string | null
 }) {
-  const role = useRole()
-  const tabs = tabsForRole(role)
-  // A tab this role may not see resolves to the Inbox at render time, never by redirect.
-  const requested: OfficeTab = place.tab ?? 'inbox'
-  const tab: OfficeTab = tabs.includes(requested) ? requested : 'inbox'
+  // A tab the caller did not offer resolves to the first one at render time, never by redirect.
+  const tab: OfficeTab = requested && tabs.includes(requested) ? requested : (tabs[0] ?? 'inbox')
 
   const inbox = useOfficeInbox()
   const inboxCount = inboxItemsOf(inbox.data)?.length ?? 0
@@ -96,11 +94,10 @@ export function OfficePane({
     <div data-testid="room-body" data-room-id="office">
       <div data-testid="office-pane" data-tab={tab}>
         <header className="sticky top-0 z-10 border-b border-ink-200 bg-paper pl-4 pr-16 pt-4">
-          <h2 className="pb-3 text-lg font-semibold leading-snug text-ink-900">Office</h2>
           {tabs.length > 1 && (
             <div
               role="tablist"
-              aria-label="Office"
+              aria-label="Tabs"
               onKeyDown={onTabKey}
               className="mb-3 inline-flex max-w-full overflow-x-auto rounded-lg border border-ink-300 bg-paper-2 p-1"
             >
@@ -120,7 +117,7 @@ export function OfficePane({
                     aria-controls="office-tabpanel"
                     tabIndex={i === rove ? 0 : -1}
                     onFocus={() => setRove(i)}
-                    onClick={() => select({ kind: 'room', id: 'office', ...(t === 'inbox' ? {} : { tab: t }) })}
+                    onClick={() => onTab(t)}
                     className={`inline-flex min-h-tap shrink-0 items-center gap-2 rounded px-2 text-ui font-semibold focus-visible:outline-2 focus-visible:outline-accent-step ${
                       active ? 'bg-ink-900 text-paper' : 'text-ink-700 hover:text-ink-900'
                     }`}

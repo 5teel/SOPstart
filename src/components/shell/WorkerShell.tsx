@@ -51,7 +51,7 @@ export interface ShellProps {
 // The supervisor's Office is the lazy pane; a worker never loads it (59 A-11).
 const OfficePane = dynamic(() => import('@/components/office/OfficePane').then((m) => m.OfficePane), {
   ssr: false,
-  loading: () => <p className="p-4 text-ui text-ink-500">Opening the Office…</p>,
+  loading: () => <p className="p-4 text-ui text-ink-500">Opening…</p>,
 })
 
 // Raise and ask are lazy modules: neither rides in the home download (60 A-07).
@@ -160,7 +160,7 @@ export function WorkerShell({ siteName, userEmail, initialPlace, initialTab, ini
     if (place.kind === 'room') {
       if (place.id === 'office') {
         return isSupervisor ? (
-          <OfficePane place={place} select={ctx.select} initialSop={initialSop} />
+          <OfficePane tab={place.tab ?? null} tabs={tabsForRole(role)} onTab={(t) => ctx.select({ kind: 'room', id: 'office', ...(t === 'inbox' ? {} : { tab: t }) })} initialSop={initialSop} />
         ) : (
           <OfficeWorkerBody
             onMyRequests={() => {

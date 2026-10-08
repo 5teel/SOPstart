@@ -99,10 +99,12 @@ test.describe('office pane and inbox tab (59-09)', () => {
     expect(TAB).toContain('Show all')
   })
 
-  test('a tab click goes through the shell select(), never the address bar or the router', () => {
-    expect(PANE).toMatch(/onClick=\{\(\) => select\(\{ kind: 'room', id: 'office', \.\.\.\(t === 'inbox' \? \{\} : \{ tab: t \}\) \}\)\}/)
+  test('a tab click goes through onTab(), never the address bar, the router or a place', () => {
+    expect(PANE).toContain('onClick={() => onTab(t)}')
     expect(PANE).not.toMatch(/replaceState|pushState|router\.|next\/navigation/)
-    expect(PANE).toContain('tabsForRole(role)')
+    expect(PANE).not.toContain('@/lib/shell/place')
+    expect(PANE).not.toMatch(/select\(/)
+    expect(PANE).toContain('tabs.includes(requested)')
     // Manual activation: the arrow keys move focus and never select.
     expect(PANE).toMatch(/ArrowRight[\s\S]*?tabRefs\.current\[next\]\?\.focus\(\)/)
     expect(PANE).toContain('tabIndex={i === rove ? 0 : -1}')
@@ -173,8 +175,11 @@ test.describe('office pane mount seams (59-12)', () => {
   test('the pane is one lazy module imported by next/dynamic from both shells', () => {
     expect(ADMIN).toMatch(DYNAMIC)
     expect(WORKER).toMatch(DYNAMIC)
-    expect(ADMIN).toContain('<OfficePane place={place} select={ctx.select} initialSop={initialSop} />')
-    expect(WORKER).toMatch(/isSupervisor \? \(\s*<OfficePane place=\{place\} select=\{ctx\.select\} initialSop=\{initialSop\} \/>\s*\) : \(\s*<OfficeWorkerBody\b/)
+    // 63-07: the old shells adapt their place to the pane's props until 63-20 deletes them.
+    const PROPS = /<OfficePane tab=\{place\.tab \?\? null\} tabs=\{tabsForRole\(role\)\} onTab=\{\(t\) => ctx\.select\(\{ kind: 'room', id: 'office'/
+    expect(ADMIN).toMatch(PROPS)
+    expect(WORKER).toMatch(PROPS)
+    expect(WORKER).toMatch(/isSupervisor \? \(\s*<OfficePane\b[\s\S]*?\) : \(\s*<OfficeWorkerBody\b/)
   })
 
   test('the old Office card body and the pending-count hook are gone', () => {
