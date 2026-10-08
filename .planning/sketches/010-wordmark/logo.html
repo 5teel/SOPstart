@@ -1,0 +1,221 @@
+<title>SOPstart Logo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Semi+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  /* Layout: the wordmark large, then the live merge in a phone-sized panel, then the wordmark on ink and its three ingredients. */
+  :root {
+    --bg: #f4f4f5; --surface: #ffffff; --fg: #09090b; --muted: #52525b; --faint: #71717a; --line: #e4e4e7;
+    /* brand — fixed in every theme */
+    --ink: #09090b; --yellow: #fbbf24; --paper: #fafafa; --paper-1: #ffffff; --ink-200: #e4e4e7; --ink-300: #d4d4d8; --ink-500: #71717a; --hazard: #b91c1c;
+    --tape: repeating-linear-gradient(-45deg, var(--yellow) 0 .16em, var(--ink) .16em .32em);
+    --tape-on-ink: repeating-linear-gradient(-45deg, var(--yellow) 0 .16em, transparent .16em .32em);
+    --ease: cubic-bezier(.5, 0, .2, 1);
+    --brand: 'Saira Semi Condensed', 'Arial Narrow', system-ui, sans-serif;
+    --sans: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #0c0c0e; --surface: #18181b; --fg: #f4f4f5; --muted: #a1a1aa; --faint: #8b8b94; --line: #2a2a2f; color-scheme: dark; }
+  }
+  :root[data-theme="dark"] { --bg: #0c0c0e; --surface: #18181b; --fg: #f4f4f5; --muted: #a1a1aa; --faint: #8b8b94; --line: #2a2a2f; color-scheme: dark; }
+
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--fg); font-family: var(--sans); font-size: 15px; line-height: 1.5; padding-inline: 16px; padding-block: 28px 56px; }
+  .wrap { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+
+  /* ---------- the wordmark ---------- */
+  .wm { display: inline-flex; align-items: baseline; white-space: nowrap; line-height: 1; color: var(--ink); position: relative; font-family: var(--brand); }
+  .wm .p1, .wm .p2 { display: inline-block; position: relative; }
+  .wm .p1 { font-weight: 800; background: var(--ink); color: #fff; padding: .08em .2em .2em; border-radius: .12em .12em .04em .04em; }
+  .wm .p2 { font-weight: 600; margin-left: .1em; }
+  .wm::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: .13em; background: var(--tape); }
+  .wm.dark { color: #fff; }
+  .wm.dark .p1 { background: #fff; color: var(--ink); }
+  .wm.dark::after { background: var(--tape-on-ink); }
+  .wm.notape::after { display: none; }
+
+  .hero { background: var(--paper-1); border: 1px solid var(--line); border-radius: 16px; padding-block: 56px 48px; padding-inline: 16px; display: flex; flex-direction: column; align-items: center; gap: 22px; }
+  .hero .wm { font-size: clamp(56px, 17vw, 112px); }
+  .hero p { margin: 0; color: var(--ink-500); font-size: 14px; text-align: center; max-width: 44ch; }
+
+  h2 { margin: 0; font-size: 13px; font-family: var(--mono); font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); }
+  .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--surface); }
+  .seg button { border: 0; background: transparent; color: var(--fg); padding: 8px 13px; font: 500 13px var(--sans); cursor: pointer; min-height: 40px; }
+  .seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); font-weight: 700; }
+  button:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
+
+  /* ---------- the merge, in a slice of the app ---------- */
+  .stage { position: relative; height: 380px; max-width: 420px; width: 100%; margin-inline: auto; border-radius: 22px; background: var(--paper); border: 1px solid var(--line); overflow: hidden; color: var(--ink); box-shadow: 0 10px 40px rgba(9, 9, 11, .08); }
+  .readcard { position: absolute; inset: 28px 22px auto 22px; display: flex; flex-direction: column; align-items: flex-start; }
+  .readcard .wm { font-size: 28px; }
+  .readcard h3 { font-family: var(--sans); font-size: 22px; line-height: 1.2; margin: 14px 0 4px; }
+  .readcard .meta { font-family: var(--mono); font-size: 11px; color: var(--ink-500); }
+  .startbtn { margin-top: 24px; height: 64px; width: 100%; border-radius: 12px; background: var(--ink); border: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .startbtn .wm { font-size: 28px; color: #fff; }
+  .run { position: absolute; inset: 0; }
+  .shd { height: 58px; display: flex; align-items: center; gap: 12px; padding: 0 16px; background: var(--paper-1); border-bottom: 1px solid var(--ink-200); }
+  .shd .slot { font-size: 20px; display: inline-flex; }
+  .shd .sep { width: 1px; height: 22px; background: var(--ink-300); flex: none; }
+  .shd .t { font-family: var(--sans); font-weight: 600; font-size: 14px; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar { height: 3px; background: var(--ink-200); } .bar i { display: block; width: 12%; height: 100%; background: var(--ink); }
+  .stp { margin: 26px 20px; padding-left: 14px; border-left: 4px solid var(--hazard); }
+  .stp .k { font-family: var(--mono); font-size: 10px; letter-spacing: .08em; color: var(--hazard); border: 1px solid currentColor; border-radius: 3px; padding: 2px 7px; }
+  .stp p { font-family: var(--sans); font-size: 21px; font-weight: 600; line-height: 1.3; margin: 12px 0 0; }
+  .veil { position: absolute; inset: 0; background: var(--paper); z-index: 40; pointer-events: none; }
+  .bbody { position: absolute; background: var(--ink); border-radius: 12px; z-index: 41; pointer-events: none; }
+  .merge { display: flex; position: absolute; left: 0; top: 0; z-index: 42; pointer-events: none; transform-origin: 0 0; }
+  .steps { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+  @media (max-width: 560px) { .steps { grid-template-columns: minmax(0, 1fr); gap: 4px; } .steps li { display: flex; gap: 10px; align-items: baseline; padding: 7px 12px; } }
+  .steps li { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font-size: 13px; color: var(--muted); }
+  .steps li b { display: block; font-family: var(--mono); font-size: 11px; color: var(--faint); font-weight: 600; }
+  .steps li.on { border-color: var(--fg); color: var(--fg); }
+
+  /* ---------- on ink + ingredients ---------- */
+  .ink { background: var(--ink); border-radius: 16px; padding-block: 48px; padding-inline: 16px; display: flex; justify-content: center; }
+  .ink .wm { font-size: clamp(44px, 13vw, 84px); }
+  .parts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  @media (max-width: 560px) { .parts { grid-template-columns: minmax(0, 1fr); } }
+  .part { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  .part .sw { height: 56px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .part .name { font-weight: 600; font-size: 14px; }
+  .part .val { font-family: var(--mono); font-size: 12px; color: var(--faint); }
+</style>
+
+<div class="wrap">
+  <section class="hero" aria-label="The SOPstart wordmark">
+    <span class="wm" role="img" aria-label="SOPstart"><span class="p1">SOP</span><span class="p2">start</span></span>
+    <p>Built from the two things a worker taps to begin a procedure: the SOP and the start button.</p>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:14px" aria-label="The start animation">
+    <div class="row">
+      <h2>How it comes together</h2>
+      <div class="seg" role="group" aria-label="Playback speed">
+        <button type="button" data-speed="1" aria-pressed="true">Normal</button>
+        <button type="button" data-speed="4" aria-pressed="false">Slow ×4</button>
+        <button type="button" id="replay">Replay</button>
+      </div>
+    </div>
+    <div class="stage" id="stage">
+      <div class="readcard">
+        <span class="wm notape" id="srcSop"><span class="p1">SOP</span></span>
+        <h3>Forklift pre-start check</h3>
+        <div class="meta">Warehouse &amp; dispatch · Inspection · v4 · ~6 min</div>
+        <button type="button" class="startbtn" id="startBtn" aria-label="start"><span class="wm notape"><span class="p2" id="srcStart" style="margin-left:0">start</span></span></button>
+      </div>
+      <div class="run" hidden>
+        <div class="shd"><span class="slot"><span class="wm"><span class="p1">SOP</span><span class="p2">start</span></span></span><span class="sep"></span><span class="t">Forklift pre-start check</span></div>
+        <div class="bar"><i></i></div>
+        <div class="stp"><span class="k">HAZARD</span><p>Pedestrians share the aisles. Sound the horn at every intersection and blind corner.</p></div>
+      </div>
+    </div>
+    <ol class="steps" id="steps">
+      <li data-s="0"><b>1</b>The button fades, leaving the word</li>
+      <li data-s="1"><b>2</b>SOP drops into line</li>
+      <li data-s="2"><b>3</b>They slide together</li>
+      <li data-s="3"><b>4</b>Hazard tape slides in</li>
+      <li data-s="4"><b>5</b>The logo becomes the header</li>
+    </ol>
+  </section>
+
+  <section class="ink" aria-label="The wordmark on black">
+    <span class="wm dark" role="img" aria-label="SOPstart"><span class="p1">SOP</span><span class="p2">start</span></span>
+  </section>
+
+  <section class="parts" aria-label="Ingredients">
+    <div class="part"><div class="sw" style="background:var(--paper-1);border:1px solid var(--line)"><span class="wm notape" style="font-size:30px"><span class="p2" style="margin-left:0">Aa</span></span></div>
+      <span class="name">Saira Semi Condensed</span><span class="val">SOP 800 · start 600</span></div>
+    <div class="part"><div class="sw" style="background:var(--ink)"></div>
+      <span class="name">Ink</span><span class="val">#09090B</span></div>
+    <div class="part"><div class="sw" style="background:var(--tape);font-size:28px"></div>
+      <span class="name">Hazard tape</span><span class="val">#FBBF24 on ink · 45°</span></div>
+  </section>
+</div>
+
+<script>
+const stage = document.getElementById('stage'), card = stage.querySelector('.readcard'), run = stage.querySelector('.run');
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let speed = 1, playing = false, loopTimer = null;
+const rel = (el) => { const r = el.getBoundingClientRect(), b = stage.getBoundingClientRect(); return { l: r.left - b.left, t: r.top - b.top, w: r.width, h: r.height }; };
+const sleep = (t) => new Promise(r => setTimeout(r, t));
+const mark = (i) => document.querySelectorAll('#steps li').forEach(li => li.classList.toggle('on', +li.dataset.s === i));
+const LOGO = '<span class="wm"><span class="p1">SOP</span><span class="p2">start</span></span>';
+
+function reset() { card.hidden = false; run.hidden = true; mark(-1); }
+
+async function play() {
+  if (playing) return;
+  clearTimeout(loopTimer);
+  reset();
+  if (reduced || !Element.prototype.animate) { card.hidden = true; run.hidden = false; return; }
+  playing = true;
+  const k = speed, T = { fade: 180 * k, drop: 300 * k, shift: 320 * k, tape: 340 * k, hold: 140 * k, rise: 420 * k };
+  const ease = 'cubic-bezier(.5,0,.2,1)';
+  const btn = document.getElementById('startBtn'), srcP1 = document.querySelector('#srcSop .p1'), srcP2 = document.getElementById('srcStart');
+  const s1 = rel(srcP1), s2 = rel(srcP2), sb = rel(btn);
+
+  const veil = document.createElement('div'); veil.className = 'veil';
+  const body = document.createElement('div'); body.className = 'bbody';
+  Object.assign(body.style, { left: sb.l + 'px', top: sb.t + 'px', width: sb.w + 'px', height: sb.h + 'px' });
+  const box = document.createElement('div'); box.className = 'merge';
+  box.style.fontSize = getComputedStyle(srcP1).fontSize;
+  box.innerHTML = LOGO;
+  stage.append(veil, body, box);
+  const wm = box.firstElementChild, p1 = wm.querySelector('.p1'), p2 = wm.querySelector('.p2');
+
+  // the finished logo sits on the button's row, centred between where the two pieces began
+  const r0 = rel(wm), q2 = rel(p2);
+  box.style.left = ((s1.l + s2.l + s2.w) / 2 - r0.w / 2) + 'px';
+  box.style.top = (s2.t - (q2.t - r0.t)) + 'px';
+  const d1 = rel(p1), d2 = rel(p2), w = rel(wm);
+  const ax = s1.l - d1.l, ay = s1.t - d1.t, bx = s2.l - d2.l, by = s2.t - d2.t;
+  const total = T.fade + T.drop + T.shift, o1 = T.fade / total, o2 = (T.fade + T.drop) / total;
+
+  mark(0);
+  setTimeout(() => mark(1), T.fade); setTimeout(() => mark(2), T.fade + T.drop); setTimeout(() => mark(3), total);
+  veil.animate([{ opacity: 0 }, { opacity: 1 }], { duration: T.fade, fill: 'forwards' });
+  body.animate([{ opacity: 1 }, { opacity: 0 }], { duration: T.fade, fill: 'forwards' });
+  p1.animate([
+    { transform: `translate(${ax}px,${ay}px)`, offset: 0 },
+    { transform: `translate(${ax}px,${ay}px)`, offset: o1, easing: 'cubic-bezier(.55,0,.35,1)' },
+    { transform: `translate(${ax}px,0px)`, offset: o2, easing: ease },
+    { transform: 'none', offset: 1 },
+  ], { duration: total, fill: 'forwards' });
+  p2.animate([
+    { transform: `translate(${bx}px,${by}px)`, color: '#ffffff', offset: 0 },
+    { transform: `translate(${bx}px,${by}px)`, color: '#09090b', offset: o1 },
+    { transform: `translate(${bx}px,${by}px)`, color: '#09090b', offset: o2, easing: ease },
+    { transform: 'none', color: '#09090b', offset: 1 },
+  ], { duration: total, fill: 'forwards' });
+  try {
+    wm.animate([{ transform: `translateX(${-(w.l + w.w + 24)}px)` }, { transform: 'translateX(0)' }],
+      { pseudoElement: '::after', duration: T.tape, delay: total, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'both' });
+  } catch (e) { /* older browsers: the tape is simply there */ }
+  await sleep(total + T.tape + T.hold);
+
+  mark(4);
+  card.hidden = true; run.hidden = false;
+  const slot = stage.querySelector('.slot');
+  slot.style.visibility = 'hidden';
+  const cur = rel(wm), tgt = rel(slot.firstElementChild);
+  body.remove();
+  veil.animate([{ opacity: 1 }, { opacity: 0 }], { duration: T.rise, fill: 'forwards' });
+  await box.animate([{ transform: 'none' }, { transform: `translate(${tgt.l - cur.l}px,${tgt.t - cur.t}px) scale(${tgt.h / cur.h})` }],
+    { duration: T.rise, easing: ease, fill: 'forwards' }).finished;
+  slot.style.visibility = '';
+  veil.remove(); box.remove();
+  playing = false;
+  loopTimer = setTimeout(play, 2600 * Math.min(k, 2)); // loops so it can be watched without touching anything
+}
+
+document.getElementById('startBtn').addEventListener('click', play);
+document.getElementById('replay').addEventListener('click', () => { if (!playing) play(); });
+document.querySelectorAll('[data-speed]').forEach(b => b.addEventListener('click', () => {
+  speed = +b.dataset.speed;
+  document.querySelectorAll('[data-speed]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  if (!playing) play();
+}));
+document.fonts.ready.then(() => { if (!reduced) loopTimer = setTimeout(play, 900); });
+</script>

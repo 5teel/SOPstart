@@ -23,7 +23,7 @@ Paper/ink engineering-drawing system (established in the blueprint-redesign expl
 | 007 | plant-floor-navigation | What if the plant itself is the navigation — an isometric site with tappable machines, pins for what is due (worker) or what is sick (admin) — and the library is never the home? | Plant (scene as worker home + phone QR + admin inbox; shared terminal dropped) | navigation, spatial, isometric, worker, kiosk, phone, admin, generated-assets |
 | 008 | one-screen-site | If the whole app is one screen (isometric site + sidebar), where does the real work render — docked panel, sheet over the map, or step inside the room? | A (three panes; an open SOP takes the whole screen — map and list removed) | mvp, simplification, navigation, isometric, one-screen, data-model |
 | 009 | sop-first-home | If safe SOP use is the whole point, what is the home, and how does starting a SOP feel? | A (library + reader; isometric site map of library areas in the reader pane, one object per SOP) | home, navigation, brand, motion, worker, phone, isometric |
-| 010 | wordmark | What should the SOPstart wordmark look like, given it is assembled live from the SOP chip and the Start button? | pending | brand, wordmark, motion, icon |
+| 010 | wordmark | What should the SOPstart wordmark look like, given it is assembled live from the SOP chip and the Start button? | 6e in Saira Semi Condensed (ink SOP chip + "start", continuous hazard tape; merge = drop, slide together, tape in from left) | brand, wordmark, motion, icon |
 
 ## Decisions
 

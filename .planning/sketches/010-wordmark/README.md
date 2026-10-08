@@ -2,11 +2,27 @@
 sketch: 010
 name: wordmark
 question: "What should the SOPstart wordmark look like, given it is assembled live from the SOP chip and the Start button?"
-winner: null
+winner: "6e in Saira Semi Condensed"
 tags: [brand, wordmark, motion, icon]
 ---
 
 # Sketch 010: SOPstart wordmark
+
+## Winner (Simon, 2026-10-08)
+**6e "Industrial continuous" in Saira Semi Condensed**: SOP in an ink chip (800), "start" beside it
+(600), one strip of hazard tape along the chip's foot running on under "start". Archivo 88% was
+rejected because its r crowded the t. Values are in `src/styles/blueprint-theme.css` (`--wm-*`,
+`--dur-fuse-*`).
+
+**The merge (Simon's rule: the pieces start in their final form, just apart):** the read screen shows
+the SOP chip and a lowercase "start" button in the logo face → the button body fades, leaving the
+word → SOP drops straight down into line → they slide together → the tape slides in from the left →
+the logo rises into the steps header. ~1.7 s full, ×0.3 short, none under reduced motion.
+
+- `logo.html` — the shareable showcase (also published as an Artifact).
+- `index.html` — the round-4 comparison (6e in seven typefaces, slow-motion playback).
+  Round 1 (A–D) is in git history; rounds 2–3 (tape variations, Industrial/Tape-chip variations) are
+  earlier versions of the comparison Artifact https://claude.ai/artifact/WxeZykiefpJr4XDyPgfbrz.
 
 ## Design Question
 Sketch 009 makes the brand out of the interaction: tapping Start flies the **SOP** chip and the

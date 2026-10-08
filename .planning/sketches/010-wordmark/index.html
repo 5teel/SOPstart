@@ -1,208 +1,346 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>010 · SOPstart wordmark</title>
-<link rel="stylesheet" href="../themes/default.css">
-<!-- the app's own tokens: the wordmark is designed against the values that ship (ADR-0004) -->
-<link rel="stylesheet" href="../../../src/styles/blueprint-theme.css">
+<title>SOPstart Wordmark</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&family=Archivo:wdth,wght@62..125,400..900&family=Big+Shoulders+Stencil+Display:wght@700;800;900&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&family=Archivo:wdth,wght@62..125,400..900&family=Barlow+Semi+Condensed:wght@500;600;700;800&family=Overpass:wght@500..900&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=Sofia+Sans+Semi+Condensed:wght@500..900&family=Saira+Semi+Condensed:wght@500;600;700;800&family=Encode+Sans+Semi+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  body { padding-top: 44px; background: var(--paper); }
-  main { max-width: 1240px; margin: 0 auto; padding: 28px 24px 80px; }
-  .dir { margin-bottom: 56px; }
-  .dir h2 { font-size: 20px; margin: 0 0 4px; }
-  .dir .why { color: var(--ink-600); font-size: 13.5px; max-width: 760px; margin: 0 0 16px; }
-  .row { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 0.8fr); gap: 12px; }
-  .tile { border: 1px solid var(--ink-200); border-radius: 10px; min-height: 150px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 18px; position: relative; }
-  .tile.paper { background: var(--paper-1); }
-  .tile.ink { background: var(--ink-900); border-color: var(--ink-900); }
-  .tile .cap { position: absolute; left: 10px; top: 8px; font-family: var(--mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-500); }
-  .tile.ink .cap { color: var(--ink-400); }
-  .hero { font-size: clamp(28px, 3.4vw, var(--wm-size-hero)); }
-  .tile { overflow: hidden; }
-  .hbar { width: 100%; display: flex; align-items: center; gap: 10px; border: 1px solid var(--ink-200); border-radius: 8px; padding: 10px 12px; background: var(--paper-1); }
-  .hbar .t { font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .hbar .sep { width: 1px; height: 18px; background: var(--ink-300); flex: none; }
-  .marks { display: flex; align-items: flex-end; gap: 14px; }
-  .marks small { display: block; text-align: center; font-family: var(--mono); font-size: 10px; color: var(--ink-500); margin-top: 4px; }
+  /* Layout: a glance strip of every option at phone-header size, then one section per option: live Start panel first, lockups after. */
+  :root {
+    /* page chrome — follows the viewer's theme */
+    --bg: #f4f4f5; --surface: #ffffff; --fg: #09090b; --muted: #52525b; --faint: #71717a; --line: #e4e4e7;
+    /* the app itself (sopstart.com paper theme) — fixed, the wordmark is judged on these */
+    --app-paper: #fafafa; --app-paper-1: #ffffff; --app-ink: #09090b; --app-ink-300: #d4d4d8; --app-ink-200: #e4e4e7; --app-ink-500: #71717a; --app-hazard: #b91c1c;
+    /* brand + motion tokens, mirrored from src/styles/blueprint-theme.css (ADR-0004) */
+    --wm-ink: #09090b; --wm-accent: #fbbf24;
+    --wm-size-hero: 52px; --wm-size-header: 20px; --wm-size-phone: 17px;
+    --ease-fuse: cubic-bezier(.5, 0, .2, 1);
+    --dur-fuse-meet: 460ms; --dur-fuse-hold: 160ms; --dur-fuse-rise: 420ms; --dur-fuse-short: 150ms;
+    /* hazard tape, sized in em so it scales with the wordmark */
+    --tape: repeating-linear-gradient(-45deg, var(--wm-accent) 0 .16em, var(--wm-ink) .16em .32em);
+    --tape-on-ink: repeating-linear-gradient(-45deg, var(--wm-accent) 0 .16em, transparent .16em .32em);
+    --sans: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #0c0c0e; --surface: #18181b; --fg: #f4f4f5; --muted: #a1a1aa; --faint: #8b8b94; --line: #2a2a2f; color-scheme: dark; }
+  }
+  :root[data-theme="dark"] { --bg: #0c0c0e; --surface: #18181b; --fg: #f4f4f5; --muted: #a1a1aa; --faint: #8b8b94; --line: #2a2a2f; color-scheme: dark; }
 
-  /* ---------------- the wordmark, four directions ---------------- */
-  .wm { display: inline-flex; align-items: baseline; white-space: nowrap; line-height: 1; color: var(--wm-ink); position: relative; }
-  .wm .p1, .wm .p2 { display: inline-block; transform-origin: 0 0; }
-  .wm::after { transform-origin: left center; transition: transform 220ms var(--ease-fuse); }
-  .wm.pre::after { transform: scaleX(0); }
-  .wm.dark { color: #fff; }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--fg); font-family: var(--sans); font-size: 15px; line-height: 1.5; padding-inline: 16px; padding-block: 24px 64px; }
+  .wrap { max-width: 880px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+  header.top { display: flex; flex-direction: column; gap: 8px; }
+  .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); }
+  h1 { font-size: 30px; line-height: 1.1; margin: 0; letter-spacing: -0.02em; text-wrap: balance; }
+  header.top p { margin: 0; color: var(--muted); max-width: 60ch; }
+  h3.fam { margin: 0; font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); font-weight: 600; }
+  nav.jump { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; display: flex; gap: 6px; padding-block: 10px; background: var(--bg); overflow-x: auto; }
+  nav.jump a { flex: none; font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--fg); text-decoration: none; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 7px 12px; }
+  nav.jump a.ref { color: var(--faint); }
+  nav.jump a:focus-visible, button:focus-visible, .strip a:focus-visible { outline: 2px solid var(--wm-accent); outline-offset: 2px; }
 
-  /* A · chip + word: SOP stays the chip it was, start is the word the button said */
-  .wmA { font-family: Inter, sans-serif; letter-spacing: -0.02em; }
-  .wmA .p1 { font-weight: 800; background: var(--wm-ink); color: #fff; padding: .07em .2em .05em; border-radius: .14em; box-shadow: inset 0 -.1em 0 var(--wm-accent); }
-  .wmA .p2 { font-weight: 600; margin-left: .1em; }
-  .wmA.dark .p1 { background: #fff; color: var(--wm-ink); }
+  .strip { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  @media (min-width: 720px) { .strip { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .strip a { display: flex; flex-direction: column; gap: 10px; text-decoration: none; color: var(--app-ink); background: var(--app-paper-1); border: 1px solid var(--line); border-radius: 10px; padding: 12px; min-width: 0; }
+  .strip .n { font-family: var(--mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--app-ink-500); }
+  .strip .big { font-size: 30px; display: flex; min-height: 50px; align-items: center; }
 
-  /* B · seam: one word, a yellow seam where the two halves met */
-  .wmB { font-family: Archivo, sans-serif; font-stretch: 112%; letter-spacing: -0.015em; }
-  .wmB .p1 { font-weight: 800; }
-  .wmB .p2 { font-weight: 500; }
-  .wmB .seam { display: inline-block; width: .09em; height: .74em; background: var(--wm-accent); transform: skewX(-14deg); margin: 0 .05em; transform-origin: bottom; transition: transform 220ms var(--ease-fuse); }
-  .wmB.pre .seam { transform: skewX(-14deg) scaleY(0); }
+  section.dir { display: flex; flex-direction: column; gap: 14px; scroll-margin-top: 64px; padding-top: 16px; border-top: 1px solid var(--line); }
+  .dir h2 { margin: 0; font-size: 22px; letter-spacing: -0.01em; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+  .dir h2 .ltr { font-family: var(--mono); font-size: 13px; color: var(--faint); }
+  .dir h2 .ref { font-family: var(--mono); font-size: 11px; font-weight: 500; color: var(--faint); border: 1px solid var(--line); border-radius: 4px; padding: 1px 6px; }
+  .dir .why { margin: 0; color: var(--muted); max-width: 62ch; }
 
-  /* C · stencil: safety-label lettering, hazard-stripe rule */
-  .wmC { font-family: 'Big Shoulders Stencil Display', sans-serif; font-weight: 800; letter-spacing: .03em; }
-  .wmC .p1 { font-weight: 900; }
-  .wmC .p2 { margin-left: .14em; }
-  .wmC::after { content: ''; position: absolute; left: 0; right: 0; bottom: -.17em; height: .1em; background: repeating-linear-gradient(-45deg, var(--wm-accent) 0 .14em, var(--wm-ink) .14em .28em); }
-  .wmC.dark::after { background: repeating-linear-gradient(-45deg, var(--wm-accent) 0 .14em, transparent .14em .28em); }
+  .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  @media (max-width: 560px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+  .tile { position: relative; border-radius: 10px; min-height: 132px; padding: 30px 14px 22px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; overflow: hidden; }
+  .tile.paper { background: var(--app-paper-1); border: 1px solid var(--line); }
+  .tile.ink { background: var(--app-ink); border: 1px solid var(--app-ink); }
+  .tile .cap { position: absolute; left: 12px; top: 9px; font-family: var(--mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--app-ink-500); }
+  .tile.ink .cap { color: #a1a1aa; }
+  .hero { font-size: clamp(34px, 11vw, var(--wm-size-hero)); }
+  .hbar { width: 100%; max-width: 320px; display: flex; align-items: center; gap: 10px; border: 1px solid var(--app-ink-200); border-radius: 8px; padding: 10px 12px; background: var(--app-paper-1); color: var(--app-ink); }
+  .hbar .t { font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .hbar .sep { width: 1px; height: 18px; background: var(--app-ink-300); flex: none; }
+  .marks { display: flex; align-items: flex-end; gap: 16px; }
+  .marks small { display: block; text-align: center; font-family: var(--mono); font-size: 10px; color: var(--app-ink-500); margin-top: 5px; }
 
-  /* D · underline: plain type, the underline draws as they merge */
-  .wmD { font-family: Inter, sans-serif; letter-spacing: -0.025em; }
-  .wmD .p1 { font-weight: 800; }
-  .wmD .p2 { font-weight: 500; }
-  .wmD::after { content: ''; position: absolute; left: 0; right: 0; bottom: -.13em; height: .11em; border-radius: .05em; background: var(--wm-accent); }
+  /* ---------- the wordmark ---------- */
+  .wm { --hole: #ffffff; display: inline-flex; align-items: baseline; white-space: nowrap; line-height: 1; color: var(--wm-ink); position: relative; }
+  .wm .p1, .wm .p2 { display: inline-block; transform-origin: 0 0; position: relative; }
+  .wm::after, .wm .p2::after { transform-origin: left center; transition: transform var(--draw, 240ms) var(--ease-fuse); }
+  .wm.pre::after, .wm.pre .p2::after { transform: scaleX(0); }
+  .wm.dark { color: #fff; --hole: #09090b; }
+  .stage .wm { --hole: #fafafa; }
 
-  /* marks (app icon / favicon) */
-  .mk { display: flex; align-items: center; justify-content: center; border-radius: 22%; font-weight: 800; line-height: 1; position: relative; overflow: hidden; }
-  .mkA { background: var(--wm-ink); color: #fff; font-family: Inter; box-shadow: inset 0 -0.12em 0 var(--wm-accent); }
-  .mkB { background: var(--paper-1); color: var(--wm-ink); font-family: Archivo; font-stretch: 112%; border: 1px solid var(--ink-200); }
-  .mkB i { display: inline-block; width: .1em; height: .62em; background: var(--wm-accent); transform: skewX(-14deg); margin-left: .05em; }
-  .mkC { background: var(--wm-ink); color: var(--wm-accent); font-family: 'Big Shoulders Stencil Display'; font-weight: 900; }
-  .mkD { background: var(--wm-ink); color: #fff; font-family: Inter; }
-  .mkD::after { content: ''; position: absolute; left: 24%; right: 24%; bottom: 18%; height: 9%; background: var(--wm-accent); border-radius: 2px; }
+  /* type families */
+  .inter { font-family: Inter, var(--sans); letter-spacing: -0.025em; }
+  .inter .p1 { font-weight: 800; } .inter .p2 { font-weight: 500; }
+  .arch { font-family: Archivo, var(--sans); font-stretch: 88%; letter-spacing: -0.01em; }
+  .arch .p1 { font-weight: 800; } .arch .p2 { font-weight: 600; }
+  .arch.cond { font-stretch: 76%; letter-spacing: 0; }
+  .arch.cond .p1 { font-weight: 900; } .arch.cond .p2 { font-weight: 700; }
 
-  /* ---------------- the Start stage ---------------- */
-  .stage { position: relative; height: 420px; margin-top: 12px; border: 1px solid var(--ink-200); border-radius: 12px; background: var(--paper); overflow: hidden; }
-  .stage .ctl { position: absolute; right: 12px; bottom: 12px; display: flex; gap: 8px; z-index: 60; }
-  .stage .ctl button, .stage .ctl select { font: 600 12px var(--sans); border: 1px solid var(--ink-300); background: var(--paper-1); border-radius: 8px; padding: 7px 12px; cursor: pointer; }
-  .stage .ctl button.go { background: var(--ink-900); color: #fff; border-color: var(--ink-900); }
-  .readcard { position: absolute; left: 40px; top: 36px; right: 40px; }
-  .readcard .srcchip { display: inline-flex; align-items: center; height: 26px; padding: 0 9px; border-radius: 5px; background: var(--wm-ink); color: #fff; font-weight: 800; font-size: 13px; }
-  .readcard h3 { font-family: Inter, sans-serif; font-size: 26px; margin: 10px 0 4px; }
-  .readcard .meta { font-family: var(--mono); font-size: 11px; color: var(--ink-500); }
-  .readcard .startbtn { margin-top: 22px; height: var(--spacing-tap-glove, 60px); /* @theme tokens only exist once Tailwind compiles; fallback for the raw sketch */ min-width: 180px; padding: 0 28px; border-radius: 10px; background: var(--wm-ink); color: #fff; border: 0; font-size: 18px; font-weight: 700; cursor: pointer; }
-  .run { position: absolute; inset: 0; display: none; }
-  .stage.running .run { display: block; }
-  .stage.running .readcard { display: none; }
-  .run .shd { height: 56px; display: flex; align-items: center; gap: 14px; padding: 0 18px; background: var(--paper-1); border-bottom: 1px solid var(--ink-200); }
-  .run .shd .wm { font-size: var(--wm-size-header); }
-  .run .shd .sep { width: 1px; height: 22px; background: var(--ink-300); }
-  .run .shd .t { font-weight: 600; font-size: 14px; flex: 1; }
-  .run .stp { max-width: 640px; margin: 36px auto; padding: 0 24px; border-left: 4px solid var(--accent-hazard); }
-  .run .stp .k { font-family: var(--mono); font-size: 10px; letter-spacing: .08em; color: var(--accent-hazard); border: 1px solid currentColor; border-radius: 3px; padding: 2px 7px; }
-  .run .stp p { font-size: var(--text-step, 28px); font-weight: 600; line-height: 1.3; margin: 16px 0; }
-  .veil { position: absolute; inset: 0; background: var(--paper); z-index: 40; pointer-events: none; }
-  .fly { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 41; font-size: var(--wm-size-hero); pointer-events: none; }
+
+  /* round 4: the 6e design in eight typefaces, all at normal letter spacing except the original */
+  .f-arch88 { font-family: Archivo, var(--sans); font-stretch: 88%; letter-spacing: -0.01em; }
+  .f-arch100 { font-family: Archivo, var(--sans); font-stretch: 100%; letter-spacing: 0; }
+  .f-barlow { font-family: 'Barlow Semi Condensed', var(--sans); letter-spacing: 0; }
+  .f-overpass { font-family: Overpass, var(--sans); letter-spacing: 0; }
+  .f-plex { font-family: 'IBM Plex Sans Condensed', var(--sans); letter-spacing: 0; }
+  .f-sofia { font-family: 'Sofia Sans Semi Condensed', var(--sans); letter-spacing: 0; }
+  .f-saira { font-family: 'Saira Semi Condensed', var(--sans); letter-spacing: 0; }
+  .f-encode { font-family: 'Encode Sans Semi Condensed', var(--sans); letter-spacing: 0; }
+  .fw .p1 { font-weight: 800; } .fw .p2 { font-weight: 600; }
+  .f-plex.fw .p1 { font-weight: 700; }
+  .rt { font-size: 112px; line-height: 1; color: var(--app-ink); font-weight: 600; display: flex; gap: 28px; align-items: baseline; }
+  .rt small { font-family: var(--mono); font-size: 11px; color: var(--app-ink-500); font-weight: 400; }
+  .tile.wide { grid-column: 1 / -1; }
+
+  /* tape treatments */
+  .rule::after { content: ''; position: absolute; left: 0; right: 0; bottom: -.2em; height: .15em; background: var(--tape); }
+  .rule.dark::after { background: var(--tape-on-ink); }
+  .rule.thick::after { bottom: -.25em; height: .2em; }
+  .kerb::after { content: ''; position: absolute; left: 0; right: 0; bottom: -.11em; height: .22em; background: var(--tape); }
+  .kerb.dark::after { background: var(--tape-on-ink); }
+  .startonly .p2::after { content: ''; position: absolute; left: .02em; right: 0; bottom: -.2em; height: .15em; background: var(--tape); }
+  .startonly.dark .p2::after { background: var(--tape-on-ink); }
+
+  /* chip treatments: SOP stays the chip that was tapped */
+  .chip .p1 { background-color: var(--wm-ink); color: #fff; padding: .08em .2em .15em; border-radius: .12em; overflow: hidden; }
+  .chip .p2 { margin-left: .1em; }
+  .chip.dark .p1 { background-color: #fff; color: var(--wm-ink); }
+  .chip.edge .p1::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: .13em; background: var(--tape-on-ink); }
+  .chip.edge.dark .p1::after { background: var(--tape); }
+  /* lockout tag: the chip is a LOTO tag, hole punched, tape across the top */
+  .chip.tag .p1 { padding: .2em .22em .1em .46em; border-radius: .1em .16em .16em .1em; }
+  .chip.tag .p1::before { content: ''; position: absolute; left: .13em; top: 50%; width: .21em; height: .21em; margin-top: -.06em; border-radius: 50%; background: var(--hole); }
+  .chip.tag .p1::after { content: ''; position: absolute; left: 0; right: 0; top: 0; height: .13em; background: var(--tape-on-ink); }
+  .chip.tag.dark .p1::after { background: var(--tape); }
+  /* taped frame: the chip edged all round in tape */
+  .chip.frame .p1 { border: .09em solid transparent; padding: .05em .16em .07em; background: linear-gradient(var(--wm-ink), var(--wm-ink)) padding-box, var(--tape) border-box; border-radius: .14em; }
+  .chip.frame.dark .p1 { background: linear-gradient(#fff, #fff) padding-box, var(--tape) border-box; }
+  /* continuous: one strip of tape runs along the chip's foot and on under start */
+  .chip.cont .p1 { padding-bottom: .2em; border-radius: .12em .12em .04em .04em; }
+  .chip.cont::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: .13em; background: var(--tape); }
+  .chip.cont.dark::after { background: var(--tape-on-ink); box-shadow: 0 0 0 .01em var(--wm-accent); }
+
+  /* marks */
+  .mk { display: flex; align-items: center; justify-content: center; border-radius: 22%; font-weight: 800; line-height: 1; position: relative; overflow: hidden; background: var(--wm-ink); color: #fff; font-family: Inter, var(--sans); }
+  .mk.ind { font-family: Archivo, var(--sans); font-stretch: 88%; }
+  .mk.ind.cond { font-stretch: 76%; font-weight: 900; }
+  .mk .tp { position: absolute; left: 0; right: 0; bottom: 0; height: 18%; background: repeating-linear-gradient(-45deg, var(--wm-accent) 0 .1em, var(--wm-ink) .1em .2em); }
+  .mk .tp.top { top: 0; bottom: auto; height: 16%; }
+  .mk .hole { position: absolute; left: 16%; top: 50%; width: 13%; height: 13%; border-radius: 50%; background: #fff; transform: translateY(-20%); }
+  .mk.tagm { padding-left: 14%; }
+  .mk.framem { border: max(2px, .1em) solid transparent; background: linear-gradient(var(--wm-ink), var(--wm-ink)) padding-box, repeating-linear-gradient(-45deg, var(--wm-accent) 0 .1em, var(--wm-ink) .1em .2em) border-box; }
+
+  /* ---------- the Start panel (a slice of sopstart.com) ---------- */
+  .stage { position: relative; height: 330px; border-radius: 12px; background: var(--app-paper); border: 1px solid var(--line); overflow: hidden; color: var(--app-ink); }
+  .readcard { position: absolute; inset: 22px 20px auto 20px; }
+  .srcchip { display: inline-flex; align-items: center; height: 26px; padding: 0 9px; border-radius: 5px; background: var(--wm-ink); color: #fff; font-weight: 800; font-size: 13px; }
+  .readcard h3 { font-size: 22px; line-height: 1.2; margin: 10px 0 4px; }
+  .readcard .meta { font-family: var(--mono); font-size: 11px; color: var(--app-ink-500); }
+  .startbtn { margin-top: 20px; height: 60px; width: 100%; max-width: 260px; border-radius: 10px; background: var(--wm-ink); color: #fff; border: 0; font-size: 18px; font-weight: 700; cursor: pointer; }
+  /* the read screen shows both pieces in their final form, at the size they merge at */
+  .srcwm { font-size: 22px; }
+  .srcwm::after { display: none; }
+  .startbtn .lbl { font-size: 22px; color: #fff; }
+  .startbtn .lbl::after { display: none; }
+  .bbody { position: absolute; background: var(--wm-ink); border-radius: 10px; z-index: 41; pointer-events: none; }
+  .merge { display: flex; position: absolute; left: 0; top: 0; z-index: 42; pointer-events: none; transform-origin: 0 0; }
+  .tap { font-family: var(--mono); font-size: 11px; color: var(--app-ink-500); margin-top: 10px; }
+  .run { position: absolute; inset: 0; }
+  .shd { height: 54px; display: flex; align-items: center; gap: 10px; padding: 0 12px; background: var(--app-paper-1); border-bottom: 1px solid var(--app-ink-200); }
+  .shd .slot { font-size: var(--wm-size-phone); display: inline-flex; }
+  .shd .sep { width: 1px; height: 22px; background: var(--app-ink-300); flex: none; }
+  .shd .t { font-weight: 600; font-size: 14px; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .shd button { border: 1px solid var(--app-ink-300); background: var(--app-paper-1); color: var(--app-ink); border-radius: 8px; padding: 7px 12px; font: 600 13px var(--sans); cursor: pointer; }
+  .stp { margin: 22px 16px; padding-left: 14px; border-left: 4px solid var(--app-hazard); }
+  .stp .k { font-family: var(--mono); font-size: 10px; letter-spacing: .08em; color: var(--app-hazard); border: 1px solid currentColor; border-radius: 3px; padding: 2px 7px; }
+  .stp p { font-size: 21px; font-weight: 600; line-height: 1.3; margin: 12px 0 0; }
+  .veil { position: absolute; inset: 0; background: var(--app-paper); z-index: 40; pointer-events: none; }
+  .fly { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 41; font-size: clamp(34px, 10vw, var(--wm-size-hero)); pointer-events: none; }
   .fly.free { transform: none; }
+
+  .speed { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .speed span { font-family: var(--mono); font-size: 11px; color: var(--faint); text-transform: uppercase; letter-spacing: .08em; }
+  .seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--surface); }
+  .seg button { border: 0; background: transparent; color: var(--fg); padding: 9px 13px; font: 500 13px var(--sans); cursor: pointer; min-height: 40px; }
+  .seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); font-weight: 700; }
+
+  footer { color: var(--faint); font-size: 13px; border-top: 1px solid var(--line); padding-top: 16px; }
+  footer code { font-family: var(--mono); font-size: 12px; }
 </style>
-</head>
-<body>
-<div id="variant-nav">
-  <span class="sketch-title">010 · SOPstart wordmark</span>
-  <button class="variant-tab active" data-v="all">All four</button>
-  <button class="variant-tab" data-v="A">A: Chip + word</button>
-  <button class="variant-tab" data-v="B">B: Seam</button>
-  <button class="variant-tab" data-v="C">C: Stencil</button>
-  <button class="variant-tab" data-v="D">D: Underline</button>
+
+<div class="wrap">
+  <header class="top">
+    <span class="eyebrow">Sketch 010 · round 4 · 6e Industrial continuous</span>
+    <h1>6e in better typefaces</h1>
+    <p>The same design (the SOP chip with one strip of tape running on under "start") in seven typefaces, all at normal letter spacing, with the current Archivo version last. Each section has a close-up of the r and t in "start". Tap Start in any panel to see the merge.</p>
+  </header>
+
+  <h3 class="fam">All options at phone-header size</h3>
+  <div class="strip" id="strip"></div>
+
+  <nav class="jump" aria-label="Options" id="jump"></nav>
+  <div class="speed" role="group" aria-label="Animation speed">
+    <span>Start animation</span>
+    <div class="seg">
+      <button type="button" data-speed="full" aria-pressed="true">Full · first today</button>
+      <button type="button" data-speed="short" aria-pressed="false">Short · after that</button>
+      <button type="button" data-speed="slow4" aria-pressed="false">Slow ×4</button>
+      <button type="button" data-speed="slow10" aria-pressed="false">Slow ×10</button>
+      <button type="button" data-speed="off" aria-pressed="false">Reduced motion</button>
+    </div>
+  </div>
+  <div id="dirs" style="display:flex;flex-direction:column;gap:40px"></div>
+  <footer>Colours, sizes and timings are the shipped tokens in <code>src/styles/blueprint-theme.css</code>. ADR-0004: the hazard tape and brand yellow belong to the wordmark only, never to a status or a warning in the app.</footer>
 </div>
-<main id="main"></main>
 
 <script>
-const DIRS = {
-  A: { name: 'Chip + word', p2: 'start', btn: 'Start', font: 'Inter',
-       why: 'The SOP chip survives inside the logo: what you tapped is what the brand is made of. Strongest link to the animation; heaviest at small sizes.' },
-  B: { name: 'Seam', p2: 'start', btn: 'Start', font: 'Archivo',
-       why: 'One wide industrial word with a yellow seam where SOP and Start met. The seam is the mark: it can stand alone as the icon and as a loading tick.' },
-  C: { name: 'Stencil', p2: 'START', btn: 'START', font: 'Big Shoulders Stencil Display',
-       why: 'Safety-label stencil lettering with a hazard-stripe rule. All caps, so the button already says START and nothing changes case at the merge. Most "site", least "software".' },
-  D: { name: 'Underline', p2: 'start', btn: 'Start', font: 'Inter',
-       why: 'Plain type; the yellow underline draws in as the halves meet. The quietest and most legible at 17 px; the brand moment is carried by the motion, not the shape.' },
-};
-const L = (d, cls = '') => `<span class="wm wm${d} ${cls}"><span class="p1">SOP</span>${d === 'B' ? '<i class="seam"></i>' : ''}<span class="p2">${DIRS[d].p2}</span></span>`;
-const MK = (d, px) => `<div class="mk mk${d}" style="width:${px}px;height:${px}px;font-size:${px * (d === 'C' ? 0.78 : 0.62)}px">${d === 'D' ? 's' : 'S'}${d === 'B' ? '<i></i>' : ''}</div>`;
+// fam groups the glance strip; cls is the wordmark recipe; mark is the icon recipe
+const DIRS = [
+  { id: '5', name: 'Saira Semi Condensed', f: 'f-saira', font: "'Saira Semi Condensed'",
+    pick: true, why: 'Your pick. Squarer, more technical shapes, close to machine labelling. The most distinctive, slightly less warm.' },
+  { id: '1', name: 'Barlow Semi Condensed', f: 'f-barlow', font: "'Barlow Semi Condensed'",
+    why: 'Drawn from highway and industrial signage, close to DIN. Short r arm and a clear gap before the t; the most "plant floor" of the set.' },
+  { id: '2', name: 'Overpass', f: 'f-overpass', font: 'Overpass',
+    why: 'Based on Highway Gothic, the US road-sign face. Open, round and very legible at 17 px; a little wider than the others.' },
+  { id: '3', name: 'Sofia Sans Semi Condensed', f: 'f-sofia', font: "'Sofia Sans Semi Condensed'",
+    why: 'A clean, modern semi-condensed grotesk with generous spacing; the r and t sit well apart.' },
+  { id: '4', name: 'IBM Plex Sans Condensed', f: 'f-plex', font: "'IBM Plex Sans Condensed'",
+    why: 'Engineering-drawing feel with crisp, squared ends. Bold tops out at 700, so SOP is a touch lighter.' },
+  { id: '6', name: 'Encode Sans Semi Condensed', f: 'f-encode', font: "'Encode Sans Semi Condensed'",
+    why: 'A neutral grotesk with an open r; the safest swap if you want 6e to look almost unchanged.' },
+  { id: '7', name: 'Archivo, normal width', f: 'f-arch100', font: 'Archivo',
+    why: 'The same typeface as 6e at full width and normal spacing. The smallest possible fix; the word gets wider.' },
+  { id: '0', name: 'Archivo 88% (current 6e)', f: 'f-arch88', font: 'Archivo', ref: true,
+    why: 'Round 3 original: Archivo at 88% width with letter spacing tightened by 1%, where the r touches the t.' },
+];
+const BY = Object.fromEntries(DIRS.map(d => [d.id, d]));
+let speed = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'off' : 'full';
+
+const L = (d, extra = '') => `<span class="wm chip cont fw ${d.f} ${extra}"><span class="p1">SOP</span><span class="p2">start</span></span>`;
+function MK(d, px) {
+  const s = (inner, cls = '') => `<div class="mk ${d.f} ${cls}" style="width:${px}px;height:${px}px;font-size:${px * 0.6}px;font-family:${d.font}, var(--sans)" aria-hidden="true">${inner}</div>`;
+  return s('S<i class="tp"></i>');
+}
 
 function section(d) {
-  const D = DIRS[d];
-  return `<section class="dir" data-d="${d}">
-    <h2>${d} · ${D.name}</h2><p class="why">${D.why}</p>
-    <div class="row">
-      <div class="tile paper"><span class="cap">Hero · 52 px</span>${L(d, 'hero')}</div>
+  return `<section class="dir" id="o${d.id}">
+    <h2><span class="ltr">${d.id}</span>${d.name}${d.ref ? '<span class="ref">current</span>' : ''}${d.pick ? '<span class="ref">your pick</span>' : ''}</h2>
+    <p class="why">${d.why}</p>
+    <div class="stage" id="st-${d.id}">
+      <div class="readcard">
+        <span class="srcwm wm chip cont fw ${d.f}"><span class="p1">SOP</span></span>
+        <h3>Forklift pre-start check</h3>
+        <div class="meta">Warehouse &amp; dispatch · Inspection · v4 · ~6 min</div>
+        <button type="button" class="startbtn" data-play="${d.id}"><span class="lbl wm fw ${d.f}"><span class="p2">start</span></span></button>
+        <div class="tap">Tap start to see the merge</div>
+      </div>
+      <div class="run" hidden>
+        <div class="shd"><span class="slot">${L(d)}</span><span class="sep"></span><span class="t">Forklift pre-start check</span><button type="button" data-reset="${d.id}">Stop</button></div>
+        <div class="stp"><span class="k">HAZARD</span><p>Pedestrians share the aisles. Sound the horn at every intersection and blind corner.</p></div>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="tile paper"><span class="cap">On paper · 52 px</span>${L(d, 'hero')}</div>
       <div class="tile ink"><span class="cap">On ink</span>${L(d, 'hero dark')}</div>
-      <div class="tile paper"><span class="cap">Headers · 20 / 17 px</span>
-        <div class="hbar">${L(d).replace('class="wm', 'style="font-size:var(--wm-size-header)" class="wm')}<span class="sep"></span><span class="t">Forklift pre-start check</span></div>
-        <div class="hbar" style="width:78%">${L(d).replace('class="wm', 'style="font-size:var(--wm-size-phone)" class="wm')}<span class="sep"></span><span class="t">Forklift pre-start…</span></div></div>
-      <div class="tile paper"><span class="cap">Mark</span><div class="marks">
+      <div class="tile paper"><span class="cap">Headers · 20 px desktop · 17 px phone</span>
+        <div class="hbar"><span style="font-size:var(--wm-size-header);display:inline-flex">${L(d)}</span><span class="sep"></span><span class="t">Forklift pre-start check</span></div>
+        <div class="hbar" style="max-width:260px"><span style="font-size:var(--wm-size-phone);display:inline-flex">${L(d)}</span><span class="sep"></span><span class="t">Forklift pre-start check</span></div>
+      </div>
+      <div class="tile paper wide"><span class="cap">The r–t pair, close up</span><div class="rt ${d.f}"><span>start</span><small>600 weight<br>as in the logo</small></div></div>
+      <div class="tile paper"><span class="cap">App icon · favicon</span><div class="marks">
         <div>${MK(d, 64)}<small>64</small></div><div>${MK(d, 32)}<small>32</small></div><div>${MK(d, 16)}<small>16</small></div></div></div>
     </div>
-    <div class="stage" id="st-${d}">
-      <div class="readcard"><span class="srcchip" style="font-family:'${D.font}'">SOP</span><h3>Forklift pre-start check</h3>
-        <div class="meta">Warehouse &amp; dispatch · Inspection · v4 · ~6 min</div>
-        <button class="startbtn" style="font-family:'${D.font}'" data-play="${d}">${D.btn}</button></div>
-      <div class="run"><div class="shd"><span class="slot">${L(d)}</span><span class="sep"></span><span class="t">Forklift pre-start check</span></div>
-        <div class="stp"><span class="k">HAZARD</span><p>Pedestrians share the aisles. Sound the horn at every intersection and blind corner.</p></div></div>
-      <div class="ctl"><select data-speed><option value="full">Full</option><option value="short">Short</option><option value="off">Reduced motion</option></select>
-        <button class="go" data-play="${d}">▶ Start</button><button data-reset="${d}">Reset</button></div>
-    </div></section>`;
+  </section>`;
 }
 
-const tok = (n) => parseFloat(getComputedStyle(document.documentElement).getPropertyValue(n)) || 0;
-const ease = () => getComputedStyle(document.documentElement).getPropertyValue('--ease-fuse').trim() || 'ease';
+const ms = (n) => parseFloat(getComputedStyle(document.documentElement).getPropertyValue(n)) || 0;
 const relTo = (el, box) => { const r = el.getBoundingClientRect(), b = box.getBoundingClientRect(); return { l: r.left - b.left, t: r.top - b.top, w: r.width, h: r.height }; };
+const sleep = (t) => new Promise(r => setTimeout(r, t));
 
-async function play(d) {
-  const st = document.getElementById('st-' + d);
-  if (st.classList.contains('running') || st.dataset.busy) return;
-  const mode = st.querySelector('[data-speed]').value;
-  if (mode === 'off') { st.classList.add('running'); return; }
-  st.dataset.busy = 1;
-  const T = mode === 'full'
-    ? { a: tok('--dur-fuse-meet'), hold: tok('--dur-fuse-hold'), b: tok('--dur-fuse-rise') }
-    : { a: tok('--dur-fuse-short'), hold: 0, b: tok('--dur-fuse-short') };
-  const chip = st.querySelector('.srcchip'), btn = st.querySelector('.startbtn');
-  const s1 = relTo(chip, st), s2 = relTo(btn, st);
+async function play(id) {
+  const d = BY[id], st = document.getElementById('st-' + id), card = st.querySelector('.readcard'), run = st.querySelector('.run');
+  if (!run.hidden || st.dataset.busy) return;
+  const show = () => { card.hidden = true; run.hidden = false; };
+  if (speed === 'off' || !Element.prototype.animate) return show();
+  st.dataset.busy = '1';
+  // ponytail: sketch-local timings; the --dur-fuse-* tokens get rewritten to these phases once the motion is signed off
+  const k = { short: 0.3, slow4: 4, slow10: 10 }[speed] || 1;
+  const T = { fade: 180 * k, drop: 300 * k, shift: 320 * k, tape: 340 * k, hold: 140 * k, rise: 420 * k };
+  const ease = getComputedStyle(document.documentElement).getPropertyValue('--ease-fuse').trim() || 'ease';
+  const btn = st.querySelector('.startbtn'), srcP1 = st.querySelector('.srcwm .p1'), srcP2 = btn.querySelector('.p2');
+  const s1 = relTo(srcP1, st), s2 = relTo(srcP2, st), sb = relTo(btn, st);
+
+  // layers: paper veil over the read screen, the button's body, then the finished logo
   const veil = document.createElement('div'); veil.className = 'veil';
-  const fly = document.createElement('div'); fly.className = 'fly';
-  fly.innerHTML = L(d, 'pre');
-  st.append(veil, fly);
-  const wm = fly.firstElementChild, [p1] = wm.getElementsByClassName('p1'), [p2] = wm.getElementsByClassName('p2');
-  const finalText = p2.textContent; p2.textContent = DIRS[d].btn;
-  const d1 = relTo(p1, st), d2 = relTo(p2, st);
-  const E = ease();
-  const flyPart = (el, src, dst) => {
-    const cs = getComputedStyle(el), s = src.h / dst.h;
-    const tx = src.l + src.w / 2 - dst.l - (dst.w * s) / 2, ty = src.t + src.h / 2 - dst.t - (dst.h * s) / 2;
-    el.animate([{ background: '#09090b', color: '#fff', boxShadow: '0 0 0 6px #09090b' }, { background: cs.backgroundColor, color: cs.color, boxShadow: cs.boxShadow === 'none' ? '0 0 0 0 transparent' : cs.boxShadow }],
-      { duration: T.a * 0.4, delay: T.a * 0.6, easing: 'ease-in', fill: 'both' });
-    return el.animate([{ transform: `translate(${tx}px,${ty}px) scale(${s})` }, { transform: 'none' }], { duration: T.a, easing: E, fill: 'forwards' }).finished;
-  };
-  veil.animate([{ opacity: 0 }, { opacity: 1 }], { duration: T.a, fill: 'forwards' });
-  await Promise.all([flyPart(p1, s1, d1), flyPart(p2, s2, d2)]);
-  p2.textContent = finalText;
-  wm.classList.remove('pre');
-  await new Promise(r => setTimeout(r, T.hold || 60));
+  const body = document.createElement('div'); body.className = 'bbody';
+  Object.assign(body.style, { left: sb.l + 'px', top: sb.t + 'px', width: sb.w + 'px', height: sb.h + 'px' });
+  const box = document.createElement('div'); box.className = 'merge';
+  box.style.fontSize = getComputedStyle(srcP1).fontSize;
+  box.innerHTML = L(d);
+  st.append(veil, body, box);
+  const wm = box.firstElementChild, p1 = wm.querySelector('.p1'), p2 = wm.querySelector('.p2');
 
-  st.classList.add('running');
+  // the finished logo sits on the start button's row, centred between where the two pieces began
+  const r0 = relTo(wm, st), q2 = relTo(p2, st);
+  const cx = (s1.l + s2.l + s2.w) / 2;
+  box.style.left = (cx - r0.w / 2) + 'px';
+  box.style.top = (s2.t - (q2.t - r0.t)) + 'px';
+  const d1 = relTo(p1, st), d2 = relTo(p2, st), w = relTo(wm, st);
+  const ax = s1.l - d1.l, ay = s1.t - d1.t, bx = s2.l - d2.l, by = s2.t - d2.t;
+  const total = T.fade + T.drop + T.shift, o1 = T.fade / total, o2 = (T.fade + T.drop) / total;
+
+  veil.animate([{ opacity: 0 }, { opacity: 1 }], { duration: T.fade, fill: 'forwards' });
+  body.animate([{ opacity: 1 }, { opacity: 0 }], { duration: T.fade, fill: 'forwards' });
+  // 1 the button body fades, leaving the word · 2 SOP drops straight down onto the row · 3 they slide together
+  p1.animate([
+    { transform: `translate(${ax}px,${ay}px)`, offset: 0 },
+    { transform: `translate(${ax}px,${ay}px)`, offset: o1, easing: 'cubic-bezier(.55,0,.35,1)' },
+    { transform: `translate(${ax}px,0px)`, offset: o2, easing: ease },
+    { transform: 'none', offset: 1 },
+  ], { duration: total, fill: 'forwards' });
+  p2.animate([
+    { transform: `translate(${bx}px,${by}px)`, color: '#ffffff', offset: 0 },
+    { transform: `translate(${bx}px,${by}px)`, color: '#09090b', offset: o1 },
+    { transform: `translate(${bx}px,${by}px)`, color: '#09090b', offset: o2, easing: ease },
+    { transform: 'none', color: '#09090b', offset: 1 },
+  ], { duration: total, fill: 'forwards' });
+  // 4 the hazard tape slides in from the left edge into place
+  let tape;
+  try {
+    tape = wm.animate([{ transform: `translateX(${-(w.l + w.w + 24)}px)` }, { transform: 'translateX(0)' }],
+      { pseudoElement: '::after', duration: T.tape, delay: total, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'both' });
+  } catch (e) { tape = null; } // older browsers: the tape is simply there
+  await sleep(total + T.tape + T.hold);
+
+  // 5 the finished logo rises into the steps header
+  show();
   const slot = st.querySelector('.slot');
   slot.style.visibility = 'hidden';
-  const cur = relTo(fly, st), tgt = relTo(slot, st);
-  fly.classList.add('free'); Object.assign(fly.style, { left: cur.l + 'px', top: cur.t + 'px' });
-  veil.animate([{ opacity: 1 }, { opacity: 0 }], { duration: T.b, fill: 'forwards' });
-  await fly.animate([{ transform: 'none' }, { transform: `translate(${tgt.l - cur.l}px,${tgt.t - cur.t}px) scale(${tgt.h / cur.h})` }], { duration: T.b, easing: E, fill: 'forwards' }).finished;
+  const cur = relTo(wm, st), tgt = relTo(slot.firstElementChild, st);
+  body.remove();
+  veil.animate([{ opacity: 1 }, { opacity: 0 }], { duration: T.rise, fill: 'forwards' });
+  await box.animate([{ transform: 'none' }, { transform: `translate(${tgt.l - cur.l}px,${tgt.t - cur.t}px) scale(${tgt.h / cur.h})` }],
+    { duration: T.rise, easing: ease, fill: 'forwards' }).finished;
   slot.style.visibility = '';
-  veil.remove(); fly.remove(); delete st.dataset.busy;
+  veil.remove(); box.remove(); delete st.dataset.busy;
+}
+function reset(id) {
+  const st = document.getElementById('st-' + id);
+  st.querySelector('.readcard').hidden = false; st.querySelector('.run').hidden = true;
 }
 
-const main = document.getElementById('main');
-function show(v) { main.innerHTML = (v === 'all' ? Object.keys(DIRS) : [v]).map(section).join(''); }
-main.addEventListener('click', (e) => {
-  const p = e.target.closest('[data-play]'), r = e.target.closest('[data-reset]');
+document.getElementById('strip').innerHTML = DIRS.map(d => `<a href="#o${d.id}"><span class="n">${d.id} · ${d.name}${d.ref ? ' · current' : ''}</span><span class="big">${L(d)}</span><span class="hbar" style="padding:7px 9px"><span style="font-size:var(--wm-size-phone);display:inline-flex">${L(d)}</span><span class="sep"></span><span class="t">Forklift pre-start</span></span></a>`).join('');
+document.getElementById('jump').innerHTML = DIRS.map(d => `<a href="#o${d.id}" class="${d.ref ? 'ref' : ''}">${d.id} · ${d.name}</a>`).join('');
+document.getElementById('dirs').innerHTML = DIRS.map(section).join('');
+document.addEventListener('click', (e) => {
+  const p = e.target.closest('[data-play]'), r = e.target.closest('[data-reset]'), s = e.target.closest('[data-speed]');
   if (p) play(p.dataset.play);
-  if (r) document.getElementById('st-' + r.dataset.reset).classList.remove('running');
+  if (r) reset(r.dataset.reset);
+  if (s) { speed = s.dataset.speed; document.querySelectorAll('[data-speed]').forEach(b => b.setAttribute('aria-pressed', String(b === s))); }
 });
-document.querySelectorAll('.variant-tab').forEach(t => t.onclick = () => {
-  document.querySelectorAll('.variant-tab').forEach(x => x.classList.toggle('active', x === t)); show(t.dataset.v);
-});
-document.fonts.ready.then(() => show('all'));
+document.querySelectorAll('[data-speed]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.speed === speed)));
 </script>
-</body>
-</html>

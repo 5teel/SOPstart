@@ -160,19 +160,32 @@
    * Brand yellow belongs to the wordmark and nothing else on paper; it never
    * signals state. The wordmark is two parts that meet at Start: --wm-part-sop
    * (the SOP chip) and --wm-part-start (the Start button). */
+  /* Chosen 2026-10-08 (sketch 010, "6e" in Saira): SOP in an ink chip, "start" beside it,
+   * one strip of hazard tape along the chip's foot running on under "start". */
+  --wm-font:         'Saira Semi Condensed', 'Arial Narrow', system-ui, sans-serif;
+  --wm-weight-sop:   800;
+  --wm-weight-start: 600;
   --wm-ink:          var(--ink-900);
   --wm-accent:       var(--brand-yellow);
-  --wm-size-hero:    52px;   /* the fuse, centre screen */
+  --wm-tape:         repeating-linear-gradient(-45deg, var(--wm-accent) 0 .16em, var(--wm-ink) .16em .32em);
+  --wm-tape-on-ink:  repeating-linear-gradient(-45deg, var(--wm-accent) 0 .16em, transparent .16em .32em);
+  --wm-size-hero:    52px;   /* splash / marketing */
+  --wm-size-merge:   22px;   /* read screen: SOP chip and start button label, the size they merge at */
   --wm-size-header:  20px;   /* desktop header, steps-screen header */
   --wm-size-phone:   17px;   /* phone steps-screen header */
 
   /* Motion: only where it shows a change of state, never while the user waits.
-   * Full fuse plays on the first Start of the day, short after; reduced motion = none. */
+   * The Start merge, in order: the button body fades leaving "start"; SOP drops into line;
+   * they slide together; the tape slides in from the left; the logo rises into the header.
+   * Full plays on the first Start of the day, short (x0.3) after; reduced motion = none. */
   --ease-fuse:        cubic-bezier(.5, 0, .2, 1);
-  --dur-fuse-meet:    460ms;  /* chip + button fly to centre */
-  --dur-fuse-hold:    160ms;  /* the merged wordmark settles */
-  --dur-fuse-rise:    420ms;  /* wordmark rises into the header */
-  --dur-fuse-short:   150ms;  /* each half of the short version */
+  --dur-fuse-fade:    180ms;
+  --dur-fuse-drop:    300ms;
+  --dur-fuse-shift:   320ms;
+  --dur-fuse-tape:    340ms;
+  --dur-fuse-hold:    140ms;
+  --dur-fuse-rise:    420ms;
+  --fuse-short-scale: 0.3;
   --dur-map-zoom:     520ms;  /* site map: whole site <-> one area */
   --dur-hover-lift:   160ms;
 
