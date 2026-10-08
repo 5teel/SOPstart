@@ -26,9 +26,11 @@ interface WizardClientProps {
   departments: Department[]
   /** Phase 57 D-19: link the new SOP to this machine once it exists. */
   machineId?: string | null
+  /** Phase 63: the words a search found no SOP for ("Write it"); only the title field's starting value. */
+  initialTitle?: string
 }
 
-export function WizardClient({ departments, machineId = null }: WizardClientProps) {
+export function WizardClient({ departments, machineId = null, initialTitle = '' }: WizardClientProps) {
   const router = useRouter()
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1)
   const [titleValues, setTitleValues] = useState<TitleStepValues | null>(null)
@@ -39,7 +41,7 @@ export function WizardClient({ departments, machineId = null }: WizardClientProp
   // state and the dead SOP-level-category state that used to sit here
   // (previously set once at declaration and never mutated by any control).
   const [meta, setMeta] = useState<SopMetadataValue>({
-    title: '',
+    title: initialTitle,
     departmentIds: [],
     allDepartments: false,
     categorySlug: null,

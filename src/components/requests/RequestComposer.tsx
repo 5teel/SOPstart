@@ -45,12 +45,15 @@ export function RequestComposerTrigger({
   triggerLabel = 'Make a request',
   triggerStyle = 'button',
   title = 'Make a request',
+  initialNote = '',
 }: {
   kinds: ReadonlyArray<Raisable>
   about: ComposerAbout
   triggerLabel?: string
   triggerStyle?: 'button' | 'text'
   title?: string
+  /** Pre-fills the note on every open, e.g. the words a search found nothing for. */
+  initialNote?: string
 }) {
   const [open, setOpen] = useState(false)
   const [sent, setSent] = useState(0)
@@ -86,6 +89,7 @@ export function RequestComposerTrigger({
           kinds={offered}
           about={about}
           title={title}
+          initialNote={initialNote}
           onClose={() => setOpen(false)}
           onSent={() => {
             setOpen(false)
@@ -101,12 +105,14 @@ function ComposerDialog({
   kinds,
   about,
   title,
+  initialNote,
   onClose,
   onSent,
 }: {
   kinds: Raisable[]
   about: ComposerAbout
   title: string
+  initialNote: string
   onClose(): void
   onSent(): void
 }) {
@@ -114,7 +120,7 @@ function ComposerDialog({
   const uid = useId()
   const [kind, setKind] = useState<Raisable>(kinds[0])
   const [aboutId, setAboutId] = useState('')
-  const [note, setNote] = useState('')
+  const [note, setNote] = useState(initialNote)
   const [touched, setTouched] = useState(false)
   const [pending, setPending] = useState(false)
   const [error, setError] = useState<string | null>(null)

@@ -16,10 +16,12 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 export default async function NewBlankSopPage({
   searchParams,
 }: {
-  searchParams: Promise<{ machine?: string | string[] }>
+  searchParams: Promise<{ machine?: string | string[]; title?: string | string[] }>
 }) {
-  const { machine } = await searchParams
+  const { machine, title } = await searchParams
   const machineId = typeof machine === 'string' && UUID.test(machine) ? machine : null
+  // Phase 63: ?title= from the home's "Write it" -- a form default only, trimmed and capped; creation validates as before.
+  const initialTitle = typeof title === 'string' ? title.trim().slice(0, 200) : ''
   const { userId, role } = await getSessionContext()
   if (!userId) redirect('/login')
 
@@ -36,7 +38,7 @@ export default async function NewBlankSopPage({
       title="New SOP"
       description="Start a SOP from scratch — pick the sections you want, then build them in the editor."
     >
-      <WizardClient departments={departments} machineId={machineId} />
+      <WizardClient departments={departments} machineId={machineId} initialTitle={initialTitle} />
     </AdminPageShell>
   )
 }

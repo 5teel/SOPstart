@@ -61,4 +61,39 @@ test.describe('sop list', () => {
     // Every localStorage touch sits inside a function body (indented), none at column 0.
     expect(s).not.toMatch(/^[^\s/*].*localStorage/m)
   })
+
+  test('SopList reaches RequestComposer only through dynamic(), pre-filled with the search words', () => {
+    const s = code('src/components/home/SopList.tsx')
+    expect(s).not.toMatch(/from '@\/components\/requests\/RequestComposer'/)
+    expect(s).toMatch(/dynamic\(\s*\(\) => import\('@\/components\/requests\/RequestComposer'\)/)
+    expect(s).toContain('initialNote={q}')
+    expect(code('src/components/requests/RequestComposer.tsx')).toMatch(/useState\(initialNote\)/)
+  })
+
+  test('Write it renders only for a SOP admin and opens the blank flow with the title', () => {
+    const s = code('src/components/home/SopList.tsx')
+    expect(s).toMatch(/\{canWrite && \(\s*<Link/)
+    expect(s).toContain('/admin/sops/new/blank?title=${encodeURIComponent(q)}')
+    expect(code('src/app/(protected)/admin/sops/new/blank/page.tsx')).toMatch(/title\.trim\(\)\.slice\(0, 200\)/)
+    expect(code('src/app/(protected)/admin/sops/new/blank/WizardClient.tsx')).toContain('title: initialTitle')
+  })
+
+  test('the empty-search copy, both labels and the list structure are present', () => {
+    const s = src('src/components/home/SopList.tsx')
+    for (const t of ['No SOP for', 'Ask for one', 'Write it', 'Recent', 'Most used', 'All SOPs', 'Search SOPs, steps and tools', 'Search all SOPs, steps and tools']) {
+      expect(s, t).toContain(t)
+    }
+    expect(s).toContain('aria-pressed')
+    expect(s).toContain('data-testid="area-group"')
+    expect(s).toContain('data-testid="area-filter"')
+  })
+
+  test('the list carries no retired to-do vocabulary, no hex and no arbitrary size', () => {
+    for (const f of ['src/components/home/SopList.tsx', 'src/components/home/SopRow.tsx']) {
+      const s = code(f)
+      expect(s, f).not.toMatch(/\b(overdue|due|Next for you)\b/i)
+      expect(s, f).not.toMatch(/#[0-9a-fA-F]{3,6}\b/)
+      expect(s, f).not.toMatch(/-\[[0-9.]+(px|rem)?\]/)
+    }
+  })
 })
