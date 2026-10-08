@@ -83,7 +83,6 @@ const GATED_ROUTES: GatedRoute[] = [
       { label: 'pdfjs-dist (D-21-09)', markers: ['pdf.worker', 'PDFWorker', 'getDocument'] },
       { label: 'mammoth (D-21-09)', markers: ['mammoth', 'convertToHtml'] },
       { label: 'konva (26-05 D-03)', markers: ['react-konva', 'konva'] },
-      { label: 'one screen machine body (MachineBody)', markers: ['No procedures for this machine yet.'] },
       // Phase 58-13: the editor mounts through one next/dynamic({ ssr: false }) seam in
       // FocusFrame. These two literals live only in that lazy chunk (StepCard's tick and
       // the AI check banner), so seeing either in this route's own chunk set means the
@@ -113,6 +112,11 @@ const GATED_ROUTES: GatedRoute[] = [
       { label: 'request composer + ask picker (lazy, 60 A-07)', markers: ['What do you need?', 'Find a person…'] },
       { label: 'objective editor (lazy, 60 A-07)', markers: ['By (optional)'] },
       { label: 'site overview (lazy, 60 A-07)', markers: ['Nothing unread.'] },
+      // Phase 63-11: the home's map and section bodies are lazy modules reached from HomeShell.
+      { label: 'site map (lazy, 63-10)', markers: ['Esc for the whole site'] },
+      { label: 'Manage SOPs (lazy, 63-08)', markers: ['Every way in ends in the same editor.'] },
+      { label: 'Training (lazy, 63-09)', markers: ['A record to look up, not a to-do list.'] },
+      { label: 'My record (lazy, 63-09)', markers: ['and who signed it off.'] },
     ],
   },
 ]

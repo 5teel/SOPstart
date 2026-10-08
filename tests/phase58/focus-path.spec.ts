@@ -22,20 +22,26 @@ test.describe('placeToken', () => {
 })
 
 test.describe('focusHref / backHref', () => {
-  test('from is carried only as a whitelisted token', () => {
-    expect(focusHref(ID, { from: 'office' })).toBe(`/sops/${ID}?from=office`)
-    expect(focusHref(ID, { mode: 'edit', from: 'office' })).toBe(`/sops/${ID}?mode=edit&from=office`)
+  test('from is carried only as a whitelisted home token (63-11)', () => {
+    // a legacy office token is the Sign-offs section
+    expect(focusHref(ID, { from: 'office' })).toBe(`/sops/${ID}?from=s%3Dsignoffs`)
+    expect(focusHref(ID, { mode: 'edit', from: 'office' })).toBe(`/sops/${ID}?mode=edit&from=s%3Dsignoffs`)
+    // a home token round-trips
+    expect(focusHref(ID, { from: `sop=${ID}` })).toBe(`/sops/${ID}?from=sop%3D${ID}`)
     expect(focusHref(ID)).toBe(`/sops/${ID}`)
-    for (const from of ['javascript:x', 'https://evil', '', null, undefined]) expect(focusHref(ID, { from }), String(from)).toBe(`/sops/${ID}`)
+    for (const from of ['javascript:x', 'https://evil', 'a=b&c=d', '', null, undefined]) expect(focusHref(ID, { from }), String(from)).toBe(`/sops/${ID}`)
   })
 
   test('a non-UUID id throws', () => {
     expect(() => focusHref('../x')).toThrow()
   })
 
-  test('back goes to the place, hostile or empty tokens to the overview', () => {
-    expect(backHref('office')).toBe('/?place=office')
+  test('back returns to the exact home state; legacy office goes to Sign-offs; hostile or empty tokens to the home', () => {
+    expect(backHref('office')).toBe('/?s=signoffs')
+    expect(backHref(`sop=${ID}&area=${ID}`)).toBe(`/?sop=${ID}&area=${ID}`)
+    expect(backHref('s=manage&view=site')).toBe('/?s=manage&view=site')
     expect(backHref('https://evil')).toBe('/')
+    expect(backHref('s=//evil.com')).toBe('/')
     expect(backHref(null)).toBe('/')
   })
 })
@@ -44,7 +50,7 @@ test.describe('legacyRedirectFor', () => {
   test('tabbed addresses collapse to the focus screen and keep a valid from', () => {
     expect(legacyRedirectFor(`/sops/${ID}`, 'tab=walk')).toBe(`/sops/${ID}`)
     expect(legacyRedirectFor(`/sops/${ID}`, 'tab=read')).toBe(`/sops/${ID}`)
-    expect(legacyRedirectFor(`/sops/${ID}`, 'tab=walk&from=office')).toBe(`/sops/${ID}?from=office`)
+    expect(legacyRedirectFor(`/sops/${ID}`, 'tab=walk&from=office')).toBe(`/sops/${ID}?from=s%3Dsignoffs`)
     expect(legacyRedirectFor(`/sops/${ID}`, 'tab=walk&from=https://evil')).toBe(`/sops/${ID}`)
     expect(legacyRedirectFor(`/sops/${ID}`, '')).toBeNull()
     expect(legacyRedirectFor(`/sops/${ID}`, 'tab=other')).toBeNull()
