@@ -56,7 +56,7 @@ const DEAD_PARAMS = /view=attention|['"]admin-(all|draft|published|failed|attent
 const ATTENTION_COMPARE = /===\s*'attention'/g
 const PERMITTED_ATTENTION_FILES = [
   // Phase 59: the attention view -> Office inbox redirect is server-side; the pure helper the proxy calls holds the comparison.
-  path.join('src', 'lib', 'shell', 'place.ts'),
+  path.join('src', 'lib', 'shell', 'home-state.ts'),
 ]
 const EXPECTED_ATTENTION_COUNT = 1
 

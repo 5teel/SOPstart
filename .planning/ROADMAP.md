@@ -2149,7 +2149,7 @@ Plans:
 **Depends on**: Phase 60 (Phases 61/62 moved out of GSD 2026-10-06; their room-shaped todos are superseded by this phase where they conflict)
 **Bundle decisions**: 2026-10-08 (63-04) — `/page` baseline moved UP 834 → 837 by the orchestrator: +~227 B of `next/font` loader in the root layout for the approved wordmark face (Saira Semi Condensed); recorded in `.bundle-baseline.json` history. 2026-10-08 (63-11) — `/sops/[sopId]/page` UP 795 → 802 (shared-chunk accounting: home and focus now share wordmark/home-state/focus-path modules that previously sat in the uncounted page chunk; real download unchanged) and `/page` DOWN 837 → 831 (new home behind lazy seams).
 **Design sources**: `.planning/sketches/009-sop-first-home/`, `.planning/sketches/010-wordmark/`, `docs/adr/0004-design-principles.md`
-**Plans:** 14/21 plans executed
+**Plans:** 15/21 plans executed
 
 **Execution:** from Wave 2 on, plans run sequentially on the main tree, one push and one deployed eval run at a time; each eval waits for its own HEAD sha at `/api/version`. Wave 5 order: 63-12 → 63-13 → 63-15. Wave 6 order: 63-14 → 63-16.
 
@@ -2185,7 +2185,7 @@ Plans:
 
 **Wave 6** *(blocked on Wave 5 completion; order 63-14 → 63-16)*
 
-- [ ] 63-14-PLAN.md — Address sweep: old-address literals repointed; /activity and /admin/training retired with redirects and pathways routes; address eval
+- [x] 63-14-PLAN.md — Address sweep: old-address literals repointed; /activity and /admin/training retired with redirects and pathways routes; address eval
 - [ ] 63-16-PLAN.md — "Walk" off every screen, server strings + STALE_WALK in lockstep, no-walk-words guard (after 63-15)
 
 **Wave 7** *(blocked on Wave 6 completion)*

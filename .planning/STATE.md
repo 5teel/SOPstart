@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v11.0
 milestone_name: — One-Screen MVP
 status: executing
-stopped_at: 63-15 complete (the Start; deployed eval 5/5 at 7753690f; bundle gate 802 / 832); 63-14 next in Wave 6
-last_updated: "2026-10-08T09:30:00.000Z"
+stopped_at: 63-14 complete (address sweep; /activity + /admin/training retired; deployed address eval 5/5 at 80b4b3aa; bundle gate 802 / 832); 63-16 next in Wave 6
+last_updated: "2026-10-08T11:00:00.000Z"
 last_activity: 2026-10-08
 progress:
   total_phases: 15
   completed_phases: 6
   total_plans: 107
-  completed_plans: 100
+  completed_plans: 101
   percent: 40
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-03)
 ## Current Position
 
 Phase: 63 (SOP-first Home, Library Site Map and the SOPstart Start)
-Plan: 63-15 complete (the Start: lazy merge engine, #fuse-layer, autostart, resume words, start eval 5/5 on the deploy); Wave 6 next: 63-14, then 63-16
+Plan: 63-14 complete (old addresses swept, /activity and /admin/training retired into My record and Training with redirects, address eval 5/5 on the deploy); Wave 6 next: 63-16
 Status: Executing Phase 63 — sequential on main tree
 Last activity: 2026-10-08
 
@@ -745,5 +745,5 @@ deliberate decision, not a side-effect.
 ## Session Continuity
 
 Last session: 2026-10-08
-Stopped at: Completed 63-15-PLAN.md
+Stopped at: Completed 63-14-PLAN.md
 Resume file: .planning/phases/60-requests-notifications-objectives/60-01-PLAN.md
