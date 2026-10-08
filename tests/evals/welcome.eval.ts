@@ -25,6 +25,8 @@ test.describe('promo reel', () => {
     await expect(reel).toHaveAttribute('data-scene', 'hook', { timeout: 25_000 })
     await expect(reel).toHaveAttribute('data-scene', 'reveal', { timeout: 8_000 })
     await expect(page.getByRole('link', { name: 'Sign in' }).first()).toHaveAttribute('href', '/login')
+    // The brand mark is a named image (63-04): the header carries it.
+    await expect(page.getByRole('img', { name: 'SOPstart' }).first()).toBeVisible()
     expect(errors).toEqual([])
   })
 

@@ -74,21 +74,19 @@ const photosRow = (page: Page, n: number) =>
   officeRow(page, EVAL_WALK_SOP_TITLE).filter({ hasText: new RegExp(`\\b${n} photo`) }) // no trailing \b: the row text runs on into the button ("photoSign off")
 
 /**
- * The Office room pin text, the Inbox tab count text and the Requests tab count text ('' when absent, i.e.
- * nothing waiting). `total` is what the pin must read: Inbox rows plus open requests (60-05, D-03); the
- * Requests tab itself lands in 60-11, so until then its count is simply absent.
+ * The Inbox tab count text and the Requests tab count text ('' when absent, i.e. nothing waiting). The menu
+ * carries no count any more (ADR-0004 rule 2), so the tabs are the only place the numbers live.
  */
-async function pinAndTab(page: Page) {
+async function tabCounts(page: Page) {
   const read = async (l: Locator) => ((await l.count()) ? ((await l.first().textContent()) ?? '').trim() : '')
-  const pin = await read(page.locator('[data-testid="shell-room-row"][data-room-id="office"] .mono'))
   const tab = await read(page.getByTestId('office-tab-inbox').locator('.mono'))
   const requests = await read(page.getByTestId('office-tab-requests').locator('.mono'))
-  const sum = (Number(tab) || 0) + (Number(requests) || 0)
-  return { pin, tab, requests, total: sum ? String(sum) : '' }
+  return { tab, requests }
 }
 
+/** Sign-offs, first tab: the pane the Office used to be (Phase 63 moved it, unchanged). */
 async function openOffice(page: Page) {
-  await page.goto('/?place=office')
+  await page.goto('/?s=signoffs')
   await expect(page.getByTestId('office-pane')).toHaveCount(1, SLOW)
 }
 
@@ -118,7 +116,6 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
     let db: SupabaseClient
     let siteOrgId: string
     let plantSopId: string
-    let siteAdminId: string
     let walkSopId: string
     let walkSopVersion: number
     let walkStepId: string
@@ -293,29 +290,8 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       for (const c of [adminCtx, supervisorCtx, idleCtx, workerCtx]) await c?.close().catch(() => {})
     })
 
-    test('meta line: owner and review line on a machine panel row, a Noticeboard row and a Workshop draft; This SOP carries Owner and Review (59-07)', async ({ page, context }) => {
+    test('meta line: owner and review line on a Manage SOPs draft, and the admin Read of an unowned SOP; This SOP carries Owner and Review (59-07)', async ({ page, context }) => {
       const errors = watchConsole(page)
-      // A published site-wide SOP for the Noticeboard row (upsert by title, eval-site org only).
-      const NOTICEBOARD_TITLE = 'Eval office noticeboard SOP'
-      const { data: nb } = await db.from('sops').select('id').eq('organisation_id', siteOrgId).eq('title', NOTICEBOARD_TITLE).maybeSingle()
-      if (!nb) {
-        const { data: admin } = await db.from('organisation_members').select('user_id').eq('organisation_id', siteOrgId).eq('role', 'admin').limit(1).maybeSingle()
-        siteAdminId = (admin as { user_id: string } | null)?.user_id ?? ''
-        const { error } = await db.from('sops').insert({
-          organisation_id: siteOrgId,
-          title: NOTICEBOARD_TITLE,
-          source_file_name: NOTICEBOARD_TITLE,
-          source_file_type: 'docx',
-          source_file_path: '',
-          uploaded_by: siteAdminId,
-          status: 'published',
-          published_at: new Date().toISOString(),
-          version: 1,
-          source_type: 'blank',
-          placement: 'site',
-        })
-        if (error) throw new Error(`noticeboard fixture insert failed: ${error.message}`)
-      }
       // The plant SOP starts with no owner so "No owner" is a state we know exists.
       const { error: resetErr } = await db.from('sops').update({ owner_user_id: null }).eq('id', plantSopId)
       if (resetErr) throw new Error(`owner reset failed: ${resetErr.message}`)
@@ -323,28 +299,16 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
 
       await signInAs(context, 'siteAdmin')
 
-      // Machine panel row.
-      await page.goto('/')
-      const press = page.locator('[data-testid="plant-machine"][data-machine-name="EVAL Press"]')
-      await expect(press).toHaveCount(1, SLOW)
-      await press.click()
-      const panelRow = page.getByTestId('admin-panel').getByTestId('admin-panel-row').filter({ hasText: EVAL_PLANT_SOP_TITLE })
-      await expect(panelRow).toHaveCount(1, SLOW)
-      const panelMeta = panelRow.getByTestId('owner-review-meta')
-      await expect(panelMeta).toHaveAttribute('data-owner', 'none', SLOW)
-      await expect(panelMeta).toContainText('No owner')
-      await expect(panelMeta).toHaveAttribute('data-review', /^(none|due|overdue)$/)
+      // Read of the unowned SOP: the meta line names no owner (the machine panel row that said "No owner" went with the machine panel).
+      await page.goto(`/?sop=${plantSopId}`)
+      await expect(page.getByTestId('read-view').locator('h1')).toHaveText(EVAL_PLANT_SOP_TITLE, SLOW)
+      await page.waitForTimeout(1_500) // the owner query has landed (an unowned SOP has none to show)
+      await expect(page.locator('[data-testid="read-view"] p.font-mono').first()).not.toContainText(' · owner ')
       await shot(page, '59-owner-meta')
 
-      // Noticeboard row.
-      await page.goto('/?place=noticeboard')
-      const boardRow = page.getByTestId('admin-panel-row').filter({ hasText: NOTICEBOARD_TITLE })
-      await expect(boardRow).toHaveCount(1, SLOW)
-      await expect(boardRow.getByTestId('owner-review-meta')).toHaveAttribute('data-owner', /^(set|none)$/)
-
-      // Workshop draft.
-      await page.goto('/?place=workshop')
-      const draftRow = page.getByTestId('room-workshop-draft').filter({ hasText: EVAL_SITE_SOP_TITLE })
+      // Manage SOPs: the draft row.
+      await page.goto('/?s=manage')
+      const draftRow = page.getByTestId('manage-draft').filter({ hasText: EVAL_SITE_SOP_TITLE })
       await expect(draftRow).toHaveCount(1, SLOW)
       await expect(draftRow.getByTestId('owner-review-meta')).toHaveAttribute('data-review', /^(none|due|overdue)$/)
 
@@ -359,7 +323,7 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       expect(errors).toEqual([])
     })
 
-    test('inbox: tabs, count equals the pin, the unowned row has Assign owner, assigning clears it by title and the receipt ends "logged in the decision ledger" (59-09)', async () => {
+    test('inbox: tabs, the unowned row has Assign owner, assigning clears it by title and the receipt ends "logged in the decision ledger" (59-09)', async () => {
       assertEvalOrg()
       // The plant SOP is unowned and overdue, so it is one "No owner" row until it has an owner.
       const reset = await db
@@ -372,16 +336,15 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       const errors = watchConsole(page)
       await openOffice(page)
       await expect(page.getByTestId('office-tab-inbox')).toHaveCount(1, SLOW)
-      await expect(page.getByRole('tablist', { name: 'Office' })).toBeVisible(SLOW)
+      await expect(page.getByRole('tablist', { name: 'Tabs' })).toBeVisible(SLOW)
 
       const row = officeRow(page, EVAL_PLANT_SOP_TITLE)
       await expect(row).toHaveCount(1, SLOW)
       await expect(row.getByTestId('office-row-action')).toHaveCount(1, SHORT)
       await expect(row.getByTestId('office-row-action')).toHaveText('Assign owner')
       await expect(async () => {
-        const c = await pinAndTab(page)
+        const c = await tabCounts(page)
         expect(c.tab).not.toBe('')
-        expect(c.pin).toBe(c.total)
       }).toPass(SLOW)
       await shot(page, '59-inbox')
 
@@ -392,20 +355,16 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       const byEmail = row.getByRole('button', { name: new RegExp(EVAL_USERS.siteAdmin.split('@')[0]) })
       await ((await byEmail.count()) > 0 ? byEmail.first() : options.nth(1)).click()
 
-      // Receipt, pin patched without a reload, and the row comes back as Mark reviewed (it is overdue).
+      // Receipt, and the row comes back as Mark reviewed (it is overdue).
       await expect(page.getByTestId('office-receipt')).toContainText(`Owner set${LEDGER}`, SLOW)
       await expect(row).toHaveCount(1, SLOW)
       await expect(row.getByTestId('office-row-action')).toHaveText('Mark reviewed', SLOW)
-      await expect(async () => {
-        const c = await pinAndTab(page)
-        expect(c.pin).toBe(c.total)
-      }).toPass(SLOW)
       await shot(page, '59-receipt')
       expect(errors).toEqual([])
       await page.close()
     })
 
-    test('inbox: a machine with no SOPs is no longer an inbox row (no Machines chip, no machines-kind row); it reaches the Office as an agent request (60-05, D-05; proved in requests.eval), no real-org title leaks', async () => {
+    test('inbox: a machine with no SOPs is not an inbox row (no Machines chip, no machines-kind row), no real-org title leaks (60-05, D-05)', async () => {
       assertEvalOrg()
       const OVEN = 'EVAL Oven'
       // Fixture: a second machine on the eval-site layout with zero linked SOPs (upsert by name, eval-site org only).
@@ -466,10 +425,6 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       await action.click()
       await expect(page.getByTestId('office-receipt')).toContainText(`Marked reviewed${LEDGER}`, SLOW)
       await expect(row).toHaveCount(0, SLOW)
-      await expect(async () => {
-        const c = await pinAndTab(page)
-        expect(c.pin).toBe(c.total)
-      }).toPass(SLOW)
       await page.close()
     })
 
@@ -477,7 +432,7 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       const page = await idleCtx.newPage()
       await openOffice(page)
       await expect(page.getByTestId('office-empty')).toHaveText("Nothing needs you. That's the goal.", SLOW)
-      await expect(page.getByRole('tablist', { name: 'Office' })).toHaveCount(1)
+      await expect(page.getByRole('tablist', { name: 'Tabs' })).toHaveCount(1)
       await expect(page.getByRole('tab')).toHaveCount(2)
       await expect(page.getByTestId('office-tab-requests')).toHaveCount(1)
       await expect(page.getByTestId('office-chip')).toHaveCount(0)
@@ -486,7 +441,7 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       await page.close()
     })
 
-    test('admin sign-off: pending completion with a photo, thumbnail loads, lightbox opens, Escape closes the lightbox only, override reason enables Sign off, row leaves, pin patched; twice (59-09)', async () => {
+    test('admin sign-off: pending completion with a photo, thumbnail loads, lightbox opens, Escape closes the lightbox only, override reason enables Sign off, row leaves; twice (59-09)', async () => {
       test.setTimeout(180_000)
       const first = await seedCompletion(workerId, 1)
       const second = await seedCompletion(workerId, 2)
@@ -509,7 +464,7 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       await shot(page, '59-signoff-lightbox')
       await page.keyboard.press('Escape')
       await expect(lightbox).toHaveCount(0, SLOW)
-      await expect(page.getByTestId('shell-detail')).toHaveAttribute('data-place', '/?place=office')
+      await expect(page.getByTestId('section-signoffs')).toBeVisible()
       await expect(panelA).toBeVisible()
 
       // An admin who is not a signed-off assessor must give an override reason.
@@ -525,10 +480,6 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       await expect(page.getByTestId('office-receipt')).toContainText(`Signed off${LEDGER}`, SLOW)
       await expect(rowA).toHaveCount(0, SLOW)
       await expect.poll(() => statusOf(first), SLOW).toBe('signed_off')
-      await expect(async () => {
-        const c = await pinAndTab(page)
-        expect(c.pin).toBe(c.total)
-      }).toPass(SLOW)
 
       // Second walk in the same pane session: its own photos, no stale panel.
       const rowB = photosRow(page, 2)
@@ -632,15 +583,10 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       await page.close()
     })
 
-    test('reject with a reason; the worker then sees the walk as sent back; second iteration (59-09)', async () => {
+    test('reject with a reason; the worker then sees the completion sent back, with the reason, in My record (59-09)', async () => {
       test.setTimeout(180_000)
       const workerPage = await workerCtx.newPage()
-      // The card defaults to 0 until its query lands, so the expected number is read from the
-      // database the way the card reads it: the worker's 50 newest completions, rejected ones counted.
-      const sentBackInDb = async () => {
-        const { data } = await db.from('sop_completions').select('status').eq('worker_id', workerId).order('submitted_at', { ascending: false }).limit(50)
-        return (data ?? []).filter((r) => r.status === 'rejected').length
-      }
+      const REASON = 'Eval: the lock is not visible in the photo.'
 
       const rejected = await seedCompletion(workerId, 3)
       const page = await adminCtx.newPage()
@@ -653,18 +599,17 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       await expect(dialog).toBeVisible(SLOW)
       await expect(dialog.getByTestId('reason-dialog-confirm')).toBeDisabled()
       await shot(page, '59-reject-dialog')
-      await dialog.getByTestId('reason-dialog-field').fill('Eval: the lock is not visible in the photo.')
+      await dialog.getByTestId('reason-dialog-field').fill(REASON)
       await dialog.getByTestId('reason-dialog-confirm').click()
       await expect(page.getByTestId('office-receipt')).toContainText(`Rejected${LEDGER}`, SLOW)
       await expect(row).toHaveCount(0, SLOW)
       await expect.poll(() => statusOf(rejected), SLOW).toBe('rejected')
       await page.close()
 
-      // The worker's own view counts it as sent back, not done.
-      const expected = await sentBackInDb()
-      expect(expected).toBeGreaterThan(0)
-      await workerPage.goto('/?place=office')
-      await expect(workerPage.getByText(`Sent back: ${expected}`, { exact: true })).toHaveCount(1, SLOW)
+      // The worker's own record shows it sent back (not done) with the reason; the old "Sent back: N" count is gone (ADR-0004 rule 2).
+      await workerPage.goto('/?s=record')
+      await expect(workerPage.getByTestId('section-record')).toBeVisible(SLOW)
+      await expect(workerPage.getByText(REASON, { exact: true }).first()).toBeVisible(SLOW)
       await shot(workerPage, '59-worker-sent-back')
       await workerPage.close()
     })
@@ -729,27 +674,22 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       expect(errors).toEqual([])
     })
 
-    test('decisions: wide pane, newest first, a kind chip narrows, absolute time on hover, the map re-centres (59-10)', async () => {
+    test('decisions: full width, newest first, a kind chip narrows, absolute time on hover (59-10)', async () => {
       const page = await adminCtx.newPage()
       const errors = watchConsole(page)
       await openOffice(page)
-      const world = page.getByTestId('plant-world')
-      const camera = async () => `${await world.getAttribute('data-scale')}|${await world.getAttribute('data-x')}`
-      const detail = page.getByTestId('shell-detail')
-      await expect(detail).toHaveAttribute('data-wide', 'false', SLOW)
-      const inboxCamera = await camera()
 
       await page.getByTestId('office-tab-decisions').click()
-      await expect(detail).toHaveAttribute('data-wide', 'true', SLOW)
+      await expect(page.getByTestId('office-pane')).toHaveAttribute('data-tab', 'decisions', SLOW)
       const rows = page.getByTestId('decisions-row')
       await expect(rows.first()).toBeVisible(SLOW)
-      expect(await detail.evaluate((el) => el.getBoundingClientRect().width)).toBeGreaterThanOrEqual(560)
+      // The section takes the width beside the menu (the pane no longer widens and recentres a map).
+      expect(await page.getByTestId('office-pane').evaluate((el) => el.getBoundingClientRect().width)).toBeGreaterThanOrEqual(560)
       // The earlier cases wrote sign-offs and owner changes into the shared eval org, so the ledger has rows.
       await expect.poll(() => rows.count(), SLOW).toBeGreaterThanOrEqual(2)
 
       const times = await rows.locator('time').evaluateAll((els) => els.map((e) => (e as HTMLTimeElement).dateTime))
       expect(new Date(times[0]).getTime()).toBeGreaterThanOrEqual(new Date(times[1]).getTime())
-      await expect.poll(camera, SLOW).not.toBe(inboxCamera)
 
       // Hover a time: the absolute NZ date and time is its title.
       const firstTime = rows.first().locator('time')
@@ -780,14 +720,12 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       expect(errors).toEqual([])
       await page.close()
     })
-    test('people: wide pane, invite with a role, Invited chip, role change both ways, remove with confirmation (59-11)', async () => {
+    test('people: full width, invite with a role, Invited chip, role change both ways, remove with confirmation (59-11)', async () => {
       const page = await adminCtx.newPage()
       const errors = watchConsole(page)
-      await page.goto('/?place=office&tab=people')
+      await page.goto('/?s=people')
       await expect(page.getByTestId('people-tab')).toHaveCount(1, SLOW)
-      const detail = page.getByTestId('shell-detail')
-      await expect(detail).toHaveAttribute('data-wide', 'true', SLOW)
-      expect(await detail.evaluate((el) => el.getBoundingClientRect().width)).toBeGreaterThanOrEqual(560)
+      expect(await page.getByTestId('section-people').evaluate((el) => el.getBoundingClientRect().width)).toBeGreaterThanOrEqual(560)
 
       // Rows are told apart by the address this run seeded, never by a count (shared org).
       const row = page.getByTestId('people-row').filter({ hasText: DISPOSABLE_EMAIL })
@@ -846,40 +784,36 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
     test('people at 1024x768: the stacked layout, nothing clipped (59-11)', async () => {
       const page = await adminCtx.newPage()
       await page.setViewportSize({ width: 1024, height: 768 })
-      await page.goto('/?place=office&tab=people')
+      await page.goto('/?s=people')
       await expect(page.getByTestId('people-tab')).toHaveCount(1, SLOW)
       await expect(page.getByTestId('people-invite')).toBeVisible(SLOW)
-      const clipped = await page.getByTestId('shell-detail').evaluate((el) => el.scrollWidth > el.clientWidth + 1)
+      const clipped = await page.getByTestId('home-section').evaluate((el) => el.scrollWidth > el.clientWidth + 1)
       expect(clipped).toBe(false)
       await shot(page, '59-people-1024')
       await page.close()
     })
 
-    test('access: the wiring screen renders in the wide pane, the map re-centres, a sop address pins it (59-11)', async () => {
+    test('access: the wiring screen renders in the People section, a sop address pins it (59-11)', async () => {
       const page = await adminCtx.newPage()
       const errors = watchConsole(page)
-      await openOffice(page)
-      const world = page.getByTestId('plant-world')
-      const camera = async () => `${await world.getAttribute('data-scale')}|${await world.getAttribute('data-x')}`
-      const inboxCamera = await camera()
+      await page.goto('/?s=people')
+      await expect(page.getByTestId('office-tab-access')).toBeVisible(SLOW)
 
       await page.getByTestId('office-tab-access').click()
-      await expect(page.getByTestId('shell-detail')).toHaveAttribute('data-wide', 'true', SLOW)
+      await expect(page.getByTestId('office-pane')).toHaveAttribute('data-tab', 'access', SLOW)
       await expect(page.getByTestId('office-pane').locator('.bay')).toHaveCount(1, SLOW)
-      await expect(world).toBeVisible()
-      await expect.poll(camera, SLOW).not.toBe(inboxCamera)
 
-      await page.goto(`/?place=office&tab=access&sop=${plantSopId}`)
+      await page.goto(`/?s=people&tab=access&pin=${plantSopId}`)
       await expect(page.getByTestId('office-pane').locator('.bay')).toHaveCount(1, SLOW)
       await expect(page.getByTestId('office-pane')).toContainText(EVAL_PLANT_SOP_TITLE, SLOW)
       await shot(page, '59-access')
       expect(errors).toEqual([])
       await page.close()
     })
-    test('supervisor Office: Inbox and Requests only, a people tab address falls back to the inbox (59-13, 60-11)', async () => {
+    test('supervisor Sign-offs: Inbox and Requests only, a tab they lack falls back to the inbox, People is the list (59-13, 60-11)', async () => {
       const page = await supervisorCtx.newPage()
       const errors = watchConsole(page)
-      for (const address of ['/?place=office', '/?place=office&tab=people', '/?place=office&tab=access', '/?place=office&tab=decisions']) {
+      for (const address of ['/?s=signoffs', '/?s=signoffs&tab=people', '/?s=signoffs&tab=access', '/?s=signoffs&tab=decisions']) {
         await page.goto(address)
         await expect(page.getByTestId('office-pane'), address).toHaveCount(1, SLOW)
         await expect(page.getByTestId('office-pane'), address).toHaveAttribute('data-tab', 'inbox', SLOW)
@@ -887,34 +821,37 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
         await expect(page.getByTestId('office-chip'), address).toHaveCount(0)
         await expect(page.getByTestId('people-tab'), address).toHaveCount(0)
       }
+      // A section they lack is the list, not an error and not that section.
+      await page.goto('/?s=people')
+      await expect(page.getByTestId('sop-list')).toBeVisible(SLOW)
+      await expect(page.getByTestId('office-pane')).toHaveCount(0)
       await shot(page, '59-supervisor')
       expect(errors).toEqual([])
       await page.close()
     })
 
-    test('legacy addresses (governance, team, access with a sop, attention view) land on the right Office place; assert the rendered place, not the status (59-13)', async () => {
+    test('legacy addresses (governance, team, access with a sop, attention view) land on the right section; assert the rendered section, not the status (59-13)', async () => {
       const page = await adminCtx.newPage()
       const errors = watchConsole(page)
-      const cases: Array<{ from: string; place: string; tab: string; probe: string }> = [
-        { from: '/governance', place: '/?place=office', tab: 'inbox', probe: 'office-tab-inbox' },
-        { from: '/sops?view=attention', place: '/?place=office', tab: 'inbox', probe: 'office-tab-inbox' },
-        { from: '/admin/team', place: '/?place=office&tab=people', tab: 'people', probe: 'people-tab' },
-        { from: `/admin/access?sop=${plantSopId}`, place: `/?place=office&tab=access`, tab: 'access', probe: 'office-tab-access' },
+      const cases: Array<{ from: string; search: string; tab: string; probe: string }> = [
+        { from: '/governance', search: '?s=signoffs', tab: 'inbox', probe: 'office-tab-inbox' },
+        { from: '/sops?view=attention', search: '?s=signoffs', tab: 'inbox', probe: 'office-tab-inbox' },
+        { from: '/admin/team', search: '?s=people', tab: 'people', probe: 'people-tab' },
+        { from: `/admin/access?sop=${plantSopId}`, search: `?s=people&tab=access&pin=${plantSopId}`, tab: 'access', probe: 'office-tab-access' },
       ]
       for (const c of cases) {
         await page.goto(c.from)
         await expect(page.getByTestId('office-pane'), c.from).toHaveCount(1, SLOW)
         await expect(page.getByTestId('office-pane'), c.from).toHaveAttribute('data-tab', c.tab, SLOW)
-        await expect(page.getByTestId('shell-detail'), c.from).toHaveAttribute('data-place', c.place, SLOW)
+        await expect(page, c.from).toHaveURL((u) => u.pathname === '/' && u.search === c.search, SLOW)
         await expect(page.getByTestId(c.probe).first(), c.from).toBeVisible(SLOW)
-        expect(new URL(page.url()).pathname, c.from).toBe('/')
       }
       // an address pinned to a SOP carries it through to the Access tab
       await page.goto(`/admin/access?sop=${plantSopId}`)
       await expect(page.getByTestId('office-pane')).toContainText(EVAL_PLANT_SOP_TITLE, SLOW)
-      // the retired library scope goes to the site itself: no Office pane at all
+      // the retired library scope goes to the list itself: no pane at all
       await page.goto('/governance?view=library')
-      await expect(page.getByTestId('plant-world')).toBeVisible(SLOW)
+      await expect(page.getByTestId('sop-list')).toBeVisible(SLOW)
       await expect(page.getByTestId('office-pane')).toHaveCount(0)
       // a sop value that is not an id is dropped, not carried
       await page.goto('/admin/access?sop=not-an-id')
@@ -925,22 +862,22 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       await page.close()
     })
 
-    test('the training bridge: the Smoko room links it, the matrix renders, Back returns to the Smoko room (59-13)', async () => {
+    test('the training matrix: the Training section opens it from the menu and shows the matrix (59-13)', async () => {
       const page = await adminCtx.newPage()
       const errors = watchConsole(page)
-      await page.goto('/?place=smoko')
-      const link = page.getByRole('link', { name: 'Training matrix' })
-      await expect(link).toHaveCount(1, SLOW)
-      await link.click()
-      await expect(page).toHaveURL(/\/admin\/training$/, SLOW)
-      await expect(page.getByRole('heading', { name: 'Training', exact: true })).toBeVisible(SLOW)
-      await shot(page, '59-training-bridge')
-      await page.getByTestId('back-to-site').locator('a').click()
-      await expect(page).toHaveURL(/place=smoko/, SLOW)
+      await page.goto('/')
+      await expect(page.getByTestId('home-section-training')).toBeVisible(SLOW)
+      await page.getByTestId('home-section-training').click()
+      const training = page.getByTestId('section-training')
+      await expect(training).toBeVisible(SLOW)
+      await expect(training.getByRole('heading', { name: 'Training' })).toBeVisible(SLOW)
+      await expect(training.locator('table').or(training.getByText('No people with required SOPs in this cut.'))).toBeVisible(SLOW)
+      await expect(page).toHaveURL(/[?&]s=training/)
+      await shot(page, '59-training-section')
       expect(errors).toEqual([])
       await page.close()
     })
-    test('a non-owner completion address lands on the Office; the walker still sees their own (59-15)', async () => {
+    test('a non-owner completion address lands on Sign-offs; the walker still sees their own (59-15)', async () => {
       test.setTimeout(180_000)
       const completionId = await seedCompletion(workerId, 1)
       // The supervisor is not the walker: the server page sends them to the Office inbox (content, not status).
@@ -948,7 +885,7 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       const errors = watchConsole(page)
       await page.goto(`/activity/${completionId}`)
       await expect(page.getByTestId('office-pane')).toHaveCount(1, SLOW)
-      await expect(page).toHaveURL(/place=office/, SLOW)
+      await expect(page).toHaveURL(/[?&]s=signoffs/, SLOW)
       await expect(page.getByText('Completion Detail')).toHaveCount(0)
       await shot(page, '59-completion-non-owner')
       expect(errors).toEqual([])

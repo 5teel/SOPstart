@@ -13,7 +13,7 @@
  */
 import { test, expect } from '@playwright/test'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
-import { EVAL_ENV_READY, EVAL_SITE_ORG_NAME, EVAL_WALK_SOP_TITLE, signInAs } from './lib/session'
+import { EVAL_ENV_READY, EVAL_PLANT_SOP_TITLE, EVAL_SITE_ORG_NAME, EVAL_WALK_SOP_TITLE, signInAs } from './lib/session'
 import { ensurePlantFixture, REAL_SOPSTART_ORG_ID, shot, watchConsole } from './lib/plant-fixture'
 import { deleteEvalCompletions } from './lib/completion-cleanup'
 
@@ -58,7 +58,7 @@ test.describe('Phase 55 — cut features (deployed)', () => {
     await deleteEvalCompletions(db, walkSopId)
   })
 
-  test('worker at 1440 sees pins and the next-SOP card — no install prompt, no offline banner, no microphone, no service worker', async ({
+  test('worker at 1440 sees the SOP list and the site map — no install prompt, no offline banner, no microphone, no service worker', async ({
     page,
     context,
     request,
@@ -69,13 +69,13 @@ test.describe('Phase 55 — cut features (deployed)', () => {
     await signInAs(context, 'siteWorker')
     await page.goto('/')
 
-    await expect(page.getByTestId('plant-stage')).toBeVisible(SLOW)
-    const press = page.locator('[data-testid="plant-machine"][data-machine-name="EVAL Press"]')
-    await expect(press).toHaveAttribute('data-pin', /^[1-9]\d*$/, { timeout: 45_000 })
-    await expect(page.getByTestId('plant-now-card')).toBeVisible(SLOW)
+    await expect(page.getByTestId('home')).toBeVisible(SLOW)
+    await expect(page.getByTestId('sop-list')).toBeVisible(SLOW)
+    await expect(page.getByTestId('sop-row').filter({ hasText: EVAL_PLANT_SOP_TITLE }).first()).toBeVisible(SLOW)
+    await expect(page.getByTestId('site-map')).toBeVisible(SLOW)
     await expect(page.getByTestId('plant-ask-mic')).toHaveCount(0)
     await expect(page.getByText(/Install SOPstart|Add to Home Screen|No internet/i)).toHaveCount(0)
-    await shot(page, 'cut-worker-plant')
+    await shot(page, 'cut-worker-home')
 
     const registrations = await page.evaluate(() =>
       navigator.serviceWorker ? navigator.serviceWorker.getRegistrations().then((r) => r.length) : 0
@@ -134,7 +134,7 @@ test.describe('Phase 55 — cut features (deployed)', () => {
       expect(errors, errors.join('\n')).toEqual([])
     })
 
-    test('admin sees that completion waiting for sign-off in the Office inbox with its photo', async ({ page, context }) => {
+    test('admin sees that completion waiting for sign-off in the Sign-offs inbox with its photo', async ({ page, context }) => {
       test.setTimeout(180_000)
       const { data: rows, error } = await db
         .from('sop_completions')
@@ -152,7 +152,7 @@ test.describe('Phase 55 — cut features (deployed)', () => {
       await page.setViewportSize({ width: 1280, height: 900 })
       const errors = watchConsole(page)
       await signInAs(context, 'siteAdmin')
-      await page.goto('/?place=office')
+      await page.goto('/?s=signoffs')
       const row = page.locator(`[data-testid="office-row"][data-key="signoff-${completionId}"]`)
       await expect(row).toHaveCount(1, SLOW)
       await row.getByTestId('office-row-action').click()
@@ -168,7 +168,7 @@ test.describe('Phase 55 — cut features (deployed)', () => {
     })
   })
 
-  test('existing SOPs open, and an old completion address lands on the Office', async ({ page, context }) => {
+  test('existing SOPs open, and an old completion address lands on Sign-offs', async ({ page, context }) => {
     test.setTimeout(180_000)
     await page.setViewportSize({ width: 1440, height: 900 })
     const errors = watchConsole(page)
@@ -188,7 +188,7 @@ test.describe('Phase 55 — cut features (deployed)', () => {
     const { data: rows } = await (ids.length ? q.in('id', ids) : q).order('submitted_at', { ascending: false }).limit(1)
     test.skip(!rows?.length, 'no real-org completion exists')
     // 59-15: a completion belongs to its walker. An admin who is not the walker opening the old address
-    // is sent to the Office inbox by the server page -- content asserted, never the status code.
+    // is sent to the Sign-offs inbox by the server page -- content asserted, never the status code.
     await page.goto(`/activity/${rows![0].id}`)
     await expect(page.getByTestId('office-pane')).toHaveCount(1, SLOW)
     await expect(page.getByText(NOT_FOUND)).toHaveCount(0)

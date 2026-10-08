@@ -23,7 +23,7 @@ export async function press(page: Page) {
   await primary(page).click()
 }
 
-/** Browse -> Start walking (or the resume card) -> the first step is on screen. */
+/** Browse -> the start button (or the resume card) -> the first step is on screen. */
 export async function startWalking(page: Page) {
   const start = page.getByTestId('focus-start-walking')
   await expect(start).toHaveCount(1, SLOW)

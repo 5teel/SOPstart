@@ -291,14 +291,14 @@ test.describe.serial('Phase 56 -- simpler SOP + decision ledger (deployed)', () 
       return data ?? []
     }
 
-    // (1) owner change through the Office inbox
+    // (1) owner change through the Sign-offs inbox
     const { error: resetErr } = await db.from('sops').update({ owner_user_id: null }).eq('id', sopIds.plant)
     expect(resetErr).toBeNull()
     const { data: readBack } = await db.from('sops').select('owner_user_id').eq('id', sopIds.plant).single()
     expect(readBack?.owner_user_id).toBeNull()
 
     const admin = await adminCtx.newPage()
-    await admin.goto('/?place=office')
+    await admin.goto('/?s=signoffs')
     const fixtureRow = admin.getByTestId('office-row').filter({ hasText: EVAL_PLANT_SOP_TITLE })
     await expect(fixtureRow).toHaveCount(1, SLOW)
     await fixtureRow.getByTestId('office-row-action').click()
@@ -314,7 +314,7 @@ test.describe.serial('Phase 56 -- simpler SOP + decision ledger (deployed)', () 
     }).toPass(SLOW)
     await shot(admin, 'ledger-e-owner')
 
-    // (2) completion rejection through the Office inbox sign-off row (59-15: no page of its own)
+    // (2) completion rejection through the Sign-offs inbox row (59-15: no page of its own)
     const completionId = randomUUID()
     const { error: insErr } = await db.from('sop_completions').insert({
       id: completionId,
@@ -327,7 +327,7 @@ test.describe.serial('Phase 56 -- simpler SOP + decision ledger (deployed)', () 
       step_data: {},
     })
     expect(insErr).toBeNull()
-    await admin.goto('/?place=office')
+    await admin.goto('/?s=signoffs')
     const signOffRow = admin.locator(`[data-testid="office-row"][data-key="signoff-${completionId}"]`)
     await expect(signOffRow).toHaveCount(1, { timeout: 40_000 })
     await signOffRow.getByTestId('office-row-action').click()

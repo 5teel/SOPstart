@@ -32,7 +32,6 @@ import path from 'node:path'
 import {
   EVAL_BASE_URL,
   EVAL_ENV_READY,
-  EVAL_PLANT_MACHINE,
   EVAL_PLANT_SOP_TITLE,
   EVAL_WALK_SOP_TITLE,
   signInAs,
@@ -55,9 +54,11 @@ test.describe('Phase 58 — the SOP focus screen (deployed)', () => {
     let db: SupabaseClient
     let ctx: BrowserContext
     let siteOrgId: string
-    let pressId: string
     let plantSopId: string
     const ids = { walk: '', jump: '', lineageRoot: '', lineageV3: '', lineageV4: '', draft: '' }
+
+    // The address Read gives a focus screen: the home query that shows this SOP.
+    const fromRead = (id: string) => encodeURIComponent(`sop=${id}`)
 
     const sopsTitled = async (title: string) => {
       const { data, error } = await db.from('sops').select('id, version, parent_sop_id, status').eq('organisation_id', siteOrgId).eq('title', title)
@@ -74,7 +75,6 @@ test.describe('Phase 58 — the SOP focus screen (deployed)', () => {
       db = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } })
       const fixture = await ensurePlantFixture(db)
       siteOrgId = fixture.siteOrgId
-      pressId = fixture.pressId
       plantSopId = fixture.plantSopId
       if (siteOrgId === REAL_SOPSTART_ORG_ID) throw new Error('refusing to run -- resolved org id equals the real SOPstart org')
 
@@ -98,31 +98,26 @@ test.describe('Phase 58 — the SOP focus screen (deployed)', () => {
     })
 
     // ---------------------------------------------------- SC1 -- the focus frame
-    test('SC1 frame: opened from a machine it holds only the SOP — Back + title, rail 300 px, column <= 820, Start walking, no site chrome', async () => {
+    test('SC1 frame: opened from Read it holds only the SOP — Back + title, rail 300 px, column <= 820, the start button, no home chrome', async () => {
       test.setTimeout(180_000)
       const page = await ctx.newPage()
       const errors = watchConsole(page)
 
-      // From the machine: the row opens /sops/<id>?from=<machine>.
-      await page.goto('/')
-      const machineRow = page.getByTestId('shell-machine-row').filter({ hasText: EVAL_PLANT_MACHINE })
-      await expect(machineRow).toHaveCount(1, SLOW)
-      await machineRow.click()
-      const sopRow = page.getByTestId('shell-detail').getByTestId('plant-panel-row').filter({ hasText: EVAL_PLANT_SOP_TITLE })
-      await expect(sopRow).toHaveCount(1, SLOW)
-      const walkLink = sopRow.getByTestId('plant-panel-walk')
-      await expect(walkLink).toHaveCount(1, SHORT)
-      await walkLink.click()
-      await expect(page).toHaveURL(new RegExp(`/sops/${plantSopId}\\?from=${pressId}$`), SLOW)
+      // Read offers the start (the click itself is proved in the start eval); the focus address carries Read as its from.
+      await page.goto(`/?sop=${plantSopId}`)
+      await expect(page.getByTestId('read-view').locator('h1')).toHaveText(EVAL_PLANT_SOP_TITLE, SLOW)
+      await expect(page.getByTestId('read-start')).toHaveCount(1, SHORT)
+      await page.goto(`/sops/${plantSopId}?from=${fromRead(plantSopId)}`)
+      await expect(page).toHaveURL(new RegExp(`/sops/${plantSopId}\\?from=${fromRead(plantSopId)}$`), SLOW)
       await expect(page.getByTestId('focus-screen')).toBeVisible(SLOW)
       await expect(page.getByText(NOT_FOUND)).toHaveCount(0)
 
-      // The walk fixture's browse state, opened from the same machine.
-      await page.goto(`/sops/${ids.walk}?from=${pressId}`)
+      // The walk fixture's browse state, opened from its own Read.
+      await page.goto(`/sops/${ids.walk}?from=${fromRead(ids.walk)}`)
       await expect(page.getByTestId('focus-screen')).toBeVisible(SLOW)
       await expect(page.getByTestId('focus-screen')).toHaveAttribute('data-mode', 'browse')
       await expect(page.getByTestId('focus-start-walking')).toBeVisible(SLOW)
-      for (const id of ['shell', 'shell-stage', 'shell-summary', 'plant-stage', 'back-to-site', 'office-pane']) {
+      for (const id of ['home', 'home-menu', 'home-list', 'home-reader', 'back-to-site', 'office-pane']) {
         await expect(page.getByTestId(id), id).toHaveCount(0)
       }
       await expect(page.locator('[data-testid*="inbox"], [data-testid*="notification"]')).toHaveCount(0)
@@ -158,7 +153,7 @@ test.describe('Phase 58 — the SOP focus screen (deployed)', () => {
       const errors = watchConsole(page)
 
       for (const pass of [0, 1]) {
-        await page.goto(`/sops/${ids.walk}?from=${pressId}`)
+        await page.goto(`/sops/${ids.walk}?from=${fromRead(ids.walk)}`)
         // The second pass inherits nothing: no resume card, no photo, step 1 of 5 again.
         await expect(page.getByTestId('focus-start-walking')).toHaveCount(1, SLOW)
         await expect(page.getByTestId('walk-resume')).toHaveCount(0)
@@ -168,12 +163,10 @@ test.describe('Phase 58 — the SOP focus screen (deployed)', () => {
         if (pass === 0) {
           await expect(page.getByTestId('walk-sent-back')).toHaveCount(1, SHORT)
           await page.getByTestId('walk-sent-back').click()
-          // Back lands on the one screen with the originating machine still selected.
-          await expect(page).toHaveURL(new RegExp(`/\\?place=${pressId}$`), SLOW)
-          await expect(page.getByTestId('shell-detail')).toHaveAttribute('data-place', `/?place=${pressId}`, SLOW)
-          // The machine's own panel is on screen (not the site overview) before the shot is taken.
-          await expect(page.getByTestId('shell-detail')).toContainText(EVAL_PLANT_MACHINE, SLOW)
-          await shot(page, '58-back-place')
+          // Back lands on the home with the SOP it came from open in Read.
+          await expect(page).toHaveURL(new RegExp(`/\\?sop=${ids.walk}$`), SLOW)
+          await expect(page.getByTestId('read-view').locator('h1')).toHaveText(EVAL_WALK_SOP_TITLE, SLOW)
+          await shot(page, '58-back-read')
         }
       }
 
@@ -189,11 +182,11 @@ test.describe('Phase 58 — the SOP focus screen (deployed)', () => {
       await page.close()
     })
 
-    test('SC2 resume: reopening mid-walk offers "Resume where you left off"; Esc closes the Start over dialog; Start over begins again', async () => {
+    test('SC2 resume: reopening mid-walk offers the start with "Picks up at step 3 of 5"; Esc closes the Start over dialog; Start over begins again', async () => {
       test.setTimeout(240_000)
       await deleteEvalCompletions(db, ids.walk)
       const page = await ctx.newPage()
-      await page.goto(`/sops/${ids.walk}?from=${pressId}`)
+      await page.goto(`/sops/${ids.walk}?from=${fromRead(ids.walk)}`)
       await startWalking(page)
       await press(page) // hazard
       await press(page) // PPE
@@ -201,11 +194,10 @@ test.describe('Phase 58 — the SOP focus screen (deployed)', () => {
 
       // Back (progress is already on the server), then reopen.
       await page.getByTestId('focus-back').click()
-      await expect(page).toHaveURL(new RegExp(`/\\?place=${pressId}$`), SLOW)
-      await page.goto(`/sops/${ids.walk}?from=${pressId}`)
-      const resume = page.getByTestId('walk-resume-button')
-      await expect(resume).toHaveCount(1, SLOW)
-      await expect(resume).toContainText('Resume where you left off (step 3 of 5)')
+      await expect(page).toHaveURL(new RegExp(`/\\?sop=${ids.walk}$`), SLOW)
+      await page.goto(`/sops/${ids.walk}?from=${fromRead(ids.walk)}`)
+      await expect(page.getByTestId('walk-resume-button')).toHaveCount(1, SLOW)
+      await expect(page.getByTestId('walk-resume')).toContainText('Picks up at step 3 of 5')
       await shot(page, '58-resume')
 
       // Esc closes the dialog first and does not leave the screen.
@@ -245,8 +237,8 @@ test.describe('Phase 58 — the SOP focus screen (deployed)', () => {
       test.setTimeout(180_000)
       const page = await ctx.newPage()
 
-      await page.goto(`/sops/${ids.walk}?${LEGACY_TAB}=walk&from=${pressId}`)
-      await expect(page).toHaveURL(new RegExp(`/sops/${ids.walk}\\?from=${pressId}$`), SLOW)
+      await page.goto(`/sops/${ids.walk}?${LEGACY_TAB}=walk&from=${fromRead(ids.walk)}`)
+      await expect(page).toHaveURL(new RegExp(`/sops/${ids.walk}\\?from=${fromRead(ids.walk)}$`), SLOW)
       await expect(page.getByTestId('focus-screen')).toBeVisible(SLOW)
       await page.goto(`/sops/${ids.walk}?${LEGACY_TAB}=read`)
       await expect(page).toHaveURL(new RegExp(`/sops/${ids.walk}$`), SLOW)
@@ -274,7 +266,7 @@ test.describe('Phase 58 — the SOP focus screen (deployed)', () => {
       await deleteEvalCompletions(db, ids.walk)
       const page = await ctx.newPage()
       await page.setViewportSize({ width: 390, height: 844 })
-      await page.goto(`/sops/${ids.walk}?from=${pressId}`)
+      await page.goto(`/sops/${ids.walk}?from=${fromRead(ids.walk)}`)
       await startWalking(page)
 
       await expect(page.getByTestId('focus-rail')).toBeHidden()
@@ -309,7 +301,7 @@ test.describe('Phase 58 — the SOP focus screen (deployed)', () => {
 
   // ------------------------------------------------ SC3 / SC4 / SC5 -- the admin half (58-13)
   // Admin session; the editor is opened straight from its address
-  // (/sops/<id>?mode=edit&from=workshop) until 58-14 repoints the machine panel's Edit link.
+  // (/sops/<id>?mode=edit&from=s%3Dmanage) until 58-14 repoints the machine panel's Edit link.
   test.describe.serial('admin: editor, parsing, versions and publish', () => {
     let db: SupabaseClient
     let adminCtx: BrowserContext
@@ -317,7 +309,7 @@ test.describe('Phase 58 — the SOP focus screen (deployed)', () => {
     let siteOrgId = ''
     const ids = { draft: '', ready: '', blank: '', lineageRoot: '', lineageV4: '', publish: '', parsing: '', parsingVideo: '', parseFailed: '' }
 
-    const editUrl = (id: string) => `/sops/${id}?mode=edit&from=workshop`
+    const editUrl = (id: string) => `/sops/${id}?mode=edit&from=s%3Dmanage`
     const rows = async (title: string) => {
       const { data, error } = await db.from('sops').select('id, version, parent_sop_id, status').eq('organisation_id', siteOrgId).eq('title', title)
       if (error || !data?.length) throw new Error(`"${title}" not found in the eval-site org -- run node scripts/eval-fixtures.mjs`)
@@ -460,10 +452,10 @@ test.describe('Phase 58 — the SOP focus screen (deployed)', () => {
     })
 
     // ---- SC5: an earlier version is read-only for an admin too
-    test('SC5 58-superseded: the admin opens the exact earlier version, "v2 — superseded", no Start walking, no switch', async () => {
+    test('SC5 58-superseded: the admin opens the exact earlier version, "v2 — superseded", no start button, no switch', async () => {
       test.setTimeout(120_000)
       const page = await adminCtx.newPage()
-      await page.goto(`/sops/${ids.lineageRoot}?from=workshop`)
+      await page.goto(`/sops/${ids.lineageRoot}?from=s%3Dmanage`)
       await expect(page.getByTestId('focus-version-chip')).toContainText('v2 — superseded', SLOW)
       await expect(page.getByTestId('focus-start-walking')).toHaveCount(0)
       await expect(page.getByTestId('focus-mode-switch')).toHaveCount(0)
@@ -476,7 +468,7 @@ test.describe('Phase 58 — the SOP focus screen (deployed)', () => {
       test.setTimeout(180_000)
       const page = await adminCtx.newPage()
       const errors = watchConsole(page)
-      await page.goto(`/sops/${ids.parsing}?from=workshop`)
+      await page.goto(`/sops/${ids.parsing}?from=s%3Dmanage`)
       await expect(page.getByTestId('parse-progress')).toHaveCount(1, SLOW)
       await expect(page.getByTestId('parse-stage')).not.toBeEmpty(SLOW)
       await expect(page.getByTestId('parse-eta')).toContainText(/left/, SLOW)
@@ -492,7 +484,7 @@ test.describe('Phase 58 — the SOP focus screen (deployed)', () => {
       await db.from('parse_jobs').update({ current_stage: 'transcribing' }).eq('sop_id', ids.parsingVideo)
       try {
         const video = await adminCtx.newPage()
-        await video.goto(`/sops/${ids.parsingVideo}?from=workshop`)
+        await video.goto(`/sops/${ids.parsingVideo}?from=s%3Dmanage`)
         await expect(video.getByTestId('parse-stage')).toContainText('Transcribing the video', SLOW)
         await shot(video, '58-parsing-video')
         await video.close()
@@ -504,7 +496,7 @@ test.describe('Phase 58 — the SOP focus screen (deployed)', () => {
     test("SC4 58-parse-failed: the card says it could not read the document, shows the job's own line, Try again and Back", async () => {
       test.setTimeout(120_000)
       const page = await adminCtx.newPage()
-      await page.goto(`/sops/${ids.parseFailed}?from=workshop`)
+      await page.goto(`/sops/${ids.parseFailed}?from=s%3Dmanage`)
       const card = page.getByTestId('parse-progress')
       await expect(card).toHaveAttribute('data-state', 'failed', SLOW)
       await expect(card).toContainText("We couldn't read this document.")

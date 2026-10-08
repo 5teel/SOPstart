@@ -5,7 +5,9 @@
  * Templates") that beforeAll recreates and afterAll deletes, so applying a
  * template never touches the real org or the shared eval-site org. For each
  * template: reset the org's site, pick the template on the empty state, then
- * prove the one screen shows its rooms and machines and screenshot it.
+ * prove the site editor lists its departments and machines and screenshot it.
+ * The template's picture is the editor's workspace; where the rooms sat in it
+ * is gone (ADR-0005), so no room position is asserted.
  *
  * Self-skips when EVAL_BASE_URL is unset.
  */
@@ -72,7 +74,7 @@ test.describe.serial('ADR-0003 site templates', () => {
   })
 
   for (const preset of SITE_PRESETS) {
-    test(`${preset.name}: picking the template draws its site, departments, machines and rooms`, async ({ page, context }) => {
+    test(`${preset.name}: picking the template draws its site, departments and machines`, async ({ page, context }) => {
       test.setTimeout(240_000)
       await page.setViewportSize({ width: 1440, height: 900 })
       const errors = watchConsole(page)
@@ -82,7 +84,7 @@ test.describe.serial('ADR-0003 site templates', () => {
       await db.from('departments').delete().eq('organisation_id', orgId)
 
       await signInAs(context, 'templateAdmin')
-      await page.goto('/?place=edit')
+      await page.goto('/?s=manage&view=site')
       await expect(page.getByTestId('site-empty-state')).toBeVisible(SLOW)
       await expect(page.getByTestId('site-preset')).toHaveCount(SITE_PRESETS.length)
       if (preset.id === SITE_PRESETS[0].id) await shot(page, 'templates-picker')
@@ -95,15 +97,17 @@ test.describe.serial('ADR-0003 site templates', () => {
       const { count } = await db.from('site_machines').select('id', { count: 'exact', head: true }).eq('site_layout_id', layout!.id)
       expect(count).toBe(preset.machines.length)
 
-      await page.goto('/')
-      await expect(page.getByTestId('shell-machine-row')).toHaveCount(preset.machines.length, SLOW)
-      await expect(page.getByTestId('shell-room-row')).toHaveCount(4)
-      await expect(page.getByTestId('shell-dept-row')).toHaveCount(preset.departments.length)
+      // The editor lists the template's machines and departments.
+      await expect(page.getByTestId('site-machine-row')).toHaveCount(preset.machines.length, SLOW)
+      await expect(page.getByTestId('dept-strip-row')).toHaveCount(preset.departments.length, SLOW)
       await shot(page, `template-${preset.id}`)
 
-      // A room flies the camera to the picture's own office, not Visy's.
-      await page.locator('[data-testid="shell-room-row"][data-room-id="office"]').click()
-      await shot(page, `template-${preset.id}-office`)
+      // Done returns to the list: the home opens on the new site's areas.
+      await page.getByTestId('site-edit-done').click()
+      await expect(page.getByTestId('home')).toBeVisible(SLOW)
+      await page.goto('/')
+      await expect(page.getByTestId('home')).toBeVisible(SLOW)
+      await shot(page, `template-${preset.id}-home`)
 
       expect(errors).toEqual([])
     })

@@ -5,10 +5,10 @@
  * live in production, not just source-contract-pinned:
  *   C — the Access map shows the Wiring view only, no Matrix/Illuminate
  *       lens toggle (D-05); the legacy list address's access view lands on
- *       the Office Access tab (Phase 59)
+ *       the People section's Access tab (Phase 63)
  *   D1/D2 — the legacy admin list and governance URLs still land on real
- *       places for an admin (the one screen, the Office), and never open the
- *       Office inbox for a worker (D-01)
+ *       places for an admin (the home, Sign-offs), and never open the
+ *       Sign-offs inbox for a worker (D-01)
  *
  * C reads the real org (read-only, as `admin`) because the Access map needs
  * a populated org tree to render meaningfully. The pathways 0-not-mapped
@@ -57,7 +57,7 @@ test.describe('Phase 43 — dead-surface removal (deployed)', () => {
     await expect(page).toHaveURL((u) => u.pathname === '/' && u.search === '', SLOW)
 
     await page.goto('/admin/governance?filter=no_owner')
-    await expect(page).toHaveURL((u) => u.pathname === '/' && u.searchParams.get('place') === 'office', SLOW)
+    await expect(page).toHaveURL((u) => u.pathname === '/' && u.searchParams.get('s') === 'signoffs', SLOW)
     await expect(page.getByTestId('office-pane')).toBeVisible(SLOW)
   })
 
