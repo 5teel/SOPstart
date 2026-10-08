@@ -7,7 +7,7 @@
 import type { LibraryRow } from '@/hooks/useLibrary'
 import type { RowStatus } from '@/lib/library/status'
 
-const DOT: Record<RowStatus['kind'], string> = {
+export const DOT: Record<RowStatus['kind'], string> = {
   signed: 'bg-accent-signoff',
   waiting: 'bg-accent-decision',
   updated: 'bg-accent-step',

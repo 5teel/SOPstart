@@ -66,6 +66,40 @@ test.describe('read view', () => {
     for (const e of exports) expect(e).toMatch(/^export async function /)
   })
 
+  test('ReadView carries the fuse hooks, the walk order and the existing chip', () => {
+    const s = code('src/components/home/ReadView.tsx')
+    for (const hook of ['data-fuse="sop"', 'data-fuse="button"', 'data-fuse="start"']) expect(s).toContain(hook)
+    expect(s).toContain('walkOrder(')
+    expect(s).toContain('<KindChip')
+    expect(s).toContain('Picks up at step')
+    expect(s).toContain('or begin from step 1')
+    expect(s).not.toContain('dangerouslySetInnerHTML')
+  })
+
+  test('ReadView asks for the owner only behind a role gate, and Ask / Edit are role-gated', () => {
+    const s = code('src/components/home/ReadView.tsx')
+    expect(s).toMatch(/enabled: supervisorUp/)
+    expect(s).toMatch(/OWNER_ROLES = \['supervisor', 'admin', 'safety_manager'\]/)
+    expect(s).toMatch(/supervisorUp && <AskTrigger/)
+    expect(s).toMatch(/canEdit && \(\s*<Link/)
+    expect(s).toMatch(/canEdit = role === 'admin' \|\| role === 'safety_manager'/)
+    // the owner query is the only server action on this view
+    expect(s.match(/from '@\/actions\//g)).toHaveLength(1)
+  })
+
+  test('the composer and the ask picker load only through dynamic()', () => {
+    const s = code('src/components/home/ReadView.tsx')
+    expect(s).not.toMatch(/from '@\/components\/requests\//)
+    expect(s.match(/dynamic\(/g)).toHaveLength(2)
+  })
+
+  test('no walk word in any JSX text', () => {
+    const s = code('src/components/home/ReadView.tsx')
+    const texts = [...s.matchAll(/>([^<>{}]*[A-Za-z][^<>{}]*)</g)].map((m) => m[1])
+    expect(texts.length).toBeGreaterThan(0)
+    for (const t of texts) expect(t, t).not.toMatch(/\bwalk/i)
+  })
+
   test('the capability matrix names the owner row with the workers cell empty', () => {
     const m = src('.planning/codebase/CAPABILITY-MATRIX.md')
     const row = m.split('\n').find((l) => l.startsWith('| SOP owner name on Read (home) |')) ?? ''
