@@ -10,14 +10,14 @@
  *      that the three Phase 41 lens files are deleted): `WiringPatchBayShell`
  *      may only be statically imported from its own named file below. The
  *      retired governance queue row left the list when it was deleted in 59-14.
- *      `AdminShell` and `OfficePane` have empty allow-lists: each is only ever
- *      reached via `next/dynamic`, so ANY static import is a violation.
+ *      `OfficePane` and the request/objective editors have empty allow-lists: each is
+ *      only ever reached via `next/dynamic`, so ANY static import is a violation.
  *
- *   2. The worker shell files (the one screen's worker half, Phase 57) must
+ *   2. The home shell files (the worker download, 63-11) must
  *      not import any admin table/lens component, nor `DepartmentPicker`, nor
  *      `setSopCategory`, nor anything from `@/actions/governance`,
- *      `@/actions/org-model`, `@/actions/grants`. `OneScreen.tsx` reaches the
- *      admin shell only through `dynamic(`.
+ *      `@/actions/org-model`, `@/actions/grants`. The admin section bodies are
+ *      reached only through `dynamic(`.
  *
  * Runs LIVE (no test.fixme).
  */
@@ -33,8 +33,6 @@ const SRC_DIR = path.join(REPO_ROOT, 'src')
 // anywhere — only via next/dynamic.
 const ALLOWED_IMPORTERS: Record<string, string[]> = {
   WiringPatchBayShell: [path.join('src', 'components', 'sop', 'lenses', 'AdminAccessLens.tsx')],
-  // Phase 57: reachable only through next/dynamic in OneScreen.
-  AdminShell: [],
   // Phase 59: the Office pane is only ever reached through next/dynamic (A-11).
   OfficePane: [],
   // Phase 60: the composer and the ask picker are only ever reached through next/dynamic (A-07).
@@ -45,15 +43,7 @@ const ALLOWED_IMPORTERS: Record<string, string[]> = {
 }
 
 const WORKER_SHELL_FILES = [
-  ...[
-    'ShellFrame.tsx',
-    'WorkerShell.tsx',
-    'RoomBodies.tsx',
-    'SiteSummary.tsx',
-    'OfficeCard.tsx',
-    'AccountControl.tsx',
-  ].map((f) => path.join(REPO_ROOT, 'src', 'components', 'shell', f)),
-  // 63-11: the home replaced OneScreen as the worker download
+  path.join(REPO_ROOT, 'src', 'components', 'shell', 'AccountControl.tsx'),
   ...['HomeShell.tsx', 'SectionMenu.tsx', 'TabBar.tsx'].map((f) => path.join(REPO_ROOT, 'src', 'components', 'home', f)),
 ]
 
@@ -133,12 +123,11 @@ test.describe('T-41-02 — admin lens components cannot leak into the worker imp
     }
   })
 
-  test('HomeShell reaches the admin-only section bodies only through dynamic(), and WorkerShell is a worker-shell file', () => {
+  test('HomeShell reaches the admin-only section bodies only through dynamic()', () => {
     const home = fs.readFileSync(WORKER_SHELL_FILES.find((f) => f.endsWith('HomeShell.tsx')) as string, 'utf-8')
     for (const m of ['PeopleSection', 'ManageSection', 'SignOffsSection']) {
       expect(home, m).toMatch(new RegExp(`const ${m} = dynamic\\(\\(\\) => import\\('@/components/home/sections/${m}'\\)`))
       expect(home, m).not.toMatch(new RegExp(`^import[^\\n]*\\b${m}\\b[^\\n]*from`, 'm'))
     }
-    expect(WORKER_SHELL_FILES.some((f) => f.endsWith('WorkerShell.tsx'))).toBe(true)
   })
 })

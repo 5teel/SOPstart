@@ -13,13 +13,10 @@ import path from 'node:path'
 
 const ROOT = process.cwd()
 const NEXT_CONFIG = path.join(ROOT, 'next.config.ts')
-// 57-09: the library table is gone; the Workshop's draft rows are the admin list -> editor chain.
-const WORKSHOP = path.join(ROOT, 'src', 'components', 'shell', 'AdminRoomBodies.tsx')
-// 57-08: the worker list is gone; the worker half of the one screen is the shell.
-const WORKER_SHELL = [
-  ...['WorkerShell.tsx', 'RoomBodies.tsx', 'SiteSummary.tsx', 'OfficeCard.tsx'].map((f) => path.join(ROOT, 'src', 'components', 'shell', f)),
-  path.join(ROOT, 'src', 'components', 'home', 'HomeShell.tsx'), // 63-11: the home replaced OneScreen
-]
+// 63-19: Manage SOPs' draft rows are the admin list -> editor chain.
+const MANAGE = path.join(ROOT, 'src', 'components', 'home', 'sections', 'ManageSection.tsx')
+// 63-19: the worker half of the home is the shell, the list and its rows.
+const WORKER_SHELL = ['HomeShell.tsx', 'SopList.tsx', 'SopRow.tsx'].map((f) => path.join(ROOT, 'src', 'components', 'home', f))
 const SOP_DETAIL_PAGE = path.join(ROOT, 'src', 'app', '(protected)', 'sops', '[sopId]', 'page.tsx')
 
 function read(p: string): string {
@@ -43,14 +40,14 @@ test.describe('legacy /admin/sops — static next.config.ts redirect (Phase 43 D
 })
 
 test.describe('SUR-04 — one path from a SOP to its editor', () => {
-  test('SUR-04: the Workshop (AdminRoomBodies) links the focus editor; the worker shell links no edit address', () => {
-    const workshop = read(WORKSHOP)
-    expect(workshop).toContain("focusHref(d.id, { mode: 'edit', from: homeFrom({ ...HOME, s: 'manage' }) })")
+  test('SUR-04: Manage SOPs links the focus editor; the worker shell links no edit address', () => {
+    const manage = read(MANAGE)
+    expect(manage).toContain("focusHref(d.id, { mode: 'edit', from: homeFrom({ ...HOME, s: 'manage' }) })")
     for (const f of WORKER_SHELL) expect(read(f), f).not.toContain("mode: 'edit'")
   })
 
   test('SUR-04: the SOP focus page is not a second list-to-editor chain (58-15: it renders no links of its own; its edit entry is the Walk / Edit switch)', () => {
-    // The Workshop's draft rows are the only admin list that links directly
+    // Manage SOPs' draft rows are the only admin list that links directly
     // into the editor; the server page renders only FocusWalker and adds no second one.
     const detail = read(SOP_DETAIL_PAGE)
     expect(detail).not.toMatch(/<Link|href=/)

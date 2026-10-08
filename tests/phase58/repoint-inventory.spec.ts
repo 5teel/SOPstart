@@ -78,10 +78,6 @@ export const INVENTORY: Row[] = [
   { file: 'tests/integration/scp-parse-pipeline.test.ts', disposition: 'repoint', plan: '58-16' }, // 58-07 repoints the parse-route halves (focus steps, no layout); the builder halves go with 58-16
   { file: 'src/lib/parsers/__tests__/parser-creates-junctions.test.ts', disposition: 'delete', plan: '58-07' },
   // ---- 58-10 worker entry hrefs ----
-  { file: 'tests/phase52/plant-panel.spec.ts', disposition: 'repoint', plan: '58-10' }, // 58-11 edits the tab literal
-  { file: 'tests/phase52/plant-now-card.spec.ts', disposition: 'repoint', plan: '58-10' }, // 58-11 edits the tab literal
-  { file: 'tests/phase54/admin-machine-panel.spec.ts', disposition: 'repoint', plan: '58-10' }, // 58-14 edits the builder href
-  { file: 'tests/phase57/machine-body.spec.ts', disposition: 'repoint', plan: '58-10' }, // 58-11 tab literal, 58-14 builder href
   // ---- 58-11 walk and page evals ----
   { file: 'tests/evals/cut-features.eval.ts', disposition: 'repoint', plan: '58-11' }, // 58-14 edits the builder/versions probes
   { file: 'tests/evals/sop-ledger.eval.ts', disposition: 'repoint', plan: '58-11' }, // 58-14 edits the builder href
@@ -109,7 +105,6 @@ export const INVENTORY: Row[] = [
   { file: 'tests/phase36/no-refresher-gate.spec.ts', disposition: 'repoint', plan: '58-15' },
   { file: 'tests/phase37/no-competency-gate-worker.spec.ts', disposition: 'repoint', plan: '58-15' },
   { file: 'tests/phase40/dup04-page-shell.spec.ts', disposition: 'repoint', plan: '58-15' },
-  { file: 'tests/phase57/shell-structure.spec.ts', disposition: 'repoint', plan: '58-16' }, // 58-14 exempts the two redirect-only pages; 58-16 removes the exemption with the directories
   { file: 'tests/phase40/spine-freeze.spec.ts', disposition: 'repoint', plan: '58-15' },
   { file: 'tests/phase40/parse-status-no-navigate-after-unmount.spec.ts', disposition: 'repoint', plan: '58-15' },
   { file: 'tests/phase41/nav-and-shim.spec.ts', disposition: 'repoint', plan: '58-15' }, // 58-11 edits the admin-link literal first
@@ -123,7 +118,6 @@ export const INVENTORY: Row[] = [
   { file: 'tests/phase54/library-table.spec.ts', disposition: 'repoint', plan: '58-15' },
   { file: 'tests/phase55/worker-path-contract.spec.ts', disposition: 'repoint', plan: '58-15' },
   { file: 'tests/phase56/decision-writers-sweep.spec.ts', disposition: 'repoint', plan: '58-15' },
-  { file: 'tests/phase57/place.spec.ts', disposition: 'repoint', plan: '58-15' }, // 58-11 makes the back-bar path null on /sops/*
   { file: 'tests/lint/no-bulk-verify-ui.spec.ts', disposition: 'repoint', plan: '58-15' }, // allow-list stays; new code must not use the banned phrases
   { file: 'tests/lint/no-dead-internal-hrefs.spec.ts', disposition: 'repoint', plan: '58-15' },
   // ---- 58-16 retirement: whole-subject deletes and the deletion sweep ----

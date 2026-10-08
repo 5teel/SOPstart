@@ -71,7 +71,6 @@ export const INVENTORY: Row[] = [
   // ---- 59-02 ledger kinds ----
   { file: 'tests/phase56/decision-kinds-live.spec.ts', disposition: 'repoint', plan: '59-02' }, // Record<DecisionKind, ...> sample for the three new kinds
   // ---- 59-03 shell place + tab ----
-  { file: 'tests/phase57/shell-structure.spec.ts', disposition: 'repoint', plan: '59-03' }, // the parsePlace(initialPlace) pin
   // ---- 59-04 inbox model ----
   { file: 'tests/phase54/governance-inbox.spec.ts', disposition: 'repoint', plan: '59-04' }, // chip order + action labels; page / component wiring half goes in 59-14
   { file: 'tests/phase30/governance-fold.spec.ts', disposition: 'repoint', plan: '59-04' }, // stuck-action literal; wiring half goes in 59-14
@@ -80,9 +79,7 @@ export const INVENTORY: Row[] = [
   // ---- 59-07 owner + review ----
   { file: 'tests/phase28/governance-actions.spec.ts', disposition: 'repoint', plan: '59-07' }, // confirmSopCurrent owner path
   // ---- 59-12 mount ----
-  { file: 'tests/phase57/machine-body.spec.ts', disposition: 'repoint', plan: '59-12' }, // Office links
   // ---- 59-13 addresses ----
-  { file: 'tests/phase57/place.spec.ts', disposition: 'repoint', plan: '59-13' }, // back-bar Office group
   { file: 'tests/phase54/deletion-sweep.spec.ts', disposition: 'repoint', plan: '59-13' }, // attention view destination
   // ---- 59-14 retirement A ----
   { file: 'tests/phase57/retirement-sweep.spec.ts', disposition: 'repoint', plan: '59-14' }, // 59-12 repoints the access-bridge link case, 59-13 its proxy and place cases
@@ -105,7 +102,6 @@ export const INVENTORY: Row[] = [
   { file: 'tests/phase43/dead-controls.spec.ts', disposition: 'repoint', plan: '59-14' }, // the org-model view toggle
   { file: 'tests/phase43/route-truth.spec.ts', disposition: 'repoint', plan: '59-14' }, // proxy destination; 59-13 changes it first
   { file: 'tests/phase54/inbox-reuses-governance-gating.spec.ts', disposition: 'delete', plan: '59-14' }, // wrapper + page gone; gating literals re-homed in 59-04
-  { file: 'tests/phase57/one-query.spec.ts', disposition: 'repoint', plan: '59-14' }, // 59-12 removes the pending-count hook token first
   { file: 'tests/phase57/departments.spec.ts', disposition: 'repoint', plan: '59-14' },
   { file: 'tests/e2e/sub-trade-assignment.spec.ts', disposition: 'repoint', plan: '59-14' },
   { file: 'tests/lint/design-tokens.spec.ts', disposition: 'repoint', plan: '59-14' }, // names the org-model component folder

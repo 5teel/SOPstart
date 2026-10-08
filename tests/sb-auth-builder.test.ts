@@ -81,8 +81,8 @@ test.describe('SOP authoring entry points (SB-AUTH)', () => {
 
     const listAction = await fs.readFile('src/actions/admin-sop-list.ts', 'utf8')
     expect(listAction).toContain('source_type')
-    const workshop = await fs.readFile('src/components/shell/AdminRoomBodies.tsx', 'utf8')
-    expect(workshop).toContain('room-workshop-new')
+    const manage = await fs.readFile('src/components/home/sections/ManageSection.tsx', 'utf8')
+    expect(manage).toContain('manage-new')
 
     const publishRoute = await fs.readFile('src/app/api/sops/[sopId]/publish/route.ts', 'utf8').catch(() => null)
     expect(publishRoute).not.toBeNull()

@@ -40,9 +40,8 @@ const FOCUS_WORKER_FILES = [
 ].map(FOCUS)
 const WALK_HOOK = path.join(ROOT, 'src', 'hooks', 'useWalk.ts')
 const WALK_ACTIONS = path.join(ROOT, 'src', 'actions', 'walk.ts')
-// 57-08: the worker list page and library card are gone; the worker surfaces are the shell + plant files.
-const SHELL = (f: string) => path.join(ROOT, 'src', 'components', 'shell', f)
-const PLANT = (f: string) => path.join(ROOT, 'src', 'components', 'sop', 'plant', f)
+// 63-19: the worker surfaces are the home (list, row, Read); the plant stage and machine body are gone.
+const HOME = (f: string) => path.join(ROOT, 'src', 'components', 'home', f)
 const PROFILE_COMPETENCY_SECTION = path.join(ROOT, 'src', 'components', 'profile', 'CompetencySection.tsx')
 const CLASSIFY = path.join(ROOT, 'src', 'lib', 'competency', 'classify.ts')
 // Phase 53-02: the worker list derivation moved out of page.tsx into this hook.
@@ -53,12 +52,10 @@ const TARGETS: Array<{ label: string; file: string }> = [
   ...FOCUS_WORKER_FILES.map((file) => ({ label: `focus/${path.basename(file)}`, file })),
   { label: 'useWalk.ts (the walk hook)', file: WALK_HOOK },
   { label: 'walk.ts (walk server actions)', file: WALK_ACTIONS },
-  { label: 'WorkerShell.tsx (worker one screen)', file: SHELL('WorkerShell.tsx') },
-  { label: 'HomeShell.tsx (63-11: replaced OneScreen)', file: path.join(process.cwd(), 'src', 'components', 'home', 'HomeShell.tsx') },
-  { label: 'RoomBodies.tsx', file: SHELL('RoomBodies.tsx') },
-  { label: 'SiteSummary.tsx', file: SHELL('SiteSummary.tsx') },
-  { label: 'MachinePanel.tsx (machine body)', file: PLANT('MachinePanel.tsx') },
-  { label: 'NowCard.tsx', file: PLANT('NowCard.tsx') },
+  { label: 'HomeShell.tsx (63-11: replaced the one screen)', file: HOME('HomeShell.tsx') },
+  { label: 'SopList.tsx (the home list)', file: HOME('SopList.tsx') },
+  { label: 'SopRow.tsx (a list row and its status)', file: HOME('SopRow.tsx') },
+  { label: 'ReadView.tsx (Read)', file: HOME('ReadView.tsx') },
   { label: 'profile CompetencySection.tsx (informational only)', file: PROFILE_COMPETENCY_SECTION },
   { label: 'classify.ts (competency ladder -- must stay assessor-unaware)', file: CLASSIFY },
   { label: 'useWorkerSops.ts (worker list derivation)', file: WORKER_SOPS_HOOK },

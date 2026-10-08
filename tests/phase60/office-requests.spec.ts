@@ -28,13 +28,11 @@ test.describe('Office Requests data and pin (60-05)', () => {
     expect(src).not.toContain('createAdminClient')
   })
 
-  test('the Office pin is officePinCount(items, requests) in getAdminShell, WorkerShell and InboxTab', () => {
-    expect(read('src/actions/shell.ts')).toContain('inboxCount: officePinCount(inbox.items, inbox.requests)')
-    expect(read('src/components/shell/WorkerShell.tsx')).toContain('officePinCount(inbox.items, inbox.requests)')
-    const tab = read('src/components/office/InboxTab.tsx')
-    expect(tab).toContain('officePinCount(freshItems, fresh.requests)')
-    expect(tab).toMatch(/setQueryData<AdminShellData/)
-    expect(read('src/actions/shell.ts')).not.toContain('createAdminClient')
+  test('no Office pin: no tab writes a count into another cache (63-19, ADR-0004 rule 2)', () => {
+    for (const f of ['InboxTab', 'RequestsTab']) {
+      const src = read(`src/components/office/${f}.tsx`)
+      expect(src, f).not.toMatch(/setQueryData|officePinCount/)
+    }
   })
 
   test('nothing in the Office invalidates the shell cache (patched, never refetched)', () => {
@@ -98,10 +96,9 @@ test.describe('Office Requests tab (60-11)', () => {
     }
   })
 
-  test('the tab patches the shell pin with officePinCount and never invalidates the shell cache', () => {
+  test('the tab writes no pin and never invalidates the shell cache', () => {
     const src = read('src/components/office/RequestsTab.tsx')
-    expect(src).toContain('officePinCount(fresh.items, fresh.requests)')
-    expect(src).toMatch(/setQueryData<AdminShellData/)
+    expect(src).not.toMatch(/officePinCount|setQueryData/)
     expect(src).toContain('No requests waiting.')
     expect(src).toContain('data-testid="requests-empty"')
     expect(src).not.toMatch(/invalidateQueries\(\{ queryKey: SHELL_KEY/)

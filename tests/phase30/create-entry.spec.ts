@@ -24,8 +24,7 @@ const METHOD_PICKER = path.join(
   ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'new', 'page.tsx',
 )
 const WORKER_SHELL = [
-  ...['WorkerShell.tsx', 'RoomBodies.tsx', 'SiteSummary.tsx', 'OfficeCard.tsx'].map((f) => path.join(ROOT, 'src', 'components', 'shell', f)),
-  path.join(ROOT, 'src', 'components', 'home', 'HomeShell.tsx'), // 63-11: the home replaced OneScreen
+  path.join(ROOT, 'src', 'components', 'home', 'HomeShell.tsx'), // 63-11: the home replaced the one screen
 ]
 const JOURNEYS = path.join(ROOT, 'src', 'lib', 'journeys', 'journeys.ts')
 
@@ -77,15 +76,16 @@ test.describe('UX-04 — one create entry', () => {
     expect(src).not.toContain('<AdminNav')
   })
 
-  test('the worker shell has no create entry (the Workshop Write a new SOP link is the one entry)', () => {
+  test('the worker shell has no create entry (the Manage section new-SOP link is the one entry)', () => {
     const shellSrc = WORKER_SHELL.map(read).join('\n')
     const pickerLinks: string[] = [
       ...(shellSrc.match(/href="\/admin\/sops\/new"/g) ?? []),
     ]
     expect(pickerLinks).toHaveLength(0)
-    // Phase 57: the header is gone; the one create entry is the Workshop's "Write a new SOP".
-    const workshop = read(path.join(ROOT, 'src', 'components', 'shell', 'AdminRoomBodies.tsx'))
-    expect(workshop).toContain('room-workshop-new')
+    // The header is gone; the one create entry is the Manage section's new-SOP link (63-19).
+    const manage = read(path.join(ROOT, 'src', 'components', 'home', 'sections', 'ManageSection.tsx'))
+    expect(manage).toContain('data-testid="manage-new"')
+    expect(manage).toContain('href="/admin/sops/new"')
     expect(shellSrc).not.toContain('href="/admin/sops/upload"')
     expect(shellSrc).not.toContain('href="/admin/sops/new/ai"')
     expect(shellSrc).not.toContain('href="/admin/sops/new/blank"')

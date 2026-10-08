@@ -133,8 +133,8 @@ test.describe('signoff panel', () => {
     expect(PANEL).toContain('<SignOffBody key={data.completionId}')
   })
 
-  test('the panel is admin-chunk only: nothing in the worker shell or the root page imports it', () => {
-    for (const rel of ['src/components/shell/WorkerShell.tsx', 'src/app/page.tsx']) {
+  test('the panel is admin-chunk only: nothing in the home shell or the root page imports it', () => {
+    for (const rel of ['src/components/home/HomeShell.tsx', 'src/app/page.tsx']) {
       const f = path.join(process.cwd(), rel)
       if (!fs.existsSync(f)) continue
       expect(strip(fs.readFileSync(f, 'utf-8'))).not.toMatch(/from '@\/components\/office\/(SignOffPanel|ApprovePanel|ReasonDialog)'/)

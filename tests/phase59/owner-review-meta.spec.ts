@@ -82,11 +82,9 @@ test.describe('owner review meta -- surfaces', () => {
     expect(META).toContain("from '@/lib/office/format'")
   })
 
-  test('AdminSopRows and Workshop drafts render the line', () => {
-    expect(read('src/components/admin/governance/AdminMachinePanel.tsx')).toContain('<OwnerReviewMeta ownerLabel={sop.ownerLabel}')
-    expect(read('src/components/admin/governance/AdminMachinePanel.tsx')).not.toContain('reviewLabel(')
-    const rooms = read('src/components/shell/AdminRoomBodies.tsx')
-    expect(rooms).toContain('<OwnerReviewMeta ownerLabel={d.ownerLabel} reviewDueAt={d.reviewDueAt}')
+  test('Manage SOPs drafts render the line', () => {
+    const manage = read('src/components/home/sections/ManageSection.tsx')
+    expect(manage).toContain('<OwnerReviewMeta ownerLabel={d.ownerLabel} reviewDueAt={d.reviewDueAt}')
   })
 
   test('OwnerPicker closes on onDone and on Escape', () => {

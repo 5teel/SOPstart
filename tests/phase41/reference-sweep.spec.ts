@@ -106,9 +106,9 @@ test.describe('SUR-03/SUR-04/SUR-06 reference sweep — /admin/sops list route i
     // Phase 58-13: an upload opens in the focus editor, not the old builder.
     expect(uploadDropzone).toContain('focusHref(')
 
-    const workshop = read(path.join('src', 'components', 'shell', 'AdminRoomBodies.tsx'))
-    expect(workshop).toContain("focusHref(d.id, { mode: 'edit', from: homeFrom({ ...HOME, s: 'manage' }) })")
-    expect(workshop).toContain('/admin/sops/new')
+    const manage = read(path.join('src', 'components', 'home', 'sections', 'ManageSection.tsx'))
+    expect(manage).toContain("focusHref(d.id, { mode: 'edit', from: homeFrom({ ...HOME, s: 'manage' }) })")
+    expect(manage).toContain('/admin/sops/new')
   })
 
   test('SUR-06: "Library" names no destination label in roles.ts or uat/tests.ts', () => {

@@ -12,10 +12,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { CheckCircle } from 'lucide-react'
 import type { OfficeInbox } from '@/actions/office'
-import type { AdminShellData } from '@/actions/shell'
-import { inboxCounts } from '@/lib/governance/inbox'
-import { officePinCount } from '@/lib/requests/model'
-import { OFFICE_INBOX_KEY, SHELL_KEY } from '@/lib/shell/query-keys'
+import { OFFICE_INBOX_KEY } from '@/lib/shell/query-keys'
 import { useOfficeInbox } from './InboxTab'
 import type { RowDone } from './InboxRow'
 import { RequestRow } from './RequestRow'
@@ -53,15 +50,6 @@ export function RequestsTab({ onReceipt }: { onReceipt(r: RowDone): void }) {
     await queryClient.invalidateQueries({ queryKey: OFFICE_INBOX_KEY })
     const fresh = queryClient.getQueryData<InboxData>(OFFICE_INBOX_KEY)
     if (!fresh || 'error' in fresh) return
-
-    // The Office pin, the segment counts and the list agree: write the shell cache, never refetch it.
-    if (fresh.role !== 'supervisor') {
-      queryClient.setQueryData<AdminShellData | { error: string }>(SHELL_KEY, (old) =>
-        old && !('error' in old)
-          ? { ...old, inboxCount: officePinCount(fresh.items, fresh.requests), inboxChips: inboxCounts(fresh.items) }
-          : old,
-      )
-    }
 
     const stillThere = new Set(fresh.requests.map((x) => x.id))
     const index = before.findIndex((x) => x.id === id)

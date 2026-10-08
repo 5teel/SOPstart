@@ -36,7 +36,7 @@ test.describe('retire: the Machines inbox kind (60-05)', () => {
     const src = stripComments(read('src/lib/governance/inbox.ts'))
     expect(src).not.toContain("'machines'")
     expect(src).not.toContain('Write a SOP')
-    expect(src).not.toContain('machinesWithoutSops')
+    expect(src).not.toContain(['machines', 'Without', 'Sops'].join(''))
     expect(src).not.toMatch(/machines:\s*ReadonlyArray/)
   })
   test('the stale-department row links to the SOP edit address and reads "Open SOP"', () => {

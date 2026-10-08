@@ -9,17 +9,9 @@ import path from 'node:path'
 
 const read = (rel: string) => fs.readFileSync(path.join(process.cwd(), rel), 'utf8').replace(/\r\n/g, '\n')
 const bell = () => read('src/components/shell/NotificationBell.tsx')
-const frame = () => read('src/components/shell/ShellFrame.tsx')
 
 test.describe('Notification bell (60-16)', () => {
-  test('ShellFrame takes a renderBell slot beside search, absent while editing, and holds no router', () => {
-    const f = frame()
-    expect(f).toContain('renderBell?(select: (p: Place) => void): ReactNode')
-    expect(f).toContain('{!editing && renderBell?.(select)}')
-    // the slot sits in the same row as the search label
-    expect(f).toMatch(/<div className="flex items-center pr-2">\s*<label[\s\S]*<\/label>\s*\{!editing && renderBell/)
-    expect(f).toContain('placeholder="Search…"')
-    expect(f).not.toMatch(/useRouter|next\/navigation/)
+  test('the bell holds no router', () => {
     expect(bell()).not.toMatch(/useRouter|next\/navigation/)
   })
 
@@ -52,27 +44,14 @@ test.describe('Notification bell (60-16)', () => {
     expect(b).toContain('onClick={onOpen}')
   })
 
-  test('NotificationBell mounts in both shells and opens the overview at Notifications', () => {
-    for (const rel of ['src/components/shell/WorkerShell.tsx', 'src/components/shell/AdminShell.tsx']) {
-      const s = read(rel)
-      expect(s, rel).toContain('<NotificationBell')
-      // the bell is a lazy seam (bundle fallback, 60-16): the home route could not carry it statically
-      expect(s, rel).toContain("import('@/components/shell/NotificationBell')")
-      expect(s, rel).not.toMatch(/from '@\/components\/shell\/NotificationBell'/)
-      expect(s, rel).toContain("requestOverviewSection('notifications')")
-      expect(s, rel).toContain("select({ kind: 'overview' })")
-      expect(s, rel).toContain('renderBell=')
-      expect(s, rel).toContain("import('@/components/shell/SiteOverview')")
-      expect(s, rel).not.toMatch(/from '@\/components\/shell\/SiteOverview'/)
-    }
-  })
-
-  test('the worker Office card points at the overview instead of promising a later update', () => {
-    const r = read('src/components/shell/RoomBodies.tsx')
-    expect(r).toContain('Your requests are on the site overview.')
-    expect(r).toContain('Go to my requests')
-    expect(r).not.toContain('Your requests will show here')
-    const w = read('src/components/shell/WorkerShell.tsx')
-    expect(w).toContain("requestOverviewSection('requests')")
+  test('NotificationBell mounts in the home as a lazy seam and opens My record at Notifications', () => {
+    const rel = 'src/components/home/HomeShell.tsx'
+    const s = read(rel)
+    expect(s, rel).toContain('<NotificationBell')
+    // the bell is a lazy seam (bundle fallback, 60-16): the home route could not carry it statically
+    expect(s, rel).toContain("import('@/components/shell/NotificationBell')")
+    expect(s, rel).not.toMatch(/from '@\/components\/shell\/NotificationBell'/)
+    expect(s, rel).toContain("requestOverviewSection('notifications')")
+    expect(s, rel).toContain("s: 'record'")
   })
 })

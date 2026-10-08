@@ -44,7 +44,7 @@ import path from 'node:path'
 const ROOT = process.cwd()
 const BAY = path.join(ROOT, 'src', 'components', 'admin', 'wiring', 'WiringPatchBay.tsx')
 const ADMIN_ACCESS_VIEW = path.join(ROOT, 'src', 'actions', 'admin-access-view.ts')
-const PLACE = path.join(ROOT, 'src', 'lib', 'shell', 'place.ts')
+const PLACE = path.join(ROOT, 'src', 'lib', 'shell', 'home-state.ts')
 const OFFICE_PANE = path.join(ROOT, 'src', 'components', 'office', 'OfficePane.tsx')
 
 function read(p: string): string {
@@ -62,7 +62,8 @@ test.describe('SC-2 — server assembly: sopsByCollection + ?sop= deep-link entr
   })
 
   test('the proxy helper keeps ?sop= only when it is a UUID and the Office Access tab hands it to AdminAccessLens (deep-link entry point, 59-14)', () => {
-    expect(read(PLACE)).toContain("sop && UUID.test(sop) ? `&sop=${sop}`")
+    // 63-19: the home address keeps the pin only when it is a UUID (the place module no longer owns this)
+    expect(read(PLACE)).toContain("pin: s === 'people' && tab === 'access' ? uuid(x.pin) : null")
     expect(read(OFFICE_PANE)).toContain('<AdminAccessLens pinnedSopId={initialSop ?? undefined} />')
   })
 })

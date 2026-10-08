@@ -102,7 +102,6 @@ test.describe('office pane and inbox tab (59-09)', () => {
   test('a tab click goes through onTab(), never the address bar, the router or a place', () => {
     expect(PANE).toContain('onClick={() => onTab(t)}')
     expect(PANE).not.toMatch(/replaceState|pushState|router\.|next\/navigation/)
-    expect(PANE).not.toContain('@/lib/shell/place')
     expect(PANE).not.toMatch(/select\(/)
     expect(PANE).toContain('tabs.includes(requested)')
     // Manual activation: the arrow keys move focus and never select.
@@ -110,17 +109,11 @@ test.describe('office pane and inbox tab (59-09)', () => {
     expect(PANE).toContain('tabIndex={i === rove ? 0 : -1}')
   })
 
-  test('a cleared row refetches the inbox and writes the shell cache; the shell query is never invalidated', () => {
+  test('a cleared row refetches the inbox; no second shell cache is written (63-19: the admin shell read is gone)', () => {
     expect(TAB).toContain('invalidateQueries({ queryKey: OFFICE_INBOX_KEY })')
-    expect(TAB).toContain('setQueryData<AdminShellData | { error: string }>(SHELL_KEY')
-    expect(TAB).toContain('inboxCount: officePinCount(freshItems, fresh.requests), inboxChips: inboxCounts(freshItems)')
-    expect(TAB).not.toMatch(/invalidateQueries\(\{ queryKey: SHELL_KEY/)
+    expect(TAB).not.toMatch(/SHELL_KEY|setQueryData/)
     expect(TAB).not.toMatch(/refetchQueries/)
     expect(TAB).toContain('getOfficeInbox(')
-    // The patch happens after the refetch, for admins only (a supervisor's shell has no admin cache).
-    const done = TAB.slice(TAB.indexOf('async function handleDone'))
-    expect(done.indexOf('await queryClient.invalidateQueries')).toBeLessThan(done.indexOf('setQueryData'))
-    expect(done).toContain("fresh.role !== 'supervisor'")
   })
 
   test('the ledger suffix is said only when the action says it was logged', () => {
@@ -167,33 +160,17 @@ test.describe('office pane and inbox tab (59-09)', () => {
   })
 })
 
-test.describe('office pane mount seams (59-12)', () => {
-  const ADMIN = strip(read('src/components/shell/AdminShell.tsx'))
-  const WORKER = strip(read('src/components/shell/WorkerShell.tsx'))
-  const DYNAMIC = /const OfficePane = dynamic\(\(\) => import\('@\/components\/office\/OfficePane'\)\.then\(\(m\) => m\.OfficePane\), \{\s*ssr: false/
-
-  test('the pane is one lazy module imported by next/dynamic from both shells', () => {
-    expect(ADMIN).toMatch(DYNAMIC)
-    expect(WORKER).toMatch(DYNAMIC)
-    // 63-07: the old shells adapt their place to the pane's props until 63-20 deletes them.
-    const PROPS = /<OfficePane tab=\{place\.tab \?\? null\} tabs=\{tabsForRole\(role\)\} onTab=\{\(t\) => ctx\.select\(\{ kind: 'room', id: 'office'/
-    expect(ADMIN).toMatch(PROPS)
-    expect(WORKER).toMatch(PROPS)
-    expect(WORKER).toMatch(/isSupervisor \? \(\s*<OfficePane\b[\s\S]*?\) : \(\s*<OfficeWorkerBody\b/)
-  })
+test.describe('office pane mount seams (59-12, repointed 63-19)', () => {
+  const HOME = strip(read('src/components/home/HomeShell.tsx'))
 
   test('the old Office card body and the pending-count hook are gone', () => {
-    const rooms = read('src/components/shell/AdminRoomBodies.tsx')
-    expect(rooms).not.toContain('AdminOfficeBody')
-    expect(rooms).not.toContain('CHIP_WORDS')
     expect(read('src/hooks/useCompletions.ts')).not.toContain('usePendingSignOffCount')
-    expect(ADMIN).not.toContain('usePendingSignOffCount')
-    expect(WORKER).not.toContain('usePendingSignOffCount')
+    expect(HOME).not.toContain('usePendingSignOffCount')
   })
 
-  test('worker and supervisor shell files carry no static pane or admin import', () => {
-    for (const src of [ADMIN, WORKER]) expect(src).not.toMatch(/^import[^\n]*components\/office\//m)
-    expect(WORKER).not.toMatch(/components\/admin/)
+  test('the home carries no static pane or admin import (the section bodies are lazy: tests/phase63/home-shell.spec.ts)', () => {
+    expect(HOME).not.toMatch(/^import[^\n]*components\/office\//m)
+    expect(HOME).not.toMatch(/components\/admin/)
   })
 
   test('the bundle script has a forbidden marker for the pane and its literals live in the pane module', () => {
@@ -204,17 +181,8 @@ test.describe('office pane mount seams (59-12)', () => {
       const sources = ['InboxTab.tsx', 'DecisionsTab.tsx'].map((f) => read('src/components/office/' + f)).join('\n')
       expect(sources.replace(/&apos;/g, "'")).toContain(marker)
     }
-    // Neither literal may appear in either shell or the worker room bodies.
-    for (const src of [ADMIN, WORKER, strip(read('src/components/shell/RoomBodies.tsx'))]) {
-      expect(src).not.toContain('Nothing needs you')
-    }
+    // Neither literal may appear in the home shell.
+    expect(HOME).not.toContain('Nothing needs you')
     expect(read('tests/lint/no-static-admin-lens-import.spec.ts')).toContain('OfficePane: []')
-  })
-
-  test('the supervisor pin and card read the same inbox query the pane does', () => {
-    expect(WORKER).toContain('queryKey: OFFICE_INBOX_KEY')
-    expect(WORKER).toContain('count={pending}')
-    expect(WORKER).toMatch(/office: pending,/)
-    expect(strip(read('src/components/office/InboxTab.tsx'))).toContain('queryKey: OFFICE_INBOX_KEY')
   })
 })

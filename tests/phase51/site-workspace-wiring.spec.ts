@@ -1,6 +1,6 @@
 /**
  * Phase 51 -- SIT-02/SIT-03/SIT-04. Source-contract assertions for
- * `SiteWorkspace.tsx` and (Phase 57) the edit mode that mounts it in `AdminShell.tsx`.
+ * `SiteWorkspace.tsx` and (63-19) the Manage > Site & departments surface that mounts it in `SiteEditSurface.tsx`.
  *
  * `workspace` describe activated by Plan 51-05 Task 1.
  * `route` describe activated by Plan 51-05 Task 2.
@@ -21,7 +21,7 @@ function read(rel: string): string {
 
 const WORKSPACE_PATH = 'src/components/admin/site/SiteWorkspace.tsx'
 const EMPTY_STATE_PATH = 'src/components/admin/site/SiteEmptyState.tsx'
-const SHELL_PATH = 'src/components/shell/AdminShell.tsx'
+const SHELL_PATH = 'src/components/admin/site/SiteEditSurface.tsx'
 const JOURNEYS_PATH = 'src/lib/journeys/journeys.ts'
 
 /** Returns the [start, end) character span of a top-level `function <name>(` body. */
@@ -122,7 +122,7 @@ test.describe('workspace', () => {
 })
 
 test.describe('route', () => {
-  test('the site is edited from AdminShell edit mode; the read self-guards with requireAdminContext() (Phase 57 D-10)', () => {
+  test('the site is edited from Manage > Site & departments; the read self-guards with requireAdminContext() (Phase 57 D-10)', () => {
     const src = read(SHELL_PATH)
     expect(src).not.toContain('createAdminClient')
     expect(src).toContain('listSiteForOrg()')

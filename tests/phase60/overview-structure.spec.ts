@@ -1,6 +1,7 @@
 /**
- * Phase 60 -- the site overview body (60-15). Requirements: SHL-03, NTF-01, RQS-01, RQS-03.
- * Decisions: D-13, A-06, A-07. Source-contract guards over SiteOverview.tsx and overview-focus.ts;
+ * Phase 60 -- the notification and request panels (60-15). Requirements: NTF-01, RQS-01, RQS-03.
+ * Decisions: D-13, A-06, A-07. Source-contract guards over the home panels and overview-focus.ts
+ * (63-19: the overview that composed them is gone; the panels sit in My record);
  * the screen itself is judged by the deployed eval (60-16 mounts it).
  * Registration: playwright.config.ts `phase60` project.
  */
@@ -12,22 +13,12 @@ const ROOT = process.cwd()
 const read = (p: string) => fs.readFileSync(path.join(ROOT, p), 'utf8').replace(/\r\n/g, '\n')
 const strip = (s: string) => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')
 
-// 63-09: the overview composes two panels; their code is asserted where it now lives.
-const OVERVIEW = strip(read('src/components/shell/SiteOverview.tsx'))
+// 63-19: the site overview is gone; the two panels it composed are asserted where they live (My record).
 const NOTIF = strip(read('src/components/home/panels/NotificationsPanel.tsx'))
 const REQS = strip(read('src/components/home/panels/MyRequestsPanel.tsx'))
 const SCROLL = strip(read('src/components/home/panels/useSectionScroll.ts'))
-const SRC = [OVERVIEW, NOTIF, REQS, SCROLL].join('\n')
+const SRC = [NOTIF, REQS, SCROLL].join('\n')
 const FOCUS = strip(read('src/lib/shell/overview-focus.ts'))
-
-function walk(dir: string, out: string[] = []): string[] {
-  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
-    const p = path.join(dir, e.name)
-    if (e.isDirectory()) walk(p, out)
-    else if (/\.(ts|tsx)$/.test(e.name)) out.push(p)
-  }
-  return out
-}
 
 /** Bodies of every useEffect callback, by brace matching from the opening call. */
 function effectBodies(src: string): string[] {
@@ -48,28 +39,11 @@ function effectBodies(src: string): string[] {
 }
 
 test.describe('Overview (60-15)', () => {
-  test('sections render in the order objectives, notifications, requests, office line', () => {
-    const at = [
-      OVERVIEW.indexOf('data-testid="overview-objectives"'),
-      OVERVIEW.indexOf('<NotificationsPanel'),
-      OVERVIEW.indexOf('<MyRequestsPanel'),
-      OVERVIEW.indexOf('data-testid="overview-office-link"'),
-    ]
-    expect(at.every((n) => n > -1)).toBe(true)
-    expect([...at].sort((a, b) => a - b)).toEqual(at)
+  test('each panel carries its test id and hides itself when it has nothing to show', () => {
     expect(NOTIF).toContain('data-testid="overview-notifications"')
     expect(REQS).toContain('data-testid="overview-requests"')
-    expect(OVERVIEW).toContain('data-testid="overview-body"')
-  })
-
-  test('each section hides on its own emptiness; only the admin Objectives section always shows', () => {
-    expect(SRC).toMatch(/\(isAdmin \|\| siteObjective \|\| deptObjectives\.length > 0\) && \(\s*<section data-testid="overview-objectives"/)
-    // a panel hides itself when it has nothing to show
     expect(NOTIF).toMatch(/if \(unread\.length === 0 && read\.length === 0\) return null/)
     expect(REQS).toMatch(/if \(!anyRequests \|\| !groups\) return dialogEl\(\)/)
-    expect(OVERVIEW).toMatch(/\{canAnswer && officeCount > 0 && \(\s*<button\s+type="button"\s+data-testid="overview-office-link"/)
-    expect(OVERVIEW).toContain('Open requests in the Office · {officeCount}')
-    expect(OVERVIEW).toContain("select({ kind: 'room', id: 'office', tab: 'requests' })")
   })
 
   test('notifications use the browser client; no server action; mark-read writes read_at only', () => {
@@ -97,8 +71,6 @@ test.describe('Overview (60-15)', () => {
     expect(NOTIF).toContain('isSafePlace(n.place)')
     expect(NOTIF).toContain("n.place.startsWith('/sops/')")
     expect(NOTIF).toContain('onOpenAddress(')
-    expect(OVERVIEW).toContain('placeTarget(a)')
-    expect(OVERVIEW).toMatch(/t\.type !== 'select'/)
     expect(SRC).not.toMatch(/router\.replace/)
     expect(NOTIF.match(/router\.push\(/g)).toHaveLength(1)
     expect(NOTIF).toMatch(/onClick=\{\(\) => void open\(n\)\}/)
@@ -107,20 +79,12 @@ test.describe('Overview (60-15)', () => {
       expect(body).not.toMatch(/\bselect\(/)
       expect(body).not.toMatch(/onOpenAddress\(/)
     }
-    expect(OVERVIEW).toContain("requestOverviewSection('requests')")
     expect(SCROLL).toContain('takeOverviewSection(section)')
   })
 
-  test('no stylesheet import, no shell refresh, no static importer of the overview', () => {
+  test('no stylesheet import and no shell cache key in the panels', () => {
     expect(SRC).not.toMatch(/import\s+['"][^'"]*\.css['"]/)
     expect(SRC).not.toMatch(/SHELL_KEY/)
-    expect(OVERVIEW).toContain('<NotificationsPanel')
-    expect(OVERVIEW).toContain('<MyRequestsPanel')
-    const importers = [...walk(path.join(ROOT, 'src')), ...walk(path.join(ROOT, 'tests/phase60'))].filter((f) => {
-      if (/SiteOverview\.tsx$/.test(f) || /overview-structure\.spec\.ts$/.test(f)) return false
-      return /import[^;\n]*from\s+['"]@\/components\/shell\/SiteOverview['"]/.test(fs.readFileSync(f, 'utf8'))
-    })
-    expect(importers).toEqual([])
   })
 
   test('withdraw, decline and stop asking are the right actions; the last two go through the reason dialog', () => {
@@ -148,12 +112,9 @@ test.describe('Overview (60-15)', () => {
   })
 
   test('the editor and composer arrive lazily; the groups come from the shared model', () => {
-    // the slot is the lazy seam (it loads the editor itself); imported plainly so it does not add a chunk
-    expect(OVERVIEW).toContain("from '@/components/shell/ObjectiveSlot'")
     expect(REQS).toMatch(/dynamic\(\s*\(\) => import\('@\/components\/requests\/RequestComposer'\)/)
     expect(SRC).not.toMatch(/^import (?!type )[^\n]*from '@\/components\/requests\/(RequestComposer|ObjectiveEditor)'/m)
     expect(REQS).toContain('groupMyRequests(')
-    expect(OVERVIEW).toContain('canAnswerRequests(role)')
     expect(REQS).toContain('Ask for a new SOP')
   })
 

@@ -80,13 +80,11 @@ export const INVENTORY: Row[] = [
   { file: 'tests/phase46/sop-edit-guard-wiring.spec.ts', disposition: 'repoint', plan: '60-14' }, // objective writer
   { file: 'tests/phase58/fork-draft.spec.ts', disposition: 'repoint', plan: '60-14' }, // forkDraft stops copying the column
   // ---- 60-16 bell + mount ----
-  { file: 'tests/phase57/shell-structure.spec.ts', disposition: 'repoint', plan: '60-16' }, // placeholder copy; 60-13 edits the dept slot first
   // ---- 60-17 retirement ----
   { file: 'tests/phase56/decision-writers-sweep.spec.ts', disposition: 'repoint', plan: '60-17' }, // 60-04/06/09 append writers first
   { file: 'tests/phase58/legacy-redirects.spec.ts', disposition: 'repoint', plan: '60-17' }, // the assign address returns null today
   { file: 'tests/e2e/sub-trade-assignment.spec.ts', disposition: 'repoint', plan: '60-17' }, // assign page integration block
   // ---- kept on purpose ----
-  { file: 'tests/phase57/place.spec.ts', disposition: 'keep', plan: '60-17' }, // back-bar path of the assign address still resolves to the site
 ]
 
 // Each owning plan appends its id (e.g. '60-05') when its last commit lands.

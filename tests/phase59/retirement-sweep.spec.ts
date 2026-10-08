@@ -56,16 +56,16 @@ test.describe('retire: legacy addresses redirect to Office places (59-13)', () =
       .map((f) => path.relative(ROOT, f))
     expect(offenders, offenders.join('\n')).toEqual([])
   })
-  test('the old Office card bridge links are gone, and no shell, office or journeys source names a legacy address as a link or route', () => {
-    for (const f of ['src/components/shell/AdminRoomBodies.tsx', 'src/components/shell/OfficeCard.tsx', 'src/components/shell/AdminShell.tsx', 'src/components/shell/WorkerShell.tsx', 'src/lib/journeys/journeys.ts']) {
+  test('the old Office card bridge links are gone, and no home, office or journeys source names a legacy address as a link or route', () => {
+    for (const f of ['src/components/home/HomeShell.tsx', 'src/components/home/sections/ManageSection.tsx', 'src/lib/journeys/journeys.ts']) {
       expect(LEGACY_HREF.test(stripComments(read(f))), f).toBe(false)
     }
     const officeDir = path.join(ROOT, 'src/components/office')
     for (const f of fs.readdirSync(officeDir)) {
       expect(LEGACY_HREF.test(stripComments(read(`src/components/office/${f}`))), f).toBe(false)
     }
-    // the training bridge is the one new address, linked from the Smoko room (A-05)
-    expect(read('src/components/shell/AdminShell.tsx')).toContain('href="/?s=training"')
+    // the training bridge is the one new address, a section of the home (A-05, 63-19)
+    expect(read('src/lib/shell/home-state.ts')).toContain("'training'")
     // 63-14: the page is a section now; the admin guard sits in the action the section reads
     expect(fs.existsSync(path.join(ROOT, 'src/app/(protected)/admin/training/page.tsx'))).toBe(false)
     const tree = stripComments(read('src/actions/org-model.ts'))
@@ -107,7 +107,6 @@ test.describe('retire: governance, team and access pages (59-14)', () => {
       'src/components/observations/AssessmentRequestsPanel.tsx',
       'src/components/admin/governance/OwnerPicker.tsx',
       'src/components/admin/governance/ApprovalChainEditor.tsx',
-      'src/components/admin/governance/AdminMachinePanel.tsx',
     ]) expect(fs.existsSync(path.join(ROOT, f)), f).toBe(true)
   })
 

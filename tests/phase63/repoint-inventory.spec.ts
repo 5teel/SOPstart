@@ -14,9 +14,9 @@
  *  - LIVE_PLANS each owning plan appends its id when its last commit lands;
  *              from then on its tokens must be gone from every test file.
  *              63-18 appended 63-13, 63-16 and itself once every test file was clean of their
- *              tokens. 63-11 (OneScreen), 63-14 (a legacy-address reader test and the place module
- *              test) and 63-15 (the frame-structure start word) still have holders that 63-19 and
- *              63-20 own: whichever of them lands the last holder appends the plan id.
+ *              tokens; 63-19 appended itself with 63-11 and 63-15 once the room specs were retired or
+ *              repointed. 63-14 still has one holder (the legacy-address reader test, whose inputs are
+ *              the old addresses by nature); 63-20 appends 63-14 and itself with the room deletion.
  *
  * A retire row is exempt from the stale-token check until its owner is live (a file
  * slated for deletion is not "stale"); once live it must be gone from disk.
@@ -129,22 +129,7 @@ export const INVENTORY: Row[] = [
   // ---- 63-16: walk words ----
   { file: 'tests/phase58/walk-no-leak.spec.ts', disposition: 'repoint', plan: '63-16' },
   // ---- 63-19: room specs retired / repointed ahead of the deletion (R1 producer specs too) ----
-  { file: 'tests/phase52/plant-now-card.spec.ts', disposition: 'retire', plan: '63-19' },
-  { file: 'tests/phase52/plant-panel.spec.ts', disposition: 'retire', plan: '63-19' },
-  { file: 'tests/phase52/plant-pins-no-storage.spec.ts', disposition: 'retire', plan: '63-19' },
-  { file: 'tests/phase52/plant-pins.spec.ts', disposition: 'retire', plan: '63-19' },
-  { file: 'tests/phase52/plant-stage.spec.ts', disposition: 'retire', plan: '63-19' },
-  { file: 'tests/phase54/admin-machine-panel.spec.ts', disposition: 'retire', plan: '63-19' },
-  { file: 'tests/phase57/machine-body.spec.ts', disposition: 'retire', plan: '63-19' },
-  { file: 'tests/phase57/noticeboard.spec.ts', disposition: 'retire', plan: '63-19' },
-  { file: 'tests/phase57/one-query.spec.ts', disposition: 'retire', plan: '63-19' },
-  { file: 'tests/phase57/pins.spec.ts', disposition: 'retire', plan: '63-19' },
-  { file: 'tests/phase57/rooms.spec.ts', disposition: 'retire', plan: '63-19' }, // ADR-0003's guard; 63-20 supersedes with ADR-0005
-  { file: 'tests/phase57/search.spec.ts', disposition: 'retire', plan: '63-19' },
-  { file: 'tests/phase57/shell-structure.spec.ts', disposition: 'retire', plan: '63-19' },
-  { file: 'tests/phase57/stage.spec.ts', disposition: 'retire', plan: '63-19' },
-  { file: 'tests/phase59/shell-wide.spec.ts', disposition: 'retire', plan: '63-19' },
-  { file: 'tests/phase60/overview-structure.spec.ts', disposition: 'retire', plan: '63-19' },
+  { file: 'tests/phase57/rooms.spec.ts', disposition: 'retire', plan: '63-20' }, // ADR-0003's guard; 63-20 supersedes it with ADR-0005
   { file: 'tests/lint/no-static-admin-lens-import.spec.ts', disposition: 'repoint', plan: '63-19' },
   { file: 'tests/phase23/version-indicator.spec.ts', disposition: 'repoint', plan: '63-19' },
   { file: 'tests/phase30/create-entry.spec.ts', disposition: 'repoint', plan: '63-19' },
@@ -170,15 +155,10 @@ export const INVENTORY: Row[] = [
   { file: 'tests/phase60/request-surfaces.spec.ts', disposition: 'repoint', plan: '63-19' },
   { file: 'tests/phase60/retirement-sweep.spec.ts', disposition: 'repoint', plan: '63-19' },
   { file: 'tests/sb-auth-builder.test.ts', disposition: 'repoint', plan: '63-19' },
-  // ---- 63-20: specs that import the place module, which is deleted with the rooms ----
-  { file: 'tests/phase57/place.spec.ts', disposition: 'retire', plan: '63-20' },
-  { file: 'tests/phase58/focus-path.spec.ts', disposition: 'repoint', plan: '63-20' },
-  { file: 'tests/phase59/legacy-redirects.spec.ts', disposition: 'repoint', plan: '63-20' },
-  { file: 'tests/phase59/place-tab.spec.ts', disposition: 'repoint', plan: '63-20' },
 ]
 
 // Each owning plan appends its id when its last commit lands (see header).
-export const LIVE_PLANS: string[] = ['63-13', '63-16', '63-18']
+export const LIVE_PLANS: string[] = ['63-11', '63-13', '63-15', '63-16', '63-18', '63-19']
 
 function stripComments(src: string): string {
   return src

@@ -71,11 +71,7 @@ test.describe('UX-08 — dead-weight sweep', () => {
   // guard went with the worker list page (57-08): the list is retired, so the
   // placebo filter it pinned no longer exists to be placebo.
   test('the worker shell offers no Create SOP entry', () => {
-    const shellDir = path.join(ROOT, 'src', 'components', 'shell')
-    for (const f of ['WorkerShell.tsx', 'RoomBodies.tsx', 'SiteSummary.tsx', 'OfficeCard.tsx']) {
-      expect(fs.readFileSync(path.join(shellDir, f), 'utf-8'), f).not.toContain('Create SOP')
-    }
-    // 63-11: the home replaced OneScreen
+    // 63-11: the home replaced the one screen
     expect(fs.readFileSync(path.join(ROOT, 'src', 'components', 'home', 'HomeShell.tsx'), 'utf-8')).not.toContain('Create SOP')
   })
 

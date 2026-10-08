@@ -18,10 +18,10 @@ const strip = (src: string) =>
     .join('\n')
 const read = (rel: string) => strip(fs.readFileSync(path.join(ROOT, rel), 'utf8'))
 
-const SHELL = read('src/components/shell/WorkerShell.tsx')
-const ADMIN_ROWS = read('src/components/admin/governance/AdminMachinePanel.tsx')
+// 63-19: the machine panels are gone; the ask and request surfaces are Read, the list and This SOP.
+const READ = read('src/components/home/ReadView.tsx')
+const LIST = read('src/components/home/SopList.tsx')
 const THIS_SOP = read('src/components/focus/admin/ThisSopBlock.tsx')
-const PANEL = read('src/components/sop/plant/MachinePanel.tsx')
 const COMPOSER = read('src/components/requests/RequestComposer.tsx')
 const PICKER = read('src/components/requests/AskPicker.tsx')
 const SHELL_DIALOG = read('src/components/requests/DialogShell.tsx')
@@ -34,7 +34,7 @@ test.describe('Raise and ask surfaces (60-12)', () => {
     for (const src of [COMPOSER, PICKER, SHELL_DIALOG]) expect(src).not.toMatch(/import\s+['"][^'"]*\.css['"]/)
     for (const route of ['/sops/[sopId]/page', "route: '/page'"]) expect(BUNDLE).toContain(route)
     expect(BUNDLE.split("'What do you need?', 'Find a person…'").length - 1).toBe(2)
-    for (const src of [SHELL, ADMIN_ROWS, THIS_SOP]) {
+    for (const src of [READ, LIST, THIS_SOP]) {
       expect(src).not.toMatch(/^import\s[^;]*from\s+'@\/components\/requests\/(AskPicker|RequestComposer)'/m)
       expect(src).toMatch(/dynamic\(\s*\(\)\s*=>\s*import\('@\/components\/requests\/(AskPicker|RequestComposer)'\)/)
     }
@@ -43,20 +43,11 @@ test.describe('Raise and ask surfaces (60-12)', () => {
     expect(SHELL_DIALOG).toContain('aria-modal="true"')
   })
 
-  test('MachineBody takes rowAction and footer slots and imports neither module', () => {
-    expect(PANEL).toContain('rowAction?:')
-    expect(PANEL).toContain('footer?: ReactNode')
-    expect(PANEL).toContain('{rowAction?.(sop)}')
-    expect(PANEL).toContain('{footer}')
-    expect(PANEL).not.toContain('components/requests')
-  })
-
-  test('"Ask" shows on admin and supervisor machine rows and nowhere for a worker', () => {
-    expect(SHELL).toMatch(/isSupervisor\s*\?\s*\(sop\) => <AskTrigger[^>]*variant="row"[^>]*\/>\s*:\s*undefined/)
-    expect(SHELL).toContain('<RequestComposerTrigger')
-    expect(ADMIN_ROWS).toContain("sop.status === 'published' && <AskTrigger")
-    // No composer on the admin panel: admins write SOPs directly.
-    expect(ADMIN_ROWS).not.toContain('RequestComposer')
+  test('"Ask" shows in Read for a supervisor or above and nowhere for a worker; the composer is open to every role', () => {
+    expect(READ).toContain('{supervisorUp && <AskTrigger')
+    expect(READ).toContain('<RequestComposerTrigger')
+    expect(LIST).toContain('<RequestComposerTrigger')
+    expect(LIST).not.toContain('AskTrigger')
   })
 
   test('This SOP offers "Ask someone to do this" instead of the retired assign link', () => {

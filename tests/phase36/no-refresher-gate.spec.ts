@@ -55,11 +55,8 @@ const FOCUS_WORKER_FILES = [
 ].map(FOCUS)
 const WALK_HOOK = path.join(ROOT, 'src', 'hooks', 'useWalk.ts')
 const WALK_ACTIONS = path.join(ROOT, 'src', 'actions', 'walk.ts')
-// 57-08: the worker list page and its library card are gone. The worker's
-// surfaces are the one screen's worker shell and the plant machine body / Now card.
-const SHELL = (f: string) => path.join(ROOT, 'src', 'components', 'shell', f)
-const PLANT = (f: string) => path.join(ROOT, 'src', 'components', 'sop', 'plant', f)
-const REL_BADGE = PLANT('RelBadge.tsx')
+// 63-19: the worker's surfaces are the home (list, row, Read); the plant stage and machine body are gone.
+const HOME = (f: string) => path.join(ROOT, 'src', 'components', 'home', f)
 const STATE_PILL = path.join(ROOT, 'src', 'components', 'admin', 'competency', 'StatePill.tsx')
 const TRAINING_RECORD_SECTION = path.join(ROOT, 'src', 'components', 'admin', 'competency', 'TrainingRecordSection.tsx')
 const TRAINING_MATRIX_VIEW = path.join(ROOT, 'src', 'components', 'admin', 'competency', 'TrainingMatrixView.tsx')
@@ -72,13 +69,10 @@ const TARGETS: Array<{ label: string; file: string }> = [
   ...FOCUS_WORKER_FILES.map((file) => ({ label: `focus/${path.basename(file)}`, file })),
   { label: 'useWalk.ts (the walk hook)', file: WALK_HOOK },
   { label: 'walk.ts (walk server actions)', file: WALK_ACTIONS },
-  { label: 'WorkerShell.tsx (worker one screen)', file: SHELL('WorkerShell.tsx') },
-  { label: 'HomeShell.tsx (63-11: replaced OneScreen)', file: path.join(process.cwd(), 'src', 'components', 'home', 'HomeShell.tsx') },
-  { label: 'RoomBodies.tsx', file: SHELL('RoomBodies.tsx') },
-  { label: 'SiteSummary.tsx', file: SHELL('SiteSummary.tsx') },
-  { label: 'MachinePanel.tsx (machine body)', file: PLANT('MachinePanel.tsx') },
-  { label: 'NowCard.tsx', file: PLANT('NowCard.tsx') },
-  { label: 'RelBadge.tsx', file: REL_BADGE },
+  { label: 'HomeShell.tsx (63-11: replaced the one screen)', file: HOME('HomeShell.tsx') },
+  { label: 'SopList.tsx (the home list)', file: HOME('SopList.tsx') },
+  { label: 'SopRow.tsx (a list row and its status)', file: HOME('SopRow.tsx') },
+  { label: 'ReadView.tsx (Read)', file: HOME('ReadView.tsx') },
   { label: 'StatePill.tsx (shared chip renderer)', file: STATE_PILL },
   { label: 'TrainingRecordSection.tsx (per-worker record panel)', file: TRAINING_RECORD_SECTION },
   { label: 'TrainingMatrixView.tsx (supervisor matrix surface)', file: TRAINING_MATRIX_VIEW },
@@ -156,7 +150,7 @@ test.describe('REF-01 / CMP-04 -- refresher and version-currency state never gat
 
 // ---------------------------------------------------------------------------
 // Second, stricter assertion class (Plan 36-10): the chip-DEFINING markup
-// itself (StatePill.tsx's two sibling chips, RelBadge.tsx's due badge) must carry no `disabled=` and no `onClick` anywhere near the chip's
+// itself (StatePill.tsx's two sibling chips) must carry no `disabled=` and no `onClick` anywhere near the chip's
 // own label text -- i.e. the chip is passive, not merely un-gated by
 // GATE_PATTERN's comparison/if-branch check. Scoped to a window around each
 // chip label (sliceAroundOccurrences) rather than the whole file, so the
@@ -169,7 +163,6 @@ test.describe('REF-01 / CMP-04 -- refresher and version-currency state never gat
 // ---------------------------------------------------------------------------
 const CHIP_DEFINING_TARGETS: Array<{ label: string; file: string; chipLabels: string[] }> = [
   { label: 'StatePill.tsx', file: STATE_PILL, chipLabels: ['Outdated version', 'Refresher overdue', 'Refresher due'] },
-  { label: 'RelBadge.tsx', file: REL_BADGE, chipLabels: ['plant-rel-badge'] },
 ]
 
 test.describe('REF-01 / CMP-04 -- chip markup itself is passive (no disabled=/onClick near the chip label)', () => {

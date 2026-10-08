@@ -70,7 +70,7 @@ test.describe('FOC-01/FOC-03 focus frame', () => {
     expect(code).toContain('redirect(focusHref(target.id, { from, go, fresh }))')
     expect(code).toContain('<FocusWalker')
     expect(code).not.toMatch(/useEffect|useRouter|router\./)
-    for (const banned of ['BackToSite', 'PlantStage', '@/components/shell', '@/components/admin', 'SopTabNav', 'WalkthroughSwitcher', 'ReadTab', 'useSopDetail']) {
+    for (const banned of ['BackToSite', 'sop/plant', '@/components/shell', '@/components/admin', 'SopTabNav', 'WalkthroughSwitcher', 'ReadTab', 'useSopDetail']) {
       expect(code, banned).not.toContain(banned)
     }
     // A draft is never offered to a worker: the resolver decides, not RLS.
@@ -87,7 +87,7 @@ test.describe('FOC-01/FOC-03 focus frame', () => {
     for (const { f, code } of focusFiles()) {
       // 60-14: the objective line and its editor seam are the two shell files a SOP surface may import (A-01)
       expect(code, f).not.toMatch(/@\/components\/shell(?!\/Objective(Line|Slot)')/)
-      for (const banned of ['PlantStage', ['Notification', 'Badge'].join(''), 'AccountControl', 'loadInbox', 'BackToSite', '@/components/admin']) {
+      for (const banned of ['sop/plant', ['Notification', 'Badge'].join(''), 'AccountControl', 'loadInbox', 'BackToSite', '@/components/admin']) {
         expect(code, `${f} imports ${banned}`).not.toContain(banned)
       }
     }
@@ -137,7 +137,7 @@ test.describe('FOC-01/FOC-03 focus frame', () => {
     for (const { f, code } of focusFiles()) expect(code, f).not.toMatch(/router\.(push|replace)/)
   })
 
-  test('Start walking renders only when onStartWalking is passed and the version is not superseded (D-05, D-14)', () => {
+  test('Start renders only when onStartWalking is passed and the version is not superseded (D-05, D-14)', () => {
     const BROWSE = read('src/components/focus/BrowseDocument.tsx')
     expect(BROWSE).toContain('const canStart = !!onStartWalking && !supersededBy')
     expect(BROWSE).toMatch(/\{canStart && \(/)

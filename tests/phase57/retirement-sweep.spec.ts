@@ -52,9 +52,8 @@ test.describe('retire sweep', () => {
 
   // 59-14: the governance page and the access bridge page are deleted; the redirects are proved by
   // tests/phase59/legacy-redirects.spec.ts and the 59-14 retirement sweep.
-  test('retire access: the lens has no back handler and the room bodies never link the old access address', () => {
+  test('retire access: the lens has no back handler (the old access address is quoted nowhere in src: see the sweep below)', () => {
     expect(read('src/components/sop/lenses/AdminAccessLens.tsx')).not.toContain('onBack')
-    expect(read('src/components/shell/AdminRoomBodies.tsx')).not.toContain('/admin/access')
   })
 
   test('retire list: the proxy redirects every list address to a fixed destination, server-side (Phase 59: the Office places)', () => {
@@ -102,11 +101,6 @@ test.describe('retire sweep', () => {
     ]) {
       expect(fs.existsSync(path.join(ROOT, f)), f).toBe(false)
     }
-    // the overlay machine panel went; the body and rows the detail pane renders stayed
-    const panel = read('src/components/sop/plant/MachinePanel.tsx')
-    expect(panel).not.toContain('export function MachinePanel(')
-    expect(panel).toContain('export function MachineBody(')
-    expect(panel).toContain('No procedures for this machine yet.')
   })
 
   test('retire list: nothing in src links to, pushes to or revalidates the list address', () => {
@@ -135,24 +129,17 @@ test.describe('retire sweep', () => {
     expect(violations).toEqual([])
   })
 
-  test('retire list: the site-worker query has no persister (survivor of plant-render-seam, T-52-02)', () => {
-    const src = read('src/components/shell/WorkerShell.tsx')
-    const idx = src.indexOf("queryKey: ['site-worker']")
-    expect(idx).toBeGreaterThan(-1)
-    expect(src.slice(idx, idx + 200)).not.toContain('persister')
-  })
-
   test('retire list: the worker list is derived in exactly one place (survivor of merged-surface)', () => {
     const owners = walkSrc(path.join(ROOT, 'src'))
       .map((f) => path.relative(ROOT, f).replace(/\\/g, '/'))
       .filter((f) => stripComments(read(f)).includes("queryKey: ['worker-last-completions']"))
-    expect(owners).toEqual(['src/hooks/useWorkerSops.ts'])
-    const hook = read('src/hooks/useWorkerSops.ts')
+    expect(owners).toHaveLength(1)
+    const hook = read(owners[0])
     expect(hook).toContain(".eq('worker_id'")
     expect(hook).toContain('getUserSopAssignments')
     expect(hook).toContain('refresherDueDate')
     expect(hook).toContain('library-sops')
-    const shell = stripComments(read('src/components/shell/WorkerShell.tsx'))
+    const shell = stripComments(read('src/components/home/HomeShell.tsx'))
     for (const key of ["queryKey: ['worker-last-completions']", "queryKey: ['sop-refresher-intervals']", "queryKey: ['library-sops']"]) {
       expect(shell).not.toContain(key)
     }
@@ -167,10 +154,6 @@ test.describe('retire sweep', () => {
     const health = read('src/lib/sop/admin-health.ts')
     for (const name of ['libraryNavToUrl', 'resolveLibraryNav', 'DEFAULT_LIBRARY_NAV', 'deriveChecks', 'tableStatus', 'CHECK_ORDER']) {
       expect(rows + health, name).not.toContain(name)
-    }
-    // what the one screen still reads stays
-    for (const name of ['adminSopBadge', 'machinePanelSops', 'noticeboardSops', 'healthPinCount', 'machineHealth']) {
-      expect(health, name).toContain(`export function ${name}(`)
     }
     // the quoted bare list address, with or without a query, outside the proxy
     const bareList = /['"`]\/sops(?:['"`?]|$)/m

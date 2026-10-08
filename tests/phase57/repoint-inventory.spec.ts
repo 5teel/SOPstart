@@ -77,7 +77,6 @@ export const RETIRED: Retired[] = [
 interface Row { file: string; disposition: 'delete' | 'repoint'; plan: string }
 export const INVENTORY: Row[] = [
   // 57-05
-  { file: 'tests/phase54/admin-machine-panel.spec.ts', disposition: 'repoint', plan: '57-05' },
   // 57-06 (owner 06)
   { file: 'tests/phase30/admin-nav.spec.ts', disposition: 'repoint', plan: '57-06' }, // kept: settings guard + journeys mapping survive
   { file: 'tests/phase30/role-homes.spec.ts', disposition: 'repoint', plan: '57-06' },
@@ -108,7 +107,6 @@ export const INVENTORY: Row[] = [
   { file: 'tests/phase37/no-competency-gate-worker.spec.ts', disposition: 'repoint', plan: '57-08' },
   { file: 'tests/phase41/admin-sop-list-action.spec.ts', disposition: 'repoint', plan: '57-08' },
   { file: 'tests/phase41/bundle-gate.spec.ts', disposition: 'repoint', plan: '57-08' },
-  { file: 'tests/phase52/plant-panel.spec.ts', disposition: 'repoint', plan: '57-08' },
   { file: 'tests/phase55/worker-path-contract.spec.ts', disposition: 'repoint', plan: '57-08' },
   // 57-09 (owner 09)
   { file: 'tests/lint/no-static-admin-lens-import.spec.ts', disposition: 'repoint', plan: '57-09' }, // 05 drops the floor component, 08 repoints the worker-surface contract first
@@ -132,8 +130,6 @@ export const INVENTORY: Row[] = [
   { file: 'tests/evals/cut-features.eval.ts', disposition: 'repoint', plan: '57-10' },
   // Informational (no retired token today; the owning plan still edits them)
   { file: 'tests/phase54/governance-inbox.spec.ts', disposition: 'repoint', plan: '57-03' },
-  { file: 'tests/phase52/plant-stage.spec.ts', disposition: 'repoint', plan: '57-02' },
-  { file: 'tests/phase52/plant-now-card.spec.ts', disposition: 'repoint', plan: '57-04' },
 ]
 
 // Each owning plan appends its id (e.g. '57-05') when its last commit lands.
