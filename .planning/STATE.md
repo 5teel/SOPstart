@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-03)
 ## Current Position
 
 Phase: 63 (SOP-first Home, Library Site Map and the SOPstart Start)
-Plan: 63-02 next (63-01 complete)
+Plan: 63-03 next (63-01, 63-02 complete)
 Status: Executing Phase 63 — sequential on main tree
 Last activity: 2026-10-06
 
