@@ -105,12 +105,12 @@ test.describe('AI check banner (WRK-04, D-02, D-17)', () => {
     expect(banner).not.toContain('border-[--')
   })
 
-  test('Clear goes through clearFinding (the ledger row) and re-reads; Show me scrolls and focuses the step', () => {
+  test('Clear goes through clearFinding (the ledger row) and re-reads; Go to it scrolls and focuses the step', () => {
     expect(banner).toContain('clearFinding({ findingId })')
     expect(banner).toContain('await api.refresh()')
     expect(banner).toContain('scrollToStep(f.step_id as string)')
     expect(banner).toContain('Clear finding')
-    expect(banner).toContain('Show me')
+    expect(banner).toContain('Go to it')
     expect(banner).toContain('Cleared · logged in the decision ledger')
   })
 

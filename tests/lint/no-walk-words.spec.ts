@@ -21,7 +21,6 @@ const DIRS = ['src/components', 'src/app', 'src/actions', 'src/hooks', 'src/lib/
 // Path prefixes (posix, from the repo root) the scan skips.
 const ALLOW = [
   'src/actions/introspection.ts', // agent descriptions, never shown to a worker
-  'src/components/focus/admin/AiCheckBanner.tsx', // "Show me" jumps to a finding in the editor: a different control
 ]
 
 const WORD = /\b[Ww]alk(?:s|ed|ing|through|throughs)?\b/

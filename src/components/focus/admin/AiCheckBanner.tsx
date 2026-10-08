@@ -99,7 +99,7 @@ export function AiCheckBanner({ api, canRun, stepLabel }: AiCheckBannerProps) {
                 <span className="flex flex-wrap gap-2">
                   {f.step_id && label && (
                     <button type="button" data-testid="ai-finding-show" className={ghost} onClick={() => scrollToStep(f.step_id as string)}>
-                      Show me
+                      Go to it
                     </button>
                   )}
                   {canRun && (

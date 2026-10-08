@@ -17,7 +17,7 @@ export function SentPanel() {
         onClick={goBack}
         className="mt-4 min-h-tap-glove w-full max-w-80 rounded-lg bg-ink-900 text-reading font-semibold text-paper"
       >
-        Back to the site
+        Back
       </button>
     </div>
   )
