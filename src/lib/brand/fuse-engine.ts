@@ -109,6 +109,9 @@ export async function run({ chip, label, button, mode, factor }: FuseInput, onCo
 
     // The focus screen mounts its wordmark slot while this plays; wait for it (timers, not rAF: hidden tabs).
     for (let waited = 0; waited < 2500 && !(target = document.querySelector<HTMLElement>('[data-wm-target]')); waited += 16) await sleep(16)
+    // Keep the veil up while the walker is still starting the walk (its placeholder carries data-fuse-hold), so the rise
+    // lands on the running SOP, not on a blank page.
+    for (let waited = 0; target && waited < 2500 && document.querySelector('[data-fuse-hold]'); waited += 16) await sleep(16)
     body.remove()
     if (!target) {
       console.warn('[fuse] target not found')

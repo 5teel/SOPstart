@@ -133,7 +133,7 @@ export function FocusWalker({ data: served, initialWalk, from, versionState: ser
     body = <SentPanel />
   } else if (canAutostart && !w.error && !editing) {
     // The merge is landing here: hold a blank paper page until the first step arrives.
-    body = <div data-testid="focus-autostart" className="min-h-dvh bg-paper" />
+    body = <div data-testid="focus-autostart" data-fuse-hold="" className="min-h-dvh bg-paper" />
   } else {
     body = (
       <BrowseDocument

@@ -88,6 +88,8 @@ test.describe('fuse wiring', () => {
     expect(w).toContain('void w.start()')
     expect(w).not.toMatch(/\brouter\b/)
     expect(w).toContain('data-testid="focus-autostart"')
+    expect(w).toContain('data-fuse-hold')
+    expect(code('src/lib/brand/fuse-engine.ts')).toContain('[data-fuse-hold]')
   })
 
   test('the resume card and the browse page speak the new words', () => {
