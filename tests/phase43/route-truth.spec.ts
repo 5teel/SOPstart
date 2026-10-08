@@ -104,8 +104,8 @@ test.describe('Route truth: legacy shims retired to config redirects (D-01, acti
 
       const middlewareSrc = read('src/lib/supabase/middleware.ts')
       expect(middlewareSrc).toContain("path === '/sops'")
-      expect(middlewareSrc).toContain('officeRedirectFor(path, request.nextUrl.search)')
-      expect(read('src/lib/shell/place.ts')).toContain("view === 'attention' ? '/?place=office'")
+      expect(middlewareSrc).toContain('legacyPathRedirect(path, request.nextUrl.search)')
+      expect(read('src/lib/shell/home-state.ts')).toContain("view === 'attention' ? at('signoffs')")
     }
   )
 

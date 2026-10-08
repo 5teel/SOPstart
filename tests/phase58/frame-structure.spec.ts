@@ -1,7 +1,7 @@
 /**
  * Phase 58 -- FOC-01, FOC-03 (D-26): the focus frame's structure.
  * Decisions: top bar, rail, column, Esc order, Back behaviour.
- * Filled by: 58-10 (frame + browse), 58-11 (walk UI, placeForPath).
+ * Filled by: 58-10 (frame + browse), 58-11 (walk UI, backForPath).
  * Registration: playwright.config.ts `phase58` project.
  */
 import { test, expect } from '@playwright/test'
@@ -54,10 +54,10 @@ test.describe('FOC-01/FOC-03 focus frame', () => {
     expect(read('src/components/focus/FocusFrame.tsx')).not.toMatch(/useViewport|matchMedia/)
   })
 
-  test('placeForPath returns null for every /sops/* path so the focus frame owns the top bar (58-11)', () => {
-    const PLACE = stripComments(read('src/lib/shell/place.ts'))
+  test('backForPath returns null for every /sops/* path so the focus frame owns the top bar (58-11)', () => {
+    const PLACE = stripComments(read('src/lib/shell/home-state.ts'))
     expect(PLACE).toContain("pathname.startsWith('/sops/')) return null")
-    // BackToSite renders nothing when placeForPath is null (the layout stays unchanged).
+    // BackToSite renders nothing when backForPath is null (the layout stays unchanged).
     expect(read('src/components/layout/BackToSite.tsx')).toContain('if (!href) return null')
   })
 

@@ -60,38 +60,3 @@ export function placeToken(place: Place): string | null {
       return `dept:${place.id}`
   }
 }
-
-/**
- * Where a bridged page's "Back to the site" goes (D-15a). null = no Back bar
- * (a role-less user on /pending has no site to go back to).
- */
-export function placeForPath(pathname: string): string | null {
-  // The SOP focus screen (Phase 58) owns its own top bar with Back; /pending has no site to go back to.
-  if (pathname === '/pending' || pathname.startsWith('/sops/')) return null
-  if (pathname === '/admin/settings') return '/?place=office'
-  if (pathname === '/admin/training') return '/?place=smoko'
-  if (pathname === '/activity' || pathname.startsWith('/activity/')) return '/?place=smoko'
-  if (pathname === '/admin/sops/new' || pathname.startsWith('/admin/sops/new/') || pathname === '/admin/sops/upload') {
-    return '/?place=workshop'
-  }
-  return '/'
-}
-
-/**
- * Phase 59 (D-13) -- the old governance, team and access addresses (and the old
- * list views that led to them) land in the Office. Pure, no Next imports (the
- * proxy imports it). Every destination is a fixed template; the sop value is
- * appended only when it is a UUID, and nothing else from the query is carried,
- * so the redirect cannot be steered offsite (T-59-47). null = not a legacy address.
- */
-export function officeRedirectFor(pathname: string, search: string): string | null {
-  const params = new URLSearchParams(search)
-  const view = params.get('view')
-  const sop = params.get('sop')
-  const access = `/?place=office&tab=access${sop && UUID.test(sop) ? `&sop=${sop}` : ''}`
-  if (pathname === '/governance') return view === 'library' ? '/' : '/?place=office'
-  if (pathname === '/admin/team') return '/?place=office&tab=people'
-  if (pathname === '/admin/access') return access
-  if (pathname === '/sops') return view === 'attention' ? '/?place=office' : view === 'access' ? access : '/'
-  return null
-}

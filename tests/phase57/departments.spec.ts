@@ -180,7 +180,7 @@ test.describe('PLC-05 departments: the retired screen (57-07)', () => {
     const config = read('next.config.ts')
     for (const source of ['/admin/departments', '/admin/site']) {
       expect(config, source).toMatch(
-        new RegExp(String.raw`source: '${source}',\s*destination: '/\?place=edit',\s*permanent: false`),
+        new RegExp(String.raw`source: '${source}',\s*destination: '/\?s=manage&view=site',\s*permanent: false`),
       )
       expect(fs.existsSync(path.join(ROOT, 'src', 'app', '(protected)', source)), source).toBe(false)
     }

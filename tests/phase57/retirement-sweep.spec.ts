@@ -60,12 +60,12 @@ test.describe('retire sweep', () => {
   test('retire list: the proxy redirects every list address to a fixed destination, server-side (Phase 59: the Office places)', () => {
     const proxy = stripComments(read('src/lib/supabase/middleware.ts'))
     expect(proxy).toContain("path === '/sops'")
-    expect(proxy).toContain('officeRedirectFor(path, request.nextUrl.search)')
-    const helper = stripComments(read('src/lib/shell/place.ts'))
+    expect(proxy).toContain('legacyPathRedirect(path, request.nextUrl.search)')
+    const helper = stripComments(read('src/lib/shell/home-state.ts'))
     expect(helper).toContain("view === 'attention'")
-    expect(helper).toContain("'/?place=office'")
-    expect(helper).toContain('sop && UUID.test(sop)')
-    expect(helper).toContain('/?place=office&tab=access')
+    expect(helper).toContain("at('signoffs')")
+    expect(helper).toContain("pin: params.get('sop')")
+    expect(helper).toContain("tab: 'access'")
     // the library scope is retired: it goes home (D-17).
     expect(helper).toContain("view === 'library' ? '/' :")
     // refreshed session cookies survive the hop; the redirect is built from a fixed string

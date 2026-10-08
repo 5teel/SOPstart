@@ -37,15 +37,15 @@ test.describe('retire: legacy addresses redirect to Office places (59-13)', () =
   test('the proxy sends the governance, team and access addresses to their Office places with fixed templates', () => {
     const proxy = stripComments(read('src/lib/supabase/middleware.ts'))
     expect(proxy).toContain("path === '/sops' || path === '/governance' || path === '/admin/team' || path === '/admin/access'")
-    expect(proxy).toContain('officeRedirectFor(path, request.nextUrl.search)')
+    expect(proxy).toContain('legacyPathRedirect(path, request.nextUrl.search)')
     // the destinations are plain templates in the helper; the proxy builds nothing from the query
-    const helper = stripComments(read('src/lib/shell/place.ts'))
-    for (const dest of ["'/?place=office'", "'/?place=office&tab=people'", '`/?place=office&tab=access${']) expect(helper, dest).toContain(dest)
+    const helper = stripComments(read('src/lib/shell/home-state.ts'))
+    for (const dest of ["at('signoffs')", "at('people')", "tab: 'access'"]) expect(helper, dest).toContain(dest)
     expect(proxy).not.toContain('sop=${')
   })
   test('the sop query is UUID-gated and cookies are copied onto the redirect', () => {
-    const helper = stripComments(read('src/lib/shell/place.ts'))
-    expect(helper).toContain('sop && UUID.test(sop)')
+    const helper = stripComments(read('src/lib/shell/home-state.ts'))
+    expect(helper).toContain('uuid(x.pin)')
     const proxy = stripComments(read('src/lib/supabase/middleware.ts'))
     expect(proxy).toContain('NextResponse.redirect(new URL(office, request.url))')
     expect(proxy).toContain('response.cookies.getAll().forEach((c) => redirect.cookies.set(c))')

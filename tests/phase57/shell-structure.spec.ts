@@ -162,7 +162,7 @@ test.describe('SHL-01 one screen structure', () => {
     const files = ['src/app/(protected)/layout.tsx', 'src/app/page.tsx', ...fs.readdirSync(shellDir).map((f) => `src/components/shell/${f}`)]
     for (const f of files) expect(read(f), f).not.toMatch(/<header|role="banner"|<nav/)
     const back = read('src/components/layout/BackToSite.tsx')
-    expect(back).toContain('placeForPath(')
+    expect(back).toContain('backForPath(')
     expect(back).toContain('data-testid="back-to-site"')
     expect(back).not.toMatch(/<header|<nav/)
     for (const f of ['TopHeader', 'NotificationBadge', 'NavPendingSpinner']) {

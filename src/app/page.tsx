@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { getSessionContext } from '@/lib/auth/session-context'
 import { ProtectedProviders, type AppRole } from '@/components/providers/ProtectedProviders'
 import { HomeShell } from '@/components/home/HomeShell'
+import { ensureReviewDueNotifications } from '@/lib/notifications/ensure-review-due'
 import { formatHome, legacyToHome, parseHome } from '@/lib/shell/home-state'
 
 /**
@@ -29,9 +30,14 @@ export default async function Home({
   const place = str(q.place)
   if (place !== null) redirect(formatHome(legacyToHome(place, str(q.tab), str(q.sop))))
 
+  // ADR-0002: due reviews are written on the read that needs them -- the caller's
+  // own rows only, idempotent, never throws -- before the bell reads them.
   let siteName = 'Your site'
   if (organisationId) {
-    const { data: org } = await supabase.from('organisations').select('name').eq('id', organisationId).maybeSingle()
+    const [{ data: org }] = await Promise.all([
+      supabase.from('organisations').select('name').eq('id', organisationId).maybeSingle(),
+      ensureReviewDueNotifications(organisationId, userId),
+    ])
     if (org?.name) siteName = org.name
   }
 

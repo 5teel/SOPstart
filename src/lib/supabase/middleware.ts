@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { roleHome } from '@/lib/auth/role-home'
 import { safeNextPath } from '@/lib/auth/next-redirect'
 import { legacyRedirectFor } from '@/lib/sop/focus-path'
-import { officeRedirectFor } from '@/lib/shell/place'
+import { legacyPathRedirect } from '@/lib/shell/home-state'
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request })
@@ -61,10 +61,10 @@ export async function updateSession(request: NextRequest) {
   // The worker list page is gone (Phase 57) and so are the governance, team and
   // access pages (Phase 59): the one screen at / is the only list of places and
   // the Office is where those three lived. Each legacy address redirects to a
-  // fixed destination built by officeRedirectFor (the bare list and the library
-  // scope go to the site, the attention view and the governance page to the
-  // Office inbox, the team page to its People tab, the access page and the
-  // access view to the Access tab). Server-side on purpose: a
+  // fixed destination built by legacyPathRedirect (the bare list and the library
+  // scope go to the home, the attention view and the governance page to
+  // Sign-offs, the team page to People, the access page and the access view
+  // to People > Access). Server-side on purpose: a
   // client router.replace fired on mount raced the page's own mount-time
   // server actions, and Next 16.2.1's action queue orphans a server action
   // dispatched while a navigation has discarded another — the router then
@@ -72,7 +72,7 @@ export async function updateSession(request: NextRequest) {
   // The sop value is appended only when it is a UUID; nothing else from the
   // query reaches the destination, so the redirect cannot be steered offsite.
   if (path === '/sops' || path === '/governance' || path === '/admin/team' || path === '/admin/access') {
-    const office = officeRedirectFor(path, request.nextUrl.search)
+    const office = legacyPathRedirect(path, request.nextUrl.search)
     if (office) {
       const redirect = NextResponse.redirect(new URL(office, request.url))
       response.cookies.getAll().forEach((c) => redirect.cookies.set(c))

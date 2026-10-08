@@ -21,7 +21,6 @@ import {
   tabsFor,
   type HomeState,
 } from '../../src/lib/shell/home-state'
-import { officeRedirectFor } from '../../src/lib/shell/place'
 import { notificationPlace } from '../../src/lib/notifications/places'
 import { NOTIFICATION_KINDS } from '../../src/lib/notifications/kinds'
 
@@ -159,11 +158,10 @@ test.describe('home state', () => {
     expect(legacyPathRedirect('/dashboard', '')).toBeNull()
   })
 
-  test('the four old officeRedirectFor paths all land on the same screens', () => {
+  test('every old governance, team, access and list address lands on a home screen', () => {
     const search = [['/governance', ''], ['/governance', 'view=library'], ['/admin/team', ''], ['/admin/access', ''], ['/sops', 'view=attention'], ['/sops', '']] as const
     for (const [p, q] of search) {
       expect(legacyPathRedirect(p, q), `${p}?${q}`).not.toBeNull()
-      expect(officeRedirectFor(p, q), `${p}?${q}`).not.toBeNull()
     }
   })
 

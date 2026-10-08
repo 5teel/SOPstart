@@ -50,8 +50,8 @@ test.describe('UX-02 — one shared admin nav', () => {
     // The attention view stays reachable — the session proxy maps the legacy
     // ?view=attention deep link onto the governance route (Phase 57).
     const proxy = read(PROXY)
-    expect(proxy).toContain('officeRedirectFor(path, request.nextUrl.search)')
-    expect(read(path.join(ROOT, 'src', 'lib', 'shell', 'place.ts'))).toContain("view === 'attention' ? '/?place=office'")
+    expect(proxy).toContain('legacyPathRedirect(path, request.nextUrl.search)')
+    expect(read(path.join(ROOT, 'src', 'lib', 'shell', 'home-state.ts'))).toContain("view === 'attention' ? at('signoffs')")
   })
 
   test('no admin page mounts AdminNav or an inline "Admin sections" sub-nav; guards survive', () => {

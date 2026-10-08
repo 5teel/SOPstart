@@ -68,12 +68,12 @@ const nextConfig: NextConfig = {
       // Phase 57 D-08/D-10: departments and machines are edited on the drawing. Fixed destination.
       {
         source: '/admin/departments',
-        destination: '/?place=edit',
+        destination: '/?s=manage&view=site',
         permanent: false,
       },
       {
         source: '/admin/site',
-        destination: '/?place=edit',
+        destination: '/?s=manage&view=site',
         permanent: false,
       },
       // Phase 57 D-10: the dashboard is gone; old links land on the one screen. Fixed destination.
