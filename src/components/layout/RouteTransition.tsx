@@ -22,7 +22,8 @@ export function RouteTransition({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const el = innerRef.current
-    if (!el) return
+    // The Start merge (63-15) rises into the new screen: the fade-up must not race it.
+    if (!el || document.documentElement.dataset.fuse === 'on') return
     el.classList.remove('page-shell-enter')
     // Force a reflow so the animation restarts rather than being deduped.
     void el.offsetWidth

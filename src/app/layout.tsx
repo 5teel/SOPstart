@@ -30,7 +30,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={saira.variable}>
-      <body data-theme="paper">{children}</body>
+      <body data-theme="paper">
+        {children}
+        <div id="fuse-layer" aria-hidden="true" className="pointer-events-none fixed inset-0 z-50" />
+      </body>
     </html>
   )
 }

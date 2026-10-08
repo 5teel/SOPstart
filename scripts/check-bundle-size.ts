@@ -93,6 +93,8 @@ const GATED_ROUTES: GatedRoute[] = [
       // Phase 63-11: the home list lives in the root page chunk only. Seen in a chunk this route
       // loads, the home was hoisted into a shared chunk and every focus screen would pay for it.
       { label: 'home list (63-05, root page chunk only)', markers: ['Search SOPs, steps and tools'] },
+      // Phase 63-15: the Start merge engine is a lazy module reached by import() from fuse.ts.
+      { label: 'fuse engine (lazy, 63-15)', markers: ['[fuse] target not found'] },
     ],
   },
   {
@@ -120,6 +122,7 @@ const GATED_ROUTES: GatedRoute[] = [
       { label: 'Manage SOPs (lazy, 63-08)', markers: ['Every way in ends in the same editor.'] },
       { label: 'Training (lazy, 63-09)', markers: ['A record to look up, not a to-do list.'] },
       { label: 'My record (lazy, 63-09)', markers: ['and who signed it off.'] },
+      { label: 'fuse engine (lazy, 63-15)', markers: ['[fuse] target not found'] },
     ],
   },
 ]
