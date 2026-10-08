@@ -1,16 +1,19 @@
 'use client'
 
+/**
+ * Phase 63 (HOME-04) -- the person's own completions and who signed them off. Moved from the
+ * activity page so My record and /activity (until 63-14 retires it) show the same list.
+ */
 import Link from 'next/link'
 import { ClipboardList } from 'lucide-react'
 import { useWorkerCompletions } from '@/hooks/useCompletions'
 import { CompletionHistoryCard } from '@/components/activity/CompletionHistoryCard'
 
-export function WorkerActivityView() {
+export function CompletionList() {
   const { data: completions = [], isLoading } = useWorkerCompletions()
 
   return (
-    <div className="px-4 py-6 max-w-5xl mx-auto">
-      <h1 className="text-2xl font-bold text-[var(--ink-900)] mb-1">My sign-offs</h1>
+    <div>
       {!isLoading && (
         <p className="text-sm text-[var(--ink-500)] mb-6">
           {completions.length} completed procedure{completions.length !== 1 ? 's' : ''}

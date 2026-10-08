@@ -140,9 +140,10 @@ test.describe('retire: supervisor activity view and completion supervisor half (
       .map((f) => path.relative(ROOT, f))
     expect(offenders, offenders.join('\n')).toEqual([])
     // the worker's own record survives until Phase 61, for every role
-    expect(fs.existsSync(path.join(ROOT, 'src/app/(protected)/activity/WorkerActivityView.tsx'))).toBe(true)
+    // 63-09 moved the list to a home section component; the page renders it
+    expect(fs.existsSync(path.join(ROOT, 'src/components/home/sections/CompletionList.tsx'))).toBe(true)
     const page = stripComments(read('src/app/(protected)/activity/page.tsx'))
-    expect(page).toContain('<WorkerActivityView />')
+    expect(page).toContain('<CompletionList />')
     expect(page).not.toContain('SupervisorActivityView')
     // the dropped list keeps it out and the Phase 55 sweep runs it live
     expect(read('scripts/dropped-features.json')).toContain('"feature": "supervisor-review"')
