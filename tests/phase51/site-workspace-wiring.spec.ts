@@ -135,9 +135,9 @@ test.describe('route', () => {
     expect(fn.indexOf('requireAdminContext()')).toBeLessThan(fn.indexOf('.from('))
   })
 
-  test('journeys.ts maps the site edit mode on the one screen', () => {
+  test('journeys.ts maps the site edit mode in Manage SOPs', () => {
     const src = read(JOURNEYS_PATH)
-    expect(src).toContain('?place=edit')
+    expect(src).toContain('view=site')
     expect(src).toContain("id: 'map-the-site'")
   })
 })

@@ -16,7 +16,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 const ROOT = path.resolve(__dirname, '..', '..')
-const DIRS = ['src/components', 'src/app', 'src/actions', 'src/hooks']
+const DIRS = ['src/components', 'src/app', 'src/actions', 'src/hooks', 'src/lib/journeys', 'src/lib/uat']
 
 // Path prefixes (posix, from the repo root) the scan skips.
 const ALLOW = [

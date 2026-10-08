@@ -30,7 +30,7 @@ export interface Journey {
   id: string
   /** Index grouping, e.g. 'Worker', 'Create an SOP'. */
   group: string
-  /** Who walks this path. */
+  /** Who follows this path. */
   persona: string
   title: string
   summary: string
@@ -59,12 +59,12 @@ export const JOURNEYS: Journey[] = [
       { id: 's', type: 'start', label: 'Has an account' },
       { id: 'welcome', type: 'screen', label: 'Promo reel', route: '/welcome', detail: 'A signed-out visit to / lands here: a looping reel over a template site (machines and SOPs, consistent structure, visual steps, AI building). Sign in leads to the login screen.' },
       { id: 'login', type: 'screen', label: 'Login screen', route: '/login' },
-      { id: 'auth', type: 'action', label: 'Enter email + password', detail: 'Supabase Auth verifies and sets a session. roleHome(role) sends every role to the one screen, or to /pending when there is no role (UX-01, Phase 57).' },
+      { id: 'auth', type: 'action', label: 'Enter email + password', detail: 'Supabase Auth verifies and sets a session. roleHome(role) sends every role to the home, or to /pending when there is no role (UX-01, Phase 57).' },
       { id: 'role', type: 'decision', label: 'Role?', branches: [
         { label: 'Worker, supervisor, safety manager or admin', to: 'one-screen' },
         { label: 'No role yet', to: 'pending-home' },
       ] },
-      { id: 'one-screen', type: 'screen', label: 'The one screen — list, isometric site and detail', route: '/', detail: 'Every role lands here (Phase 57 D-10). Admins also see the Office card, the rooms and edit mode.' },
+      { id: 'one-screen', type: 'screen', label: 'The home - search and the SOP list', route: '/', detail: 'Every role lands here (Phase 63). Admins and safety managers also see the Sign-offs, People, Training and Manage SOPs sections.' },
       { id: 'pending-home', type: 'screen', label: 'Account pending', route: '/pending', detail: 'Holding screen until an admin assigns a role.' },
       { id: 'e', type: 'end', label: 'Signed in' },
     ],
@@ -96,72 +96,116 @@ export const JOURNEYS: Journey[] = [
       { id: 'invite', type: 'screen', label: 'Accept invite', route: '/invite/accept' },
       { id: 'join', type: 'screen', label: 'Join with code', route: '/join' },
       { id: 'added', type: 'action', label: 'Added to the org with a role' },
-      { id: 'home', type: 'screen', label: 'Role home — the one screen', route: '/', detail: 'roleHome(role) dispatch sends every role to the one screen — join-by-code always joins as worker.' },
+      { id: 'home', type: 'screen', label: 'Role home - the home', route: '/', detail: 'roleHome(role) dispatch sends every role to the home — join-by-code always joins as worker.' },
       { id: 'e', type: 'end', label: 'On the team' },
     ],
   },
 
   // ================================ Worker ================================
   {
-    id: 'find-follow-sop',
+    id: 'find-read-sop',
     group: 'Worker',
     persona: 'Worker',
-    title: 'Find & open a procedure',
-    summary: 'A worker finds the right SOP and opens it to read before starting work.',
+    title: 'Find and read a SOP',
+    summary: 'A worker finds the right SOP from the home and reads it before starting work.',
     steps: [
       { id: 's', type: 'start', label: 'Needs to do a task' },
-      { id: 'site', type: 'screen', label: 'The one screen — the site, with every machine clickable', route: '/', detail: 'The isometric site (Phase 52, now the one screen of Phase 57). An amber pin on a machine counts that worker\'s procedures there that are due, never done, or updated — worked out live from the worker\'s own list, never stored. The "Next for you" card shows the single next procedure with Walk it and Show me. There is no separate SOP list: site-wide SOPs are on the Noticeboard and each machine\'s are on the machine.' },
-      { id: 'pick', type: 'decision', label: 'How do they get there?', branches: [
-        { label: 'Click a machine', to: 'panel' },
-        { label: 'Open the Noticeboard', to: 'board' },
-        { label: 'Now card → Walk it', to: 'detail' },
+      { id: 'home', type: 'screen', label: 'The home - search and the SOP list', route: '/', detail: 'Every signed-in role lands here. Search runs over SOP titles, steps and tools. Below it sit Recent (the SOPs you opened last), Most used, and All SOPs, grouped by area or by type.' },
+      { id: 'pick', type: 'decision', label: 'How do they find it?', branches: [
+        { label: 'Type in search', to: 'read' },
+        { label: 'Pick from Recent or Most used', to: 'read' },
+        { label: 'Open All SOPs, by area or by type', to: 'read' },
+        { label: 'Nothing matches', to: 'missing' },
       ] },
-      { id: 'panel', type: 'screen', label: 'Machine in the detail pane', route: '/', detail: 'The machine\'s photo (or "no photo yet"), its department named in that department\'s colour, then its procedures to-do first with the shared badge (Due, Updated, Never done, Done — "Updated" marks any SOP published after the worker\'s last completion, AFL-VER-04), a Walk › link and the SOP title, both opening the focus screen. A refresher chip never blocks opening the card (Phase 36).', branches: [
-        { label: 'Walk › or the SOP title', to: 'detail' },
-        { label: 'Make a request', to: 'request' },
-      ] },
-      { id: 'request', type: 'action', label: 'Make a request', route: '/', detail: 'Under the SOP rows, a worker or supervisor can ask for a change to a SOP, a new SOP for this machine, or to be observed. A focused dialog with the screen recessed; Send request answers under My requests. Nothing in the walk offers it.', branches: [
+      { id: 'missing', type: 'action', label: 'Ask for one', route: '/', detail: 'A search with no match offers Ask for one (it opens a request, with the search words as the note). An admin or safety manager also gets Write it.', branches: [
         { label: 'Request sent', to: 'e' },
       ] },
-      { id: 'board', type: 'screen', label: 'Noticeboard room', route: '/', detail: 'The site-wide SOPs in the detail pane, each with the same shared badge and a Walk › link.', branches: [
-        { label: 'Walk › or the SOP title', to: 'detail' },
-      ] },
-      { id: 'detail', type: 'screen', label: 'The SOP, with the whole screen to itself', route: '/sops/[sopId]', detail: 'The focus screen (Phase 58): a slim bar with Back and the title, a step rail and one reading column, and nothing from the site (no map, list, inbox or notifications). A worker always lands on the latest published version, or on the version of a walk they have in progress; a draft or unknown address is not found and an older version redirects to the current one. Browse shows every step in walking order (hazards and PPE first), Start walking, and "Updated since you last walked it" when a newer version was published. Back returns to the machine or room it was opened from (?from=).' },
+      { id: 'read', type: 'screen', label: 'Read the SOP', route: '/', detail: 'The SOP opens beside the list (on a phone it takes the screen, with a back link): hazards and PPE first, then every step in order, the owner, the version and "Updated since you last did it" when a newer version was published. Back and Esc return to the list.' },
       { id: 'go', type: 'decision', label: 'Ready to start?', branches: [
-        { label: 'Start walking', to: 'walk' },
+        { label: 'Press start', to: 'start' },
         { label: 'Just reading', to: 'e' },
+        { label: 'Something is wrong with it', to: 'request' },
       ] },
-      { id: 'walk', type: 'screen', label: 'Walking the SOP — one step at a time', route: '/sops/[sopId]', detail: 'Start walking (or Resume where you left off) opens the first step alone on the screen. Walk ›, Walk it and Show me all open /sops/<id>?from=<the machine or room it came from>, so Back returns there.' },
-      { id: 'e', type: 'end', label: 'Procedure open' },
+      { id: 'request', type: 'action', label: 'Make a request', route: '/', detail: 'Under the SOP, a worker or supervisor can ask for a change to it or to be observed doing it. A focused dialog with the screen recessed; Send request answers under My requests.', branches: [
+        { label: 'Request sent', to: 'e' },
+      ] },
+      { id: 'start', type: 'screen', label: 'The SOP, running', route: '/sops/[sopId]', detail: 'See "Start a SOP".' },
+      { id: 'e', type: 'end', label: 'SOP found' },
     ],
   },
   {
-    id: 'walkthrough-complete',
+    id: 'start-sop',
     group: 'Worker',
     persona: 'Worker',
-    title: 'Follow a procedure & complete it',
-    summary: 'A worker walks each step on their phone, captures evidence, and completes the job with a tamper-proof record.',
+    title: 'Start a SOP and finish it',
+    summary: 'A worker starts a SOP on their phone or computer, does each step, captures the evidence the SOP asks for, and finishes with a tamper-proof record.',
     steps: [
-      { id: 's', type: 'start', label: 'Start walking', route: '/sops/[sopId]' },
-      { id: 'read', type: 'action', label: 'Do the step, then press the one button', detail: 'Each press is saved on the server before the screen moves, so closing the page loses nothing. Hazard and PPE steps cannot be passed without "I understand — continue" / "I\'m wearing it — continue". The rail goes back only by default; an SOP can allow jumping ahead.' },
+      { id: 's', type: 'start', label: 'Press start on Read', route: '/', detail: 'The start button plays a short merge, then opens the SOP on its own screen at its current step. If you already started it, it says "Picks up at step N of M"; "or begin from step 1" asks first and throws away the earlier ticks and photos only if you say so.' },
+      { id: 'run', type: 'screen', label: 'The SOP, running - one step at a time', route: '/sops/[sopId]', detail: 'A slim bar with Back and the title, a step rail and one reading column, and nothing from the home. Each press is saved on the server before the screen moves, so closing the page loses nothing. A worker always lands on the latest published version, or on the version they started. Back returns to where the SOP was opened from.' },
       { id: 'kind', type: 'decision', label: 'What does the step need?', branches: [
         { label: 'Just do it', to: 'next' },
         { label: 'Acknowledge a hazard or PPE', to: 'next' },
         { label: 'Add a photo', to: 'photo' },
       ] },
-      { id: 'photo', type: 'action', label: 'Add the photo the step asks for', detail: 'Compressed and uploaded straight away to the walk; the step cannot be finished until the photo is there. Retake replaces it.' },
+      { id: 'photo', type: 'action', label: 'Add the photo the step asks for', detail: 'Compressed and uploaded straight away; the step cannot be finished until the photo is there. Retake replaces it.' },
       { id: 'next', type: 'decision', label: 'More steps?', branches: [
-        { label: 'Yes', to: 'read' },
+        { label: 'Yes - Next', to: 'run' },
         { label: 'Last step done', to: 'review' },
+        { label: 'Stop', to: 'back' },
       ] },
-      { id: 'review', type: 'screen', label: 'Review — Ready to send?', route: '/sops/[sopId]', detail: 'Every step with its acknowledgement and photo. Nothing is written until Send for sign-off; a missing acknowledgement or photo lists what is still to do and blocks Send.' },
-      { id: 'complete', type: 'action', label: 'Send for sign-off', detail: 'Creates the append-only completion record and the worker\'s ledger row from the server walk. Completing IS the worker signature (D-09). Then one line, "Sent for sign-off", and Back to the site returns to the place the worker came from.' },
+      { id: 'review', type: 'screen', label: 'Review - Ready to send?', route: '/sops/[sopId]', detail: 'Every step with its acknowledgement and photo. Nothing is written until Send for sign-off; a missing acknowledgement or photo lists what is still to do and blocks Send.' },
+      { id: 'complete', type: 'action', label: 'Send for sign-off', detail: 'Creates the append-only completion record and the worker\'s ledger row. Finishing IS the worker signature (D-09). Then one line, "Sent for sign-off", and Done.' },
+      { id: 'back', type: 'screen', label: 'Back to Read', route: '/', detail: 'Done or Stop returns to Read on the home, on the same SOP, so the next SOP is one tap away.' },
       { id: 'signoff', type: 'decision', label: 'Supervisor counter-sign required?', branches: [
-        { label: 'Yes → supervisor counter-signs', to: 'sup' },
+        { label: 'Yes - it waits in Sign-offs', to: 'sup' },
         { label: 'No', to: 'e' },
       ] },
-      { id: 'sup', type: 'screen', label: 'Office inbox - sign-off row', route: '/', detail: 'The supervisor opens the sign-off row in the Office inbox, reads the steps and photos in place, and signs off or rejects. The server writes the counter-signature - second immutable record (D-10 / AFL-VER-05).' },
+      { id: 'sup', type: 'screen', label: 'Sign-offs - Inbox', route: '/', detail: 'In the Sign-offs section the supervisor or admin opens the row, reads the steps and photos in place, and signs off or sends it back. The server writes the counter-signature - second immutable record (D-10 / AFL-VER-05).' },
       { id: 'e', type: 'end', label: 'Job recorded' },
+    ],
+  },
+  {
+    id: 'browse-site-map',
+    group: 'Worker',
+    persona: 'Everyone',
+    title: 'Browse the site map',
+    summary: 'The library as a picture of the site: areas, the objects in them, and the SOPs each object carries.',
+    steps: [
+      { id: 's', type: 'start', label: 'Wants to find a SOP by where it is' },
+      { id: 'map', type: 'screen', label: 'The whole site', route: '/', detail: 'The site map beside the list: every area drawn in its own colour, with a count of the SOPs inside. Choosing an area also filters the list.' },
+      { id: 'area', type: 'screen', label: 'An area', route: '/', detail: 'The map zooms to the area and shows its objects (machines and places). The address carries the area, so the view can be shared.' },
+      { id: 'object', type: 'screen', label: 'An object', route: '/', detail: 'The SOPs linked to the object are listed; pick one to Read it. SOPs with no object sit under Site-wide.' },
+      { id: 'read', type: 'screen', label: 'Read the SOP', route: '/', detail: 'The same Read as from the list. Esc steps back one level: SOP, object, area, whole site.' },
+      { id: 'e', type: 'end', label: 'SOP found by place' },
+    ],
+  },
+  {
+    id: 'on-a-phone',
+    group: 'Worker',
+    persona: 'Worker',
+    title: 'On a phone',
+    summary: 'The same home in one column: a tab bar for the sections, a List | Site map switch, and Read that takes the whole screen.',
+    steps: [
+      { id: 's', type: 'start', label: 'Opens the site on a phone' },
+      { id: 'tabs', type: 'screen', label: 'Tab bar and List | Site map', route: '/', detail: 'The tab bar at the foot holds the sections the role may open (a worker has SOPs and My record). At the top the wordmark sits beside a List | Site map switch.' },
+      { id: 'key', type: 'screen', label: 'Site map with a numbered key', route: '/', detail: 'The map shows numbered markers; the key under it names each one and gives its SOP count, so nothing depends on tiny labels. Tap a number to see that object\'s SOPs.' },
+      { id: 'read', type: 'screen', label: 'Read takes the screen', route: '/', detail: 'An open SOP covers the list; a back link at the top returns to it. Start opens the running SOP, with Back and Stop at the top.' },
+      { id: 'e', type: 'end', label: 'Back on the list' },
+    ],
+  },
+  {
+    id: 'my-record',
+    group: 'Worker',
+    persona: 'Everyone',
+    title: 'My record, notifications and requests',
+    summary: 'Every role sees their own finished SOPs, what they have been told and what they have asked for, in one section.',
+    steps: [
+      { id: 's', type: 'start', label: 'Wants to check what they have done' },
+      { id: 'record', type: 'screen', label: 'My record', route: '/', detail: 'The My record section: the SOPs you have finished, newest first, with their sign-off state. The old /activity address redirects here. Sections with nothing in them are absent.' },
+      { id: 'one', type: 'screen', label: 'One completion', route: '/activity/[completionId]', detail: 'The steps, photos, status and any reason it was sent back. Only the person who did it can open it; anyone else is sent to their own section. Back returns to My record.' },
+      { id: 'notif', type: 'action', label: 'Open a notification', route: '/sops/[sopId]', detail: 'The bell is a dot when something is unread. Opening a row marks it read and goes to where it points: a SOP, a section of the home or the sign-offs.' },
+      { id: 'myreq', type: 'action', label: 'My requests', route: '/', detail: 'Asked of you, You asked and Answered. Withdraw a request you raised, decline an ask with a reason, or stop asking.' },
+      { id: 'e', type: 'end', label: 'Up to date' },
     ],
   },
 
@@ -170,17 +214,27 @@ export const JOURNEYS: Journey[] = [
     id: 'review-signoff',
     group: 'Supervisor',
     persona: 'Supervisor',
-    title: 'Review & sign off a completion',
-    summary: 'A supervisor checks a worker’s completed procedure and signs it off, creating a second immutable record.',
+    title: 'Sign-offs: review and sign off a completion',
+    summary: 'A supervisor, safety manager or admin checks a worker\'s finished SOP and signs it off, creating a second immutable record.',
     steps: [
       { id: 's', type: 'start', label: 'Completion submitted' },
-      { id: 'activity', type: 'screen', label: 'Office inbox - sign-off row', route: '/', detail: 'Walks waiting for review sit in the Office inbox for the supervisor (their own workers) and the admin (everyone). Open a row and the steps, photos and who/when expand in place; a walker never signs off their own walk.' },
-      { id: 'one', type: 'screen', label: 'My completion', route: '/activity/[completionId]', detail: 'The walker sees their own completion here - steps, photos, status and any reason it was sent back (listed under My sign-offs, /activity, for every role until Phase 61 moves it to the Smoko room). Anyone else who opens the address is sent to the Office.' },
-      { id: 'ok', type: 'decision', label: 'Done correctly?', branches: [
-        { label: 'Yes — sign off', to: 'sign' },
-        { label: 'No — follow up', to: 'e' },
+      { id: 'inbox', type: 'screen', label: 'Sign-offs - Inbox', route: '/', detail: 'The Sign-offs section opens on the Inbox: one action per row. Completions waiting for review sit here for the supervisor (their own workers) and the admin (everyone). Open a row and the steps, photos and who/when expand in place; nobody signs off their own completion.' },
+      { id: 'tabs', type: 'decision', label: 'Which tab?', branches: [
+        { label: 'Inbox (supervisor, admin, safety manager)', to: 'ok' },
+        { label: 'Requests (the same roles)', to: 'requests' },
+        { label: 'Decisions (admin, safety manager)', to: 'decisions' },
       ] },
-      { id: 'sign', type: 'action', label: 'Sign off', detail: 'Append-only sign-off record (legal defensibility).' },
+      { id: 'requests', type: 'screen', label: 'Sign-offs - Requests', route: '/', detail: 'Open requests newest first: Accept or Decline with a reason. Agent-raised rows carry the agent chip; the answer is logged and the asker told.', branches: [
+        { label: 'Done', to: 'e' },
+      ] },
+      { id: 'decisions', type: 'screen', label: 'Sign-offs - Decisions', route: '/', detail: 'The ledger of who decided what: sign-offs, approvals, owner changes, role changes, invites and removals, with a cleared-today line.', branches: [
+        { label: 'Done', to: 'e' },
+      ] },
+      { id: 'ok', type: 'decision', label: 'Done correctly?', branches: [
+        { label: 'Yes - sign off', to: 'sign' },
+        { label: 'No - send it back', to: 'e' },
+      ] },
+      { id: 'sign', type: 'action', label: 'Sign off', detail: 'Append-only sign-off record (legal defensibility). The row leaves the Inbox and the action shows on the Decisions tab.' },
       { id: 'e', type: 'end', label: 'Reviewed' },
     ],
   },
@@ -194,11 +248,11 @@ export const JOURNEYS: Journey[] = [
     steps: [
       { id: 's', type: 'start', label: 'Watched a worker perform a SOP' },
       { id: 'entry', type: 'decision', label: 'Where from?', branches: [
-        { label: 'Walking the floor — training matrix', to: 'team' },
-        { label: 'Just watched a completion (admins only until Phase 61)', to: 'activity' },
+        { label: 'On the floor - training matrix', to: 'team' },
+        { label: 'Just watched a completion (admins only for now)', to: 'activity' },
       ] },
-      { id: 'team', type: 'screen', label: 'Training matrix — person panel', route: '/', detail: 'In the Training section. Reached from the Smoko room. Click a matrix cell to open the PersonPanel on that person and SOP; "Record observation" pre-fills the worker.' },
-      { id: 'activity', type: 'screen', label: 'Training matrix bridge (admins)', route: '/', detail: 'In the Training section. The old Sign-off page entry is gone: supervisors have no Record observation button until Phase 61 puts it in the Smoko room. Admins record from the training matrix bridge.' },
+      { id: 'team', type: 'screen', label: 'Training matrix — person record', route: '/', detail: 'In the Training section. Click a matrix cell to open the record for that person and SOP; "Record observation" pre-fills the worker.' },
+      { id: 'activity', type: 'screen', label: 'Training matrix bridge (admins)', route: '/', detail: 'In the Training section. Supervisors have no Record observation button yet (a gap recorded in the capability matrix); admins record from the training matrix.' },
       { id: 'modal', type: 'screen', label: 'Record observation modal', detail: 'Shared modal: worker chip, SOP picker (assigned-first), verdict buttons, optional note. "Permanent record — cannot be edited or deleted after saving" (D-08).' },
       { id: 'assessor-check', type: 'decision', label: 'Recording "performed to SOP"? Is the recorder a signed-off assessor on this SOP? (ASR-01 gate — "needs support" is never gated, D-04)', branches: [
         { label: 'Signed off — proceed as normal', to: 'save' },
@@ -246,22 +300,22 @@ export const JOURNEYS: Journey[] = [
     group: 'Create an SOP',
     persona: 'SOP Admin',
     title: 'Switch into admin tools',
-    summary: 'An admin signs in and lands on the one screen — the SOP list, the isometric site and the detail pane. The Office card and the rooms (Office, Smoko room, Workshop, Noticeboard) carry the admin surfaces; every page they open has one Back to the site bar.',
+    summary: 'An admin signs in and lands on the home - search and the SOP list beside the site map. The section menu (Sign-offs, People, Training, Manage SOPs) carries the admin surfaces; every page they open has a Back to the home.',
     steps: [
       { id: 's', type: 'start', label: 'Signed in as admin / safety manager' },
-      { id: 'home', type: 'screen', label: 'Admin home — the one screen', route: '/', detail: 'roleHome(admin) lands here. The Office card and the rooms open the Office tabs (Inbox, Decisions, People & roles, Access), Settings, the training matrix and the new-SOP wizard; edit mode (Edit the site) is on the same screen. Profile, Sign out, Pathways and Feedback sit in the account control at the foot of the list.' },
-      { id: 'menu', type: 'decision', label: 'Open another admin surface? (the Office card and rooms: the Office inbox · Write a new SOP · People & roles · Settings; Site is Edit the site on the same screen)', branches: [
-        { label: 'SOPs', to: 'sops' },
-        { label: 'Office inbox', to: 'gov' },
-        { label: 'People & roles', to: 'team' },
+      { id: 'home', type: 'screen', label: 'Admin home', route: '/', detail: 'roleHome(admin) lands here. The section menu opens Sign-offs (Inbox, Requests, Decisions), People (people and access), Training and Manage SOPs (drafts, New SOP, the site editor). Profile, Sign out, Pathways and Feedback sit in the account control at the foot of the menu.' },
+      { id: 'menu', type: 'decision', label: 'Open another admin surface? (the section menu: Sign-offs · Manage SOPs · People · Training; Settings is a page of its own)', branches: [
+        { label: 'Manage SOPs', to: 'sops' },
+        { label: 'Sign-offs', to: 'gov' },
+        { label: 'People', to: 'team' },
         { label: 'Site', to: 'site' },
         { label: 'Settings', to: 'settings' },
         { label: 'Stay on worker path', to: 'e' },
       ] },
-      { id: 'gov', type: 'screen', label: 'Office — Inbox tab', route: '/', detail: 'The Office Inbox tab (/?place=office): one action per row — no owner, review overdue, awaiting approval, sign-off, stuck converting — counted chips and an All clear empty state (Phase 54 D-01/D-02, Phase 59). The old /governance address redirects here.' },
-      { id: 'sops', type: 'screen', label: 'Workshop room — SOPs that are not published yet', route: '/', detail: 'The Workshop lists every SOP that is not published yet, with Write a new SOP; a machine\'s SOPs open in the detail pane when the machine is selected, each with its owner and review line and Edit, which opens the SOP in the focus editor. Who sees a SOP is edited on the Office Access tab.' },
-      { id: 'team', type: 'screen', label: 'Office — People & roles tab', route: '/', detail: 'The Office People & roles tab (/?place=office&tab=people): invite, roles, departments and removal. The old /admin/team address redirects here.' },
-      { id: 'site', type: 'screen', label: 'Site map — edit mode', route: '/', detail: 'The plant-floor scene and its machines (Phase 51) — draw/name/tag machines, link SOPs to them. Edit mode is /?place=edit on the one screen (Phase 57); the old /admin/site address redirects there.' },
+      { id: 'gov', type: 'screen', label: 'Sign-offs - Inbox', route: '/', detail: 'The Sign-offs section opens on the Inbox: one action per row - no owner, review overdue, awaiting approval, sign-off, stuck converting - counted chips and an All clear empty state (Phase 54 D-01/D-02, Phase 59). The old /governance address redirects here.' },
+      { id: 'sops', type: 'screen', label: 'Manage SOPs - SOPs that are not published yet', route: '/', detail: 'Manage SOPs lists every SOP that is not published yet, with New SOP; Edit opens the SOP in the focus editor. Who sees a SOP is edited on the People access tab.' },
+      { id: 'team', type: 'screen', label: 'People - people and roles', route: '/', detail: 'The People section: invite, roles, departments and removal. The old /admin/team address redirects here.' },
+      { id: 'site', type: 'screen', label: 'Site map - edit mode', route: '/', detail: 'The plant-floor scene and its machines (Phase 51) - draw/name/tag machines, link SOPs to them. In Manage SOPs with view=site; the old /admin/site address redirects there.' },
       { id: 'settings', type: 'screen', label: 'Settings hub', route: '/admin/settings', detail: 'Groups AI Settings, a link to Departments (site edit mode), the AI agent layer, and the approval-chain editor under one home.' },
       { id: 'ai', type: 'screen', label: 'AI Settings', route: '/admin/ai-settings', detail: 'Reached from the Settings hub. Per-organisation AI model overrides (parse pipeline) + read-only view of every env-managed model.' },
       { id: 'e', type: 'end', label: 'On the chosen path' },
@@ -275,7 +329,7 @@ export const JOURNEYS: Journey[] = [
     summary: 'An admin uploads an existing Word/PDF/Excel/PowerPoint/photo and AI turns it into a structured, mobile-friendly procedure.',
     steps: [
       { id: 's', type: 'start', label: 'Has an existing SOP doc' },
-      { id: 'picker', type: 'screen', label: 'New SOP method picker', route: '/admin/sops/new', detail: 'The Workshop room "Write a new SOP" link (admin roles) lands here directly. 3 tiles, Upload first: Upload a document · Draft it with AI · Start blank. The type-vs-talk choice moved off this screen onto /admin/sops/new/ai.' },
+      { id: 'picker', type: 'screen', label: 'New SOP method picker', route: '/admin/sops/new', detail: 'The New SOP button in Manage SOPs (admin roles) lands here directly. 3 tiles, Upload first: Upload a document · Draft it with AI · Start blank. The type-vs-talk choice moved off this screen onto /admin/sops/new/ai.' },
       { id: 'up', type: 'screen', label: 'Upload', route: '/admin/sops/upload', detail: 'Drag in .docx/.pdf/.xlsx/.pptx/photo.' },
       { id: 'parse', type: 'action', label: 'AI parses the document', detail: 'Async pipeline (30–120s); extracts sections, steps, hazards.' },
       { id: 'status', type: 'decision', label: 'Parse result?', branches: [
@@ -341,7 +395,7 @@ export const JOURNEYS: Journey[] = [
     steps: [
       { id: 's', type: 'start', label: 'Have a draft' },
       { id: 'build', type: 'screen', label: 'Edit the draft', route: '/sops/[sopId]', detail: 'The focus editor: the step list in a rail, one document of steps. Add, edit, reorder and delete steps in place; hazards and PPE come first. The This SOP block holds the version, machine, objective, standards, jump-ahead switch, Ask someone to do this and the earlier versions.' },
-      { id: 'check', type: 'action', label: 'Run the AI check and tick each step', detail: 'The AI check lists findings; Show me scrolls to the step and Clear finding is logged in the decision ledger. Each step is ticked once; changing a step clears its tick and says "Edited — check it again".' },
+      { id: 'check', type: 'action', label: 'Run the AI check and tick each step', detail: 'The AI check lists findings; each finding links to its step and Clear finding is logged in the decision ledger. Each step is ticked once; changing a step clears its tick and says "Edited — check it again".' },
       { id: 'verify', type: 'decision', label: 'Every step ticked and every finding cleared?', branches: [
         { label: 'Yes', to: 'publish' },
         { label: 'No — Publish stays off and says why', to: 'check' },
@@ -358,15 +412,15 @@ export const JOURNEYS: Journey[] = [
     summary: 'A published SOP is never edited in place: Start editing opens the next version as a draft, every step is checked again, and Publish puts it live. Earlier versions stay on record.',
     steps: [
       { id: 's', type: 'start', label: 'A published SOP needs a change' },
-      { id: 'open', type: 'screen', label: 'Open the SOP in Edit', route: '/sops/[sopId]', detail: 'Admins and safety managers get a Walk / Edit switch in the top bar (never workers, never on a superseded version). Edit on a published version is read-only and offers Start editing v{n+1}.' },
-      { id: 'fork', type: 'action', label: 'Start editing v{n+1}', detail: 'Copies the live version into a new draft and opens it in the editor. Pressing it again opens the same draft, so a double press never makes two. Workers keep walking the live version meanwhile.' },
+      { id: 'open', type: 'screen', label: 'Open the SOP in Edit', route: '/sops/[sopId]', detail: 'Admins and safety managers get a Read / Edit switch in the top bar (never workers, never on a superseded version). Edit on a published version is read-only and offers Start editing v{n+1}.' },
+      { id: 'fork', type: 'action', label: 'Start editing v{n+1}', detail: 'Copies the live version into a new draft and opens it in the editor. Pressing it again opens the same draft, so a double press never makes two. Workers keep using the live version meanwhile.' },
       { id: 'edit', type: 'screen', label: 'Edit the draft', route: '/sops/[sopId]', detail: 'Edit steps in place; changing a step clears its tick and says "Edited — check it again". Run the AI check, show or clear each finding (each clear is logged), tick every step once.' },
       { id: 'ready', type: 'decision', label: 'Every step checked and every finding cleared?', branches: [
         { label: 'Yes', to: 'publish' },
         { label: 'No — Publish stays off and says why', to: 'edit' },
       ] },
       { id: 'publish', type: 'action', label: 'Publish v{n+1}', route: '/api/sops/[sopId]/publish', detail: 'The dialog says workers get the new version the next time they open it and the old one stays on record. If an approval chain applies it is sent to the approver instead.' },
-      { id: 'workers', type: 'screen', label: 'Workers land on the new version', route: '/sops/[sopId]', detail: 'An old address redirects to the live version, and a walk already in progress finishes on the version it started on. The earlier versions are listed under This SOP in the editor rail, read-only.' },
+      { id: 'workers', type: 'screen', label: 'Workers land on the new version', route: '/sops/[sopId]', detail: 'An old address redirects to the live version, and a SOP already in progress finishes on the version it started on. The earlier versions are listed under This SOP in the editor rail, read-only.' },
       { id: 'e', type: 'end', label: 'New version live' },
     ],
   },
@@ -382,7 +436,7 @@ export const JOURNEYS: Journey[] = [
       { id: 'tools', type: 'action', label: 'This SOP → + Standard' },
       { id: 'manage', type: 'action', label: 'Add, rename or remove a standard', detail: 'One list for the whole organisation, seeded with LOTO, Hot Work, Confined Space, Working at Height, Manual Handling and Electrical Isolation. Removing one takes it off everywhere, and the panel says how many places before it does.' },
       { id: 'attach', type: 'action', label: 'Put a standard on the SOP, a section or a step' },
-      { id: 'sop', type: 'screen', label: 'SOP page', route: '/sops/[sopId]', detail: 'The label shows beside the SOP title and beside each labelled section, also on the walk. Step labels reach the walk in Phase 58.' },
+      { id: 'sop', type: 'screen', label: 'SOP page', route: '/sops/[sopId]', detail: 'The label shows beside the SOP title and beside each labelled section, also while it runs. Step labels show on the step.' },
       { id: 'e', type: 'end', label: 'Labelled' },
     ],
   },
@@ -395,11 +449,11 @@ export const JOURNEYS: Journey[] = [
     steps: [
       { id: 's', type: 'start', label: 'SOP just published (or any existing SOP)' },
       { id: 'cta', type: 'action', label: '"Choose who sees it →" CTA on the Publish stage', detail: 'D-12a — only shown once the SOP is published; jumps straight into choose-mode for it.' },
-      { id: 'access', type: 'screen', label: 'Access map — Office Access tab', route: '/', detail: 'The Office Access tab (/?place=office&tab=access; admins and safety managers only), reached from the Office tabs or the Choose who sees it link in the editor (which pins the SOP with &sop=). The old /admin/access address redirects here. Site→area→department→role→person on the left, collections on the right — expand a collection to see the SOPs inside it (33-08 SC-2). The CTA pins this SOP tagged NEW atop its collection; opening the map directly (D-12b) or drilling into any collection reaches any SOP the same way.' },
+      { id: 'access', type: 'screen', label: 'Access map - People access tab', route: '/', detail: 'The access tab of the People section (admins and safety managers only), reached from the section menu or the Choose who sees it link in the editor (which pins the SOP with &sop=). The old /admin/access address redirects here. Site→area→department→role→person on the left, collections on the right — expand a collection to see the SOPs inside it (33-08 SC-2). The CTA pins this SOP tagged NEW atop its collection; opening the map directly (D-12b) or drilling into any collection reaches any SOP the same way.' },
       { id: 'connect', type: 'action', label: 'Choose people, roles or teams', detail: 'Each choice draws a live line and updates a plain "N people can see this" blast-radius banner.' },
       { id: 'done', type: 'action', label: '✓ Save — done', detail: 'Writes an additive SOP-target grant (D-11) via createGrant, materializing into sop_departments/sop_access_people — the SOP becomes "chosen by name" and stops following its collection until every named person is removed again (33-05).' },
       { id: 'panel', type: 'action', label: 'Read the answer panel', detail: 'Below the map, a plain-language panel states who can see the selected SOP/collection (or what a selected person/team can see) — no "wire"/"grant"/"UNWIRED" wording anywhere (33-09 SC-5).' },
-      { id: 'filter', type: 'action', label: 'Focus a unit to filter the SOP surface', detail: 'Clicking a department jack surfaces an "Open" link that takes the admin to that department\'s place on the one screen — the same viz doubles as a filter (SC-4).' },
+      { id: 'filter', type: 'action', label: 'Focus a unit to filter the SOP surface', detail: 'Clicking a department jack surfaces an "Open" link that takes the admin to that department\'s area on the home - the same viz doubles as a filter (SC-4).' },
       { id: 'e', type: 'end', label: 'Access set' },
     ],
   },
@@ -411,9 +465,9 @@ export const JOURNEYS: Journey[] = [
     summary: 'An admin, safety manager or supervisor asks a role or a named person to do a published procedure, from a machine row or This SOP. It is due at once; a person asked by name can decline from My requests.',
     steps: [
       { id: 's', type: 'start', label: 'SOP published' },
-      { id: 'lib', type: 'screen', label: 'A machine on the one screen', route: '/', detail: 'Each published SOP row has Ask ›; a supervisor sees it on the worker panel too.' },
+      { id: 'lib', type: 'screen', label: 'A SOP on the home', route: '/', detail: 'Each published SOP has Ask beside it in Read; a supervisor sees it too.' },
       { id: 'assign', type: 'screen', label: 'Ask someone to do this', route: '/sops/[sopId]', detail: 'The This SOP rail has the same button. Choose a role or a person, then press Ask: choosing alone sends nothing, and the picker says how many people will be told.' },
-      { id: 'notify', type: 'action', label: 'They are told and it is due', detail: 'It shows on their machines and Now card at once. A person asked by name can decline from My requests.' },
+      { id: 'notify', type: 'action', label: 'They are told and it is due', detail: 'It shows in their SOP list at once. A person asked by name can decline from My requests.' },
       { id: 'e', type: 'end', label: 'Asked' },
     ],
   },
@@ -451,45 +505,79 @@ export const JOURNEYS: Journey[] = [
 
   // ============================ Library & team ============================
   {
-    id: 'manage-team',
+    id: 'people',
     group: 'Library & team',
     persona: 'SOP Admin',
-    title: 'Manage team & roles',
-    summary: 'An admin manages members, sets roles, and assigns sub-trades that gate which SOPs each worker sees.',
+    title: 'People and access',
+    summary: 'An admin manages members, sets roles and departments, and chooses who can see which SOPs.',
     steps: [
       { id: 's', type: 'start', label: 'Set up the team' },
-      { id: 'team', type: 'screen', label: 'Office — People & roles tab', route: '/', detail: 'The Office People & roles tab (/?place=office&tab=people; admins and safety managers only): invite by email, change a role, set departments, remove a member — each change is written to the Decisions tab. The old /admin/team address redirects here.' },
-      { id: 'roles', type: 'action', label: 'Set org roles + job roles + departments', detail: 'Org-privilege role (Worker / Supervisor / SOP Admin / Safety Manager) on the People & roles tab; job roles + vacancies + headcount live on the org chart itself (D-05).' },
+      { id: 'team', type: 'screen', label: 'People - people and roles', route: '/', detail: 'The People section (admins and safety managers only) opens on people and roles: invite by email, change a role, set departments, remove a member. Each change is written to the Decisions tab. The old /admin/team address redirects here.' },
+      { id: 'roles', type: 'action', label: 'Set org roles + job roles + departments', detail: 'Org-privilege role (Worker / Supervisor / SOP Admin / Safety Manager) on the people tab; job roles + vacancies + headcount live on the org chart itself (D-05).' },
+      { id: 'access', type: 'screen', label: 'People - access', route: '/', detail: 'The access tab: who can see which SOPs, in plain language. Add a SOP to the address to pin it. The old /admin/access address redirects here. See "Choose who sees a SOP".' },
       { id: 'e', type: 'end', label: 'Access configured' },
     ],
   },
-
   {
-    id: 'training-matrix-records',
+    id: 'training',
     group: 'Library & team',
     persona: 'Supervisor / Admin',
-    title: 'See training status & records',
-    summary: 'A supervisor or admin opens the training matrix to see who has read, been observed on, or been signed off for each required SOP, drills into one worker\'s record, and exports a SuccessFactors-shaped CSV for an audit. Workers see their own states too, read-only.',
+    title: 'Training: status, records and assessment requests',
+    summary: 'An admin or safety manager opens the training matrix to see who has read, been observed on, or been signed off for each required SOP, drills into one person\'s record, and exports a SuccessFactors-shaped CSV for an audit. A worker sees their own states in My record and on their profile, read-only.',
     steps: [
       { id: 's', type: 'start', label: 'Needs a pre-audit training scan' },
-      { id: 'team', type: 'screen', label: 'Training matrix', route: '/', detail: 'In the Training section. Phase 35 (D-06), re-homed by Phase 59 (A-05): the matrix is its own page, linked from the Smoko room, until Phase 61.' },
-      { id: 'toggle', type: 'action', label: 'Read the matrix', detail: 'Department-first cut with labelled state pills + both-axis rollups; MTX-03 department/worker/SOP filters narrow it further.' },
-      { id: 'cell', type: 'action', label: 'Click a state pill cell', detail: 'onSelectCell opens the PersonPanel focused on that person + SOP (D-09).' },
-      { id: 'record', type: 'screen', label: 'PersonPanel training record', route: '/', detail: 'In the Training section. Grouped-by-SOP evidence trail + "Other completed SOPs" section (TRN-01/D-12/D-13).' },
-      { id: 'export', type: 'action', label: 'Export CSV', detail: 'Matrix header (filtered cut) or PersonPanel (one worker) — both call the same exportTrainingCsv generator (D-16/TRN-02).' },
-      { id: 'own', type: 'screen', label: 'Worker sees their own competency state', route: '/profile', detail: '"My competency" section — read-only, informational, never gates access (CMP-04). Phase 36 (REF-01/CMP-03): each SOP row can also carry an "Outdated version" chip (their last completion predates the current version, but their evidence is never lost or reset) and a "Refresher due"/"Refresher overdue" chip — both passive coaching signals, never a lock.' },
+      { id: 'team', type: 'screen', label: 'Training matrix', route: '/', detail: 'The Training section (admins and safety managers). The old /admin/training address redirects here. Department-first cut with labelled state pills and both-axis rollups; department, worker and SOP filters narrow it.' },
+      { id: 'cell', type: 'action', label: 'Click a state pill cell', detail: 'Opens the person\'s record on that person and SOP (D-09).' },
+      { id: 'record', type: 'screen', label: 'A person\'s training record', route: '/', detail: 'Grouped-by-SOP evidence trail plus an "Other completed SOPs" list (TRN-01/D-12/D-13). Record observation here pre-fills the worker.' },
+      { id: 'requests', type: 'screen', label: 'Assessment requests', route: '/', detail: 'Open requests from supervisors who need to be assessed on a SOP: who asked, which SOP. Assess now opens the observation form preset to that person and SOP.' },
+      { id: 'export', type: 'action', label: 'Export CSV', detail: 'Matrix header (filtered cut) or a person\'s record - both call the same exportTrainingCsv generator (D-16/TRN-02).' },
+      { id: 'own', type: 'screen', label: 'A worker sees their own competency state', route: '/profile', detail: '"My competency" section - read-only, informational, never gates access (CMP-04). Phase 36 (REF-01/CMP-03): each SOP row can also carry an "Outdated version" chip and a "Refresher due" / "Refresher overdue" chip - passive coaching signals, never a lock.' },
       { id: 'e', type: 'end', label: 'Training status visible, evidence exportable' },
     ],
   },
+  {
+    id: 'manage-sops',
+    group: 'Library & team',
+    persona: 'SOP Admin',
+    title: 'Manage SOPs',
+    summary: 'An admin or safety manager starts a new SOP, picks up their drafts, edits the site and its departments, and sets the objectives - all from the Manage SOPs section.',
+    steps: [
+      { id: 's', type: 'start', label: 'Opens the home as admin' },
+      { id: 'manage', type: 'screen', label: 'Manage SOPs', route: '/', detail: 'The Manage SOPs section lists every draft in the organisation with its state and a New SOP button. Open goes to the editor; Back returns here. The old workshop address redirects here.' },
+      { id: 'choice', type: 'decision', label: 'What now?', branches: [
+        { label: 'New SOP', to: 'new' },
+        { label: 'Open a draft', to: 'draft' },
+        { label: 'Site and departments', to: 'site' },
+        { label: 'Objectives', to: 'obj' },
+      ] },
+      { id: 'new', type: 'screen', label: 'New SOP', route: '/admin/sops/new', detail: 'Three tiles, Upload first: Upload a document - Draft it with AI - Start blank. See the Create an SOP journeys.', branches: [
+        { label: 'Done', to: 'e' },
+      ] },
+      { id: 'draft', type: 'screen', label: 'A draft in the editor', route: '/sops/[sopId]', detail: 'Opens the focus editor; Back returns to Manage SOPs.', branches: [
+        { label: 'Done', to: 'e' },
+      ] },
+      { id: 'site', type: 'screen', label: 'Site and departments', route: '/', detail: 'Manage SOPs with view=site in the address: the site editor with the departments strip above it. See "Map the site and its machines".', branches: [
+        { label: 'Done', to: 'e' },
+      ] },
+      { id: 'obj', type: 'action', label: 'Objectives', detail: 'What the site is aiming for; shown to everyone, edited here.', branches: [
+        { label: 'Done', to: 'e' },
+      ] },
+      { id: 'machine', type: 'screen', label: 'New SOP for a machine', route: '/admin/sops/new/blank', detail: 'From an object on the site map, New SOP opens the blank wizard with the machine already chosen; the new SOP is linked to it when it is created.', branches: [
+        { label: 'Done', to: 'e' },
+      ] },
+      { id: 'e', type: 'end', label: 'Back on the home' },
+    ],
+  },
+
   {
     id: 'governance-queue',
     group: 'Library & team',
     persona: 'SOP Admin',
     title: 'Work the needs-attention queue',
-    summary: 'An admin opens the Office and works an inbox of one-action rows — no owner, review overdue, waiting on their approval, stuck converting — until it reads All clear.',
+    summary: 'An admin opens Sign-offs and works an inbox of one-action rows — no owner, review overdue, waiting on their approval, stuck converting — until it reads All clear.',
     steps: [
       { id: 's', type: 'start', label: 'SOPs are drifting out of date, ownerless, or awaiting approval' },
-      { id: 'queue', type: 'screen', label: 'Office — Inbox tab', route: '/', detail: 'The Office Inbox tab (/?place=office); the old /governance address redirects here. One action per row: Assign owner · Approve · Confirm current · Open SOP · Retry; the rows are no owner, review overdue, awaiting the caller\'s approval, stuck converting. Machines without SOPs arrive as agent requests in the Requests tab. An empty inbox shows the All clear state. Computed on read — no jobs, no materialized state (D28-05).' },
+      { id: 'queue', type: 'screen', label: 'Sign-offs - Inbox', route: '/', detail: 'The Sign-offs Inbox; the old /governance address redirects here. One action per row: Assign owner · Approve · Confirm current · Open SOP · Retry; the rows are no owner, review overdue, awaiting the caller\'s approval, stuck converting. Machines without SOPs arrive as agent requests in the Requests tab. An empty inbox shows the All clear state. Computed on read — no jobs, no materialized state (D28-05).' },
       { id: 'action', type: 'decision', label: 'What does the row need?', branches: [
         { label: 'Approve (awaiting approval)', to: 'approve' },
         { label: 'Confirm current (overdue/due soon)', to: 'confirm' },
@@ -500,8 +588,8 @@ export const JOURNEYS: Journey[] = [
       { id: 'approve', type: 'action', label: 'Approve step', detail: 'One-click approveStep — shown only when the caller matches the chain’s next step (APR-03/APR-04); also available from the publish bar in the editor.' },
       { id: 'confirm', type: 'action', label: 'Confirm current', detail: 'One click; stamps last_reviewed_at + resets review_due_at; appends an audited sop_review_events row (D28-04).' },
       { id: 'assign', type: 'action', label: 'Reassign owner inline', detail: 'OwnerPicker popover — ≤2 clicks total via setSopOwner (OWN-02).' },
-      { id: 'fix', type: 'screen', label: 'Open the SOP', route: '/sops/[sopId]', detail: 'Stale-department rows open the SOP in the editor from the Office; the dangling or renamed department reference is fixed in This SOP (GQ-03). Back returns to the Office.' },
-      { id: 'retry', type: 'screen', label: 'Retry in the editor', route: '/sops/[sopId]', detail: 'A stuck or failed conversion row opens the SOP in the focus editor (from the Office); the parse view shows the stage and Try again, and Back returns to the Office.' },
+      { id: 'fix', type: 'screen', label: 'Open the SOP', route: '/sops/[sopId]', detail: 'Stale-department rows open the SOP in the editor from Sign-offs; the dangling or renamed department reference is fixed in This SOP (GQ-03). Back returns to Sign-offs.' },
+      { id: 'retry', type: 'screen', label: 'Retry in the editor', route: '/sops/[sopId]', detail: 'A stuck or failed conversion row opens the SOP in the focus editor (from Sign-offs); the parse view shows the stage and Try again, and Back returns to Sign-offs.' },
       { id: 'e', type: 'end', label: 'Row leaves the queue' },
     ],
   },
@@ -513,7 +601,7 @@ export const JOURNEYS: Journey[] = [
     summary: 'An admin creates departments, assigns owners, and uses them to organise SOPs, content, and team members.',
     steps: [
       { id: 's', type: 'start', label: 'Need to organise by department' },
-      { id: 'depts', type: 'screen', label: 'Departments strip — edit mode', route: '/', detail: 'Edit mode (/?place=edit) carries the departments strip: add, rename, recolour, remove. The old /admin/departments address redirects there. Per-person department membership is on the Office People & roles tab.' },
+      { id: 'depts', type: 'screen', label: 'Departments strip — edit mode', route: '/', detail: 'Manage SOPs with view=site carries the departments strip: add, rename, recolour, remove. The old /admin/departments address redirects there. Per-person department membership is on the People section.' },
       { id: 'create', type: 'action', label: 'Create department', detail: 'Name, code, colour, icon, owner.' },
       { id: 'owner', type: 'action', label: 'Set owner', detail: 'Clears the "No owner assigned" warning.' },
       { id: 'e', type: 'end', label: 'Department ready' },
@@ -526,15 +614,15 @@ export const JOURNEYS: Journey[] = [
     title: 'Map the site and its machines',
     summary: 'An admin turns the plant floor into a drawing — a scene image with named, departmentised machines — so any SOP can say which machines it belongs to.',
     steps: [
-      { id: 's', type: 'start', label: 'Admin opens Edit the site on the one screen' },
-      { id: 'empty', type: 'screen', label: 'No site yet', route: '/', detail: 'Edit mode (/?place=edit). Two choices: Generate from a description (shown only when scene generation is set up on the server), or Upload a JPG/PNG up to 15 MB.' },
+      { id: 's', type: 'start', label: 'Admin opens Manage SOPs and chooses the site editor' },
+      { id: 'empty', type: 'screen', label: 'No site yet', route: '/', detail: 'Manage SOPs with view=site. Two choices: Generate from a description (shown only when scene generation is set up on the server), or Upload a JPG/PNG up to 15 MB.' },
       { id: 'method', type: 'decision', label: 'How to make the scene?', branches: [
         { label: 'Generate', to: 'generate' },
         { label: 'Upload', to: 'upload' },
       ] },
       { id: 'generate', type: 'action', label: 'Describe the site and generate the scene' },
       { id: 'upload', type: 'action', label: 'Upload a JPG or PNG of the site' },
-      { id: 'editor', type: 'screen', label: 'Site map editor', route: '/', detail: 'Edit mode (/?place=edit). Scene at full size, drag to pan, scroll to zoom.' },
+      { id: 'editor', type: 'screen', label: 'Site map editor', route: '/', detail: 'Manage SOPs with view=site. Scene at full size, drag to pan, scroll to zoom.' },
       { id: 'draw', type: 'action', label: 'Draw machine', detail: 'Click each corner, click the first to finish; name it, pick its department.' },
       { id: 'link', type: 'action', label: 'Show SOPs on a machine', detail: 'Link or unlink SOPs from the machine panel.' },
       { id: 'builder', type: 'screen', label: 'Edit the SOP → This SOP → Machine', route: '/sops/[sopId]', detail: 'The same links, edited from the SOP side. The picker says where the SOP lives: its machines and their department, or Whole site. The Whole site button clears every machine, and a SOP with no machine is site-wide (Phase 56, D-09/D-10). The department shown comes from the machines; who can see the SOP is still the access wiring. This SOP also carries the category button (D-09) — the category fix that used to live in the retired list detail pane.' },
@@ -543,78 +631,6 @@ export const JOURNEYS: Journey[] = [
   },
 
   // ================================ Everyone ================================
-  {
-    id: 'one-screen',
-    group: 'Everyone',
-    persona: 'Everyone',
-    title: 'The one screen',
-    summary: 'Signed-in members open / and get the list, the isometric site and a detail pane in one screen.',
-    steps: [
-      { id: 's', type: 'start', label: 'Opens the site' },
-      { id: 'screen', type: 'screen', label: 'The one screen - list, site, detail', route: '/', detail: 'Rooms are always signposted on the site. Selecting a machine or the Noticeboard lists its SOPs with Walk. Searching lights the matching shapes. Esc returns to the overview. Every place has an address, /?place=... A visitor who is not signed in sees the landing with Log In instead; a member with no role goes to the holding screen.' },
-      { id: 'overview', type: 'screen', label: 'Site overview - nothing selected', route: '/', detail: 'With nothing selected the detail pane shows the counts card, then Objectives, Notifications, My requests and a line to the Office. Sections with nothing in them are absent.' },
-      { id: 'bell', type: 'action', label: 'Bell beside search', route: '/', detail: 'The bell shows how many notifications are unread (nothing at 0, 99+ above 99). Pressing it selects the overview and brings the Notifications section into view. It is not shown while the site is being drawn.' },
-      { id: 'notif', type: 'action', label: 'Open a notification', route: '/sops/[sopId]', detail: 'Opening a row marks it read and goes to its place: a machine, the Office, the overview, or the SOP.' },
-      { id: 'myreq', type: 'action', label: 'My requests', route: '/', detail: 'Asked of you, You asked and Answered. Withdraw a request you raised, decline an ask with a reason, or stop asking. The worker Office card has Go to my requests.' },
-      { id: 'walk', type: 'action', label: 'Walk a SOP', detail: 'Walk beside a SOP row, or Walk it on the Now card.' },
-      { id: 'sop', type: 'screen', label: 'Procedure', route: '/sops/[sopId]' },
-      { id: 'smoko', type: 'screen', label: 'Smoko room - my record', route: '/', detail: 'In My record. The Smoko room bridges to My sign-offs: every role sees their own record.' },
-      { id: 'e', type: 'end', label: 'Back on the site' },
-    ],
-  },
-  {
-    id: 'one-screen-admin',
-    group: 'Library & team',
-    persona: 'SOP Admin',
-    title: 'Run the site from the one screen',
-    summary: 'An admin opens / and sees health marks on the site, the Office inbox count, the Workshop drafts and the Noticeboard, and can start a SOP for a machine or edit the site without leaving the screen.',
-    steps: [
-      { id: 's', type: 'start', label: 'Opens the site' },
-      { id: 'screen', type: 'screen', label: 'The one screen (admin)', route: '/', detail: 'Machines carry a red, amber or green mark from the SOPs linked to them. The Office pin and the Office card show the same inbox count. Selecting a machine lists its SOPs with a badge each (no owner, review due, draft, ok), Walk on published ones, Edit on any.', branches: [
-        { label: 'Open the Office', to: 'office' },
-        { label: 'Open the Smoko room', to: 'smoko' },
-        { label: 'Open the Workshop', to: 'workshop' },
-        { label: 'Select a machine', to: 'machine' },
-        { label: 'Edit site', to: 'edit' },
-      ] },
-      { id: 'office', type: 'screen', label: 'Office - Inbox tab', route: '/', detail: 'The Office opens on the Inbox (/?place=office), seen by admins, safety managers and supervisors. One action per row: sign a walk off, approve a step, mark your own SOP reviewed, assign an owner, retry a stuck conversion. Sign-off and approve expand in place. Empty is the goal. A supervisor sees the Inbox and Requests tabs: no chips, and any other tab address falls back to the Inbox.', branches: [
-        { label: 'Requests', to: 'requests' },
-        { label: 'Decisions', to: 'decisions' },
-        { label: 'People & roles', to: 'people' },
-        { label: 'Access', to: 'access' },
-        { label: 'Done', to: 'e' },
-      ] },
-      { id: 'requests', type: 'screen', label: 'Office - Requests tab', route: '/', detail: 'Office → Requests tab (/?place=office&tab=requests): open requests newest first, Accept or Decline with a reason; agent-raised rows carry the agent chip; the answer is logged and the asker told. Admins, safety managers and supervisors.', branches: [
-        { label: 'Done', to: 'e' },
-      ] },
-      { id: 'decisions', type: 'screen', label: 'Office - Decisions tab', route: '/', detail: '/?place=office&tab=decisions, admins and safety managers only. The ledger of who decided what: sign-offs, approvals, owner changes, role changes, invites and removals, with a cleared-today line.', branches: [
-        { label: 'Done', to: 'e' },
-      ] },
-      { id: 'people', type: 'screen', label: 'Office - People & roles tab', route: '/', detail: '/?place=office&tab=people, admins and safety managers only. Invite by email, change a role, set departments, remove a member. The old /admin/team address redirects here.', branches: [
-        { label: 'Done', to: 'e' },
-      ] },
-      { id: 'access', type: 'screen', label: 'Office - Access tab', route: '/', detail: '/?place=office&tab=access (add &sop= to pin a SOP), admins and safety managers only. Who can see which SOPs. The old /admin/access address redirects here.', branches: [
-        { label: 'Done', to: 'e' },
-      ] },
-      { id: 'smoko', type: 'screen', label: 'Smoko room - training matrix link', route: '/', detail: 'In the Training section. The Smoko room carries a Training matrix link (admins and safety managers) to the training page, where the matrix, a person\'s training record and the assessment requests stay until Phase 61. Back to the site returns to the Smoko room.', branches: [
-        { label: 'Done', to: 'e' },
-      ] },
-      { id: 'workshop', type: 'screen', label: 'Workshop - drafts', route: '/sops/[sopId]', detail: 'Every draft in the organisation with its state; Open goes to the focus editor, and Back returns to the Workshop.', branches: [
-        { label: 'Write a new SOP', to: 'new' },
-        { label: 'Done', to: 'e' },
-      ] },
-      { id: 'new', type: 'screen', label: 'New SOP', route: '/admin/sops/new', branches: [
-        { label: 'Done', to: 'e' },
-      ] },
-      { id: 'machine', type: 'screen', label: 'Machine - SOPs and New SOP for this machine', route: '/admin/sops/new/blank', detail: 'New SOP for this machine opens the blank wizard with the machine already chosen; the new SOP is linked to it when it is created.', branches: [
-        { label: 'Done', to: 'e' },
-      ] },
-      { id: 'edit', type: 'action', label: 'Edit site', detail: 'The site editor replaces the stage and detail panes, with the departments strip above it. With no site yet it offers four templates (railway maintenance, trades training centre, food-safety training kitchen, bottling factory) that set up the picture, departments, machines and rooms in one tap, or a generated or uploaded picture. Done returns to the overview with fresh marks.', branches: [
-        { label: 'Done', to: 'e' },
-      ] },
-      { id: 'e', type: 'end', label: 'Back on the site' },
-    ],
-  },
   {
     id: 'give-feedback',
     group: 'Everyone',

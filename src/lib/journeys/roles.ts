@@ -48,7 +48,7 @@ export const ROLES: RoleDef[] = [
     who: 'A new member whose role has not been set yet.',
     landsOn: { label: 'Account pending', route: '/pending' },
     can: ['Sign in and see a "your account is being set up" holding screen'],
-    cannot: ['Read SOPs', 'Access any admin or activity surface — until an admin assigns a role'],
+    cannot: ['Read SOPs', 'Access any admin or record surface — until an admin assigns a role'],
   },
   {
     key: 'worker',
@@ -56,9 +56,9 @@ export const ROLES: RoleDef[] = [
     kind: 'org',
     colour: '#2563eb',
     who: 'Front-line tradesperson / inspector following procedures on-site.',
-    landsOn: { label: 'The one screen', route: '/' },
+    landsOn: { label: 'The home', route: '/' },
     can: [
-      'Read and walk through assigned / visible SOPs step-by-step',
+      'Read, start and finish assigned / visible SOPs step-by-step',
       'Capture photos, complete steps, sign off their own instance',
       'Self-add a published SOP to "Your SOPs"',
     ],
@@ -70,7 +70,7 @@ export const ROLES: RoleDef[] = [
     kind: 'org',
     colour: '#7c3aed',
     who: 'Oversees a crew and reviews their completed work.',
-    landsOn: { label: 'The one screen', route: '/' },
+    landsOn: { label: 'The home', route: '/' },
     can: [
       'Review worker completion records and sign-offs',
       'Open a completion to inspect captured photos and step results',
@@ -83,7 +83,7 @@ export const ROLES: RoleDef[] = [
     kind: 'org',
     colour: '#0d9488',
     who: 'Owns safety governance — supervisor oversight plus full admin authoring.',
-    landsOn: { label: 'The one screen', route: '/' },
+    landsOn: { label: 'The home', route: '/' },
     can: [
       'Everything a Supervisor can do',
       'Full admin authoring: create / upload / parse SOPs, manage the content library',
@@ -97,7 +97,7 @@ export const ROLES: RoleDef[] = [
     kind: 'org',
     colour: '#b45309',
     who: 'The organisation’s administrator — set up by Potenco and by invitation.',
-    landsOn: { label: 'The one screen', route: '/' },
+    landsOn: { label: 'The home', route: '/' },
     can: [
       'Create / upload / AI-parse SOPs and run them to publish',
       'Manage the content library (department tagging)',
@@ -174,15 +174,14 @@ export interface AccessRow {
 }
 
 export const ACCESS_MATRIX: AccessRow[] = [
-  // NOTE: the one screen (/) is one row: every role lands on it. It lists,
-  // draws and opens the places a role may see; what an admin can do from it
-  // (the Office card, Workshop, edit mode) is gated by the server reads it
-  // fetches, never by this row. The Office is its own row below.
-  { surface: 'The one screen (read / walk)', route: '/',              access: { worker: true,  supervisor: true,  safety_manager: true, admin: true } },
-  { surface: 'Activity (review sign-off)', route: '/activity',    access: { worker: 'own', supervisor: true,  safety_manager: true, admin: true } },
-  { surface: 'Office: Inbox (sign-offs only for a supervisor)', route: '/', access: { worker: false, supervisor: true, safety_manager: true, admin: true } },
-  { surface: 'Office: Decisions, People & roles, Access', route: '/', access: { worker: false, supervisor: false, safety_manager: true, admin: true } },
-  { surface: 'Departments (site edit mode)', route: '/', access: { worker: false, supervisor: false, safety_manager: true, admin: true } },
+  // NOTE: the home (/) is one row: every role lands on it. Its sections are
+  // the rest of the rows; what a role can do inside one is gated by the server
+  // reads it fetches, never by these rows (see CAPABILITY-MATRIX.md).
+  { surface: 'The home (find, read, start a SOP)', route: '/',              access: { worker: true,  supervisor: true,  safety_manager: true, admin: true } },
+  { surface: 'My record (own finished SOPs)', route: '/',    access: { worker: 'own', supervisor: 'own',  safety_manager: 'own', admin: 'own' } },
+  { surface: 'Sign-offs: Inbox, Requests (supervisor sees these two)', route: '/', access: { worker: false, supervisor: true, safety_manager: true, admin: true } },
+  { surface: 'Sign-offs: Decisions; People (people, access); Training', route: '/', access: { worker: false, supervisor: false, safety_manager: true, admin: true } },
+  { surface: 'Manage SOPs (drafts, New SOP, site and departments)', route: '/', access: { worker: false, supervisor: false, safety_manager: true, admin: true } },
 ]
 
 export const ACCESS_ROLE_ORDER = ['worker', 'supervisor', 'safety_manager', 'admin'] as const

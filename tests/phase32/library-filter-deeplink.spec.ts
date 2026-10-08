@@ -42,9 +42,9 @@ test.describe('SC-4 — library filter deep-link', () => {
     expect(src).toContain("query = query.in('id', filterIds.length > 0 ? filterIds : [NO_MATCH_ID])")
   })
 
-  test('WiringPatchBay exposes a focus-based Open link: a department opens its place; no collection link (list retired, D-13)', () => {
+  test('WiringPatchBay exposes a focus-based Open link: a department opens its area on the home; no collection link (list retired, D-13)', () => {
     const src = fs.readFileSync(WIRING_PATCH_BAY_PATH, 'utf-8')
-    expect(src).toContain('`/?place=dept:${focus}`')
+    expect(src).toContain("`/?area=${focus}`")
     expect(src).not.toContain('`/sops?collection=${focus}`')
     expect(src).toContain('openInLibraryHref')
   })
