@@ -305,6 +305,8 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 
 ### Roadmap Evolution
 
+- Phase 63 added (2026-10-08): SOP-first Home, Library Site Map and the SOPstart Start — implements sketches 009 A and 010 under ADR-0004; retires the room metaphor; supersedes ADR-0003
+
 - v7.0 roadmap created (2026-07-19): 6 phases (34-39) mapping all 23 v7.0 REQ-IDs — Phase 34 Supervisor Observations, Phase 35 Competency Classifier + Training Matrix + Records, Phase 36 Refresher Cadence + Version-Currency, Phase 37 Assessor Governance, Phase 38 Guidance-Notes Adoptions (promotes backlog 999.4-999.6), Phase 39 AI-Prioritized Maintenance Schedule (absorbs Phase 31 rollforward). Backlog 999.7 promoted into Phase 36.
 - Phase 32 added (2026-07-18): Visual Org Model & Library Permissions — design pre-validated via sketches 001/002/003 (Node Chart org builder + D-hybrid wiring surface with library-filter deep-links and wire-up mode); findings in sketch-findings-SOPstart. Pre-plan gates: roles entity schema, inherited-revoke UX, RLS extension to area/person grants.
 

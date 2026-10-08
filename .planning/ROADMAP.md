@@ -808,8 +808,6 @@ Plans:
 
 **Plans**: TBD
 
----
-
 ## v4.0 — Safety-Critical Parsing + Voice + AI Foundation (started 2026-05-24 · ✅ shipped 2026-07-02)
 
 Bundles the 8 v4.0 NOW features from `.planning/PRODUCT-ROADMAP.md` v0.3. Planned 21 → 22 → 23; grew in-flight with 21.5/21.6 (builder UX) and 24/25 (flow graph + departments). All phases executed and code-reviewed; residual = human UAT (21.6/22/23/25) carried per the v3.0 field-verification precedent. Archive via `/gsd-complete-milestone`.
@@ -1719,6 +1717,7 @@ Executes 55 → 56 → 57 → 58 → 59 → 60 → 61 → 62, strictly sequentia
 - [x] **Phase 60: Requests, Notifications & Objectives** - People and agents raise requests the Office answers; notifications with a bell; objectives as quiet metadata; the site overview fills in (completed 2026-10-06)
 - [~] **Phase 61: The Workshop & the Smoko Room** - MOVED OUT OF GSD 2026-10-06: tracked as todo pieces A-H in the Claude Doc https://claude.ai/code/artifact/16b59e56-b699-4972-81e8-d946f140234f
 - [~] **Phase 62: Removal Certified, Addresses & Maps** - MOVED OUT OF GSD 2026-10-06: tracked as clean-up todos in the Claude Doc https://claude.ai/code/artifact/16b59e56-b699-4972-81e8-d946f140234f
+- [ ] **Phase 63: SOP-first Home, Library Site Map and the SOPstart Start** - The home becomes find · read · start (sketch 009 A + the library site map); rooms retired; the SOPstart wordmark and the start merge (sketch 010); "walk" leaves the screen
 
 ### Phase 55: Cut the Dropped Features & One Organisation
 
@@ -2142,6 +2141,18 @@ Plans:
 
 **Plans**: none -- moved out of GSD 2026-10-06, see https://claude.ai/code/artifact/16b59e56-b699-4972-81e8-d946f140234f
 **UI hint**: yes
+
+### Phase 63: SOP-first Home, Library Site Map and the SOPstart Start
+
+**Goal**: The home becomes a way to find a SOP, read it and start it, ranked by ADR-0004 (safe SOP use > records > authoring). Sketch 009 variant A: a plain section menu (My SOPs · My record · Training and Sign-offs for supervisor and up · Manage SOPs for SOP admin, last, no count); the SOP list (search, Recent, Most used, All SOPs by area or by type; status shown on the row as information, no "next for you", no due queues); and a reader pane that shows the open SOP in Read with the SOP chip and the start button, or — with no SOP open — an isometric SVG map of the library: every area a clearly outlined clickable floor area, every object on it one SOP (noticeboards for processes, orders of operation and emergencies), click an area to zoom and filter the list, click an object to read it. The room metaphor (Office, Smoko room, Workshop, Noticeboard) is retired and their contents re-homed as the plain sections. The SOPstart wordmark (sketch 010: Saira Semi Condensed, ink SOP chip + start, continuous hazard tape, `--wm-*` tokens) replaces the text logo, and tapping start plays the merge into the focus screen (button body fades, SOP drops into line, they slide together, tape slides in from the left, the logo rises into the steps header; full on the first start of the day, ×0.3 after, none under reduced motion; `--dur-fuse-*` tokens). Worker words: Read · Start · Stop · Next · Done — "walk" never appears on screen. Phone: List | Site map toggle with numbered area markers and a tappable key. Supersedes ADR-0003 (site templates fix room positions) with a new ADR in the same change; `journeys.ts` and the deployed evals follow.
+**Requirements**: TBD (planning derives them from sketches 009/010 and ADR-0004)
+**Depends on**: Phase 60 (Phases 61/62 moved out of GSD 2026-10-06; their room-shaped todos are superseded by this phase where they conflict)
+**Design sources**: `.planning/sketches/009-sop-first-home/`, `.planning/sketches/010-wordmark/`, `docs/adr/0004-design-principles.md`
+**Plans:** 0 plans
+
+Plans:
+
+- [ ] TBD (run /gsd-plan-phase 63 to break down)
 
 ## Progress
 
