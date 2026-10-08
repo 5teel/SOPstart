@@ -21,6 +21,25 @@ import { categoryLabel } from '@/lib/sop-categories'
 import type { WorkerSop, WorkerSopRow } from '@/lib/sop/worker-signal'
 import { latestPublished, type LineageRow } from '@/lib/sop/lineage-current'
 
+/** The `['library-sops']` query function: one row per SOP, latest published version. Shared with useLibrary (one cache key, one shape). */
+export async function libraryQueryFn(): Promise<WorkerSopRow[]> {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from('sops')
+    .select('id, title, sop_number, category_slug, department, published_at, placement, version, parent_sop_id, status')
+    .eq('status', 'published')
+    .order('title', { ascending: true }) as {
+      data: Array<WorkerSopRow & LineageRow> | null
+      error: { message: string } | null
+    }
+  // A failed read must not look like an empty library.
+  if (error) throw new Error(error.message)
+  // One row per SOP: the latest published version (D-13, D-18), keeping the title order.
+  const rows = data ?? []
+  const keep = new Set(latestPublished(rows).map((r) => r.id))
+  return rows.filter((r) => keep.has(r.id))
+}
+
 export function useWorkerSops(requestedIds?: ReadonlySet<string>) {
   const { data: assignments = [], isLoading: assignmentsLoading } = useQuery({
     queryKey: ['user-sop-assignments'],
@@ -38,23 +57,7 @@ export function useWorkerSops(requestedIds?: ReadonlySet<string>) {
     refetch: refetchLibrary,
   } = useQuery<WorkerSopRow[]>({
     queryKey: ['library-sops'],
-    queryFn: async () => {
-      const supabase = createClient()
-      const { data, error } = await supabase
-        .from('sops')
-        .select('id, title, sop_number, category_slug, department, published_at, placement, version, parent_sop_id, status')
-        .eq('status', 'published')
-        .order('title', { ascending: true }) as {
-          data: Array<WorkerSopRow & LineageRow> | null
-          error: { message: string } | null
-        }
-      // A failed read must not look like an empty library.
-      if (error) throw new Error(error.message)
-      // One row per SOP: the latest published version (D-13, D-18), keeping the title order.
-      const rows = data ?? []
-      const keep = new Set(latestPublished(rows).map((r) => r.id))
-      return rows.filter((r) => keep.has(r.id))
-    },
+    queryFn: libraryQueryFn,
     staleTime: 1000 * 60 * 2,
   })
   const librarySops = libraryData ?? []
