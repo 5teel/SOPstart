@@ -215,7 +215,7 @@ test.describe('inbox model', () => {
     expect(src).toContain('loadInbox()')
     expect(src).toMatch(/governance: \[\], library: \[\], signOffs, ownedReviews/)
     expect(src).toContain('listOpenRequests()')
-    expect(src).toContain("'Office access required'")
+    expect(src).toContain(`"You don't have access to this."`)
   })
 
   test('the inbox model never calls the row actions itself (moved from the phase54 gating spec in 59-14)', () => {

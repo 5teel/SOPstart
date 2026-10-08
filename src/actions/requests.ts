@@ -94,7 +94,7 @@ export async function answerRequest(
   const { userId, role, organisationId } = await getSessionContext()
   if (!userId) return { error: 'Not authenticated' }
   if (!organisationId) return { error: 'No organisation found' }
-  if (!canAnswerRequests(role)) return { error: 'Office access required' }
+  if (!canAnswerRequests(role)) return { error: "You don't have access to this." }
 
   const parsed = answerSchema.safeParse(input)
   if (!parsed.success) return { error: 'That answer is not valid.' }

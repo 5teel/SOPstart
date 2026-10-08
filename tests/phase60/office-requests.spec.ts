@@ -24,7 +24,7 @@ test.describe('Office Requests data and pin (60-05)', () => {
     expect(src).toContain('requests: inbox.requests')
     expect(src).toMatch(/listOpenRequests\(\),/)
     expect(src).toMatch(/items: deriveInbox\(\{ governance: \[\], library: \[\], signOffs, ownedReviews \}\),\s*requests,/)
-    expect(src).toContain("'Office access required'")
+    expect(src).toContain(`"You don't have access to this."`)
     expect(src).not.toContain('createAdminClient')
   })
 

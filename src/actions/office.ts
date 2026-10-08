@@ -64,7 +64,7 @@ export async function getOfficeInbox(): Promise<OfficeInbox | { error: string }>
     }
   }
 
-  return { error: 'Office access required' }
+  return { error: "You don't have access to this." }
 }
 
 export type ReviewStep = {
@@ -109,7 +109,7 @@ export async function getCompletionForReview(completionId: string): Promise<Comp
   const { supabase, userId, role, organisationId } = await getSessionContext()
   if (!userId) return { error: 'Not authenticated' }
   if (!organisationId) return { error: 'No organisation found' }
-  if (role !== 'supervisor' && role !== 'safety_manager' && role !== 'admin') return { error: 'Office access required' }
+  if (role !== 'supervisor' && role !== 'safety_manager' && role !== 'admin') return { error: "You don't have access to this." }
 
   const { data, error } = await supabase
     .from('sop_completions')

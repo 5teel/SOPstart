@@ -48,7 +48,7 @@ export async function askToDoSop(
   const { userId, role, organisationId } = await getSessionContext()
   if (!userId) return { error: 'Not authenticated' }
   if (!organisationId) return { error: 'No organisation found' }
-  if (!canAsk(role)) return { error: 'Office access required' }
+  if (!canAsk(role)) return { error: "You don't have access to this." }
 
   const parsed = askSchema.safeParse(input)
   if (!parsed.success) return { error: 'That ask is not valid.' }
@@ -146,7 +146,7 @@ export async function stopAsking(input: unknown): Promise<{ logged: boolean } | 
   const { userId, role, organisationId } = await getSessionContext()
   if (!userId) return { error: 'Not authenticated' }
   if (!organisationId) return { error: 'No organisation found' }
-  if (!canAsk(role)) return { error: 'Office access required' }
+  if (!canAsk(role)) return { error: "You don't have access to this." }
 
   const parsed = answerSchema.safeParse(input)
   if (!parsed.success) return { error: 'That answer is not valid.' }
@@ -183,7 +183,7 @@ export async function listAskTargets(input?: unknown): Promise<AskTargets | { er
   const { userId, role, organisationId } = await getSessionContext()
   if (!userId) return { error: 'Not authenticated' }
   if (!organisationId) return { error: 'No organisation found' }
-  if (!canAsk(role)) return { error: 'Office access required' }
+  if (!canAsk(role)) return { error: "You don't have access to this." }
 
   const parsed = targetsSchema.safeParse(input ?? {})
   if (!parsed.success) return { error: 'That is not valid.' }
