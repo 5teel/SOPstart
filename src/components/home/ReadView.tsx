@@ -36,6 +36,15 @@ const AskTrigger = dynamic(() => import('@/components/requests/AskPicker').then(
   loading: () => null,
 })
 
+/**
+ * The wordmark's face is loaded (the merge must not play on a fallback font that then swaps). Only the first
+ * family is checked: next/font adds an unloaded size-adjusted fallback face to the list, which would read false for ever.
+ */
+function wordmarkFontReady(el: Element): boolean {
+  const family = getComputedStyle(el).fontFamily.split(',')[0]
+  return document.fonts.check(`800 22px ${family}`, 'SOP') && document.fonts.check(`600 22px ${family}`, 'start')
+}
+
 const OWNER_ROLES = ['supervisor', 'admin', 'safety_manager']
 
 export function ReadView({
@@ -83,7 +92,7 @@ export function ReadView({
     const chipEl = document.querySelector('[data-fuse="sop"] .wm-sop')
     const labelEl = button.querySelector('.wm-start')
     const go = () => (qc.isFetching() + qc.isMutating() === 0 ? router.push(href) : void whenQueriesIdle(qc).then(() => router.push(href)))
-    if (mode !== 'off' && typeof Element.prototype.animate === 'function' && chipEl && labelEl && document.fonts.check(`800 22px ${getComputedStyle(chipEl).fontFamily}`)) {
+    if (mode !== 'off' && typeof Element.prototype.animate === 'function' && chipEl && labelEl && wordmarkFontReady(chipEl)) {
       // The screen fades to paper first, then the page changes underneath (no loading skeleton shows through).
       void playFuse({ chip: chipEl.getBoundingClientRect(), label: labelEl.getBoundingClientRect(), button: button.getBoundingClientRect(), mode, factor: slowFactor() }).then(go)
     } else go()

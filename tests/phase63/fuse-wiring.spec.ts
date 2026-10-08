@@ -61,6 +61,9 @@ test.describe('fuse wiring', () => {
     // getSopOwner (the owner's name, supervisor and up) is the only server action ReadView imports, and it is a query.
     expect(r.match(/from '@\/actions\/[^']+'/g)).toEqual(["from '@/actions/sop-owner'"])
     expect(r).toContain('fresh: true')
+    // The font check reads the first family only: next/font's unloaded fallback face made check() false on the deploy.
+    expect(r).toContain("split(',')[0]")
+    expect(r).not.toMatch(/fonts\.check\(`800 22px \$\{getComputedStyle/)
   })
 
   test('the focus page forwards go and fresh through both server redirects and hands them to the walker', () => {
