@@ -2148,7 +2148,7 @@ Plans:
 **Requirements**: HOME-01, HOME-02, HOME-03, HOME-04, HOME-05, MAP-01, MAP-02, MAP-03, MAP-04, BRAND-01, FUSE-01, FUSE-02, WORD-01, RET-01, GATE-01, DOCS-01, EVAL-01
 **Depends on**: Phase 60 (Phases 61/62 moved out of GSD 2026-10-06; their room-shaped todos are superseded by this phase where they conflict)
 **Design sources**: `.planning/sketches/009-sop-first-home/`, `.planning/sketches/010-wordmark/`, `docs/adr/0004-design-principles.md`
-**Plans:** 1/21 plans executed
+**Plans:** 3/21 plans executed
 
 **Execution:** from Wave 2 on, plans run sequentially on the main tree, one push and one deployed eval run at a time; each eval waits for its own HEAD sha at `/api/version`. Wave 5 order: 63-12 → 63-13 → 63-15. Wave 6 order: 63-14 → 63-16.
 
@@ -2160,7 +2160,7 @@ Plans:
 **Wave 2** *(blocked on Wave 1 completion)*
 
 - [x] 63-02-PLAN.md — Pure models: library classifier (area R8, type R3, object kind), row status, Recent / Most used, the home address module
-- [ ] 63-03-PLAN.md — Isometric geometry and automatic site layout (TDD)
+- [x] 63-03-PLAN.md — Isometric geometry and automatic site layout (TDD)
 - [ ] 63-04-PLAN.md — SOPstart wordmark component, Saira via next/font, wordmark in the focus top bar / sign-in / welcome, Back and Stop
 
 **Wave 3** *(blocked on Wave 2 completion)*
