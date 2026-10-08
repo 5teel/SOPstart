@@ -2195,7 +2195,7 @@ Plans:
 
 **Wave 8** *(blocked on Wave 7 completion)*
 
-- [ ] 63-19-PLAN.md — R1: machine-coverage request producer removed; room specs retired / repointed ahead of the deletion
+- [x] 63-19-PLAN.md — R1: machine-coverage request producer removed; room specs retired / repointed ahead of the deletion
 
 **Wave 9** *(blocked on Wave 8 completion)*
 

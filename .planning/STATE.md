@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v11.0
 milestone_name: — One-Screen MVP
 status: executing
-stopped_at: 63-18 complete (one-screen eval retired with a case mapping; nine sibling evals rewritten and run once each on the deployed site; four small product fixes; inventory live for 63-13 / 63-16 / 63-18); Wave 8 next: 63-19
+stopped_at: 63-19 complete (R1: machine-coverage producer removed, agent machine requests hidden from Requests; 15 room specs deleted, 22 repointed; inventory live for 63-11 / 63-13 / 63-15 / 63-16 / 63-18 / 63-19); Wave 9 next: 63-20
 last_updated: "2026-10-08T12:30:00.000Z"
 last_activity: 2026-10-08
 progress:
   total_phases: 15
   completed_phases: 6
   total_plans: 107
-  completed_plans: 104
+  completed_plans: 105
   percent: 40
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-03)
 ## Current Position
 
 Phase: 63 (SOP-first Home, Library Site Map and the SOPstart Start)
-Plan: 63-18 complete (sibling evals speak sections and Read; one-screen eval retired into the home evals; the office invite receipt is the one leg not proven, mailer rate limit); Wave 8 next: 63-19
+Plan: 63-19 complete (nothing asks for a SOP because a machine has none; the suite no longer depends on the room code); Wave 9 next: 63-20 (delete the rooms with ADR-0005 in one commit)
 Status: Executing Phase 63 — sequential on main tree
 Last activity: 2026-10-08
 
