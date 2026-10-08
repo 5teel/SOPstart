@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-03)
 
 **Core value:** A worker can find the SOP for the machine in front of them and follow it step by step with nothing else on the screen — and the business can see, in one ledger, who decided and did what.
-**Current focus:** Phase 60 — requests-notifications-objectives
+**Current focus:** Phase 63 — sop-first-home-library-site-map-and-the-sopstart-start
 
 ## Current Position
 
-Phase: 61
-Plan: Not started
-Status: Executing Phase 60
+Phase: 63 (SOP-first Home, Library Site Map and the SOPstart Start)
+Plan: 63-02 next (63-01 complete)
+Status: Executing Phase 63 — sequential on main tree
 Last activity: 2026-10-06
 
 ### v11.0 roadmap (created 2026-10-03)
