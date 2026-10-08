@@ -90,6 +90,9 @@ const GATED_ROUTES: GatedRoute[] = [
       { label: 'focus editor (lazy admin chunk, 58-13)', markers: ['I have checked this', 'Run the AI check'] },
       { label: 'request composer + ask picker (lazy, 60 A-07)', markers: ['What do you need?', 'Find a person…'] },
       { label: 'objective editor (lazy, 60 A-07)', markers: ['By (optional)'] },
+      // Phase 63-11: the home list lives in the root page chunk only. Seen in a chunk this route
+      // loads, the home was hoisted into a shared chunk and every focus screen would pay for it.
+      { label: 'home list (63-05, root page chunk only)', markers: ['Search SOPs, steps and tools'] },
     ],
   },
   {

@@ -137,7 +137,7 @@ test.describe('SHL-01 one screen structure', () => {
     expect(page).toContain("if (!userId) redirect('/welcome')")
     expect(page).toContain("redirect('/pending')")
     expect(page).toContain('<ProtectedProviders')
-    expect(page).toContain('<OneScreen')
+    expect(page).toContain('<HomeShell') // 63-11: the home replaced the one screen
     expect(page).not.toMatch(/QueryProvider|RoleProvider/)
     expect(page).not.toContain('useEffect')
     expect(page).not.toContain("'use client'")

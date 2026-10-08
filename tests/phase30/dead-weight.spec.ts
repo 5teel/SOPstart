@@ -72,9 +72,11 @@ test.describe('UX-08 — dead-weight sweep', () => {
   // placebo filter it pinned no longer exists to be placebo.
   test('the worker shell offers no Create SOP entry', () => {
     const shellDir = path.join(ROOT, 'src', 'components', 'shell')
-    for (const f of ['OneScreen.tsx', 'WorkerShell.tsx', 'RoomBodies.tsx', 'SiteSummary.tsx', 'OfficeCard.tsx']) {
+    for (const f of ['WorkerShell.tsx', 'RoomBodies.tsx', 'SiteSummary.tsx', 'OfficeCard.tsx']) {
       expect(fs.readFileSync(path.join(shellDir, f), 'utf-8'), f).not.toContain('Create SOP')
     }
+    // 63-11: the home replaced OneScreen
+    expect(fs.readFileSync(path.join(ROOT, 'src', 'components', 'home', 'HomeShell.tsx'), 'utf-8')).not.toContain('Create SOP')
   })
 
   // LIVE from 30-06: walkthrough journeys repointed to /sops/[sopId] Walk tab.

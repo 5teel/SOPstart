@@ -16,9 +16,10 @@ const NEXT_CONFIG = path.join(ROOT, 'next.config.ts')
 // 57-09: the library table is gone; the Workshop's draft rows are the admin list -> editor chain.
 const WORKSHOP = path.join(ROOT, 'src', 'components', 'shell', 'AdminRoomBodies.tsx')
 // 57-08: the worker list is gone; the worker half of the one screen is the shell.
-const WORKER_SHELL = ['OneScreen.tsx', 'WorkerShell.tsx', 'RoomBodies.tsx', 'SiteSummary.tsx', 'OfficeCard.tsx'].map(
-  (f) => path.join(ROOT, 'src', 'components', 'shell', f),
-)
+const WORKER_SHELL = [
+  ...['WorkerShell.tsx', 'RoomBodies.tsx', 'SiteSummary.tsx', 'OfficeCard.tsx'].map((f) => path.join(ROOT, 'src', 'components', 'shell', f)),
+  path.join(ROOT, 'src', 'components', 'home', 'HomeShell.tsx'), // 63-11: the home replaced OneScreen
+]
 const SOP_DETAIL_PAGE = path.join(ROOT, 'src', 'app', '(protected)', 'sops', '[sopId]', 'page.tsx')
 
 function read(p: string): string {

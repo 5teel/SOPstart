@@ -73,7 +73,7 @@ const TARGETS: Array<{ label: string; file: string }> = [
   { label: 'useWalk.ts (the walk hook)', file: WALK_HOOK },
   { label: 'walk.ts (walk server actions)', file: WALK_ACTIONS },
   { label: 'WorkerShell.tsx (worker one screen)', file: SHELL('WorkerShell.tsx') },
-  { label: 'OneScreen.tsx', file: SHELL('OneScreen.tsx') },
+  { label: 'HomeShell.tsx (63-11: replaced OneScreen)', file: path.join(process.cwd(), 'src', 'components', 'home', 'HomeShell.tsx') },
   { label: 'RoomBodies.tsx', file: SHELL('RoomBodies.tsx') },
   { label: 'SiteSummary.tsx', file: SHELL('SiteSummary.tsx') },
   { label: 'MachinePanel.tsx (machine body)', file: PLANT('MachinePanel.tsx') },

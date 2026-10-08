@@ -133,13 +133,13 @@ test.describe('deriveInbox', () => {
     expect(items[0].chips).toEqual(['stuck'])
     expect(items[0].severity).toBe('bad')
     expect(items[0].meta).toContain('stopped while converting')
-    expect(items[0].action).toEqual({ label: 'Try again', href: `/sops/${SOP_ID}?mode=edit&from=office`, retry: { sopId: SOP_ID, isVideo: false } })
+    expect(items[0].action).toEqual({ label: 'Try again', href: `/sops/${SOP_ID}?mode=edit&from=s%3Dsignoffs`, retry: { sopId: SOP_ID, isVideo: false } })
   })
 
   test('library row parseFailed -> meta contains conversion failed, same action shape', () => {
     const items = deriveInbox({ governance: [], library: [libRow(SOP_ID, { parseFailed: true })] })
     expect(items[0].meta).toContain('conversion failed')
-    expect(items[0].action).toEqual({ label: 'Try again', href: `/sops/${SOP_ID}?mode=edit&from=office`, retry: { sopId: SOP_ID, isVideo: false } })
+    expect(items[0].action).toEqual({ label: 'Try again', href: `/sops/${SOP_ID}?mode=edit&from=s%3Dsignoffs`, retry: { sopId: SOP_ID, isVideo: false } })
   })
 
   test('machines are not an inbox input any more: a floor with machines and no links derives no row (D-05)', () => {

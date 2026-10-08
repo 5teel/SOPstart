@@ -48,8 +48,8 @@ test.describe('shell wide', () => {
 
   test('the page reads tab and a UUID-gated sop and hands them to the shells', () => {
     const page = read('src/app/page.tsx')
-    expect(page).toContain('initialTab=')
-    expect(page).toMatch(/initialSop=\{typeof sop === 'string' && UUID\.test\(sop\)/)
+    // 63-11: the server maps the old address to the home; the home whitelists tab and sop
+    expect(page).toContain('legacyToHome(place, str(q.tab), str(q.sop))')
     for (const f of ['WorkerShell', 'AdminShell']) {
       const src = read(`src/components/shell/${f}.tsx`)
       expect(src, f).toContain('initialTab={initialTab}')

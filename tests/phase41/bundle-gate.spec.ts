@@ -80,7 +80,9 @@ test.describe('SB-LINE-06 -- bundle gate (the worker SOP route, plus / from Phas
       .split('\n')
       .filter((l) => !/^\s*(\/\/|\/\*|\*\/|\*)/.test(l))
       .join('\n')
-    expect(src).toContain('No procedures for this machine yet.')
+    // 63-11: the machine body left the build with the old shell; the home list is the new marker
+    expect(src).not.toContain('No procedures for this machine yet.')
+    expect(src).toContain('Search SOPs, steps and tools')
     expect(src).not.toContain('Reviewed within 12 months')
     expect(src).not.toContain('Owner role gone')
     expect(src).not.toContain('follows collection')

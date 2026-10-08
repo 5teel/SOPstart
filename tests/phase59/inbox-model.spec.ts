@@ -153,7 +153,7 @@ test.describe('inbox model', () => {
   })
 
   test('row actions: stuck retry / open', () => {
-    const href = `/sops/${SOP}?mode=edit&from=office`
+    const href = `/sops/${SOP}?mode=edit&from=s%3Dsignoffs`
     const [retry] = deriveInbox({
       ...empty,
       library: [libRow(SOP, { stuck: true, parseRetry: { isVideo: false, canRetry: true } })],

@@ -180,8 +180,8 @@ test.describe('retire sweep', () => {
     for (const f of walkSrc(path.join(ROOT, 'src'))) {
       const rel = path.relative(ROOT, f).replace(/\\/g, '/')
       const code = stripComments(fs.readFileSync(f, 'utf-8'))
-      // Phase 59: the proxy and the pure helper it calls are the two homes of the list address
-      if (rel !== 'src/lib/supabase/middleware.ts' && rel !== 'src/lib/shell/place.ts' && bareList.test(code)) listHits.push(rel)
+      // Phase 59: the proxy and the pure helpers it calls (place.ts, home-state.ts) are the homes of the list address
+      if (rel !== 'src/lib/supabase/middleware.ts' && rel !== 'src/lib/shell/place.ts' && rel !== 'src/lib/shell/home-state.ts' && bareList.test(code)) listHits.push(rel)
       if (accessView.test(code)) accessHits.push(rel)
     }
     expect(listHits, listHits.join(', ')).toEqual([])

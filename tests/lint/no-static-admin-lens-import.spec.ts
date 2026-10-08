@@ -45,14 +45,17 @@ const ALLOWED_IMPORTERS: Record<string, string[]> = {
 }
 
 const WORKER_SHELL_FILES = [
-  'OneScreen.tsx',
-  'ShellFrame.tsx',
-  'WorkerShell.tsx',
-  'RoomBodies.tsx',
-  'SiteSummary.tsx',
-  'OfficeCard.tsx',
-  'AccountControl.tsx',
-].map((f) => path.join(REPO_ROOT, 'src', 'components', 'shell', f))
+  ...[
+    'ShellFrame.tsx',
+    'WorkerShell.tsx',
+    'RoomBodies.tsx',
+    'SiteSummary.tsx',
+    'OfficeCard.tsx',
+    'AccountControl.tsx',
+  ].map((f) => path.join(REPO_ROOT, 'src', 'components', 'shell', f)),
+  // 63-11: the home replaced OneScreen as the worker download
+  ...['HomeShell.tsx', 'SectionMenu.tsx', 'TabBar.tsx'].map((f) => path.join(REPO_ROOT, 'src', 'components', 'home', f)),
+]
 
 type Hit = { file: string; line: number; text: string }
 
@@ -130,10 +133,12 @@ test.describe('T-41-02 — admin lens components cannot leak into the worker imp
     }
   })
 
-  test('OneScreen reaches the admin shell only through dynamic(), and WorkerShell is a worker-shell file', () => {
-    const one = fs.readFileSync(WORKER_SHELL_FILES[0], 'utf-8')
-    expect(one).toMatch(/dynamic\(\s*\(\)\s*=>\s*import\([^)]*AdminShell/)
-    expect(one).not.toMatch(/^import\s+[^;]*\bAdminShell\b[^;]*from/m)
+  test('HomeShell reaches the admin-only section bodies only through dynamic(), and WorkerShell is a worker-shell file', () => {
+    const home = fs.readFileSync(WORKER_SHELL_FILES.find((f) => f.endsWith('HomeShell.tsx')) as string, 'utf-8')
+    for (const m of ['PeopleSection', 'ManageSection', 'SignOffsSection']) {
+      expect(home, m).toMatch(new RegExp(`const ${m} = dynamic\\(\\(\\) => import\\('@/components/home/sections/${m}'\\)`))
+      expect(home, m).not.toMatch(new RegExp(`^import[^\\n]*\\b${m}\\b[^\\n]*from`, 'm'))
+    }
     expect(WORKER_SHELL_FILES.some((f) => f.endsWith('WorkerShell.tsx'))).toBe(true)
   })
 })

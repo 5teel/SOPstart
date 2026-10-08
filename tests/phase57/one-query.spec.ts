@@ -96,28 +96,13 @@ test.describe('SHL-05 supervisor parity', () => {
 test.describe('SHL-05 admin seam', () => {
   const MODULE = '@/components/shell/AdminShell'
 
-  test('OneScreen reaches AdminShell only through next/dynamic with ssr off', () => {
-    const src = strip(read('src', 'components', 'shell', 'OneScreen.tsx'))
-    expect(src).toContain(`import('${MODULE}')`)
-    expect(src).toMatch(/dynamic\(\s*\(\) => import\('@\/components\/shell\/AdminShell'\)/)
-    expect(src).toContain('ssr: false')
-    expect(src).toContain('useIsAdmin()')
-    expect(src).toContain('data-testid="shell-loading"')
-    expect(src).not.toMatch(/^import .*AdminShell/m)
-  })
-
-  test('OneScreen imports WorkerShell statically so the / gate measures the worker download', () => {
-    const src = strip(read('src', 'components', 'shell', 'OneScreen.tsx'))
-    expect(src).toMatch(/^import \{[^}]*\bWorkerShell\b[^}]*\} from '@\/components\/shell\/WorkerShell'/m)
-    expect(src).not.toMatch(/import\('@\/components\/shell\/WorkerShell'\)/)
-  })
-
-  test('no other file under src references the AdminShell module', () => {
+  test('no file under src references the AdminShell module', () => {
     const hits = walk(path.join(ROOT, 'src'))
       .filter((f) => !f.endsWith(path.join('shell', 'AdminShell.tsx')))
       .filter((f) => fs.readFileSync(f, 'utf-8').includes(MODULE))
       .map((f) => path.relative(ROOT, f).split(path.sep).join('/'))
-    expect(hits).toEqual(['src/components/shell/OneScreen.tsx'])
+    // 63-11: OneScreen is deleted; AdminShell is unreferenced until 63-20 removes it
+    expect(hits).toEqual([])
   })
 
   test('the worker shell imports nothing from the admin side', () => {

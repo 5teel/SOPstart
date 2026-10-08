@@ -23,9 +23,10 @@ const ROOT = process.cwd()
 const METHOD_PICKER = path.join(
   ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'new', 'page.tsx',
 )
-const WORKER_SHELL = ['OneScreen.tsx', 'WorkerShell.tsx', 'RoomBodies.tsx', 'SiteSummary.tsx', 'OfficeCard.tsx'].map(
-  (f) => path.join(ROOT, 'src', 'components', 'shell', f),
-)
+const WORKER_SHELL = [
+  ...['WorkerShell.tsx', 'RoomBodies.tsx', 'SiteSummary.tsx', 'OfficeCard.tsx'].map((f) => path.join(ROOT, 'src', 'components', 'shell', f)),
+  path.join(ROOT, 'src', 'components', 'home', 'HomeShell.tsx'), // 63-11: the home replaced OneScreen
+]
 const JOURNEYS = path.join(ROOT, 'src', 'lib', 'journeys', 'journeys.ts')
 
 function read(p: string): string {

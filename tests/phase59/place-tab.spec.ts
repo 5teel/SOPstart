@@ -25,7 +25,7 @@ test.describe('place tab', () => {
 
   test('placeToken stays "office" whatever the tab', () => {
     expect(placeToken({ kind: 'room', id: 'office', tab: 'decisions' })).toBe('office')
-    expect(backHref('office')).toBe('/?place=office')
+    expect(backHref('office')).toBe('/?s=signoffs') // 63-11: Back speaks the home address
   })
 
   test('tabsForRole: admin and safety manager get all five; supervisor gets the inbox and requests (A-04, 60 D-03); worker gets none', () => {
