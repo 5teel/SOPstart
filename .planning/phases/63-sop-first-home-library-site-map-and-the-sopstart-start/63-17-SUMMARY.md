@@ -108,4 +108,9 @@ No gate changed. No auth gates.
 
 ## Deployed check
 
-Recorded in the section below after the push.
+`/api/version` served `19bad6cf` (this plan's HEAD) before the check. Opened https://sopstart.com/pathways as the eval admin (session via `tests/evals/lib/session.ts`), pressed All screens, screenshot read: **18 screens, 18 in a pathway, 0 not mapped yet**; the left list shows the new journeys (Find and read a SOP, Start a SOP and finish it, Browse the site map, On a phone, My record, Sign-offs, ...). The existing `home.eval.ts` DOCS-01 case asserts the same line; the check here was a one-off run (temporary spec, deleted, not committed).
+
+## Self-Check: PASSED
+
+- Commits `088f2b42`, `7701dd92`, `dc030098`, `19bad6cf` exist on master; pushed.
+- Files listed under key-files exist; `.bundle-baseline.json` untouched.
