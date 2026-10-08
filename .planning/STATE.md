@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v11.0
 milestone_name: — One-Screen MVP
 status: executing
-stopped_at: Completed 63-10-PLAN.md
+stopped_at: 63-11 built and committed locally, NOT pushed (bundle gate red: /sops/[sopId]/page 802 vs 795)
 last_updated: "2026-10-08T05:40:00.000Z"
 last_activity: 2026-10-06
 progress:
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-03)
 ## Current Position
 
 Phase: 63 (SOP-first Home, Library Site Map and the SOPstart Start)
-Plan: 63-11 next (63-01 .. 63-10 complete; /page baseline 837 held)
+Plan: 63-11 built, awaiting orchestrator decision on the detail-route bundle gate (802 vs 795; /page 831 vs 837); 63-12 next once resolved and pushed
 Status: Executing Phase 63 — sequential on main tree
 Last activity: 2026-10-06
 

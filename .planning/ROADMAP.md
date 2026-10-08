@@ -2175,7 +2175,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 63-11-PLAN.md — HomeShell, section menu, tab bar; `/` on the new home; legacy ?place= redirect; focus from / Back; bell dot (R5); bundle markers on /page
+- [x] 63-11-PLAN.md — HomeShell, section menu, tab bar; `/` on the new home; legacy ?place= redirect; focus from / Back; bell dot (R5); bundle markers on /page
 
 **Wave 5** *(blocked on Wave 4 completion; order 63-12 → 63-13 → 63-15)*
 
