@@ -2167,7 +2167,7 @@ Plans:
 **Wave 3** *(blocked on Wave 2 completion)*
 
 - [x] 63-05-PLAN.md — Library hooks (browser client only) and the SOP list: search, Recent, Most used, All SOPs by area / type, Ask for one / Write it
-- [ ] 63-06-PLAN.md — Read view: shared focus assembly, browser-client read, owner for supervisor and up (R4), Make a request / Ask / Edit
+- [x] 63-06-PLAN.md — Read view: shared focus assembly, browser-client read, owner for supervisor and up (R4), Make a request / Ask / Edit
 - [ ] 63-07-PLAN.md — Sign-offs and People sections over a place-free Office pane (R2)
 - [ ] 63-08-PLAN.md — Manage SOPs: drafts, New SOP, Site & departments (R7), objectives list
 - [ ] 63-09-PLAN.md — My record (completions, notifications, my requests) and Training sections
