@@ -37,7 +37,7 @@ function walkDir(dir: string, ext: string): string[] {
 
 test('journeys.ts names the site edit mode', () => {
   const content = readJourneys()
-  expect(content).toContain('?place=edit')
+  expect(content).toContain('view=site')
 })
 
 test('journeys.ts does NOT contain /admin/global-blocks', () => {
