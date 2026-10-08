@@ -2171,7 +2171,7 @@ Plans:
 - [x] 63-07-PLAN.md — Sign-offs and People sections over a place-free Office pane (R2)
 - [x] 63-08-PLAN.md — Manage SOPs: drafts, New SOP, Site & departments (R7), objectives list
 - [x] 63-09-PLAN.md — My record (completions, notifications, my requests) and Training sections
-- [ ] 63-10-PLAN.md — The library site map (lazy SVG), keyboard and phone markers + key; sample renders read
+- [x] 63-10-PLAN.md — The library site map (lazy SVG), keyboard and phone markers + key; sample renders read
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
