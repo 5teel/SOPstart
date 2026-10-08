@@ -454,6 +454,45 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
     })
   })
 
+  test('HOME-04 Manage: Carry on is a tap target at 390 px; Site & departments keeps its canvas on screen at 900 px and its dots wear the map colours', async ({ browser }) => {
+    test.setTimeout(240_000)
+    await asRole(browser, 'siteAdmin', PHONE, async (page) => {
+      await page.goto('/?s=manage')
+      const carry = page.getByTestId('manage-draft-carry-on').first()
+      await expect(carry).toBeVisible(SLOW)
+      const box = await carry.boundingBox()
+      expect(box?.height ?? 0, 'Carry on height').toBeGreaterThanOrEqual(44)
+      await noSideways(page, 'manage drafts')
+      await shot(page, '63-home-phone-manage')
+    })
+    await asRole(browser, 'siteAdmin', DESKTOP, async (page) => {
+      await page.goto('/?s=manage&view=site')
+      await expect(page.getByTestId('dept-strip')).toBeVisible(SLOW)
+      const dots = page.getByTestId('dept-strip-dot')
+      const n = await dots.count()
+      expect(n).toBeGreaterThanOrEqual(2)
+      // Each dot is --area-N for its place in name order, the colour the map gives that area.
+      const colours = await page.evaluate(() => {
+        const probe = (v: string) => {
+          const el = document.createElement('i')
+          el.style.background = v
+          document.body.append(el)
+          const c = getComputedStyle(el).backgroundColor
+          el.remove()
+          return c
+        }
+        const dotColours = [...document.querySelectorAll('[data-testid="dept-strip-dot"]')].map((d) => getComputedStyle(d).backgroundColor)
+        return { dotColours, expected: dotColours.map((_, i) => probe(`var(--area-${(i % 8) + 1})`)) }
+      })
+      expect(colours.dotColours).toEqual(colours.expected)
+      expect(new Set(colours.dotColours).size, 'departments are not all one default colour').toBe(Math.min(n, 8))
+      // The canvas starts on screen, not under a stack of cards.
+      const canvas = await page.getByTestId('site-save-status').boundingBox()
+      expect(canvas?.y ?? 9999, 'the editor toolbar starts above the fold').toBeLessThan(DESKTOP.height * 0.6)
+      await shot(page, '63-home-site-fold')
+    })
+  })
+
   test('HOME-04 the bell dot opens My record with the Notifications heading focused', async ({ browser }) => {
     test.setTimeout(180_000)
     await asRole(browser, 'siteWorker', DESKTOP, async (page, userId) => {

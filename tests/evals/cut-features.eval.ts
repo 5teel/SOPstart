@@ -102,7 +102,7 @@ test.describe('Phase 55 — cut features (deployed)', () => {
       await page.goto(`/sops/${walkSopId}`)
 
       // The focus screen (Phase 58): browse first, then one step at a time.
-      const start = page.getByTestId('focus-start-walking')
+      const start = page.getByTestId('focus-start-walking').or(page.getByTestId('walk-resume-button'))
       await expect(start).toHaveCount(1, SLOW)
       await start.click()
       const primary = page.getByTestId('walk-primary')

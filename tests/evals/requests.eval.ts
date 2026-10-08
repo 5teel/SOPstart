@@ -311,7 +311,7 @@ test.describe('Phase 60 -- requests, notifications and objectives (deployed)', (
       await expect(page.getByTestId('request-sent')).toContainText('Request sent', SLOW)
 
       // The walk state offers no request.
-      await page.getByTestId('focus-start-walking').click()
+      await page.getByTestId('focus-start-walking').or(page.getByTestId('walk-resume-button')).click()
       await expect(page.getByTestId('focus-browse')).toHaveCount(0, SLOW)
       await expect(page.getByTestId('request-composer-trigger')).toHaveCount(0)
       await ctx.close()

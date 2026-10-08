@@ -25,7 +25,7 @@ export async function press(page: Page) {
 
 /** Browse -> the start button (or the resume card) -> the first step is on screen. */
 export async function startWalking(page: Page) {
-  const start = page.getByTestId('focus-start-walking')
+  const start = page.getByTestId('focus-start-walking').or(page.getByTestId('walk-resume-button')) // one start: the resume card's when a walk is open
   await expect(start).toHaveCount(1, SLOW)
   await start.click()
   await expect(page.getByTestId('walk-step')).toHaveCount(1, SLOW)
