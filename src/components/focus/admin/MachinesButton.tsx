@@ -188,7 +188,7 @@ export function MachinesButton({
               {!loading && !loadError && machines.length === 0 && (
                 <div className="p-4 flex flex-col gap-2">
                   <p className="text-meta text-[var(--ink-500)]">No machines on the site map yet.</p>
-                  <Link href="/?place=edit" className="text-ui text-[var(--ink-900)] underline">
+                  <Link href="/?s=manage&view=site" className="text-ui text-[var(--ink-900)] underline">
                     Open the site map
                   </Link>
                 </div>

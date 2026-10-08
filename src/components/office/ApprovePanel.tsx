@@ -6,6 +6,7 @@
  * publish path (and gates) it always has, and this panel only reports what it answered.
  * Admin-chunk component: the Office pane is its only importer.
  */
+import { HOME, homeFrom } from '@/lib/shell/home-state'
 import { useState } from 'react'
 import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
@@ -136,7 +137,7 @@ function ApproveBody({
           <span className="mono shrink-0 rounded border border-ink-200 bg-paper-2 px-2 text-meta text-ink-500">v{version}</span>
         </div>
         <Link
-          href={focusHref(sopId, { from: 'office' })}
+          href={focusHref(sopId, { from: homeFrom({ ...HOME, s: 'signoffs' }) })}
           className="inline-flex min-h-tap items-center self-start text-ui underline"
         >
           Open it to read it

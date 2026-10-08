@@ -35,7 +35,7 @@ const SECTIONS = [
       'Which AI models power each part of SOPstart, with per-organisation overrides.',
   },
   {
-    href: '/?place=edit',
+    href: '/?s=manage&view=site',
     eyebrow: 'ORGANISATION',
     title: 'Departments',
     description:

@@ -65,7 +65,7 @@ test.describe('retire: legacy addresses redirect to Office places (59-13)', () =
       expect(LEGACY_HREF.test(stripComments(read(`src/components/office/${f}`))), f).toBe(false)
     }
     // the training bridge is the one new address, linked from the Smoko room (A-05)
-    expect(read('src/components/shell/AdminShell.tsx')).toContain('href="/admin/training"')
+    expect(read('src/components/shell/AdminShell.tsx')).toContain('href="/?s=training"')
     const page = stripComments(read('src/app/(protected)/admin/training/page.tsx'))
     expect(page.indexOf('requireAdminContext()')).toBeGreaterThan(-1)
     expect(page.indexOf('requireAdminContext()')).toBeLessThan(page.indexOf('listOrgTree()'))

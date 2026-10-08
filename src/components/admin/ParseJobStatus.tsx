@@ -141,7 +141,7 @@ export default function ParseJobStatus(props: ParseJobStatusProps) {
     }
     setDeleting(true)
     await fetch(`/api/sops/${sopId}`, { method: 'DELETE' })
-    router.push('/?place=workshop')
+    router.push('/?s=manage')
   }
 
   // Gap-closure (40-13, CR-04/WR-02): an AI-prompt draft has no source file to

@@ -1,5 +1,6 @@
 'use client'
 
+import { HOME, homeFrom } from '@/lib/shell/home-state'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm, type SubmitHandler } from 'react-hook-form'
@@ -100,7 +101,7 @@ export function PromptClient({ departments }: Props) {
       }
       setSopId(json.sopId)
       // The SOP exists: carry on in the editor, which shows the draft being written (58-13).
-      router.push(focusHref(json.sopId, { mode: 'edit', from: 'workshop' }))
+      router.push(focusHref(json.sopId, { mode: 'edit', from: homeFrom({ ...HOME, s: 'manage' }) }))
     } catch (e) {
       setServerError(e instanceof Error ? e.message : 'Network error')
       setSubmitting(false)

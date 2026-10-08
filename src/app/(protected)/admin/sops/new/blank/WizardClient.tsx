@@ -1,4 +1,5 @@
 'use client'
+import { HOME, homeFrom } from '@/lib/shell/home-state'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { z } from 'zod'
@@ -103,7 +104,7 @@ export function WizardClient({ departments, machineId = null, initialTitle = '' 
     // so carry on to the editor, where the admin can place it by hand.
     if (machineId) await setSopMachines({ sopId: result.sopId, machineIds: [machineId] })
 
-    router.push(focusHref(result.sopId, { mode: 'edit', from: 'workshop' }))
+    router.push(focusHref(result.sopId, { mode: 'edit', from: homeFrom({ ...HOME, s: 'manage' }) }))
   }
 
   return (

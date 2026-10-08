@@ -39,7 +39,7 @@ test.describe('PLC-02 machine body', () => {
     expect(ROOMS).toContain('<SopRows sops={sops} empty="No site-wide SOPs yet." from="noticeboard" />')
     expect(ROOMS).not.toContain('@/actions/governance')
     expect(ROOMS).not.toMatch(/components\/admin/)
-    expect(ROOMS).toContain('href="/activity"')
+    expect(ROOMS).toContain('href="/?s=record"')
     expect(ROOMS).toContain('Ask for a change')
   })
 
@@ -76,7 +76,7 @@ test.describe('PLC-02 admin machine body', () => {
     expect((ROOMS.match(/data-testid="room-body"/g) ?? []).length).toBe(2)
     expect(ROOMS).not.toContain('data-room-id="office"')
     expect(ROOMS).toContain('data-testid="room-workshop-draft"')
-    expect(ROOMS).toContain("href={focusHref(d.id, { mode: 'edit', from: 'workshop' })}")
+    expect(ROOMS).toContain("href={focusHref(d.id, { mode: 'edit', from: homeFrom({ ...HOME, s: 'manage' }) })}")
     expect(ROOMS).toContain('href="/admin/sops/new" data-testid="room-workshop-new"')
     expect(ROOMS).toContain('Write a new SOP')
     expect(ROOMS).toContain('<AdminSopRows sops={sops} empty="No site-wide SOPs yet." from="noticeboard" />')
@@ -92,7 +92,7 @@ test.describe('PLC-02 admin machine body', () => {
   test('the wizard creates the SOP, then links it to the machine, then opens the editor (58-13)', () => {
     const create = WIZ.indexOf('await createSopFromWizard(')
     const link = WIZ.indexOf('setSopMachines({ sopId: result.sopId, machineIds: [machineId] })')
-    const push = WIZ.indexOf("router.push(focusHref(result.sopId, { mode: 'edit', from: 'workshop' }))")
+    const push = WIZ.indexOf("router.push(focusHref(result.sopId, { mode: 'edit', from: homeFrom({ ...HOME, s: 'manage' }) }))")
     expect(create).toBeGreaterThan(-1)
     expect(link).toBeGreaterThan(create)
     expect(push).toBeGreaterThan(link)

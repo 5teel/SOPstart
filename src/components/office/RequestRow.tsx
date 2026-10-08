@@ -9,6 +9,7 @@
  * manager and to the browse address for a supervisor (F-23). Admin-chunk code: the Office
  * pane is the only importer. No router, no navigation from an effect.
  */
+import { HOME, homeFrom } from '@/lib/shell/home-state'
 import { useState } from 'react'
 import Link from 'next/link'
 import { Loader2 } from 'lucide-react'
@@ -41,8 +42,8 @@ export function RequestRow({ request, onDone }: { request: OfficeRequest; onDone
     if (logged) {
       if (request.kind === 'change_sop' && sopId) {
         link = canEdit
-          ? { href: focusHref(sopId, { mode: 'edit', from: 'office' }), label: 'Open the SOP' }
-          : { href: focusHref(sopId, { from: 'office' }), label: 'Open the SOP' }
+          ? { href: focusHref(sopId, { mode: 'edit', from: homeFrom({ ...HOME, s: 'signoffs' }) }), label: 'Open the SOP' }
+          : { href: focusHref(sopId, { from: homeFrom({ ...HOME, s: 'signoffs' }) }), label: 'Open the SOP' }
       } else if (request.kind === 'new_sop' && canEdit) {
         link = {
           href: subject.type === 'machine' && subject.id ? `/admin/sops/new/blank?machine=${encodeURIComponent(subject.id)}` : '/admin/sops/new/blank',
@@ -92,7 +93,7 @@ export function RequestRow({ request, onDone }: { request: OfficeRequest; onDone
         <span className={`mt-1 size-3 shrink-0 rounded-full ${request.agent ? 'bg-ink-300' : 'bg-accent-measure'}`} aria-hidden />
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           {sopId ? (
-            <Link href={focusHref(sopId, { from: 'office' })} className="truncate text-reading font-semibold text-ink-900 hover:underline">
+            <Link href={focusHref(sopId, { from: homeFrom({ ...HOME, s: 'signoffs' }) })} className="truncate text-reading font-semibold text-ink-900 hover:underline">
               {subject.title}
             </Link>
           ) : (

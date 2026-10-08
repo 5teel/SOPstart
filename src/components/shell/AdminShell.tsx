@@ -169,7 +169,7 @@ export function AdminShell({ siteName, userEmail, initialPlace, initialTab, init
         return (
           <SmokoBody>
             <Link
-              href="/admin/training"
+              href="/?s=training"
               className="flex min-h-tap items-center justify-center rounded-lg border border-ink-300 bg-white px-4 text-ui font-semibold text-ink-900"
             >
               Training matrix

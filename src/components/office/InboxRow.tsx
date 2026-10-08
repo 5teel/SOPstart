@@ -13,6 +13,7 @@
  * (the pane keeps one open at a time). Admin-chunk code: the Office pane is the
  * only importer. No router, no navigation from an effect.
  */
+import { HOME, homeFrom } from '@/lib/shell/home-state'
 import { useEffect, useId, useRef, useState } from 'react'
 import Link from 'next/link'
 import { Loader2 } from 'lucide-react'
@@ -173,7 +174,7 @@ export function InboxRow({
     })
 
   const sopId = g?.id ?? item.signOff?.sopId ?? item.review?.sopId ?? null
-  const titleHref = sopId ? focusHref(sopId, { from: 'office' }) : branch === 'stuck' ? (item.action?.href ?? null) : null
+  const titleHref = sopId ? focusHref(sopId, { from: homeFrom({ ...HOME, s: 'signoffs' }) }) : branch === 'stuck' ? (item.action?.href ?? null) : null
 
   const busyLabel = (label: string) =>
     pending ? (
@@ -213,7 +214,7 @@ export function InboxRow({
     )
   } else if (branch === 'fix' && g) {
     button = (
-      <Link data-testid="office-row-action" href={focusHref(g.id, { mode: 'edit', from: 'office' })} className={ROW_BUTTON}>
+      <Link data-testid="office-row-action" href={focusHref(g.id, { mode: 'edit', from: homeFrom({ ...HOME, s: 'signoffs' }) })} className={ROW_BUTTON}>
         Open SOP
       </Link>
     )

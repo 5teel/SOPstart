@@ -617,7 +617,7 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, sops
   // person focus have no destination and render no link.
   const openInLibraryHref = useMemo(() => {
     if (connecting || !focus) return undefined
-    if (deptById.has(focus)) return `/?place=dept:${focus}`
+    if (deptById.has(focus)) return `/?area=${focus}`
     return undefined
   }, [connecting, focus, deptById])
 

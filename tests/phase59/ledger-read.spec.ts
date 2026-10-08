@@ -132,7 +132,7 @@ test.describe('ledger read', () => {
       expect(TAB).toMatch(/data-testid="decisions-show-older"[\s\S]*?fetchNextPage/)
       expect(TAB).toContain('hasNextPage')
       expect(TAB).toContain('KIND_WORDS[row.kind]')
-      expect(TAB).toContain("focusHref(about.sopId, { from: 'office' })")
+      expect(TAB).toContain("focusHref(about.sopId, { from: homeFrom({ ...HOME, s: 'signoffs' }) })")
       expect(TAB).not.toContain('details')
       expect(PANE).toMatch(/tab === 'decisions' && <DecisionsTab/)
     })

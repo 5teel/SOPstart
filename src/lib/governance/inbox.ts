@@ -9,6 +9,7 @@
  * actions own that (D-03). Plain module, no directive -- importable from both
  * client and server code.
  */
+import { HOME, homeFrom } from '@/lib/shell/home-state'
 import type { GovernanceRow } from '@/actions/governance'
 import type { MillerSop } from '@/lib/sop-list/admin-rows'
 import { focusHref } from '@/lib/sop/focus-path'
@@ -68,7 +69,7 @@ export const INBOX_CHIPS: ReadonlyArray<{ key: 'all' | InboxChip; label: string 
 const SEVERITY_RANK: Record<InboxSeverity, number> = { bad: 0, warn: 1, info: 2, grey: 3 }
 
 function stuckAction(lib: MillerSop): InboxItem['action'] {
-  const href = focusHref(lib.id, { mode: 'edit', from: 'office' })
+  const href = focusHref(lib.id, { mode: 'edit', from: homeFrom({ ...HOME, s: 'signoffs' }) })
   const pr = lib.parseRetry
   return pr?.canRetry
     ? { label: 'Try again', href, retry: { sopId: lib.id, isVideo: pr.isVideo } }

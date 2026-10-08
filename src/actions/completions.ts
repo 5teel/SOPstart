@@ -375,7 +375,7 @@ export async function signOffCompletion(
     }
   }
 
-  revalidatePath('/activity')
+  revalidatePath('/')
   return { success: true, logged }
 }
 

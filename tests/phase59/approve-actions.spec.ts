@@ -105,7 +105,7 @@ test.describe('approve actions', () => {
   })
 
   test('the approve panel links to the browse state with focusHref from office (59-08)', () => {
-    expect(PANEL).toContain("focusHref(sopId, { from: 'office' })")
+    expect(PANEL).toContain("focusHref(sopId, { from: homeFrom({ ...HOME, s: 'signoffs' }) })")
     expect(PANEL).toContain('Open it to read it')
   })
 

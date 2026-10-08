@@ -7,6 +7,7 @@
  * Rows carry plain words only -- the read action sends titles, labels and code-literal summaries,
  * never ids or free text. Admin-chunk code: the Office pane is the only importer.
  */
+import { HOME, homeFrom } from '@/lib/shell/home-state'
 import { useState } from 'react'
 import Link from 'next/link'
 import { useInfiniteQuery } from '@tanstack/react-query'
@@ -51,7 +52,7 @@ function Row({ row }: { row: DecisionListRow }) {
       </td>
       <td className="truncate" title={aboutText}>
         {about.type === 'sop' ? (
-          <Link href={focusHref(about.sopId, { from: 'office' })} className="underline-offset-2 hover:underline">
+          <Link href={focusHref(about.sopId, { from: homeFrom({ ...HOME, s: 'signoffs' }) })} className="underline-offset-2 hover:underline">
             {about.title}
           </Link>
         ) : (

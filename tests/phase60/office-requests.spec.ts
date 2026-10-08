@@ -79,7 +79,8 @@ test.describe('Office Requests tab (60-11)', () => {
 
   test('a supervisor\'s change-a-SOP link is the browse address, never the editor (F-23)', () => {
     const src = read('src/components/office/RequestRow.tsx')
-    expect(src).toMatch(/canEdit\s*\?\s*\{ href: focusHref\(sopId, \{ mode: 'edit', from: 'office' \}\)[^}]*\}\s*:\s*\{ href: focusHref\(sopId, \{ from: 'office' \}\)/)
+    const FROM = String.raw`from: homeFrom\(\{ \.\.\.HOME, s: 'signoffs' \}\)`
+    expect(src).toMatch(new RegExp(String.raw`canEdit\s*\?\s*\{ href: focusHref\(sopId, \{ mode: 'edit', ${FROM} \}\)[^}]*\}\s*:\s*\{ href: focusHref\(sopId, \{ ${FROM} \}\)`))
     expect(src).toContain("role === 'admin' || role === 'safety_manager'")
     // The wizard link is for admin and safety manager only, and only when the ledger write succeeded.
     expect(src).toContain("request.kind === 'new_sop' && canEdit")

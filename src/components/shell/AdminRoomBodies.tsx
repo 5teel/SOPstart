@@ -5,6 +5,7 @@
  * number and row arrives from the one admin read in AdminShell. Lives in the
  * lazy admin module only.
  */
+import { HOME, homeFrom } from '@/lib/shell/home-state'
 import Link from 'next/link'
 import { AdminSopRows } from '@/components/admin/governance/AdminMachinePanel'
 import { OwnerReviewMeta } from '@/components/admin/governance/OwnerReviewMeta'
@@ -43,7 +44,7 @@ export function AdminWorkshopBody({
               <div className="flex min-h-tap items-center gap-2">
                 <span className="min-w-0 flex-1 truncate font-semibold">{d.title}</span>
                 <span className="mono text-meta text-ink-500">{d.stuck ? 'stuck' : d.status}</span>
-                <Link href={focusHref(d.id, { mode: 'edit', from: 'workshop' })} className="mono text-meta text-ink-500">
+                <Link href={focusHref(d.id, { mode: 'edit', from: homeFrom({ ...HOME, s: 'manage' }) })} className="mono text-meta text-ink-500">
                   Open
                 </Link>
               </div>

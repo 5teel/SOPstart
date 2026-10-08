@@ -314,7 +314,7 @@ export function ThisSopBlock({ sopId, initial, from, isAdmin, owner }: ThisSopBl
             )}
             {isAdmin && isDraft && (
               <div className="px-2">
-                <DeleteSopButton sopId={sopId} redirectTo="/?place=workshop" showLabel label="Delete draft" />
+                <DeleteSopButton sopId={sopId} redirectTo="/?s=manage" showLabel label="Delete draft" />
               </div>
             )}
           </div>

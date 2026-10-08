@@ -41,7 +41,7 @@ test.describe('retire: the Machines inbox kind (60-05)', () => {
   })
   test('the stale-department row links to the SOP edit address and reads "Open SOP"', () => {
     const row = read('src/components/office/InboxRow.tsx')
-    expect(row).toContain("focusHref(g.id, { mode: 'edit', from: 'office' })")
+    expect(row).toContain("focusHref(g.id, { mode: 'edit', from: homeFrom({ ...HOME, s: 'signoffs' }) })")
     expect(row).toContain('Open SOP')
     expect(row).not.toContain('Fix assignment')
     expect(row).not.toMatch(/href=\{`\/admin\/sops\/\$\{[^}]+\}\/assign`\}/)

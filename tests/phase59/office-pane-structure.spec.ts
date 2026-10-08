@@ -59,7 +59,7 @@ test.describe('inbox row (59-09)', () => {
     expect(ROW).toMatch(/<SignOffPanel completionId=\{item\.signOff\.completionId\} onDone=\{onDone\} \/>/)
     expect(ROW).toMatch(/<ApprovePanel sopId=\{g\.id\} title=\{item\.title\} onDone=\{onDone\} \/>/)
     expect(ROW).toMatch(/<OwnerPicker[\s\S]*?onDone=\{\(r\) => onDone\(\{ receipt: 'Owner set', logged: r\.logged \}\)\}/)
-    expect(ROW).toContain("focusHref(g.id, { mode: 'edit', from: 'office' })")
+    expect(ROW).toContain("focusHref(g.id, { mode: 'edit', from: homeFrom({ ...HOME, s: 'signoffs' }) })")
     expect(ROW).toContain('Open SOP')
     // Expansion is the only thing the Sign off / Approve opener does.
     expect(ROW).toMatch(/aria-expanded=\{expanded\}[\s\S]*?aria-controls=\{panelId\}[\s\S]*?onClick=\{onToggle\}/)

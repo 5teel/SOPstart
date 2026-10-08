@@ -1,5 +1,6 @@
 'use client'
 
+import { HOME, homeFrom } from '@/lib/shell/home-state'
 import { useRef, useState, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import {
@@ -311,7 +312,7 @@ export function UploadDropzone() {
     // (client navigation, so the parse request already sent keeps going). Several files
     // keep the banner. This runs from the Upload press finishing, never from a mount effect.
     if (pendingFiles.length === 1 && landedIds.length === 1) {
-      router.push(focusHref(landedIds[0], { mode: 'edit', from: 'workshop' }))
+      router.push(focusHref(landedIds[0], { mode: 'edit', from: homeFrom({ ...HOME, s: 'manage' }) }))
     }
   }, [queue, router])
 
@@ -539,7 +540,7 @@ export function UploadDropzone() {
                 {uploadedSopIds.length === 1 ? (
                   <button
                     type="button"
-                    onClick={() => router.push(focusHref(uploadedSopIds[0], { mode: 'edit', from: 'workshop' }))}
+                    onClick={() => router.push(focusHref(uploadedSopIds[0], { mode: 'edit', from: homeFrom({ ...HOME, s: 'manage' }) }))}
                     className="flex-1 min-h-tap px-4 bg-[var(--ink-900)] text-white font-semibold rounded-lg hover:bg-[var(--ink-700)] active:bg-[var(--ink-700)] transition-colors"
                   >
                     Review parsed SOP
@@ -547,7 +548,7 @@ export function UploadDropzone() {
                 ) : (
                   <button
                     type="button"
-                    onClick={() => router.push('/?place=workshop')}
+                    onClick={() => router.push('/?s=manage')}
                     className="flex-1 min-h-tap px-4 bg-[var(--ink-900)] text-white font-semibold rounded-lg hover:bg-[var(--ink-700)] active:bg-[var(--ink-700)] transition-colors"
                   >
                     Review drafts
@@ -584,7 +585,7 @@ export function UploadDropzone() {
           onClose={() => setRecorderOpen(false)}
           onSubmitComplete={(sopId) => {
             setRecorderOpen(false)
-            router.push(focusHref(sopId, { mode: 'edit', from: 'workshop' }))
+            router.push(focusHref(sopId, { mode: 'edit', from: homeFrom({ ...HOME, s: 'manage' }) }))
           }}
         />
       )}

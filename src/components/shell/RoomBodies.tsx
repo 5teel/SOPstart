@@ -48,7 +48,7 @@ export function OfficeWorkerBody({ onMyRequests }: { onMyRequests?(): void } = {
           </li>
         ))}
       </ul>
-      <Link href="/activity" className={LINK}>
+      <Link href="/?s=record" className={LINK}>
         Open sign-offs
       </Link>
     </div>
@@ -71,7 +71,7 @@ export function SmokoBody({ children }: { children?: React.ReactNode }) {
           Latest: {latest.sop_title ?? 'Untitled SOP'}, {day(latest.submitted_at)}
         </p>
       )}
-      <Link href="/activity" className={LINK}>
+      <Link href="/?s=record" className={LINK}>
         Open my record
       </Link>
       {children}
