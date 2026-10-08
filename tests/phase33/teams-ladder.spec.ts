@@ -126,7 +126,7 @@ test.describe('SC-1 — teams-column ladder runtime (requires chromium + live ap
   test.fixme(
     'WiringPatchBay renders site -> area -> department -> role -> person as expandable/selectable tiers, vacancies dashed and inert',
     async ({ page }) => {
-      await page.goto('/?place=office&tab=access')
+      await page.goto('/?s=people&tab=access')
       await page.locator('.jack.group-jack').first().click() // expand an area
       const deptTwist = page.locator('.jack .twist').nth(1)
       await deptTwist.click() // expand a dept -> reveals role rows

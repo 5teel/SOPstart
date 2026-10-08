@@ -13,8 +13,10 @@
  *              repoint = the code it tests survives under a new address; edited by its owner.
  *  - LIVE_PLANS each owning plan appends its id when its last commit lands;
  *              from then on its tokens must be gone from every test file.
- *              63-18 appends 63-11, 63-13, 63-14, 63-15 and 63-16 once the sibling
- *              evals no longer carry their tokens; 63-19 and 63-20 append themselves.
+ *              63-18 appended 63-13, 63-16 and itself once every test file was clean of their
+ *              tokens. 63-11 (OneScreen), 63-14 (a legacy-address reader test and the place module
+ *              test) and 63-15 (the frame-structure start word) still have holders that 63-19 and
+ *              63-20 own: whichever of them lands the last holder appends the plan id.
  *
  * A retire row is exempt from the stale-token check until its owner is live (a file
  * slated for deletion is not "stale"); once live it must be gone from disk.
@@ -176,7 +178,7 @@ export const INVENTORY: Row[] = [
 ]
 
 // Each owning plan appends its id when its last commit lands (see header).
-export const LIVE_PLANS: string[] = ['63-18']
+export const LIVE_PLANS: string[] = ['63-13', '63-16', '63-18']
 
 function stripComments(src: string): string {
   return src

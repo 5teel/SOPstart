@@ -138,14 +138,14 @@ test.describe('SC-5 — ✓ Done writes grants via createGrant', () => {
 // ---------------------------------------------------------------------------
 // Runtime smoke — requires chromium + live app + a published NEW SOP
 // (Rule-3 fallback documented above). The post-publish "Choose who sees it"
-// CTA (a link to /?place=office&tab=access&sop=<id>) is 32-09/33-09 scope.
+// CTA (a link to /?s=people&tab=access&pin=<id>) is 32-09/33-09 scope.
 // ---------------------------------------------------------------------------
 
 test.describe('SC-5 — wire-up mode runtime (requires chromium + live app, 32-09 page arm)', () => {
   test.fixme(
     'connect mode toggles live wires, blast-radius counts people, Done writes grants via createGrant',
     async ({ page }) => {
-      await page.goto('/?place=office&tab=access')
+      await page.goto('/?s=people&tab=access')
       await page.locator('.jack.newsop').click()
       await expect(page.locator('.strip-slot.wiring')).toBeVisible()
       await page.locator('.col.left .jack').first().click()

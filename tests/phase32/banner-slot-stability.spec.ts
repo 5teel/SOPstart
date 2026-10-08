@@ -73,7 +73,7 @@ test.describe('SC-6 — banner slot stability runtime (requires chromium + live 
   test.fixme(
     'SelectionStrip reserves a fixed 48px slot; bay getBoundingClientRect().top never changes across idle/selection/wiring',
     async ({ page }) => {
-      await page.goto('/?place=office&tab=access')
+      await page.goto('/?s=people&tab=access')
       const bayTop = () => page.locator('.bay').boundingBox()
       const idle = await bayTop()
       await page.locator('.jack').first().click()
