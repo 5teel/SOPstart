@@ -1,9 +1,9 @@
 {
-  "capturedAt": "2026-10-08T00:00:00.000Z",
+  "capturedAt": "2026-10-08T06:00:00.000Z",
   "note": "Phase 55 D-07 moved the worker routes DOWN by hand to the measured post-cut First Load JS and they are never re-captured. Phase 57-04 added /page (the one screen), recorded by hand once. Phase 57-08 retired the list page: /sops/page left the gate (history) and /sops/[sopId]/page moved DOWN by hand to its measured post-deletion value. /page was then set to 831 KB, the first measurement of the worker's real first download on / (signed-off by the phase-57 orchestrator, 2026-10-05; see history). Raising a value needs a signed-off decision recorded in ROADMAP.",
   "previousBaseline": {
-    "/sops/[sopId]/page": 792,
-    "/page": 834
+    "/sops/[sopId]/page": 795,
+    "/page": 837
   },
   "history": [
     {
@@ -77,10 +77,22 @@
       "value": 834,
       "capturedAt": "2026-10-08T00:00:00.000Z",
       "note": "Phase 63-04 (orchestrator decision, not the executor): measured 837 KB against 834 (+3, tolerance 2); the untouched tree already read 836. Summed-file diff against the parent build: ~+251 bytes, ~+227 B in app/layout-*.js from next/font (Saira Semi Condensed, the approved SOPstart wordmark face, Simon 2026-10-08, ADR-0004); the Wordmark component is in no /page chunk. Moved UP by hand from 834 to 837 as the accepted cost of the brand typeface in the root layout. Phase 63-11 replaces the home on / behind lazy seams; it is measured against 837."
+    },
+    {
+      "route": "/sops/[sopId]/page",
+      "value": 795,
+      "capturedAt": "2026-10-08T06:00:00.000Z",
+      "note": "Phase 63-11 (orchestrator decision, not the executor): measured 802 KB against 795 (+7, tolerance 2). Summed-file diff against the parent (63-10) build: one new 9.5 KB shared chunk of modules now imported by both / and the focus screen (home-state, nzDay, focus walk text, Wordmark, focus-path); before, they sat in the detail route page chunk (which the gate never counts, CLAUDE.md 2026-09-29 blind spot) or the protected layout chunk (4.5 -> 2.2 KB). The focus screen real download is unchanged; ReadView behind next/dynamic gave 801 and was rejected (loading flash on the primary worker action). Moved UP by hand 795 -> 802 as accounting movement; a forbidden marker (Search SOPs, steps and tools) now guards against the home hoisting into this route."
+    },
+    {
+      "route": "/page",
+      "value": 837,
+      "capturedAt": "2026-10-08T06:00:00.000Z",
+      "note": "Phase 63-11: the new SOP-first home replaced the one-screen shell on / (map, five section bodies, bell and objective line behind next/dynamic). Measured 831 KB; moved DOWN by hand 837 -> 831 (never up without a decision)."
     }
   ],
   "routes": {
-    "/sops/[sopId]/page": 795,
-    "/page": 837
+    "/sops/[sopId]/page": 802,
+    "/page": 831
   }
 }
