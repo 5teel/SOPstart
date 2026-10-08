@@ -162,7 +162,7 @@
    * (the SOP chip) and --wm-part-start (the Start button). */
   /* Chosen 2026-10-08 (sketch 010, "6e" in Saira): SOP in an ink chip, "start" beside it,
    * one strip of hazard tape along the chip's foot running on under "start". */
-  --wm-font:         'Saira Semi Condensed', 'Arial Narrow', system-ui, sans-serif;
+  --wm-font:         var(--font-saira, 'Saira Semi Condensed'), 'Arial Narrow', system-ui, sans-serif;
   --wm-weight-sop:   800;
   --wm-weight-start: 600;
   --wm-ink:          var(--ink-900);
@@ -742,4 +742,50 @@ body[data-theme="paper"] .strip-slot .done {
 body[data-theme="paper"] .strip-slot .done:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* ---------- The wordmark (sketch 010, 6e). One component: src/components/brand/Wordmark.tsx ---------- */
+.wm {
+  display: inline-flex;
+  align-items: baseline;
+  position: relative;
+  white-space: nowrap;
+  line-height: 1;
+  font-family: var(--wm-font);
+  color: var(--wm-ink);
+}
+.wm-sop {
+  display: inline-block;
+  font-weight: var(--wm-weight-sop);
+  background: var(--wm-ink);
+  color: var(--paper);
+  padding: 0.08em 0.2em 0.2em;
+  border-radius: 0.12em 0.12em 0.04em 0.04em;
+}
+.wm-start {
+  display: inline-block;
+  font-weight: var(--wm-weight-start);
+  margin-left: 0.1em;
+}
+.wm-start-only { margin-left: 0; }
+.wm::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 0.13em;
+  background: var(--wm-tape);
+}
+.wm-on-ink { color: var(--paper); }
+.wm-on-ink .wm-sop { background: var(--paper); color: var(--wm-ink); }
+.wm-on-ink::after { background: var(--wm-tape-on-ink); }
+.wm-notape::after { display: none; }
+.wm-hero { font-size: var(--wm-size-hero); }
+.wm-merge { font-size: var(--wm-size-merge); }
+.wm-header { font-size: var(--wm-size-header); }
+.wm-phone { font-size: var(--wm-size-phone); }
+.wm-bar { font-size: var(--wm-size-phone); }
+@media (min-width: 64rem) {
+  .wm-bar { font-size: var(--wm-size-header); }
 }
