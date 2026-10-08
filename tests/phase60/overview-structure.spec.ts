@@ -12,7 +12,12 @@ const ROOT = process.cwd()
 const read = (p: string) => fs.readFileSync(path.join(ROOT, p), 'utf8').replace(/\r\n/g, '\n')
 const strip = (s: string) => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')
 
-const SRC = strip(read('src/components/shell/SiteOverview.tsx'))
+// 63-09: the overview composes two panels; their code is asserted where it now lives.
+const OVERVIEW = strip(read('src/components/shell/SiteOverview.tsx'))
+const NOTIF = strip(read('src/components/home/panels/NotificationsPanel.tsx'))
+const REQS = strip(read('src/components/home/panels/MyRequestsPanel.tsx'))
+const SCROLL = strip(read('src/components/home/panels/useSectionScroll.ts'))
+const SRC = [OVERVIEW, NOTIF, REQS, SCROLL].join('\n')
 const FOCUS = strip(read('src/lib/shell/overview-focus.ts'))
 
 function walk(dir: string, out: string[] = []): string[] {
@@ -44,59 +49,73 @@ function effectBodies(src: string): string[] {
 
 test.describe('Overview (60-15)', () => {
   test('sections render in the order objectives, notifications, requests, office line', () => {
-    const at = ['overview-objectives', 'overview-notifications', 'overview-requests', 'overview-office-link'].map((id) =>
-      SRC.indexOf(`data-testid="${id}"`),
-    )
+    const at = [
+      OVERVIEW.indexOf('data-testid="overview-objectives"'),
+      OVERVIEW.indexOf('<NotificationsPanel'),
+      OVERVIEW.indexOf('<MyRequestsPanel'),
+      OVERVIEW.indexOf('data-testid="overview-office-link"'),
+    ]
     expect(at.every((n) => n > -1)).toBe(true)
     expect([...at].sort((a, b) => a - b)).toEqual(at)
-    expect(SRC).toContain('data-testid="overview-body"')
+    expect(NOTIF).toContain('data-testid="overview-notifications"')
+    expect(REQS).toContain('data-testid="overview-requests"')
+    expect(OVERVIEW).toContain('data-testid="overview-body"')
   })
 
   test('each section hides on its own emptiness; only the admin Objectives section always shows', () => {
     expect(SRC).toMatch(/\(isAdmin \|\| siteObjective \|\| deptObjectives\.length > 0\) && \(\s*<section data-testid="overview-objectives"/)
-    expect(SRC).toMatch(/\{anyNotifications && \(\s*<section\s+data-testid="overview-notifications"/)
-    expect(SRC).toMatch(/\{anyRequests && groups && \(\s*<section\s+data-testid="overview-requests"/)
-    expect(SRC).toMatch(/\{canAnswer && officeCount > 0 && \(\s*<button\s+type="button"\s+data-testid="overview-office-link"/)
-    expect(SRC).toContain('Open requests in the Office · {officeCount}')
-    expect(SRC).toContain("select({ kind: 'room', id: 'office', tab: 'requests' })")
+    // a panel hides itself when it has nothing to show
+    expect(NOTIF).toMatch(/if \(unread\.length === 0 && read\.length === 0\) return null/)
+    expect(REQS).toMatch(/if \(!anyRequests \|\| !groups\) return dialogEl\(\)/)
+    expect(OVERVIEW).toMatch(/\{canAnswer && officeCount > 0 && \(\s*<button\s+type="button"\s+data-testid="overview-office-link"/)
+    expect(OVERVIEW).toContain('Open requests in the Office · {officeCount}')
+    expect(OVERVIEW).toContain("select({ kind: 'room', id: 'office', tab: 'requests' })")
   })
 
   test('notifications use the browser client; no server action; mark-read writes read_at only', () => {
-    expect(SRC).toContain("from '@/lib/supabase/client'")
-    expect(SRC).toContain(".from('notifications')")
-    expect(SRC).not.toMatch(/from '@\/actions\/notifications'/)
-    expect(SRC).not.toMatch(/from '@\/lib\/supabase\/(server|admin)'/)
-    const updates = SRC.match(/\.update\(\{[^}]*\}/g) ?? []
+    expect(NOTIF).toContain("from '@/lib/supabase/client'")
+    expect(NOTIF).toContain(".from('notifications')")
+    expect(NOTIF).not.toMatch(/from '@\/actions\//)
+    expect(NOTIF).not.toMatch(/from '@\/lib\/supabase\/(server|admin)'/)
+    expect(NOTIF).toContain('Nothing unread.')
+    expect(NOTIF).not.toMatch(/NOTIFICATIONS\s*·/) // R5: no number in the heading
+    const updates = NOTIF.match(/\.update\(\{[^}]*\}/g) ?? []
     expect(updates).toHaveLength(1)
     expect(updates[0]).toMatch(/^\.update\(\{ read_at: /)
-    expect(SRC).toMatch(/\.is\('read_at', null\)/) // the unread filter lives in the queryFn
+    expect(NOTIF).toMatch(/\.is\('read_at', null\)/) // the unread filter lives in the queryFn
     // WR-07: the browser client resolves { error }; a denied or timed-out mark-read undims the row
-    const open = SRC.slice(SRC.indexOf('async function open('), SRC.indexOf('const target = placeTarget(n.place)'))
+    const open = NOTIF.slice(NOTIF.indexOf('async function open('), NOTIF.indexOf("if (isSafePlace(n.place) && n.place.startsWith('/sops/'))"))
     expect(open).toContain('const { error } = await Promise.race([')
     expect(open).toContain('failed = !!error')
     expect(open).toMatch(/if \(failed\)\s+setDimmed\(\(s\) => \{\s+const next = new Set\(s\)\s+next\.delete\(n\.id\)/)
-    expect(SRC).toContain('.limit(50)')
-    expect(SRC).toContain('refetchOnWindowFocus: true')
-    expect(SRC).not.toContain('refetchInterval')
+    expect(NOTIF).toContain('.limit(50)')
+    expect(NOTIF).toContain('refetchOnWindowFocus: true')
+    expect(NOTIF).not.toContain('refetchInterval')
   })
 
-  test('opening a notification goes through placeTarget; router push only in the click path, never an effect', () => {
-    expect(SRC).toContain('placeTarget(n.place)')
-    expect(SRC).toMatch(/target\.type === 'href'/)
+  test('opening a notification checks the place first; router push only in the click path, never an effect', () => {
+    expect(NOTIF).toContain('isSafePlace(n.place)')
+    expect(NOTIF).toContain("n.place.startsWith('/sops/')")
+    expect(NOTIF).toContain('onOpenAddress(')
+    expect(OVERVIEW).toContain('placeTarget(a)')
+    expect(OVERVIEW).toMatch(/t\.type !== 'select'/)
     expect(SRC).not.toMatch(/router\.replace/)
-    expect(SRC.match(/router\.push\(/g)).toHaveLength(1)
-    expect(SRC).toMatch(/onClick=\{\(\) => void open\(n\)\}/)
+    expect(NOTIF.match(/router\.push\(/g)).toHaveLength(1)
+    expect(NOTIF).toMatch(/onClick=\{\(\) => void open\(n\)\}/)
     for (const body of effectBodies(SRC)) {
       expect(body).not.toMatch(/router\./)
       expect(body).not.toMatch(/\bselect\(/)
+      expect(body).not.toMatch(/onOpenAddress\(/)
     }
-    expect(SRC).toContain("requestOverviewSection('requests')")
-    expect(SRC).toContain('takeOverviewSection()')
+    expect(OVERVIEW).toContain("requestOverviewSection('requests')")
+    expect(SCROLL).toContain('takeOverviewSection(section)')
   })
 
   test('no stylesheet import, no shell refresh, no static importer of the overview', () => {
     expect(SRC).not.toMatch(/import\s+['"][^'"]*\.css['"]/)
     expect(SRC).not.toMatch(/SHELL_KEY/)
+    expect(OVERVIEW).toContain('<NotificationsPanel')
+    expect(OVERVIEW).toContain('<MyRequestsPanel')
     const importers = [...walk(path.join(ROOT, 'src')), ...walk(path.join(ROOT, 'tests/phase60'))].filter((f) => {
       if (/SiteOverview\.tsx$/.test(f) || /overview-structure\.spec\.ts$/.test(f)) return false
       return /import[^;\n]*from\s+['"]@\/components\/shell\/SiteOverview['"]/.test(fs.readFileSync(f, 'utf8'))
@@ -124,18 +143,18 @@ test.describe('Overview (60-15)', () => {
 
   test("the person's assignments refresh after a decline and for unread asked rows", () => {
     expect(SRC.match(/\['user-sop-assignments'\]/g)!.length).toBeGreaterThanOrEqual(3)
-    expect(SRC).toMatch(/n\.kind === 'asked'/)
-    expect(SRC).toMatch(/askedIds === askedSeen\.current/) // once per new set of ids
+    expect(NOTIF).toMatch(/n\.kind === 'asked'/)
+    expect(NOTIF).toMatch(/askedIds === askedSeen\.current/) // once per new set of ids
   })
 
   test('the editor and composer arrive lazily; the groups come from the shared model', () => {
     // the slot is the lazy seam (it loads the editor itself); imported plainly so it does not add a chunk
-    expect(SRC).toContain("from '@/components/shell/ObjectiveSlot'")
-    expect(SRC).toMatch(/dynamic\(\s*\(\) => import\('@\/components\/requests\/RequestComposer'\)/)
-    expect(SRC).not.toMatch(/^import [^\n]*from '@\/components\/requests\/(RequestComposer|ObjectiveEditor)'/m)
-    expect(SRC).toContain('groupMyRequests(')
-    expect(SRC).toContain('canAnswerRequests(role)')
-    expect(SRC).toContain('Ask for a new SOP')
+    expect(OVERVIEW).toContain("from '@/components/shell/ObjectiveSlot'")
+    expect(REQS).toMatch(/dynamic\(\s*\(\) => import\('@\/components\/requests\/RequestComposer'\)/)
+    expect(SRC).not.toMatch(/^import (?!type )[^\n]*from '@\/components\/requests\/(RequestComposer|ObjectiveEditor)'/m)
+    expect(REQS).toContain('groupMyRequests(')
+    expect(OVERVIEW).toContain('canAnswerRequests(role)')
+    expect(REQS).toContain('Ask for a new SOP')
   })
 
   test('overview-focus is plain, stores one pending section, and only dispatches an event', () => {

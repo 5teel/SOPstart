@@ -16,8 +16,9 @@ export function requestOverviewSection(section: OverviewSection): void {
   if (typeof window !== 'undefined') window.dispatchEvent(new Event(OVERVIEW_SECTION_EVENT))
 }
 
-/** Returns the pending section and clears it. */
-export function takeOverviewSection(): OverviewSection | null {
+/** Returns the pending section and clears it; with `only`, takes it only when it is that section (63-09: one panel each). */
+export function takeOverviewSection(only?: OverviewSection): OverviewSection | null {
+  if (only && pending !== only) return null
   const s = pending
   pending = null
   return s
