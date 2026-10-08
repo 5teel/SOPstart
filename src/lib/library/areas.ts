@@ -41,6 +41,9 @@ export interface LibraryArea {
 
 const byName = (a: string, b: string) => a.localeCompare(b, 'en', { sensitivity: 'base' })
 
+/** The one colour assignment: the i-th area (0-based) in name order. The map, key, list and Site & departments all use it. */
+export const areaColourVar = (i: number): string => `var(--area-${(i % 8) + 1})`
+
 export function areaOf(sopId: string, inputs: AreaInputs): string {
   const active = new Map(inputs.departments.filter((d) => !d.archived).map((d) => [d.id, d]))
 
@@ -69,5 +72,5 @@ export function buildAreas(visibleSopIds: readonly string[], inputs: AreaInputs)
   const names = new Map(inputs.departments.map((d) => [d.id, d.name]))
   const rows = [...bySop.entries()].map(([id, sopIds]) => ({ id, name: id === SITE_WIDE ? 'Site-wide' : (names.get(id) ?? ''), sopIds }))
   rows.sort((a, b) => (a.id === SITE_WIDE ? 1 : 0) - (b.id === SITE_WIDE ? 1 : 0) || byName(a.name, b.name))
-  return rows.map((r, i) => ({ ...r, index: i + 1, colourVar: `var(--area-${(i % 8) + 1})` }))
+  return rows.map((r, i) => ({ ...r, index: i + 1, colourVar: areaColourVar(i) }))
 }

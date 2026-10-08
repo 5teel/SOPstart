@@ -284,7 +284,7 @@ export function SiteWorkspace({ layout, machines: initialMachines, links: initia
       </div>
 
       <div className="flex gap-3">
-        <div className="h-[72vh] min-h-120 min-w-0 flex-1 overflow-hidden rounded-lg border border-ink-200 bg-paper">
+        <div className="h-[60vh] min-h-120 min-w-0 flex-1 overflow-hidden rounded-lg border border-ink-200 bg-paper">
           <SiteEditorLoader
             sceneUrl={layout.sceneUrl}
             sceneWidth={layout.scene_width ?? 0}

@@ -70,7 +70,8 @@ export function ManageSection({ view, onView }: { view: 'site' | null; onView(v:
                 <span className="mono text-meta text-ink-500">{d.stuck ? 'stuck' : d.status}</span>
                 <Link
                   href={focusHref(d.id, { mode: 'edit', from: homeFrom({ ...HOME, s: 'manage' }) })}
-                  className="mono text-meta text-ink-500"
+                  data-testid="manage-draft-carry-on"
+                  className="mono flex min-h-tap shrink-0 items-center px-1 text-meta text-ink-500 underline"
                 >
                   Carry on
                 </Link>

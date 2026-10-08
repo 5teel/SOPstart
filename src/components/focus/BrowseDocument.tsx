@@ -150,7 +150,8 @@ export function BrowseDocument({ data, order, from, supersededBy, updatedSinceLa
         )}
       </div>
 
-      {canStart && (
+      {/* The resume card carries the one start when a walk is in progress. */}
+      {canStart && !resumeSlot && (
         <div className="sticky bottom-0 border-t border-ink-200 bg-paper p-4">
           <div className="mx-auto max-w-205">
             <button

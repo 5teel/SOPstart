@@ -25,7 +25,17 @@ function personLabelFromTree(tree: OrgTree, personId: string): { name: string; r
   return null
 }
 
-export function TrainingBridge({ tree, departments }: { tree: OrgTree; departments: Department[] }) {
+/** The matrix opens on the department with the most people, so it does not read empty on an org where the first one has none. */
+function mostPeopleFirst(tree: OrgTree, departments: Department[]): Department[] {
+  const count = new Map<string, number>()
+  for (const d of [...tree.areas.flatMap((a) => a.departments), ...tree.ungroupedDepartments]) {
+    count.set(d.id, d.roles.reduce((n, r) => n + r.people.filter((p) => !p.isVacancy).length, 0))
+  }
+  return [...departments].sort((a, b) => (count.get(b.id) ?? 0) - (count.get(a.id) ?? 0))
+}
+
+export function TrainingBridge({ tree, departments: all }: { tree: OrgTree; departments: Department[] }) {
+  const departments = mostPeopleFirst(tree, all)
   const [selectedPerson, setSelectedPerson] = useState<{ id: string; name: string; roleLabel?: string } | null>(null)
   const [focusSopId, setFocusSopId] = useState<string | null>(null)
 

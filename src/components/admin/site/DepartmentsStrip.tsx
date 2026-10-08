@@ -9,6 +9,7 @@
  */
 import { useState } from 'react'
 import { archiveDepartment, createDepartment, updateDepartment } from '@/actions/departments'
+import { areaColourVar } from '@/lib/library/areas'
 import { DEPT_COLOURS } from '@/lib/site/departments'
 import type { SiteDepartment } from '@/lib/validators/site'
 
@@ -21,7 +22,7 @@ function plural(n: number, word: string): string {
   return `${n} ${word}${n === 1 ? '' : 's'}`
 }
 
-function DepartmentRow({ dept, onChanged }: { dept: SiteDepartment; onChanged(): void }) {
+function DepartmentRow({ dept, areaIndex, onChanged }: { dept: SiteDepartment; areaIndex: number; onChanged(): void }) {
   const [name, setName] = useState(dept.name)
   const [pending, setPending] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
@@ -81,7 +82,7 @@ function DepartmentRow({ dept, onChanged }: { dept: SiteDepartment; onChanged():
   return (
     <div data-testid="dept-strip-row" data-dept-id={dept.id} className="flex flex-col gap-2 rounded-lg border border-ink-200 p-3">
       <div className="flex items-center gap-2">
-        <span className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: dept.colour }} />
+        <span data-testid="dept-strip-dot" className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: areaColourVar(areaIndex) }} />
         <input
           data-testid="dept-strip-rename"
           aria-label={`Rename ${dept.name}`}
@@ -139,6 +140,8 @@ export function DepartmentsStrip({ departments, onChanged }: DepartmentsStripPro
   const [newName, setNewName] = useState('')
   const [adding, setAdding] = useState(false)
   const [addError, setAddError] = useState<string | null>(null)
+  // Same order the map names its areas in (name order), so a department keeps its map colour.
+  const areaOrder = [...departments].sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }))
 
   async function handleAdd() {
     const name = newName.trim()
@@ -159,9 +162,9 @@ export function DepartmentsStrip({ departments, onChanged }: DepartmentsStripPro
   return (
     <div data-testid="dept-strip" className="rounded-lg border border-ink-200 bg-paper-1 p-3">
       <h2 className="text-ui font-medium text-ink-900">Departments</h2>
-      <div className="mt-3 flex flex-col gap-2">
-        {departments.map((d) => (
-          <DepartmentRow key={`${d.id}:${d.name}:${d.colour}`} dept={d} onChanged={onChanged} />
+      <div className="mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+        {areaOrder.map((d, i) => (
+          <DepartmentRow key={`${d.id}:${d.name}:${d.colour}`} dept={d} areaIndex={i} onChanged={onChanged} />
         ))}
       </div>
       <div className="mt-3 flex items-center gap-2">

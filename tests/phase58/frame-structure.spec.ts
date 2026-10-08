@@ -140,7 +140,7 @@ test.describe('FOC-01/FOC-03 focus frame', () => {
   test('Start renders only when onStartWalking is passed and the version is not superseded (D-05, D-14)', () => {
     const BROWSE = read('src/components/focus/BrowseDocument.tsx')
     expect(BROWSE).toContain('const canStart = !!onStartWalking && !supersededBy')
-    expect(BROWSE).toMatch(/\{canStart && \(/)
+    expect(BROWSE).toMatch(/\{canStart && !resumeSlot && \(/)
     expect(BROWSE).toContain('aria-label="start"')
     expect(BROWSE).toContain('data-testid="focus-start-walking"')
     expect(BROWSE).toContain('Updated since you last did it')

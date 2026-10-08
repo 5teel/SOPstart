@@ -30,6 +30,7 @@ const SHOW_ME = /\bShow me\b/
 
 export function stripComments(src: string): string {
   return src
+    .replace(/\r\n/g, '\n')
     .replace(/\/\*[\s\S]*?\*\//g, '')
     .split('\n')
     .map((l) => l.replace(/(^|[^:'"`\\])\/\/.*$/, '$1'))
@@ -87,6 +88,8 @@ test.describe('no walk words on a screen', () => {
     expect(scan("const x = () => a.walk < 3; const y = 'sop_walks'")).toEqual([])
     expect(scan("const k = `${t.id}:${walk?.id ?? 'none'}`; console.error('submit walk update error:', e)")).toEqual([])
     expect(scan("// 'Could not start the walk' was the old line\n/* Walk it */ const z = 1")).toEqual([])
+    // CRLF files: a // comment must not stop at the carriage return.
+    expect(scan("// 'Could not start the walk' was the old line\r\nconst z = 1\r\n")).toEqual([])
   })
 
   test('the allowlist holds two reasoned entries and the guard is registered', () => {
