@@ -2179,7 +2179,7 @@ Plans:
 
 **Wave 5** *(blocked on Wave 4 completion; order 63-12 → 63-13 → 63-15)*
 
-- [ ] 63-12-PLAN.md — Home eval cases and the first deployed run, screenshots read
+- [x] 63-12-PLAN.md — Home eval cases and the first deployed run, screenshots read
 - [ ] 63-13-PLAN.md — Address writers: notification places, Back bars, proxy and next.config translators; due reviews on home load
 - [ ] 63-15-PLAN.md — The Start: lazy merge engine into a root-layout layer, autostart into the running SOP, resume and browse start words (R6, R9); start eval
 

@@ -1121,7 +1121,7 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 
 ### Home (HOME)
 
-- [ ] **HOME-01**: Signing in lands on the SOP-first home: on desktop a section menu (wordmark at the top; My SOPs, My record, then Training, Sign-offs, People and Manage SOPs as the role allows; Manage last and quiet; no counts), the SOP list and the reader pane; on a phone a bottom tab bar of the same sections. Section visibility follows the capability matrix (R2)
+- [x] **HOME-01**: Signing in lands on the SOP-first home: on desktop a section menu (wordmark at the top; My SOPs, My record, then Training, Sign-offs, People and Manage SOPs as the role allows; Manage last and quiet; no counts), the SOP list and the reader pane; on a phone a bottom tab bar of the same sections. Section visibility follows the capability matrix (R2)
 - [ ] **HOME-02**: My SOPs lists search (titles, steps, tools), Recent, Most used ("done N×") and All SOPs grouped by area or by type; each row shows its area, type, minutes and a status line that is information only; a search with no result offers Ask for one (and Write it for a SOP admin)
 - [ ] **HOME-03**: With a SOP open the reader pane shows Read: the SOP chip, title, area · type · version · owner (supervisor and up, R4) · minutes, standards labels, status, the start button and "What you'll do" with kind chips; an unfinished SOP reads "Picks up at step N of M · or begin from step 1" (begin again asks first, R6)
 - [ ] **HOME-04**: My record, Training, Sign-offs, People and Manage SOPs (with Site & departments, R7) carry the content of the retired rooms and bridged pages, with every server guard and RLS policy unchanged
@@ -1132,7 +1132,7 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 - [ ] **MAP-01**: Each SOP's area (machine's department → department tag → Site-wide, R8), type (Machine · Process · Inspection · Emergency, R3) and map object are derived from existing data in one module; only areas holding a visible published SOP exist
 - [ ] **MAP-02**: The site map is an isometric SVG generated in code from the library: every area an outlined, coloured, raised plate with its name and SOP count, every object exactly one SOP; it lays out 1–12 areas with 1–15 SOPs each without overlap, using design tokens only
 - [ ] **MAP-03**: Clicking an area zooms the map into it and filters the list; other areas dim and switch on click; Esc or the breadcrumb returns; zoomed objects show title and status and open Read; plates and objects are keyboard-reachable; reduced motion cuts instead of animating
-- [ ] **MAP-04**: On a phone, My SOPs has a List | Site map toggle; the whole-site view shows numbered markers and a tappable two-column key of areas
+- [x] **MAP-04**: On a phone, My SOPs has a List | Site map toggle; the whole-site view shows numbered markers and a tappable two-column key of areas
 
 ### Brand and the Start (BRAND, FUSE)
 
@@ -1162,7 +1162,7 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 
 | REQ-ID | Plans | Status |
 |--------|-------|--------|
-| HOME-01 | 63-11, 63-12 | Pending |
+| HOME-01 | 63-11, 63-12 | Complete |
 | HOME-02 | 63-02, 63-05, 63-12 | Pending |
 | HOME-03 | 63-06, 63-15 | Pending |
 | HOME-04 | 63-07, 63-08, 63-09, 63-12, 63-14 | Pending |
@@ -1170,7 +1170,7 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 | MAP-01 | 63-02 | Pending |
 | MAP-02 | 63-03, 63-10 | Pending |
 | MAP-03 | 63-10, 63-12 | Pending |
-| MAP-04 | 63-10, 63-11, 63-12 | Pending |
+| MAP-04 | 63-10, 63-11, 63-12 | Complete |
 | BRAND-01 | 63-04 | Pending |
 | FUSE-01 | 63-15 | Pending |
 | FUSE-02 | 63-15 | Pending |
