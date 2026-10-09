@@ -463,7 +463,24 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
       const box = await carry.boundingBox()
       expect(box?.height ?? 0, 'Carry on height').toBeGreaterThanOrEqual(44)
       await noSideways(page, 'manage drafts')
+      // Six tabs at 390 px: every label stays on one line (the 13 px floor wrapped "My record").
+      const tabs = await page.locator('[data-testid^="home-tab-"]').evaluateAll((els) =>
+        els.map((el) => {
+          const r = document.createRange()
+          r.selectNodeContents(el)
+          return { t: el.textContent, lines: new Set([...r.getClientRects()].map((b) => Math.round(b.top))).size }
+        }),
+      )
+      expect(tabs.length, 'admin has six tabs').toBe(6)
+      for (const tab of tabs) expect(tab.lines, `tab "${tab.t}" wraps`).toBe(1)
       await shot(page, '63-home-phone-manage')
+      for (const s of ['signoffs', 'record']) {
+        await page.getByTestId(`home-tab-${s}`).click()
+        await expect(page.getByTestId(`home-tab-${s}`)).toHaveAttribute('aria-current', 'page')
+        await page.waitForLoadState('networkidle', { timeout: 10_000 }).catch(() => {})
+        await noSideways(page, s)
+        await shot(page, `63-home-phone-${s}`)
+      }
     })
     await asRole(browser, 'siteAdmin', DESKTOP, async (page) => {
       await page.goto('/?s=manage&view=site')

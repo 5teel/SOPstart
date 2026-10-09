@@ -7,7 +7,7 @@ import { sectionsForRole, type Section } from '@/lib/shell/home-state'
 
 const SHORT: Record<Section, string> = {
   sops: 'SOPs',
-  record: 'My record',
+  record: 'Record', // ponytail: 'My record' wraps at 390 px with six tabs at 13 px
   training: 'Training',
   signoffs: 'Sign-offs',
   people: 'People',
