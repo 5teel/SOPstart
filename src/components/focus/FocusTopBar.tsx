@@ -61,7 +61,7 @@ export function FocusTopBar({
       <span aria-hidden="true" className="h-5 w-px bg-ink-300" />
       <h1 className="min-w-0 flex-1 truncate text-reading font-semibold text-ink-900">{title}</h1>
       {chip && (
-        <span data-testid="focus-version-chip" className="mono rounded border border-ink-300 px-2 py-1 text-meta uppercase text-ink-500">
+        <span data-testid="focus-version-chip" className="mono rounded border border-ink-300 px-2 py-1 text-meta uppercase text-ink-600">
           {chip}
         </span>
       )}

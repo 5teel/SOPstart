@@ -65,7 +65,7 @@ export function BrowseDocument({ data, order, from, supersededBy, updatedSinceLa
         )}
 
         <div data-testid="focus-summary" className="mb-6 flex flex-col gap-2 rounded-lg border border-ink-200 bg-paper-1 p-4">
-          <p className="mono text-meta uppercase text-ink-500">{summary}</p>
+          <p className="mono text-meta uppercase text-ink-600">{summary}</p>
           <p data-testid="sop-meta" className="text-ui text-ink-500">
             {placementLabel(placementSummary(sop.placement, data.machines.map((m) => ({ name: m.name, department: m.department }))))}
           </p>
@@ -111,7 +111,7 @@ export function BrowseDocument({ data, order, from, supersededBy, updatedSinceLa
               return (
                 <div key={step.id} className="flex flex-col gap-4">
                   {header && (
-                    <h2 className="mono mt-4 flex flex-wrap items-center gap-2 text-meta uppercase text-ink-500">
+                    <h2 className="mono mt-4 flex flex-wrap items-center gap-2 text-meta uppercase text-ink-600">
                       {header}
                       {header !== BEFORE_YOU_START && (
                         <StandardLabels names={(data.standards.sections[step.section_id] ?? []).map((s) => s.name)} />
@@ -134,7 +134,7 @@ export function BrowseDocument({ data, order, from, supersededBy, updatedSinceLa
                       <div className="flex items-start gap-2 rounded-lg border border-ink-200 bg-paper-2 p-4">
                         <Lightbulb className="mt-0.5 size-4 shrink-0 text-ink-500" aria-hidden="true" />
                         <p className="text-reading text-ink-900">
-                          <span className="mono mr-2 text-meta uppercase text-ink-500">Tip</span>
+                          <span className="mono mr-2 text-meta uppercase text-ink-600">Tip</span>
                           {step.tip}
                         </p>
                       </div>

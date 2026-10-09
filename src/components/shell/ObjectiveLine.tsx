@@ -34,7 +34,7 @@ export function ObjectiveLine({ view, prefix }: { view: ObjectiveView; prefix?: 
       data-testid="objective-line"
       data-agent={p.agent ? 'true' : 'false'}
       data-confirmed={p.unconfirmed ? 'false' : 'true'}
-      className="mono min-w-0 break-words text-meta text-ink-500"
+      className="mono min-w-0 break-words text-meta text-ink-600"
     >
       {p.prefix} · <span className="text-ink-700">{p.text}</span>
       {p.when && (

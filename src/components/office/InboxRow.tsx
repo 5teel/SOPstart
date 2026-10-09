@@ -279,7 +279,7 @@ export function InboxRow({
             <span className={`mono rounded px-2 py-1 text-meta font-semibold uppercase ${CHIP_STYLE[item.severity]}`}>
               {CHIP_WORD[branch]}
             </span>
-            {item.age && <span className="mono text-meta text-ink-500">{item.age}</span>}
+            {item.age && <span className="mono text-meta text-ink-600">{item.age}</span>}
           </div>
           <p className="text-ui text-ink-500">{detailOf(item, branch)}</p>
           {g && (

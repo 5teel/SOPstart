@@ -52,7 +52,7 @@ export function SectionMenu({
       </nav>
       <div className="mt-auto">
         <AccountControl email={userEmail} isAdmin={role === 'admin' || role === 'safety_manager'} />
-        <p data-testid="home-org" className="mono truncate px-4 pb-3 text-meta text-ink-500">
+        <p data-testid="home-org" className="mono truncate px-4 pb-3 text-meta text-ink-600">
           {orgName}
         </p>
       </div>

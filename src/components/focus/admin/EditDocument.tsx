@@ -206,7 +206,7 @@ export function EditDocument({ sopId, initial, from, canTick, findings = [], ban
             return (
               <section key={section.id} data-testid="edit-section" aria-label={section.title} className="flex flex-col gap-4">
                 <header className="flex items-center gap-3">
-                  <span className="mono text-meta text-ink-500">{pad(si + 1)}</span>
+                  <span className="mono text-meta text-ink-600">{pad(si + 1)}</span>
                   {renamingId === section.id && !readOnly ? (
                     <InlineText
                       initialValue={section.title}

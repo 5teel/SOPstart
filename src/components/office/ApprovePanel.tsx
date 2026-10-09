@@ -19,7 +19,7 @@ import { ReasonDialog } from './ReasonDialog'
 
 type Receipt = { receipt: string; logged: boolean }
 
-const LABEL = 'mono text-meta uppercase text-ink-500'
+const LABEL = 'mono text-meta uppercase text-ink-600'
 const FAILED_COPY = "That didn't work. Nothing was changed — try again."
 
 export function ApprovePanel({ sopId, title, onDone }: { sopId: string; title: string; onDone(r: Receipt): void }) {
@@ -134,7 +134,7 @@ function ApproveBody({
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2">
           <h3 className="min-w-0 truncate text-ui font-semibold text-ink-900">{title}</h3>
-          <span className="mono shrink-0 rounded border border-ink-200 bg-paper-2 px-2 text-meta text-ink-500">v{version}</span>
+          <span className="mono shrink-0 rounded border border-ink-200 bg-paper-2 px-2 text-meta text-ink-600">v{version}</span>
         </div>
         <Link
           href={focusHref(sopId, { from: homeFrom({ ...HOME, s: 'signoffs' }) })}

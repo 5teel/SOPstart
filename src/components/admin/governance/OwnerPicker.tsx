@@ -108,7 +108,7 @@ export function OwnerPicker({
 
       {open && (
         <div className="absolute right-0 z-10 mt-1 w-64 rounded-lg border border-ink-200 bg-paper-1 p-2 shadow-lg">
-          <p className="mono mb-2 text-meta uppercase tracking-wider text-ink-500">Current: {ownerLabel}</p>
+          <p className="mono mb-2 text-meta uppercase tracking-wider text-ink-600">Current: {ownerLabel}</p>
           {loading && <p className="text-xs text-ink-500">Loading members…</p>}
           {error && <p className="mb-2 text-xs text-accent-escalate">{error}</p>}
           <ul className="max-h-56 space-y-0.5 overflow-y-auto">

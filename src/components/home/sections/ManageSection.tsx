@@ -67,11 +67,11 @@ export function ManageSection({ view, onView }: { view: 'site' | null; onView(v:
             >
               <div className="flex min-h-tap items-center gap-2">
                 <span className="min-w-0 flex-1 truncate font-semibold">{d.title}</span>
-                <span className="mono text-meta text-ink-500">{d.stuck ? 'stuck' : d.status}</span>
+                <span className="mono text-meta text-ink-600">{d.stuck ? 'stuck' : d.status}</span>
                 <Link
                   href={focusHref(d.id, { mode: 'edit', from: homeFrom({ ...HOME, s: 'manage' }) })}
                   data-testid="manage-draft-carry-on"
-                  className="mono flex min-h-tap shrink-0 items-center px-1 text-meta text-ink-500 underline"
+                  className="mono flex min-h-tap shrink-0 items-center px-1 text-meta text-ink-600 underline"
                 >
                   Carry on
                 </Link>

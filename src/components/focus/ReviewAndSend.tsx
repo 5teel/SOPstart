@@ -60,7 +60,7 @@ export function ReviewAndSend({ walk, order, missing, previews, onReopen, onKeep
       <div className="flex flex-col gap-2">
         <h2 className="text-step font-semibold text-ink-900">Ready to send?</h2>
         <p className="text-reading text-ink-700">Look over what you did. Once you send it, your supervisor signs it off.</p>
-        <p data-testid="walk-review-summary" className="mono text-meta uppercase text-ink-500">
+        <p data-testid="walk-review-summary" className="mono text-meta uppercase text-ink-600">
           {doneCount} {doneCount === 1 ? 'step' : 'steps'} done · {walk.photos.length} {walk.photos.length === 1 ? 'photo' : 'photos'}
         </p>
       </div>
@@ -76,7 +76,7 @@ export function ReviewAndSend({ walk, order, missing, previews, onReopen, onKeep
           const preview = previews[`${walk.id}:${step.id}`]
           return (
             <div key={step.id}>
-              {header && <p className="mono pb-1 pt-4 text-meta uppercase text-ink-500">{header}</p>}
+              {header && <p className="mono pb-1 pt-4 text-meta uppercase text-ink-600">{header}</p>}
               <button
                 type="button"
                 data-testid="walk-review-row"
@@ -92,7 +92,7 @@ export function ReviewAndSend({ walk, order, missing, previews, onReopen, onKeep
                   <span className="mono shrink-0 text-meta uppercase text-accent-escalate">Not done</span>
                 )}
                 <span className="min-w-0 flex-1 truncate text-ui text-ink-900">{step.text}</span>
-                {acked && <span className="mono shrink-0 text-meta uppercase text-ink-500">Acknowledged</span>}
+                {acked && <span className="mono shrink-0 text-meta uppercase text-ink-600">Acknowledged</span>}
                 {hasPhoto &&
                   (preview ? (
                     <img src={preview} alt="" className="size-18 shrink-0 rounded-lg object-cover" />

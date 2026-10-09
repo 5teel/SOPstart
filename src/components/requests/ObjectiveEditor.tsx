@@ -132,7 +132,7 @@ export function ObjectiveEditor({
           onChange={(e) => setText(e.target.value)}
           className="rounded-lg border border-ink-300 p-3 text-reading text-ink-900"
         />
-        <p className="mono text-meta text-ink-500">
+        <p className="mono text-meta text-ink-600">
           {text.length} / {OBJECTIVE_MAX}
         </p>
         <label htmlFor="objective-due" className="text-ui font-semibold text-ink-900">

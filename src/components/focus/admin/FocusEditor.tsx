@@ -101,7 +101,7 @@ export function FocusEditor({ sop: initial, job, from, canPublish, owner, parsin
         createPortal(
           <span
             data-testid="focus-save-pill"
-            className={`mono text-meta ${saveState === 'error' ? 'text-accent-escalate' : 'text-ink-500'}`}
+            className={`mono text-meta ${saveState === 'error' ? 'text-accent-escalate' : 'text-ink-600'}`}
             role="status"
           >
             {pill}

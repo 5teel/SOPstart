@@ -39,7 +39,7 @@ export function SopRow({
       <i aria-hidden="true" className="w-1 self-stretch rounded-full" style={{ background: row.colourVar }} />
       <span className="min-w-0 flex-1">
         <span className="block text-reading font-semibold text-ink-900">{row.title}</span>
-        <span className="block font-label text-meta text-ink-500">
+        <span className="block font-label text-meta text-ink-600">
           {row.areaName} · {row.type}
           {row.minutes ? ` · ~${row.minutes} min` : ''}
           {extra}

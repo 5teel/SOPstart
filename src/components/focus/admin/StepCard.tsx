@@ -345,7 +345,7 @@ export function StepCard({
         step.tip && <p className="text-ui text-ink-700">Tip: {step.tip}</p>
       ) : tipOpen ? (
         <label className="flex flex-col gap-1">
-          <span className="mono text-meta uppercase text-ink-500">Tip</span>
+          <span className="mono text-meta uppercase text-ink-600">Tip</span>
           <textarea
             defaultValue={step.tip ?? ''}
             rows={2}
@@ -512,7 +512,7 @@ export function StepCard({
             {wasTicked ? 'Checked' : 'Not checked yet'}
           </span>
         )}
-        {recheck && <span className="mono text-meta text-ink-500">Edited — check it again</span>}
+        {recheck && <span className="mono text-meta text-ink-600">Edited — check it again</span>}
       </div>
     </article>
   )

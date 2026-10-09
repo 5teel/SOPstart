@@ -58,7 +58,7 @@ export function FocusRail({ order, open, onClose, rowState, hollowDot, onPick, s
         const locked = state === 'locked'
         return (
           <div key={entry.step.id}>
-            {header && <p className="mono px-4 pb-1 pt-4 text-meta uppercase text-ink-500">{header}</p>}
+            {header && <p className="mono px-4 pb-1 pt-4 text-meta uppercase text-ink-600">{header}</p>}
             <button
               type="button"
               data-testid="focus-rail-row"

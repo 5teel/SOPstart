@@ -21,7 +21,7 @@ const RequestComposerTrigger = dynamic(
   { ssr: false, loading: () => null },
 )
 
-const LABEL = 'mt-5 mb-1.5 font-label text-micro uppercase tracking-widest text-ink-500'
+const LABEL = 'mt-5 mb-1.5 font-label text-micro uppercase tracking-widest text-ink-600'
 const GROUP = 'flex w-full items-center justify-between px-2.5 pt-3 pb-0.5 font-label text-meta text-ink-600'
 
 export function SopList({

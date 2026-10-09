@@ -94,7 +94,7 @@ export function AiCheckBanner({ api, canRun, stepLabel }: AiCheckBannerProps) {
             const label = f.step_id ? stepLabel(f.step_id) : null
             return (
               <li key={f.id} data-testid="ai-finding" className="flex flex-col gap-2 rounded-lg border border-ink-200 bg-paper-1 p-3">
-                <span className="mono text-meta text-ink-500">{label ?? 'Whole SOP'}</span>
+                <span className="mono text-meta text-ink-600">{label ?? 'Whole SOP'}</span>
                 <span className="text-ui text-ink-900">{f.description}</span>
                 <span className="flex flex-wrap gap-2">
                   {f.step_id && label && (

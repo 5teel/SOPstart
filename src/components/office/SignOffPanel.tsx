@@ -44,7 +44,7 @@ const OVERRIDE_REQUIRED_COPY = 'An override reason (10+ characters) is required 
 const FAILED_COPY = "That didn't work. Nothing was changed — try again."
 const STATUS_FAILED = 'Sign-off recorded but status update failed.'
 
-const LABEL = 'mono text-meta uppercase text-ink-500'
+const LABEL = 'mono text-meta uppercase text-ink-600'
 const MIN_REASON = 10
 
 type Receipt = { receipt: string; logged: boolean }
@@ -245,7 +245,7 @@ function SignOffBody({ review, onDone }: { review: CompletionReview; onDone(r: R
           <Link href={focusHref(sopId, { from: homeFrom({ ...HOME, s: 'signoffs' }) })} className="min-w-0 truncate underline">
             {review.sopTitle}
           </Link>
-          <span className="mono shrink-0 rounded border border-ink-200 bg-paper-2 px-2 text-meta text-ink-500">
+          <span className="mono shrink-0 rounded border border-ink-200 bg-paper-2 px-2 text-meta text-ink-600">
             v{review.sopVersion}
           </span>
         </dd>
@@ -281,7 +281,7 @@ function SignOffBody({ review, onDone }: { review: CompletionReview; onDone(r: R
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={p.src} alt="" className="size-full object-cover" />
                 </button>
-                <span className="mono text-meta text-ink-500">{p.stepNumber ? `Step ${p.stepNumber}` : 'Photo'}</span>
+                <span className="mono text-meta text-ink-600">{p.stepNumber ? `Step ${p.stepNumber}` : 'Photo'}</span>
               </div>
             ))}
           </div>
@@ -299,7 +299,7 @@ function SignOffBody({ review, onDone }: { review: CompletionReview; onDone(r: R
                   <div key={st.id} className="flex min-h-tap items-center gap-2 border-b border-ink-100 py-2">
                     <Check size={16} className="shrink-0 text-accent-ok" aria-hidden="true" />
                     <span className="min-w-0 flex-1 text-ui text-ink-900">{st.text}</span>
-                    <span className="mono shrink-0 text-meta text-ink-500">
+                    <span className="mono shrink-0 text-meta text-ink-600">
                       {[st.state === 'acknowledged' ? 'Acknowledged' : null, st.photoIds.length > 0 ? plural(st.photoIds.length, 'photo', 'photos') : null]
                         .filter(Boolean)
                         .join(' · ')}

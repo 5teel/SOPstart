@@ -252,7 +252,7 @@ function ComposerDialog({
           ) : (
             <span />
           )}
-          <span className="mono text-meta text-ink-500">
+          <span className="mono text-meta text-ink-600">
             {note.length} / {MAX_NOTE}
           </span>
         </div>

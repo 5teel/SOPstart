@@ -125,7 +125,7 @@ export function DecisionsTab() {
           <div className="overflow-x-auto">
             <table className="w-full table-fixed text-ui">
               <thead>
-                <tr className="border-b border-ink-200 text-left mono text-meta uppercase tracking-wide text-ink-500">
+                <tr className="border-b border-ink-200 text-left mono text-meta uppercase tracking-wide text-ink-600">
                   <th className="w-24 pb-2 pr-2 font-semibold">When</th>
                   <th className="w-36 pb-2 pr-2 font-semibold">Who</th>
                   <th className="w-36 pb-2 pr-2 font-semibold">What</th>
@@ -150,7 +150,7 @@ export function DecisionsTab() {
               {isFetchingNextPage ? 'Loading…' : 'Show older'}
             </button>
           ) : (
-            <p className="mono text-meta text-ink-500">That&apos;s everything.</p>
+            <p className="mono text-meta text-ink-600">That&apos;s everything.</p>
           )}
         </>
       )}

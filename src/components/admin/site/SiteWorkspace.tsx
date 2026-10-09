@@ -278,7 +278,7 @@ export function SiteWorkspace({ layout, machines: initialMachines, links: initia
           {saveState === 'saved' && 'Saved ✓'}
           {saveState === 'error' && "Couldn't save — try again"}
         </span>
-        <span className="font-label text-micro text-ink-500">
+        <span className="font-label text-micro text-ink-600">
           {layout.scene_width ?? 0} × {layout.scene_height ?? 0} px
         </span>
       </div>

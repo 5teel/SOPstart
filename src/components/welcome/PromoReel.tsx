@@ -120,7 +120,7 @@ function MachinePanel() {
   ]
   return (
     <Card style={enter(1.6)}>
-      <p className="mono text-meta text-ink-500">MACHINE · K7M2QX</p>
+      <p className="mono text-meta text-ink-600">MACHINE · K7M2QX</p>
       <h3 className="mt-1 text-lg font-semibold text-ink-900">Line 1 filler-capper</h3>
       <ul className="mt-3 flex flex-col gap-2">
         {sops.map((s, i) => (
@@ -203,8 +203,8 @@ function WalkPanel() {
           <div className="h-1 rounded-full bg-ink-100">
             <div className="h-1 w-full rounded-full bg-accent-step" />
           </div>
-          <p className="mono text-meta text-ink-500">Step 7 of 7</p>
-          <p className="mono flex items-center gap-2 text-meta uppercase text-ink-500">
+          <p className="mono text-meta text-ink-600">Step 7 of 7</p>
+          <p className="mono flex items-center gap-2 text-meta uppercase text-ink-600">
             Clear a jam <KindChip kind="step" />
           </p>
           <p className="text-reading font-semibold text-ink-900">Clear the label web at the peel plate.</p>

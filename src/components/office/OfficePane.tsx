@@ -124,7 +124,7 @@ export function OfficePane({
                   >
                     {TAB_LABEL[t]}
                     {(t === 'inbox' ? inboxCount : t === 'requests' ? requestCount : 0) > 0 && (
-                      <span className={`mono text-meta ${active ? 'text-paper' : 'text-ink-500'}`}>
+                      <span className={`mono text-meta ${active ? 'text-paper' : 'text-ink-600'}`}>
                         {t === 'inbox' ? inboxCount : requestCount}
                       </span>
                     )}

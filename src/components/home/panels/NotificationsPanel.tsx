@@ -19,7 +19,7 @@ import { NOTIFICATIONS_KEY } from '@/lib/shell/query-keys'
 import { useSectionScroll } from './useSectionScroll'
 
 const READ_KEY = [...NOTIFICATIONS_KEY, 'read'] as const
-const HEADING = 'mono px-4 pb-1 pt-4 text-meta uppercase tracking-wide text-ink-500'
+const HEADING = 'mono px-4 pb-1 pt-4 text-meta uppercase tracking-wide text-ink-600'
 
 interface NotificationRow {
   id: string
@@ -165,7 +165,7 @@ export function NotificationsPanel({ onOpenAddress }: { onOpenAddress(address: s
         >
           <span className={`mt-1 size-3 shrink-0 rounded-full ${isUnread ? 'bg-accent-measure' : ''}`} aria-hidden="true" />
           <span className="flex min-w-0 flex-col">
-            <span className="mono text-meta uppercase text-ink-500">
+            <span className="mono text-meta uppercase text-ink-600">
               {NOTIFICATION_KIND_WORDS[n.kind]} · {relativeWhen(n.created_at)}
             </span>
             <span className="line-clamp-2 text-ui text-ink-900">{n.title}</span>

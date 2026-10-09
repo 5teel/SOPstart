@@ -103,7 +103,7 @@ export function WalkStep({
           <div className="h-1 rounded-full bg-ink-100" role="progressbar" aria-valuemin={1} aria-valuemax={total} aria-valuenow={entry.index}>
             <div className="h-1 rounded-full bg-accent-step" style={{ width: `${(entry.index / total) * 100}%` }} />
           </div>
-          <p data-testid="walk-progress" className="mono text-meta text-ink-500">
+          <p data-testid="walk-progress" className="mono text-meta text-ink-600">
             Step {entry.index} of {total}
           </p>
           <span className="sr-only" aria-live="polite">
@@ -111,7 +111,7 @@ export function WalkStep({
           </span>
         </div>
 
-        <p className="mono flex flex-wrap items-center gap-2 text-meta uppercase text-ink-500">
+        <p className="mono flex flex-wrap items-center gap-2 text-meta uppercase text-ink-600">
           {entry.groupLabel}
           <StandardLabels names={groupStandardNames} />
         </p>
@@ -131,7 +131,7 @@ export function WalkStep({
           <div className="flex items-start gap-2 rounded-lg border border-ink-200 bg-paper-2 p-4">
             <Lightbulb className="mt-0.5 size-4 shrink-0 text-ink-500" aria-hidden="true" />
             <p className="text-reading text-ink-900">
-              <span className="mono mr-2 text-meta uppercase text-ink-500">Tip</span>
+              <span className="mono mr-2 text-meta uppercase text-ink-600">Tip</span>
               {step.tip}
             </p>
           </div>

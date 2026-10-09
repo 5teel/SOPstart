@@ -122,7 +122,7 @@ export function ReadView({
       {back}
       <Wordmark variant="chip" size="merge" data-fuse="sop" />
       <h1 className="mb-1.5 mt-2.5 text-2xl font-semibold text-ink-900">{row.title}</h1>
-      <p className="font-label text-meta text-ink-500">
+      <p className="font-label text-meta text-ink-600">
         <i aria-hidden="true" className="mr-1 inline-block size-2 rounded align-baseline" style={{ background: row.colourVar }} />
         {row.areaName} · {row.type} · v{row.version ?? 1}
         {owner ? ` · owner ${owner}` : ''}
@@ -179,7 +179,7 @@ export function ReadView({
         )}
       </div>
 
-      <h2 className="mono mb-1 mt-7 text-meta uppercase text-ink-500">What you&apos;ll do</h2>
+      <h2 className="mono mb-1 mt-7 text-meta uppercase text-ink-600">What you&apos;ll do</h2>
       {isLoading || !data ? (
         <div aria-busy="true" className="space-y-3 pt-2">
           <div className="h-5 w-3/4 animate-pulse rounded bg-paper-2 motion-reduce:animate-none" />
@@ -189,10 +189,10 @@ export function ReadView({
         <ol data-testid="read-steps" className="m-0 list-none p-0">
           {order.map((e) => (
             <li key={e.step.id} className="flex gap-3 border-b border-ink-200 py-2.5 text-reading">
-              <span className="w-6 shrink-0 pt-1 font-label text-meta text-ink-500">{e.index}</span>
+              <span className="w-6 shrink-0 pt-1 font-label text-meta text-ink-600">{e.index}</span>
               <span className="flex-1">
                 {e.step.text}
-                {e.step.photo_required && <span className="font-label text-meta text-ink-500"> · photo</span>}
+                {e.step.photo_required && <span className="font-label text-meta text-ink-600"> · photo</span>}
               </span>
               <span className="h-fit shrink-0">
                 <KindChip kind={e.step.kind} />

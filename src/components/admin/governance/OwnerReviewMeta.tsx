@@ -20,7 +20,7 @@ export function OwnerReviewMeta({
       data-testid="owner-review-meta"
       data-owner={ownerLabel ? 'set' : 'none'}
       data-review={review.state}
-      className="mono flex min-w-0 items-center gap-1 text-meta text-ink-500"
+      className="mono flex min-w-0 items-center gap-1 text-meta text-ink-600"
     >
       {omit !== 'owner' &&
         (ownerLabel ? (

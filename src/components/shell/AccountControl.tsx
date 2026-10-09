@@ -13,7 +13,7 @@ const LINK = 'flex min-h-tap items-center rounded px-2 text-meta text-ink-600 ho
 export function AccountControl({ email, isAdmin }: { email: string | null; isAdmin: boolean }) {
   return (
     <div data-testid="shell-account" className="flex flex-col gap-0.5 border-t border-ink-200 p-2">
-      {email && <p className="mono truncate px-2 text-meta text-ink-500">{email}</p>}
+      {email && <p className="mono truncate px-2 text-meta text-ink-600">{email}</p>}
       <div className="flex flex-wrap items-center gap-x-1">
         <Link href="/profile" className={LINK}>
           Profile

@@ -362,7 +362,7 @@ export function PeopleTab({ onReceipt }: { onReceipt(r: RowDone): void }) {
         </div>
       ) : (
         <div className="flex flex-col">
-          <div className="mono hidden grid-cols-12 gap-2 border-b border-ink-200 pb-2 text-meta uppercase tracking-wide text-ink-500 xl:grid">
+          <div className="mono hidden grid-cols-12 gap-2 border-b border-ink-200 pb-2 text-meta uppercase tracking-wide text-ink-600 xl:grid">
             <span className="col-span-3">Email</span>
             <span className="col-span-3">Role</span>
             <span className="col-span-3">Departments</span>
@@ -381,7 +381,7 @@ export function PeopleTab({ onReceipt }: { onReceipt(r: RowDone): void }) {
                 <p className="truncate text-ui font-semibold text-ink-900" title={p.email ?? undefined}>
                   {p.email ?? 'Invited person'}
                 </p>
-                <p className="mono text-meta text-ink-500">Waiting to accept</p>
+                <p className="mono text-meta text-ink-600">Waiting to accept</p>
               </div>
               <span className="text-ui text-ink-700 xl:col-span-3">{ROLE_WORDS[p.role] ?? ROLE_WORDS.worker}</span>
               <span className="text-ui text-ink-500 xl:col-span-3">—</span>

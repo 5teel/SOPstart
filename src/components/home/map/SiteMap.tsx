@@ -201,7 +201,7 @@ export function SiteMap({ areas, rows, area, onArea, onOpenSop, orgName, renderO
         ) : (
           <span className="text-reading font-bold text-ink-900">{orgName} · site map</span>
         )}
-        <span className="ml-auto font-label text-meta text-ink-500 max-lg:hidden">
+        <span className="ml-auto font-label text-meta text-ink-600 max-lg:hidden">
           {openArea ? 'click a SOP to read it · Esc for the whole site' : 'click an area to open it'}
         </span>
       </div>

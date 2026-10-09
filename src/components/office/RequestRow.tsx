@@ -102,7 +102,7 @@ export function RequestRow({ request, onDone }: { request: OfficeRequest; onDone
           <div className="flex flex-wrap items-center gap-2">
             <span className={`${CHIP} bg-paper-2 text-ink-700`}>{REQUEST_KIND_WORDS[request.kind]}</span>
             {request.agent && <span className={`${CHIP} border border-ai/40 bg-ai/10 text-ai`}>agent</span>}
-            <span className="mono text-meta text-ink-500">{relativeWhen(request.createdAt)}</span>
+            <span className="mono text-meta text-ink-600">{relativeWhen(request.createdAt)}</span>
           </div>
           <p className="text-ui font-semibold text-ink-900">{name}</p>
           {request.note && <p className="text-ui text-ink-700">{request.note}</p>}

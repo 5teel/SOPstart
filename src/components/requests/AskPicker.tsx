@@ -128,7 +128,7 @@ export function AskTrigger({
         className={
           rail
             ? 'flex min-h-tap w-full items-center rounded px-2 text-left text-ui text-ink-900 hover:bg-paper-1'
-            : 'mono text-meta text-ink-500 hover:text-ink-900'
+            : 'mono text-meta text-ink-600 hover:text-ink-900'
         }
       >
         {rail ? 'Ask someone to do this' : 'Ask ›'}
@@ -158,7 +158,7 @@ export function AskTrigger({
             align === 'end' ? 'right-0' : 'left-0'
           }`}
         >
-          <p className="mono text-meta uppercase text-ink-500">Ask someone to do this</p>
+          <p className="mono text-meta uppercase text-ink-600">Ask someone to do this</p>
           <p className="mb-2 truncate text-ui text-ink-700">{sopTitle}</p>
 
           <div role="radiogroup" aria-label="Who to ask" className="mb-2 flex gap-1">
@@ -203,7 +203,7 @@ export function AskTrigger({
                     >
                       {on ? <Check size={16} className="text-accent-ok" aria-hidden="true" /> : <span className="w-4" />}
                       <span className="flex-1">{ROLE_PLURAL[r.role]}</span>
-                      <span className="mono text-meta text-ink-500">{people(r.count)}</span>
+                      <span className="mono text-meta text-ink-600">{people(r.count)}</span>
                     </button>
                   </li>
                 )
@@ -240,7 +240,7 @@ export function AskTrigger({
                           {p.label}
                           {p.hasIt && <span className="ml-2 font-normal text-ink-500">Already has this</span>}
                         </span>
-                        <span className="mono text-meta text-ink-500">{ROLE_PLURAL[p.role].replace(/s$/, '')}</span>
+                        <span className="mono text-meta text-ink-600">{ROLE_PLURAL[p.role].replace(/s$/, '')}</span>
                       </button>
                     </li>
                   )
