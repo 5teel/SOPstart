@@ -31,7 +31,7 @@ export function TabBar({ role, section, onSelect }: { role: string | null; secti
           data-testid={`home-tab-${s}`}
           aria-current={section === s ? 'page' : undefined}
           onClick={() => onSelect(s)}
-          className="min-h-tap flex-1 px-0.5 text-meta text-ink-500 aria-[current=page]:font-bold aria-[current=page]:text-ink-900"
+          className="min-h-tap flex-1 whitespace-nowrap px-0.5 text-meta text-ink-500 aria-[current=page]:font-bold aria-[current=page]:text-ink-900"
         >
           {SHORT[s]}
         </button>

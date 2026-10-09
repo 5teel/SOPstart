@@ -463,21 +463,31 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
       const box = await carry.boundingBox()
       expect(box?.height ?? 0, 'Carry on height').toBeGreaterThanOrEqual(44)
       await noSideways(page, 'manage drafts')
-      // Six tabs at 390 px: every label stays on one line (the 13 px floor wrapped "My record").
-      const tabs = await page.locator('[data-testid^="home-tab-"]').evaluateAll((els) =>
-        els.map((el) => {
-          const r = document.createRange()
-          r.selectNodeContents(el)
-          return { t: el.textContent, lines: new Set([...r.getClientRects()].map((b) => Math.round(b.top))).size }
-        }),
-      )
-      expect(tabs.length, 'admin has six tabs').toBe(6)
-      for (const tab of tabs) expect(tab.lines, `tab "${tab.t}" wraps`).toBe(1)
+      // Six tabs at 390 px: every label stays on one line, the current (bold) one too -- the 13 px
+      // floor wrapped "My record" and a bold "Sign-offs".
+      const tabsFit = async (current: string) => {
+        const tabs = await page.locator('[data-testid^="home-tab-"]').evaluateAll((els) =>
+          els.map((el) => {
+            const r = document.createRange()
+            r.selectNodeContents(el)
+            return { t: el.textContent, lines: new Set([...r.getClientRects()].map((b) => Math.round(b.top))).size, w: el.scrollWidth - el.clientWidth }
+          }),
+        )
+        expect(tabs.length, 'admin has six tabs').toBe(6)
+        for (const tab of tabs) {
+          expect(tab.lines, `tab "${tab.t}" wraps (${current} current)`).toBe(1)
+          expect(tab.w, `tab "${tab.t}" overflows (${current} current)`).toBeLessThanOrEqual(0)
+        }
+      }
+      await tabsFit('manage')
       await shot(page, '63-home-phone-manage')
       for (const s of ['signoffs', 'record']) {
         await page.getByTestId(`home-tab-${s}`).click()
         await expect(page.getByTestId(`home-tab-${s}`)).toHaveAttribute('aria-current', 'page')
+        if (s === 'signoffs') await expect(page.getByTestId('office-row').first()).toBeVisible(SLOW)
+        else await expect(page.getByRole('heading', { name: 'My record' })).toBeVisible(SLOW)
         await page.waitForLoadState('networkidle', { timeout: 10_000 }).catch(() => {})
+        await tabsFit(s)
         await noSideways(page, s)
         await shot(page, `63-home-phone-${s}`)
       }
