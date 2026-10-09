@@ -1,9 +1,10 @@
 import type { Metadata, Viewport } from 'next'
-import { Saira_Semi_Condensed } from 'next/font/google'
+import { Inter, Saira_Semi_Condensed } from 'next/font/google'
 import { PRODUCT_NAME, PRODUCT_DESCRIPTION } from '@/lib/constants'
 import './globals.css'
 
-const saira = Saira_Semi_Condensed({ weight: ['600', '800'], subsets: ['latin'], display: 'swap', variable: '--font-saira' })
+const inter = Inter({ subsets: ['latin'], display: 'swap', variable: '--font-inter' })
+const saira = Saira_Semi_Condensed({ weight: ['500', '600', '700', '800'], subsets: ['latin'], display: 'swap', variable: '--font-saira' })
 
 export const metadata: Metadata = {
   title: PRODUCT_NAME,
@@ -29,7 +30,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={saira.variable}>
+    <html lang="en" className={`${inter.variable} ${saira.variable}`}>
       <body data-theme="paper">
         {children}
         <div id="fuse-layer" aria-hidden="true" className="pointer-events-none fixed inset-0 z-50" />

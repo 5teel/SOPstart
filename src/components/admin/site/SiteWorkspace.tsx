@@ -278,7 +278,7 @@ export function SiteWorkspace({ layout, machines: initialMachines, links: initia
           {saveState === 'saved' && 'Saved ✓'}
           {saveState === 'error' && "Couldn't save — try again"}
         </span>
-        <span className="font-mono text-micro text-ink-500">
+        <span className="font-label text-micro text-ink-500">
           {layout.scene_width ?? 0} × {layout.scene_height ?? 0} px
         </span>
       </div>
@@ -337,7 +337,7 @@ export function SiteWorkspace({ layout, machines: initialMachines, links: initia
                       className="flex w-full items-start justify-between gap-2 text-left"
                     >
                       <span className="min-w-0 flex-1">
-                        <span className="block truncate font-mono text-ui text-ink-900">{machine.name}</span>
+                        <span className="block truncate font-label text-ui text-ink-900">{machine.name}</span>
                         <span className="mt-0.5 flex items-center gap-1.5 text-meta text-ink-500">
                           {dept && <span className="h-2 w-2 rounded-full" style={{ backgroundColor: dept.colour }} />}
                           {dept ? dept.name : 'No department'}

@@ -28,7 +28,7 @@ export function MapKey({ items, area, onArea }: { items: MapKeyItem[]; area: str
             {a.index}
           </span>
           <span className="min-w-0 flex-1 truncate font-semibold">{a.name}</span>
-          <span className="font-mono text-meta text-ink-500">{a.count}</span>
+          <span className="font-label text-meta text-ink-500">{a.count}</span>
         </button>
       ))}
     </div>

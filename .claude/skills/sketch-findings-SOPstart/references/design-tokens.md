@@ -1,3 +1,5 @@
+> **2026-10-09, ADR-0006 supersedes the typography below.** Inter (`--font-reading`) for all reading; Saira Semi Condensed (`font-label`, `.mono`) for wordmark, labels, tags, pills and short data lines. No JetBrains Mono. Saira: short strings, min 12 px (`text-micro` 12, `text-meta` 13), weight >= 500, labels caps 700 with +0.06em, data sentence case 500. Aligned number columns use the `figures` class (Saira has no tabular digits).
+
 # Design tokens
 
 All tokens extracted from `sources/blueprint-sketch.html` `<style>` block (lines 11-82). These are the canonical values — if you need to port the sketch, these are the source of truth.

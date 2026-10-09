@@ -30,13 +30,13 @@ test.describe('wordmark', () => {
     expect(css).toMatch(/--wm-font:\s*var\(--font-saira, 'Saira Semi Condensed'\)/)
   })
 
-  test('Saira Semi Condensed 600 and 800 load through next/font on <html>', () => {
+  test('Saira Semi Condensed 500 to 800 load through next/font on <html>', () => {
     const layout = read('src/app/layout.tsx')
     expect(layout).toContain("from 'next/font/google'")
     expect(layout).toContain('Saira_Semi_Condensed')
-    expect(layout).toMatch(/weight: \['600', '800'\]/)
+    expect(layout).toMatch(/weight: \['500', '600', '700', '800'\]/)
     expect(layout).toContain("variable: '--font-saira'")
-    expect(layout).toContain('className={saira.variable}')
+    expect(layout).toContain('saira.variable')
   })
 
   test('brand yellow lives only in the wordmark (outside the annotation-tool allowlist)', () => {

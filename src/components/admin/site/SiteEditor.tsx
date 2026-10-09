@@ -34,7 +34,7 @@ const VIEW_ZOOM_MAX = 4
 // Vertex handle radius / close-snap distance are screen px, constant at any zoom (D-09 discretion).
 const VERTEX_RADIUS_PX = 7
 const CLOSE_SNAP_PX = 10
-const MONO_FONT = "'JetBrains Mono', ui-monospace, monospace"
+const MONO_FONT = "'Saira Semi Condensed', 'Arial Narrow', system-ui, sans-serif"
 
 interface ColourTokens {
   zone: string

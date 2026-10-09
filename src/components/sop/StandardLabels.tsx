@@ -9,7 +9,7 @@ export function StandardLabels({ names }: { names: string[] }) {
         <span
           key={n}
           data-testid="standard-label"
-          className="font-mono text-micro text-accent-inspect bg-accent-inspect/10 rounded px-1.5 py-px"
+          className="font-label text-micro text-accent-inspect bg-accent-inspect/10 rounded px-1.5 py-px"
         >
           {n}
         </span>

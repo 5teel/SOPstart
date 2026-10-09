@@ -44,7 +44,7 @@ export default async function AgentDashboardPage() {
           fontWeight: 700,
           color: 'var(--ink-900)',
           margin: '0 0 6px',
-          fontFamily: 'var(--font-mono, monospace)',
+          fontFamily: 'var(--font-label)',
         }}
       >
         ⚇ Agent layer

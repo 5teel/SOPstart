@@ -19,7 +19,7 @@
  *   - Old value: struck-through, text-[var(--ink-500)] (neutral/dim)
  *   - New value: highlighted, text-[var(--ink-900)] (prominent)
  *   - Card: paper bg (var(--paper)), ink border
- *   - diff values: JetBrains Mono (font-mono)
+ *   - diff values: label face (font-label)
  *
  * Security: handlers call acceptProposal/rejectProposal server actions (not empty —
  *   CLAUDE.md 2026-06-05 wiring learning)
@@ -198,14 +198,14 @@ export function InlineProposalDiff({ proposal, onResolved }: InlineProposalDiffP
                     {field.key}
                   </div>
                   <div className="grid grid-cols-2 gap-2">
-                    <div className={`rounded-lg px-3 py-2 text-sm font-mono border ${
+                    <div className={`rounded-lg px-3 py-2 text-sm font-label border ${
                       changed
                         ? 'border-[var(--ink-100)] bg-[var(--paper-2)] text-[var(--ink-500)] line-through'
                         : 'border-[var(--ink-100)] bg-[var(--paper-2)] text-[var(--ink-500)]'
                     }`}>
                       {field.oldValue || <span className="italic opacity-50">(empty)</span>}
                     </div>
-                    <div className={`rounded-lg px-3 py-2 text-sm font-mono border ${
+                    <div className={`rounded-lg px-3 py-2 text-sm font-label border ${
                       changed
                         ? 'border-accent-signoff/40 bg-accent-signoff/10 text-[var(--ink-900)]'
                         : 'border-[var(--ink-100)] bg-[var(--paper-2)] text-[var(--ink-500)]'
@@ -224,7 +224,7 @@ export function InlineProposalDiff({ proposal, onResolved }: InlineProposalDiffP
               <div className="text-micro uppercase tracking-wider text-[var(--ink-500)] mb-1">
                 Current
               </div>
-              <div className="rounded-lg px-3 py-2 text-sm font-mono border border-[var(--ink-100)] bg-[var(--paper-2)] text-[var(--ink-500)] line-through">
+              <div className="rounded-lg px-3 py-2 text-sm font-label border border-[var(--ink-100)] bg-[var(--paper-2)] text-[var(--ink-500)] line-through">
                 {toDisplayString(proposal.current_value)}
               </div>
             </div>
@@ -232,7 +232,7 @@ export function InlineProposalDiff({ proposal, onResolved }: InlineProposalDiffP
               <div className="text-micro uppercase tracking-wider text-[var(--ink-500)] mb-1">
                 Proposed
               </div>
-              <div className="rounded-lg px-3 py-2 text-sm font-mono border border-accent-signoff/40 bg-accent-signoff/10 text-[var(--ink-900)]">
+              <div className="rounded-lg px-3 py-2 text-sm font-label border border-accent-signoff/40 bg-accent-signoff/10 text-[var(--ink-900)]">
                 {toDisplayString(proposal.proposed_value)}
               </div>
             </div>

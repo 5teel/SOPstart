@@ -110,7 +110,7 @@ export function WizardClient({ departments, machineId = null, initialTitle = '' 
   return (
     <div className="rounded-lg border border-[var(--ink-100)] bg-white p-6" data-testid="wizard-client">
       {/* Step indicator */}
-      <div className="mb-6 flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-[var(--ink-500)]">
+      <div className="mb-6 flex items-center gap-2 text-xs font-label uppercase tracking-wider text-[var(--ink-500)]">
         <span className={step === 1 ? 'text-[var(--ink-900)]' : ''}>1 Title</span>
         <span>→</span>
         <span className={step === 2 ? 'text-[var(--ink-900)]' : ''}>2 Sections</span>

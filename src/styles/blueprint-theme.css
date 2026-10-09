@@ -56,8 +56,8 @@
  *
  * Type: Tailwind's own xs/sm/base/lg/xl/2xl stay in use; these four fill the
  * gaps the app kept writing by hand (122× text-[11px], 86× text-[10px] …).
- *   micro   10px — pill labels, counters, the tiniest mono captions
- *   meta    11px — mono captions, column headers, row metadata
+ *   micro   12px — pill labels, counters, tags (Saira floor, ADR-0006)
+ *   meta    13px — data lines, captions, column headers, row metadata
  *   ui      13px — dense list rows and controls (between xs and sm)
  *   reading 15px — worker-facing body text on phones (between sm and base)
  * Tap targets (D-19 glove rule): tap 44px standard control, tap-glove 60px
@@ -66,10 +66,15 @@
  * small controls), rounded-lg (inputs, buttons, cards), rounded-2xl (sheets,
  * modals), rounded-full (circles). xs/sm/md/xl/3xl and px values are banned
  * by tests/lint/design-tokens.spec.ts. */
+@theme inline {
+  /* ADR-0006: the label / data face. Saira Semi Condensed, short strings only. */
+  --font-label: var(--font-saira, 'Saira Semi Condensed'), 'Arial Narrow', system-ui, sans-serif;
+  --font-reading: var(--font-inter, 'Inter'), ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
 @theme {
-  --text-micro: 10px;
+  --text-micro: 12px;
   --text-micro--line-height: 1.2;
-  --text-meta: 11px;
+  --text-meta: 13px;
   --text-meta--line-height: 1.35;
   --text-ui: 13px;
   --text-ui--line-height: 1.4;
@@ -208,13 +213,22 @@ body[data-theme="paper"] {
   background-color: var(--paper);
   background-image: none;
   color: var(--ink-900);
-  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-family: var(--font-reading);
+  /* ADR-0006: tabular digits. The cv05 / cv08 / zero glyphs are stripped from the Google Fonts Inter build (checked on the shipped woff2), so they are not enabled. */
+  font-feature-settings: 'tnum';
   -webkit-font-smoothing: antialiased;
 }
 
-body[data-theme="paper"] .mono {
-  font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
-  font-feature-settings: 'calt' 0;
+/* Label / data face (ADR-0006). In a layer so utilities (font-bold, tracking-*) still win.
+ * Sentence case = data line (500); caps = label or tag (700, +0.06em). */
+@layer components {
+  .mono {
+    font-family: var(--font-label);
+    font-weight: 500;
+  }
+  /* Numbers that must align in a column: Saira has no tabular digits, so these use Inter. */
+  .figures { font-family: var(--font-reading); font-variant-numeric: tabular-nums; }
+  .mono.uppercase { font-weight: 700; letter-spacing: 0.06em; }
 }
 
 body[data-theme="paper"] .bg-grid {
@@ -232,8 +246,8 @@ body[data-theme="paper"] .pill {
   padding: 0.125rem 0.625rem;
   border: 1px solid var(--ink-300);
   border-radius: 9999px;
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
-  font-size: 11px;
+  font-family: var(--font-label);
+  font-size: var(--text-meta);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--ink-700);
@@ -256,7 +270,7 @@ body[data-theme="paper"] .tab {
   padding: 0.5rem 0.875rem;
   border-bottom: 2px solid transparent;
   color: var(--ink-500);
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-family: var(--font-label);
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -375,13 +389,13 @@ body[data-theme="paper"] .layout-shell {
   border-radius: 7px;
   padding: 15px 17px;
   margin-bottom: 22px;
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
-  font-size: 11px;
+  font-family: var(--font-label);
+  font-size: var(--text-meta);
 }
-.agentpanel h4 { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ai); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-.agentpanel h4 .tag { margin-left: auto; font-size: 8px; border: 1px solid var(--ai); border-radius: 2px; padding: 1px 6px; color: var(--ai); }
+.agentpanel h4 { font-size: var(--text-micro); text-transform: uppercase; letter-spacing: 0.08em; color: var(--ai); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+.agentpanel h4 .tag { margin-left: auto; font-size: var(--text-micro); border: 1px solid var(--ai); border-radius: 2px; padding: 1px 6px; color: var(--ai); }
 .agentpanel .arow { display: flex; gap: 10px; padding: 4px 0; border-top: 1px solid rgba(139, 92, 246, 0.15); line-height: 1.55; }
-.agentpanel .ak { color: var(--ai); flex: 0 0 108px; text-transform: uppercase; font-size: 9px; letter-spacing: 0.04em; padding-top: 1px; }
+.agentpanel .ak { color: var(--ai); flex: 0 0 108px; text-transform: uppercase; font-size: var(--text-micro); letter-spacing: 0.04em; padding-top: 1px; }
 .agentpanel .av { flex: 1; color: var(--ink-700); }
 .agentpanel .av .link { color: var(--accent-measure); }
 
@@ -403,8 +417,8 @@ body[data-theme="paper"] .node.selected {
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 body[data-theme="paper"] .node .kicker {
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
-  font-size: 9px;
+  font-family: var(--font-label);
+  font-size: var(--text-micro);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--ink-500);
@@ -430,8 +444,8 @@ body[data-theme="paper"] .person-chip .avatar {
   border-radius: 50%;
   background: var(--ink-900);
   color: #fff;
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
-  font-size: 9px;
+  font-family: var(--font-label);
+  font-size: var(--text-micro);
   font-weight: 700;
   display: grid;
   place-items: center;
@@ -455,8 +469,8 @@ body[data-theme="paper"] .view-toggle {
   overflow: hidden;
 }
 body[data-theme="paper"] .view-toggle button {
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
-  font-size: 10px;
+  font-family: var(--font-label);
+  font-size: var(--text-micro);
   font-weight: 600;
   text-transform: uppercase;
   padding: 5px 12px;
@@ -479,7 +493,7 @@ body[data-theme="paper"] .org-add-ghost {
   border-radius: 5px;
   background: transparent;
   color: var(--ink-500);
-  font-size: 11px;
+  font-size: var(--text-meta);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   cursor: pointer;
@@ -543,14 +557,14 @@ body[data-theme="paper"] .col {
   gap: 5px;
 }
 body[data-theme="paper"] .col h2 {
-  font-size: 11px;
+  font-size: var(--text-meta);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--ink-500);
   margin: 0 0 6px;
 }
 body[data-theme="paper"] .bay-hint {
-  font-size: 10px;
+  font-size: var(--text-micro);
   color: var(--ink-500);
   margin-top: 12px;
 }
@@ -576,7 +590,7 @@ body[data-theme="paper"] .jack .name {
   text-overflow: ellipsis;
 }
 body[data-theme="paper"] .jack .meta {
-  font-size: 9.5px;
+  font-size: var(--text-micro);
   color: var(--ink-500);
   flex-shrink: 0;
 }
@@ -603,7 +617,7 @@ body[data-theme="paper"] .jack.site-jack {
   margin-bottom: 8px;
 }
 body[data-theme="paper"] .jack .twist {
-  font-size: 9px;
+  font-size: var(--text-micro);
   color: var(--ink-400);
   cursor: pointer;
 }
@@ -645,7 +659,7 @@ body[data-theme="paper"] .jack.newsop {
   border: 2px solid var(--accent-decision);
 }
 body[data-theme="paper"] .jack.newsop .newpill {
-  font-size: 8px;
+  font-size: var(--text-micro);
   font-weight: 700;
   letter-spacing: 0.06em;
   background: var(--accent-decision);
@@ -698,7 +712,7 @@ body[data-theme="paper"] .strip-slot .headline b {
 }
 body[data-theme="paper"] .strip-slot .open-in-library {
   margin-left: 10px;
-  font-size: 10px;
+  font-size: var(--text-micro);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -709,7 +723,7 @@ body[data-theme="paper"] .strip-slot .open-in-library:hover {
   text-decoration: underline;
 }
 body[data-theme="paper"] .strip-slot.idle {
-  font-size: 10px;
+  font-size: var(--text-micro);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--ink-400);
@@ -728,7 +742,7 @@ body[data-theme="paper"] .strip-slot.wiring {
 body[data-theme="paper"] .strip-slot .done {
   margin-left: auto;
   flex-shrink: 0;
-  font-size: 10px;
+  font-size: var(--text-micro);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;

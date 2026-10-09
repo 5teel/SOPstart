@@ -192,8 +192,8 @@ export function StandardsButton({
               onClick={() => void toggleStandard(s.id, target, !on)}
               className={
                 on
-                  ? 'min-h-tap rounded border border-transparent bg-accent-inspect/10 px-2.5 font-mono text-micro text-accent-inspect'
-                  : 'min-h-tap rounded border border-[var(--ink-200)] px-2.5 font-mono text-micro text-[var(--ink-500)] hover:bg-[var(--paper-2)]'
+                  ? 'min-h-tap rounded border border-transparent bg-accent-inspect/10 px-2.5 font-label text-micro text-accent-inspect'
+                  : 'min-h-tap rounded border border-[var(--ink-200)] px-2.5 font-label text-micro text-[var(--ink-500)] hover:bg-[var(--paper-2)]'
               }
             >
               {s.name}

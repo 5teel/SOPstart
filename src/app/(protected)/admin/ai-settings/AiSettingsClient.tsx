@@ -100,7 +100,7 @@ export function AiSettingsClient({
               {envManaged.map((s) => (
                 <tr key={s.key} className="border-t border-[var(--ink-100)]">
                   <td className="py-2 pr-3 text-[var(--ink-900)]">{s.key}</td>
-                  <td className="py-2 pr-3 font-mono text-xs text-[var(--ink-700)]">{s.resolvedDefault}</td>
+                  <td className="py-2 pr-3 font-label text-xs text-[var(--ink-700)]">{s.resolvedDefault}</td>
                   <td className="py-2 pr-3 text-[var(--ink-700)]">
                     {s.provider}
                     {!s.providerKeyConfigured && (
@@ -109,7 +109,7 @@ export function AiSettingsClient({
                       </span>
                     )}
                   </td>
-                  <td className="py-2 font-mono text-xs text-[var(--ink-500)]">{s.envVar ?? '—'}</td>
+                  <td className="py-2 font-label text-xs text-[var(--ink-500)]">{s.envVar ?? '—'}</td>
                 </tr>
               ))}
             </tbody>

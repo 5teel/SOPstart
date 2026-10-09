@@ -201,7 +201,7 @@ export function SiteMap({ areas, rows, area, onArea, onOpenSop, orgName, renderO
         ) : (
           <span className="text-reading font-bold text-ink-900">{orgName} · site map</span>
         )}
-        <span className="ml-auto font-mono text-meta text-ink-500 max-lg:hidden">
+        <span className="ml-auto font-label text-meta text-ink-500 max-lg:hidden">
           {openArea ? 'click a SOP to read it · Esc for the whole site' : 'click an area to open it'}
         </span>
       </div>
@@ -292,7 +292,7 @@ export function SiteMap({ areas, rows, area, onArea, onOpenSop, orgName, renderO
                   <text x={sx - w / 2 + 14 * k} y={sy - 9 * k} fontSize={12.5 * k} fontWeight={700} style={{ fill: 'var(--paper-1)' }}>
                     {label}
                   </text>
-                  <text x={sx + w / 2 - 10 * k} y={sy - 9 * k} fontSize={10.5 * k} textAnchor="end" className="font-mono" style={{ fill: 'var(--ink-400)' }}>
+                  <text x={sx + w / 2 - 10 * k} y={sy - 9 * k} fontSize={10.5 * k} textAnchor="end" className="font-label" style={{ fill: 'var(--ink-400)' }}>
                     {n}
                   </text>
                 </g>
