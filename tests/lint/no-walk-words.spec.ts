@@ -91,8 +91,8 @@ test.describe('no walk words on a screen', () => {
     expect(scan("// 'Could not start the walk' was the old line\r\nconst z = 1\r\n")).toEqual([])
   })
 
-  test('the allowlist holds two reasoned entries and the guard is registered', () => {
-    expect(ALLOW).toHaveLength(2)
+  test('the allowlist holds one reasoned entry and the guard is registered', () => {
+    expect(ALLOW).toHaveLength(1)
     const cfg = fs.readFileSync(path.join(ROOT, 'playwright.config.ts'), 'utf-8')
     expect(cfg).toContain('no-walk-words')
   })
