@@ -13,7 +13,10 @@ Pick up here in a fresh context. Read CLAUDE.md, docs/adr/README.md (ADR-0004, 0
   - Guard: `tests/lint/typography.spec.ts` (phase15-stubs), mutation-proven.
   - Rule from the verdict: Saira only for short strings (labels, tags, counts, data lines), never step instructions or long text; caps only for labels/tags.
 
-### Not yet verified live (do first, cheaply)
+### Verified live 2026-10-09 (next session)
+- home + sop-focus + office evals 53/53 against `6ec09329`. Sign-offs, My record, Manage SOPs read at 1440 and 390: clean, except that the phone tab bar wrapped "My record" and a bold current "Sign-offs". Fixed in `4d4d9c1b` / `b77ae968` (tab reads "Record", `whitespace-nowrap`); the HOME-04 phone case now checks every tab stays on one line with each tab selected, and takes `63-home-phone-signoffs` / `-record` shots. Invite leg was rate-limited again.
+
+### (was) Not yet verified live
 1. `28db4997` (darker data lines) has no deployed eval run. Run once (wait for `/api/version` = HEAD):
    `npx playwright test --project=evals --workers=1 --retries=0 tests/evals/home.eval.ts tests/evals/sop-focus.eval.ts tests/evals/office.eval.ts` with `EVAL_BASE_URL=https://sopstart.com` — sop-focus was not re-run after its `font-mono` → `font-label` selector fix.
 2. Read live screenshots of **Sign-offs, My record, Manage SOPs** (desktop 1440 + phone 390) — the bigger 12/13 px labels have not been looked at there. Check row-height ceilings (`getBoundingClientRect` limits in evals) and fixed-width segmented controls for clipping (CLAUDE.md 2026-10-06 (7)).
