@@ -332,7 +332,7 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
 
   test('HOME-03 Read shows chip, meta, steps with kinds and the start button; owner hidden for a worker, shown for a supervisor', async ({ browser }) => {
     test.setTimeout(240_000)
-    const meta = (page: Page) => page.locator('[data-testid="read-view"] p.font-mono').first()
+    const meta = (page: Page) => page.locator('[data-testid="read-view"] p.font-label').first()
 
     await asRole(browser, 'siteWorker', DESKTOP, async (page) => {
       await page.goto(`/?sop=${lib.sopIds.packing}`)
@@ -364,7 +364,7 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
 
   test('HOME-03 opening two SOPs in a row shows no stale Read (second iteration, same session)', async ({ browser }) => {
     test.setTimeout(240_000)
-    const meta = (page: Page) => page.locator('[data-testid="read-view"] p.font-mono').first()
+    const meta = (page: Page) => page.locator('[data-testid="read-view"] p.font-label').first()
     await asRole(browser, 'siteAdmin', DESKTOP, async (page) => {
       await page.goto('/')
       await listReady(page)

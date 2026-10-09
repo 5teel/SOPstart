@@ -303,7 +303,7 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       await page.goto(`/?sop=${plantSopId}`)
       await expect(page.getByTestId('read-view').locator('h1')).toHaveText(EVAL_PLANT_SOP_TITLE, SLOW)
       await page.waitForTimeout(1_500) // the owner query has landed (an unowned SOP has none to show)
-      await expect(page.locator('[data-testid="read-view"] p.font-mono').first()).not.toContainText(' · owner ')
+      await expect(page.locator('[data-testid="read-view"] p.font-label').first()).not.toContainText(' · owner ')
       await shot(page, '59-owner-meta')
 
       // Manage SOPs: the draft row.
