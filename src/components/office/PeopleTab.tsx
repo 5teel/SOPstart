@@ -211,14 +211,20 @@ function DepartmentBoard({
   auth(m: TeamMember): Authority
   onOpen(m: TeamMember): void
 }) {
-  const groups: Array<{ key: string; name: string; colour: string | null; people: TeamMember[] }> = departments.map((d) => ({
+  const all = departments.map((d) => ({
     key: d.id,
     name: d.name,
-    colour: d.colour,
+    colour: d.colour as string | null,
     people: members.filter((m) => m.department_ids.includes(d.id)),
   }))
+  // People nobody has placed come first (they are the admin's to-do); departments with people next;
+  // empty departments fold into one quiet line at the end so they never push people off the screen.
   const loose = members.filter((m) => !m.department_ids.some((id) => departments.some((d) => d.id === id)))
-  if (loose.length > 0) groups.push({ key: 'none', name: 'No department', colour: null, people: loose })
+  const groups = [
+    ...(loose.length > 0 ? [{ key: 'none', name: 'No department', colour: null as string | null, people: loose }] : []),
+    ...all.filter((g) => g.people.length > 0),
+  ]
+  const empty = all.filter((g) => g.people.length === 0)
 
   return (
     <div data-testid="people-board" className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">
@@ -234,10 +240,8 @@ function DepartmentBoard({
             <h3 className="section-heading min-w-0 flex-1 truncate">{g.name}</h3>
             <span className="mono text-meta text-ink-600">{g.people.length === 1 ? '1 person' : `${g.people.length} people`}</span>
           </header>
-          {g.people.length === 0 ? (
-            <p className="text-ui text-ink-500">Nobody in this department yet.</p>
-          ) : (
-            ROLE_ORDER.map((r) => {
+          {g.key === 'none' && <p className="text-meta text-ink-600">Open a person to give them a department.</p>}
+          {ROLE_ORDER.map((r) => {
               const own = g.people.filter((m) => m.role === r)
               if (own.length === 0) return null
               return (
@@ -248,8 +252,7 @@ function DepartmentBoard({
                   ))}
                 </div>
               )
-            })
-          )}
+            })}
         </section>
       ))}
       {invited.length > 0 && (
@@ -264,6 +267,21 @@ function DepartmentBoard({
               <span className="text-meta text-ink-600">{ROLE_WORDS[p.role] ?? ROLE_WORDS.worker}</span>
             </p>
           ))}
+        </section>
+      )}
+      {empty.length > 0 && (
+        <section data-testid="people-empty-departments" className="flex flex-col gap-2 lg:col-span-2 2xl:col-span-3">
+          <h3 className="text-ui font-semibold text-ink-700">
+            {empty.length === 1 ? '1 department has nobody in it yet' : `${empty.length} departments have nobody in them yet`}
+          </h3>
+          <p className="flex flex-wrap gap-1">
+            {empty.map((g) => (
+              <span key={g.key} className="tag gap-1.5 font-medium">
+                {g.colour && <i aria-hidden="true" className="size-2 shrink-0 rounded-full" style={{ background: g.colour }} />}
+                {g.name}
+              </span>
+            ))}
+          </p>
         </section>
       )}
     </div>
