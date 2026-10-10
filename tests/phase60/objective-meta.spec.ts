@@ -27,7 +27,7 @@ test.describe('Objective line (60-13)', () => {
     expect(LINE).toContain('data-testid="objective-line"')
     expect(LINE).toContain('data-agent=')
     expect(LINE).toContain('data-confirmed=')
-    expect(LINE).toContain('mono min-w-0 break-words text-meta text-ink-500')
+    expect(LINE).toContain('mono min-w-0 break-words text-meta text-ink-600')
     expect(LINE).not.toMatch(/import\s+['"][^'"]*\.css['"]/)
     expect(LINE).not.toContain('lucide-react')
     // the line itself is never a card (the chips carry their own border)
