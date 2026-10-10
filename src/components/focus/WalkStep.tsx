@@ -9,16 +9,13 @@
  */
 import { useEffect, useRef } from 'react'
 import { AlertTriangle, Camera, Check, Lightbulb, ShieldCheck } from 'lucide-react'
-import { primaryLabel, type WalkEntry } from '@/lib/sop/focus'
+import { kindLabel, primaryLabel, type WalkEntry } from '@/lib/sop/focus'
 import type { FocusStepRow } from '@/lib/sop/focus-read'
 import { KindChip } from '@/components/focus/KindChip'
 import { StandardLabels } from '@/components/sop/StandardLabels'
 
-/** Full class strings (Tailwind cannot see built-up names): the hazard / PPE card per kind. */
-const CARD = {
-  hazard: 'border-accent-hazard/40 border-l-accent-hazard bg-accent-hazard/10',
-  ppe: 'border-accent-decision/40 border-l-accent-decision bg-accent-decision/10',
-} as const
+/** The hazard / PPE sign (theme `.signal`): frame, solid strip with the caps word, then the step. */
+const SIGNAL = { hazard: 'signal-hazard', ppe: 'signal-ppe' } as const
 
 export interface WalkStepProps {
   entry: WalkEntry<FocusStepRow>
@@ -82,18 +79,10 @@ export function WalkStep({
   }, [])
 
   const carded = step.kind === 'hazard' || step.kind === 'ppe'
-  const body = (
-    <>
-      <div className="flex flex-wrap items-center gap-2">
-        {step.kind === 'hazard' && <AlertTriangle className="size-4 text-accent-hazard" aria-hidden="true" />}
-        {step.kind === 'ppe' && <ShieldCheck className="size-4 text-accent-decision" aria-hidden="true" />}
-        <KindChip kind={step.kind} />
-        <StandardLabels names={standardNames} />
-      </div>
-      <p ref={textRef} tabIndex={-1} data-testid="walk-step-text" className="text-step font-semibold text-ink-900 outline-none">
-        {step.text}
-      </p>
-    </>
+  const text = (
+    <p ref={textRef} tabIndex={-1} data-testid="walk-step-text" className="text-step font-semibold text-ink-900 outline-none">
+      {step.text}
+    </p>
   )
 
   return (
@@ -101,7 +90,7 @@ export function WalkStep({
       <div className="flex flex-1 flex-col gap-6">
         <div className="flex flex-col gap-2">
           <div className="h-1 rounded-full bg-ink-100" role="progressbar" aria-valuemin={1} aria-valuemax={total} aria-valuenow={entry.index}>
-            <div className="h-1 rounded-full bg-accent-step" style={{ width: `${(entry.index / total) * 100}%` }} />
+            <div className="h-1 rounded-full bg-ink-900" style={{ width: `${(entry.index / total) * 100}%` }} />
           </div>
           <p data-testid="walk-progress" className="mono text-meta text-ink-600">
             Step {entry.index} of {total}
@@ -111,27 +100,48 @@ export function WalkStep({
           </span>
         </div>
 
-        <p className="mono flex flex-wrap items-center gap-2 text-meta uppercase text-ink-600">
-          {entry.groupLabel}
-          <StandardLabels names={groupStandardNames} />
-        </p>
+        {/* A hazard or PPE sign already says "before you start"; the group label would repeat it. */}
+        {(!carded || groupStandardNames.length > 0) && (
+          <p className="flex flex-wrap items-center gap-2 text-ui font-semibold text-ink-700">
+            {!carded && entry.groupLabel}
+            <StandardLabels names={groupStandardNames} />
+          </p>
+        )}
 
         {carded ? (
-          <div
-            data-testid="walk-card"
-            className={`flex flex-col gap-4 rounded-lg border border-l-4 p-4 ${CARD[step.kind as 'hazard' | 'ppe']}`}
-          >
-            {body}
+          <div data-testid="walk-card" className={`signal ${SIGNAL[step.kind as 'hazard' | 'ppe']}`}>
+            <div className="signal-strip">
+              {step.kind === 'hazard' ? <AlertTriangle className="size-4" aria-hidden="true" /> : <ShieldCheck className="size-4" aria-hidden="true" />}
+              <span data-testid="focus-kind-chip" data-kind={step.kind}>
+                {kindLabel(step.kind)}
+              </span>
+            </div>
+            <div className="flex flex-col gap-3 p-4">
+              {standardNames.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  <StandardLabels names={standardNames} />
+                </div>
+              )}
+              {text}
+            </div>
           </div>
         ) : (
-          <div className="flex flex-col gap-4">{body}</div>
+          <div className="flex flex-col gap-4">
+            {(step.kind === 'check' || standardNames.length > 0) && (
+              <div className="flex flex-wrap items-center gap-2">
+                {step.kind === 'check' && <KindChip kind={step.kind} />}
+                <StandardLabels names={standardNames} />
+              </div>
+            )}
+            {text}
+          </div>
         )}
 
         {step.tip && (
           <div className="flex items-start gap-2 rounded-lg border border-ink-200 bg-paper-2 p-4">
             <Lightbulb className="mt-0.5 size-4 shrink-0 text-ink-500" aria-hidden="true" />
             <p className="text-reading text-ink-900">
-              <span className="mono mr-2 text-meta uppercase text-ink-600">Tip</span>
+              <span className="mr-2 font-semibold">Tip</span>
               {step.tip}
             </p>
           </div>

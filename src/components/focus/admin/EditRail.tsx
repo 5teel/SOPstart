@@ -60,7 +60,7 @@ export function EditRail({ sopId, initial, open, onClose, flaggedStepIds, footer
 
       {focus.sections.map((section, i) => (
         <div key={section.id}>
-          <p className="mono px-4 pb-1 pt-4 text-meta uppercase text-ink-600">
+          <p className="section-heading px-4 pb-1 pt-4">
             {String(i + 1).padStart(2, '0')} · {section.title}
           </p>
           {focus.steps

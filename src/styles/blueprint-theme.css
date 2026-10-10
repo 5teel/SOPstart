@@ -116,7 +116,7 @@
    * fallback (globals.css `var(--accent-step, #3b82f6)`) is what kept this
    * hidden; those values are adopted here as the definitions. Same class as
    * the 30-07 undefined --brand-yellow bug. */
-  --accent-step:     #3b82f6;  /* blue   — the active/current step */
+  --accent-step:     var(--accent-measure);  /* one blue (design base 2026-10-10): step and measure no longer differ */
   --accent-ok:       #16a34a;  /* green  — verified / all clear */
   --accent-hazard:   #b91c1c;  /* red-700  — hazard pill text (red-50/red-300 pill) */
   --accent-mcu:      #0e7490;  /* cyan-700 — inspect pill text (cyan-50/cyan-300 pill) */
@@ -129,7 +129,8 @@
   --paper-1:   #ffffff;  /* input/field surface — sits above --paper */
 
   /* Phase 26.5 — the human-invisible AGENT metadata layer (D-09) */
-  --ai: #8b5cf6; /* violet — agentview toggle, agent panel, per-block ameta rows */
+  /* Design base 2026-10-10: no violet "AI costume". AI and agent marks are plain ink. */
+  --ai: var(--ink-700);
   --accent-ai: var(--ai); /* alias — BlockEditShell referenced this spelling with a fallback */
   --ink-050: var(--ink-50); /* alias for the --ink-050 spelling */
 
@@ -158,8 +159,8 @@
   --tint-zone-border:     color-mix(in srgb, var(--accent-zone) 45%, white);
   --tint-measure-bg:      color-mix(in srgb, var(--accent-measure) 8%, white);
   --tint-measure-border:  color-mix(in srgb, var(--accent-measure) 45%, white);
-  --tint-ai-bg:           color-mix(in srgb, var(--ai) 8%, white);
-  --tint-ai-border:       color-mix(in srgb, var(--ai) 45%, white);
+  --tint-ai-bg:           var(--paper-1);
+  --tint-ai-border:       var(--ink-200);
 
   /* ---- Brand, motion and library areas (ADR-0004, sketches 009/010) ----
    * Brand yellow belongs to the wordmark and nothing else on paper; it never
@@ -196,15 +197,16 @@
 
   /* Library areas on the site map, assigned in order. A data palette, distinct
    * from the semantic accents: an area colour says WHERE in the library, never
-   * whether something is wrong. */
-  --area-1: #0891b2;
-  --area-2: #2563eb;
-  --area-3: #7c3aed;
-  --area-4: #0d9488;
-  --area-5: #16a34a;
-  --area-6: #475569;
-  --area-7: #d97706;
-  --area-8: #be185d;
+   * whether something is wrong. Design base 2026-10-10: one muted lightness and
+   * chroma, eight hues, so no area shares a value with a safety accent. */
+  --area-1: oklch(0.62 0.07 210);
+  --area-2: oklch(0.62 0.07 255);
+  --area-3: oklch(0.62 0.07 300);
+  --area-4: oklch(0.62 0.07 175);
+  --area-5: oklch(0.62 0.07 140);
+  --area-6: oklch(0.62 0.02 260);
+  --area-7: oklch(0.62 0.07 75);
+  --area-8: oklch(0.62 0.07 0);
 }
 
 /* ---------- SCOPED ONLY UNDER body[data-theme="paper"] ---------- */
@@ -229,7 +231,37 @@ body[data-theme="paper"] {
   /* Numbers that must align in a column: Saira has no tabular digits, so these use Inter. */
   .figures { font-family: var(--font-reading); font-variant-numeric: tabular-nums; }
   .mono.uppercase { font-weight: 700; letter-spacing: 0.06em; }
+
+  /* ---- Design base (2026-10-10, ADR-0007, sketch 011) ----
+   * The shared controls every screen uses. A later design pass changes these
+   * classes, not the call sites. */
+
+  /* A section heading: sentence case, reading size. Replaces caps eyebrows. */
+  .section-heading { font-size: var(--text-reading); line-height: 1.4; font-weight: 600; color: var(--ink-900); }
+
+  /* The one segmented control: a bordered group whose pressed / selected child is ink. */
+  .seg { display: inline-flex; max-width: 100%; overflow-x: auto; border: 1px solid var(--ink-300); border-radius: var(--radius-lg); background: var(--paper-1); }
+  .seg > * { display: inline-flex; flex-shrink: 0; align-items: center; gap: 0.5rem; min-height: var(--spacing-tap); padding: 0 0.875rem; font-size: var(--text-ui); font-weight: 500; color: var(--ink-700); }
+  .seg > :hover { color: var(--ink-900); }
+  .seg > [aria-pressed="true"], .seg > [aria-selected="true"] { background: var(--ink-900); color: var(--paper); font-weight: 600; }
+
+  /* Filter chip: 44 px, same radius as controls. */
+  .chip { display: inline-flex; align-items: center; gap: 0.5rem; min-height: var(--spacing-tap); padding: 0 0.875rem; border: 1px solid var(--ink-300); border-radius: var(--radius-lg); background: var(--paper-1); font-size: var(--text-ui); color: var(--ink-700); }
+  .chip[aria-pressed="true"] { background: var(--ink-900); border-color: var(--ink-900); color: var(--paper); }
+
+  /* A status tag: ink outline, sentence case. Colour is for safety, not for chores. */
+  .tag { display: inline-flex; align-items: center; padding: 0.125rem 0.5rem; border: 1px solid var(--ink-300); border-radius: 0.25rem; font-family: var(--font-label); font-size: var(--text-micro); font-weight: 600; color: var(--ink-700); white-space: nowrap; }
+  .tag-warn { border-color: var(--accent-decision); background: var(--tint-decision-bg); color: var(--ink-900); }
+
+  /* Safety signal (ISO 3864 / ANSI Z535): a 1 px frame and a solid strip carrying the caps word. */
+  .signal { overflow: hidden; border: 1px solid var(--signal); border-radius: var(--radius-lg); background: color-mix(in srgb, var(--signal) 6%, white); }
+  .signal-strip { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: var(--signal); color: var(--paper); font-family: var(--font-label); font-size: var(--text-meta); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+  .signal-hazard { --signal: var(--accent-hazard); }
+  .signal-ppe { --signal: var(--accent-decision); }
 }
+
+/* Native checkboxes and radios in ink, not the browser's blue. */
+body[data-theme="paper"] { accent-color: var(--ink-900); }
 
 body[data-theme="paper"] .bg-grid {
   background-color: var(--paper);

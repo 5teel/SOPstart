@@ -44,7 +44,7 @@ const OVERRIDE_REQUIRED_COPY = 'An override reason (10+ characters) is required 
 const FAILED_COPY = "That didn't work. Nothing was changed — try again."
 const STATUS_FAILED = 'Sign-off recorded but status update failed.'
 
-const LABEL = 'mono text-meta uppercase text-ink-600'
+const LABEL = 'text-ui font-semibold text-ink-700'
 const MIN_REASON = 10
 
 type Receipt = { receipt: string; logged: boolean }

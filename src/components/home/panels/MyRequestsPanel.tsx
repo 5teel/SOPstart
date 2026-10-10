@@ -25,8 +25,8 @@ const RequestComposerTrigger = dynamic(() => import('@/components/requests/Reque
 })
 
 const FAILED_COPY = "That didn't work. Nothing was changed — try again."
-const HEADING = 'mono px-4 pb-1 pt-4 text-meta uppercase tracking-wide text-ink-600'
-const CHIP = 'rounded mono text-meta font-semibold uppercase px-2 py-1'
+const HEADING = 'section-heading px-4 pb-1 pt-4'
+const CHIP = 'rounded mono text-meta font-semibold px-2 py-1'
 const STATE_CHIP: Record<string, string> = {
   open: 'bg-paper-2 text-ink-700',
   accepted: 'bg-accent-ok/10 text-accent-ok',
@@ -155,7 +155,7 @@ export function MyRequestsPanel({ role, about }: { role: string | null; about: C
         </div>
         <p className="mono flex flex-wrap items-center gap-2 text-meta text-ink-600">
           <span>{REQUEST_KIND_WORDS[r.kind]}</span>
-          {r.agent && <span className="rounded border border-ai/40 bg-ai/10 px-2 py-1 uppercase text-ai">agent</span>}
+          {r.agent && <span className="rounded border border-ai/40 bg-ai/10 px-2 py-1 text-ai">agent</span>}
           <span>{relativeWhen(r.createdAt)}</span>
         </p>
         {r.note && <p className="line-clamp-2 text-ui text-ink-700">{r.note}</p>}
@@ -266,13 +266,13 @@ export function MyRequestsPanel({ role, about }: { role: string | null; about: C
         <div className="flex flex-col gap-3 px-4">
           {groups.askedOfYou.length > 0 && (
             <div>
-              <h3 className="mono pb-1 text-meta uppercase tracking-wide text-ink-600">Asked of you</h3>
+              <h3 className="section-heading pb-1">Asked of you</h3>
               <ul className="flex flex-col gap-2">{groups.askedOfYou.map((r) => requestRow(r, 'asked'))}</ul>
             </div>
           )}
           {youAsked.length > 0 && (
             <div>
-              <h3 className="mono pb-1 text-meta uppercase tracking-wide text-ink-600">You asked</h3>
+              <h3 className="section-heading pb-1">You asked</h3>
               <ul className="flex flex-col gap-2">{youAsked.map((r) => requestRow(r, 'youAsked'))}</ul>
               {!showAllAsked && groups.youAskedTotal > youAsked.length && (
                 <button
@@ -287,7 +287,7 @@ export function MyRequestsPanel({ role, about }: { role: string | null; about: C
           )}
           {groups.answered.length > 0 && (
             <div>
-              <h3 className="mono pb-1 text-meta uppercase tracking-wide text-ink-600">Answered</h3>
+              <h3 className="section-heading pb-1">Answered</h3>
               <ul className="flex flex-col gap-2">{groups.answered.map((r) => requestRow(r, 'answered'))}</ul>
             </div>
           )}

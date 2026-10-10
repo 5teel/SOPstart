@@ -36,10 +36,10 @@ export function SopRow({
       onClick={() => onOpen(row.id)}
       className={`flex min-h-tap-row w-full items-center gap-3 rounded-lg px-2.5 py-2.5 text-left hover:bg-paper-2 ${selected ? 'bg-paper-2' : ''}`}
     >
-      <i aria-hidden="true" className="w-1 self-stretch rounded-full" style={{ background: row.colourVar }} />
       <span className="min-w-0 flex-1">
         <span className="block text-reading font-semibold text-ink-900">{row.title}</span>
-        <span className="block font-label text-meta text-ink-600">
+        <span className="flex items-center gap-1.5 font-label text-meta text-ink-600">
+          <i aria-hidden="true" className="size-2 shrink-0 rounded-full" style={{ background: row.colourVar }} />
           {row.areaName} · {row.type}
           {row.minutes ? ` · ~${row.minutes} min` : ''}
           {extra}

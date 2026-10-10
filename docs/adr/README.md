@@ -20,4 +20,5 @@ code, plans and phases follow it until a later ADR supersedes it.
 | [0003](0003-site-templates.md) | Site templates are code; a layout records which one it came from | Superseded by ADR-0005 | `tests/phase57/rooms.spec.ts` (retired in ADR-0005) |
 | [0004](0004-design-principles.md) | Design principles — attention follows the objectives | Accepted | `tests/lint/design-principles.spec.ts` · `tests/lint/design-tokens.spec.ts` |
 | [0005](0005-library-map-replaces-rooms.md) | The library map replaces rooms | Accepted | `tests/lint/no-rooms.spec.ts` |
-| [0006](0006-typography.md) | Typography: Inter for reading, Saira for labels | Accepted | `tests/lint/typography.spec.ts` |
+| [0006](0006-typography.md) | Typography: Inter for reading, Saira for labels | Accepted (caps-label rule superseded by ADR-0007) | `tests/lint/typography.spec.ts` |
+| [0007](0007-design-base.md) | The design base — colour for safety, shared controls, sentence-case headings | Accepted | review only |

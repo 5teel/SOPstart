@@ -31,19 +31,13 @@ export type RowDone = { receipt: string; logged: boolean | null; link?: { href: 
 
 const FAILED_COPY = "That didn't work. Nothing was changed — try again."
 
-const SEVERITY_DOT: Record<InboxItem['severity'], string> = {
-  bad: 'bg-accent-escalate',
-  warn: 'bg-accent-decision',
-  info: 'bg-accent-measure',
-  grey: 'bg-ink-300',
-}
-
-// Amber is never small text: the warn chip carries colour in fill and border, the words stay dark.
+// Red is kept for hazards (design base 2026-10-10): an admin chore is an ink tag; only an
+// overdue item (warn) is amber, carried in fill and border while the words stay dark.
 const CHIP_STYLE: Record<InboxItem['severity'], string> = {
-  bad: 'bg-accent-escalate/10 text-accent-escalate',
-  warn: 'bg-accent-decision/10 border border-accent-decision/40 text-ink-900',
-  info: 'bg-accent-measure/10 text-accent-measure',
-  grey: 'bg-paper-2 text-ink-700',
+  bad: 'tag',
+  warn: 'tag tag-warn',
+  info: 'tag',
+  grey: 'tag',
 }
 
 const ROW_BUTTON =
@@ -266,7 +260,6 @@ export function InboxRow({
       } ${pending ? 'opacity-60' : ''}`}
     >
       <div className="flex gap-3">
-        <span className={`mt-1 size-3 shrink-0 rounded-full ${SEVERITY_DOT[item.severity]}`} aria-hidden />
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           {titleHref ? (
             <Link href={titleHref} className="truncate text-reading font-semibold text-ink-900 hover:underline">
@@ -276,7 +269,7 @@ export function InboxRow({
             <span className="truncate text-reading font-semibold text-ink-900">{item.title}</span>
           )}
           <div className="flex items-center gap-2">
-            <span className={`mono rounded px-2 py-1 text-meta font-semibold uppercase ${CHIP_STYLE[item.severity]}`}>
+            <span className={CHIP_STYLE[item.severity]}>
               {CHIP_WORD[branch]}
             </span>
             {item.age && <span className="mono text-meta text-ink-600">{item.age}</span>}

@@ -22,7 +22,7 @@ import { ReasonDialog } from './ReasonDialog'
 import type { RowDone } from './InboxRow'
 
 const FAILED_COPY = "That didn't work. Nothing was changed — try again."
-const CHIP = 'rounded mono text-meta uppercase px-2 py-1'
+const CHIP = 'rounded mono text-meta font-semibold px-2 py-1'
 const BUTTON =
   'inline-flex min-h-tap flex-1 items-center justify-center gap-1.5 rounded-lg text-ui font-semibold focus-visible:outline-2 focus-visible:outline-accent-step disabled:opacity-60'
 

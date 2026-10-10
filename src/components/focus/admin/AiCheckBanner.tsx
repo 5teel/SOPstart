@@ -5,9 +5,12 @@
  * column. Not run / running / findings / all clear / failed. Each open finding
  * can be shown (scroll + focus the step) or cleared; clearing writes a decision
  * ledger row on the server. Ticking a step never clears a finding.
+ *
+ * Design base 2026-10-10 (ADR-0007): a plain section, findings as divided rows.
+ * No violet frame, no sparkle, no cards inside a card.
  */
 import { useState } from 'react'
-import { AlertTriangle, Check, Loader2, Sparkles } from 'lucide-react'
+import { AlertTriangle, Check, Loader2 } from 'lucide-react'
 import { clearFinding } from '@/actions/findings'
 import { scrollToStep } from '@/components/focus/FocusRail'
 import type { useFindings } from '@/hooks/useFindings'
@@ -77,7 +80,6 @@ export function AiCheckBanner({ api, canRun, stepLabel }: AiCheckBannerProps) {
             onClick={() => void api.run()}
             className="inline-flex min-h-tap items-center gap-2 rounded-lg bg-ink-900 px-4 text-ui font-semibold text-paper"
           >
-            <Sparkles className="size-4" aria-hidden="true" />
             Run the AI check
           </button>
         )}
@@ -85,15 +87,15 @@ export function AiCheckBanner({ api, canRun, stepLabel }: AiCheckBannerProps) {
     )
   } else if (open.length > 0) {
     body = (
-      <div className="flex flex-col gap-3">
-        <p className="text-reading font-semibold text-ink-900">
-          AI found {open.length} {open.length === 1 ? 'thing' : 'things'} to look at
+      <div className="flex flex-col gap-2">
+        <p className="section-heading">
+          {open.length} {open.length === 1 ? 'thing' : 'things'} to check
         </p>
-        <ul className="flex flex-col gap-2">
+        <ul className="flex flex-col divide-y divide-ink-200 border-t border-ink-200">
           {open.map((f) => {
             const label = f.step_id ? stepLabel(f.step_id) : null
             return (
-              <li key={f.id} data-testid="ai-finding" className="flex flex-col gap-2 rounded-lg border border-ink-200 bg-paper-1 p-3">
+              <li key={f.id} data-testid="ai-finding" className="flex flex-col gap-2 py-3">
                 <span className="mono text-meta text-ink-600">{label ?? 'Whole SOP'}</span>
                 <span className="text-ui text-ink-900">{f.description}</span>
                 <span className="flex flex-wrap gap-2">
@@ -137,16 +139,8 @@ export function AiCheckBanner({ api, canRun, stepLabel }: AiCheckBannerProps) {
   }
 
   return (
-    <section
-      data-testid="ai-check-banner"
-      aria-label="AI check"
-      className="flex flex-col gap-3 rounded-lg border p-4"
-      style={{ background: 'var(--tint-ai-bg)', borderColor: 'var(--tint-ai-border)' }}
-    >
-      <p className="flex items-center gap-2 text-ui font-semibold text-ink-900">
-        <Sparkles className="size-4 text-ai" aria-hidden="true" />
-        AI check
-      </p>
+    <section data-testid="ai-check-banner" aria-label="AI check" className="flex flex-col gap-3 border-b border-ink-200 pb-4">
+      <p className="text-ui font-semibold text-ink-700">AI check</p>
       {body}
       {!api.loading && !api.hasSource && (
         <p data-testid="ai-check-no-source" className="text-ui text-ink-500">

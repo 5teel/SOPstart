@@ -34,7 +34,6 @@ export function ManageSection({ view, onView }: { view: 'site' | null; onView(v:
     <section data-testid="section-manage" className="flex flex-col gap-3 p-4">
       <div>
         <h2 className="text-xl font-semibold text-ink-900">Manage SOPs</h2>
-        <p className="text-ui text-ink-500">Write, convert and fix SOPs. Every way in ends in the same editor.</p>
       </div>
       <div className="flex flex-col gap-2 sm:flex-row">
         <Link

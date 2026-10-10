@@ -93,7 +93,7 @@ test.describe('office pane and inbox tab (59-09)', () => {
     expect(PANE).toContain('data-testid="office-receipt"')
     expect(PANE).toContain('data-testid="office-pane"')
     expect(PANE).toContain('<InboxChips')
-    expect(TAB).toContain("Nothing needs you. That&apos;s the goal.")
+    expect(TAB).toContain('Nothing waiting for you.')
     expect(TAB).toContain('data-testid="office-empty"')
     expect(TAB).toContain('Nothing under this filter.')
     expect(TAB).toContain('Show all')
@@ -176,13 +176,13 @@ test.describe('office pane mount seams (59-12, repointed 63-19)', () => {
   test('the bundle script has a forbidden marker for the pane and its literals live in the pane module', () => {
     const script = read('scripts/check-bundle-size.ts')
     expect(script).toContain("label: 'office pane (lazy, 59 A-11)'")
-    for (const marker of ['Nothing needs you', 'Nothing here can be edited or deleted']) {
+    for (const marker of ['Nothing waiting for you', 'Nothing here can be edited or deleted']) {
       expect(script).toContain(marker)
       const sources = ['InboxTab.tsx', 'DecisionsTab.tsx'].map((f) => read('src/components/office/' + f)).join('\n')
       expect(sources.replace(/&apos;/g, "'")).toContain(marker)
     }
     // Neither literal may appear in the home shell.
-    expect(HOME).not.toContain('Nothing needs you')
+    expect(HOME).not.toContain('Nothing waiting for you')
     expect(read('tests/lint/no-static-admin-lens-import.spec.ts')).toContain('OfficePane: []')
   })
 })

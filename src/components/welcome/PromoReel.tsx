@@ -17,7 +17,7 @@ import Link from 'next/link'
 import { Wordmark } from '@/components/brand/Wordmark'
 import { Camera, CheckCircle, FileText, Pause, Play, Sparkles } from 'lucide-react'
 import { SITE_PRESETS, presetImagePath } from '@/lib/site/presets'
-import { KindChip, KIND_EDGE } from '@/components/focus/KindChip'
+import { KindChip } from '@/components/focus/KindChip'
 import { primaryLabel, type FocusKind } from '@/lib/sop/focus'
 
 type Frac = ReadonlyArray<readonly [number, number]>
@@ -169,7 +169,7 @@ function StructurePanel() {
             {KINDS.map((k, i) => (
               <li
                 key={k}
-                className={`flex flex-col items-start gap-1 rounded-lg border border-l-4 border-ink-200 p-2 ${KIND_EDGE[k]}`}
+                className="flex flex-col items-start gap-1 rounded-lg border border-ink-200 p-2"
                 style={{ animation: `reel-light 0.6s ease-out ${0.9 + i * 0.45}s both` }}
               >
                 <KindChip kind={k} />

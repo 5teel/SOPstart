@@ -4,7 +4,6 @@
  * Phase 63 (HOME-04) -- the person's own completions and who signed them off. Moved from the
  * activity page so My record and /activity (until 63-14 retires it) show the same list.
  */
-import { ClipboardList } from 'lucide-react'
 import { useWorkerCompletions } from '@/hooks/useCompletions'
 import { CompletionHistoryCard } from '@/components/activity/CompletionHistoryCard'
 import { HOME, type HomeState } from '@/lib/shell/home-state'
@@ -14,30 +13,19 @@ export function CompletionList({ onHome }: { onHome(state: HomeState): void }) {
 
   return (
     <div>
-      {!isLoading && (
-        <p className="text-sm text-[var(--ink-500)] mb-6">
-          {completions.length} completed procedure{completions.length !== 1 ? 's' : ''}
-        </p>
-      )}
-      {isLoading && (
-        <p className="text-sm text-[var(--ink-500)] mb-6">Loading...</p>
-      )}
+      <p className="mono mb-6 text-meta text-ink-600">{isLoading ? 'Loading…' : `${completions.length} finished`}</p>
 
       {!isLoading && completions.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
-          <div className="w-16 h-16 rounded-full bg-[var(--paper-2)] border border-[var(--ink-100)] flex items-center justify-center">
-            <ClipboardList size={28} className="text-[var(--ink-500)]" />
-          </div>
-          <div>
-            <p className="text-base font-semibold text-[var(--ink-700)]">No completions yet</p>
-            <p className="text-sm text-[var(--ink-500)] mt-1">
-              Finish a SOP to see your record here.
-            </p>
+        // The empty state shows the shape of what will land here, not an icon in a circle.
+        <div className="flex flex-col items-start gap-4">
+          <div aria-hidden="true" className="flex w-full flex-col gap-2 rounded-lg border border-dashed border-ink-300 p-4">
+            <span className="h-2.5 w-1/2 rounded bg-ink-100" />
+            <span className="text-ui text-ink-700">Your first finished SOP lands here, with who signed it off.</span>
           </div>
           <button
             type="button"
             onClick={() => onHome(HOME)}
-            className="mt-2 px-6 h-12 flex items-center rounded-lg bg-[var(--ink-900)] text-[var(--paper)] font-semibold text-sm hover:opacity-80 transition-opacity"
+            className="flex min-h-tap items-center rounded-lg border border-ink-300 bg-paper-1 px-4 text-ui font-semibold text-ink-900"
           >
             Find a SOP
           </button>

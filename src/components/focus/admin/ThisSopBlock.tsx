@@ -43,7 +43,7 @@ const AskTrigger = dynamic(() => import('@/components/requests/AskPicker').then(
   loading: () => null,
 })
 
-const label = 'mono text-meta uppercase text-ink-600'
+const label = 'text-ui font-semibold text-ink-700'
 const rowButton =
   'flex min-h-tap w-full items-center rounded px-2 text-left text-ui text-ink-900 hover:bg-paper-1'
 

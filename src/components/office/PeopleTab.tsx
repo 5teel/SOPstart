@@ -41,16 +41,13 @@ const ROLES = Object.keys(ROLE_WORDS) as AppRole[]
 
 const SELECT =
   'min-h-tap rounded-lg border border-ink-300 bg-paper-1 px-3 text-ui text-ink-900 disabled:opacity-60'
-const CHIP = 'rounded mono text-meta uppercase tracking-wide px-2 py-1'
+const CHIP = 'rounded mono text-meta font-semibold px-2 py-1'
 const EMAIL_OK = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const FAILED_COPY = "That didn't work. Nothing was changed — try again."
 
 function StatusChip({ invited }: { invited: boolean }) {
-  return invited ? (
-    <span className={`${CHIP} bg-accent-decision/10 border border-accent-decision/40 text-ink-900`}>Invited</span>
-  ) : (
-    <span className={`${CHIP} bg-accent-ok/10 text-accent-ok`}>Active</span>
-  )
+  // Active is the normal state, so it carries no tag; only the exception does.
+  return invited ? <span className="tag tag-warn">Invited</span> : null
 }
 
 function RemoveDialog({

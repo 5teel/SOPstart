@@ -58,7 +58,7 @@ export function FocusRail({ order, open, onClose, rowState, hollowDot, onPick, s
         const locked = state === 'locked'
         return (
           <div key={entry.step.id}>
-            {header && <p className="mono px-4 pb-1 pt-4 text-meta uppercase text-ink-600">{header}</p>}
+            {header && <p className="section-heading px-4 pb-1 pt-4">{header}</p>}
             <button
               type="button"
               data-testid="focus-rail-row"
@@ -72,13 +72,13 @@ export function FocusRail({ order, open, onClose, rowState, hollowDot, onPick, s
                 onClose()
               }}
               className={`flex min-h-tap w-full items-center gap-2 px-4 text-left text-ui ${
-                state === 'current' ? 'border-l-4 border-accent-step bg-paper-1 font-semibold text-ink-900' : locked ? 'text-ink-400' : 'text-ink-700'
+                state === 'current' ? 'bg-paper-1 font-semibold text-ink-900' : locked ? 'text-ink-600' : 'text-ink-700'
               }`}
             >
               {state === 'done' ? (
                 <Check className="size-4 shrink-0 text-accent-ok" aria-hidden="true" />
               ) : locked ? (
-                <Lock className="size-4 shrink-0 text-ink-400" aria-hidden="true" />
+                <Lock className="size-4 shrink-0 text-ink-600" aria-hidden="true" />
               ) : (
                 <span
                   data-hollow={hollowDot?.(entry) ? 'true' : undefined}

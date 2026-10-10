@@ -26,9 +26,6 @@ export function SignOffsSection({
     <section data-testid="section-signoffs" className="flex flex-col">
       <div className="px-4 pt-4">
         <h2 className="text-xl font-semibold text-ink-900">Sign-offs</h2>
-        <p className="text-ui text-ink-500">
-          Completed SOPs, approvals and requests waiting on you. Each decision is logged in the decision ledger.
-        </p>
       </div>
       <OfficePane tab={tab} tabs={tabsFor('signoffs', role)} onTab={onTab} />
     </section>

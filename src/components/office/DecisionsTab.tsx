@@ -18,7 +18,7 @@ import { focusHref } from '@/lib/sop/focus-path'
 
 type Cursor = { createdAt: string; id: string }
 
-const CHIP = 'rounded mono text-meta uppercase tracking-wide px-2 py-1'
+const CHIP = 'rounded mono text-meta font-semibold px-2 py-1'
 
 function kindChipClass(row: DecisionListRow): string {
   if (row.kind === 'reject') return `${CHIP} bg-accent-escalate/10 text-accent-escalate`

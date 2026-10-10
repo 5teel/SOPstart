@@ -28,7 +28,6 @@ export function PeopleSection({
     <section data-testid="section-people" className="flex flex-col">
       <div className="px-4 pt-4">
         <h2 className="text-xl font-semibold text-ink-900">People</h2>
-        <p className="text-ui text-ink-500">Who is in the organisation, their roles, and who can open which SOPs.</p>
       </div>
       <OfficePane tab={tab} tabs={tabsFor('people', role)} onTab={onTab} initialSop={pin} />
     </section>

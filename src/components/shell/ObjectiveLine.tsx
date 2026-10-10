@@ -11,7 +11,7 @@ import { listObjectives } from '@/actions/objectives'
 import { objectiveLine, type ObjectiveSubject, type ObjectiveView } from '@/lib/objectives/model'
 import { OBJECTIVES_KEY } from '@/lib/shell/query-keys'
 
-const CHIP = 'rounded mono text-meta font-semibold uppercase px-2 py-1'
+const CHIP = 'rounded mono text-meta font-semibold px-2 py-1'
 
 /** The one objectives read; `find` is the live objective of a place, or null. */
 export function useObjectives() {

@@ -21,7 +21,7 @@ const RequestComposerTrigger = dynamic(
   { ssr: false, loading: () => null },
 )
 
-const LABEL = 'mt-5 mb-1.5 font-label text-micro uppercase tracking-widest text-ink-600'
+const LABEL = 'section-heading mt-6 mb-1 px-2.5'
 const GROUP = 'flex w-full items-center justify-between px-2.5 pt-3 pb-0.5 font-label text-meta text-ink-600'
 
 export function SopList({
@@ -150,16 +150,12 @@ export function SopList({
             </>
           )}
           <div className={`${LABEL} flex items-center justify-between`}>
-            <span>All SOPs · {rows.length}</span>
-            <span className="inline-flex overflow-hidden rounded-lg border border-ink-300 normal-case tracking-normal">
+            <span>
+              All SOPs <span className="font-label font-medium text-ink-600">{rows.length}</span>
+            </span>
+            <span className="seg">
               {(['area', 'type'] as const).map((g) => (
-                <button
-                  key={g}
-                  type="button"
-                  aria-pressed={group === g}
-                  onClick={() => setGroup(g)}
-                  className={`min-h-8 px-3 text-ui ${group === g ? 'bg-ink-900 text-white' : 'bg-paper-1 text-ink-900'}`}
-                >
+                <button key={g} type="button" aria-pressed={group === g} onClick={() => setGroup(g)}>
                   {g === 'area' ? 'Area' : 'Type'}
                 </button>
               ))}
@@ -172,7 +168,7 @@ export function SopList({
                   <div key={a.id}>
                     <button type="button" data-testid="area-group" data-area-id={a.id} title={`Open ${a.name} on the map`} onClick={() => onArea(a.id)} className={GROUP}>
                       <span className="flex items-center gap-2">
-                        <i aria-hidden="true" className="size-2 rounded" style={{ background: a.colourVar }} />
+                        <i aria-hidden="true" className="size-2 rounded-full" style={{ background: a.colourVar }} />
                         {a.name}
                       </span>
                       <span>{own.length} ›</span>

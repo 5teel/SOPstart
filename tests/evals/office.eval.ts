@@ -428,10 +428,10 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       await page.close()
     })
 
-    test('idle supervisor: a true empty inbox reads "Nothing needs you. That\'s the goal." with a two-segment tab control (Inbox, Requests) and no chips or cleared-today line (59-09, 60-11)', async () => {
+    test('idle supervisor: a true empty inbox reads "Nothing waiting for you." with a two-segment tab control (Inbox, Requests) and no chips or cleared-today line (59-09, 60-11)', async () => {
       const page = await idleCtx.newPage()
       await openOffice(page)
-      await expect(page.getByTestId('office-empty')).toHaveText("Nothing needs you. That's the goal.", SLOW)
+      await expect(page.getByTestId('office-empty')).toHaveText('Nothing waiting for you.', SLOW)
       await expect(page.getByRole('tablist', { name: 'Tabs' })).toHaveCount(1)
       await expect(page.getByRole('tab')).toHaveCount(2)
       await expect(page.getByTestId('office-tab-requests')).toHaveCount(1)

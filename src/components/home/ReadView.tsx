@@ -18,7 +18,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { getSopOwner } from '@/actions/sop-owner'
 import { Wordmark } from '@/components/brand/Wordmark'
 import { captureSlowFlag, motionMode, playFuse, prefetchFuse, slowFactor, whenQueriesIdle } from '@/lib/brand/fuse'
-import { KindChip } from '@/components/focus/KindChip'
+import { KindChip, isSignal } from '@/components/focus/KindChip'
 import { DOT } from '@/components/home/SopRow'
 import { StandardLabels } from '@/components/sop/StandardLabels'
 import { useReadSop } from '@/hooks/useReadSop'
@@ -179,7 +179,7 @@ export function ReadView({
         )}
       </div>
 
-      <h2 className="mono mb-1 mt-7 text-meta uppercase text-ink-600">What you&apos;ll do</h2>
+      <div className="mt-7" />
       {isLoading || !data ? (
         <div aria-busy="true" className="space-y-3 pt-2">
           <div className="h-5 w-3/4 animate-pulse rounded bg-paper-2 motion-reduce:animate-none" />
@@ -194,9 +194,11 @@ export function ReadView({
                 {e.step.text}
                 {e.step.photo_required && <span className="font-label text-meta text-ink-600"> · photo</span>}
               </span>
-              <span className="h-fit shrink-0">
-                <KindChip kind={e.step.kind} />
-              </span>
+              {isSignal(e.step.kind) && (
+                <span className="h-fit shrink-0">
+                  <KindChip kind={e.step.kind} />
+                </span>
+              )}
             </li>
           ))}
         </ol>

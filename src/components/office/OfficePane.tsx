@@ -99,7 +99,7 @@ export function OfficePane({
               role="tablist"
               aria-label="Tabs"
               onKeyDown={onTabKey}
-              className="mb-3 inline-flex max-w-full overflow-x-auto rounded-lg border border-ink-300 bg-paper-2 p-1"
+              className="seg mb-3"
             >
               {OFFICE_TABS.filter((t) => tabs.includes(t)).map((t, i) => {
                 const active = t === tab
@@ -118,9 +118,7 @@ export function OfficePane({
                     tabIndex={i === rove ? 0 : -1}
                     onFocus={() => setRove(i)}
                     onClick={() => onTab(t)}
-                    className={`inline-flex min-h-tap shrink-0 items-center gap-2 rounded px-2 text-ui font-semibold focus-visible:outline-2 focus-visible:outline-accent-step ${
-                      active ? 'bg-ink-900 text-paper' : 'text-ink-700 hover:text-ink-900'
-                    }`}
+                    className="focus-visible:outline-2 focus-visible:outline-accent-step"
                   >
                     {TAB_LABEL[t]}
                     {(t === 'inbox' ? inboxCount : t === 'requests' ? requestCount : 0) > 0 && (

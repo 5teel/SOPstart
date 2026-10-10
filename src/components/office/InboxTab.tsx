@@ -12,7 +12,6 @@
  */
 import { useEffect, useRef, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { CheckCircle } from 'lucide-react'
 import { countClearedToday, getOfficeInbox, type OfficeInbox } from '@/actions/office'
 import { useRole } from '@/components/providers/RoleProvider'
 import { INBOX_CHIPS, chipMatches, inboxCounts, type InboxChip, type InboxItem } from '@/lib/governance/inbox'
@@ -57,9 +56,7 @@ export function InboxChips({
           data-chip={c.key}
           aria-pressed={chip === c.key}
           onClick={() => onChip(c.key)}
-          className={`inline-flex h-9 items-center gap-2 rounded-full border px-3 text-ui focus-visible:outline-2 focus-visible:outline-accent-step ${
-            chip === c.key ? 'border-ink-900 bg-ink-900 text-paper' : 'border-ink-300 text-ink-700'
-          }`}
+          className="chip focus-visible:outline-2 focus-visible:outline-accent-step"
         >
           {c.label}
           <span className="mono text-meta">{counts[c.key]}</span>
@@ -169,15 +166,9 @@ export function InboxTab({
 
   if (items.length === 0 && ghosts.length === 0) {
     return (
-      <div className="flex flex-col items-center px-4 py-12 text-center">
-        <CheckCircle className="size-12 text-accent-ok" aria-hidden />
-        <h3
-          ref={emptyRef}
-          tabIndex={-1}
-          data-testid="office-empty"
-          className="mt-3 text-lg font-semibold leading-snug text-ink-900 outline-none"
-        >
-          Nothing needs you. That&apos;s the goal.
+      <div className="py-8">
+        <h3 ref={emptyRef} tabIndex={-1} data-testid="office-empty" className="section-heading outline-none">
+          Nothing waiting for you.
         </h3>
         {canSeeLedger && clearedCount !== null && (
           <p data-testid="office-cleared-today" className="mt-1 text-ui text-ink-500">

@@ -19,7 +19,7 @@ import { ReasonDialog } from './ReasonDialog'
 
 type Receipt = { receipt: string; logged: boolean }
 
-const LABEL = 'mono text-meta uppercase text-ink-600'
+const LABEL = 'text-ui font-semibold text-ink-700'
 const FAILED_COPY = "That didn't work. Nothing was changed — try again."
 
 export function ApprovePanel({ sopId, title, onDone }: { sopId: string; title: string; onDone(r: Receipt): void }) {

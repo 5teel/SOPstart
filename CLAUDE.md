@@ -36,14 +36,15 @@ Multi-tenant SaaS PWA for New Zealand industrial sites (glass, packaging, machin
 ## Conventions
 
 - **Design tokens live only in `src/styles/blueprint-theme.css`** (colour, type, spacing, radius, tap targets). No raw Tailwind palette classes, bare hex, or arbitrary `h-[56px]` in components; radius is `rounded` / `rounded-lg` / `rounded-2xl` / `rounded-full`. Enforced by `tests/lint/design-tokens.spec.ts`.
-- Paper theme app-wide; one semantic accent per role; brand yellow belongs to the wordmark.
+- **Design base (ADR-0007, sketch `011-design-base`)**: colour is for safety (red hazard, amber PPE/overdue, everything else ink); no coloured left bars; sentence-case `.section-heading`, caps only for HAZARD/PPE; shared controls `.seg` `.chip` `.tag` `.signal` live in `blueprint-theme.css`. New design passes change those classes, not call sites.
+- Paper theme app-wide; brand yellow belongs to the wordmark.
 - Glove-friendly tap targets; RLS for all data access; `admin.ts` client only for elevated work, scoped to the session org.
 - Mutations in `src/actions/`; complex file/AI work in API routes; Zod schemas in `src/lib/validators/`; migrations numbered in `supabase/migrations/`.
 - Plain words in the UI: no "block", no "walk", no "rooms" (guards in `tests/lint/`).
 
 ## Binding docs (read before planning or building)
 
-- **ADRs** — `docs/adr/README.md`. Accepted ADRs are binding; a plan that contradicts one stops and asks Simon. Structural choices get a new ADR in the same commit (plus a `tests/lint/` guard if checkable). Supersede, never edit. Key ones: 0002 no scheduled jobs · 0004 design principles · 0005 library map replaces rooms · 0006 typography (Inter + Saira Semi Condensed, nothing under 12 px).
+- **ADRs** — `docs/adr/README.md`. Accepted ADRs are binding; a plan that contradicts one stops and asks Simon. Structural choices get a new ADR in the same commit (plus a `tests/lint/` guard if checkable). Supersede, never edit. Key ones: 0002 no scheduled jobs · 0004 design principles · 0005 library map replaces rooms · 0006 typography (Inter + Saira Semi Condensed, nothing under 12 px) · 0007 design base.
 - **Design** — `Skill("sketch-findings-SOPstart")` before any worker-facing UI, home, authoring flow or org/permission surface. For the home: sketches `009-sop-first-home` and `010-wordmark` plus ADR-0004/0005 govern.
 - **Customer research** — `.planning/research/customer-interviews/` before locking contentious UX decisions.
 

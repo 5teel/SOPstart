@@ -82,7 +82,7 @@ test.describe('home route', () => {
     const g = read('scripts/check-bundle-size.ts')
     expect(g).not.toContain('No procedures for this machine yet.')
     const page = g.slice(g.indexOf("route: '/page'"))
-    for (const m of ['Esc for the whole site', 'Every way in ends in the same editor.', 'A record to look up, not a to-do list.', 'and who signed it off.']) {
+    for (const m of ['Esc for the whole site', 'No drafts.', 'Swap rows and columns', 'Your first finished SOP lands here']) {
       expect(page, m).toContain(m)
     }
   })

@@ -113,15 +113,15 @@ const GATED_ROUTES: GatedRoute[] = [
       // Phase 59 A-11: the Office pane (inbox empty state, decisions footer) is one lazy chunk
       // reached by next/dynamic from the home shell; either literal in the home route's own chunk
       // set means a static import slipped in.
-      { label: 'office pane (lazy, 59 A-11)', markers: ['Nothing needs you', 'Nothing here can be edited or deleted', 'No requests waiting.'] },
+      { label: 'office pane (lazy, 59 A-11)', markers: ['Nothing waiting for you', 'Nothing here can be edited or deleted', 'No requests waiting.'] },
       { label: 'request composer + ask picker (lazy, 60 A-07)', markers: ['What do you need?', 'Find a person…'] },
       { label: 'objective editor (lazy, 60 A-07)', markers: ['By (optional)'] },
       { label: 'notifications panel (lazy, 63-09; its line moved here when the old overview was deleted in 63-20)', markers: ['Nothing unread.'] },
       // Phase 63-11: the home's map and section bodies are lazy modules reached from HomeShell.
       { label: 'site map (lazy, 63-10)', markers: ['Esc for the whole site'] },
-      { label: 'Manage SOPs (lazy, 63-08)', markers: ['Every way in ends in the same editor.'] },
-      { label: 'Training (lazy, 63-09)', markers: ['A record to look up, not a to-do list.'] },
-      { label: 'My record (lazy, 63-09)', markers: ['and who signed it off.'] },
+      { label: 'Manage SOPs (lazy, 63-08)', markers: ['No drafts.'] },
+      { label: 'Training (lazy, 63-09)', markers: ['Swap rows and columns'] },
+      { label: 'My record (lazy, 63-09)', markers: ['Your first finished SOP lands here'] },
       { label: 'fuse engine (lazy, 63-15)', markers: ['[fuse] target not found'] },
     ],
   },

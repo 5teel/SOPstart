@@ -448,7 +448,7 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
 
       await page.getByTestId('home-section-record').click()
       await expect(page.getByTestId('section-record')).toBeVisible(SLOW)
-      await expect(page.getByTestId('section-record').getByText(/\d+ completed procedures?/)).toBeVisible(SLOW)
+      await expect(page.getByTestId('section-record').getByText(/\d+ finished/)).toBeVisible(SLOW)
       // The Notifications panel renders only when the person has some (the bell case below seeds one).
       await shot(page, '63-home-section-record')
     })

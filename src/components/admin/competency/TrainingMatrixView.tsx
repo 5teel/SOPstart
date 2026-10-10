@@ -197,7 +197,7 @@ export function TrainingMatrixView({ departments, onSelectCell }: TrainingMatrix
         <label className="flex flex-col gap-1 text-xs text-[var(--ink-500)]">
           Department
           <select
-            className="border border-[var(--ink-100)] rounded px-2 py-1.5 text-sm"
+            className="min-h-tap rounded-lg border border-ink-300 bg-paper-1 px-3 text-ui text-ink-900"
             value={departmentId}
             onChange={(e) => {
               setDepartmentId(e.target.value)
@@ -214,7 +214,7 @@ export function TrainingMatrixView({ departments, onSelectCell }: TrainingMatrix
         <label className="flex flex-col gap-1 text-xs text-[var(--ink-500)]">
           Worker
           <select
-            className="border border-[var(--ink-100)] rounded px-2 py-1.5 text-sm"
+            className="min-h-tap rounded-lg border border-ink-300 bg-paper-1 px-3 text-ui text-ink-900"
             value={workerId}
             onChange={(e) => setWorkerId(e.target.value)}
           >
@@ -228,7 +228,7 @@ export function TrainingMatrixView({ departments, onSelectCell }: TrainingMatrix
         <label className="flex flex-col gap-1 text-xs text-[var(--ink-500)]">
           SOP
           <select
-            className="border border-[var(--ink-100)] rounded px-2 py-1.5 text-sm"
+            className="min-h-tap rounded-lg border border-ink-300 bg-paper-1 px-3 text-ui text-ink-900"
             value={sopId}
             onChange={(e) => setSopId(e.target.value)}
           >
@@ -243,7 +243,7 @@ export function TrainingMatrixView({ departments, onSelectCell }: TrainingMatrix
           From
           <input
             type="date"
-            className="border border-[var(--ink-100)] rounded px-2 py-1.5 text-sm"
+            className="min-h-tap rounded-lg border border-ink-300 bg-paper-1 px-3 text-ui text-ink-900"
             value={dateFrom}
             onChange={(e) => setDateFrom(e.target.value)}
           />
@@ -252,7 +252,7 @@ export function TrainingMatrixView({ departments, onSelectCell }: TrainingMatrix
           To
           <input
             type="date"
-            className="border border-[var(--ink-100)] rounded px-2 py-1.5 text-sm"
+            className="min-h-tap rounded-lg border border-ink-300 bg-paper-1 px-3 text-ui text-ink-900"
             value={dateTo}
             onChange={(e) => setDateTo(e.target.value)}
           />
@@ -263,14 +263,14 @@ export function TrainingMatrixView({ departments, onSelectCell }: TrainingMatrix
             type="button"
             onClick={() => setTransposed((t) => !t)}
             aria-pressed={transposed}
-            className="px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wide border border-[var(--ink-300)] text-[var(--ink-700)]"
+            className="min-h-tap rounded-lg border border-ink-300 bg-paper-1 px-4 text-ui font-semibold text-ink-900"
           >
-            Swap rows/columns
+            Swap rows and columns
           </button>
           <button
             type="button"
             onClick={() => void handleExport()}
-            className="px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wide bg-[var(--ink-900)] text-white"
+            className="min-h-tap rounded-lg bg-ink-900 px-4 text-ui font-semibold text-paper"
           >
             {exporting ? 'Exporting…' : 'Export CSV'}
           </button>

@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Now: the live app</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Saira+Semi+Condensed:wght@500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.wrap{--paper:#fafafa;--p1:#ffffff;--p2:#f4f4f5;--i9:#09090b;--i7:#27272a;--i6:#52525b;--i5:#71717a;--i3:#d4d4d8;--i2:#e4e4e7;width:2190px;height:960px;box-sizing:border-box;padding:40px;display:flex;gap:40px;background:#e7e7ea;font-family:Inter,system-ui,sans-serif;color:var(--i9)}
+.col{display:flex;flex-direction:column;gap:12px;width:390px;flex:none}
+.cap{font-size:14px;line-height:20px;font-weight:600;color:#3f3f46}
+.ph{position:relative;width:390px;height:844px;background:var(--paper);border:1px solid #c8c8cc;border-radius:18px;overflow:hidden;display:flex;flex-direction:column;box-sizing:border-box}
+.body{flex:1;overflow:hidden;padding:16px}
+.L{font-family:'Saira Semi Condensed',sans-serif}
+.lbl{font-family:'Saira Semi Condensed',sans-serif;font-weight:700;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--i6)}
+.h1{font-size:22px;font-weight:600;margin:0}
+.sub{font-size:13px;line-height:18px;color:var(--i5);margin:4px 0 0}
+.wm{display:inline-flex;position:relative;padding-bottom:5px;flex:none}
+.wm::after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;background:repeating-linear-gradient(-45deg,#facc15 0 4px,#09090b 4px 8px)}
+.wm b{background:#09090b;color:#fff;font-family:'Saira Semi Condensed',sans-serif;font-weight:800;font-size:18px;line-height:22px;padding:0 3px}
+.wm span{font-family:'Saira Semi Condensed',sans-serif;font-weight:700;font-size:18px;line-height:22px;margin-left:2px}
+.top{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--i2);font-size:14px;flex:none}
+.tb{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--i7);white-space:nowrap}
+.tabbar{display:flex;border-top:1px solid var(--i2);background:var(--p1);flex:none}
+.tabbar span{flex:1;min-height:52px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--i5);white-space:nowrap}
+.tabbar .on{font-weight:700;color:var(--i9)}
+.btn{display:flex;align-items:center;justify-content:center;min-height:60px;border-radius:8px;background:var(--i9);color:#fff;font:600 15px Inter,sans-serif;border:0;width:100%}
+.btn2{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 14px;border-radius:8px;border:1px solid var(--i3);background:var(--p1);font:600 14px Inter,sans-serif;color:var(--i9);white-space:nowrap}
+.seg{display:flex;border:1px solid var(--i3);border-radius:8px;overflow:hidden;font-size:14px;background:var(--p1)}
+.seg span{padding:0 14px;min-height:42px;display:flex;align-items:center}
+.seg .on{background:var(--i9);color:#fff;font-weight:600}
+.seg.sm span{min-height:32px;padding:0 10px;font-size:13px}
+.search{flex:1;display:flex;align-items:center;gap:8px;min-height:44px;border:1px solid var(--i3);border-radius:8px;padding:0 12px;color:var(--i5);font-size:15px;background:var(--p1)}
+.row{display:flex;gap:12px;padding:8px 0}
+.stripe{width:4px;border-radius:4px;flex:none}
+.rt{font-size:15px;font-weight:600}
+.rm{font-size:13px;color:var(--i6);margin-top:2px}
+.rs{font-size:13px;color:var(--i6);margin-top:4px;display:flex;align-items:center;gap:6px}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none}
+.grp{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--i6);margin:14px 0 2px}
+.grp .n{margin-left:auto}
+.track{height:4px;border-radius:4px;background:var(--i2)}
+.chip{font-family:'Saira Semi Condensed',sans-serif;font-weight:700;font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:4px}
+.hz{border:1px solid rgba(185,28,28,.4);border-left:4px solid #b91c1c;background:rgba(185,28,28,.1);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:14px}
+.stepT{margin:0;font-size:28px;line-height:34px;font-weight:600}
+.dock{border-top:1px solid var(--i2);padding:16px;flex:none}
+.tray{display:inline-flex;gap:2px;padding:4px;border:1px solid var(--i2);background:var(--p2);border-radius:8px;margin-top:14px}
+.tray span{padding:0 10px;min-height:40px;display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600;border-radius:6px}
+.tray .on{background:var(--i9);color:#fff}
+.pill{display:inline-flex;align-items:center;height:36px;padding:0 12px;border:1px solid var(--i3);border-radius:999px;font-size:13px;gap:6px;background:var(--p1)}
+.pill.on{background:var(--i9);color:#fff;border-color:var(--i9)}
+.irow{display:flex;gap:10px;padding:14px 0;border-bottom:1px solid var(--i2);align-items:flex-start}
+.ai{border:1px solid color-mix(in srgb,#8b5cf6 45%,white);background:color-mix(in srgb,#8b5cf6 8%,white);border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.aicard{background:#fff;border:1px solid var(--i2);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:8px;font-size:14px}
+.scard{border:1px solid var(--i2);border-left:4px solid #3b82f6;background:#fff;border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+</style>
+</helmet>
+<div class="wrap">
+
+<div class="col">
+<div class="cap">1 · SOP list</div>
+<div class="ph">
+<div style="display:flex;align-items:center;justify-content:space-between;padding:16px 14px 10px">
+<span class="wm"><b>SOP</b><span>start</span></span>
+<div class="seg"><span class="on">List</span><span>Site map</span></div>
+</div>
+<div style="display:flex;align-items:center;gap:12px;padding:4px 14px 0">
+<div class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>Search SOPs, steps and tools</div>
+<span style="position:relative;display:flex"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg><i style="position:absolute;top:0;right:0;width:7px;height:7px;border-radius:50%;background:#09090b"></i></span>
+</div>
+<div class="body" style="padding:0 14px">
+<div class="lbl" style="margin:22px 0 8px">Recent</div>
+<div class="row"><i class="stripe" style="background:#7c3aed"></i><div><div class="rt">Press changeover</div><div class="rm">Forming · Machine · ~8 min</div><div class="rs"><i class="dot" style="background:#16a34a"></i>Signed off 9 Oct</div></div></div>
+<div class="row"><i class="stripe" style="background:#0d9488"></i><div><div class="rt">Forklift pre-start check</div><div class="rm">Site-wide · Process · ~5 min</div><div class="rs"><i class="dot" style="background:#09090b"></i>You stopped at step 3</div></div></div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin:24px 0 6px"><span class="lbl">All SOPs · 10</span><div class="seg sm"><span class="on">Area</span><span>Type</span></div></div>
+<div class="grp"><i class="dot" style="background:#0891b2"></i>Batch house<span class="n">2 ›</span></div>
+<div class="row"><i class="stripe" style="background:#0891b2"></i><div><div class="rt">Batch weigh-up check</div><div class="rm">Batch house · Inspection · ~6 min</div></div></div>
+<div class="grp"><i class="dot" style="background:#2563eb"></i>Packing<span class="n">3 ›</span></div>
+<div class="row"><i class="stripe" style="background:#2563eb"></i><div><div class="rt">Pallet wrap and label</div><div class="rm">Packing · Process · ~5 min</div></div></div>
+<div class="grp"><i class="dot" style="background:#7c3aed"></i>Forming<span class="n">4 ›</span></div>
+<div class="row"><i class="stripe" style="background:#7c3aed"></i><div><div class="rt">Press changeover</div><div class="rm">Forming · Machine · ~8 min</div></div></div>
+</div>
+<div class="tabbar"><span class="on">SOPs</span><span>Record</span></div>
+</div>
+</div>
+
+<div class="col">
+<div class="cap">2 · Walk: hazard step</div>
+<div class="ph">
+<div class="top"><span class="wm"><b>SOP</b><span>start</span></span><span style="width:1px;height:20px;background:var(--i2)"></span><b style="flex:1;min-width:0;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Press changeover</b><span class="tb"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"></path></svg>Steps · 1 of 5</span><span class="tb"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>Stop</span></div>
+<div class="body" style="display:flex;flex-direction:column;gap:24px;padding-top:28px">
+<div style="display:flex;flex-direction:column;gap:8px"><div class="track"><div style="width:20%;height:4px;border-radius:4px;background:#3b82f6"></div></div><span class="L" style="font-size:13px;font-weight:500;color:var(--i6)">Step 1 of 5</span></div>
+<span class="lbl">Before you start</span>
+<div class="hz">
+<div style="display:flex;align-items:center;gap:8px;color:#b91c1c"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path><path d="M12 9v4M12 17h.01"></path></svg><span class="chip" style="background:#fbd5d5;color:#b91c1c">Hazard</span></div>
+<p class="stepT">Stored energy in the hydraulic line.</p>
+</div>
+</div>
+<div class="dock"><button class="btn">I understand — continue</button></div>
+</div>
+</div>
+
+<div class="col">
+<div class="cap">3 · Sign-offs inbox</div>
+<div class="ph">
+<div class="body">
+<h1 class="h1">Sign-offs</h1>
+<p class="sub">Completed SOPs, approvals and requests waiting on you. Each decision is logged in the decision ledger.</p>
+<div class="tray"><span class="on">Inbox 3</span><span>Requests</span><span>Decisions</span></div>
+<div style="display:flex;gap:8px;margin-top:12px"><span class="pill on">All 3</span><span class="pill">Stuck 2</span><span class="pill">No owner 1</span></div>
+<div style="border-top:1px solid var(--i2);margin:20px -16px 0"></div>
+<div class="irow"><i class="dot" style="background:#dc2626;margin-top:6px"></i><div style="flex:1;min-width:0"><div class="rt">Furnace lid inspection</div><div style="display:flex;gap:8px;align-items:center;margin-top:6px"><span class="chip" style="background:#fde2e2;color:#b91c1c">No owner</span><span class="L" style="font-size:13px;color:var(--i6)">today</span></div><div class="rm" style="margin-top:6px">Nobody looks after this SOP.</div></div><button class="btn2">Assign owner</button></div>
+<div class="irow"><i class="dot" style="background:#dc2626;margin-top:6px"></i><div style="flex:1;min-width:0"><div class="rt">Batch weigh-up check</div><div style="display:flex;gap:8px;align-items:center;margin-top:6px"><span class="chip" style="background:#fde2e2;color:#b91c1c">Stuck</span><span class="L" style="font-size:13px;color:var(--i6)">4d</span></div><div class="rm" style="margin-top:6px">Stopped while reading the document.</div></div><button class="btn2">Try again</button></div>
+<div class="irow"><i class="dot" style="background:#dc2626;margin-top:6px"></i><div style="flex:1;min-width:0"><div class="rt">Forklift pre-start check</div><div style="display:flex;gap:8px;align-items:center;margin-top:6px"><span class="chip" style="background:#fde2e2;color:#b91c1c">Stuck</span><span class="L" style="font-size:13px;color:var(--i6)">2d</span></div><div class="rm" style="margin-top:6px">Stopped while reading the document.</div></div><button class="btn2">Try again</button></div>
+</div>
+<div class="tabbar"><span>SOPs</span><span>Record</span><span>Training</span><span class="on">Sign-offs</span><span>People</span><span>Manage</span></div>
+</div>
+</div>
+
+<div class="col">
+<div class="cap">4 · Editor: AI check</div>
+<div class="ph">
+<div class="top"><span class="wm"><b>SOP</b><span>start</span></span><b style="flex:1;font-weight:600">Press changeover</b><span class="chip" style="border:1px solid var(--i3);color:var(--i6)">Draft</span></div>
+<div class="body" style="display:flex;flex-direction:column;gap:14px">
+<div style="background:var(--p2);border:1px solid var(--i2);border-radius:8px;padding:10px 14px;font-size:14px;color:var(--i7)">Draft — not published yet</div>
+<div class="ai">
+<div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"></path><path d="M19 15l.7 1.8 1.8.7-1.8.7L19 20l-.7-1.8-1.8-.7 1.8-.7z"></path></svg>AI check</div>
+<div style="font-size:15px;font-weight:600">AI found 2 things to look at</div>
+<div class="aicard"><div class="L" style="font-size:13px;color:var(--i6)">Procedure · 3</div><div>The photo step has no instruction on what to show.</div><div style="display:flex;gap:8px"><button class="btn2">Go to it</button><button class="btn2">Clear finding</button></div></div>
+<div class="aicard"><div class="L" style="font-size:13px;color:var(--i6)">Whole SOP</div><div>No emergency stop step is mentioned anywhere.</div><div><button class="btn2">Clear finding</button></div></div>
+<div style="font-size:13px;color:var(--i5)">AI check — wording and clarity only.</div>
+</div>
+<div style="display:flex;align-items:center;gap:10px;margin-top:4px"><span class="L" style="font-size:13px;color:#2563eb">01</span><b style="font-size:16px">Procedure</b><span style="flex:1;height:1px;background:var(--i2)"></span></div>
+<div class="scard"><span class="chip" style="background:#dbeafe;color:#2563eb">Step</span><div style="font-size:16px">Isolate the press at the main switch.</div></div>
+</div>
+<div style="border-top:1px solid var(--i2);padding:12px 16px;display:flex;align-items:center;gap:12px;background:var(--p1);flex:none"><div style="flex:1"><div style="font-size:14px;font-weight:600">Checked 2 of 4</div><div class="track" style="margin-top:6px"><div style="width:50%;height:4px;border-radius:4px;background:#16a34a"></div></div></div><button class="btn2" style="background:#d4d4d8;color:#71717a;border-color:#d4d4d8">Publish SOP</button></div>
+</div>
+</div>
+
+<div class="col">
+<div class="cap">5 · My record, empty</div>
+<div class="ph">
+<div class="body">
+<h1 class="h1">My record</h1>
+<p class="sub">What you've done and who signed it off.</p>
+<p style="font-size:14px;color:var(--i6);margin:10px 0 0">0 completed procedures</p>
+<div style="display:flex;flex-direction:column;align-items:center;text-align:center;margin-top:70px;gap:6px">
+<span style="width:64px;height:64px;border-radius:50%;background:var(--p2);border:1px solid var(--i2);display:flex;align-items:center;justify-content:center;color:var(--i6)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="8" y="2" width="8" height="4" rx="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2M12 11h4M12 16h4M8 11h.01M8 16h.01"></path></svg></span>
+<div style="font-size:16px;font-weight:600;margin-top:12px">No completions yet</div>
+<div style="font-size:14px;color:var(--i6)">Finish a SOP to see your record here.</div>
+<button class="btn" style="width:auto;min-height:48px;padding:0 24px;margin-top:20px">Find a SOP</button>
+</div>
+<div class="lbl" style="margin-top:80px">Notifications</div>
+<div style="display:flex;gap:10px;margin-top:10px"><i class="dot" style="background:#2563eb;margin-top:5px"></i><div><div class="lbl" style="color:var(--i7)">Review · 10 min ago</div><div style="font-size:14px;margin-top:2px">Press changeover was due for review on 6 Oct.</div></div></div>
+</div>
+<div class="tabbar"><span>SOPs</span><span class="on">Record</span><span>Training</span><span>Sign-offs</span><span>People</span><span>Manage</span></div>
+</div>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":2190,"height":960}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

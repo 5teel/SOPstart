@@ -98,9 +98,9 @@ test.describe('AI check banner (WRK-04, D-02, D-17)', () => {
   const raw = read(`${ADMIN}/AiCheckBanner.tsx`)
   const banner = code(raw)
 
-  test('uses the token pair through a style, never an arbitrary-value class', () => {
-    expect(banner).toContain("'var(--tint-ai-bg)'")
-    expect(banner).toContain("'var(--tint-ai-border)'")
+  test('is a plain section: no violet frame, no sparkle, never an arbitrary-value class (design base 2026-10-10)', () => {
+    expect(banner).not.toContain('tint-ai')
+    expect(banner).not.toContain('Sparkles')
     expect(banner).not.toContain('bg-[--')
     expect(banner).not.toContain('border-[--')
   })

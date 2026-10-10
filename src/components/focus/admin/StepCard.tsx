@@ -24,7 +24,7 @@ import {
 } from '@/actions/focus-steps'
 import { InlineText } from '@/components/focus/admin/InlineText'
 import { StandardsButton } from '@/components/focus/admin/StandardsButton'
-import { KIND_CHIP, KIND_EDGE } from '@/components/focus/KindChip'
+import { KIND_CHIP } from '@/components/focus/KindChip'
 import { StandardLabels } from '@/components/sop/StandardLabels'
 import { useRegisterOverlay } from '@/hooks/useFocusBack'
 import type { FocusStepPatch } from '@/hooks/useFocusAutosave'
@@ -210,9 +210,7 @@ export function StepCard({
       tabIndex={-1}
       data-testid="edit-step"
       data-kind={kind}
-      className={`flex flex-col gap-4 rounded-lg border border-l-4 border-ink-200 bg-paper-1 p-4 outline-none ${
-        findings.length > 0 ? 'border-l-ai' : KIND_EDGE[kind]
-      }`}
+      className={`flex flex-col gap-4 rounded-lg border bg-paper-1 p-4 outline-none ${findings.length > 0 ? 'border-ink-900' : 'border-ink-200'}`}
     >
       <div className="flex items-start gap-3">
         {readOnly ? (
@@ -345,7 +343,7 @@ export function StepCard({
         step.tip && <p className="text-ui text-ink-700">Tip: {step.tip}</p>
       ) : tipOpen ? (
         <label className="flex flex-col gap-1">
-          <span className="mono text-meta uppercase text-ink-600">Tip</span>
+          <span className="text-ui font-semibold text-ink-700">Tip</span>
           <textarea
             defaultValue={step.tip ?? ''}
             rows={2}
@@ -480,9 +478,9 @@ export function StepCard({
         <p
           key={f.id}
           data-testid="edit-step-finding"
-          className="rounded-lg border p-3 text-ui text-ink-900"
-          style={{ background: 'var(--tint-ai-bg)', borderColor: 'var(--tint-ai-border)' }}
+          className="border-t border-ink-200 pt-3 text-ui text-ink-900"
         >
+          <span className="font-semibold">To check: </span>
           {f.text}
         </p>
       ))}

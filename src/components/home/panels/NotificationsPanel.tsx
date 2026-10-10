@@ -19,7 +19,7 @@ import { NOTIFICATIONS_KEY } from '@/lib/shell/query-keys'
 import { useSectionScroll } from './useSectionScroll'
 
 const READ_KEY = [...NOTIFICATIONS_KEY, 'read'] as const
-const HEADING = 'mono px-4 pb-1 pt-4 text-meta uppercase tracking-wide text-ink-600'
+const HEADING = 'section-heading px-4 pb-1 pt-4'
 
 interface NotificationRow {
   id: string

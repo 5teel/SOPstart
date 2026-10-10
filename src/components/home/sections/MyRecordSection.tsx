@@ -16,7 +16,6 @@ export function MyRecordSection({ role, onHome }: { role: string | null; onHome(
     <section data-testid="section-record" className="flex flex-col gap-3 p-4">
       <div>
         <h2 className="text-xl font-semibold text-ink-900">My record</h2>
-        <p className="text-ui text-ink-500">What you&apos;ve done and who signed it off.</p>
       </div>
       <CompletionList onHome={onHome} />
       <NotificationsPanel onOpenAddress={(a) => onHome(homeFromAddress(a) ?? HOME)} />

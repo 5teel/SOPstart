@@ -21,9 +21,6 @@ export function TrainingSection() {
     <section data-testid="section-training" className="flex flex-col gap-3 p-4">
       <div>
         <h2 className="text-xl font-semibold text-ink-900">Training</h2>
-        <p className="text-ui text-ink-500">
-          Who has read, been observed on and been signed off for each SOP. A record to look up, not a to-do list.
-        </p>
       </div>
       <AssessmentRequestsPanel />
       {treeQ.isError || (tree && 'error' in tree) ? (
