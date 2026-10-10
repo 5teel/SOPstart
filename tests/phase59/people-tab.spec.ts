@@ -20,14 +20,18 @@ const TAB = strip(read('src/components/office/PeopleTab.tsx'))
 const PANE = strip(read('src/components/office/OfficePane.tsx'))
 
 test.describe('people tab', () => {
-  test('the table has email, role select, departments, status and Remove, in a 3-3-3-2-1 grid at xl', () => {
+  test('two views of the same people (2026-10-11): a department board and a who-can-do-what grid; one person sheet edits', () => {
+    expect(TAB).toContain('data-testid="people-board"')
+    expect(TAB).toContain('data-testid="people-card"')
+    expect(TAB).toContain('data-testid="people-grid"')
     expect(TAB).toContain('data-testid="people-row"')
+    expect(TAB).toContain('data-testid="person-sheet"')
     expect(TAB).toContain('data-testid="people-role-select"')
     expect(TAB).toContain('data-testid="people-remove"')
-    expect(TAB).toContain('xl:col-span-3')
-    expect(TAB).toContain('xl:col-span-2')
-    expect(TAB).toContain('xl:col-span-1')
-    for (const w of ['Email', 'Role', 'Departments', 'Status']) expect(TAB).toContain(`>${w}<`)
+    for (const w of ['Person', 'Role', 'Departments', 'Signs off work', 'Assigns SOPs', 'Approves SOPs']) expect(TAB).toContain(`>${w}<`)
+    // The marks come from the one authority module, never a private copy of the role rules.
+    expect(TAB).toContain("from '@/lib/members/authority'")
+    expect(TAB).toContain('authorityOf(')
   })
 
   test('the role select calls the safe role writer, never the retired one', () => {
@@ -37,7 +41,7 @@ test.describe('people tab', () => {
     expect(TAB).toContain('removeMember(')
     expect(TAB).not.toContain('addMemberByEmail')
     // A safety manager sees the role select and the Invite button disabled, with the server's words.
-    expect(TAB).toMatch(/disabled=\{!isAdmin \|\| pendingRole === m\.id\}/)
+    expect(TAB).toMatch(/disabled=\{!isAdmin \|\| pendingRole\}/)
     expect(TAB).toMatch(/data-testid="people-invite"[\s\S]{0,80}disabled=\{!isAdmin\}/)
     expect(TAB).toContain('Only an admin can invite people.')
     expect(TAB).toContain('Only an admin can change roles.')

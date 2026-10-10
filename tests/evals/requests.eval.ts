@@ -245,8 +245,13 @@ test.describe('Phase 60 -- requests, notifications and objectives (deployed)', (
 
       // Person: the People row of the eval-site worker; removal is two-step.
       await page.goto('/?s=people')
-      const row = page.getByTestId('people-row').filter({ hasText: EVAL_USERS.siteWorker })
-      await expect(row).toHaveCount(1, SLOW)
+      await page.getByTestId('people-view-authority').click()
+      const personRow = page.getByTestId('people-row').filter({ hasText: EVAL_USERS.siteWorker })
+      await expect(personRow).toHaveCount(1, SLOW)
+      await personRow.click()
+      // The person sheet carries the objective (2026-10-11).
+      const row = page.getByTestId('person-sheet')
+      await expect(row).toBeVisible(SLOW)
       await row.getByRole('button', { name: '+ Objective' }).click()
       await row.getByLabel('Objective', { exact: true }).fill(`${typed} person`)
       await row.getByRole('button', { name: 'Save objective' }).click()

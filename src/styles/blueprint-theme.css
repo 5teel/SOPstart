@@ -179,6 +179,7 @@
   --wm-size-merge:   22px;   /* read screen: SOP chip and start button label, the size they merge at */
   --wm-size-header:  20px;   /* desktop header, steps-screen header */
   --wm-size-phone:   17px;   /* phone steps-screen header */
+  --wm-size-menu:    30px;   /* desktop section menu, centred in the panel */
 
   /* Motion: only where it shows a change of state, never while the user waits.
    * The Start merge, in order: the button body fades leaving "start"; SOP drops into line;
@@ -831,6 +832,7 @@ body[data-theme="paper"] .strip-slot .done:disabled {
 .wm-merge { font-size: var(--wm-size-merge); }
 .wm-header { font-size: var(--wm-size-header); }
 .wm-phone { font-size: var(--wm-size-phone); }
+.wm-menu { font-size: var(--wm-size-menu); }
 .wm-bar { font-size: var(--wm-size-phone); }
 @media (min-width: 64rem) {
   .wm-bar { font-size: var(--wm-size-header); }

@@ -424,7 +424,7 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
       await expect(page.getByTestId('office-pane')).toHaveAttribute('data-tab', 'people', SLOW)
       await expect(page.getByTestId('office-tab-access')).toBeVisible(SLOW)
       await expect(page.getByTestId('people-loading')).toHaveCount(0, SLOW)
-      await expect(page.getByTestId('people-row').first()).toBeVisible(SLOW)
+      await expect(page.getByTestId('people-board')).toBeVisible(SLOW)
       await shot(page, '63-home-section-people')
 
       await page.getByTestId('home-section-training').click()

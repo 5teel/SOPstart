@@ -17,7 +17,7 @@ export function Wordmark({
 }: {
   variant?: 'full' | 'chip' | 'start'
   onInk?: boolean
-  size?: 'hero' | 'merge' | 'header' | 'phone' | 'bar'
+  size?: 'hero' | 'merge' | 'header' | 'phone' | 'bar' | 'menu'
   className?: string
   /** Marks the slot the Start merge lands in. */
   target?: boolean

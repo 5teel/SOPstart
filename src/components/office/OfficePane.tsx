@@ -24,8 +24,8 @@ const TAB_LABEL: Record<OfficeTab, string> = {
   inbox: 'Inbox',
   requests: 'Requests',
   decisions: 'Decisions',
-  people: 'People & roles',
-  access: 'Access',
+  people: 'People & authority',
+  access: 'SOP access',
 }
 
 const RECEIPT_MS = 10_000

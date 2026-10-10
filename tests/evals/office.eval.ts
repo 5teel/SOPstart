@@ -720,21 +720,35 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       expect(errors).toEqual([])
       await page.close()
     })
-    test('people: full width, invite with a role, Invited chip, role change both ways, remove with confirmation (59-11)', async () => {
+    test('people: department board, who-can-do-what grid, invite with a role, Invited chip, role change both ways in the person sheet, remove with confirmation (59-11, 2026-10-11)', async () => {
       const page = await adminCtx.newPage()
       const errors = watchConsole(page)
       await page.goto('/?s=people')
       await expect(page.getByTestId('people-tab')).toHaveCount(1, SLOW)
       expect(await page.getByTestId('section-people').evaluate((el) => el.getBoundingClientRect().width)).toBeGreaterThanOrEqual(560)
 
-      // Rows are told apart by the address this run seeded, never by a count (shared org).
+      // The board opens first: departments, people grouped by role, the authority legend.
+      await expect(page.getByTestId('people-board')).toBeVisible(SLOW)
+      await expect(page.getByTestId('people-legend')).toBeVisible()
+      await expect(page.getByTestId('people-department').first()).toBeVisible(SLOW)
+      await page.waitForTimeout(800)
+      await shot(page, '64-people-board')
+
+      // Who can do what: one row per person. Rows are told apart by the address this run seeded, never by a count (shared org).
+      await page.getByTestId('people-view-authority').click()
+      await expect(page.getByTestId('people-grid')).toBeVisible(SLOW)
       const row = page.getByTestId('people-row').filter({ hasText: DISPOSABLE_EMAIL })
       await expect(row).toHaveCount(1, SLOW)
-      await expect(row.getByTestId('people-role-select')).toBeVisible()
       await expect(row.getByText('No department')).toBeVisible()
-      // One row line plus the quiet objective line (60-13 added it under every person): still one line of controls, not two stacked.
-      expect(await row.evaluate((el) => el.getBoundingClientRect().height)).toBeLessThan(150)
-      await shot(page, '59-people')
+      await shot(page, '64-people-grid')
+      // The row opens the person sheet, where the person is edited.
+      await row.click()
+      const sheet = page.getByTestId('person-sheet')
+      await expect(sheet).toBeVisible(SLOW)
+      await expect(sheet.getByTestId('person-authority')).toContainText('Follows SOPs')
+      await shot(page, '64-person-sheet')
+      await sheet.getByTestId('person-sheet-close').click()
+      await expect(sheet).toHaveCount(0)
 
       // Invite: Send is disabled until the email is valid.
       await page.getByTestId('people-invite').click()
@@ -767,7 +781,8 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       }
 
       // Role change on the disposable member, both ways in one session (state must not leak).
-      const select = row.getByTestId('people-role-select')
+      await row.click()
+      const select = sheet.getByTestId('people-role-select')
       await select.selectOption('supervisor')
       await expect(receipt).toContainText('Role changed to Supervisor' + LEDGER, SLOW)
       await expect(select).toHaveValue('supervisor', SLOW)
@@ -776,7 +791,7 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       await expect(select).toHaveValue('worker', SLOW)
 
       // Remove: Keep them leaves the row; Remove takes it away.
-      const remove = row.getByTestId('people-remove')
+      const remove = sheet.getByTestId('people-remove')
       await expect(remove).toHaveCount(1, SHORT)
       await remove.click()
       const dialog = page.getByTestId('people-remove-dialog')
@@ -785,6 +800,7 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       await page.getByTestId('people-remove-cancel').click()
       await expect(dialog).toHaveCount(0)
       await expect(row).toHaveCount(1)
+      await expect(sheet).toBeVisible()
       await remove.click()
       await page.getByTestId('people-remove-confirm').click()
       await expect(receipt).toContainText('Removed' + LEDGER, SLOW)

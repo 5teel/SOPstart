@@ -549,14 +549,14 @@ export const UAT_TESTS: UatTest[] = [
       'In the Inbox, sign off a finished SOP or mark one of your own SOPs as reviewed. Do it without leaving the row.',
       'Look at the Decisions tab and find what you just did.',
       'Open People and look at who is on the team.',
-      'Open the Access tab and pick a SOP to see who can see it.',
+      'Open the SOP access tab and pick a SOP to see who can see it.',
       'Type an old address such as /governance into the browser.',
     ],
     links: [
       { label: 'Sign-offs inbox', href: '/?s=signoffs' },
       { label: 'Decisions', href: '/?s=signoffs&tab=decisions' },
       { label: 'People', href: '/?s=people' },
-      { label: 'Access', href: '/?s=people&tab=access' },
+      { label: 'SOP access', href: '/?s=people&tab=access' },
     ],
     questions: [
       { id: 'inbox-one-action', text: 'Was it clear what each row in the Inbox wanted you to do?' },

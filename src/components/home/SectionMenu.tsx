@@ -31,8 +31,8 @@ export function SectionMenu({
 }) {
   return (
     <aside data-testid="home-menu" className="flex w-55 shrink-0 flex-col border-r border-ink-200 bg-paper max-lg:hidden">
-      <div className="px-5 pb-6 pt-5">
-        <Wordmark size="header" />
+      <div className="flex justify-center px-5 pb-7 pt-6">
+        <Wordmark size="menu" />
       </div>
       <nav aria-label="Sections" className="flex flex-col gap-0.5 px-3">
         {sectionsForRole(role).map((s) => (
