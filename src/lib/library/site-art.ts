@@ -1,28 +1,13 @@
 /**
- * 2026-10-11 (ADR-0009) -- pictures for the site map. A floor picture per area, keyed by the
- * area's department name, mapped onto the plate's top face; a cut-out picture per named machine.
- * Pictures decorate only: the plates, objects, signs and status marks stay the drawn ones, and
- * an area with no picture keeps the flat plate. Files live in public/site-art/. Plain module.
+ * 2026-10-11 (ADR-0009) -- pictures for the site map: a cut-out isometric picture per named machine.
+ * Pictures decorate only: the area plates, signs and status marks stay drawn, each picture is still
+ * exactly one SOP, and a machine with no picture keeps its drawn shape. Files live in public/site-art/. Plain module.
  */
 import { FOOTPRINT, HEIGHT, project } from './iso'
-import { SITE_WIDE } from './areas'
 import type { ObjectKind } from './object-kind'
-
-// ponytail: a fixed list of shipped pictures; per-site uploads would move this into the site model.
-const FLOORS = new Set([
-  'site-wide', 'general', 'forming', 'engineering',
-  'track-renewal', 'signals-comms', 'overhead-line', 'welding-grinding', 'plant-fleet', 'depot-yard',
-  'wiring-workshop', 'switchboards', 'solar-battery', 'testing-inspection', 'industrial-controls',
-  'water-treatment', 'syrup-room', 'blow-moulding', 'filling-line', 'packing-palletising', 'warehouse',
-])
 
 export const artSlug = (s: string) =>
   s.toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-
-export function floorArt(areaId: string, name: string): string | null {
-  const k = areaId === SITE_WIDE ? 'site-wide' : artSlug(name)
-  return FLOORS.has(k) ? `/site-art/floor/${k}.webp` : null
-}
 
 // One picture per machine name (its slug); a SOP with no machine shows the notice board.
 // ponytail: a fixed list; a machine not listed keeps its drawn shape until a picture is made for it.

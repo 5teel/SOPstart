@@ -11,7 +11,7 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
 import { byDepth, layoutSite, viewFor } from '@/lib/library/iso-layout'
 import { HEIGHT, TILE, project } from '@/lib/library/iso'
-import { floorArt, machineArt, objectBox } from '@/lib/library/site-art'
+import { machineArt, objectBox } from '@/lib/library/site-art'
 import type { LibraryArea } from '@/lib/library/areas'
 import type { ObjectKind } from '@/lib/library/object-kind'
 import type { RowStatus } from '@/lib/library/status'
@@ -49,7 +49,7 @@ const STATUS_FILL: Record<RowStatus['kind'], string> = {
   stopped: 'var(--ink-900)',
 }
 
-// The plate's top face as an affine map of plan coordinates, so a top-down floor picture lies on it.
+// The plate's top face as an affine map of plan coordinates, so the painted floor line lies on it.
 const TOP_FACE = (z: number) => `matrix(${TILE * 0.866} ${TILE * 0.5} ${-TILE * 0.866} ${TILE * 0.5} 0 ${-z * TILE})`
 
 const clip = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1)}…` : s)
@@ -245,18 +245,20 @@ export function SiteMap({ areas, rows, area, onArea, onOpenSop, orgName, renderO
                 : { role: 'button', tabIndex: 0, 'aria-label': name, onClick: go, onKeyDown: activate(go) })}
             >
               <Plate x={plate.x} y={plate.y} w={plate.w} d={plate.d} colourVar={a.colourVar} />
-              {floorArt(a.id, a.name) && (
-                <g transform={TOP_FACE(PLATE_H)}>
-                  <image href={floorArt(a.id, a.name)!} x={plate.x} y={plate.y} width={plate.w} height={plate.d} preserveAspectRatio="xMidYMid slice" />
-                  <rect x={plate.x} y={plate.y} width={plate.w} height={plate.d} vectorEffect="non-scaling-stroke" style={{ fill: 'none', stroke: a.colourVar, strokeWidth: 2 }} />
-                </g>
-              )}
+              {/* A painted floor line just inside the edge: the zone reads as a marked area of the floor. */}
+              <g transform={TOP_FACE(PLATE_H)} aria-hidden="true">
+                <rect x={plate.x + 0.3} y={plate.y + 0.3} width={plate.w - 0.6} height={plate.d - 0.6} vectorEffect="non-scaling-stroke" strokeDasharray="6 4" style={{ fill: 'none', stroke: a.colourVar, strokeWidth: 1.5 }} />
+              </g>
               {objects.map((o) => {
                 const row = list[o.i]
                 const box = objectBox(o.kind, o.x, o.y, PLATE_H)
-                const sprite = floorArt(a.id, a.name) && row ? machineArt(row.machine ?? null) : null
+                const sprite = row ? machineArt(row.machine ?? null) : null
+                const [shx, shy] = project(o.cx, o.cy, PLATE_H)
                 const shapes = sprite ? (
-                  <image href={sprite} x={box.x} y={box.y} width={box.w} height={box.h} preserveAspectRatio="xMidYMax meet" />
+                  <>
+                    <ellipse cx={shx} cy={shy} rx={box.w * 0.42} ry={box.w * 0.16} style={{ fill: 'var(--ink-900)', opacity: 0.14 }} />
+                    <image href={sprite} x={box.x - box.w * 0.1} y={box.y - box.h * 0.2} width={box.w * 1.2} height={box.h * 1.2} preserveAspectRatio="xMidYMax meet" />
+                  </>
                 ) : (
                   <MapObject kind={o.kind} x={o.x} y={o.y} colourVar={a.colourVar} />
                 )
@@ -298,7 +300,8 @@ export function SiteMap({ areas, rows, area, onArea, onOpenSop, orgName, renderO
             const [sx, sy] = project(cx, cy, 3)
             const [, floorY] = project(cx, cy, PLATE_H)
             const label = clip(a.name, 22)
-            const w = (label.length * 7.4 + 54) * k
+            const count = plural(n)
+            const w = (label.length * 7.4 + count.length * 6.2 + 34) * k
             const h = 26 * k
             const [mx, my] = project(cx, cy, 1.2)
             return (
@@ -311,7 +314,7 @@ export function SiteMap({ areas, rows, area, onArea, onOpenSop, orgName, renderO
                     {label}
                   </text>
                   <text x={sx + w / 2 - 10 * k} y={sy - 9 * k} fontSize={10.5 * k} textAnchor="end" className="font-label" style={{ fill: 'var(--ink-400)' }}>
-                    {n}
+                    {count}
                   </text>
                 </g>
                 <g className="lg:hidden">

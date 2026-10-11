@@ -22,3 +22,6 @@ The library site map (ADR-0005) drew every area and object as flat token-coloure
 
 ## Amendment (2026-10-11, same day)
 Objects are pictured per named machine, not per object kind: `public/site-art/machine/<slug>.webp`, keyed by the SOP's first linked machine name; a SOP with no machine shows `notice-board`. They are GPT-image-2 / Seedream 5.0 isometric renders cut out with rembg. Hunyuan3D-2.1 was dropped: its texture pass ran out of memory on the 24 GB GPU (over 20 minutes per object). A machine without a picture keeps its drawn shape.
+
+## Amendment 2 (2026-10-11)
+Floor pictures are removed (Simon: the machine pictures make them unnecessary). An area is a tinted plate in its area colour with a dashed floor line inside its edge; every SOP's machine picture stands on it with a soft contact shadow; each area sign reads its name and "N SOPs" in one standard form.
