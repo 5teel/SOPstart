@@ -1,6 +1,6 @@
 /**
  * 2026-10-11 (ADR-0009) -- pictures for the site map. A floor picture per area, keyed by the
- * area's department name, mapped onto the plate's top face; a rendered object per object kind.
+ * area's department name, mapped onto the plate's top face; a cut-out picture per named machine.
  * Pictures decorate only: the plates, objects, signs and status marks stay the drawn ones, and
  * an area with no picture keeps the flat plate. Files live in public/site-art/. Plain module.
  */
@@ -24,10 +24,23 @@ export function floorArt(areaId: string, name: string): string | null {
   return FLOORS.has(k) ? `/site-art/floor/${k}.webp` : null
 }
 
-// Rendered objects shipped so far; a kind not listed keeps its drawn shape.
-const OBJECTS = new Set<ObjectKind>([])
+// One picture per machine name (its slug); a SOP with no machine shows the notice board.
+// ponytail: a fixed list; a machine not listed keeps its drawn shape until a picture is made for it.
+const MACHINES = new Set([
+  'alkaline-cleaning-tank', 'annealing-lehr', 'axle-counter', 'ballast-regulator', 'battery-enclosure',
+  'blow-moulder', 'capper', 'chlorine-dosing-tank', 'cold-end-inspection-line', 'filler',
+  'filler-infeed-conveyor', 'forklift', 'furnace-forehearth', 'hi-rail-truck', 'hot-melt-gluer', 'inverter',
+  'is-machine-1', 'is-machine-2', 'lathe', 'main-switchboard', 'motor-starter-panel', 'notice-board',
+  'office-terminal', 'ohl-mast', 'palletiser', 'preform-hopper', 'racking', 'rail-grinder',
+  'sand-filter-tank', 'shrink-wrapper', 'signal-location-case', 'sleeper-rack', 'sleeper-stack-rack',
+  'syrup-tank-1', 'tamper', 'test-lab-bench', 'training-switchboard', 'weld-bench', 'wiring-bench',
+  'work-platform-truck', 'workbench',
+])
 
-export const objectArt = (kind: ObjectKind): string | null => (OBJECTS.has(kind) ? `/site-art/obj/${kind}.webp` : null)
+export function machineArt(machine: string | null): string | null {
+  const k = machine === null ? 'notice-board' : artSlug(machine)
+  return MACHINES.has(k) ? `/site-art/machine/${k}.webp` : null
+}
 
 /** Screen box of an object's footprint standing on the plate (z0), for a bottom-centred picture. */
 export function objectBox(kind: ObjectKind, x: number, y: number, z0: number) {

@@ -51,6 +51,8 @@ export interface LibraryRow {
   colourVar: string
   type: SopType
   kind: ObjectKind
+  /** The first linked machine's name (its picture on the map), or null for a noticeboard SOP. */
+  machine: string | null
   minutes: number | null
   /** The person's own history with this SOP; information only. */
   status: RowStatus | null
@@ -243,6 +245,7 @@ export function useLibrary(userId: string) {
         colourVar: area?.colourVar ?? 'var(--area-1)',
         type: sopTypeOf(s, linked.length > 0),
         kind: objectKindOf(linked[0]?.name ?? null),
+        machine: linked[0]?.name ?? null,
         minutes: minutes ? Math.max(1, Math.round(minutes)) : null,
         // A walk whose steps have not landed yet shows no status rather than a wrong one.
         status:

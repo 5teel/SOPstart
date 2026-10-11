@@ -11,7 +11,7 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
 import { byDepth, layoutSite, viewFor } from '@/lib/library/iso-layout'
 import { HEIGHT, TILE, project } from '@/lib/library/iso'
-import { floorArt, objectArt, objectBox } from '@/lib/library/site-art'
+import { floorArt, machineArt, objectBox } from '@/lib/library/site-art'
 import type { LibraryArea } from '@/lib/library/areas'
 import type { ObjectKind } from '@/lib/library/object-kind'
 import type { RowStatus } from '@/lib/library/status'
@@ -23,6 +23,8 @@ export interface MapRow {
   title: string
   areaId: string
   kind: ObjectKind
+  /** The first linked machine's name, for its picture; null is a noticeboard. */
+  machine?: string | null
   status: RowStatus | null
 }
 
@@ -252,7 +254,7 @@ export function SiteMap({ areas, rows, area, onArea, onOpenSop, orgName, renderO
               {objects.map((o) => {
                 const row = list[o.i]
                 const box = objectBox(o.kind, o.x, o.y, PLATE_H)
-                const sprite = floorArt(a.id, a.name) ? objectArt(o.kind) : null
+                const sprite = floorArt(a.id, a.name) && row ? machineArt(row.machine ?? null) : null
                 const shapes = sprite ? (
                   <image href={sprite} x={box.x} y={box.y} width={box.w} height={box.h} preserveAspectRatio="xMidYMax meet" />
                 ) : (

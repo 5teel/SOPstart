@@ -19,3 +19,6 @@ The library site map (ADR-0005) drew every area and object as flat token-coloure
 - Easier: a site reads as its place at a glance; demo sites look real.
 - Harder: a new department name has no picture until one is made and its slug is added to `site-art.ts`.
 - Each picture is a static file; the map loads up to ~25 small webp files.
+
+## Amendment (2026-10-11, same day)
+Objects are pictured per named machine, not per object kind: `public/site-art/machine/<slug>.webp`, keyed by the SOP's first linked machine name; a SOP with no machine shows `notice-board`. They are GPT-image-2 / Seedream 5.0 isometric renders cut out with rembg. Hunyuan3D-2.1 was dropped: its texture pass ran out of memory on the 24 GB GPU (over 20 minutes per object). A machine without a picture keeps its drawn shape.
