@@ -56,4 +56,15 @@ test.describe('authorityOf', () => {
     expect(src.match(/\.eq\('organisation_id', ctx\.organisationId\)/g)?.length).toBe(2)
     expect(src).not.toContain('createAdminClient')
   })
+
+  test('linking a supervisor to a worker is admin only, org-scoped, and only a supervisor can be linked', () => {
+    const src = fs.readFileSync(path.join(process.cwd(), 'src/actions/people.ts'), 'utf-8')
+    const fn = src.slice(src.indexOf('export async function setSupervision'))
+    expect(fn).toContain("ctx.role !== 'admin'")
+    expect(fn).toContain("sup.role !== 'supervisor'")
+    expect(fn.split(".eq('organisation_id', org)").length - 1).toBe(2)
+    const tab = fs.readFileSync(path.join(process.cwd(), 'src/components/office/PeopleTab.tsx'), 'utf-8')
+    expect(tab).toContain('data-testid="people-supervises-worker"')
+    expect(tab).toContain('setSupervision({ supervisorId, workerId, linked })')
+  })
 })

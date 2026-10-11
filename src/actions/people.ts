@@ -30,3 +30,45 @@ export async function getPeopleAuthorityData(): Promise<PeopleAuthorityData | { 
     supervision: (supervision.data ?? []) as PeopleAuthorityData['supervision'],
   }
 }
+
+/**
+ * Link or unlink a supervisor and a worker (the rows supervisor sign-off is gated on). Admin only,
+ * as the 00002 insert/delete policies are; both people must be members of the session organisation.
+ */
+export async function setSupervision(input: { supervisorId: string; workerId: string; linked: boolean }): Promise<{ success: true } | { error: string }> {
+  const ctx = await requireAdminContext()
+  if ('error' in ctx) return { error: ctx.error }
+  if (ctx.role !== 'admin') return { error: 'Only an admin can link supervisors.' }
+  if (!ctx.organisationId) return { error: 'No organisation' }
+  const { supervisorId, workerId, linked } = input
+  if (typeof supervisorId !== 'string' || typeof workerId !== 'string' || typeof linked !== 'boolean' || supervisorId === workerId) {
+    return { error: 'Invalid input' }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const db = ctx.supabase as any
+  const org = ctx.organisationId
+  const { data: people } = await db
+    .from('organisation_members')
+    .select('user_id, role')
+    .eq('organisation_id', org)
+    .in('user_id', [supervisorId, workerId])
+  const sup = (people ?? []).find((p: { user_id: string }) => p.user_id === supervisorId)
+  if (!sup || !(people ?? []).some((p: { user_id: string }) => p.user_id === workerId)) return { error: 'Member not found' }
+  if (linked && sup.role !== 'supervisor') return { error: 'Only a supervisor can be linked to workers.' }
+
+  const res = linked
+    ? await db
+        .from('supervisor_assignments')
+        .upsert({ organisation_id: org, supervisor_id: supervisorId, worker_id: workerId }, { onConflict: 'organisation_id,supervisor_id,worker_id', ignoreDuplicates: true })
+        .select('id')
+    : await db
+        .from('supervisor_assignments')
+        .delete()
+        .eq('organisation_id', org)
+        .eq('supervisor_id', supervisorId)
+        .eq('worker_id', workerId)
+        .select('id')
+  if (res.error) return { error: "That didn't save." }
+  return { success: true }
+}

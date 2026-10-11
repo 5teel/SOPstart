@@ -25,7 +25,7 @@ import {
   type TeamMember,
 } from '@/actions/auth'
 import { listDepartments } from '@/actions/departments'
-import { getPeopleAuthorityData } from '@/actions/people'
+import { getPeopleAuthorityData, setSupervision } from '@/actions/people'
 import { DChip } from '@/components/admin/departments/DChip'
 import { DepartmentPicker } from '@/components/admin/departments/DepartmentPicker'
 import { useRole } from '@/components/providers/RoleProvider'
@@ -535,6 +535,17 @@ export function PeopleTab({ onReceipt }: { onReceipt(r: RowDone): void }) {
     }
   }
 
+  async function link(supervisorId: string, workerId: string, linked: boolean): Promise<string | null> {
+    try {
+      const res = await setSupervision({ supervisorId, workerId, linked })
+      if ('error' in res) return res.error
+      await qc.invalidateQueries({ queryKey: AUTHORITY_KEY })
+      return null
+    } catch {
+      return FAILED_COPY
+    }
+  }
+
   async function newCode() {
     setCodeBusy(true)
     setCodeError(null)
@@ -734,6 +745,7 @@ export function PeopleTab({ onReceipt }: { onReceipt(r: RowDone): void }) {
           pickerOpen={pickerOpen}
           onPicker={setPickerOpen}
           onRole={(r) => void changeRole(open, r)}
+          onLink={(workerId, linked) => link(open.user_id, workerId, linked)}
           onDepartments={() => {
             onReceipt({ receipt: 'Departments updated', logged: null })
             void refetch()
@@ -774,6 +786,7 @@ function PersonSheet({
   pickerOpen,
   onPicker,
   onRole,
+  onLink,
   onDepartments,
   onRemove,
   onClose,
@@ -791,6 +804,7 @@ function PersonSheet({
   pickerOpen: boolean
   onPicker(open: boolean): void
   onRole(r: AppRole): void
+  onLink(workerId: string, linked: boolean): Promise<string | null>
   onDepartments(): void
   onRemove(): void
   onClose(): void
@@ -912,15 +926,19 @@ function PersonSheet({
           )}
         </section>
 
-        {(supervises.length > 0 || supervisedBy.length > 0) && (
-          <section className="flex flex-col gap-1">
-            <h3 className={H}>{supervises.length > 0 ? 'Supervises' : 'Supervised by'}</h3>
-            {(supervises.length > 0 ? supervises : supervisedBy).map((x) => (
-              <p key={x.id} className="truncate text-ui text-ink-900">
-                {nameOf(x)}
-              </p>
-            ))}
-          </section>
+        {m.role === 'supervisor' ? (
+          <SupervisesPicker m={m} isAdmin={isAdmin} members={members} supervises={supervises} onLink={onLink} />
+        ) : (
+          supervisedBy.length > 0 && (
+            <section className="flex flex-col gap-1">
+              <h3 className={H}>Supervised by</h3>
+              {supervisedBy.map((x) => (
+                <p key={x.id} className="truncate text-ui text-ink-900">
+                  {nameOf(x)}
+                </p>
+              ))}
+            </section>
+          )
         )}
 
         <section data-testid="people-objective" className="flex flex-col gap-1">
@@ -949,5 +967,84 @@ function PersonSheet({
         )}
       </aside>
     </div>
+  )
+}
+
+/**
+ * Which workers a supervisor signs off (supervisor_assignments). Admins tick workers; everyone else
+ * sees the list. Workers sharing a department with the supervisor come first.
+ */
+function SupervisesPicker({
+  m,
+  isAdmin,
+  members,
+  supervises,
+  onLink,
+}: {
+  m: TeamMember
+  isAdmin: boolean
+  members: TeamMember[]
+  supervises: TeamMember[]
+  onLink(workerId: string, linked: boolean): Promise<string | null>
+}) {
+  const [busy, setBusy] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const linked = new Set(supervises.map((x) => x.user_id))
+  const near = (x: TeamMember) => x.department_ids.some((d) => m.department_ids.includes(d))
+  const workers = members
+    .filter((x) => x.role === 'worker')
+    .sort((a, b) => Number(near(b)) - Number(near(a)) || nameOf(a).localeCompare(nameOf(b)))
+  const H = 'text-ui font-semibold text-ink-700'
+
+  async function toggle(x: TeamMember) {
+    setBusy(x.user_id)
+    setError(null)
+    try {
+      setError(await onLink(x.user_id, !linked.has(x.user_id)))
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  return (
+    <section data-testid="people-supervises" className="flex flex-col gap-2">
+      <h3 className={H}>Supervises</h3>
+      <p className="text-meta text-ink-600">
+        {linked.size === 0 ? 'Nobody yet. ' : ''}They sign off the workers ticked here, on SOPs they are signed off on themselves.
+      </p>
+      {!isAdmin ? (
+        supervises.map((x) => (
+          <p key={x.id} className="truncate text-ui text-ink-900">
+            {nameOf(x)}
+          </p>
+        ))
+      ) : workers.length === 0 ? (
+        <p className="text-ui text-ink-500">No workers on the site yet.</p>
+      ) : (
+        <ul className="flex max-h-72 flex-col overflow-y-auto rounded-lg border border-ink-200">
+          {workers.map((x) => (
+            <li key={x.id} className="border-b border-ink-200 last:border-b-0">
+              <label className="flex min-h-tap cursor-pointer items-center gap-3 px-3 text-ui text-ink-900 hover:bg-paper-2">
+                <input
+                  type="checkbox"
+                  data-testid="people-supervises-worker"
+                  checked={linked.has(x.user_id)}
+                  disabled={busy !== null}
+                  onChange={() => void toggle(x)}
+                  className="size-4"
+                />
+                <span className="min-w-0 flex-1 truncate">{nameOf(x)}</span>
+                {near(x) && <span className="text-meta text-ink-500">Same department</span>}
+              </label>
+            </li>
+          ))}
+        </ul>
+      )}
+      {error && (
+        <p role="alert" className="text-ui text-accent-escalate">
+          {error}
+        </p>
+      )}
+    </section>
   )
 }
