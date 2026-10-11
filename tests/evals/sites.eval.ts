@@ -33,6 +33,7 @@ test.describe('Switchable sites', () => {
       await expect(sw).toHaveCount(1, SLOW)
       for (const n of ['Visy', ...DEMO]) await expect(sw.locator('option', { hasText: n })).toHaveCount(1)
       await expect(page.getByTestId('map-header')).toContainText('Visy · site map', SLOW)
+      await expect(page.locator('[data-testid="site-map"] image').first()).toBeVisible(SLOW)
       await shot(page, '70-site-visy')
       for (const [i, name] of DEMO.entries()) {
         await pick(page, name)
