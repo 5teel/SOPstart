@@ -59,8 +59,8 @@ export const ROLES: RoleDef[] = [
     landsOn: { label: 'The home', route: '/' },
     can: [
       'Read, start and finish assigned / visible SOPs step-by-step',
-      'Capture photos, complete steps, sign off their own instance',
-      'Self-add a published SOP to "Your SOPs"',
+      'Capture photos, complete steps and send them for sign-off',
+      'Ask for a SOP, or for a change to one; decline a SOP they were asked to do',
     ],
     cannot: ['Create or edit SOPs', 'Manage the library, team, or departments', 'Review other people’s completions'],
   },
@@ -72,8 +72,8 @@ export const ROLES: RoleDef[] = [
     who: 'Oversees a crew and reviews their completed work.',
     landsOn: { label: 'The home', route: '/' },
     can: [
-      'Review worker completion records and sign-offs',
-      'Open a completion to inspect captured photos and step results',
+      'Sign off the completions of the workers linked to them, on SOPs they are signed off on themselves',
+      'Ask people to do SOPs; answer requests in Sign-offs',
     ],
     cannot: ['Create or edit SOPs', 'Manage the library, team, or departments (that is admin / safety-manager)'],
   },
@@ -87,9 +87,9 @@ export const ROLES: RoleDef[] = [
     can: [
       'Everything a Supervisor can do',
       'Full admin authoring: create / upload / parse SOPs, manage the content library',
-      'Manage team & roles, manage departments + owners, assign SOPs',
+      'See People, Training and the decision ledger; manage departments; ask people to do SOPs; sign off anyone',
     ],
-    cannot: ['Cross-org / platform curation (that is the Potenco platform admin)'],
+    cannot: ['Invite people, change roles or link supervisors (admin only)', 'Cross-org / platform curation (that is the Potenco platform admin)'],
   },
   {
     key: 'admin',
@@ -101,8 +101,8 @@ export const ROLES: RoleDef[] = [
     can: [
       'Create / upload / AI-parse SOPs and run them to publish',
       'Manage the content library (department tagging)',
-      'Manage team, roles & invites; manage departments + owners',
-      'Assign SOPs by role / department',
+      'Invite people, change roles, link supervisors to their workers; manage departments + owners',
+      'Ask people to do SOPs; sign off anyone',
     ],
     cannot: ['Cross-org / platform curation (that is the Potenco platform admin)'],
   },
@@ -129,7 +129,7 @@ export const ROLES: RoleDef[] = [
     kind: 'overlay',
     colour: '#0891b2',
     who: 'An org unit (Forming, Quality, Maintenance…) that organises SOPs, content & people.',
-    gates: 'Worker SOP visibility (RLS, additive-OR with assignment + sub-trade). Organises the library & team.',
+    gates: 'Worker SOP visibility (RLS, additive-OR with assignment and named people). Organises the library, the site map and the People board.',
     can: ['A SOP / content item / member can belong to many departments, or be org-wide ("All departments")'],
   },
   {
@@ -140,18 +140,8 @@ export const ROLES: RoleDef[] = [
     who: 'A named member accountable for a department — answers the Visy "nobody owns SOPs" gap.',
     gates: 'Accountability only (D-03) — grants NO edit / approve permissions beyond the member’s existing role.',
     can: [
-      'Rendered as the "★ Owns {Dept}" team badge + the department-card owner line',
-      'A department with no owner surfaces the red "No owner assigned" warning',
+      'Set in the person sheet: Owner on one of their departments',
     ],
-  },
-  {
-    key: 'sub_trade',
-    label: 'Sub-trade',
-    kind: 'overlay',
-    colour: '#65a30d',
-    who: 'A skill tag (operator / fitter / sparky) — orthogonal to role and to department.',
-    gates: 'Worker SOP visibility (RLS, additive-OR). Left untouched by Phase 25; dept↔sub-trade combination deferred.',
-    can: ['A member and a SOP each carry sub-trade tags; a match contributes to visibility'],
   },
 ]
 

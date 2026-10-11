@@ -430,7 +430,7 @@ function RolesView() {
         <h2 className="text-xl font-semibold text-[var(--ink-900)]">Roles &amp; access</h2>
         <p className="text-sm text-[var(--ink-700)] mt-2 leading-relaxed">
           Who can do what. <span className="font-semibold">Organisation roles</span> escalate from Pending to Admin and set
-          where you land after login. <span className="font-semibold">Overlays</span> (department, owner, sub-trade) are
+          where you land after login. <span className="font-semibold">Overlays</span> (department, department owner) are
           <em> not</em> roles — they gate visibility and accountability, never permissions. The admin gate in code is{' '}
           <span className="mono text-xs">[&apos;admin&apos;, &apos;safety_manager&apos;]</span>.
         </p>
