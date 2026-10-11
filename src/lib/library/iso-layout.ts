@@ -45,14 +45,13 @@ export function layoutSite(areas: LayoutArea[]): SiteLayout {
     x += p.w + GAP
     rowD = Math.max(rowD, p.d)
   }
-  // No bare floor: every plate takes its row's depth, and the last plate in a row runs to the site's width.
+  // No bare floor: every plate takes its row's depth, and a short row shares its spare width across its plates.
   const siteW = Math.max(0, ...plates.map((p) => p.x + p.w))
   for (const y of new Set(plates.map((p) => p.y))) {
-    const row = plates.filter((p) => p.y === y)
+    const row = plates.filter((p) => p.y === y).sort((a, b) => a.x - b.x)
     const d = Math.max(...row.map((p) => p.d))
-    for (const p of row) p.d = d
-    const last = row.reduce((a, b) => (b.x > a.x ? b : a))
-    last.w = siteW - last.x
+    const extra = (siteW - (row[row.length - 1].x + row[row.length - 1].w)) / row.length
+    row.forEach((p, i) => { p.d = d; p.x += i * extra; p.w += extra })
   }
 
   const objects: Placed[] = []

@@ -109,7 +109,7 @@ const WALL = { top: 'accent-dark', right: 'steel-side', left: 'steel-top' }
  * so each machine stands in its own housing instead of floating on the plate. (cx, cy) centre, cw x cd size.
  */
 export const Bay = memo(function Bay({ cx, cy, cw, cd, colourVar }: { cx: number; cy: number; cw: number; cd: number; colourVar: string }) {
-  const [w, d] = [cw - 0.24, cd - 0.24]
+  const [w, d] = [Math.min(cw, 3.2) - 0.24, Math.min(cd, 2.8) - 0.24] // a wide area keeps normal-size bays
   const [x, y, z] = [cx - w / 2, cy - d / 2, PLATE_H + 0.06]
   const shapes = [
     ...boxFaces(x, y, PLATE_H, w, d, 0.06, PAD),

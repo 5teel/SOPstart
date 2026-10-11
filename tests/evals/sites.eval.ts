@@ -32,7 +32,7 @@ test.describe('Switchable sites', () => {
       const sw = page.getByTestId('home-menu').getByTestId('site-switch')
       await expect(sw).toHaveCount(1, SLOW)
       for (const n of ['Visy', ...DEMO]) await expect(sw.locator('option', { hasText: n })).toHaveCount(1)
-      await expect(page.getByTestId('map-header')).toContainText('Visy · site map', SLOW)
+      await pick(page, 'Visy') // a failed earlier run can leave the session on a demo site
       await expect(page.locator('[data-testid="site-map"] image').first()).toBeVisible(SLOW)
       await shot(page, '70-site-visy')
       for (const [i, name] of DEMO.entries()) {
@@ -41,7 +41,7 @@ test.describe('Switchable sites', () => {
         await expect(page.locator('[data-testid="site-map"] image').first()).toBeVisible(SLOW)
         await page.waitForLoadState('networkidle')
         await shot(page, `7${i + 1}-site-${name.split(' ')[0].toLowerCase()}`)
-        await page.getByTestId('map-area').first().click()
+        await page.getByTestId('map-area').first().dispatchEvent('click') // plates overlap in screen space; a centre click can hit a nearer one
         await expect(page.getByTestId('map-object').first()).toBeVisible(SLOW)
         await page.waitForTimeout(800)
         await shot(page, `7${i + 1}-site-${name.split(' ')[0].toLowerCase()}-area`)

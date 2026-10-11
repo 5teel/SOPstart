@@ -29,4 +29,4 @@ Floor pictures are removed (Simon: the machine pictures make them unnecessary). 
 ## Amendment 3 (2026-10-11)
 Each object stands in its own bay: a floor pad with a low partition on its two far sides, topped in the area colour (`Bay` in `MapShapes.tsx`, sized to the object's share of the plate). The ground carries walkways (`walkways()` in `iso-layout.ts`): a ring round the site, cross aisles between rows of areas and aisles between neighbouring areas, drawn pale with a dashed centre line in ink. Both are drawn shapes, not pictures, and carry no meaning.
 
-Areas fill their row: every plate takes its row's depth and the last plate in a row runs to the site's width, so no bare floor is left beside the walkways.
+Areas fill their row: every plate takes its row's depth and the last plate in a row runs to the site's width, so no bare floor is left beside the walkways. (Revised the same day: a short row shares its spare width across its plates, and a bay keeps its normal size in a wide area.)
