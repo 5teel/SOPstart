@@ -29,7 +29,7 @@ Multi-tenant SaaS PWA for New Zealand industrial sites (glass, packaging, machin
 
 - `sops` → `sop_sections` → steps; `sop_focus_steps` (hazard / ppe / step / check rows) are written only by `scripts/convert-sops-to-steps.ts`, re-runnable by `(section_id, source_key)`. SOP lifecycle `uploading → parsing → draft → published`.
 - `standards` + `standard_attachments`; `sops.placement` is trigger-maintained from `sop_machines`, never written by the UI.
-- `decisions` is an append-only ledger: write only via `recordDecision()` (org and actor from the session).
+- `decisions` is an append-only ledger: write only via `recordDecision()` (org and actor from the session). Every data-changing action logs a row (ADR-0008; autosaves coalesce).
 - Walk photos: signed-URL upload tagged to the active completion id; `submitCompletion` (`src/actions/completions.ts`) validates `{org}/completions/{localId}/{photoId}.{jpg|png}` and is retry-safe.
 - Roles: worker, supervisor, admin, safety_manager. Who can do what: `.planning/codebase/CAPABILITY-MATRIX.md` (access only; obligation is the Phase 44a record).
 
@@ -44,7 +44,7 @@ Multi-tenant SaaS PWA for New Zealand industrial sites (glass, packaging, machin
 
 ## Binding docs (read before planning or building)
 
-- **ADRs** — `docs/adr/README.md`. Accepted ADRs are binding; a plan that contradicts one stops and asks Simon. Structural choices get a new ADR in the same commit (plus a `tests/lint/` guard if checkable). Supersede, never edit. Key ones: 0002 no scheduled jobs · 0004 design principles · 0005 library map replaces rooms · 0006 typography (Inter + Saira Semi Condensed, nothing under 12 px) · 0007 design base.
+- **ADRs** — `docs/adr/README.md`. Accepted ADRs are binding; a plan that contradicts one stops and asks Simon. Structural choices get a new ADR in the same commit (plus a `tests/lint/` guard if checkable). Supersede, never edit. Key ones: 0002 no scheduled jobs · 0004 design principles · 0005 library map replaces rooms · 0006 typography (Inter + Saira Semi Condensed, nothing under 12 px) · 0007 design base · 0008 every action logged to the ledger.
 - **Design** — `Skill("sketch-findings-SOPstart")` before any worker-facing UI, home, authoring flow or org/permission surface. For the home: sketches `009-sop-first-home` and `010-wordmark` plus ADR-0004/0005 govern.
 - **Customer research** — `.planning/research/customer-interviews/` before locking contentious UX decisions.
 

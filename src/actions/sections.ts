@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireSopEditAccess } from '@/lib/auth/guards'
 import { editableSop } from '@/lib/sop/editable'
+import { recordDecision } from '@/lib/decisions/record'
 import type { SectionKind, SopSection } from '@/types/sop'
 
 /**
@@ -37,7 +38,7 @@ export type CreateSectionInputType = z.infer<typeof CreateSectionInput>
 
 export async function createSection(
   input: CreateSectionInputType
-): Promise<SopSection> {
+): Promise<SopSection & { logged: boolean }> {
   const parsed = CreateSectionInput.parse(input)
 
   const ctx = await requireSopEditAccess({ sopId: parsed.sopId })
@@ -96,7 +97,14 @@ export async function createSection(
     console.error('[createSection] insert error', insErr)
     throw new Error('Failed to create section')
   }
-  return inserted as unknown as SopSection
+  const rec = await recordDecision({
+    kind: 'sop_edited',
+    subject: { kind: 'section', id: (inserted as { id: string }).id },
+    sopId: parsed.sopId,
+    summary: 'Added a section',
+    details: { section_kind: kind.slug, title: parsed.title },
+  })
+  return { ...(inserted as unknown as SopSection), logged: rec.ok }
 }
 
 // --- Phase 12 additions: reorderSections + updateSectionLayout ---
@@ -112,7 +120,7 @@ const ReorderSectionsInput = z.object({
 
 export async function reorderSections(
   input: z.infer<typeof ReorderSectionsInput>
-): Promise<{ success: true } | { error: string }> {
+): Promise<{ success: true; logged: boolean } | { error: string }> {
   const parsed = ReorderSectionsInput.safeParse(input)
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? 'Invalid input' }
@@ -133,7 +141,13 @@ export async function reorderSections(
     console.error('[reorderSections] rpc error', error)
     return { error: `Reorder failed: ${error.message}` }
   }
-  return { success: true }
+  const rec = await recordDecision({
+    kind: 'sop_edited',
+    subject: { kind: 'sop', id: parsed.data.sopId },
+    sopId: parsed.data.sopId,
+    summary: 'Reordered sections',
+  })
+  return { success: true, logged: rec.ok }
 }
 
 /**
@@ -145,7 +159,7 @@ export async function reorderSections(
 export async function updateSectionTitle(
   sectionId: string,
   newTitle: string,
-): Promise<{ success: true } | { error: string }> {
+): Promise<{ success: true; logged: boolean } | { error: string }> {
   if (!newTitle || typeof newTitle !== 'string' || !newTitle.trim()) {
     return { error: 'Section title must be a non-empty string.' }
   }
@@ -165,5 +179,12 @@ export async function updateSectionTitle(
     .eq('id', sectionId)
 
   if (updateError) return { error: updateError.message }
-  return { success: true }
+  const rec = await recordDecision({
+    kind: 'sop_edited',
+    subject: { kind: 'section', id: sectionId },
+    sopId: ctx.sopId,
+    summary: 'Renamed a section',
+    details: { title: newTitle.trim() },
+  })
+  return { success: true, logged: rec.ok }
 }

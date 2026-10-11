@@ -18,9 +18,9 @@ function kindList(src: string): string[] {
 }
 
 test.describe('Ledger kinds (60-02)', () => {
-  test('the five new kinds are in DECISION_KINDS, 23 in total, and come last', () => {
-    expect(DECISION_KINDS.length).toBe(23)
-    expect([...DECISION_KINDS].slice(-5)).toEqual(NEW_KINDS)
+  test('the five new kinds are in DECISION_KINDS, after the 59 kinds and before the ADR-0008 kinds', () => {
+    expect(DECISION_KINDS.length).toBe(34)
+    expect([...DECISION_KINDS].slice(18, 23)).toEqual(NEW_KINDS)
   })
 
   test('each kind sits in exactly one group; requests sits between ownership and publishing; objective kinds are in other', () => {
@@ -45,8 +45,8 @@ test.describe('Ledger kinds (60-02)', () => {
     expect(KIND_WORDS.objective_confirmed).toBe('Confirmed an objective')
   })
 
-  test('the 00074 migration kind list equals DECISION_KINDS', () => {
-    const kinds = kindList(read('supabase/migrations/00074_requests_notifications_objectives.sql'))
+  test('the latest migration kind list (00076) equals DECISION_KINDS', () => {
+    const kinds = kindList(read('supabase/migrations/00076_ledger_every_action.sql'))
     expect(new Set(kinds)).toEqual(new Set(DECISION_KINDS))
     expect(kinds.length).toBe(DECISION_KINDS.length)
   })

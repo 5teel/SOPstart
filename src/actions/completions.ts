@@ -27,7 +27,7 @@ import { loadWalkSop, toWalkState, WALK_COLUMNS } from '@/lib/sop/walk-read'
 // ---------------------------------------------------------------
 export async function submitCompletion(
   rawInput: unknown
-): Promise<{ success: true; completionId: string } | { success: false; error: string }> {
+): Promise<{ success: true; completionId: string; logged?: boolean } | { success: false; error: string }> {
   const parsed = z.object({ walkId: z.string().uuid() }).strict().safeParse(rawInput)
   if (!parsed.success) return { success: false, error: 'Invalid input' }
 
@@ -180,7 +180,7 @@ export async function submitCompletion(
   } catch (err) {
     console.error('submitCompletion sign-off notification failed:', err)
   }
-  return { success: true, completionId: walk.id }
+  return { success: true, completionId: walk.id, logged: signed.success && signed.logged }
 }
 
 // ---------------------------------------------------------------

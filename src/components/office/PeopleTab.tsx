@@ -746,8 +746,8 @@ export function PeopleTab({ onReceipt }: { onReceipt(r: RowDone): void }) {
           onPicker={setPickerOpen}
           onRole={(r) => void changeRole(open, r)}
           onLink={(workerId, linked) => link(open.user_id, workerId, linked)}
-          onDepartments={() => {
-            onReceipt({ receipt: 'Departments updated', logged: null })
+          onDepartments={(logged) => {
+            onReceipt({ receipt: 'Departments updated', logged: logged ?? null })
             void refetch()
           }}
           onRemove={() => {
@@ -805,7 +805,7 @@ function PersonSheet({
   onPicker(open: boolean): void
   onRole(r: AppRole): void
   onLink(workerId: string, linked: boolean): Promise<string | null>
-  onDepartments(): void
+  onDepartments(logged?: boolean): void
   onRemove(): void
   onClose(): void
 }) {
@@ -914,7 +914,7 @@ function PersonSheet({
           </div>
           {pickerOpen && (
             <div>
-              <DepartmentPicker mode="member" memberId={m.user_id} departments={departments} selectedIds={m.department_ids} onChange={onDepartments} />
+              <DepartmentPicker mode="member" memberId={m.user_id} departments={departments} selectedIds={m.department_ids} onChange={(_ids, logged) => onDepartments(logged)} />
               <button
                 type="button"
                 onClick={() => onPicker(false)}

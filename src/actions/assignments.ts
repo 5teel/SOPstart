@@ -1,7 +1,6 @@
 'use server'
 
 import { getSessionContext } from '@/lib/auth/session-context'
-import { createAdminClient } from '@/lib/supabase/admin'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { AppRole } from '@/types/auth'
 import { userLabels } from '@/lib/members/labels'
@@ -59,7 +58,7 @@ export async function getOrgMembers(): Promise<
   }
 }
 
-// ─── Worker Self-Assignment ─────────────────────────────────────────────────
+// ─── The signed-in person's SOPs ─────────────────────────────────────────────
 
 async function getWorkerContext() {
   // getSessionContext already resolves role + organisation_id from
@@ -70,50 +69,6 @@ async function getWorkerContext() {
   if (!organisationId) return { error: 'No organisation membership' } as const
 
   return { supabase, user: { id: userId }, organisationId, role: role as AppRole | null }
-}
-
-/**
- * Self-add a published SOP to "Your SOPs".
- * Uses admin client because workers can't INSERT via RLS.
- */
-export async function selfAddSop(sopId: string) {
-  const ctx = await getWorkerContext()
-  if ('error' in ctx) return { success: false, error: ctx.error }
-
-  const admin = createAdminClient()
-  const { error } = await admin.from('sop_assignments').insert({
-    organisation_id: ctx.organisationId,
-    sop_id: sopId,
-    assignment_type: 'individual',
-    user_id: ctx.user.id,
-    assigned_by: ctx.user.id,
-  })
-
-  if (error) {
-    if (error.code === '23505') return { success: true } // already assigned
-    return { success: false, error: error.message }
-  }
-  return { success: true }
-}
-
-/**
- * Remove a self-added SOP (where assigned_by = current user).
- */
-export async function selfRemoveSop(sopId: string) {
-  const ctx = await getWorkerContext()
-  if ('error' in ctx) return { success: false, error: ctx.error }
-
-  const admin = createAdminClient()
-  const { error } = await admin
-    .from('sop_assignments')
-    .delete()
-    .eq('sop_id', sopId)
-    .eq('user_id', ctx.user.id)
-    .eq('assigned_by', ctx.user.id)
-    .eq('assignment_type', 'individual')
-
-  if (error) return { success: false, error: error.message }
-  return { success: true }
 }
 
 /**

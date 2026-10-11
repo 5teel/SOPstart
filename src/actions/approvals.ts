@@ -88,7 +88,7 @@ export interface ApprovalHistoryRow {
 export async function setApprovalChain(
   category: string,
   steps: ChainStep[],
-): Promise<{ success: true } | { error: string }> {
+): Promise<{ success: true; logged: boolean } | { error: string }> {
   const ctx = await requireAdmin()
   if ('error' in ctx) return { error: ctx.error }
 
@@ -136,7 +136,13 @@ export async function setApprovalChain(
     console.error('[setApprovalChain] upsert error', error)
     return { error: error.message }
   }
-  return { success: true }
+  const rec = await recordDecision({
+    kind: 'settings_change',
+    subject: { kind: 'approval_chain', id: null },
+    summary: 'Changed who approves SOPs',
+    details: { setting: 'approval_chain', category: parsed.data.category, steps: parsed.data.steps },
+  })
+  return { success: true, logged: rec.ok }
 }
 
 // ---------------------------------------------------------------------------

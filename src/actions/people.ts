@@ -3,9 +3,10 @@
 /**
  * The reads behind the People board's authority marks: the approval chains and who supervises
  * whom. Admin and safety manager only (the People section's audience); session client under RLS,
- * filtered to the session organisation. Read-only: nothing here grants anything.
+ * filtered to the session organisation. setSupervision is the one write; it logs to the ledger.
  */
 import { requireAdminContext } from '@/lib/auth/guards'
+import { recordDecision } from '@/lib/decisions/record'
 import type { ChainStep } from '@/lib/governance/approvals'
 
 export interface PeopleAuthorityData {
@@ -35,7 +36,7 @@ export async function getPeopleAuthorityData(): Promise<PeopleAuthorityData | { 
  * Link or unlink a supervisor and a worker (the rows supervisor sign-off is gated on). Admin only,
  * as the 00002 insert/delete policies are; both people must be members of the session organisation.
  */
-export async function setSupervision(input: { supervisorId: string; workerId: string; linked: boolean }): Promise<{ success: true } | { error: string }> {
+export async function setSupervision(input: { supervisorId: string; workerId: string; linked: boolean }): Promise<{ success: true; logged?: boolean } | { error: string }> {
   const ctx = await requireAdminContext()
   if ('error' in ctx) return { error: ctx.error }
   if (ctx.role !== 'admin') return { error: 'Only an admin can link supervisors.' }
@@ -70,5 +71,13 @@ export async function setSupervision(input: { supervisorId: string; workerId: st
         .eq('worker_id', workerId)
         .select('id')
   if (res.error) return { error: "That didn't save." }
-  return { success: true }
+  // No row changed (already linked, or nothing to unlink): no decision to record.
+  if (!res.data || res.data.length === 0) return { success: true }
+  const rec = await recordDecision({
+    kind: linked ? 'supervisor_linked' : 'supervisor_unlinked',
+    subject: { kind: 'member', id: workerId },
+    summary: linked ? 'Linked a supervisor to a person' : 'Unlinked a supervisor from a person',
+    details: { supervisorId },
+  })
+  return { success: true, logged: rec.ok }
 }

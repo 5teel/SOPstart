@@ -25,7 +25,10 @@ import { fileURLToPath } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
-const MIGRATION_FILES = [path.join(ROOT, 'supabase/migrations/00074_requests_notifications_objectives.sql')]
+const MIGRATION_FILES = [
+  path.join(ROOT, 'supabase/migrations/00074_requests_notifications_objectives.sql'),
+  path.join(ROOT, 'supabase/migrations/00076_ledger_every_action.sql'),
+]
 
 for (const f of ['.env.local', '.env']) {
   try {
@@ -155,9 +158,12 @@ const KINDS = [
   'ai_finding_cleared', 'cadence_change', 'ai_field_write',
   'role_change', 'member_invited', 'member_removed',
   'request_accepted', 'request_declined', 'objective_set', 'objective_cleared', 'objective_confirmed',
+  'supervisor_linked', 'supervisor_unlinked', 'department_change', 'access_change',
+  'sop_created', 'sop_edited', 'sop_deleted', 'sop_version', 'standard_change',
+  'site_change', 'settings_change',
 ]
 await assertSql(
-  'decisions_kind_check accepts all 23 kinds',
+  'decisions_kind_check accepts all 34 kinds',
   `SELECT pg_get_constraintdef(oid) AS def FROM pg_constraint
     WHERE conrelid = 'public.decisions'::regclass AND conname = 'decisions_kind_check'`,
   (rows) => {

@@ -161,7 +161,7 @@ test.describe('CR-01 — deleteSop guard ordering (source-contract)', () => {
     const nextExport = content.indexOf('\nexport ', fnStart + 1)
     const fnBody = content.slice(fnStart, nextExport === -1 ? undefined : nextExport)
 
-    const fetchIdx = fnBody.indexOf("select('id, organisation_id')")
+    const fetchIdx = fnBody.indexOf("select('id, organisation_id, title')")
     const mismatchIdx = fnBody.indexOf('organisation_id !== ctx.organisationId')
     const noOrgIdx = fnBody.indexOf('if (!ctx.organisationId)')
     const firstDeleteIdx = fnBody.indexOf("from('sop_sections').delete")

@@ -86,7 +86,7 @@ test.describe('retire: the assign screen and its writers (60-17)', () => {
     expect(read('tests/phase56/decision-writers-sweep.spec.ts')).not.toMatch(names)
     // the surviving sop_assignments writers stay registered: no assignment is written without a ledger row or an allow reason
     const reg = read('scripts/decision-writers.json')
-    for (const fn of ['selfAddSop', 'selfRemoveSop', 'askToDoSopCore', 'notifyAssignedWorkers', 'deleteSop']) expect(reg, fn).toContain(`"function": "${fn}"`)
+    for (const fn of ['askToDoSopCore', 'notifyAssignedWorkers', 'deleteSop']) expect(reg, fn).toContain(`"function": "${fn}"`)
   })
   test('no src file links to an assign address (regex anchored on an href or a router call plus the admin SOP path, so the proxy redirect source is not counted)', () => {
     const link = /(href=|href:|\.push\(|\.replace\(|redirect\()[^\n]*\/admin\/sops\/[^\n]*\/assign/

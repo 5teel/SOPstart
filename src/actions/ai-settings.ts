@@ -10,6 +10,7 @@
  */
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getSessionContext } from '@/lib/auth/session-context'
+import { recordDecision } from '@/lib/decisions/record'
 import { AI_MODELS, type AiModelKey } from '@/lib/ai/registry'
 import { AI_MODEL_OPTIONS } from '@/lib/ai/model-options'
 import { ORG_CONFIGURABLE_KEYS, getOrgAiModels, type OrgAiModels } from '@/lib/ai/org-settings'
@@ -42,7 +43,7 @@ export async function getAiSettings(): Promise<{ settings: OrgAiModels } | { err
 export async function setAiModelSetting(
   useCase: string,
   modelId: string | null,
-): Promise<{ ok: true } | { error: string }> {
+): Promise<{ ok: true; logged: boolean } | { error: string }> {
   const ctx = await requireAdmin()
   if ('error' in ctx) return ctx
 
@@ -64,7 +65,7 @@ export async function setAiModelSetting(
       .eq('organisation_id', ctx.organisationId)
       .eq('use_case', key)
     if (error) return { error: error.message }
-    return { ok: true }
+    return { ok: true, logged: await logModelSetting(key, null) }
   }
 
   if (!AI_MODEL_OPTIONS[key].some((o) => o.id === modelId)) {
@@ -82,5 +83,15 @@ export async function setAiModelSetting(
     { onConflict: 'organisation_id,use_case' },
   )
   if (error) return { error: error.message }
-  return { ok: true }
+  return { ok: true, logged: await logModelSetting(key, modelId) }
+}
+
+async function logModelSetting(useCase: AiModelKey, modelId: string | null): Promise<boolean> {
+  const rec = await recordDecision({
+    kind: 'settings_change',
+    subject: { kind: 'ai_model_setting', id: null },
+    summary: modelId === null ? 'Reset an AI model to the default' : 'Changed an AI model',
+    details: { setting: 'ai_model', use_case: useCase, model_id: modelId },
+  })
+  return rec.ok
 }

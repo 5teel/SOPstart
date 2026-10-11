@@ -473,7 +473,14 @@ export async function regenerateInviteCode() {
     .eq('id', organisationId)
 
   if (error) return { error: 'Failed to regenerate code' }
-  return { code: newCode }
+  // The code itself is a join secret: never in the ledger.
+  const rec = await recordDecision({
+    kind: 'settings_change',
+    subject: { kind: 'organisation', id: organisationId },
+    summary: 'Made a new invite code',
+    details: { setting: 'invite_code' },
+  })
+  return { code: newCode, logged: rec.ok }
 }
 
 // ─────────────────────────────────────────────

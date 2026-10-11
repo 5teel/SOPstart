@@ -36,6 +36,7 @@
 import { z } from 'zod'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireAdminContext } from '@/lib/auth/guards'
+import { recordDecision } from '@/lib/decisions/record'
 import { resolveSopAccess } from '@/lib/org-model/resolve-sop-access'
 import { ensureSopCollectionsForOrg } from '@/lib/org-model/sop-collections'
 import type { SubjectType } from '@/types/org-model'
@@ -162,7 +163,7 @@ export async function listGrants(): Promise<{ grants: GrantRow[] } | { error: st
 
 export async function createGrant(
   input: z.input<typeof CreateGrantInput>
-): Promise<{ grant: GrantRow } | { error: string }> {
+): Promise<{ grant: GrantRow; logged: boolean } | { error: string }> {
   const parsed = CreateGrantInput.safeParse(input)
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? 'Invalid input' }
 
@@ -234,7 +235,19 @@ export async function createGrant(
     return { error: `Grant created but materialization failed: ${materialized.error}` }
   }
 
+  // An identical grant that already existed (double-click) is not a new decision.
+  const rec = data
+    ? await recordDecision({
+        kind: 'access_change',
+        subject: { kind: 'access_grant', id: row.id },
+        sopId: sopId ?? null,
+        summary: 'Gave access to SOPs',
+        details: { action: 'grant', subject_type: subjectType, subject_id: subjectId, collection_id: collectionId, sop_id: sopId },
+      })
+    : { ok: false }
+
   return {
+    logged: rec.ok,
     grant: {
       id: row.id,
       subjectType: row.subject_type,
@@ -252,7 +265,7 @@ export async function createGrant(
 // exclusion rows), then re-materializes the affected collection.
 // ---------------------------------------------------------------------------
 
-export async function revokeGrant(grantId: string): Promise<{ success: true } | { error: string }> {
+export async function revokeGrant(grantId: string): Promise<{ success: true; logged: boolean } | { error: string }> {
   if (!grantId) return { error: 'grantId required' }
 
   const ctx = await requireAdmin()
@@ -284,7 +297,14 @@ export async function revokeGrant(grantId: string): Promise<{ success: true } | 
     return { error: `Grant revoked but materialization failed: ${materialized.error}` }
   }
 
-  return { success: true }
+  const rec = await recordDecision({
+    kind: 'access_change',
+    subject: { kind: 'access_grant', id: grantId },
+    sopId: grantRow.sop_id ?? null,
+    summary: 'Removed access to SOPs',
+    details: { action: 'revoke', collection_id: grantRow.collection_id, sop_id: grantRow.sop_id },
+  })
+  return { success: true, logged: rec.ok }
 }
 
 // ---------------------------------------------------------------------------

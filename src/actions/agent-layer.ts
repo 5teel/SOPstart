@@ -18,6 +18,7 @@
 
 import { approveProposal, declineProposal } from '@/lib/ai-fields/agent-proposals'
 import { requireAdminContext } from '@/lib/auth/guards'
+import { recordDecision } from '@/lib/decisions/record'
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -165,7 +166,7 @@ export async function getAgentDashboardData(): Promise<
 
 export async function approveProposalAction(
   proposalId: string
-): Promise<{ success: true } | { error: string }> {
+): Promise<{ success: true; logged: boolean } | { error: string }> {
   if (!proposalId) return { error: 'proposalId required' }
   const ctx = await requireAdmin()
   if ('error' in ctx) return { error: ctx.error }
@@ -173,16 +174,21 @@ export async function approveProposalAction(
 
   try {
     await approveProposal(ctx.organisationId, proposalId)
-    return { success: true }
   } catch (e) {
     console.error('[approveProposalAction] error', e)
     return { error: e instanceof Error ? e.message : 'Failed to approve proposal' }
   }
+  const rec = await recordDecision({
+    kind: 'approve',
+    subject: { kind: 'agent_proposal', id: proposalId },
+    summary: 'Approved an assistant suggestion',
+  })
+  return { success: true, logged: rec.ok }
 }
 
 export async function declineProposalAction(
   proposalId: string
-): Promise<{ success: true } | { error: string }> {
+): Promise<{ success: true; logged: boolean } | { error: string }> {
   if (!proposalId) return { error: 'proposalId required' }
   const ctx = await requireAdmin()
   if ('error' in ctx) return { error: ctx.error }
@@ -190,9 +196,14 @@ export async function declineProposalAction(
 
   try {
     await declineProposal(ctx.organisationId, proposalId)
-    return { success: true }
   } catch (e) {
     console.error('[declineProposalAction] error', e)
     return { error: e instanceof Error ? e.message : 'Failed to decline proposal' }
   }
+  const rec = await recordDecision({
+    kind: 'reject',
+    subject: { kind: 'agent_proposal', id: proposalId },
+    summary: 'Declined an assistant suggestion',
+  })
+  return { success: true, logged: rec.ok }
 }

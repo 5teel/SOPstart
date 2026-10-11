@@ -26,6 +26,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireAdminContext } from '@/lib/auth/guards'
 import { materializeSopAccess } from '@/actions/grants'
+import { recordDecision } from '@/lib/decisions/record'
 import { DEPT_COLOURS, deriveDepartmentCode } from '@/lib/site/departments'
 import type { Department, DepartmentWithCounts } from '@/types/sop'
 
@@ -177,7 +178,7 @@ export async function listDepartments(): Promise<DepartmentWithCounts[]> {
 
 export async function createDepartment(
   input: z.input<typeof CreateDepartmentInput>
-): Promise<{ department: Department } | { error: string }> {
+): Promise<{ department: Department; logged: boolean } | { error: string }> {
   const parsed = CreateDepartmentInput.safeParse(input)
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? 'Invalid input' }
 
@@ -216,7 +217,13 @@ export async function createDepartment(
     console.error('[createDepartment] insert error', error)
     return { error: error?.message ?? 'Failed to create department' }
   }
-  return { department: data as unknown as Department }
+  const rec = await recordDecision({
+    kind: 'department_change',
+    subject: { kind: 'department', id: (data as { id: string }).id },
+    summary: 'Created a department',
+    details: { action: 'create', name: parsed.data.name, code },
+  })
+  return { department: data as unknown as Department, logged: rec.ok }
 }
 
 // ---------------------------------------------------------------------------
@@ -225,7 +232,7 @@ export async function createDepartment(
 
 export async function updateDepartment(
   input: z.input<typeof UpdateDepartmentInput>
-): Promise<{ department: Department } | { error: string }> {
+): Promise<{ department: Department; logged: boolean } | { error: string }> {
   const parsed = UpdateDepartmentInput.safeParse(input)
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? 'Invalid input' }
 
@@ -253,7 +260,14 @@ export async function updateDepartment(
     console.error('[updateDepartment] update error', error)
     return { error: error?.message ?? 'Failed to update department' }
   }
-  return { department: data as unknown as Department }
+  const changed = Object.keys(updates).filter((k) => k !== 'updated_at')
+  const rec = await recordDecision({
+    kind: 'department_change',
+    subject: { kind: 'department', id: parsed.data.id },
+    summary: parsed.data.name !== undefined ? 'Renamed a department' : 'Changed a department',
+    details: { action: 'update', changed, ...(parsed.data.name !== undefined ? { name: parsed.data.name } : {}) },
+  })
+  return { department: data as unknown as Department, logged: rec.ok }
 }
 
 // ---------------------------------------------------------------------------
@@ -263,7 +277,7 @@ export async function updateDepartment(
 export async function archiveDepartment(
   departmentId: string
 ): Promise<
-  { success: true } | { error: string; machines?: number; sops?: number; people?: number; blocks?: number }
+  { success: true; logged: boolean } | { error: string; machines?: number; sops?: number; people?: number; blocks?: number }
 > {
   if (!departmentId) return { error: 'departmentId required' }
 
@@ -320,7 +334,13 @@ export async function archiveDepartment(
     console.error('[archiveDepartment] update error', error)
     return { error: error.message }
   }
-  return { success: true }
+  const rec = await recordDecision({
+    kind: 'department_change',
+    subject: { kind: 'department', id: departmentId },
+    summary: 'Archived a department',
+    details: { action: 'archive' },
+  })
+  return { success: true, logged: rec.ok }
 }
 
 // ---------------------------------------------------------------------------
@@ -331,7 +351,7 @@ export async function archiveDepartment(
 export async function setDepartmentOwner(
   departmentId: string,
   userId: string | null
-): Promise<{ success: true } | { error: string }> {
+): Promise<{ success: true; logged: boolean } | { error: string }> {
   if (!departmentId) return { error: 'departmentId required' }
 
   const ctx = await requireAdmin()
@@ -364,7 +384,13 @@ export async function setDepartmentOwner(
     console.error('[setDepartmentOwner] update error', error)
     return { error: error.message }
   }
-  return { success: true }
+  const rec = await recordDecision({
+    kind: 'department_change',
+    subject: { kind: 'department', id: departmentId },
+    summary: "Changed a department's owner",
+    details: { action: 'owner', owner_user_id: userId },
+  })
+  return { success: true, logged: rec.ok }
 }
 
 // ---------------------------------------------------------------------------
@@ -414,7 +440,7 @@ async function callerOrgId(admin: any, ctx: AdminCtx): Promise<string | null> {
 export async function assignMemberDepartments(
   memberId: string,
   departmentIds: string[]
-): Promise<{ success: true } | { error: string }> {
+): Promise<{ success: true; logged: boolean } | { error: string }> {
   if (!memberId) return { error: 'memberId required' }
 
   const ctx = await requireAdmin()
@@ -461,7 +487,13 @@ export async function assignMemberDepartments(
     }
   }
 
-  return { success: true }
+  const rec = await recordDecision({
+    kind: 'department_change',
+    subject: { kind: 'member', id: memberId },
+    summary: "Changed a person's departments",
+    details: { action: 'member_departments', department_ids: validIds },
+  })
+  return { success: true, logged: rec.ok }
 }
 
 // ---------------------------------------------------------------------------
@@ -472,7 +504,7 @@ export async function assignBlockDepartments(
   blockId: string,
   departmentIds: string[],
   allDepartments: boolean = false
-): Promise<{ success: true } | { error: string }> {
+): Promise<{ success: true; logged: boolean } | { error: string }> {
   if (!blockId) return { error: 'blockId required' }
 
   const ctx = await requireAdmin()
@@ -510,8 +542,8 @@ export async function assignBlockDepartments(
     .eq('id', blockId)
   if (flagErr) return { error: flagErr.message }
 
+  const validIds = allDepartments ? [] : await orgScopedDeptIds(admin, orgId, departmentIds)
   if (!allDepartments) {
-    const validIds = await orgScopedDeptIds(admin, orgId, departmentIds)
     if (validIds.length > 0) {
       const rows = validIds.map((department_id: string) => ({ block_id: blockId, department_id }))
       const { error: insErr } = await admin
@@ -521,7 +553,13 @@ export async function assignBlockDepartments(
     }
   }
 
-  return { success: true }
+  const rec = await recordDecision({
+    kind: 'department_change',
+    subject: { kind: 'library_item', id: blockId },
+    summary: "Changed a library item's departments",
+    details: { action: 'item_departments', all_departments: allDepartments, department_ids: validIds },
+  })
+  return { success: true, logged: rec.ok }
 }
 
 // ---------------------------------------------------------------------------
@@ -541,7 +579,7 @@ export async function assignSopDepartments(
   sopId: string,
   departmentIds: string[],
   allDepartments: boolean = false
-): Promise<{ success: true } | { error: string }> {
+): Promise<{ success: true; logged: boolean } | { error: string }> {
   if (!sopId) return { error: 'sopId required' }
 
   const ctx = await requireAdmin()
@@ -588,8 +626,8 @@ export async function assignSopDepartments(
     .eq('id', sopId)
   if (flagErr) return { error: flagErr.message }
 
+  const validIds = allDepartments ? [] : await orgScopedDeptIds(admin, orgId, departmentIds)
   if (!allDepartments) {
-    const validIds = await orgScopedDeptIds(admin, orgId, departmentIds)
     if (validIds.length > 0) {
       const rows = validIds.map((department_id: string) => ({
         organisation_id: orgId,
@@ -610,5 +648,12 @@ export async function assignSopDepartments(
   const materialized = await materializeSopAccess(sopId)
   if ('error' in materialized) return { error: `Departments assigned but materialization failed: ${materialized.error}` }
 
-  return { success: true }
+  const rec = await recordDecision({
+    kind: 'department_change',
+    subject: { kind: 'sop', id: sopId },
+    sopId,
+    summary: "Changed a SOP's departments",
+    details: { action: 'sop_departments', all_departments: allDepartments, department_ids: validIds },
+  })
+  return { success: true, logged: rec.ok }
 }

@@ -177,7 +177,7 @@ export async function setSopOwner(
 export async function setRefresherInterval(
   sopId: string,
   months: number | null,
-): Promise<{ success: true } | { error: string }> {
+): Promise<{ success: true; logged: boolean } | { error: string }> {
   if (!sopId) return { error: 'sopId required' }
 
   const ctx = await requireAdmin()
@@ -210,7 +210,14 @@ export async function setRefresherInterval(
   if (!updated || updated.length === 0) {
     return { error: 'SOP not found' }
   }
-  return { success: true }
+  const rec = await recordDecision({
+    kind: 'settings_change',
+    subject: { kind: 'sop', id: sopId },
+    sopId,
+    summary: months === null ? 'Turned off refresher training for a SOP' : 'Changed how often a SOP is retrained',
+    details: { setting: 'refresher_interval', months },
+  })
+  return { success: true, logged: rec.ok }
 }
 
 // ---------------------------------------------------------------------------

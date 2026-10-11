@@ -10,7 +10,7 @@
  */
 import type { DecisionKind } from '@/lib/decisions/shape'
 
-export type DecisionGroupKey = 'all' | 'approvals' | 'signoffs' | 'ownership' | 'requests' | 'publishing' | 'reviews' | 'ai' | 'other'
+export type DecisionGroupKey = 'all' | 'approvals' | 'signoffs' | 'ownership' | 'requests' | 'publishing' | 'changes' | 'reviews' | 'people' | 'setup' | 'ai' | 'other'
 
 export const DECISION_GROUPS: ReadonlyArray<{ key: DecisionGroupKey; label: string }> = [
   { key: 'all', label: 'All' },
@@ -19,7 +19,10 @@ export const DECISION_GROUPS: ReadonlyArray<{ key: DecisionGroupKey; label: stri
   { key: 'ownership', label: 'Ownership' },
   { key: 'requests', label: 'Requests' },
   { key: 'publishing', label: 'Publishing' },
+  { key: 'changes', label: 'SOP changes' },
   { key: 'reviews', label: 'Reviews' },
+  { key: 'people', label: 'People' },
+  { key: 'setup', label: 'Site & settings' },
   { key: 'ai', label: 'AI' },
   { key: 'other', label: 'Other' },
 ]
@@ -30,9 +33,12 @@ export const KIND_GROUPS: Record<Exclude<DecisionGroupKey, 'all'>, ReadonlyArray
   ownership: ['owner_change', 'assign', 'unassign'],
   requests: ['request_accepted', 'request_declined'],
   publishing: ['publish'],
+  changes: ['sop_created', 'sop_edited', 'sop_deleted', 'sop_version', 'standard_change'],
   reviews: ['review', 'cadence_change'],
   ai: ['ai_finding_cleared', 'ai_field_write', 'verify', 'verify_withdrawn'],
-  other: ['observation', 'role_change', 'member_invited', 'member_removed', 'objective_set', 'objective_cleared', 'objective_confirmed'],
+  people: ['role_change', 'member_invited', 'member_removed', 'supervisor_linked', 'supervisor_unlinked', 'department_change'],
+  setup: ['access_change', 'site_change', 'settings_change'],
+  other: ['observation', 'objective_set', 'objective_cleared', 'objective_confirmed'],
 }
 
 export const KIND_WORDS: Record<DecisionKind, string> = {
@@ -61,6 +67,17 @@ export const KIND_WORDS: Record<DecisionKind, string> = {
   objective_set: 'Set an objective',
   objective_cleared: 'Removed an objective',
   objective_confirmed: 'Confirmed an objective',
+  supervisor_linked: 'Linked a supervisor',
+  supervisor_unlinked: 'Unlinked a supervisor',
+  department_change: 'Changed departments',
+  access_change: 'Changed SOP access',
+  sop_created: 'Created a SOP',
+  sop_edited: 'Edited a SOP',
+  sop_deleted: 'Deleted a SOP',
+  sop_version: 'Started a new version',
+  standard_change: 'Changed a standard',
+  site_change: 'Changed the site map',
+  settings_change: 'Changed a setting',
 }
 
 /**

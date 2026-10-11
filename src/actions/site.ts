@@ -33,6 +33,7 @@ import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { requireAdminContext } from '@/lib/auth/guards'
+import { recordDecision } from '@/lib/decisions/record'
 import {
   SCENE_MAX_BYTES,
   upsertSiteMachineSchema,
@@ -207,6 +208,21 @@ export async function createSceneUploadUrl(
 
 export async function upsertSiteLayout(
   input: { id: string; ext: string; name?: string }
+): Promise<{ layout: SiteLayout; logged: boolean } | { error: string }> {
+  const saved = await saveSiteLayout(input)
+  if ('error' in saved) return saved
+  const rec = await recordDecision({
+    kind: 'site_change',
+    subject: { kind: 'site_layout', id: saved.layout.id },
+    summary: 'Uploaded a site picture',
+    details: { action: 'layout' },
+  })
+  return { ...saved, logged: rec.ok }
+}
+
+// Unlogged core: applySitePreset records one row for the whole template.
+async function saveSiteLayout(
+  input: { id: string; ext: string; name?: string }
 ): Promise<{ layout: SiteLayout } | { error: string }> {
   const ctx = await requireAdminContext()
   if ('error' in ctx) return { error: ctx.error }
@@ -274,15 +290,32 @@ export async function upsertSiteLayout(
 // 4. upsertSiteMachine — polygon must lie inside the layout's scene (D-02).
 // ---------------------------------------------------------------------------
 
+type SiteMachineInput = {
+  id?: string
+  siteLayoutId: string
+  name: string
+  departmentId: string | null
+  polygon: [number, number][]
+  sort?: number
+}
+
 export async function upsertSiteMachine(
-  input: {
-    id?: string
-    siteLayoutId: string
-    name: string
-    departmentId: string | null
-    polygon: [number, number][]
-    sort?: number
-  }
+  input: SiteMachineInput
+): Promise<{ machine: SiteMachine; logged: boolean } | { error: string }> {
+  const saved = await saveSiteMachine(input)
+  if ('error' in saved) return saved
+  const rec = await recordDecision({
+    kind: 'site_change',
+    subject: { kind: 'machine', id: saved.machine.id },
+    summary: input.id ? 'Changed a machine' : 'Added a machine',
+    details: { action: input.id ? 'machine_update' : 'machine_create', name: saved.machine.name, department_id: saved.machine.department_id },
+  })
+  return { ...saved, logged: rec.ok }
+}
+
+// Unlogged core: applySitePreset draws ~20 machines under one ledger row.
+async function saveSiteMachine(
+  input: SiteMachineInput
 ): Promise<{ machine: SiteMachine } | { error: string }> {
   const ctx = await requireAdminContext()
   if ('error' in ctx) return { error: ctx.error }
@@ -378,7 +411,7 @@ export async function upsertSiteMachine(
 // 5. deleteSiteMachine — sop_machines links go by FK cascade (D-13).
 // ---------------------------------------------------------------------------
 
-export async function deleteSiteMachine(machineId: string): Promise<{ success: true } | { error: string }> {
+export async function deleteSiteMachine(machineId: string): Promise<{ success: true; logged: boolean } | { error: string }> {
   const ctx = await requireAdminContext()
   if ('error' in ctx) return { error: ctx.error }
   const orgId = ctx.organisationId
@@ -398,7 +431,13 @@ export async function deleteSiteMachine(machineId: string): Promise<{ success: t
     return { error: error.message }
   }
   if (!deleted || deleted.length === 0) return { error: 'Machine not found' }
-  return { success: true }
+  const rec = await recordDecision({
+    kind: 'site_change',
+    subject: { kind: 'machine', id: machineId },
+    summary: 'Removed a machine',
+    details: { action: 'machine_delete' },
+  })
+  return { success: true, logged: rec.ok }
 }
 
 // ---------------------------------------------------------------------------
@@ -408,7 +447,7 @@ export async function deleteSiteMachine(machineId: string): Promise<{ success: t
 
 export async function setSopMachines(
   input: { sopId: string; machineIds: string[] }
-): Promise<{ machineIds: string[] } | { error: string }> {
+): Promise<{ machineIds: string[]; logged: boolean } | { error: string }> {
   const ctx = await requireAdminContext()
   if ('error' in ctx) return { error: ctx.error }
   const orgId = ctx.organisationId
@@ -468,7 +507,14 @@ export async function setSopMachines(
     return { error: pruneErr.message }
   }
 
-  return { machineIds: validIds }
+  const rec = await recordDecision({
+    kind: 'site_change',
+    subject: { kind: 'sop', id: sopId },
+    sopId,
+    summary: "Changed a SOP's machines",
+    details: { action: 'sop_machines', machine_ids: validIds },
+  })
+  return { machineIds: validIds, logged: rec.ok }
 }
 
 // ---------------------------------------------------------------------------
@@ -588,7 +634,7 @@ export async function listSiteHealthForOrg(): Promise<AdminSiteFloor | { error: 
 //    name and draws every machine through upsertSiteMachine.
 // ---------------------------------------------------------------------------
 
-export async function applySitePreset(presetId: string): Promise<{ layoutId: string } | { error: string }> {
+export async function applySitePreset(presetId: string): Promise<{ layoutId: string; logged: boolean } | { error: string }> {
   const ctx = await requireAdminContext()
   if ('error' in ctx) return { error: ctx.error }
   const orgId = ctx.organisationId
@@ -630,7 +676,7 @@ export async function applySitePreset(presetId: string): Promise<{ layoutId: str
     return { error: 'Could not save the template picture' }
   }
 
-  const recorded = await upsertSiteLayout({ id: layoutId, ext: 'jpg', name: preset.name })
+  const recorded = await saveSiteLayout({ id: layoutId, ext: 'jpg', name: preset.name })
   if ('error' in recorded) return recorded
   const { scene_width: w, scene_height: h } = recorded.layout
   if (!w || !h) return { error: 'Could not read the template picture' }
@@ -681,7 +727,7 @@ export async function applySitePreset(presetId: string): Promise<{ layoutId: str
   // ponytail: sequential, ~20 machines; a failure part-way leaves a usable
   // site with the machines drawn so far, which the admin can finish by hand.
   for (const [i, m] of preset.machines.entries()) {
-    const result = await upsertSiteMachine({
+    const result = await saveSiteMachine({
       siteLayoutId: layoutId,
       name: m.name,
       departmentId: deptIds[m.dept] ?? null,
@@ -691,5 +737,11 @@ export async function applySitePreset(presetId: string): Promise<{ layoutId: str
     if ('error' in result) return { error: `${m.name}: ${result.error}` }
   }
 
-  return { layoutId }
+  const rec = await recordDecision({
+    kind: 'site_change',
+    subject: { kind: 'site_layout', id: layoutId },
+    summary: 'Set up the site from a template',
+    details: { action: 'preset', preset: preset.id, machines: preset.machines.length, departments: deptIds.length },
+  })
+  return { layoutId, logged: rec.ok }
 }

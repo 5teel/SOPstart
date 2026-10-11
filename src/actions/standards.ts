@@ -8,8 +8,8 @@
  * the session only; no export accepts one. Every query filters by it, and the
  * standard and the target are both checked in the org before an attachment is
  * written (T-56-04). The session client carries the admin write RLS policies
- * (00069), so no service-role client is used. Managing a label is not a
- * decision, so nothing is written to the ledger.
+ * (00069), so no service-role client is used. Every change is a person's action
+ * and writes one standard_change ledger row after it lands (ADR-0008).
  *
  * Async exports only (CLAUDE.md 2026-06-27). The tables are not all in
  * database.types.ts yet, so the client is used through an untyped view, as
@@ -17,6 +17,7 @@
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { requireAdminContext } from '@/lib/auth/guards'
+import { recordDecision } from '@/lib/decisions/record'
 import {
   createStandardSchema,
   removeStandardSchema,
@@ -64,7 +65,7 @@ export async function listStandards(): Promise<{ standards: StandardRow[] } | { 
 
 export async function createStandard(
   input: { name: string }
-): Promise<{ standard: { id: string; name: string } } | { error: string }> {
+): Promise<{ standard: { id: string; name: string }; logged: boolean } | { error: string }> {
   const ctx = await requireAdminContext()
   if ('error' in ctx) return { error: ctx.error }
   const orgId = ctx.organisationId
@@ -84,12 +85,19 @@ export async function createStandard(
     console.error('[createStandard] insert error', error)
     return { error: error.message }
   }
-  return { standard: data as { id: string; name: string } }
+  const standard = data as { id: string; name: string }
+  const rec = await recordDecision({
+    kind: 'standard_change',
+    subject: { kind: 'standard', id: standard.id },
+    summary: 'Added a standard',
+    details: { name: standard.name },
+  })
+  return { standard, logged: rec.ok }
 }
 
 export async function renameStandard(
   input: { standardId: string; name: string }
-): Promise<{ standard: { id: string; name: string } } | { error: string }> {
+): Promise<{ standard: { id: string; name: string }; logged: boolean } | { error: string }> {
   const ctx = await requireAdminContext()
   if ('error' in ctx) return { error: ctx.error }
   const orgId = ctx.organisationId
@@ -112,12 +120,18 @@ export async function renameStandard(
   }
   const row = ((data ?? []) as Array<{ id: string; name: string }>)[0]
   if (!row) return { error: 'Standard not found' }
-  return { standard: row }
+  const rec = await recordDecision({
+    kind: 'standard_change',
+    subject: { kind: 'standard', id: row.id },
+    summary: 'Renamed a standard',
+    details: { name: row.name },
+  })
+  return { standard: row, logged: rec.ok }
 }
 
 export async function removeStandard(
   input: { standardId: string }
-): Promise<{ removed: true; detached: number } | { error: string }> {
+): Promise<{ removed: true; detached: number; logged: boolean } | { error: string }> {
   const ctx = await requireAdminContext()
   if ('error' in ctx) return { error: ctx.error }
   const orgId = ctx.organisationId
@@ -150,7 +164,13 @@ export async function removeStandard(
     return { error: error.message }
   }
   if (((data ?? []) as unknown[]).length === 0) return { error: 'Standard not found' }
-  return { removed: true, detached: count ?? 0 }
+  const rec = await recordDecision({
+    kind: 'standard_change',
+    subject: { kind: 'standard', id: standardId },
+    summary: 'Removed a standard',
+    details: { detached: count ?? 0 },
+  })
+  return { removed: true, detached: count ?? 0, logged: rec.ok }
 }
 
 export async function getSopStandardsPanel(sopId: string): Promise<StandardsPanel | { error: string }> {
@@ -253,7 +273,7 @@ export async function getSopStandardsPanel(sopId: string): Promise<StandardsPane
 
 export async function setStandardAttachment(
   input: { standardId: string; target: { kind: 'sop' | 'section' | 'step'; id: string }; attached: boolean }
-): Promise<{ ok: true } | { error: string }> {
+): Promise<{ ok: true; logged?: boolean } | { error: string }> {
   const ctx = await requireAdminContext()
   if ('error' in ctx) return { error: ctx.error }
   const orgId = ctx.organisationId
@@ -308,7 +328,7 @@ export async function setStandardAttachment(
   } else {
     const { data: stepRow, error: stepErr } = await db
       .from('sop_focus_steps')
-      .select('id')
+      .select('id, sop_id')
       .eq('id', target.id)
       .eq('organisation_id', orgId)
       .maybeSingle()
@@ -317,7 +337,18 @@ export async function setStandardAttachment(
       return { error: stepErr.message }
     }
     if (!stepRow) return { error: 'Step not found in your organisation' }
+    sopIdToCheck = (stepRow as { sop_id: string }).sop_id
   }
+  const record = () =>
+    recordDecision({
+      kind: 'standard_change',
+      subject: { kind: 'standard', id: standardId },
+      sopId: sopIdToCheck,
+      summary: attached
+        ? target.kind === 'sop' ? 'Attached a standard to a SOP' : target.kind === 'section' ? 'Attached a standard to a section' : 'Attached a standard to a step'
+        : target.kind === 'sop' ? 'Detached a standard from a SOP' : target.kind === 'section' ? 'Detached a standard from a section' : 'Detached a standard from a step',
+      details: { target_kind: target.kind, target_id: target.id, attached },
+    })
 
   const column = target.kind === 'sop' ? 'sop_id' : target.kind === 'section' ? 'section_id' : 'focus_step_id'
 
@@ -333,18 +364,25 @@ export async function setStandardAttachment(
       console.error('[setStandardAttachment] insert error', error)
       return { error: error.message }
     }
-    return { ok: true }
+    // Already attached wrote nothing, so there is nothing to record.
+    if (error) return { ok: true }
+    const rec = await record()
+    return { ok: true, logged: rec.ok }
   }
 
-  const { error } = await db
+  const { data: gone, error } = await db
     .from('standard_attachments')
     .delete()
     .eq('standard_id', standardId)
     .eq(column, target.id)
     .eq('organisation_id', orgId)
+    .select('id')
   if (error) {
     console.error('[setStandardAttachment] delete error', error)
     return { error: error.message }
   }
-  return { ok: true }
+  // Not attached wrote nothing, so there is nothing to record.
+  if (((gone ?? []) as unknown[]).length === 0) return { ok: true }
+  const rec = await record()
+  return { ok: true, logged: rec.ok }
 }

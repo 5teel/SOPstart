@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getSessionContext } from '@/lib/auth/session-context'
 import { requireAdminContext } from '@/lib/auth/guards'
+import { recordDecision } from '@/lib/decisions/record'
 import { PUBLISHED_MSG } from '@/lib/sop/editable'
 import { assignSopDepartments } from '@/actions/departments'
 import { uploadSessionSchema, getSourceFileType, isBlockedMacroFile } from '@/lib/validators/sop'
@@ -12,7 +13,7 @@ import { isValidCategorySlug } from '@/lib/sop-categories'
 
 export async function createUploadSession(
   files: { name: string; size: number; type: string }[]
-): Promise<{ sessions: UploadSession[] } | { error: string }> {
+): Promise<{ sessions: UploadSession[]; logged: boolean } | { error: string }> {
   const result = uploadSessionSchema.safeParse({ files })
   if (!result.success) {
     return { error: result.error.issues[0]?.message ?? 'Invalid files' }
@@ -29,6 +30,7 @@ export async function createUploadSession(
 
   const admin = createAdminClient()
   const sessions: UploadSession[] = []
+  let logged = true
 
   for (const file of result.data.files) {
     // Reject macro-enabled Office files before any parsing library is invoked
@@ -82,6 +84,15 @@ export async function createUploadSession(
       status: 'queued',
     })
 
+    const rec = await recordDecision({
+      kind: 'sop_created',
+      subject: { kind: 'sop', id: sop.id },
+      sopId: sop.id,
+      summary: 'Created a SOP from an uploaded file',
+      details: { file_name: file.name, file_type: fileType },
+    })
+    logged = logged && rec.ok
+
     sessions.push({
       sopId: sop.id,
       uploadUrl: signedData.signedUrl,
@@ -90,31 +101,12 @@ export async function createUploadSession(
     })
   }
 
-  return { sessions }
-}
-
-export async function triggerParse(sopId: string): Promise<{ success: boolean } | { error: string }> {
-  const { supabase, userId } = await getSessionContext()
-  if (!userId) return { error: 'Not authenticated' }
-
-  // Update SOP status to parsing
-  const { error } = await supabase
-    .from('sops')
-    .update({ status: 'parsing' })
-    .eq('id', sopId)
-
-  if (error) {
-    console.error('trigger parse error:', error)
-    return { error: 'Failed to start parsing' }
-  }
-
-  // Client triggers /api/sops/parse directly (fire-and-forget doesn't work in Next.js 16 server actions)
-  return { success: true }
+  return { sessions, logged }
 }
 
 export async function createVideoUploadSession(
   file: { name: string; size: string; type: string }
-): Promise<{ sopId: string; path: string; signedUploadUrl: string | null } | { error: string }> {
+): Promise<{ sopId: string; path: string; signedUploadUrl: string | null; logged: boolean } | { error: string }> {
   const { userId, role, organisationId } = await getSessionContext()
   if (!userId) return { error: 'Not authenticated' }
   if (!organisationId) return { error: 'No organisation found' }
@@ -191,14 +183,23 @@ export async function createVideoUploadSession(
     signedUploadUrl = signedData?.signedUrl ?? null
   }
 
+  const rec = await recordDecision({
+    kind: 'sop_created',
+    subject: { kind: 'sop', id: sop.id },
+    sopId: sop.id,
+    summary: 'Created a SOP from a video',
+    details: { file_name: file.name },
+  })
+
   return {
     sopId: sop.id,
     path: storagePath,
     signedUploadUrl,
+    logged: rec.ok,
   }
 }
 
-export async function reparseSop(sopId: string): Promise<{ success: true; sopId: string } | { error: string }> {
+export async function reparseSop(sopId: string): Promise<{ success: true; sopId: string; logged: boolean } | { error: string }> {
   const { supabase, userId, role, organisationId } = await getSessionContext()
   if (!userId) return { error: 'Not authenticated' }
 
@@ -260,16 +261,23 @@ export async function reparseSop(sopId: string): Promise<{ success: true; sopId:
     status: 'queued',
   })
 
+  const rec = await recordDecision({
+    kind: 'sop_edited',
+    subject: { kind: 'sop', id: sopId },
+    sopId,
+    summary: 'Read the SOP file again',
+  })
+
   // Return sopId — client triggers parse API directly
   // (server action fire-and-forget fetch gets aborted by Next.js 16)
-  return { success: true, sopId }
+  return { success: true, sopId, logged: rec.ok }
 }
 
 /**
  * Re-structure a video SOP using the existing transcript (skips re-transcription).
  * Much faster than full re-parse (~3-5s vs ~15-30s).
  */
-export async function restructureSop(sopId: string): Promise<{ success: true; sopId: string } | { error: string }> {
+export async function restructureSop(sopId: string): Promise<{ success: true; sopId: string; logged: boolean } | { error: string }> {
   const { supabase, userId, role, organisationId } = await getSessionContext()
   if (!userId) return { error: 'Not authenticated' }
   // Same gates as reparseSop (review WR-04): role, session org, and never a published SOP.
@@ -322,7 +330,14 @@ export async function restructureSop(sopId: string): Promise<{ success: true; so
     transcript_segments: null, // will be re-populated from existing job if needed
   })
 
-  return { success: true, sopId }
+  const rec = await recordDecision({
+    kind: 'sop_edited',
+    subject: { kind: 'sop', id: sopId },
+    sopId,
+    summary: 'Rebuilt the SOP from its video transcript',
+  })
+
+  return { success: true, sopId, logged: rec.ok }
 }
 
 /**
@@ -333,7 +348,7 @@ export async function restructureSop(sopId: string): Promise<{ success: true; so
 export async function updateSopTitle(
   sopId: string,
   newTitle: string,
-): Promise<{ success: true } | { error: string }> {
+): Promise<{ success: true; logged: boolean } | { error: string }> {
   if (!newTitle || typeof newTitle !== 'string' || !newTitle.trim()) {
     return { error: 'Title must be a non-empty string.' }
   }
@@ -354,10 +369,17 @@ export async function updateSopTitle(
     .eq('organisation_id', organisationId)
 
   if (updateError) return { error: updateError.message }
-  return { success: true }
+  const rec = await recordDecision({
+    kind: 'sop_edited',
+    subject: { kind: 'sop', id: sopId },
+    sopId,
+    summary: 'Renamed a SOP',
+    details: { title: newTitle.trim() },
+  })
+  return { success: true, logged: rec.ok }
 }
 
-export async function deleteSop(sopId: string): Promise<{ success: true } | { error: string }> {
+export async function deleteSop(sopId: string): Promise<{ success: true; logged: boolean } | { error: string }> {
   const ctx = await requireAdminContext()
   if ('error' in ctx) return ctx
   if (!ctx.organisationId) return { error: 'No organisation' }
@@ -368,7 +390,7 @@ export async function deleteSop(sopId: string): Promise<{ success: true } | { er
   // so sopId is attacker-controllable. Must reject BEFORE any service-role delete.
   const { data: sopRow } = await admin
     .from('sops')
-    .select('id, organisation_id')
+    .select('id, organisation_id, title')
     .eq('id', sopId)
     .maybeSingle()
   if (!sopRow) return { error: 'SOP not found' }
@@ -389,7 +411,14 @@ export async function deleteSop(sopId: string): Promise<{ success: true } | { er
   const { error } = await admin.from('sops').delete().eq('id', sopId)
 
   if (error) return { error: error.message }
-  return { success: true }
+  // sop_id stays null: the SOP row is gone, so the subject id and the title in details name it.
+  const rec = await recordDecision({
+    kind: 'sop_deleted',
+    subject: { kind: 'sop', id: sopId },
+    summary: 'Deleted a SOP',
+    details: { title: sopRow.title ?? null },
+  })
+  return { success: true, logged: rec.ok }
 }
 
 // ---------------------------------------------------------------
@@ -416,7 +445,7 @@ const CreateSopFromWizardInput = z.object({
 
 export async function createSopFromWizard(
   input: z.infer<typeof CreateSopFromWizardInput>
-): Promise<{ sopId: string } | { error: string }> {
+): Promise<{ sopId: string; logged: boolean } | { error: string }> {
   const parsed = CreateSopFromWizardInput.safeParse(input)
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? 'Invalid input' }
@@ -476,7 +505,15 @@ export async function createSopFromWizard(
   //    and the author adds the first section there (Phase 58, D-19). kindIds is still
   //    accepted so the wizard form keeps working; it no longer creates anything.
 
-  return { sopId: sop.id }
+  const rec = await recordDecision({
+    kind: 'sop_created',
+    subject: { kind: 'sop', id: sop.id },
+    sopId: sop.id,
+    summary: 'Created a blank SOP',
+    details: { title: parsed.data.title },
+  })
+
+  return { sopId: sop.id, logged: rec.ok }
 }
 
 /**
@@ -497,7 +534,7 @@ export async function createSopFromWizard(
 export async function setSopCategory(
   sopId: string,
   categorySlug: string | null
-): Promise<{ success: true } | { error: string }> {
+): Promise<{ success: true; logged: boolean } | { error: string }> {
   if (!sopId) return { error: 'sopId required' }
   if (categorySlug !== null && !isValidCategorySlug(categorySlug)) {
     return { error: 'Unknown category' }
@@ -528,5 +565,12 @@ export async function setSopCategory(
     console.error('[setSopCategory] update error', error)
     return { error: 'Could not save the category. Please try again.' }
   }
-  return { success: true }
+  const rec = await recordDecision({
+    kind: 'sop_edited',
+    subject: { kind: 'sop', id: sopId },
+    sopId,
+    summary: "Changed a SOP's category",
+    details: { category_slug: categorySlug },
+  })
+  return { success: true, logged: rec.ok }
 }

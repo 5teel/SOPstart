@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getSessionContext } from '@/lib/auth/session-context'
+import { recordDecision } from '@/lib/decisions/record'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { assignSopDepartments } from '@/actions/departments'
 import { parseSop } from '@/lib/parsers/sop-parser'
@@ -114,6 +115,14 @@ export async function POST(request: NextRequest) {
   if (jobError || !job) {
     return NextResponse.json({ error: 'Failed to create parse job' }, { status: 500 })
   }
+  // The drafting that follows is part of creating it, so it is not logged separately.
+  await recordDecision({
+    kind: 'sop_created',
+    subject: { kind: 'sop', id: sop.id },
+    sopId: sop.id,
+    summary: 'Created a SOP from an AI prompt',
+    details: { title: title ?? null, prompt: promptText },
+  })
 
   // (No idempotency guard — see 14-02 plan Task 2 rationale. Each POST creates a
   // fresh SOP+job; admin dedupes from the library.)

@@ -2,6 +2,7 @@
 
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getSessionContext } from '@/lib/auth/session-context'
+import { recordDecision } from '@/lib/decisions/record'
 import { getSourceFileType, isBlockedMacroFile } from '@/lib/validators/sop'
 import { notify } from '@/lib/notifications/write'
 import { dedupeKey, notificationTitle } from '@/lib/notifications/kinds'
@@ -22,7 +23,7 @@ export async function uploadNewVersion(
   oldSopId: string,
   file: { name: string; size: number; type: string }
 ): Promise<
-  | { success: true; newSopId: string; uploadUrl: string; token?: string; path: string; isVideo: boolean }
+  | { success: true; newSopId: string; uploadUrl: string; token?: string; path: string; isVideo: boolean; logged: boolean }
   | { success: false; error: string }
 > {
   const { supabase, userId, role, organisationId } = await getSessionContext()
@@ -128,6 +129,14 @@ export async function uploadNewVersion(
     // Mark old SOP as superseded by new SOP
     await admin.from('sops').update({ superseded_by: newSop.id }).eq('id', oldSopId)
 
+    const rec = await recordDecision({
+      kind: 'sop_version',
+      subject: { kind: 'sop', id: newSop.id },
+      sopId: newSop.id,
+      summary: 'Uploaded a new version from a video',
+      details: { from_sop_id: oldSopId, version: newVersion, file_name: file.name },
+    })
+
     // TUS uploads authenticate with the caller's own session access token
     // (resolved client-side in startVideoSopUpload), not a presigned PUT URL.
     return {
@@ -136,6 +145,7 @@ export async function uploadNewVersion(
       uploadUrl: '',
       path,
       isVideo: true,
+      logged: rec.ok,
     }
   }
 
@@ -169,8 +179,17 @@ export async function uploadNewVersion(
     .update({ superseded_by: newSop.id })
     .eq('id', oldSopId)
 
+  const rec = await recordDecision({
+    kind: 'sop_version',
+    subject: { kind: 'sop', id: newSop.id },
+    sopId: newSop.id,
+    summary: 'Uploaded a new version from a file',
+    details: { from_sop_id: oldSopId, version: newVersion, file_name: file.name, file_type: fileType },
+  })
+
   return {
     success: true,
+    logged: rec.ok,
     newSopId: newSop.id,
     uploadUrl: signedData.signedUrl,
     token: signedData.token,

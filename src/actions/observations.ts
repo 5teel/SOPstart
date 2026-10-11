@@ -171,7 +171,7 @@ export async function getObservationLabels(): Promise<typeof DEFAULT_LABELS> {
 
 export async function setObservationLabels(
   rawInput: unknown
-): Promise<{ success: true } | { success: false; error: string }> {
+): Promise<{ success: true; logged: boolean } | { success: false; error: string }> {
   const parsed = ObservationLabelsSchema.safeParse(rawInput)
   if (!parsed.success) {
     return { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid label input' }
@@ -204,7 +204,13 @@ export async function setObservationLabels(
     console.error('setObservationLabels update error:', error)
     return { success: false, error: 'Failed to update observation labels.' }
   }
-  return { success: true }
+  const rec = await recordDecision({
+    kind: 'observation',
+    subject: { kind: 'organisation', id: organisationId },
+    summary: 'Renamed the observation results',
+    details: { setting: 'observation_labels', labels },
+  })
+  return { success: true, logged: rec.ok }
 }
 
 // ---------------------------------------------------------------
@@ -411,7 +417,7 @@ export async function getAssessorStatusForSop(sopId: string): Promise<AssessorSt
 // filtering every query on it.
 export async function requestAssessorReview(
   sopId: string
-): Promise<{ success: true } | { success: false; error: string }> {
+): Promise<{ success: true; logged?: boolean } | { success: false; error: string }> {
   const { userId, role, organisationId } = await getSessionContext()
   if (!userId) return { success: false, error: 'Not authenticated' }
   // Phase 37-07 WR-02: gate before any admin-client work — every sibling
@@ -470,7 +476,14 @@ export async function requestAssessorReview(
     console.error('requestAssessorReview insert error:', error)
     return { success: false, error: 'Failed to request assessment.' }
   }
-  return { success: true }
+  const rec = await recordDecision({
+    kind: 'observation',
+    subject: { kind: 'sop', id: sopId },
+    sopId,
+    summary: 'Asked for an assessment',
+    details: { action: 'assessment_requested', recipients: recipients.length },
+  })
+  return { success: true, logged: rec.ok }
 }
 
 export interface AssessmentRequest {

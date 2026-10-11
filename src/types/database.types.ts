@@ -1872,7 +1872,7 @@ export type Database = {
         Row: {
           id: string
           organisation_id: string
-          kind: 'approve' | 'reject' | 'sign_off' | 'countersign' | 'assign' | 'unassign' | 'publish' | 'owner_change' | 'review' | 'observation' | 'verify' | 'verify_withdrawn' | 'ai_finding_cleared' | 'cadence_change' | 'ai_field_write' | 'role_change' | 'member_invited' | 'member_removed' | 'request_accepted' | 'request_declined' | 'objective_set' | 'objective_cleared' | 'objective_confirmed'
+          kind: 'approve' | 'reject' | 'sign_off' | 'countersign' | 'assign' | 'unassign' | 'publish' | 'owner_change' | 'review' | 'observation' | 'verify' | 'verify_withdrawn' | 'ai_finding_cleared' | 'cadence_change' | 'ai_field_write' | 'role_change' | 'member_invited' | 'member_removed' | 'request_accepted' | 'request_declined' | 'objective_set' | 'objective_cleared' | 'objective_confirmed' | 'supervisor_linked' | 'supervisor_unlinked' | 'department_change' | 'access_change' | 'sop_created' | 'sop_edited' | 'sop_deleted' | 'sop_version' | 'standard_change' | 'site_change' | 'settings_change'
           actor_kind: 'person' | 'agent'
           actor_id: string | null
           actor_name: string | null
@@ -1890,7 +1890,7 @@ export type Database = {
         Insert: {
           id?: string
           organisation_id: string
-          kind: 'approve' | 'reject' | 'sign_off' | 'countersign' | 'assign' | 'unassign' | 'publish' | 'owner_change' | 'review' | 'observation' | 'verify' | 'verify_withdrawn' | 'ai_finding_cleared' | 'cadence_change' | 'ai_field_write' | 'role_change' | 'member_invited' | 'member_removed' | 'request_accepted' | 'request_declined' | 'objective_set' | 'objective_cleared' | 'objective_confirmed'
+          kind: 'approve' | 'reject' | 'sign_off' | 'countersign' | 'assign' | 'unassign' | 'publish' | 'owner_change' | 'review' | 'observation' | 'verify' | 'verify_withdrawn' | 'ai_finding_cleared' | 'cadence_change' | 'ai_field_write' | 'role_change' | 'member_invited' | 'member_removed' | 'request_accepted' | 'request_declined' | 'objective_set' | 'objective_cleared' | 'objective_confirmed' | 'supervisor_linked' | 'supervisor_unlinked' | 'department_change' | 'access_change' | 'sop_created' | 'sop_edited' | 'sop_deleted' | 'sop_version' | 'standard_change' | 'site_change' | 'settings_change'
           actor_kind: 'person' | 'agent'
           actor_id?: string | null
           actor_name?: string | null
@@ -1908,7 +1908,7 @@ export type Database = {
         Update: {
           id?: string
           organisation_id?: string
-          kind?: 'approve' | 'reject' | 'sign_off' | 'countersign' | 'assign' | 'unassign' | 'publish' | 'owner_change' | 'review' | 'observation' | 'verify' | 'verify_withdrawn' | 'ai_finding_cleared' | 'cadence_change' | 'ai_field_write' | 'role_change' | 'member_invited' | 'member_removed' | 'request_accepted' | 'request_declined' | 'objective_set' | 'objective_cleared' | 'objective_confirmed'
+          kind?: 'approve' | 'reject' | 'sign_off' | 'countersign' | 'assign' | 'unassign' | 'publish' | 'owner_change' | 'review' | 'observation' | 'verify' | 'verify_withdrawn' | 'ai_finding_cleared' | 'cadence_change' | 'ai_field_write' | 'role_change' | 'member_invited' | 'member_removed' | 'request_accepted' | 'request_declined' | 'objective_set' | 'objective_cleared' | 'objective_confirmed' | 'supervisor_linked' | 'supervisor_unlinked' | 'department_change' | 'access_change' | 'sop_created' | 'sop_edited' | 'sop_deleted' | 'sop_version' | 'standard_change' | 'site_change' | 'settings_change'
           actor_kind?: 'person' | 'agent'
           actor_id?: string | null
           actor_name?: string | null

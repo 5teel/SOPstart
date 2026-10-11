@@ -13,6 +13,7 @@
  */
 import { randomUUID } from 'node:crypto'
 import { requireAdminContext } from '@/lib/auth/guards'
+import { recordDecision } from '@/lib/decisions/record'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { computeNextVersionLineage } from '@/lib/builder/version-lineage'
 import { latestPublished, lineageRoot, type LineageRow } from '@/lib/sop/lineage-current'
@@ -29,7 +30,8 @@ async function must(p: Done, what: string): Promise<void> {
  * open draft; otherwise inserts the next-version row and copies everything keyed
  * on the SOP. Called from a button only, never on mount (it writes).
  */
-export async function forkDraft({ sopId }: { sopId: string }): Promise<{ draftId: string } | { error: string }> {
+// `logged` is absent when an open draft is reused: nothing was written, so nothing is recorded.
+export async function forkDraft({ sopId }: { sopId: string }): Promise<{ draftId: string; logged?: boolean } | { error: string }> {
   const ctx = await requireAdminContext()
   if ('error' in ctx) return ctx
   const orgId = ctx.organisationId
@@ -317,13 +319,21 @@ export async function forkDraft({ sopId }: { sopId: string }): Promise<{ draftId
       await must(db.from('sop_access_people').insert(people.map((p: any) => ({ sop_id: newId, member_id: p.member_id }))), 'sop_access_people')
     }
 
-    return { draftId: newId }
   } catch (err) {
     console.error('forkDraft: copy failed, removing the partial draft', err)
     // CASCADE removes everything copied so far.
     await admin.from('sops').delete().eq('id', newId).eq('organisation_id', orgId)
     return { error: err instanceof Error ? err.message : 'Failed to create the new version.' }
   }
+
+  const rec = await recordDecision({
+    kind: 'sop_version',
+    subject: { kind: 'sop', id: newId },
+    sopId: newId,
+    summary: 'Started a draft of the next version',
+    details: { from_sop_id: source.id, version: newVersion },
+  })
+  return { draftId: newId, logged: rec.ok }
 }
 
 export type LineageVersion = {

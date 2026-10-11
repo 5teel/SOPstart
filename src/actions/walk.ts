@@ -87,6 +87,7 @@ async function openWalk(
   return { error: 'Could not start this SOP. Please try again.' }
 }
 
+// ADR-0008: walk progress is not a decision; the submitted completion is logged
 export async function startWalk(rawInput: unknown): Promise<{ walk: WalkState } | Fail> {
   const parsed = startSchema.safeParse(rawInput)
   if (!parsed.success) return { error: 'Invalid input' }
@@ -95,6 +96,7 @@ export async function startWalk(rawInput: unknown): Promise<{ walk: WalkState } 
   return openWalk(ctx, parsed.data.sopId)
 }
 
+// ADR-0008: walk progress is not a decision; the submitted completion is logged
 export async function recordWalkStep(rawInput: unknown): Promise<{ walk: WalkState } | Fail> {
   const parsed = recordSchema.safeParse(rawInput)
   if (!parsed.success) return { error: 'Invalid input' }
@@ -175,6 +177,7 @@ export async function recordWalkStep(rawInput: unknown): Promise<{ walk: WalkSta
   return { walk: toWalkState(saved) }
 }
 
+// ADR-0008: walk progress is not a decision; the submitted completion is logged
 export async function startOverWalk(rawInput: unknown): Promise<{ walk: WalkState; sopId: string } | Fail> {
   const parsed = startOverSchema.safeParse(rawInput)
   if (!parsed.success) return { error: 'Invalid input' }

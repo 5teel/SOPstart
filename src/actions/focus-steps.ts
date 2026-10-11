@@ -14,7 +14,8 @@
  *    never by a value read off a fetched row (CLAUDE.md 2026-07-28).
  *  - Content changes are draft-only (editableSop): a published SOP changes through
  *    the next version's draft, a SOP still parsing is owned by the parser.
- *  - Ticking and untick are decisions: each writes one ledger row AFTER the write.
+ *  - Every write is a decision (ADR-0008): one ledger row AFTER the write. Autosaved
+ *    step edits coalesce to one row per person per SOP per 10 minutes.
  *
  * Async exports only (CLAUDE.md 2026-06-27).
  */
@@ -34,6 +35,7 @@ const BAD = 'Invalid input'
 
 type Fail = { error: string }
 type Ok = { ok: true }
+type Logged = { ok: true; logged: boolean }
 
 const firstIssue = (e: z.ZodError) => e.issues[0]?.message ?? BAD
 
@@ -110,7 +112,7 @@ const updateStepSchema = z.object({
 export async function updateFocusStep(input: {
   stepId: string
   patch: { text?: string; kind?: Kind; tip?: string | null; photoRequired?: boolean }
-}): Promise<Ok | Fail> {
+}): Promise<Ok | Logged | Fail> {
   const parsed = updateStepSchema.safeParse(input)
   if (!parsed.success) return { error: firstIssue(parsed.error) }
   const { stepId, patch } = parsed.data
@@ -139,7 +141,18 @@ export async function updateFocusStep(input: {
     return { error: error.message }
   }
   if (!data || data.length === 0) return { error: 'Step not found.' }
-  return { ok: true }
+  // Autosaved (useFocusAutosave): one row per person per SOP per 10 minutes, not one per keystroke.
+  const rec = await recordDecision(
+    {
+      kind: 'sop_edited',
+      subject: { kind: 'sop', id: ctx.sopId },
+      sopId: ctx.sopId,
+      summary: 'Edited steps',
+      details: { step_id: stepId, fields: Object.keys(row) },
+    },
+    { coalesceMinutes: 10 },
+  )
+  return { ok: true, logged: rec.ok }
 }
 
 const addStepSchema = z.object({
@@ -152,7 +165,7 @@ export async function addFocusStep(input: {
   sectionId: string
   afterStepId?: string
   kind?: Kind
-}): Promise<{ stepId: string } | Fail> {
+}): Promise<{ stepId: string; logged: boolean } | Fail> {
   const parsed = addStepSchema.safeParse(input)
   if (!parsed.success) return { error: firstIssue(parsed.error) }
   const { sectionId, afterStepId, kind } = parsed.data
@@ -196,10 +209,17 @@ export async function addFocusStep(input: {
   current.set(stepId, at + 1)
   const failed = await renumber(ctx.organisationId, ctx.sopId, final, current)
   if (failed) return { error: failed }
-  return { stepId }
+  const rec = await recordDecision({
+    kind: 'sop_edited',
+    subject: { kind: 'step', id: stepId },
+    sopId: ctx.sopId,
+    summary: 'Added a step',
+    details: { section_id: sectionId, step_kind: kind ?? 'step' },
+  })
+  return { stepId, logged: rec.ok }
 }
 
-export async function deleteFocusStep(input: { stepId: string }): Promise<Ok | Fail> {
+export async function deleteFocusStep(input: { stepId: string }): Promise<Logged | Fail> {
   const parsed = z.object({ stepId: uuid }).safeParse(input)
   if (!parsed.success) return { error: firstIssue(parsed.error) }
   const { stepId } = parsed.data
@@ -219,10 +239,16 @@ export async function deleteFocusStep(input: { stepId: string }): Promise<Ok | F
     console.error('[deleteFocusStep] delete error', error)
     return { error: error.message }
   }
-  return { ok: true }
+  const rec = await recordDecision({
+    kind: 'sop_edited',
+    subject: { kind: 'step', id: stepId },
+    sopId: ctx.sopId,
+    summary: 'Deleted a step',
+  })
+  return { ok: true, logged: rec.ok }
 }
 
-export async function moveFocusStep(input: { stepId: string; direction: 'up' | 'down' }): Promise<Ok | Fail> {
+export async function moveFocusStep(input: { stepId: string; direction: 'up' | 'down' }): Promise<Ok | Logged | Fail> {
   const parsed = z.object({ stepId: uuid, direction: z.enum(['up', 'down']) }).safeParse(input)
   if (!parsed.success) return { error: firstIssue(parsed.error) }
   const { stepId, direction } = parsed.data
@@ -250,10 +276,17 @@ export async function moveFocusStep(input: { stepId: string; direction: 'up' | '
   const final = [...siblings.ids]
   ;[final[i], final[j]] = [final[j], final[i]]
   const failed = await renumber(ctx.organisationId, ctx.sopId, final, siblings.current)
-  return failed ? { error: failed } : { ok: true }
+  if (failed) return { error: failed }
+  const rec = await recordDecision({
+    kind: 'sop_edited',
+    subject: { kind: 'step', id: stepId },
+    sopId: ctx.sopId,
+    summary: direction === 'up' ? 'Moved a step up' : 'Moved a step down',
+  })
+  return { ok: true, logged: rec.ok }
 }
 
-export async function deleteFocusSection(input: { sectionId: string }): Promise<Ok | Fail> {
+export async function deleteFocusSection(input: { sectionId: string }): Promise<Logged | Fail> {
   const parsed = z.object({ sectionId: uuid }).safeParse(input)
   if (!parsed.success) return { error: firstIssue(parsed.error) }
   const { sectionId } = parsed.data
@@ -275,7 +308,13 @@ export async function deleteFocusSection(input: { sectionId: string }): Promise<
     console.error('[deleteFocusSection] delete error', error)
     return { error: error.message }
   }
-  return { ok: true }
+  const rec = await recordDecision({
+    kind: 'sop_edited',
+    subject: { kind: 'section', id: sectionId },
+    sopId: ctx.sopId,
+    summary: 'Deleted a section',
+  })
+  return { ok: true, logged: rec.ok }
 }
 
 // ---------------------------------------------------------------------------
@@ -366,7 +405,7 @@ export async function untickFocusStep(input: { stepId: string }): Promise<Ok | F
 // Jump-ahead (drafts only; the flag travels with the next version)
 // ---------------------------------------------------------------------------
 
-export async function setAllowForwardJump(input: { sopId: string; allow: boolean }): Promise<Ok | Fail> {
+export async function setAllowForwardJump(input: { sopId: string; allow: boolean }): Promise<Logged | Fail> {
   const parsed = z.object({ sopId: uuid, allow: z.boolean() }).safeParse(input)
   if (!parsed.success) return { error: firstIssue(parsed.error) }
 
@@ -385,7 +424,14 @@ export async function setAllowForwardJump(input: { sopId: string; allow: boolean
     console.error('[setAllowForwardJump] update error', error)
     return { error: error.message }
   }
-  return { ok: true }
+  const rec = await recordDecision({
+    kind: 'sop_edited',
+    subject: { kind: 'sop', id: parsed.data.sopId },
+    sopId: parsed.data.sopId,
+    summary: parsed.data.allow ? 'Let people skip ahead in a SOP' : 'Stopped people skipping ahead in a SOP',
+    details: { allow_forward_jump: parsed.data.allow },
+  })
+  return { ok: true, logged: rec.ok }
 }
 
 // ---------------------------------------------------------------------------
@@ -417,7 +463,7 @@ export async function getStepImageUploadUrl(input: {
   return { uploadUrl: data.signedUrl, storagePath }
 }
 
-export async function attachStepImage(input: { stepId: string; storagePath: string }): Promise<Ok | Fail> {
+export async function attachStepImage(input: { stepId: string; storagePath: string }): Promise<Ok | Logged | Fail> {
   const parsed = z.object({ stepId: uuid, storagePath: z.string().max(300) }).safeParse(input)
   if (!parsed.success) return { error: firstIssue(parsed.error) }
   const { stepId, storagePath } = parsed.data
@@ -477,10 +523,17 @@ export async function attachStepImage(input: { stepId: string; storagePath: stri
     await admin.from('sop_images').delete().eq('id', (imgRow as { id: string }).id).eq('sop_id', ctx.sopId)
     return { error: error.message }
   }
-  return { ok: true }
+  const rec = await recordDecision({
+    kind: 'sop_edited',
+    subject: { kind: 'step', id: stepId },
+    sopId: ctx.sopId,
+    summary: 'Added a photo to a step',
+    details: { image_id: (imgRow as { id: string }).id },
+  })
+  return { ok: true, logged: rec.ok }
 }
 
-export async function removeStepImage(input: { stepId: string; storagePath: string }): Promise<Ok | Fail> {
+export async function removeStepImage(input: { stepId: string; storagePath: string }): Promise<Logged | Fail> {
   const parsed = z.object({ stepId: uuid, storagePath: z.string().max(300) }).safeParse(input)
   if (!parsed.success) return { error: firstIssue(parsed.error) }
   const { stepId, storagePath } = parsed.data
@@ -539,7 +592,13 @@ export async function removeStepImage(input: { stepId: string; storagePath: stri
       await admin.from('sop_image_annotations').delete().eq('sop_image_id', markedImageId).eq('organisation_id', ctx.organisationId)
     }
   }
-  return { ok: true }
+  const rec = await recordDecision({
+    kind: 'sop_edited',
+    subject: { kind: 'step', id: stepId },
+    sopId: ctx.sopId,
+    summary: 'Removed a photo from a step',
+  })
+  return { ok: true, logged: rec.ok }
 }
 
 // ---------------------------------------------------------------------------
@@ -638,7 +697,7 @@ export async function saveAnnotatedStepImage(input: {
   originalPath: string
   bakedPath: string
   scene: unknown
-}): Promise<Ok | Fail> {
+}): Promise<Logged | Fail> {
   const parsed = z
     .object({ stepId: uuid, originalPath: z.string().max(300), bakedPath: z.string().max(300), scene: sceneSchema })
     .safeParse(input)
@@ -726,5 +785,12 @@ export async function saveAnnotatedStepImage(input: {
     await admin.from('sop_images').delete().eq('sop_id', ctx.sopId).eq('storage_path', oldBaked)
     await admin.storage.from(BUCKET).remove([oldBaked])
   }
-  return { ok: true }
+  const rec = await recordDecision({
+    kind: 'sop_edited',
+    subject: { kind: 'step', id: stepId },
+    sopId: ctx.sopId,
+    summary: 'Marked up a step photo',
+    details: { image_id: originalId, marks: scene.shapes.length },
+  })
+  return { ok: true, logged: rec.ok }
 }

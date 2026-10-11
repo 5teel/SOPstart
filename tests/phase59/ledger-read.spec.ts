@@ -11,19 +11,20 @@ import { nzStartOfDayIso } from '@/lib/office/format'
 import { DECISION_GROUPS, KIND_GROUPS, KIND_WORDS, CLEARED_KINDS, PAGE_SIZE, cursorFilter } from '@/lib/decisions/read'
 
 const MIGRATION = fs.readFileSync(path.join(process.cwd(), 'supabase/migrations/00073_office_ledger.sql'), 'utf8')
-const MIGRATION_60 = fs.readFileSync(path.join(process.cwd(), 'supabase/migrations/00074_requests_notifications_objectives.sql'), 'utf8')
+const MIGRATION_60 = fs.readFileSync(path.join(process.cwd(), 'supabase/migrations/00076_ledger_every_action.sql'), 'utf8')
 
 test.describe('ledger read', () => {
   test('every DECISION_KINDS value sits in exactly one KIND_GROUPS group (59-02)', () => {
     const all = Object.values(KIND_GROUPS).flat()
     expect([...all].sort()).toEqual([...DECISION_KINDS].sort())
     expect(new Set(all).size).toBe(all.length)
-    expect([...KIND_GROUPS.other].sort()).toEqual(['member_invited', 'member_removed', 'objective_cleared', 'objective_confirmed', 'objective_set', 'observation', 'role_change'])
+    expect([...KIND_GROUPS.other].sort()).toEqual(['objective_cleared', 'objective_confirmed', 'objective_set', 'observation'])
+    expect([...KIND_GROUPS.people]).toEqual(['role_change', 'member_invited', 'member_removed', 'supervisor_linked', 'supervisor_unlinked', 'department_change'])
   })
 
   test('the filter groups, their order and labels are the UI-SPEC chips (59-02)', () => {
-    expect(DECISION_GROUPS.map((g) => g.key)).toEqual(['all', 'approvals', 'signoffs', 'ownership', 'requests', 'publishing', 'reviews', 'ai', 'other'])
-    expect(DECISION_GROUPS.map((g) => g.label)).toEqual(['All', 'Approvals', 'Sign-offs', 'Ownership', 'Requests', 'Publishing', 'Reviews', 'AI', 'Other'])
+    expect(DECISION_GROUPS.map((g) => g.key)).toEqual(['all', 'approvals', 'signoffs', 'ownership', 'requests', 'publishing', 'changes', 'reviews', 'people', 'setup', 'ai', 'other'])
+    expect(DECISION_GROUPS.map((g) => g.label)).toEqual(['All', 'Approvals', 'Sign-offs', 'Ownership', 'Requests', 'Publishing', 'SOP changes', 'Reviews', 'People', 'Site & settings', 'AI', 'Other'])
   })
 
   test('every kind has plain words (59-02)', () => {
@@ -47,7 +48,7 @@ test.describe('ledger read', () => {
     expect([...CLEARED_KINDS]).toEqual(['countersign', 'reject', 'approve', 'owner_change', 'review'])
   })
 
-  test('the latest migration kind list (00074) equals DECISION_KINDS, including the 59 kinds (59-02, repointed by 60-02)', () => {
+  test('the latest migration kind list (00076) equals DECISION_KINDS, including the 59 kinds (59-02, repointed by 60-02 and ADR-0008)', () => {
     const m = MIGRATION_60.match(/check\s*\(\s*kind\s+in\s*\(([^)]*)\)/i)
     expect(m).not.toBeNull()
     const kinds = [...m![1].matchAll(/'([a-z_]+)'/g)].map((x) => x[1])

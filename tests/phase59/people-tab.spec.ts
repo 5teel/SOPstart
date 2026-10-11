@@ -65,7 +65,7 @@ test.describe('people tab', () => {
     expect(TAB).toContain("from '@/components/admin/departments/DepartmentPicker'")
     expect(TAB).toContain('<DepartmentPicker')
     expect(TAB).toContain('mode="member"')
-    expect(TAB).toContain("receipt: 'Departments updated', logged: null")
+    expect(TAB).toContain("receipt: 'Departments updated', logged: logged ?? null")
   })
 
   test('Invited shows as a status chip; the invite form takes an email and a role and says Don\'t invite', () => {

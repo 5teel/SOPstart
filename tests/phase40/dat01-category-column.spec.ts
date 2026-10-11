@@ -162,7 +162,6 @@ const CATEGORY_EXEMPT: CategoryExemptEntry[] = [
   { file: 'src/actions/grants.ts', keys: 'all_departments,all_departments_pre_override', reason: 'Grant-system all-departments override bookkeeping; not a category-bearing write.' },
   { file: 'src/actions/sops.ts', keys: 'organisation_id,source_file_name,source_file_path,source_file_type,status', reason: 'createUploadSession -- pre-parse shell insert; /api/sops/parse’s post-parse UPDATE sets category_slug once the document is classified.' },
   { file: 'src/actions/sops.ts', keys: 'source_file_path', reason: 'Finalises the uploaded file path after a presigned PUT/TUS upload; not a category-bearing write (2 call sites across the upload-session creators).' },
-  { file: 'src/actions/sops.ts', keys: 'status', reason: 'Status-only transition; not a category-bearing write.' },
   { file: 'src/actions/sops.ts', keys: 'is_ocr,organisation_id,source_file_name,source_file_path,source_file_type,status,title,uploaded_by,version', reason: 'createVideoUploadSession -- pre-parse shell insert; the transcribe route’s post-parse UPDATE sets category_slug once the transcript is classified.' },
   { file: 'src/actions/sops.ts', keys: 'overall_confidence,parse_notes,status,title,updated_at', reason: 'reparseSop/restructureSop reset status to re-trigger parsing; category_slug is left untouched so the existing value survives unchanged.' },
   { file: 'src/actions/sops.ts', keys: 'title,updated_at', reason: 'Title-only rename; not a category-bearing write.' },
@@ -204,7 +203,9 @@ const CATEGORY_EXEMPT: CategoryExemptEntry[] = [
 // src/lib/governance/owner-review.ts (review bookkeeping only, exempt and justified above).
 // 2026-10-06: 41 -> 40. Phase 60-14 deleted the SOP objective writer (its single update);
 // the objective now lives in the objectives table.
-const EXPECTED_SOPS_WRITE_SITE_COUNT = 40
+// 2026-10-11: 40 -> 39. ADR-0008 deleted triggerParse from src/actions/sops.ts (an
+// uncalled status-only flip); no remaining path lost category_slug.
+const EXPECTED_SOPS_WRITE_SITE_COUNT = 39
 
 // Extracts the substring between a `(` at `openIdx` and its matching `)`,
 // tracking paren depth so nested calls/objects don't truncate the payload.

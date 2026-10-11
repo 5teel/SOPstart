@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { recordDecision } from '@/lib/decisions/record'
 
 // GET /api/sops/[sopId] — fetch SOP with all sections, their focus steps (hazard / ppe / step / check), and images
 export async function GET(
@@ -53,7 +54,7 @@ export async function DELETE(
   // Verify SOP exists and is draft (don't allow deleting published SOPs)
   const { data: sop, error: fetchError } = await supabase
     .from('sops')
-    .select('id, status, source_file_path, organisation_id')
+    .select('id, status, source_file_path, organisation_id, title')
     .eq('id', sopId)
     .single()
 
@@ -66,13 +67,23 @@ export async function DELETE(
   }
 
   // Delete from database (cascade deletes sections, steps, images, parse_jobs)
-  const { error: deleteError } = await supabase
+  const { data: deleted, error: deleteError } = await supabase
     .from('sops')
     .delete()
     .eq('id', sopId)
+    .select('id')
 
   if (deleteError) {
     return NextResponse.json({ error: 'Failed to delete SOP' }, { status: 500 })
+  }
+  // RLS can match zero rows silently; only a delete that landed is recorded.
+  if (deleted && deleted.length > 0) {
+    await recordDecision({
+      kind: 'sop_deleted',
+      subject: { kind: 'sop', id: sopId },
+      summary: 'Deleted a draft SOP',
+      details: { title: sop.title ?? null },
+    })
   }
 
   // Best-effort cleanup of Storage files (don't fail the request if this fails)

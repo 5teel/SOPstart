@@ -40,7 +40,8 @@ type MemberProps = {
   selectedIds: string[]
   /** When true, no server action is fired on toggle — only onChange (A4) */
   localOnly?: boolean
-  onChange?: (ids: string[]) => void
+  /** logged: whether the ledger row was written (undefined in localOnly mode). */
+  onChange?: (ids: string[], logged?: boolean) => void
 }
 
 type BlockProps = {
@@ -111,7 +112,7 @@ export function DepartmentPicker(props: Props) {
 
     startTransition(async () => {
       setError(null)
-      let result: { success: true } | { error: string }
+      let result: { success: true; logged: boolean } | { error: string }
 
       if (props.mode === 'member') {
         result = await assignMemberDepartments(props.memberId, next)
@@ -119,7 +120,7 @@ export function DepartmentPicker(props: Props) {
           setError(result.error)
           setSelectedIds(prev)
         } else {
-          props.onChange?.(next)
+          props.onChange?.(next, result.logged)
         }
       } else if (props.mode === 'block') {
         result = await assignBlockDepartments(props.blockId, next, false)

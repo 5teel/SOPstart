@@ -20,6 +20,7 @@ import { buildDecisionRow, type DecisionInput } from '@/lib/decisions/shape'
  */
 export async function recordDecision(
   input: DecisionInput,
+  opts: { coalesceMinutes?: number } = {},
 ): Promise<{ ok: true; id: string } | { ok: false; error: string }> {
   try {
     const s = await getSessionContext()
@@ -34,6 +35,21 @@ export async function recordDecision(
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const admin = createAdminClient() as any
+    // Autosaved edits (ADR-0008): one row per person, kind and subject per window, not one per keystroke.
+    if (opts.coalesceMinutes) {
+      const since = new Date(Date.now() - opts.coalesceMinutes * 60_000).toISOString()
+      const { data: recent } = await admin
+        .from('decisions')
+        .select('id')
+        .eq('organisation_id', built.row.organisation_id)
+        .eq('actor_id', built.row.actor_id)
+        .eq('kind', built.row.kind)
+        .eq('subject_id', built.row.subject_id)
+        .gte('created_at', since)
+        .limit(1)
+        .maybeSingle()
+      if (recent) return { ok: true, id: recent.id as string }
+    }
     const { data, error } = await admin.from('decisions').insert(built.row).select('id').single()
     if (error || !data) {
       console.error('[recordDecision] FAILED', input.kind, error)

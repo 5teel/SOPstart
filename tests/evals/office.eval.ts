@@ -815,6 +815,15 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       await page.getByTestId('people-remove-confirm').click()
       await expect(receipt).toContainText('Removed' + LEDGER, SLOW)
       await expect(row).toHaveCount(0, SLOW)
+
+      // ADR-0008: the supervisor link and unlink above are in the ledger, under the People chip.
+      await page.goto('/?s=signoffs&tab=decisions')
+      await page.locator('[data-testid="decisions-chip"][data-chip="people"]').click()
+      const people = page.getByTestId('decisions-row')
+      await expect(people.first()).toBeVisible(SLOW)
+      await expect(people.filter({ hasText: 'Linked a supervisor' }).first()).toBeVisible(SLOW)
+      await expect(people.filter({ hasText: 'Unlinked a supervisor' }).first()).toBeVisible(SLOW)
+      await shot(page, '64-decisions-people')
       expect(errors).toEqual([])
       await page.close()
     })

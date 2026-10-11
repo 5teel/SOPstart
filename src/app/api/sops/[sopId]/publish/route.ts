@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionContext } from '@/lib/auth/session-context'
+import { recordDecision } from '@/lib/decisions/record'
 import { performPublish, assertPublishGates } from '@/lib/governance/publish-core'
 import { notifyNextApprover } from '@/lib/notifications/write'
 
@@ -82,6 +83,14 @@ export async function POST(
     if (!updated || updated.length === 0) {
       return NextResponse.json({ success: true, pendingApproval: true, alreadyPending: true })
     }
+    // The publish itself is logged by publish-core when the chain finishes; this is the request.
+    await recordDecision({
+      kind: 'sop_edited',
+      subject: { kind: 'sop', id: sopId },
+      sopId,
+      summary: 'Sent a SOP for approval',
+      details: { approval_steps: chainRow.steps.length },
+    })
     // D-08: step one is told it is their turn. After the divert write; never fails the request.
     try {
       await notifyNextApprover({

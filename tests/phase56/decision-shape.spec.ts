@@ -56,8 +56,8 @@ test.describe('buildDecisionRow', () => {
     expect(buildDecisionRow(session, { ...base, summary: 'x'.repeat(200) }).ok).toBe(true)
   })
 
-  test('DECISION_KINDS equals the kind list in the live CHECK (00074 widened 00073 widened 00070)', () => {
-    const sql = fs.readFileSync(path.join(process.cwd(), 'supabase/migrations/00074_requests_notifications_objectives.sql'), 'utf-8')
+  test('DECISION_KINDS equals the kind list in the live CHECK (00076 widened 00074, 00073, 00070)', () => {
+    const sql = fs.readFileSync(path.join(process.cwd(), 'supabase/migrations/00076_ledger_every_action.sql'), 'utf-8')
     const m = /check \(kind in \(([^)]*)\)\)/.exec(sql)
     expect(m, 'kind CHECK not found').not.toBeNull()
     const inSql = [...m![1].matchAll(/'([a-z_]+)'/g)].map((x) => x[1])
