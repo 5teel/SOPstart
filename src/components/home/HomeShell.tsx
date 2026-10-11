@@ -20,7 +20,7 @@ import { ReadView } from '@/components/home/ReadView'
 import { SectionMenu } from '@/components/home/SectionMenu'
 import { SopList } from '@/components/home/SopList'
 import { TabBar } from '@/components/home/TabBar'
-import { AccountControl } from '@/components/shell/AccountControl'
+import { AccountControl, type Site } from '@/components/shell/AccountControl'
 import { useLibrary } from '@/hooks/useLibrary'
 import { useRecentSops } from '@/hooks/useRecentSops'
 import { requestOverviewSection } from '@/lib/shell/overview-focus'
@@ -44,6 +44,8 @@ const WorkerObjective = dynamic(() => import('@/components/shell/WorkerObjective
 
 export interface HomeShellProps {
   siteName: string
+  siteId: string | null
+  sites: Site[]
   userEmail: string | null
   userId: string
   role: string | null
@@ -55,7 +57,7 @@ function isTypingTarget(t: EventTarget | null): boolean {
   return t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable
 }
 
-export function HomeShell({ siteName, userEmail, userId, role, initial }: HomeShellProps) {
+export function HomeShell({ siteName, siteId, sites, userEmail, userId, role, initial }: HomeShellProps) {
   const [state, setState] = useState<HomeState>(() => resolveHome(initial, role))
   const [phoneMap, setPhoneMap] = useState(false)
   const lib = useLibrary(userId)
@@ -178,7 +180,7 @@ export function HomeShell({ siteName, userEmail, userId, role, initial }: HomeSh
 
   return (
     <div data-testid="home" className="flex h-dvh flex-col bg-paper lg:flex-row">
-      <SectionMenu role={role} section={state.s} userEmail={userEmail} orgName={siteName} onSelect={openSection} />
+      <SectionMenu role={role} section={state.s} userEmail={userEmail} orgName={siteName} orgId={siteId} sites={sites} onSelect={openSection} />
 
       {state.s === 'sops' ? (
         <div className="flex min-h-0 min-w-0 flex-1 flex-col lg:flex-row">
@@ -228,7 +230,7 @@ export function HomeShell({ siteName, userEmail, userId, role, initial }: HomeSh
               />
             )}
             <div className="mt-6 lg:hidden">
-              <AccountControl email={userEmail} isAdmin={canWrite} />
+              <AccountControl email={userEmail} isAdmin={canWrite} org={siteName} orgId={siteId} sites={sites} />
             </div>
           </div>
           <div

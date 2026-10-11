@@ -23,3 +23,4 @@ code, plans and phases follow it until a later ADR supersedes it.
 | [0006](0006-typography.md) | Typography: Inter for reading, Saira for labels | Accepted (caps-label rule superseded by ADR-0007) | `tests/lint/typography.spec.ts` |
 | [0007](0007-design-base.md) | The design base — colour for safety, shared controls, sentence-case headings | Accepted | review only |
 | [0008](0008-ledger-every-action.md) | Every action a person takes is written to the decision ledger | Accepted | `tests/lint/ledger-every-action.spec.ts` |
+| [0009](0009-site-map-pictures.md) | The site map may carry pictures | Accepted | review only |

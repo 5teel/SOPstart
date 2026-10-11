@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { getSessionContext } from '@/lib/auth/session-context'
 import { ProtectedProviders, type AppRole } from '@/components/providers/ProtectedProviders'
 import { HomeShell } from '@/components/home/HomeShell'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { ensureReviewDueNotifications } from '@/lib/notifications/ensure-review-due'
 import { formatHome, legacyToHome, parseHome } from '@/lib/shell/home-state'
 
@@ -33,12 +34,19 @@ export default async function Home({
   // ADR-0002: due reviews are written on the read that needs them -- the caller's
   // own rows only, idempotent, never throws -- before the bell reads them.
   let siteName = 'Your site'
+  let sites: { id: string; name: string }[] = []
   if (organisationId) {
-    const [{ data: org }] = await Promise.all([
+    const [{ data: org }, { data: mine }] = await Promise.all([
       supabase.from('organisations').select('name').eq('id', organisationId).maybeSingle(),
+      // The caller's own memberships across sites, for the site picker (2026-10-11).
+      createAdminClient().from('organisation_members').select('organisations ( id, name )').eq('user_id', userId),
       ensureReviewDueNotifications(organisationId, userId),
     ])
     if (org?.name) siteName = org.name
+    sites = (mine ?? [])
+      .map((m) => m.organisations as unknown as { id: string; name: string } | null)
+      .filter((o): o is { id: string; name: string } => !!o)
+      .sort((a, b) => a.name.localeCompare(b.name))
   }
 
   const query = new URLSearchParams()
@@ -49,7 +57,7 @@ export default async function Home({
 
   return (
     <ProtectedProviders role={role as AppRole}>
-      <HomeShell siteName={siteName} userEmail={userEmail} userId={userId} role={role} initial={parseHome(query)} />
+      <HomeShell siteName={siteName} siteId={organisationId} sites={sites} userEmail={userEmail} userId={userId} role={role} initial={parseHome(query)} />
     </ProtectedProviders>
   )
 }

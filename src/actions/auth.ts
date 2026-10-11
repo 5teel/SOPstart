@@ -31,6 +31,29 @@ export async function signOut() {
 }
 
 // ─────────────────────────────────────────────
+// switchSite — 2026-10-11. Someone in several sites picks the one they work in.
+// The JWT hook reads active_org_id and re-checks the membership; so does this.
+// Not a ledger row (ADR-0008): it changes which site you look at, not the site.
+// ─────────────────────────────────────────────
+
+export async function switchSite(orgId: string): Promise<{ error?: string }> {
+  if (!z.string().uuid().safeParse(orgId).success) return { error: 'Unknown site.' }
+  const { supabase, userId } = await getSessionContext()
+  if (!userId) return { error: 'Not authenticated' }
+  const { data: member } = await createAdminClient()
+    .from('organisation_members')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('organisation_id', orgId)
+    .maybeSingle()
+  if (!member) return { error: 'You are not a member of that site.' }
+  const { error } = await supabase.auth.updateUser({ data: { active_org_id: orgId } })
+  if (error) return { error: "That didn't work. Try again." }
+  await supabase.auth.refreshSession()
+  return {}
+}
+
+// ─────────────────────────────────────────────
 // loginWithEmail — AUTH-02, AUTH-03
 // ─────────────────────────────────────────────
 export async function loginWithEmail(

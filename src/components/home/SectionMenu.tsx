@@ -4,7 +4,7 @@
  * sections the role may open (no counts), Manage SOPs last and quiet, and who you are at the foot.
  */
 import { Wordmark } from '@/components/brand/Wordmark'
-import { AccountControl } from '@/components/shell/AccountControl'
+import { AccountControl, type Site } from '@/components/shell/AccountControl'
 import { sectionsForRole, type Section } from '@/lib/shell/home-state'
 
 export const SECTION_LABEL: Record<Section, string> = {
@@ -21,12 +21,16 @@ export function SectionMenu({
   section,
   userEmail,
   orgName,
+  orgId,
+  sites,
   onSelect,
 }: {
   role: string | null
   section: Section
   userEmail: string | null
   orgName: string
+  orgId: string | null
+  sites: Site[]
   onSelect(s: Section): void
 }) {
   return (
@@ -51,7 +55,7 @@ export function SectionMenu({
         ))}
       </nav>
       <div className="mt-auto">
-        <AccountControl email={userEmail} org={orgName} isAdmin={role === 'admin' || role === 'safety_manager'} />
+        <AccountControl email={userEmail} org={orgName} orgId={orgId} sites={sites} isAdmin={role === 'admin' || role === 'safety_manager'} />
       </div>
     </aside>
   )

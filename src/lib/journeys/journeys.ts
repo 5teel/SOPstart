@@ -641,6 +641,19 @@ export const JOURNEYS: Journey[] = [
       { id: 'e', type: 'end', label: 'Account updated' },
     ],
   },
+  {
+    id: 'switch-site',
+    group: 'Everyone',
+    persona: 'Everyone',
+    title: 'Switch site',
+    summary: 'Someone who belongs to more than one site picks the site they are working in.',
+    steps: [
+      { id: 's', type: 'start', label: 'Belongs to several sites' },
+      { id: 'home', type: 'screen', label: 'Home', route: '/', detail: 'The account control at the foot of the menu shows a site picker instead of the site name when you belong to more than one site.' },
+      { id: 'pick', type: 'action', label: 'Pick a site', detail: 'switchSite() checks the membership and saves the choice; the page reloads into that site with its own SOPs, people and site map.' },
+      { id: 'e', type: 'end', label: 'Working in the chosen site' },
+    ],
+  },
 ]
 
 export function journeysByGroup(): { group: string; journeys: Journey[] }[] {

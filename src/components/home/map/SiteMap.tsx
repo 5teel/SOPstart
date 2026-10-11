@@ -10,7 +10,8 @@
  */
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
 import { byDepth, layoutSite, viewFor } from '@/lib/library/iso-layout'
-import { HEIGHT, project } from '@/lib/library/iso'
+import { HEIGHT, TILE, project } from '@/lib/library/iso'
+import { floorArt, objectArt, objectBox } from '@/lib/library/site-art'
 import type { LibraryArea } from '@/lib/library/areas'
 import type { ObjectKind } from '@/lib/library/object-kind'
 import type { RowStatus } from '@/lib/library/status'
@@ -45,6 +46,9 @@ const STATUS_FILL: Record<RowStatus['kind'], string> = {
   updated: 'var(--accent-step)',
   stopped: 'var(--ink-900)',
 }
+
+// The plate's top face as an affine map of plan coordinates, so a top-down floor picture lies on it.
+const TOP_FACE = (z: number) => `matrix(${TILE * 0.866} ${TILE * 0.5} ${-TILE * 0.866} ${TILE * 0.5} 0 ${-z * TILE})`
 
 const clip = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1)}…` : s)
 const plural = (n: number) => `${n} ${n === 1 ? 'SOP' : 'SOPs'}`
@@ -239,9 +243,21 @@ export function SiteMap({ areas, rows, area, onArea, onOpenSop, orgName, renderO
                 : { role: 'button', tabIndex: 0, 'aria-label': name, onClick: go, onKeyDown: activate(go) })}
             >
               <Plate x={plate.x} y={plate.y} w={plate.w} d={plate.d} colourVar={a.colourVar} />
+              {floorArt(a.id, a.name) && (
+                <g transform={TOP_FACE(PLATE_H)}>
+                  <image href={floorArt(a.id, a.name)!} x={plate.x} y={plate.y} width={plate.w} height={plate.d} preserveAspectRatio="xMidYMid slice" />
+                  <rect x={plate.x} y={plate.y} width={plate.w} height={plate.d} vectorEffect="non-scaling-stroke" style={{ fill: 'none', stroke: a.colourVar, strokeWidth: 2 }} />
+                </g>
+              )}
               {objects.map((o) => {
                 const row = list[o.i]
-                const shapes = <MapObject kind={o.kind} x={o.x} y={o.y} colourVar={a.colourVar} />
+                const box = objectBox(o.kind, o.x, o.y, PLATE_H)
+                const sprite = floorArt(a.id, a.name) ? objectArt(o.kind) : null
+                const shapes = sprite ? (
+                  <image href={sprite} x={box.x} y={box.y} width={box.w} height={box.h} preserveAspectRatio="xMidYMax meet" />
+                ) : (
+                  <MapObject kind={o.kind} x={o.x} y={o.y} colourVar={a.colourVar} />
+                )
                 if (!row) return <g key={o.i}>{shapes}</g>
                 if (!open) return <g key={row.id}>{shapes}</g>
                 const read = () => onOpenSop(row.id)
