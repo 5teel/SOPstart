@@ -301,7 +301,7 @@ export function SiteMap({ areas, rows, area, onArea, onOpenSop, orgName, renderO
             const [, floorY] = project(cx, cy, PLATE_H)
             const label = clip(a.name, 22)
             const count = plural(n)
-            const w = (label.length * 7.4 + count.length * 6.2 + 34) * k
+            const w = (label.length * 7.4 + count.length * 7 + 36) * k
             const h = 26 * k
             const [mx, my] = project(cx, cy, 1.2)
             return (
@@ -313,7 +313,7 @@ export function SiteMap({ areas, rows, area, onArea, onOpenSop, orgName, renderO
                   <text x={sx - w / 2 + 14 * k} y={sy - 9 * k} fontSize={12.5 * k} fontWeight={700} style={{ fill: 'var(--paper-1)' }}>
                     {label}
                   </text>
-                  <text x={sx + w / 2 - 10 * k} y={sy - 9 * k} fontSize={10.5 * k} textAnchor="end" className="font-label" style={{ fill: 'var(--ink-400)' }}>
+                  <text x={sx + w / 2 - 10 * k} y={sy - 9 * k} fontSize={12 * k} fontWeight={600} textAnchor="end" className="font-label" style={{ fill: 'var(--ink-200)' }}>
                     {count}
                   </text>
                 </g>
