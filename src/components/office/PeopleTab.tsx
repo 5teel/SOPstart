@@ -987,7 +987,8 @@ function SupervisesPicker({
   supervises: TeamMember[]
   onLink(workerId: string, linked: boolean): Promise<string | null>
 }) {
-  const [busy, setBusy] = useState<string | null>(null)
+  // The tick shows at once; it stays until the refetched links agree, or reverts on a refusal.
+  const [busy, setBusy] = useState<{ id: string; linked: boolean } | null>(null)
   const [error, setError] = useState<string | null>(null)
   const linked = new Set(supervises.map((x) => x.user_id))
   const near = (x: TeamMember) => x.department_ids.some((d) => m.department_ids.includes(d))
@@ -997,10 +998,11 @@ function SupervisesPicker({
   const H = 'text-ui font-semibold text-ink-700'
 
   async function toggle(x: TeamMember) {
-    setBusy(x.user_id)
+    const next = !linked.has(x.user_id)
+    setBusy({ id: x.user_id, linked: next })
     setError(null)
     try {
-      setError(await onLink(x.user_id, !linked.has(x.user_id)))
+      setError(await onLink(x.user_id, next))
     } finally {
       setBusy(null)
     }
@@ -1028,7 +1030,7 @@ function SupervisesPicker({
                 <input
                   type="checkbox"
                   data-testid="people-supervises-worker"
-                  checked={linked.has(x.user_id)}
+                  checked={busy?.id === x.user_id ? busy.linked : linked.has(x.user_id)}
                   disabled={busy !== null}
                   onChange={() => void toggle(x)}
                   className="size-4"
