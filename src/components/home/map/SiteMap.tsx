@@ -1,7 +1,8 @@
 'use client'
 /**
  * Phase 63 -- the library drawn as an isometric site (sketch 009 A). Every area is a raised plate
- * with a name sign and its SOP count; every object on a plate is exactly one SOP of that area, so
+ * with a name sign and its SOP count, joined to the others by walkways; every object (in its own
+ * bay) on a plate is exactly one SOP of that area, so
  * the map always matches the list. Click a plate to zoom in (the list filters); zoomed in, each
  * object shows its title and status and opens Read. Plates and objects are keyboard buttons.
  * Geometry comes from src/lib/library/iso-layout.ts; text is always a React node.
@@ -9,14 +10,14 @@
  * Built lazily (no stylesheet import here): the hover / dim / focus rules live in blueprint-theme.css.
  */
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
-import { byDepth, layoutSite, viewFor } from '@/lib/library/iso-layout'
+import { byDepth, layoutSite, viewFor, walkways } from '@/lib/library/iso-layout'
 import { HEIGHT, TILE, project } from '@/lib/library/iso'
 import { machineArt, objectBox } from '@/lib/library/site-art'
 import type { LibraryArea } from '@/lib/library/areas'
 import type { ObjectKind } from '@/lib/library/object-kind'
 import type { RowStatus } from '@/lib/library/status'
 import { MapKey } from './MapKey'
-import { MapObject, PLATE_H, Plate } from './MapShapes'
+import { Bay, MapObject, PLATE_H, Plate } from './MapShapes'
 
 export interface MapRow {
   id: string
@@ -223,6 +224,26 @@ export function SiteMap({ areas, rows, area, onArea, onOpenSop, orgName, renderO
         aria-label="Site map"
       >
         <polygon points={groundPts} style={{ fill: 'var(--ink-200)', stroke: 'var(--ink-300)' }} />
+        {/* Walkways: pale lanes with a dashed centre line joining every area. */}
+        <g transform={TOP_FACE(0)} aria-hidden="true">
+          {walkways(layout).map((l, i) => {
+            const along = l.w >= l.d
+            return (
+              <g key={i}>
+                <rect x={l.x + 0.12} y={l.y + 0.12} width={Math.max(0, l.w - 0.24)} height={Math.max(0, l.d - 0.24)} vectorEffect="non-scaling-stroke" style={{ fill: 'var(--paper-1)', stroke: 'var(--ink-300)', strokeWidth: 1 }} />
+                <line
+                  x1={along ? l.x + 0.4 : l.x + l.w / 2}
+                  y1={along ? l.y + l.d / 2 : l.y + 0.4}
+                  x2={along ? l.x + l.w - 0.4 : l.x + l.w / 2}
+                  y2={along ? l.y + l.d / 2 : l.y + l.d - 0.4}
+                  vectorEffect="non-scaling-stroke"
+                  strokeDasharray="5 5"
+                  style={{ stroke: 'var(--ink-400)', strokeWidth: 1 }}
+                />
+              </g>
+            )
+          })}
+        </g>
 
         {byDepth(layout.plates).map((plate) => {
           const a = areaById.get(plate.id)
@@ -254,13 +275,18 @@ export function SiteMap({ areas, rows, area, onArea, onOpenSop, orgName, renderO
                 const box = objectBox(o.kind, o.x, o.y, PLATE_H)
                 const sprite = row ? machineArt(row.machine ?? null) : null
                 const [shx, shy] = project(o.cx, o.cy, PLATE_H)
+                const bay = <Bay cx={o.cx} cy={o.cy} cw={o.cw} cd={o.cd} colourVar={a.colourVar} />
                 const shapes = sprite ? (
                   <>
+                    {bay}
                     <ellipse cx={shx} cy={shy} rx={box.w * 0.42} ry={box.w * 0.16} style={{ fill: 'var(--ink-900)', opacity: 0.14 }} />
                     <image href={sprite} x={box.x - box.w * 0.1} y={box.y - box.h * 0.2} width={box.w * 1.2} height={box.h * 1.2} preserveAspectRatio="xMidYMax meet" />
                   </>
                 ) : (
-                  <MapObject kind={o.kind} x={o.x} y={o.y} colourVar={a.colourVar} />
+                  <>
+                    {bay}
+                    <MapObject kind={o.kind} x={o.x} y={o.y} colourVar={a.colourVar} />
+                  </>
                 )
                 if (!row) return <g key={o.i}>{shapes}</g>
                 if (!open) return <g key={row.id}>{shapes}</g>

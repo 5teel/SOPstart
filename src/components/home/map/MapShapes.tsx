@@ -100,3 +100,27 @@ export const MapObject = memo(function MapObject({ kind, x, y, colourVar }: { ki
     </>
   )
 })
+
+const PAD = { top: 'paper-top', right: 'paper-side', left: 'paper-side' }
+const WALL = { top: 'accent-dark', right: 'steel-side', left: 'steel-top' }
+
+/**
+ * One object's bay: a floor pad with a low partition on its two far sides (topped in the area colour),
+ * so each machine stands in its own housing instead of floating on the plate. (cx, cy) centre, cw x cd size.
+ */
+export const Bay = memo(function Bay({ cx, cy, cw, cd, colourVar }: { cx: number; cy: number; cw: number; cd: number; colourVar: string }) {
+  const [w, d] = [cw - 0.24, cd - 0.24]
+  const [x, y, z] = [cx - w / 2, cy - d / 2, PLATE_H + 0.06]
+  const shapes = [
+    ...boxFaces(x, y, PLATE_H, w, d, 0.06, PAD),
+    ...boxFaces(x, y, z, w, 0.08, 0.8, WALL),
+    ...boxFaces(x, y, z, 0.08, d, 0.8, WALL),
+  ]
+  return (
+    <>
+      {shapes.map((s, i) => (
+        <Shape key={i} d={s} colourVar={colourVar} />
+      ))}
+    </>
+  )
+})

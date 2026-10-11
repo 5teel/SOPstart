@@ -25,3 +25,6 @@ Objects are pictured per named machine, not per object kind: `public/site-art/ma
 
 ## Amendment 2 (2026-10-11)
 Floor pictures are removed (Simon: the machine pictures make them unnecessary). An area is a tinted plate in its area colour with a dashed floor line inside its edge; every SOP's machine picture stands on it with a soft contact shadow; each area sign reads its name and "N SOPs" in one standard form.
+
+## Amendment 3 (2026-10-11)
+Each object stands in its own bay: a floor pad with a low partition on its two far sides, topped in the area colour (`Bay` in `MapShapes.tsx`, sized to the object's share of the plate). The ground carries walkways (`walkways()` in `iso-layout.ts`): a ring round the site, cross aisles between rows of areas and aisles between neighbouring areas, drawn pale with a dashed centre line in ink. Both are drawn shapes, not pictures, and carry no meaning.

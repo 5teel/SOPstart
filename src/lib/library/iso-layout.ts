@@ -8,7 +8,8 @@ import type { ObjectKind } from './object-kind'
 
 export interface LayoutArea { id: string; count: number; kinds: ObjectKind[] }
 export interface Plate { id: string; x: number; y: number; w: number; d: number }
-export interface Placed { areaId: string; i: number; kind: ObjectKind; x: number; y: number; cx: number; cy: number }
+/** cw x cd: the object's bay (its share of the plate), centred on cx, cy. */
+export interface Placed { areaId: string; i: number; kind: ObjectKind; x: number; y: number; cx: number; cy: number; cw: number; cd: number }
 export interface SiteLayout { plates: Plate[]; objects: Placed[]; ground: [number, number, number, number] }
 
 const CELL_W = 2.8
@@ -56,13 +57,37 @@ export function layoutSite(areas: LayoutArea[]): SiteLayout {
       const [fw, fd] = FOOTPRINT[kind]
       const cx = plate.x + MARGIN + ((i % cols) + 0.5) * (iw / cols)
       const cy = plate.y + MARGIN + (Math.floor(i / cols) + 0.5) * (id / rows)
-      objects.push({ areaId: plate.id, i, kind, x: cx - fw / 2, y: cy - fd / 2, cx, cy })
+      objects.push({ areaId: plate.id, i, kind, x: cx - fw / 2, y: cy - fd / 2, cx, cy, cw: iw / cols, cd: id / rows })
     }
   }
 
   const x1 = Math.max(0, ...plates.map((p) => p.x + p.w))
   const y1 = Math.max(0, ...plates.map((p) => p.y + p.d))
   return { plates, objects, ground: [-1, -1, x1 + 1, y1 + 1] }
+}
+
+export interface Lane { x: number; y: number; w: number; d: number }
+
+/**
+ * Walkways on the ground: a ring round the site, a cross aisle between shelf rows and a short aisle
+ * between neighbouring plates in a row, so every area joins one connected path. Plan coordinates.
+ */
+export function walkways(layout: SiteLayout): Lane[] {
+  const [gx0, gy0, gx1, gy1] = layout.ground
+  const lanes: Lane[] = [
+    { x: gx0, y: gy0, w: gx1 - gx0, d: -gy0 },
+    { x: gx0, y: gy1 + gy0, w: gx1 - gx0, d: -gy0 },
+    { x: gx0, y: 0, w: -gx0, d: gy1 + gy0 },
+    { x: gx1 + gx0, y: 0, w: -gx0, d: gy1 + gy0 },
+  ]
+  const rows = [...new Set(layout.plates.map((p) => p.y))].sort((a, b) => a - b)
+  rows.forEach((y, r) => {
+    const row = layout.plates.filter((p) => p.y === y).sort((a, b) => a.x - b.x)
+    const rowD = Math.max(...row.map((p) => p.d))
+    row.slice(0, -1).forEach((p) => lanes.push({ x: p.x + p.w, y, w: GAP, d: rowD }))
+    if (r < rows.length - 1) lanes.push({ x: 0, y: y + rowD, w: gx1 + gx0, d: rows[r + 1] - y - rowD })
+  })
+  return lanes
 }
 
 function bounds(list: Pt[]): [number, number, number, number] {
