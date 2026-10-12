@@ -37,28 +37,30 @@ export function SectionMenu({
   collapsed?: boolean
 }) {
   return (
-    <aside data-testid="home-menu" className={`flex w-55 shrink-0 flex-col border-r border-ink-200 bg-paper max-lg:hidden ${collapsed ? 'lg:hidden' : ''}`}>
-      <div className="flex h-16 shrink-0 items-center justify-center border-b border-ink-200 px-5">
-        <Wordmark size="menu" />
-      </div>
-      <nav aria-label="Sections" className="flex flex-col gap-0.5 px-3 pt-4">
-        {sectionsForRole(role).map((s) => (
-          <button
-            key={s}
-            type="button"
-            data-testid={`home-section-${s}`}
-            aria-current={section === s ? 'page' : undefined}
-            onClick={() => onSelect(s)}
-            className={`min-h-tap w-full rounded-lg px-3 text-left hover:bg-paper-2 aria-[current=page]:bg-paper-2 aria-[current=page]:font-bold ${
-              s === 'manage' ? 'mt-3 border-t border-ink-200 pt-1 text-ui text-ink-500' : 'text-reading text-ink-900'
-            }`}
-          >
-            {SECTION_LABEL[s]}
-          </button>
-        ))}
-      </nav>
-      <div className="mt-auto">
-        <AccountControl email={userEmail} org={orgName} orgId={orgId} sites={sites} isAdmin={role === 'admin' || role === 'safety_manager'} />
+    <aside data-testid="home-menu" data-folded={collapsed} inert={collapsed} className="fold w-55 shrink-0 border-r border-ink-200 bg-paper max-lg:hidden">
+      <div className="flex h-full w-55 flex-col">
+        <div className="flex h-16 shrink-0 items-center justify-center border-b border-ink-200 px-5">
+          <Wordmark size="menu" />
+        </div>
+        <nav aria-label="Sections" className="flex flex-col gap-0.5 px-3 pt-4">
+          {sectionsForRole(role).map((s) => (
+            <button
+              key={s}
+              type="button"
+              data-testid={`home-section-${s}`}
+              aria-current={section === s ? 'page' : undefined}
+              onClick={() => onSelect(s)}
+              className={`min-h-tap w-full rounded-lg px-3 text-left hover:bg-paper-2 aria-[current=page]:bg-paper-2 aria-[current=page]:font-bold ${
+                s === 'manage' ? 'mt-3 border-t border-ink-200 pt-1 text-ui text-ink-500' : 'text-reading text-ink-900'
+              }`}
+            >
+              {SECTION_LABEL[s]}
+            </button>
+          ))}
+        </nav>
+        <div className="mt-auto">
+          <AccountControl email={userEmail} org={orgName} orgId={orgId} sites={sites} isAdmin={role === 'admin' || role === 'safety_manager'} />
+        </div>
       </div>
     </aside>
   )

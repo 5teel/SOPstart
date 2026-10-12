@@ -218,32 +218,34 @@ export function HomeShell({ siteName, siteId, sites, userEmail, userId, role, in
           )}
           <div
             data-testid="home-list"
-            className={`min-h-0 flex-1 overflow-y-auto border-ink-200 px-3.5 pb-6 pt-3 lg:order-last lg:w-100 lg:flex-none lg:border-l lg:pt-0 ${
-              sopOpen || phoneMap ? 'max-lg:hidden' : ''
-            } ${sopOpen && !listOpen ? 'lg:hidden' : ''}`}
+            data-folded={sopOpen && !listOpen}
+            inert={sopOpen && !listOpen}
+            className={`fold min-h-0 flex-1 border-ink-200 lg:order-last lg:w-100 lg:flex-none lg:border-l ${sopOpen || phoneMap ? 'max-lg:hidden' : ''}`}
           >
-            {lib.error ? (
-              loadError
-            ) : lib.loading && lib.rows.length === 0 ? (
-              <p aria-busy="true" className="p-2 text-ui text-ink-500">
-                Loading your SOPs…
-              </p>
-            ) : (
-              <SopList
-                rows={lib.rows}
-                areas={lib.areas}
-                recent={recent}
-                mostUsed={mostUsed}
-                area={state.area}
-                selectedId={state.sop}
-                canWrite={canWrite}
-                onOpen={openSop}
-                onArea={openArea}
-                trailing={bell}
-              />
-            )}
-            <div className="mt-6 lg:hidden">
-              <AccountControl email={userEmail} isAdmin={canWrite} org={siteName} orgId={siteId} sites={sites} />
+            <div className="h-full overflow-y-auto px-3.5 pb-6 pt-3 lg:w-100 lg:pt-0">
+              {lib.error ? (
+                loadError
+              ) : lib.loading && lib.rows.length === 0 ? (
+                <p aria-busy="true" className="p-2 text-ui text-ink-500">
+                  Loading your SOPs…
+                </p>
+              ) : (
+                <SopList
+                  rows={lib.rows}
+                  areas={lib.areas}
+                  recent={recent}
+                  mostUsed={mostUsed}
+                  area={state.area}
+                  selectedId={state.sop}
+                  canWrite={canWrite}
+                  onOpen={openSop}
+                  onArea={openArea}
+                  trailing={bell}
+                />
+              )}
+              <div className="mt-6 lg:hidden">
+                <AccountControl email={userEmail} isAdmin={canWrite} org={siteName} orgId={siteId} sites={sites} />
+              </div>
             </div>
           </div>
           <div className={`flex min-h-0 min-w-0 flex-1 flex-col bg-paper-1 ${!sopOpen && !phoneMap ? 'max-lg:hidden' : ''}`}>

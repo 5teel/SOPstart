@@ -193,7 +193,8 @@
   --dur-fuse-hold:    140ms;
   --dur-fuse-rise:    420ms;
   --fuse-short-scale: 0.3;
-  --dur-map-zoom:     520ms;  /* site map: whole site <-> one area */
+  --dur-map-zoom:     520ms;
+  --dur-panel-fold:   600ms;  /* desktop side panels fold away while a SOP is open (ADR-0011) */  /* site map: whole site <-> one area */
   --dur-hover-lift:   160ms;
 
   /* Library areas on the site map, assigned in order. A data palette, distinct
@@ -880,4 +881,14 @@ body[data-theme="paper"] .strip-slot .done:disabled {
 .map-label text { paint-order: stroke; stroke: var(--paper-1); stroke-width: 4px; stroke-linejoin: round; }
 @media (prefers-reduced-motion: reduce) {
   .map-plate { transition: none; }
+}
+
+/* ADR-0011: a side panel folds to nothing on desktop, slowly; its content keeps its width inside.
+   Unlayered so the fold beats the panel's width utility. */
+@media (min-width: 64rem) {
+  .fold { overflow: hidden; transition: width var(--dur-panel-fold) var(--ease-fuse), border-width var(--dur-panel-fold) var(--ease-fuse); }
+  .fold[data-folded="true"] { width: 0; border-width: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fold { transition: none; }
 }
