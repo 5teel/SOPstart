@@ -120,7 +120,7 @@ export const JOURNEYS: Journey[] = [
       { id: 'missing', type: 'action', label: 'Ask for one', route: '/', detail: 'A search with no match offers Ask for one (it opens a request, with the search words as the note). An admin or safety manager also gets Write it.', branches: [
         { label: 'Request sent', to: 'e' },
       ] },
-      { id: 'read', type: 'screen', label: 'Read the SOP', route: '/', detail: 'The SOP opens beside the list (on a phone it takes the screen, with a back link): hazards and PPE first, then every step in order, the owner, the version and "Updated since you last did it" when a newer version was published. Back and Esc return to the list.' },
+      { id: 'read', type: 'screen', label: 'Read the SOP', route: '/', detail: 'On a computer the SOP takes the centre where the map was, and the menu and list fold away (Menu and SOP list in its header bring them back, ADR-0011); on a phone it takes the screen. Hazards and PPE first, then every step in order, the owner, the version and "Updated since you last did it" when a newer version was published. Back ("‹ Site map" / "‹ My SOPs") and Esc return to where you were.' },
       { id: 'go', type: 'decision', label: 'Ready to start?', branches: [
         { label: 'Press start', to: 'start' },
         { label: 'Just reading', to: 'e' },
@@ -172,7 +172,7 @@ export const JOURNEYS: Journey[] = [
     summary: 'The library as a picture of the site: one area per department (plus Site-wide), and one object per SOP in it.',
     steps: [
       { id: 's', type: 'start', label: 'Wants to find a SOP by where it is' },
-      { id: 'map', type: 'screen', label: 'The whole site', route: '/', detail: 'The site map beside the list: every area drawn in its own colour, with a count of the SOPs inside. Choosing an area also filters the list.' },
+      { id: 'map', type: 'screen', label: 'The whole site', route: '/', detail: 'The site map in the centre, the list on the right (a tab on a phone): every area drawn in its own colour, with a count of the SOPs inside. Choosing an area also filters the list.' },
       { id: 'area', type: 'screen', label: 'An area', route: '/', detail: 'The map zooms to the area; every object on it is one SOP, with its title and status. A SOP sits in the department of its first machine, else its first department, else Site-wide. The address carries the area, so the view can be shared.' },
       { id: 'read', type: 'screen', label: 'Read the SOP', route: '/', detail: 'Click an object to Read it, the same Read as from the list. Esc steps back to the whole site.' },
       { id: 'e', type: 'end', label: 'SOP found by place' },
