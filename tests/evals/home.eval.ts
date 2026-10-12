@@ -430,7 +430,7 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
       expect(list.x, 'the list is on the right').toBeGreaterThan(map.x)
       const bottoms = await page.evaluate(() =>
         [
-          document.querySelector('[data-testid="home-menu"] > div'),
+          document.querySelector('[data-testid="home-menu"] > div > div'),
           document.querySelector('[data-testid="map-header"]'),
           document.querySelector('[data-testid="sop-list"] > div'),
         ].map((e) => Math.round(e!.getBoundingClientRect().bottom)),
