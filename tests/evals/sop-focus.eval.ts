@@ -525,11 +525,11 @@ test.describe('Phase 58 — the SOP focus screen (deployed)', () => {
       expect(after?.find((r) => r.id === ids.publish)?.status, 'v1 stays on record').toBe('published')
       expect(after?.find((r) => r.id === v2Id)).toMatchObject({ version: 2, status: 'published' })
 
-      // A worker opening the old address lands on the new version.
+      // A worker opening the old address lands on the new version, in the home view (ADR-0012).
       const worker = await workerCtx.newPage()
       await worker.goto(`/sops/${ids.publish}`)
-      await worker.waitForURL(new RegExp(`/sops/${v2Id}`), SLOW)
-      await expect(worker.getByTestId('focus-top-bar')).toBeVisible(SLOW)
+      await worker.waitForURL(new RegExp(`/\\?sop=${v2Id}$`), SLOW)
+      await expect(worker.getByTestId('read-view')).toBeVisible(SLOW)
       await worker.close()
 
       // The admin's version list keeps v1.

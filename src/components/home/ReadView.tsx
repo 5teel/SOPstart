@@ -325,7 +325,15 @@ export function ReadView({ row, role, from, onOpenSop }: { row: LibraryRow; role
       </div>
 
       {asking && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/40 p-4" onKeyDown={(e) => e.key === 'Escape' && setAsking(false)}>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/40 p-4"
+          onKeyDown={(e) => {
+            if (e.key !== 'Escape') return
+            // Handled here: the home's Esc (close the SOP) skips a prevented key.
+            e.preventDefault()
+            setAsking(false)
+          }}
+        >
           <div role="dialog" aria-modal="true" aria-labelledby="start-over-title" data-testid="walk-start-over-dialog" className="flex w-full max-w-sm flex-col gap-4 rounded-2xl bg-paper-1 p-6">
             <h2 id="start-over-title" className="text-reading font-semibold text-ink-900">
               Start over?
