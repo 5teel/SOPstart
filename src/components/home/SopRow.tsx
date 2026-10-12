@@ -43,13 +43,9 @@ export function SopRow({
       <span className="min-w-0 flex-1">
         <span className="block text-reading font-semibold leading-snug text-ink-900">{row.title}</span>
         <span className="mt-0.5 flex flex-wrap items-center gap-x-1.5 font-label text-meta text-ink-600">
-          {!hideArea && (
-            <>
-              <i aria-hidden="true" className="size-2 shrink-0 rounded-full" style={{ background: row.colourVar }} />
-              <span>{row.areaName} · </span>
-            </>
-          )}
+          {!hideArea && <i aria-hidden="true" className="size-2 shrink-0 rounded-full" style={{ background: row.colourVar }} />}
           <span>
+            {!hideArea && `${row.areaName} · `}
             {row.type}
             {row.minutes ? ` · ~${row.minutes} min` : ''}
             {extra}
