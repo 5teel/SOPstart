@@ -267,7 +267,9 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
         await expect(page).toHaveURL(new RegExp(`sop=${id}`), SLOW)
       }
       await open(lib.sopIds.packing)
+      await page.getByTestId('read-back').click() // Read folds the list away (ADR-0011)
       await open(lib.sopIds.lab)
+      await page.getByTestId('read-back').click()
       await expect(page.getByTestId('sop-row').nth(0)).toHaveAttribute('data-sop-id', lib.sopIds.lab, SLOW)
       await expect(page.getByTestId('sop-row').nth(1)).toHaveAttribute('data-sop-id', lib.sopIds.packing, SLOW)
       await expect(page.getByTestId('sop-list').getByText('Recent', { exact: true })).toBeVisible()
