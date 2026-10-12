@@ -46,7 +46,7 @@ export function SopRow({
           {!hideArea && (
             <>
               <i aria-hidden="true" className="size-2 shrink-0 rounded-full" style={{ background: row.colourVar }} />
-              <span>{row.areaName} ·</span>
+              <span>{row.areaName} · </span>
             </>
           )}
           <span>

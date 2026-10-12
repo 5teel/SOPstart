@@ -235,18 +235,24 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
 
       // By area: the four fixture areas are group headers by name.
       for (const name of EVAL_AREA_NAMES) await expect(page.getByTestId('area-group').filter({ hasText: name }), name).toHaveCount(1, SLOW)
-      // Each fixture SOP names its area and type on its row.
+      // Under its area heading a row names its type, not the area again (2026-10-12).
+      for (const [title, type] of [[EVAL_AREA_SOPS.packing, 'Process'], [EVAL_AREA_SOPS.lab, 'Inspection'], [EVAL_AREA_SOPS.site, 'Emergency'], [EVAL_PLANT_SOP_TITLE, 'Machine']]) {
+        const r = page.getByTestId('sop-row').filter({ hasText: title }).last()
+        await expect(r, title).toContainText(type, SLOW)
+        await expect(r, title).not.toContainText(' · ' + type) // no "Area · Type" here
+      }
+      // Grouped by type, each row names its area and type.
       const meta: Array<[string, string]> = [
         [EVAL_AREA_SOPS.packing, 'EVAL Area Packing · Process'],
         [EVAL_AREA_SOPS.lab, 'EVAL Area Lab · Inspection'],
         [EVAL_AREA_SOPS.site, 'Site-wide · Emergency'],
         [EVAL_PLANT_SOP_TITLE, 'Forming · Machine'],
       ]
-      for (const [title, m] of meta) await expect(page.getByTestId('sop-row').filter({ hasText: title }).first(), title).toContainText(m, SLOW)
       await shot(page, '63-home-list-area')
 
       // By type: Machine, Process, Inspection, Emergency each hold their fixture SOP.
       await page.getByRole('button', { name: 'Type', exact: true }).click()
+      for (const [title, m] of meta) await expect(page.getByTestId('sop-row').filter({ hasText: title }).last(), title).toContainText(m, SLOW)
       const group = (t: string) => page.locator('h3').filter({ hasText: new RegExp(`^${t}\\s*\\d+$`) }).locator('..')
       await expect(group('Machine')).toContainText(EVAL_PLANT_SOP_TITLE, SLOW)
       await expect(group('Process')).toContainText(EVAL_AREA_SOPS.packing, SLOW)
