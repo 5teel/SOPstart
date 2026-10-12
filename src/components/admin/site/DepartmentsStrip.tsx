@@ -6,23 +6,47 @@
  * colour; its zone stays the hull of its machines. Remove is refused by the
  * server while a machine, a SOP visibility rule, a person or a library item
  * still uses it.
+ *
+ * ADR-0010: a department can sit inside another one (the site map draws it as a
+ * sub-area you reach by clicking its parent), and the org picks how the map packs
+ * its areas.
  */
 import { useState } from 'react'
 import { archiveDepartment, createDepartment, updateDepartment } from '@/actions/departments'
-import { areaColourVar } from '@/lib/library/areas'
+import { setSiteMapPacking } from '@/actions/site-map'
+import { areaColourVar, deptPath } from '@/lib/library/areas'
 import { DEPT_COLOURS } from '@/lib/site/departments'
 import type { SiteDepartment } from '@/lib/validators/site'
 
 interface DepartmentsStripProps {
   departments: SiteDepartment[]
+  packing: 'balanced' | 'rows'
   onChanged(): void
+}
+
+const PACKING_LABEL = { balanced: 'Balanced', rows: 'Rows' } as const
+
+/** Departments in map order: each level by name, sub-areas under their parent. */
+function treeOrder(departments: SiteDepartment[]): Array<{ dept: SiteDepartment; depth: number }> {
+  const raw = new Map(departments.map((d) => [d.id, d.parent_id]))
+  const parentOf = (id: string) => deptPath(raw, id).at(-2) ?? null
+  const byName = (a: SiteDepartment, b: SiteDepartment) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' })
+  const out: Array<{ dept: SiteDepartment; depth: number }> = []
+  const walk = (parent: string | null, depth: number) => {
+    for (const d of departments.filter((x) => parentOf(x.id) === parent).sort(byName)) {
+      out.push({ dept: d, depth })
+      walk(d.id, depth + 1)
+    }
+  }
+  walk(null, 0)
+  return out
 }
 
 function plural(n: number, word: string): string {
   return `${n} ${word}${n === 1 ? '' : 's'}`
 }
 
-function DepartmentRow({ dept, areaIndex, onChanged }: { dept: SiteDepartment; areaIndex: number; onChanged(): void }) {
+function DepartmentRow({ dept, areaIndex, depth, parents, onChanged }: { dept: SiteDepartment; areaIndex: number; depth: number; parents: SiteDepartment[]; onChanged(): void }) {
   const [name, setName] = useState(dept.name)
   const [pending, setPending] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
@@ -60,6 +84,18 @@ function DepartmentRow({ dept, areaIndex, onChanged }: { dept: SiteDepartment; a
     onChanged()
   }
 
+  async function pickParent(parentId: string | null) {
+    setPending(true)
+    setMessage(null)
+    const result = await updateDepartment({ id: dept.id, parentId })
+    setPending(false)
+    if ('error' in result) {
+      setMessage("Couldn't move it - try again")
+      return
+    }
+    onChanged()
+  }
+
   async function handleRemove() {
     setPending(true)
     setMessage(null)
@@ -80,7 +116,7 @@ function DepartmentRow({ dept, areaIndex, onChanged }: { dept: SiteDepartment; a
   }
 
   return (
-    <div data-testid="dept-strip-row" data-dept-id={dept.id} className="flex flex-col gap-2 rounded-lg border border-ink-200 p-3">
+    <div data-testid="dept-strip-row" data-dept-id={dept.id} data-depth={depth} className="flex flex-col gap-2 rounded-lg border border-ink-200 p-3">
       <div className="flex items-center gap-2">
         <span data-testid="dept-strip-dot" className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: areaColourVar(areaIndex) }} />
         <input
@@ -106,6 +142,24 @@ function DepartmentRow({ dept, areaIndex, onChanged }: { dept: SiteDepartment; a
           Remove
         </button>
       </div>
+      <label className="flex items-center gap-2 text-meta text-ink-600">
+        Sits inside
+        <select
+          data-testid="dept-strip-parent"
+          aria-label={`What ${dept.name} sits inside`}
+          value={dept.parent_id ?? ''}
+          disabled={pending}
+          onChange={(e) => void pickParent(e.target.value || null)}
+          className="min-h-tap min-w-0 flex-1 rounded-lg border border-ink-300 bg-paper px-2 text-ui text-ink-900"
+        >
+          <option value="">The whole site</option>
+          {parents.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.name}
+            </option>
+          ))}
+        </select>
+      </label>
       <div className="flex flex-wrap gap-1.5">
         {DEPT_COLOURS.map((colour) => (
           <button
@@ -136,12 +190,34 @@ function DepartmentRow({ dept, areaIndex, onChanged }: { dept: SiteDepartment; a
   )
 }
 
-export function DepartmentsStrip({ departments, onChanged }: DepartmentsStripProps) {
+export function DepartmentsStrip({ departments, packing, onChanged }: DepartmentsStripProps) {
   const [newName, setNewName] = useState('')
   const [adding, setAdding] = useState(false)
   const [addError, setAddError] = useState<string | null>(null)
-  // Same order the map names its areas in (name order), so a department keeps its map colour.
-  const areaOrder = [...departments].sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }))
+  const [packingError, setPackingError] = useState<string | null>(null)
+  // Same order the map names its areas in (tree order, by name), so a department keeps its map colour.
+  const areaOrder = treeOrder(departments)
+  // What a department may not sit inside: itself and its own sub-areas (the rows after it that are deeper).
+  const within = (id: string): Set<string> => {
+    const out = new Set([id])
+    const at = areaOrder.findIndex((x) => x.dept.id === id)
+    for (const { dept, depth } of areaOrder.slice(at + 1)) {
+      if (depth <= areaOrder[at].depth) break
+      out.add(dept.id)
+    }
+    return out
+  }
+
+  async function pickPacking(next: 'balanced' | 'rows') {
+    if (next === packing) return
+    setPackingError(null)
+    const result = await setSiteMapPacking(next)
+    if ('error' in result) {
+      setPackingError("Couldn't change the map layout - try again")
+      return
+    }
+    onChanged()
+  }
 
   async function handleAdd() {
     const name = newName.trim()
@@ -161,11 +237,38 @@ export function DepartmentsStrip({ departments, onChanged }: DepartmentsStripPro
 
   return (
     <div data-testid="dept-strip" className="rounded-lg border border-ink-200 bg-paper-1 p-3">
-      <h2 className="text-ui font-medium text-ink-900">Departments</h2>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 className="text-ui font-medium text-ink-900">Departments</h2>
+        <div className="flex items-center gap-2 text-meta text-ink-600">
+          Site map layout
+          <span className="seg" data-testid="map-packing">
+            {(['balanced', 'rows'] as const).map((p) => (
+              <button key={p} type="button" data-testid="map-packing-option" data-packing={p} aria-pressed={packing === p} onClick={() => void pickPacking(p)}>
+                {PACKING_LABEL[p]}
+              </button>
+            ))}
+          </span>
+        </div>
+      </div>
+      {packingError && (
+        <p role="alert" className="mt-2 text-meta text-accent-hazard">
+          {packingError}
+        </p>
+      )}
       <div className="mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
-        {areaOrder.map((d, i) => (
-          <DepartmentRow key={`${d.id}:${d.name}:${d.colour}`} dept={d} areaIndex={i} onChanged={onChanged} />
-        ))}
+        {areaOrder.map(({ dept: d, depth }, i) => {
+          const blocked = within(d.id)
+          return (
+            <DepartmentRow
+              key={`${d.id}:${d.name}:${d.colour}:${d.parent_id ?? ''}`}
+              dept={d}
+              areaIndex={i}
+              depth={depth}
+              parents={departments.filter((p) => !blocked.has(p.id)).sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }))}
+              onChanged={onChanged}
+            />
+          )
+        })}
       </div>
       <div className="mt-3 flex items-center gap-2">
         <input

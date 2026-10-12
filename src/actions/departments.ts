@@ -6,7 +6,7 @@
  * Exports:
  *  - listDepartments()          — DepartmentWithCounts[] for the caller's org
  *  - createDepartment()         — insert with org_id from JWT
- *  - updateDepartment()         — name/code/colour/icon/owner
+ *  - updateDepartment()         — name/code/colour/icon/owner/parent (ADR-0010)
  *  - archiveDepartment()        — flag-only, never DELETE (REQ-6)
  *  - setDepartmentOwner()       — must verify userId ∈ organisation_members (D-03, T-25-03)
  *  - assignMemberDepartments()  — replace-semantics junction write (REQ-4)
@@ -67,6 +67,8 @@ const UpdateDepartmentInput = z.object({
   colour:      z.enum(DEPT_COLOURS).optional(),
   icon:        z.string().max(4).nullable().optional(),
   ownerUserId: z.string().uuid().nullable().optional(),
+  /** ADR-0010: the department this one sits inside on the site map; null is top level. */
+  parentId:    z.string().uuid().nullable().optional(),
 })
 
 // ---------------------------------------------------------------------------
@@ -247,6 +249,23 @@ export async function updateDepartment(
   if (parsed.data.colour      !== undefined) updates.colour        = parsed.data.colour
   if (parsed.data.icon        !== undefined) updates.icon          = parsed.data.icon
   if (parsed.data.ownerUserId !== undefined) updates.owner_user_id = parsed.data.ownerUserId
+  if (parsed.data.parentId    !== undefined) {
+    // The parent must be an active department of the SESSION org and must not sit inside this one.
+    const parentId = parsed.data.parentId
+    if (parentId) {
+      const { data: all } = await ctx.supabase
+        .from('departments')
+        .select('id, parent_id, archived')
+        .eq('organisation_id', ctx.organisationId)
+      const byId = new Map(((all ?? []) as Array<{ id: string; parent_id: string | null; archived: boolean }>).map((d) => [d.id, d]))
+      const parent = byId.get(parentId)
+      if (!parent || parent.archived) return { error: 'That department is not on this site' }
+      for (let p: string | null = parentId, n = 0; p && n <= byId.size; p = byId.get(p)?.parent_id ?? null, n++) {
+        if (p === parsed.data.id) return { error: 'A department cannot sit inside itself or one of its own sub-areas' }
+      }
+    }
+    updates.parent_id = parentId
+  }
 
   const { data, error } = await ctx.supabase
     .from('departments')
@@ -264,8 +283,13 @@ export async function updateDepartment(
   const rec = await recordDecision({
     kind: 'department_change',
     subject: { kind: 'department', id: parsed.data.id },
-    summary: parsed.data.name !== undefined ? 'Renamed a department' : 'Changed a department',
-    details: { action: 'update', changed, ...(parsed.data.name !== undefined ? { name: parsed.data.name } : {}) },
+    summary: parsed.data.name !== undefined ? 'Renamed a department' : parsed.data.parentId !== undefined ? 'Moved a department on the site map' : 'Changed a department',
+    details: {
+      action: 'update',
+      changed,
+      ...(parsed.data.name !== undefined ? { name: parsed.data.name } : {}),
+      ...(parsed.data.parentId !== undefined ? { parentId: parsed.data.parentId } : {}),
+    },
   })
   return { department: data as unknown as Department, logged: rec.ok }
 }

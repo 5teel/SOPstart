@@ -128,7 +128,7 @@ export function useLibrary(userId: string) {
     enabled: hasIds,
     queryFn: async (): Promise<Areas> => {
       const [d, m, sm, sd] = await Promise.all([
-        supabase.from('departments').select('id, name, archived'),
+        supabase.from('departments').select('id, name, archived, parent_id'),
         supabase.from('site_machines').select('id, name, sort, department_id'),
         supabase.from('sop_machines').select('sop_id, machine_id').in('sop_id', ids),
         supabase.from('sop_departments').select('sop_id, department_id').in('sop_id', ids),

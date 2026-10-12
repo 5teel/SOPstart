@@ -44,7 +44,7 @@ export function SiteEditSurface({ onDone }: { onDone(): void }) {
         </p>
       ) : (
         <>
-          <DepartmentsStrip departments={site.departments} onChanged={refresh} />
+          <DepartmentsStrip departments={site.departments} packing={site.packing} onChanged={refresh} />
           {site.layout ? (
             <SiteWorkspace
               key={site.layout.id}

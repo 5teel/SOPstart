@@ -25,6 +25,7 @@ import { useLibrary } from '@/hooks/useLibrary'
 import { useRecentSops } from '@/hooks/useRecentSops'
 import { requestOverviewSection } from '@/lib/shell/overview-focus'
 import { formatHome, HOME, homeFrom, resolveHome, type HomeState } from '@/lib/shell/home-state'
+import type { Packing } from '@/lib/library/iso-layout'
 
 const OPENING = () => <p className="p-4 text-ui text-ink-500">Opening…</p>
 const SiteMap = dynamic(() => import('@/components/home/map/SiteMap').then((m) => m.SiteMap), { ssr: false, loading: OPENING })
@@ -50,6 +51,8 @@ export interface HomeShellProps {
   userId: string
   role: string | null
   initial: HomeState
+  /** The org's site map packing (ADR-0010). */
+  packing?: Packing
 }
 
 function isTypingTarget(t: EventTarget | null): boolean {
@@ -57,7 +60,7 @@ function isTypingTarget(t: EventTarget | null): boolean {
   return t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable
 }
 
-export function HomeShell({ siteName, siteId, sites, userEmail, userId, role, initial }: HomeShellProps) {
+export function HomeShell({ siteName, siteId, sites, userEmail, userId, role, initial, packing }: HomeShellProps) {
   const [state, setState] = useState<HomeState>(() => resolveHome(initial, role))
   const [phoneMap, setPhoneMap] = useState(false)
   const lib = useLibrary(userId)
@@ -71,12 +74,14 @@ export function HomeShell({ siteName, siteId, sites, userEmail, userId, role, in
     window.history.replaceState(null, '', formatHome(r))
   }
 
-  // Esc: close Read, then leave the area (not while typing, not under a dialog).
+  // Esc: close Read, then go up one area (not while typing, not under a dialog).
   const selectRef = useRef(select)
   const stateRef = useRef(state)
+  const areasRef = useRef(lib.areas)
   useEffect(() => {
     selectRef.current = select
     stateRef.current = state
+    areasRef.current = lib.areas
   })
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -85,7 +90,7 @@ export function HomeShell({ siteName, siteId, sites, userEmail, userId, role, in
       const s = stateRef.current
       if (s.s !== 'sops') return
       if (s.sop) selectRef.current({ ...s, sop: null })
-      else if (s.area) selectRef.current({ ...s, area: null })
+      else if (s.area) selectRef.current({ ...s, area: areasRef.current.find((a) => a.id === s.area)?.parentId ?? null })
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
@@ -157,6 +162,7 @@ export function HomeShell({ siteName, siteId, sites, userEmail, userId, role, in
       onArea={openArea}
       onOpenSop={openSop}
       orgName={siteName}
+      packing={packing}
       renderObjective={(a) => <WorkerObjective type={a ? 'department' : 'site'} id={a && a !== 'site-wide' ? a : null} />}
     />
   )

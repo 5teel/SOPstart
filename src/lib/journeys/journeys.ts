@@ -654,6 +654,34 @@ export const JOURNEYS: Journey[] = [
       { id: 'e', type: 'end', label: 'Working in the chosen site' },
     ],
   },
+  {
+    id: 'site-map-tiers',
+    group: 'Everyone',
+    persona: 'Everyone',
+    title: 'Find a SOP through the site map',
+    summary: 'A big site is drawn as areas inside areas; each click opens one level until the SOPs show (ADR-0010).',
+    steps: [
+      { id: 's', type: 'start', label: 'Looking for a SOP by where it is done' },
+      { id: 'home', type: 'screen', label: 'Home', route: '/', detail: 'The site map shows the top-level areas, each signed with its number of sub-areas and SOPs.' },
+      { id: 'area', type: 'action', label: 'Click an area', detail: 'The map zooms into it: its sub-areas get signs and the list narrows to everything inside it. The crumbs or Esc go back up a level.' },
+      { id: 'leaf', type: 'action', label: 'Click a sub-area', detail: 'At the last level each machine shows its SOP title; clicking one opens it.' },
+      { id: 'e', type: 'end', label: 'Reading the SOP' },
+    ],
+  },
+  {
+    id: 'site-map-layout',
+    group: 'Library & team',
+    persona: 'SOP Admin',
+    title: 'Arrange the site map',
+    summary: 'An admin nests departments into areas and picks how the map packs them (ADR-0010).',
+    steps: [
+      { id: 's', type: 'start', label: 'The map needs tidying' },
+      { id: 'site', type: 'screen', label: 'Site & departments', route: '/', detail: 'Manage SOPs -> Site & departments.' },
+      { id: 'inside', type: 'action', label: 'Set "Sits inside"', detail: 'updateDepartment() moves a department into another one; it becomes a sub-area on the map.' },
+      { id: 'pack', type: 'action', label: 'Pick Balanced or Rows', detail: 'setSiteMapPacking() saves how the map lays out its areas.' },
+      { id: 'e', type: 'end', label: 'The map is rearranged for everyone' },
+    ],
+  },
 ]
 
 export function journeysByGroup(): { group: string; journeys: Journey[] }[] {

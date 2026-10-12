@@ -24,3 +24,4 @@ code, plans and phases follow it until a later ADR supersedes it.
 | [0007](0007-design-base.md) | The design base — colour for safety, shared controls, sentence-case headings | Accepted | review only |
 | [0008](0008-ledger-every-action.md) | Every action a person takes is written to the decision ledger | Accepted | `tests/lint/ledger-every-action.spec.ts` |
 | [0009](0009-site-map-pictures.md) | The site map may carry pictures | Accepted | review only |
+| [0010](0010-tiered-site-map.md) | A tiered site map, packed by the org's choice | Accepted | `tests/phase63/site-tiers.spec.ts` |

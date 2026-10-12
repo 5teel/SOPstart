@@ -225,3 +225,20 @@ for (const o of ORGS) {
   }
   console.log(o.name, 'machine links', n)
 }
+
+// ADR-0010: tiers. Some departments sit inside a parent area on the site map; Kōwhai stays flat.
+const TIERS = {
+  southernrail: { 'Corridor Works': ['CWK', ['Track Renewal', 'Welding & Grinding', 'Overhead Line', 'Signals & Comms']], Depot: ['DPO', ['Depot & Yard', 'Plant & Fleet']] },
+  clearwater: { 'Production Hall': ['PRH', ['Blow Moulding', 'Filling Line', 'Packing & Palletising']], Utilities: ['UTL', ['Water Treatment', 'Syrup Room']] },
+}
+for (const o of ORGS) {
+  const tiers = TIERS[o.slug]
+  if (!tiers) continue
+  const org = must(await sb.from('organisations').select('id').eq('name', o.name).single())
+  for (const [parent, [code, children]] of Object.entries(tiers)) {
+    let p = must(await sb.from('departments').select('id').eq('organisation_id', org.id).eq('name', parent).maybeSingle())
+    if (!p) p = must(await sb.from('departments').insert({ organisation_id: org.id, name: parent, code }).select('id').single())
+    must(await sb.from('departments').update({ parent_id: p.id }).eq('organisation_id', org.id).in('name', children).select('id'))
+  }
+  console.log(o.name, 'tiers', Object.keys(tiers).join(', '))
+}

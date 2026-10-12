@@ -44,7 +44,7 @@ Multi-tenant SaaS PWA for New Zealand industrial sites (glass, packaging, machin
 
 ## Binding docs (read before planning or building)
 
-- **ADRs** — `docs/adr/README.md`. Accepted ADRs are binding; a plan that contradicts one stops and asks Simon. Structural choices get a new ADR in the same commit (plus a `tests/lint/` guard if checkable). Supersede, never edit. Key ones: 0002 no scheduled jobs · 0004 design principles · 0005 library map replaces rooms · 0006 typography (Inter + Saira Semi Condensed, nothing under 12 px) · 0007 design base · 0008 every action logged to the ledger · 0009 site map pictures (decorate only).
+- **ADRs** — `docs/adr/README.md`. Accepted ADRs are binding; a plan that contradicts one stops and asks Simon. Structural choices get a new ADR in the same commit (plus a `tests/lint/` guard if checkable). Supersede, never edit. Key ones: 0002 no scheduled jobs · 0004 design principles · 0005 library map replaces rooms · 0006 typography (Inter + Saira Semi Condensed, nothing under 12 px) · 0007 design base · 0008 every action logged to the ledger · 0009 site map pictures (decorate only) · 0010 tiered site map (departments nest; packing is an org setting).
 - **Design** — `Skill("sketch-findings-SOPstart")` before any worker-facing UI, home, authoring flow or org/permission surface. For the home: sketches `009-sop-first-home` and `010-wordmark` plus ADR-0004/0005 govern.
 - **Customer research** — `.planning/research/customer-interviews/` before locking contentious UX decisions.
 

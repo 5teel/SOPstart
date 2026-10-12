@@ -1,101 +1,183 @@
 /**
  * Phase 63 -- automatic layout of the library's areas and their objects on the isometric ground.
- * Plain module, pure over counts and kinds (no titles). The sketch hand-placed eight areas; this
- * packs any number.
+ * Plain module, pure over counts, kinds and the area tree (no titles).
+ *
+ * ADR-0010: areas nest (a department inside a department, any depth). A parent is a plate holding
+ * its children's plates, plus a block of its own SOPs on its floor; each plate stands on its parent
+ * (z = depth x PLATE_H). Siblings are packed into rows by the org's packing, and every row is
+ * filled out to the full width and depth, so no bare floor is left; the gaps are walkways.
  */
-import { FOOTPRINT, project, type Pt } from './iso'
+import { FOOTPRINT, PLATE_H, project, type Pt } from './iso'
 import type { ObjectKind } from './object-kind'
 
-export interface LayoutArea { id: string; count: number; kinds: ObjectKind[] }
-export interface Plate { id: string; x: number; y: number; w: number; d: number }
-/** cw x cd: the object's bay (its share of the plate), centred on cx, cy. */
-export interface Placed { areaId: string; i: number; kind: ObjectKind; x: number; y: number; cx: number; cy: number; cw: number; cd: number }
-export interface SiteLayout { plates: Plate[]; objects: Placed[]; ground: [number, number, number, number] }
+export type Packing = 'balanced' | 'rows'
+export const PACKINGS: readonly Packing[] = ['balanced', 'rows']
+
+export interface LayoutArea { id: string; count: number; kinds: ObjectKind[]; children?: LayoutArea[] }
+/** depth 0 stands on the ground; a child stands on its parent's top. */
+export interface Plate { id: string; x: number; y: number; w: number; d: number; depth: number; parentId: string | null }
+/** cw x cd: the object's bay (its share of the floor), centred on cx, cy; z: the floor it stands on. */
+export interface Placed { areaId: string; i: number; kind: ObjectKind; x: number; y: number; cx: number; cy: number; cw: number; cd: number; z: number }
+/** A walkway on a floor at height z: the ground (on: null) or an area's floor (on: its id). */
+export interface Lane { x: number; y: number; w: number; d: number; z: number; on: string | null }
+export interface SiteLayout { plates: Plate[]; objects: Placed[]; lanes: Lane[]; ground: [number, number, number, number] }
 
 const CELL_W = 2.8
 const CELL_D = 2.4
 const MARGIN = 0.8
-const GAP = 1.5 // between plates; the spec floor is 1
+const GAP = 1.5 // between areas on the ground; the spec floor is 1
+const INNER_GAP = 1 // between sub-areas on a parent's floor
 const MIN_W = 5
 const MIN_D = 4
+
+interface Box { w: number; d: number }
+interface Rect extends Box { x: number; y: number }
 
 function grid(count: number) {
   const cols = Math.max(1, Math.ceil(Math.sqrt((count * CELL_D) / CELL_W)))
   return { cols, rows: Math.max(1, Math.ceil(count / cols)) }
 }
 
-function sizeOf(count: number) {
+const leafSize = (count: number): Box => {
   const { cols, rows } = grid(count)
   return { w: Math.max(MIN_W, cols * CELL_W + 2 * MARGIN), d: Math.max(MIN_D, rows * CELL_D + 2 * MARGIN) }
 }
 
-export function layoutSite(areas: LayoutArea[]): SiteLayout {
-  const sized = areas
-    .map((a, idx) => ({ a, idx, ...sizeOf(a.count) }))
-    .sort((p, q) => q.w * q.d - p.w * p.d || p.idx - q.idx) // stable: ties keep input order
+/** Rows of item indices. 'rows': shelf rows, biggest first. 'balanced': the row count whose even split is nearest square. */
+function rowsOf(items: Box[], packing: Packing, gap: number): number[][] {
+  const idx = items.map((_, i) => i)
+  if (packing === 'rows') {
+    const order = [...idx].sort((p, q) => items[q].w * items[q].d - items[p].w * items[p].d || p - q)
+    const target = Math.sqrt(items.reduce((s, b) => s + (b.w + gap) * (b.d + gap), 0) * 1.5)
+    const rows: number[][] = []
+    let x = 0
+    for (const i of order) {
+      if (rows.length === 0 || (x > 0 && x + items[i].w > target)) { rows.push([]); x = 0 }
+      rows[rows.length - 1].push(i)
+      x += items[i].w + gap
+    }
+    return rows
+  }
+  // Balanced: for each row count, deal the widest items first into the shortest row (LPT), keep the
+  // input order inside a row, and score the bounding box by area x squareness.
+  // ponytail: O(n^2 log n) over siblings; fine to a few hundred areas per level.
+  const byWidth = [...idx].sort((p, q) => items[q].w - items[p].w || p - q)
+  let best: number[][] = [idx]
+  let bestScore = Infinity
+  for (let r = 1; r <= items.length; r++) {
+    const rows: number[][] = Array.from({ length: r }, () => [])
+    const widths = new Array<number>(r).fill(0)
+    for (const i of byWidth) {
+      const k = widths.indexOf(Math.min(...widths))
+      rows[k].push(i)
+      widths[k] += items[i].w + (rows[k].length > 1 ? gap : 0)
+    }
+    for (const row of rows) row.sort((p, q) => p - q)
+    rows.sort((p, q) => p[0] - q[0])
+    const W = Math.max(...widths)
+    const D = rows.reduce((s, row) => s + Math.max(...row.map((i) => items[i].d)), 0) + gap * (r - 1)
+    const score = W * D * (1 + Math.log(W / D) ** 2)
+    if (score < bestScore - 1e-9) { bestScore = score; best = rows }
+  }
+  return best
+}
 
-  // Shelf pack: fill rows left to right up to a width that makes the site roughly square-ish.
-  // ponytail: shelf packing leaves gaps for very uneven plate sizes; upgrade path is a skyline packer.
-  const target = Math.sqrt(sized.reduce((s, p) => s + (p.w + GAP) * (p.d + GAP), 0) * 1.5)
+/**
+ * Packs boxes into rows, then fills: every item takes its row's depth, a short row shares its spare
+ * width, and spare depth (a target bigger than the packing) is shared by the rows.
+ */
+function pack(items: Box[], packing: Packing, gap: number, target?: Box): { rects: Rect[]; w: number; d: number; lanes: Rect[] } {
+  if (items.length === 0) return { rects: [], w: target?.w ?? 0, d: target?.d ?? 0, lanes: [] }
+  const rows = rowsOf(items, packing, gap)
+  const rowW = rows.map((row) => row.reduce((s, i) => s + items[i].w, 0) + gap * (row.length - 1))
+  const rowD = rows.map((row) => Math.max(...row.map((i) => items[i].d)))
+  const W = Math.max(Math.max(...rowW), target?.w ?? 0)
+  const D0 = rowD.reduce((s, d) => s + d, 0) + gap * (rows.length - 1)
+  const D = Math.max(D0, target?.d ?? 0)
+  const extraD = (D - D0) / rows.length
+  const rects: Rect[] = new Array(items.length)
+  const lanes: Rect[] = []
+  let y = 0
+  rows.forEach((row, r) => {
+    const d = rowD[r] + extraD
+    const extraW = (W - rowW[r]) / row.length
+    let x = 0
+    row.forEach((i, k) => {
+      rects[i] = { x, y, w: items[i].w + extraW, d }
+      x += rects[i].w
+      if (k < row.length - 1) lanes.push({ x, y, w: gap, d })
+      x += gap
+    })
+    y += d
+    if (r < rows.length - 1) lanes.push({ x: 0, y, w: W, d: gap })
+    y += gap
+  })
+  return { rects, w: W, d: D, lanes }
+}
+
+export function layoutSite(areas: LayoutArea[], packing: Packing = 'balanced'): SiteLayout {
+  const sizes = new Map<LayoutArea, Box>()
+  const ownBlock = (a: LayoutArea): Box | null => {
+    if (a.count === 0) return null
+    const { cols, rows } = grid(a.count)
+    return { w: cols * CELL_W, d: rows * CELL_D }
+  }
+  const itemsOf = (a: LayoutArea): Box[] => {
+    const own = ownBlock(a)
+    return [...(a.children ?? []).map(natural), ...(own ? [own] : [])]
+  }
+  function natural(a: LayoutArea): Box {
+    const hit = sizes.get(a)
+    if (hit) return hit
+    let box = leafSize(a.count)
+    if (a.children?.length) {
+      const p = pack(itemsOf(a), packing, INNER_GAP)
+      box = { w: Math.max(MIN_W, p.w + 2 * MARGIN), d: Math.max(MIN_D, p.d + 2 * MARGIN) }
+    }
+    sizes.set(a, box)
+    return box
+  }
+
   const plates: Plate[] = []
-  let x = 0, y = 0, rowD = 0
-  for (const p of sized) {
-    if (x > 0 && x + p.w > target) { x = 0; y += rowD + GAP; rowD = 0 }
-    plates.push({ id: p.a.id, x, y, w: p.w, d: p.d })
-    x += p.w + GAP
-    rowD = Math.max(rowD, p.d)
-  }
-  // No bare floor: every plate takes its row's depth, and a short row shares its spare width across its plates.
-  const siteW = Math.max(0, ...plates.map((p) => p.x + p.w))
-  for (const y of new Set(plates.map((p) => p.y))) {
-    const row = plates.filter((p) => p.y === y).sort((a, b) => a.x - b.x)
-    const d = Math.max(...row.map((p) => p.d))
-    const extra = (siteW - (row[row.length - 1].x + row[row.length - 1].w)) / row.length
-    row.forEach((p, i) => { p.d = d; p.x += i * extra; p.w += extra })
-  }
-
   const objects: Placed[] = []
-  for (const p of sized) {
-    const plate = plates.find((q) => q.id === p.a.id)!
-    const { cols, rows } = grid(p.a.count)
-    const iw = plate.w - 2 * MARGIN
-    const id = plate.d - 2 * MARGIN
-    for (let i = 0; i < p.a.count; i++) {
-      const kind = p.a.kinds[i] ?? 'machine'
+  const lanes: Lane[] = []
+
+  const gridOn = (a: LayoutArea, r: Rect, m: number, z: number) => {
+    const { cols, rows } = grid(a.count)
+    const iw = r.w - 2 * m
+    const id = r.d - 2 * m
+    for (let i = 0; i < a.count; i++) {
+      const kind = a.kinds[i] ?? 'machine'
       const [fw, fd] = FOOTPRINT[kind]
-      const cx = plate.x + MARGIN + ((i % cols) + 0.5) * (iw / cols)
-      const cy = plate.y + MARGIN + (Math.floor(i / cols) + 0.5) * (id / rows)
-      objects.push({ areaId: plate.id, i, kind, x: cx - fw / 2, y: cy - fd / 2, cx, cy, cw: iw / cols, cd: id / rows })
+      const cx = r.x + m + ((i % cols) + 0.5) * (iw / cols)
+      const cy = r.y + m + (Math.floor(i / cols) + 0.5) * (id / rows)
+      objects.push({ areaId: a.id, i, kind, x: cx - fw / 2, y: cy - fd / 2, cx, cy, cw: iw / cols, cd: id / rows, z })
     }
   }
 
-  const x1 = Math.max(0, ...plates.map((p) => p.x + p.w))
-  const y1 = Math.max(0, ...plates.map((p) => p.y + p.d))
-  return { plates, objects, ground: [-1, -1, x1 + 1, y1 + 1] }
-}
+  function place(a: LayoutArea, r: Rect, depth: number, parentId: string | null) {
+    plates.push({ id: a.id, ...r, depth, parentId })
+    const z = (depth + 1) * PLATE_H
+    if (!a.children?.length) return gridOn(a, r, MARGIN, z)
+    const p = pack(itemsOf(a), packing, INNER_GAP, { w: r.w - 2 * MARGIN, d: r.d - 2 * MARGIN })
+    const at = (q: Rect): Rect => ({ x: r.x + MARGIN + q.x, y: r.y + MARGIN + q.y, w: q.w, d: q.d })
+    for (const l of p.lanes) lanes.push({ ...at(l), z, on: a.id })
+    a.children.forEach((c, i) => place(c, at(p.rects[i]), depth + 1, a.id))
+    if (a.count > 0) gridOn(a, at(p.rects[a.children.length]), 0, z)
+  }
 
-export interface Lane { x: number; y: number; w: number; d: number }
-
-/**
- * Walkways on the ground: a ring round the site, a cross aisle between shelf rows and a short aisle
- * between neighbouring plates in a row, so every area joins one connected path. Plan coordinates.
- */
-export function walkways(layout: SiteLayout): Lane[] {
-  const [gx0, gy0, gx1, gy1] = layout.ground
-  const lanes: Lane[] = [
-    { x: gx0, y: gy0, w: gx1 - gx0, d: -gy0 },
-    { x: gx0, y: gy1 + gy0, w: gx1 - gx0, d: -gy0 },
-    { x: gx0, y: 0, w: -gx0, d: gy1 + gy0 },
-    { x: gx1 + gx0, y: 0, w: -gx0, d: gy1 + gy0 },
-  ]
-  const rows = [...new Set(layout.plates.map((p) => p.y))].sort((a, b) => a - b)
-  rows.forEach((y, r) => {
-    const row = layout.plates.filter((p) => p.y === y).sort((a, b) => a.x - b.x)
-    const rowD = Math.max(...row.map((p) => p.d))
-    row.slice(0, -1).forEach((p) => lanes.push({ x: p.x + p.w, y, w: GAP, d: rowD }))
-    if (r < rows.length - 1) lanes.push({ x: 0, y: y + rowD, w: gx1 + gx0, d: rows[r + 1] - y - rowD })
-  })
-  return lanes
+  const top = pack(areas.map(natural), packing, GAP)
+  areas.forEach((a, i) => place(a, top.rects[i], 0, null))
+  const [W, D] = [top.w, top.d]
+  // A walkway ring round the site, then the aisles between areas.
+  lanes.unshift(
+    { x: -1, y: -1, w: W + 2, d: 1, z: 0, on: null },
+    { x: -1, y: D, w: W + 2, d: 1, z: 0, on: null },
+    { x: -1, y: 0, w: 1, d: D, z: 0, on: null },
+    { x: W, y: 0, w: 1, d: D, z: 0, on: null },
+    ...top.lanes.map((l) => ({ ...l, z: 0, on: null })),
+  )
+  return { plates, objects, lanes, ground: [-1, -1, W + 1, D + 1] }
 }
 
 function bounds(list: Pt[]): [number, number, number, number] {
@@ -106,7 +188,7 @@ function bounds(list: Pt[]): [number, number, number, number] {
 }
 
 const corners = (p: Plate, zt: number): Pt[] =>
-  [0, zt].flatMap((z) => [project(p.x, p.y, z), project(p.x + p.w, p.y, z), project(p.x, p.y + p.d, z), project(p.x + p.w, p.y + p.d, z)])
+  [p.depth * PLATE_H, p.depth * PLATE_H + zt].flatMap((z) => [project(p.x, p.y, z), project(p.x + p.w, p.y, z), project(p.x, p.y + p.d, z), project(p.x + p.w, p.y + p.d, z)])
 
 /** The viewBox for the whole site (null) or one area's zoom. An unknown id is the whole site. */
 export function viewFor(layout: SiteLayout, areaId: string | null): [number, number, number, number] {

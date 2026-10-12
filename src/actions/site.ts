@@ -21,7 +21,7 @@
  * All functions return a discriminated union `{ ... } | { error }` — never throw.
  * requireAdminContext() runs first in every export; the session client carries the
  * admin write RLS policy on all three tables (D-04) — no service-role client is
- * ever imported here. Every query also adds an explicit `.eq('organisation_id', orgId)`
+ * ever imported here (the packing write lives in site-map.ts). Every query also adds an explicit `.eq('organisation_id', orgId)`
  * using the SESSION organisationId (never a value read off a fetched row — 2026-07-28).
  *
  * These tables are not yet in database.types.ts, so the session client is used
@@ -123,7 +123,7 @@ export async function listSiteForOrg(): Promise<SiteData | { error: string }> {
 
   const { data: deptRows, error: deptErr } = await db
     .from('departments')
-    .select('id, name, colour')
+    .select('id, name, colour, parent_id')
     .eq('organisation_id', orgId)
     .eq('archived', false)
     .order('name', { ascending: true })
@@ -151,7 +151,13 @@ export async function listSiteForOrg(): Promise<SiteData | { error: string }> {
     sops: (sopRows ?? []) as SiteSopOption[],
     // The key itself is never returned — only whether it's set (T-51-04).
     canGenerate: Boolean(process.env.GEMINI_API_KEY),
+    packing: await orgPacking(db, orgId),
   }
+}
+
+async function orgPacking(db: SupabaseClient, orgId: string): Promise<'balanced' | 'rows'> {
+  const { data } = await db.from('organisations').select('*').eq('id', orgId).maybeSingle()
+  return (data as { site_map_packing?: string } | null)?.site_map_packing === 'rows' ? 'rows' : 'balanced'
 }
 
 // ---------------------------------------------------------------------------

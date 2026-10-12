@@ -11,7 +11,7 @@ import { Search, X } from 'lucide-react'
 import { SopRow } from '@/components/home/SopRow'
 import type { LibraryRow } from '@/hooks/useLibrary'
 import { useSopSearch } from '@/hooks/useSopSearch'
-import type { LibraryArea } from '@/lib/library/areas'
+import { inArea, type LibraryArea } from '@/lib/library/areas'
 import { matchesTitle } from '@/lib/library/search'
 import { SOP_TYPES } from '@/lib/library/sop-type'
 
@@ -56,7 +56,7 @@ export function SopList({
   const filtered = !!q || !!area
   const areaName = area ? (areas.find((a) => a.id === area)?.name ?? '') : ''
   const shown = filtered
-    ? rows.filter((r) => (!area || r.areaId === area) && (!q || matchesTitle(r, q) || stepHits.has(r.id)))
+    ? rows.filter((r) => inArea(areas, r.areaId, area) && (!q || matchesTitle(r, q) || stepHits.has(r.id)))
     : []
   const open = (r: LibraryRow) => (
     <SopRow key={r.id} row={r} selected={r.id === selectedId} onOpen={onOpen} />
@@ -164,14 +164,15 @@ export function SopList({
           {group === 'area'
             ? areas.map((a) => {
                 const own = rows.filter((r) => r.areaId === a.id)
+                // ADR-0010: sub-areas sit under their parent (tree order), indented, counting everything inside.
                 return (
                   <div key={a.id}>
                     <button type="button" data-testid="area-group" data-area-id={a.id} title={`Open ${a.name} on the map`} onClick={() => onArea(a.id)} className={GROUP}>
-                      <span className="flex items-center gap-2">
+                      <span className="flex items-center gap-2" style={{ paddingLeft: `${a.depth * 0.75}rem` }}>
                         <i aria-hidden="true" className="size-2 rounded-full" style={{ background: a.colourVar }} />
                         {a.name}
                       </span>
-                      <span>{own.length} ›</span>
+                      <span>{a.total} ›</span>
                     </button>
                     {own.map(open)}
                   </div>

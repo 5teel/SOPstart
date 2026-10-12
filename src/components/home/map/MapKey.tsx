@@ -1,7 +1,8 @@
 'use client'
 /**
  * Phase 63 -- the phone's key under the whole-site map: numbered areas as a two-column grid of
- * tap targets (the markers on the plates carry the same numbers). Hidden while an area is open.
+ * tap targets (the markers on the plates carry the same numbers). ADR-0010: it lists the areas one level
+ * in from the open one (the top level for the whole site), so it is empty, and hidden, inside a leaf area.
  */
 export interface MapKeyItem {
   id: string
@@ -11,8 +12,8 @@ export interface MapKeyItem {
   count: number
 }
 
-export function MapKey({ items, area, onArea }: { items: MapKeyItem[]; area: string | null; onArea(id: string | null): void }) {
-  if (area !== null || items.length === 0) return null
+export function MapKey({ items, onArea }: { items: MapKeyItem[]; onArea(id: string | null): void }) {
+  if (items.length === 0) return null
   return (
     <div data-testid="map-key" className="grid max-h-2/5 shrink-0 grid-cols-2 gap-1.5 overflow-y-auto border-t border-ink-200 p-3 lg:hidden">
       {items.map((a) => (

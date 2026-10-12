@@ -91,6 +91,8 @@ export interface SiteDepartment {
   id: string
   name: string
   colour: string
+  /** ADR-0010: the department this one sits inside on the site map. */
+  parent_id?: string | null
 }
 
 export interface SiteSopOption {
@@ -105,6 +107,8 @@ export interface SiteData {
   departments: SiteDepartment[]
   sops: SiteSopOption[]
   canGenerate: boolean
+  /** ADR-0010: how the home site map packs its areas. */
+  packing: 'balanced' | 'rows'
 }
 
 // -- Worker-readable subset (Phase 52, D-03) ---------------------------------

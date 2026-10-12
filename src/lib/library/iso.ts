@@ -65,12 +65,12 @@ const CARD = tone('card')
 const HAZARD = tone('hazard')
 const ACCENT = tone('accent')
 
-const FLOOR_Z = 0.3 // plate height; objects stand on it
+/** A plate's height; a top-level area's objects stand on it, a sub-area's plate stands on its parent. */
+export const PLATE_H = 0.3
 
-/** The shapes of one object, (x, y) = its footprint origin. Port of the sketch's entity(). */
-export function glyph(kind: ObjectKind, x: number, y: number): Shape[] {
+/** The shapes of one object, (x, y) = its footprint origin, standing on floor z. Port of the sketch's entity(). */
+export function glyph(kind: ObjectKind, x: number, y: number, z = PLATE_H): Shape[] {
   const [w, d] = FOOTPRINT[kind]
-  const z = FLOOR_Z
   switch (kind) {
     case 'machine':
       return [

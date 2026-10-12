@@ -10,6 +10,7 @@
  */
 import fs from 'node:fs'
 import path from 'node:path'
+import { pathToFileURL } from 'node:url'
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import postcss from 'postcss'
@@ -18,8 +19,10 @@ import { chromium } from '@playwright/test'
 import { SiteMap, type MapRow } from '../src/components/home/map/SiteMap'
 import { OBJECT_KINDS, type ObjectKind } from '../src/lib/library/object-kind'
 import type { LibraryArea } from '../src/lib/library/areas'
+import type { Packing } from '../src/lib/library/iso-layout'
 import type { RowStatus } from '../src/lib/library/status'
 
+const PUBLIC = pathToFileURL(path.resolve(__dirname, '..', 'public')).href
 const OUT = path.resolve(__dirname, '..', '.planning/phases/63-sop-first-home-library-site-map-and-the-sopstart-start/map-samples')
 
 const NAMES = ['Forming', 'Engineering', 'Packaging', 'Warehouse', 'Quality assurance', 'Maintenance', 'Dispatch', 'Site-wide', 'Laboratory', 'Cold end', 'Hot end', 'Health and safety']
@@ -32,7 +35,7 @@ const STATUSES: Array<RowStatus | null> = [
   { kind: 'updated', text: 'Updated since you last did it' },
 ]
 
-interface Sample { id: string; org: string; areas: LibraryArea[]; rows: MapRow[] }
+interface Sample { id: string; org: string; areas: LibraryArea[]; rows: MapRow[]; packing?: Packing; zooms?: string[] }
 
 function build(id: string, org: string, spec: Array<{ name: string; kinds: ObjectKind[] }>): Sample {
   const areas: LibraryArea[] = []
@@ -40,7 +43,7 @@ function build(id: string, org: string, spec: Array<{ name: string; kinds: Objec
   spec.forEach((s, i) => {
     const aid = `a${i + 1}`
     const sopIds = s.kinds.map((_, j) => `${aid}-s${j + 1}`)
-    areas.push({ id: aid, name: s.name, colourVar: `var(--area-${(i % 8) + 1})`, index: i + 1, sopIds })
+    areas.push({ id: aid, name: s.name, colourVar: `var(--area-${(i % 8) + 1})`, index: i + 1, sopIds, path: [aid], parentId: null, depth: 0, total: sopIds.length })
     s.kinds.forEach((kind, j) => rows.push({ id: sopIds[j], title: TITLES[(i * 5 + j) % TITLES.length], areaId: aid, kind, status: STATUSES[(i + j) % STATUSES.length] }))
   })
   return { id, org, areas, rows }
@@ -60,6 +63,45 @@ const SAMPLES: Sample[] = [
     { name: 'General', kinds: ['board'] },
   ]),
 ]
+// ADR-0010: three sites, halls and lines inside them, ~200 SOPs, with machine pictures.
+const PICS = ['filler', 'capper', 'palletiser', 'lathe', 'forklift', 'syrup-tank-1', 'blow-moulder', 'shrink-wrapper', 'workbench', 'annealing-lehr', 'is-machine-1', 'racking']
+function tiered(id: string, packing: Packing): Sample {
+  type T = { name: string; n?: number; kids?: T[] }
+  const tree: T[] = [
+    { name: 'North Plant', n: 3, kids: [
+      { name: 'Hot end', kids: [{ name: 'Furnace', n: 9 }, { name: 'Forming', n: 14 }, { name: 'Lehr', n: 5 }] },
+      { name: 'Cold end', kids: [{ name: 'Inspection', n: 11 }, { name: 'Packing', n: 8 }] },
+      { name: 'Warehouse', n: 6 },
+    ] },
+    { name: 'South Plant', kids: [
+      { name: 'Filling hall', kids: [{ name: 'Line 1', n: 12 }, { name: 'Line 2', n: 12 }, { name: 'Line 3', n: 10 }] },
+      { name: 'Utilities', kids: [{ name: 'Water treatment', n: 7 }, { name: 'Syrup room', n: 6 }] },
+      { name: 'Blow moulding', n: 9 },
+    ] },
+    { name: 'Workshop', n: 15 },
+    { name: 'Head office', n: 4 },
+    { name: 'Site-wide', n: 8 },
+  ]
+  const areas: LibraryArea[] = []
+  const rows: MapRow[] = []
+  const walk = (list: T[], parentId: string | null, depth: number): number =>
+    list.reduce((sum, t) => {
+      const aid = `t${areas.length + 1}`
+      const at = areas.length
+      areas.push({ id: aid, name: t.name, colourVar: `var(--area-${(at % 8) + 1})`, index: at + 1, sopIds: [], path: [...(parentId ? areas.find((a) => a.id === parentId)!.path : []), aid], parentId, depth, total: 0 })
+      for (let j = 0; j < (t.n ?? 0); j++) {
+        const sid = `${aid}-s${j + 1}`
+        areas[at].sopIds.push(sid)
+        rows.push({ id: sid, title: TITLES[(at * 3 + j) % TITLES.length], areaId: aid, kind: OBJECT_KINDS[(at + j) % OBJECT_KINDS.length], machine: PICS[(at + j) % PICS.length], status: STATUSES[(at + j) % STATUSES.length] })
+      }
+      areas[at].total = (t.n ?? 0) + walk(t.kids ?? [], aid, depth + 1)
+      return sum + areas[at].total
+    }, 0)
+  walk(tree, null, 0)
+  return { id, org: 'Kauri Springs Group', areas, rows, packing, zooms: ['t1', 't2', 't3'] }
+}
+SAMPLES.push(tiered('tiered-balanced', 'balanced'), tiered('tiered-rows', 'rows'))
+
 // the real org's titles
 const real = SAMPLES[4]
 ;['Alkaline Cleaning Tank Operation', 'OTG Probe Maintenance', 'Automated Sample Challenge Recording', 'Dog Bathing and Grooming'].forEach((t, i) => (real.rows[i].title = t))
@@ -77,22 +119,26 @@ async function main() {
   const browser = await chromium.launch()
   let n = 0
   for (const s of SAMPLES) {
-    // zoom the busiest area
+    // zoom the busiest area (or the sample's own zooms)
     const busiest = [...s.areas].sort((a, b) => b.sopIds.length - a.sopIds.length)[0].id
-    for (const state of ['whole', 'zoom'] as const) {
+    const states: Array<[string, string | null]> = [['whole', null], ...(s.zooms ?? [busiest]).map((z, i): [string, string] => [i ? `zoom${i + 1}` : 'zoom', z])]
+    for (const [state, zoom] of states) {
       for (const v of VIEWS) {
         const render = (initialSize?: { w: number; h: number }) => {
           const markup = renderToStaticMarkup(
-            createElement(SiteMap, { areas: s.areas, rows: s.rows, area: state === 'zoom' ? busiest : null, onArea() {}, onOpenSop() {}, orgName: s.org, initialSize }),
-          )
+            createElement(SiteMap, { areas: s.areas, rows: s.rows, area: zoom, onArea() {}, onOpenSop() {}, orgName: s.org, packing: s.packing, initialSize }),
+          ).replaceAll('href="/site-art/', `href="${PUBLIC}/site-art/`)
           return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${css}</style></head>
 <body data-theme="paper" style="margin:0"><div style="margin-left:auto;width:${v.pane}px;height:${v.height}px;background:var(--paper-1);border-left:1px solid var(--ink-200)">${markup}</div></body></html>`
         }
         const page = await browser.newPage({ viewport: { width: v.width, height: v.height }, deviceScaleFactor: v.scale })
         // pass 1 measures the drawing area, pass 2 sizes the text from it (what the ResizeObserver does in the app)
-        await page.setContent(render())
+        const tmp = path.join(OUT, '_render.html')
+        fs.writeFileSync(tmp, render())
+        await page.goto(pathToFileURL(tmp).href)
         const box = await page.locator('[data-testid="site-map"]').boundingBox()
-        await page.setContent(render(box ? { w: Math.round(box.width), h: Math.round(box.height) } : undefined))
+        fs.writeFileSync(tmp, render(box ? { w: Math.round(box.width), h: Math.round(box.height) } : undefined))
+        await page.goto(pathToFileURL(tmp).href, { waitUntil: 'load' })
         const file = `${s.id}-${state}-${v.name}.png`
         await page.screenshot({ path: path.join(OUT, file) })
         await page.close()
@@ -101,6 +147,7 @@ async function main() {
       }
     }
   }
+  fs.rmSync(path.join(OUT, '_render.html'), { force: true })
   await browser.close()
   console.log(`${n} renders in ${OUT}`)
 }

@@ -5,10 +5,10 @@
  * (one of the eight area tokens) into paper. No hex, no string SVG -- React nodes only.
  */
 import { memo, type CSSProperties } from 'react'
-import { boxFaces, glyph, type Shape as Descriptor } from '@/lib/library/iso'
+import { PLATE_H, boxFaces, glyph, type Shape as Descriptor } from '@/lib/library/iso'
 import type { ObjectKind } from '@/lib/library/object-kind'
 
-export const PLATE_H = 0.3
+export { PLATE_H }
 
 const EDGE: CSSProperties = { stroke: 'var(--ink-900)', strokeOpacity: 0.28, strokeWidth: 0.7 }
 
@@ -80,10 +80,10 @@ export function Shape({ d, colourVar }: { d: Descriptor; colourVar: string }) {
 }
 
 /** The raised floor of one area. */
-export const Plate = memo(function Plate({ x, y, w, d, colourVar }: { x: number; y: number; w: number; d: number; colourVar: string }) {
+export const Plate = memo(function Plate({ x, y, z = 0, w, d, colourVar }: { x: number; y: number; z?: number; w: number; d: number; colourVar: string }) {
   return (
     <>
-      {boxFaces(x, y, 0, w, d, PLATE_H, { top: 'plate-top', right: 'plate-right', left: 'plate-left' }).map((s, i) => (
+      {boxFaces(x, y, z, w, d, PLATE_H, { top: 'plate-top', right: 'plate-right', left: 'plate-left' }).map((s, i) => (
         <Shape key={i} d={s} colourVar={colourVar} />
       ))}
     </>
@@ -91,10 +91,10 @@ export const Plate = memo(function Plate({ x, y, w, d, colourVar }: { x: number;
 })
 
 /** One SOP's object (footprint origin x, y). */
-export const MapObject = memo(function MapObject({ kind, x, y, colourVar }: { kind: ObjectKind; x: number; y: number; colourVar: string }) {
+export const MapObject = memo(function MapObject({ kind, x, y, z, colourVar }: { kind: ObjectKind; x: number; y: number; z?: number; colourVar: string }) {
   return (
     <>
-      {glyph(kind, x, y).map((s, i) => (
+      {glyph(kind, x, y, z).map((s, i) => (
         <Shape key={i} d={s} colourVar={colourVar} />
       ))}
     </>
@@ -108,11 +108,11 @@ const WALL = { top: 'accent-dark', right: 'steel-side', left: 'steel-top' }
  * One object's bay: a floor pad with a low partition on its two far sides (topped in the area colour),
  * so each machine stands in its own housing instead of floating on the plate. (cx, cy) centre, cw x cd size.
  */
-export const Bay = memo(function Bay({ cx, cy, cw, cd, colourVar }: { cx: number; cy: number; cw: number; cd: number; colourVar: string }) {
+export const Bay = memo(function Bay({ cx, cy, cw, cd, z: floor = PLATE_H, colourVar }: { cx: number; cy: number; cw: number; cd: number; z?: number; colourVar: string }) {
   const [w, d] = [Math.min(cw, 3.2) - 0.24, Math.min(cd, 2.8) - 0.24] // a wide area keeps normal-size bays
-  const [x, y, z] = [cx - w / 2, cy - d / 2, PLATE_H + 0.06]
+  const [x, y, z] = [cx - w / 2, cy - d / 2, floor + 0.06]
   const shapes = [
-    ...boxFaces(x, y, PLATE_H, w, d, 0.06, PAD),
+    ...boxFaces(x, y, floor, w, d, 0.06, PAD),
     ...boxFaces(x, y, z, w, 0.08, 0.8, WALL),
     ...boxFaces(x, y, z, 0.08, d, 0.8, WALL),
   ]
