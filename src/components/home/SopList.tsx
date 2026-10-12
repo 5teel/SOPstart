@@ -7,7 +7,7 @@
 import { useState, type ReactNode } from 'react'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
-import { Search, X } from 'lucide-react'
+import { ChevronLeft, Search, X } from 'lucide-react'
 import { SopRow } from '@/components/home/SopRow'
 import type { LibraryRow } from '@/hooks/useLibrary'
 import { useSopSearch } from '@/hooks/useSopSearch'
@@ -55,7 +55,8 @@ export function SopList({
 
   const q = query.trim()
   const filtered = !!q || !!area
-  const areaName = area ? (areas.find((a) => a.id === area)?.name ?? '') : ''
+  const openArea = area ? areas.find((a) => a.id === area) : undefined
+  const parent = openArea?.parentId ? areas.find((a) => a.id === openArea.parentId) : undefined
   const shown = filtered
     ? rows.filter((r) => inArea(areas, r.areaId, area) && (!q || matchesTitle(r, q) || stepHits.has(r.id)))
     : []
@@ -86,11 +87,16 @@ export function SopList({
       </div>
 
       {area && (
-        <div data-testid="area-filter" className="mt-3 inline-flex items-center gap-2 rounded-full bg-paper-2 px-3 py-1 text-ui text-ink-900">
-          In {areaName}
-          <button type="button" aria-label="Show every area" onClick={() => onArea(null)} className="text-ink-500">
-            <X size={14} aria-hidden="true" />
+        // Up one level, same as Esc; names where it goes.
+        <div data-testid="area-filter" className="mt-3 flex flex-col items-start gap-2">
+          <button type="button" data-testid="area-back" onClick={() => onArea(parent?.id ?? null)} className="back">
+            <ChevronLeft size={18} aria-hidden="true" />
+            {parent ? parent.name : 'All areas'}
           </button>
+          <h2 className="flex items-center gap-2 px-2.5 text-reading font-bold text-ink-900">
+            <span aria-hidden="true" className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: openArea?.colourVar }} />
+            {openArea?.name}
+          </h2>
         </div>
       )}
 

@@ -624,7 +624,8 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
       // Back to the map, Esc to the whole site; then the keyboard path: focus a plate, Enter opens it.
       await page.getByTestId('read-back').click()
       await expect(page.getByTestId('site-map')).toBeVisible(SLOW)
-      await page.keyboard.press('Escape')
+      await expect(page.getByTestId('area-back')).toHaveText('All areas')
+      await page.getByTestId('area-back').click()
       await expect(page.getByTestId('area-filter')).toHaveCount(0, SLOW)
       await plate(page, lib.departmentIds.lab).focus()
       await page.keyboard.press('Enter')

@@ -13,6 +13,7 @@
  * Built lazily (no stylesheet import here): the hover / dim / focus rules live in blueprint-theme.css.
  */
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
+import { ChevronLeft } from 'lucide-react'
 import { byDepth, layoutSite, viewFor, type LayoutArea, type Packing, type Placed, type Plate as PlateBox } from '@/lib/library/iso-layout'
 import { HEIGHT, TILE, project } from '@/lib/library/iso'
 import { machineArt, objectBox } from '@/lib/library/site-art'
@@ -324,6 +325,18 @@ export function SiteMap({ areas, rows, area, onArea, onOpenSop, orgName, packing
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div data-testid="map-header" className="flex min-h-14 shrink-0 items-center gap-2.5 border-b border-ink-200 px-5 py-3">
+        {openArea && (
+          <button
+            type="button"
+            data-testid="map-back"
+            aria-label={`Back to ${parentArea?.name ?? orgName}`}
+            title={`Back to ${parentArea?.name ?? orgName}`}
+            onClick={() => onArea(parentArea?.id ?? null)}
+            className="back shrink-0 px-2.5"
+          >
+            <ChevronLeft size={18} aria-hidden="true" />
+          </button>
+        )}
         {openArea ? (
           <span className="flex min-w-0 flex-wrap items-center gap-2 text-reading font-bold text-ink-900">
             <button type="button" data-testid="map-crumb" onClick={() => onArea(null)} className="min-h-tap font-medium text-ink-500 hover:text-ink-900">

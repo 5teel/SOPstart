@@ -92,11 +92,17 @@ test.describe('Switchable sites', () => {
       await area(page, 'Filling Line').dispatchEvent('click')
       await expect(page.getByTestId('map-crumb-area')).toContainText('Production Hall', SLOW)
       await expect(page.getByTestId('map-object').first()).toBeVisible(SLOW)
+      // the back buttons name the level they return to
+      await expect(page.getByTestId('area-back')).toHaveText('Production Hall')
+      await expect(page.getByTestId('map-back')).toHaveAttribute('aria-label', 'Back to Production Hall')
       await page.waitForTimeout(800)
       await shot(page, '75-tiers-filling-line')
       await page.keyboard.press('Escape') // up one level, not to the whole site
       await expect(page.getByTestId('map-header')).toContainText('Production Hall', SLOW)
       await expect(page.getByTestId('map-crumb-area')).toHaveCount(0)
+      await expect(page.getByTestId('area-back')).toHaveText('All areas')
+      await page.getByTestId('map-back').click()
+      await expect(page.getByTestId('area-filter')).toHaveCount(0, SLOW)
 
       // packing is an org setting: Rows, then back to Balanced
       await setPacking('rows')

@@ -258,6 +258,10 @@ body[data-theme="paper"] {
   .view-tabs > * { flex: 1; display: inline-flex; align-items: center; justify-content: center; min-height: var(--spacing-tap); margin-bottom: -1px; border-bottom: 2px solid transparent; font-size: var(--text-ui); font-weight: 500; color: var(--ink-600); }
   .view-tabs > [aria-pressed="true"], .view-tabs > [aria-selected="true"] { border-bottom-color: var(--ink-900); color: var(--ink-900); font-weight: 700; }
 
+  /* Back up one level (area views): an outlined key with a chevron, the place it returns to as its label. */
+  .back { display: inline-flex; align-items: center; gap: 0.25rem; min-height: var(--spacing-tap); padding: 0 0.875rem 0 0.5rem; border: 1px solid var(--ink-300); border-radius: var(--radius-lg); background: var(--paper-1); font-size: var(--text-ui); font-weight: 600; color: var(--ink-900); }
+  .back:hover { border-color: var(--ink-900); }
+
   /* Filter chip: 44 px, same radius as controls. */
   .chip { display: inline-flex; align-items: center; gap: 0.5rem; min-height: var(--spacing-tap); padding: 0 0.875rem; border: 1px solid var(--ink-300); border-radius: var(--radius-lg); background: var(--paper-1); font-size: var(--text-ui); color: var(--ink-700); }
   .chip[aria-pressed="true"] { background: var(--ink-900); border-color: var(--ink-900); color: var(--paper); }
