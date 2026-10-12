@@ -1,8 +1,9 @@
 'use client'
 /**
  * Phase 63 -- one row of the SOP list (sketch 009 `row`). The area colour is the swatch
- * only (ADR-0004 rule 8); the status line is information about the person's own history
- * with the SOP, never a to-do (rule 2).
+ * only (ADR-0004 rule 8); the status is information about the person's own history
+ * with the SOP, never a to-do (rule 2). Two lines: the title, then one meta line carrying the
+ * area (left out under its own area heading), type, minutes and status.
  */
 import type { LibraryRow } from '@/hooks/useLibrary'
 import type { RowStatus } from '@/lib/library/status'
@@ -18,12 +19,15 @@ export function SopRow({
   row,
   selected = false,
   extra = '',
+  hideArea = false,
   onOpen,
 }: {
   row: LibraryRow
   selected?: boolean
   /** Appended to the meta line, e.g. " · done 3×". */
   extra?: string
+  /** The row sits under its own area's heading, so the area is not repeated. */
+  hideArea?: boolean
   onOpen(id: string): void
 }) {
   const { status } = row
@@ -34,22 +38,30 @@ export function SopRow({
       data-sop-id={row.id}
       aria-current={selected ? 'true' : undefined}
       onClick={() => onOpen(row.id)}
-      className={`flex min-h-tap-row w-full items-center gap-3 rounded-lg px-2.5 py-2.5 text-left hover:bg-paper-2 ${selected ? 'bg-paper-2' : ''}`}
+      className={`flex min-h-tap-row w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left hover:bg-paper-2 ${selected ? 'bg-paper-2' : ''}`}
     >
       <span className="min-w-0 flex-1">
-        <span className="block text-reading font-semibold text-ink-900">{row.title}</span>
-        <span className="flex items-center gap-1.5 font-label text-meta text-ink-600">
-          <i aria-hidden="true" className="size-2 shrink-0 rounded-full" style={{ background: row.colourVar }} />
-          {row.areaName} · {row.type}
-          {row.minutes ? ` · ~${row.minutes} min` : ''}
-          {extra}
-        </span>
-        {status && (
-          <span data-testid="sop-row-status" className="mt-1 flex items-center gap-1.5 text-ui text-ink-600">
-            <i aria-hidden="true" className={`size-2 shrink-0 rounded-full ${DOT[status.kind]}`} />
-            {status.text}
+        <span className="block text-reading font-semibold leading-snug text-ink-900">{row.title}</span>
+        <span className="mt-0.5 flex flex-wrap items-center gap-x-1.5 font-label text-meta text-ink-600">
+          {!hideArea && (
+            <>
+              <i aria-hidden="true" className="size-2 shrink-0 rounded-full" style={{ background: row.colourVar }} />
+              <span>{row.areaName} ·</span>
+            </>
+          )}
+          <span>
+            {row.type}
+            {row.minutes ? ` · ~${row.minutes} min` : ''}
+            {extra}
           </span>
-        )}
+          {status && (
+            <span data-testid="sop-row-status" className="inline-flex items-center gap-1.5">
+              <span aria-hidden="true">·</span>
+              <i aria-hidden="true" className={`size-2 shrink-0 rounded-full ${DOT[status.kind]}`} />
+              {status.text}
+            </span>
+          )}
+        </span>
       </span>
     </button>
   )

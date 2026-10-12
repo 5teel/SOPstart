@@ -191,9 +191,12 @@ export function HomeShell({ siteName, siteId, sites, userEmail, userId, role, in
       {state.s === 'sops' ? (
         <div className="flex min-h-0 min-w-0 flex-1 flex-col lg:flex-row">
           {!sopOpen && (
-            <div className="flex shrink-0 items-center justify-between px-4 pb-1 pt-3 lg:hidden">
-              <Wordmark size="phone" />
-              <span className="inline-flex overflow-hidden rounded-lg border border-ink-300" role="group" aria-label="View">
+            // Phone header: the brand on its own line, then the view tabs (the screen's top tier).
+            <div className="shrink-0 lg:hidden">
+              <div className="px-4 pb-2 pt-4">
+                <Wordmark size="menu" />
+              </div>
+              <div className="view-tabs px-4" role="group" aria-label="View">
                 {([false, true] as const).map((m) => (
                   <button
                     key={String(m)}
@@ -201,12 +204,11 @@ export function HomeShell({ siteName, siteId, sites, userEmail, userId, role, in
                     data-testid={m ? 'phone-view-map' : 'phone-view-list'}
                     aria-pressed={phoneMap === m}
                     onClick={() => setPhoneMap(m)}
-                    className={`min-h-tap px-4 text-ui ${phoneMap === m ? 'bg-ink-900 text-white' : 'bg-paper-1 text-ink-900'}`}
                   >
                     {m ? 'Site map' : 'List'}
                   </button>
                 ))}
-              </span>
+              </div>
             </div>
           )}
           <div

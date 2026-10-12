@@ -21,8 +21,9 @@ const RequestComposerTrigger = dynamic(
   { ssr: false, loading: () => null },
 )
 
-const LABEL = 'section-heading mt-6 mb-1 px-2.5'
-const GROUP = 'flex w-full items-center justify-between px-2.5 pt-3 pb-0.5 font-label text-meta text-ink-600'
+const LABEL = 'section-heading mt-5 mb-1 px-2.5'
+// An area / type heading: sticky while its rows scroll, so a long list always says where you are.
+const GROUP = 'sticky top-0 z-10 flex w-full min-h-tap items-center justify-between border-b border-ink-200 bg-paper px-2.5 text-ui font-semibold text-ink-900'
 
 export function SopList({
   rows,
@@ -153,7 +154,7 @@ export function SopList({
             <span>
               All SOPs <span className="font-label font-medium text-ink-600">{rows.length}</span>
             </span>
-            <span className="seg">
+            <span className="seg seg-quiet">
               {(['area', 'type'] as const).map((g) => (
                 <button key={g} type="button" aria-pressed={group === g} onClick={() => setGroup(g)}>
                   {g === 'area' ? 'Area' : 'Type'}
@@ -169,12 +170,14 @@ export function SopList({
                   <div key={a.id}>
                     <button type="button" data-testid="area-group" data-area-id={a.id} title={`Open ${a.name} on the map`} onClick={() => onArea(a.id)} className={GROUP}>
                       <span className="flex items-center gap-2" style={{ paddingLeft: `${a.depth * 0.75}rem` }}>
-                        <i aria-hidden="true" className="size-2 rounded-full" style={{ background: a.colourVar }} />
+                        <i aria-hidden="true" className="size-2.5 shrink-0 rounded-full" style={{ background: a.colourVar }} />
                         {a.name}
                       </span>
-                      <span>{a.total} ›</span>
+                      <span className="font-label text-meta font-medium text-ink-600">{a.total} ›</span>
                     </button>
-                    {own.map(open)}
+                    {own.map((r) => (
+                      <SopRow key={r.id} row={r} selected={r.id === selectedId} hideArea onOpen={onOpen} />
+                    ))}
                   </div>
                 )
               })
@@ -184,7 +187,7 @@ export function SopList({
                   <div key={t}>
                     <h3 className={GROUP}>
                       <span>{t}</span>
-                      <span>{own.length}</span>
+                      <span className="font-label text-meta font-medium text-ink-600">{own.length}</span>
                     </h3>
                     {own.map(open)}
                   </div>
