@@ -368,7 +368,7 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
 
   // ------------------------------------------------------------------ HOME-03 (63-18)
 
-  test('HOME-03 opening two SOPs in a row shows no stale Read (second iteration, same session)', async ({ browser }) => {
+  test('HOME-03 opening two SOPs in a row shows no stale Read; Read folds the side panels (ADR-0011)', async ({ browser }) => {
     test.setTimeout(240_000)
     const meta = (page: Page) => page.locator('[data-testid="read-view"] p.font-label').first()
     await asRole(browser, 'siteAdmin', DESKTOP, async (page) => {
@@ -380,7 +380,19 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
       await expect(h1).toHaveText(EVAL_AREA_SOPS.packing, SLOW)
       await expect(page.getByTestId('read-steps').locator('> li').first()).toContainText('Moving equipment nearby.', SLOW)
 
-      // The list stays on screen at desktop width: open the second SOP without going back.
+      // ADR-0011: Read folds the menu and the list away; the reader's header opens either again.
+      await expect(page.getByTestId('home-menu')).toBeHidden()
+      await expect(page.getByTestId('home-list')).toBeHidden()
+      await shot(page, '63-home-read-folded')
+      await page.getByTestId('panel-menu').click()
+      await expect(page.getByTestId('home-menu')).toBeVisible()
+      await page.getByTestId('panel-menu').click()
+      await expect(page.getByTestId('home-menu')).toBeHidden()
+      await page.getByTestId('panel-list').click()
+      await expect(page.getByTestId('home-list')).toBeVisible()
+      await expect(page.getByTestId('panel-list')).toHaveAttribute('aria-pressed', 'true')
+
+      // With the list open, open the second SOP without going back: the list stays open.
       await row(page, lib.sopIds.lab).last().click()
       await expect(h1).toHaveText(EVAL_AREA_SOPS.lab, SLOW)
       await expect(meta(page)).toContainText('EVAL Area Lab', SLOW)
@@ -392,7 +404,27 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
       await row(page, lib.sopIds.packing).last().click()
       await expect(h1).toHaveText(EVAL_AREA_SOPS.packing, SLOW)
       await expect(meta(page)).not.toContainText('EVAL Area Lab')
+      await expect(page.getByTestId('home-list')).toBeVisible()
       await shot(page, '63-home-two-reads')
+
+      // Back to the map: menu, map and list return, their header bands on one line.
+      await page.getByTestId('read-back').click()
+      await expect(page.getByTestId('site-map')).toBeVisible(SLOW)
+      await expect(page.getByTestId('home-menu')).toBeVisible()
+      const map = (await page.getByTestId('map-header').boundingBox())!
+      const list = (await page.getByTestId('home-list').boundingBox())!
+      const menu = (await page.getByTestId('home-menu').boundingBox())!
+      expect(map.x, 'map sits between the menu and the list').toBeGreaterThan(menu.x)
+      expect(list.x, 'the list is on the right').toBeGreaterThan(map.x)
+      const bottoms = await page.evaluate(() =>
+        [
+          document.querySelector('[data-testid="home-menu"] > div'),
+          document.querySelector('[data-testid="map-header"]'),
+          document.querySelector('[data-testid="sop-list"] > div'),
+        ].map((e) => Math.round(e!.getBoundingClientRect().bottom)),
+      )
+      expect(new Set(bottoms).size, `header bands end at ${bottoms}`).toBe(1)
+      await shot(page, '63-home-desktop-map')
     })
   })
 

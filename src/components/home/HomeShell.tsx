@@ -15,6 +15,7 @@
  */
 import { useEffect, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
+import { ChevronLeft } from 'lucide-react'
 import { Wordmark } from '@/components/brand/Wordmark'
 import { ReadView } from '@/components/home/ReadView'
 import { SectionMenu } from '@/components/home/SectionMenu'
@@ -64,6 +65,9 @@ function isTypingTarget(t: EventTarget | null): boolean {
 export function HomeShell({ siteName, siteId, sites, userEmail, userId, role, initial, packing }: HomeShellProps) {
   const [state, setState] = useState<HomeState>(() => resolveHome(initial, role))
   const [phoneMap, setPhoneMap] = useState(false)
+  // Desktop, while a SOP is open: the menu and the list fold away and the reader can open either (ADR-0011).
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [listOpen, setListOpen] = useState(false)
   const lib = useLibrary(userId)
   const { recent, mostUsed, remember } = useRecentSops(userId, lib.rows)
   const canWrite = role === 'admin' || role === 'safety_manager'
@@ -100,6 +104,10 @@ export function HomeShell({ siteName, siteId, sites, userEmail, userId, role, in
   const openSop = (id: string) => {
     const row = lib.byId.get(id)
     if (row) remember(row.rootId)
+    if (!state.sop) {
+      setMenuOpen(false)
+      setListOpen(false)
+    }
     select({ ...state, sop: id })
   }
   const openArea = (id: string | null) => {
@@ -139,14 +147,9 @@ export function HomeShell({ siteName, siteId, sites, userEmail, userId, role, in
       row={openRow}
       role={role}
       from={homeFrom({ ...HOME, sop: openRow.id, area: state.area })}
-      backLabel={phoneMap ? 'Site map' : 'My SOPs'}
-      onBack={back}
     />
   ) : state.sop ? (
     <div className="mx-auto max-w-3xl px-4 py-6 lg:px-8">
-      <button type="button" data-testid="read-back" onClick={back} className="mb-4 block min-h-tap text-ui text-ink-600">
-        ‹ Back
-      </button>
       <p data-testid="read-missing" className="text-reading text-ink-700">
         {lib.loading ? 'Loading…' : "This SOP isn't in your library."}
       </p>
@@ -187,7 +190,7 @@ export function HomeShell({ siteName, siteId, sites, userEmail, userId, role, in
 
   return (
     <div data-testid="home" className="flex h-dvh flex-col bg-paper lg:flex-row">
-      <SectionMenu role={role} section={state.s} userEmail={userEmail} orgName={siteName} orgId={siteId} sites={sites} onSelect={openSection} />
+      <SectionMenu role={role} section={state.s} userEmail={userEmail} orgName={siteName} orgId={siteId} sites={sites} onSelect={openSection} collapsed={sopOpen && !menuOpen} />
 
       {state.s === 'sops' ? (
         <div className="flex min-h-0 min-w-0 flex-1 flex-col lg:flex-row">
@@ -215,9 +218,9 @@ export function HomeShell({ siteName, siteId, sites, userEmail, userId, role, in
           )}
           <div
             data-testid="home-list"
-            className={`min-h-0 flex-1 overflow-y-auto border-ink-200 px-3.5 pb-6 pt-3 lg:w-100 lg:flex-none lg:border-r lg:pt-4 ${
+            className={`min-h-0 flex-1 overflow-y-auto border-ink-200 px-3.5 pb-6 pt-3 lg:order-last lg:w-100 lg:flex-none lg:border-l lg:pt-0 ${
               sopOpen || phoneMap ? 'max-lg:hidden' : ''
-            }`}
+            } ${sopOpen && !listOpen ? 'lg:hidden' : ''}`}
           >
             {lib.error ? (
               loadError
@@ -243,11 +246,26 @@ export function HomeShell({ siteName, siteId, sites, userEmail, userId, role, in
               <AccountControl email={userEmail} isAdmin={canWrite} org={siteName} orgId={siteId} sites={sites} />
             </div>
           </div>
-          <div
-            data-testid="home-reader"
-            className={`min-h-0 min-w-0 flex-1 overflow-y-auto bg-paper-1 ${!sopOpen && !phoneMap ? 'max-lg:hidden' : ''}`}
-          >
-            {reader}
+          <div className={`flex min-h-0 min-w-0 flex-1 flex-col bg-paper-1 ${!sopOpen && !phoneMap ? 'max-lg:hidden' : ''}`}>
+            {state.sop && (
+              // The reader's header band: back up, and on desktop the two folded panels.
+              <div data-testid="read-bar" className="flex min-h-16 shrink-0 items-center gap-2 border-b border-ink-200 px-4">
+                <button type="button" data-testid="panel-menu" aria-pressed={menuOpen} onClick={() => setMenuOpen((o) => !o)} className="icon-key max-lg:hidden">
+                  Menu
+                </button>
+                <button type="button" data-testid="read-back" onClick={back} className="back">
+                  <ChevronLeft size={18} aria-hidden="true" />
+                  <span className="lg:hidden">{phoneMap ? 'Site map' : 'My SOPs'}</span>
+                  <span className="max-lg:hidden">Site map</span>
+                </button>
+                <button type="button" data-testid="panel-list" aria-pressed={listOpen} onClick={() => setListOpen((o) => !o)} className="icon-key ml-auto max-lg:hidden">
+                  SOP list
+                </button>
+              </div>
+            )}
+            <div data-testid="home-reader" className="min-h-0 flex-1 overflow-y-auto">
+              {reader}
+            </div>
           </div>
         </div>
       ) : (

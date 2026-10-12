@@ -51,14 +51,10 @@ export function ReadView({
   row,
   role,
   from,
-  backLabel,
-  onBack,
 }: {
   row: LibraryRow
   role: string | null
   from: string
-  backLabel: string
-  onBack(): void
 }) {
   const router = useRouter()
   const { data, isLoading } = useReadSop(row.id)
@@ -99,16 +95,9 @@ export function ReadView({
     setTimeout(() => (starting.current = false), 4000)
   }
 
-  const back = (
-    <button type="button" data-testid="read-back" onClick={onBack} className="mb-4 block min-h-tap text-ui text-ink-600">
-      <span className="lg:hidden">‹ {backLabel}</span>
-      <span className="max-lg:hidden">‹ Site map</span>
-    </button>
-  )
   if (data === null) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-6 lg:px-8">
-        {back}
         <p data-testid="read-missing" className="text-reading text-ink-700">This SOP isn&apos;t in your library.</p>
       </div>
     )
@@ -119,7 +108,6 @@ export function ReadView({
 
   return (
     <div data-testid="read-view" className="mx-auto max-w-3xl px-4 pb-24 pt-6 lg:px-8">
-      {back}
       <Wordmark variant="chip" size="merge" data-fuse="sop" />
       <h1 className="mb-1.5 mt-2.5 text-2xl font-semibold text-ink-900">{row.title}</h1>
       <p className="font-label text-meta text-ink-600">

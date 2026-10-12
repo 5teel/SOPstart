@@ -262,6 +262,11 @@ body[data-theme="paper"] {
   .back { display: inline-flex; align-items: center; gap: 0.25rem; min-height: var(--spacing-tap); padding: 0 0.875rem 0 0.5rem; border: 1px solid var(--ink-300); border-radius: var(--radius-lg); background: var(--paper-1); font-size: var(--text-ui); font-weight: 600; color: var(--ink-900); }
   .back:hover { border-color: var(--ink-900); }
 
+  /* A panel key (fold a panel in or out); pressed = the panel is open. */
+  .icon-key { display: inline-grid; place-items: center; min-width: var(--spacing-tap); min-height: var(--spacing-tap); padding: 0 0.875rem; font-size: var(--text-ui); font-weight: 600; border: 1px solid var(--ink-300); border-radius: var(--radius-lg); background: var(--paper-1); color: var(--ink-700); }
+  .icon-key:hover { border-color: var(--ink-900); color: var(--ink-900); }
+  .icon-key[aria-pressed="true"] { background: var(--paper-2); border-color: var(--ink-900); color: var(--ink-900); }
+
   /* Filter chip: 44 px, same radius as controls. */
   .chip { display: inline-flex; align-items: center; gap: 0.5rem; min-height: var(--spacing-tap); padding: 0 0.875rem; border: 1px solid var(--ink-300); border-radius: var(--radius-lg); background: var(--paper-1); font-size: var(--text-ui); color: var(--ink-700); }
   .chip[aria-pressed="true"] { background: var(--ink-900); border-color: var(--ink-900); color: var(--paper); }

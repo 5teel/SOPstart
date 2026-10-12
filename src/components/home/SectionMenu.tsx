@@ -24,6 +24,7 @@ export function SectionMenu({
   orgId,
   sites,
   onSelect,
+  collapsed = false,
 }: {
   role: string | null
   section: Section
@@ -32,13 +33,15 @@ export function SectionMenu({
   orgId: string | null
   sites: Site[]
   onSelect(s: Section): void
+  /** Desktop, while a SOP is open: folded away until the reader opens it (ADR-0011). */
+  collapsed?: boolean
 }) {
   return (
-    <aside data-testid="home-menu" className="flex w-55 shrink-0 flex-col border-r border-ink-200 bg-paper max-lg:hidden">
-      <div className="flex justify-center px-5 pb-7 pt-6">
+    <aside data-testid="home-menu" className={`flex w-55 shrink-0 flex-col border-r border-ink-200 bg-paper max-lg:hidden ${collapsed ? 'lg:hidden' : ''}`}>
+      <div className="flex h-16 shrink-0 items-center justify-center border-b border-ink-200 px-5">
         <Wordmark size="menu" />
       </div>
-      <nav aria-label="Sections" className="flex flex-col gap-0.5 px-3">
+      <nav aria-label="Sections" className="flex flex-col gap-0.5 px-3 pt-4">
         {sectionsForRole(role).map((s) => (
           <button
             key={s}

@@ -66,7 +66,8 @@ export function SopList({
 
   return (
     <div data-testid="sop-list">
-      <div className="flex items-center gap-1">
+      {/* Desktop: the column's header band, level with the menu's wordmark and the map header. */}
+      <div className="flex items-center gap-1 lg:-mx-3.5 lg:h-16 lg:border-b lg:border-ink-200 lg:px-3.5">
         <div className="flex h-tap min-w-0 flex-1 items-center gap-2 rounded-lg border border-ink-300 bg-paper-1 px-3">
           <Search size={16} aria-hidden="true" className="shrink-0 text-ink-500" />
           <input

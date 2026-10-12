@@ -324,7 +324,7 @@ export function SiteMap({ areas, rows, area, onArea, onOpenSop, orgName, packing
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div data-testid="map-header" className="flex min-h-14 shrink-0 items-center gap-2.5 border-b border-ink-200 px-5 py-3">
+      <div data-testid="map-header" className="flex min-h-16 shrink-0 items-center gap-2.5 border-b border-ink-200 px-5 py-2.5">
         {openArea && (
           <button
             type="button"
