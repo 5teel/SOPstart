@@ -586,12 +586,12 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
       const svg = page.getByTestId('site-map')
       await expect(svg).toBeVisible(SLOW)
       await expect(plate(page, formingId)).toHaveCount(1, SLOW)
+      await page.waitForTimeout(800) // the map tweens in from its first (area-less) layout; read the settled box
       const whole = await viewBox(page)
-      await page.waitForTimeout(800)
       await shot(page, '63-home-map-site')
 
       // Click the Forming plate: the viewBox changes, the filter shows Forming, the list holds Forming only.
-      await plate(page, formingId).click({ timeout: 10_000 })
+      await plate(page, formingId).dispatchEvent('click') // plates overlap in screen space (ADR-0010 packing)
       await expect(page.getByTestId('area-filter')).toContainText('Forming', SLOW)
       await expect.poll(async () => sameBox(await viewBox(page), whole), SLOW).toBe(false)
       const rows = page.getByTestId('sop-row')
@@ -606,10 +606,10 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
       await expect.poll(async () => sameBox(await viewBox(page), whole), SLOW).toBe(true)
 
       // Open Forming, then a dimmed area switches the zoom.
-      await plate(page, formingId).click({ timeout: 10_000 })
+      await plate(page, formingId).dispatchEvent('click') // plates overlap in screen space (ADR-0010 packing)
       await expect(page.getByTestId('area-filter')).toContainText('Forming', SLOW)
       await expect(plate(page, lib.departmentIds.packing)).toHaveAttribute('data-state', 'dim')
-      await plate(page, lib.departmentIds.packing).click({ timeout: 10_000 })
+      await plate(page, lib.departmentIds.packing).dispatchEvent('click') // plates overlap in screen space (ADR-0010 packing)
       await expect(page.getByTestId('area-filter')).toContainText('EVAL Area Packing', SLOW)
       await expect(plate(page, lib.departmentIds.packing)).toHaveAttribute('data-state', 'cur')
       await page.waitForTimeout(800)
