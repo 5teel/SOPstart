@@ -21,6 +21,7 @@ import { SectionMenu } from '@/components/home/SectionMenu'
 import { SopList } from '@/components/home/SopList'
 import { TabBar } from '@/components/home/TabBar'
 import { AccountControl, type Site } from '@/components/shell/AccountControl'
+import { InstallPrompt } from '@/components/shell/InstallPrompt'
 import { useLibrary } from '@/hooks/useLibrary'
 import { useRecentSops } from '@/hooks/useRecentSops'
 import { requestOverviewSection } from '@/lib/shell/overview-focus'
@@ -209,6 +210,7 @@ export function HomeShell({ siteName, siteId, sites, userEmail, userId, role, in
                   </button>
                 ))}
               </div>
+              <InstallPrompt />
             </div>
           )}
           <div

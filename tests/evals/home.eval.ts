@@ -684,6 +684,34 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
     })
   })
 
+  test('MAP-05 Android phone: the browser install offer shows the home-screen request; Not now hides it across a reload', async ({ browser }) => {
+    test.setTimeout(120_000)
+    await asRole(browser, 'siteWorker', PHONE, async (page) => {
+      await page.addInitScript(() => Object.defineProperty(navigator, 'userAgent', { get: () => 'Mozilla/5.0 (Linux; Android 14; Pixel 8) Chrome/129.0 Mobile Safari/537.36' }))
+      // Chrome fires beforeinstallprompt only for an installable, not-installed app; stand in for it.
+      const offer = () =>
+        page.evaluate(() => {
+          const e = new Event('beforeinstallprompt', { cancelable: true })
+          Object.assign(e, { prompt: async () => {}, userChoice: Promise.resolve({ outcome: 'accepted' }) })
+          window.dispatchEvent(e)
+        })
+      await page.goto('/')
+      await listReady(page)
+      await expect(page.getByTestId('install-prompt')).toHaveCount(0)
+      await offer()
+      await expect(page.getByTestId('install-prompt')).toBeVisible()
+      await noSideways(page, 'install prompt')
+      await shot(page, '63-home-phone-install')
+      await page.getByTestId('install-later').click()
+      await expect(page.getByTestId('install-prompt')).toHaveCount(0)
+      await page.reload()
+      await listReady(page)
+      await offer()
+      await page.waitForTimeout(300)
+      await expect(page.getByTestId('install-prompt')).toHaveCount(0)
+    })
+  })
+
   // ------------------------------------------------------------------ EVAL-01
 
   test('EVAL-01 real org map and list, read-only', async ({ browser }) => {
