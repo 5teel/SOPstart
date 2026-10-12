@@ -693,7 +693,7 @@ export const UAT_TESTS: UatTest[] = [
       { id: 'miss-helpful', text: 'When nothing matched, was it clear how to ask for one?' },
     ],
     background:
-      'Phase 63 (HOME-01..05, FUSE-01..02): SopList + ReadView on /, search over titles, steps and tools, Recent / Most used / All SOPs by area or type, start plays the merge and opens /sops/[sopId]?go=1. Evals: tests/evals/home.eval.ts, start.eval.ts.',
+      'Phase 63 (HOME-01..05, FUSE-01..02): SopList + ReadView on /, search over titles, steps and tools, Recent / Most used / All SOPs by area or type, start plays the merge and turns the same list into the checklist (ADR-0012). Evals: tests/evals/home.eval.ts, start.eval.ts.',
   },
   {
     id: 'p63-site-map',

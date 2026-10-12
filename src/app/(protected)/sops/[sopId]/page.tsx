@@ -3,6 +3,7 @@ import { getSessionContext } from '@/lib/auth/session-context'
 import { requireSopEditAccess } from '@/lib/auth/guards'
 import { loadFocusSop } from '@/lib/sop/focus-read'
 import { focusHref } from '@/lib/sop/focus-path'
+import { formatHome, homeFromToken } from '@/lib/shell/home-state'
 import { latestPublishedOf, resolveFocusTarget, type LineageRow } from '@/lib/sop/lineage-current'
 import { memberLabel, userLabels } from '@/lib/members/labels'
 import { toWalkState, WALK_COLUMNS } from '@/lib/sop/walk-read'
@@ -27,13 +28,10 @@ export default async function SopFocusPage({
   searchParams,
 }: {
   params: Promise<{ sopId: string }>
-  searchParams: Promise<{ from?: string | string[]; mode?: string | string[]; go?: string | string[]; fresh?: string | string[] }>
+  searchParams: Promise<{ from?: string | string[]; mode?: string | string[] }>
 }) {
   const { sopId } = await params
-  const { from: rawFrom, mode: rawMode, go: rawGo, fresh: rawFresh } = await searchParams
-  // Single-use flags from Read (63-15): only the exact value 1 counts; the walker strips them.
-  const go = rawGo === '1'
-  const fresh = rawFresh === '1'
+  const { from: rawFrom, mode: rawMode } = await searchParams
   // Raw; every consumer (Back, the superseded link) passes it through the place whitelist.
   const from = typeof rawFrom === 'string' ? rawFrom : null
 
@@ -69,7 +67,7 @@ export default async function SopFocusPage({
 
   if (editing && requested.status === 'published') {
     const draft = lineage.find((r) => r.status === 'draft')
-    if (draft) redirect(focusHref(draft.id, { mode: 'edit', from, go, fresh }))
+    if (draft) redirect(focusHref(draft.id, { mode: 'edit', from }))
   }
 
   const [walksRes, completionsRes, jobRes] = await Promise.all([
@@ -107,7 +105,7 @@ export default async function SopFocusPage({
     target = { kind: 'open', id: sopId, superseded: !!latestRow && (latestRow.version ?? 0) > (row?.version ?? 0) }
   }
   if (target.kind === 'not_found') notFound()
-  if (target.kind === 'redirect') redirect(focusHref(target.id, { from, go, fresh }))
+  if (target.kind === 'redirect') redirect(focusHref(target.id, { from }))
 
   const data = await loadFocusSop(supabase, target.id)
   if (!data) notFound()
@@ -130,6 +128,12 @@ export default async function SopFocusPage({
   const latest = latestPublishedOf(lineage, target.id)
   const superseded = published && target.superseded && !walk
   const versionState = !published ? 'draft' : superseded ? 'superseded' : 'live'
+
+  // ADR-0012: a live SOP is read and run in one place, the home view. This page keeps editing and
+  // draft / superseded versions only.
+  // ponytail: a run left on an older version (D-12) opens on the home's current row; carry the
+  // version id through if workers report losing a mid-run republish.
+  if (!editing && versionState === 'live') redirect(formatHome({ ...homeFromToken(from), s: 'sops', sop: target.id }))
 
   // D-12: the worker has finished an earlier version of this SOP and not this one.
   const doneOn = new Set((completionsRes.data ?? []).map((c) => c.sop_id as string))
@@ -172,7 +176,6 @@ export default async function SopFocusPage({
     <FocusWalker
       key={`${target.id}:${walk?.id ?? 'none'}`}
       data={data}
-      initialWalk={walk}
       from={from}
       versionState={versionState}
       supersededBy={superseded && latest ? { id: latest.id, version: latest.version ?? 0 } : null}
@@ -181,8 +184,6 @@ export default async function SopFocusPage({
       job={job}
       canEdit={canEdit}
       owner={owner}
-      autostart={go}
-      askStartOver={fresh}
     />
   )
 }

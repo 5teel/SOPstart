@@ -187,11 +187,11 @@
    * Full plays on the first Start of the day, short (x0.3) after; reduced motion = none. */
   --ease-fuse:        cubic-bezier(.5, 0, .2, 1);
   --dur-fuse-fade:    180ms;
-  --dur-fuse-drop:    300ms;
-  --dur-fuse-shift:   320ms;
-  --dur-fuse-tape:    340ms;
-  --dur-fuse-hold:    140ms;
-  --dur-fuse-rise:    420ms;
+  --dur-fuse-gather:  560ms;  /* ADR-0012: SOP and start travel to the pane's centre and grow */
+  --dur-fuse-tape:    420ms;
+  --dur-fuse-hold:    900ms;  /* full merge only: the caption reads */
+  --dur-fuse-rise:    480ms;
+  --fuse-hero-max:    520px;  /* the joined wordmark's widest, centred in the SOP's pane */
   --fuse-short-scale: 0.3;
   --dur-map-zoom:     520ms;
   --dur-panel-fold:   600ms;  /* desktop side panels fold away while a SOP is open (ADR-0011) */  /* site map: whole site <-> one area */
@@ -892,3 +892,6 @@ body[data-theme="paper"] .strip-slot .done:disabled {
 @media (prefers-reduced-motion: reduce) {
   .fold { transition: none; }
 }
+
+/* ADR-0012: the line under the start merge (full merge only). */
+.fuse-caption { margin: 0; font-size: var(--text-lg, 18px); font-weight: 500; color: var(--ink-700); }

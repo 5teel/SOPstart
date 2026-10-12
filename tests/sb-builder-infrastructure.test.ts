@@ -35,10 +35,11 @@ test.describe('Editor infrastructure and safety gates (SB-INFRA)', () => {
     expect(frame).toMatch(/dynamic\(\(\) => import\('@\/components\/focus\/admin\/FocusEditor'\)/)
     expect(frame).toContain('ssr: false')
     // No worker focus file imports the editor statically.
-    for (const f of ['FocusWalker', 'FocusTopBar', 'FocusRail', 'BrowseDocument', 'WalkStep', 'ReviewAndSend', 'SentPanel', 'ResumeCard']) {
+    for (const f of ['FocusWalker', 'FocusTopBar', 'FocusRail', 'BrowseDocument']) {
       const src = await fs.readFile(`src/components/focus/${f}.tsx`, 'utf8')
       expect(src, f).not.toMatch(/from '@\/components\/focus\/admin\//)
     }
-    expect(await fs.readFile('src/hooks/useWalk.ts', 'utf8')).not.toContain('focus/admin')
+    // ADR-0012: the worker's run lives on the home view.
+    for (const f of ['src/components/home/ReadView.tsx', 'src/hooks/useRun.ts']) expect(await fs.readFile(f, 'utf8'), f).not.toContain('focus/admin')
   })
 })

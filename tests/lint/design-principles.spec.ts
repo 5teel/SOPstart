@@ -10,7 +10,7 @@ const theme = fs.readFileSync(path.join(process.cwd(), 'src/styles/blueprint-the
 const REQUIRED = [
   '--wm-font', '--wm-weight-sop', '--wm-weight-start', '--wm-ink', '--wm-accent', '--wm-tape', '--wm-tape-on-ink',
   '--wm-size-hero', '--wm-size-merge', '--wm-size-header', '--wm-size-phone',
-  '--ease-fuse', '--dur-fuse-fade', '--dur-fuse-drop', '--dur-fuse-shift', '--dur-fuse-tape', '--dur-fuse-hold',
+  '--ease-fuse', '--dur-fuse-fade', '--dur-fuse-gather', '--dur-fuse-tape', '--dur-fuse-hold', '--fuse-hero-max',
   '--dur-fuse-rise', '--fuse-short-scale',
   '--dur-map-zoom', '--dur-hover-lift',
   ...Array.from({ length: 8 }, (_, i) => `--area-${i + 1}`),

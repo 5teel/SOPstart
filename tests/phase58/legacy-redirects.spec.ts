@@ -43,11 +43,11 @@ test.describe('FOC-03 legacy redirects', () => {
     expect(at).toBeGreaterThan(MW.indexOf('if (!isPublicRoute && !claims)'))
   })
 
-  test('no client code redirects a legacy address (no router.replace in the page, focus components or walk hook)', () => {
+  test('no client code redirects a legacy address (no router.replace in the page, focus components or run hook)', () => {
     const files = [
       path.join(ROOT, 'src/app/(protected)/sops/[sopId]/page.tsx'),
       ...walk(path.join(ROOT, 'src/components/focus')),
-      path.join(ROOT, 'src/hooks/useWalk.ts'),
+      path.join(ROOT, 'src/hooks/useRun.ts'),
     ]
     for (const f of files) expect(fs.readFileSync(f, 'utf-8'), f).not.toMatch(/router\.replace\(/)
   })

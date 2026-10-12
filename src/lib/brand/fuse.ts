@@ -1,17 +1,18 @@
 /**
- * Phase 63 (FUSE-01) -- the Start merge, the small half. Plain client-safe module, no directive.
+ * Phase 63 (FUSE-01), ADR-0012 -- the start merge, the small half. Plain client-safe module, no directive.
  *
  * The animation itself is fuse-engine.ts, a lazy module reached only through the
- * dynamic import below (it keeps the merge out of both gated bundles). The engine
- * draws into the empty #fuse-layer element the root layout always keeps, so it
- * survives the route change that happens mid-animation (no View Transitions, R9).
+ * dynamic import below (it keeps the merge out of the gated bundles). The engine
+ * draws into the empty #fuse-layer element the root layout always keeps, over the
+ * SOP's pane; the run opens underneath it on the same page.
  */
-import type { QueryClient } from '@tanstack/react-query'
 
 export interface FuseInput {
   chip: DOMRect
   label: DOMRect
   button: DOMRect
+  /** The SOP's pane: the merge plays centred in it (ADR-0012). */
+  pane: DOMRect
   mode: 'short' | 'full'
   factor: number
 }
@@ -50,28 +51,6 @@ export function slowFactor(): number {
   }
 }
 
-/**
- * Resolves when no query or mutation is in flight, or after maxMs. The start click never
- * runs a server action itself; if one is already in flight the push waits for it so the
- * Next 16.2.1 action queue cannot orphan the navigation (CLAUDE.md 2026-09-29).
- */
-export function whenQueriesIdle(qc: QueryClient, maxMs = 3000): Promise<void> {
-  return new Promise((resolve) => {
-    const idle = () => qc.isFetching() === 0 && qc.isMutating() === 0
-    if (idle()) return resolve()
-    let timer: ReturnType<typeof setTimeout> | undefined
-    const stops: Array<() => void> = []
-    const finish = () => {
-      clearTimeout(timer)
-      stops.forEach((stop) => stop())
-      resolve()
-    }
-    const check = () => idle() && finish()
-    stops.push(qc.getQueryCache().subscribe(check), qc.getMutationCache().subscribe(check))
-    timer = setTimeout(finish, maxMs)
-  })
-}
-
 /** Warm the engine chunk while Read is open so the first tap does not wait for it. */
 export function prefetchFuse(): void {
   void import('./fuse-engine').catch(() => undefined)
@@ -80,23 +59,23 @@ export function prefetchFuse(): void {
 let playing = false
 
 /**
- * Starts the merge. Resolves when the screen has faded to paper (the first stage is over), which is the
- * moment to navigate: pushing earlier swaps Read for the next page's loading skeleton while it is still
- * half visible. Always resolves: on an engine failure at once, and after COVER_MAX_MS whatever happens,
- * so a slow chunk can never strand the start.
+ * Plays the merge and calls `onCovered` once the pane is paper (the moment to open the run
+ * underneath). Resolves when the merge is over. `onCovered` always runs exactly once: at once
+ * on an engine failure, and after COVER_MAX_MS whatever happens, so a slow chunk can never
+ * strand the start.
  */
-export function playFuse(input: FuseInput): Promise<void> {
-  return new Promise((resolve) => {
-    if (playing) return resolve()
-    playing = true
-    const guard = setTimeout(resolve, COVER_MAX_MS)
-    void import('./fuse-engine')
-      .then((m) => m.run(input, resolve))
-      .catch(() => undefined)
-      .finally(() => {
-        playing = false
-        clearTimeout(guard)
-        resolve()
-      })
-  })
+export function playFuse(input: FuseInput, onCovered: () => Promise<void>): Promise<void> {
+  let once: Promise<void> | null = null
+  const cover = () => (once ??= onCovered())
+  if (playing) return cover()
+  playing = true
+  const guard = setTimeout(cover, COVER_MAX_MS)
+  return import('./fuse-engine')
+    .then((m) => m.run(input, cover))
+    .catch(() => undefined)
+    .then(() => cover())
+    .finally(() => {
+      playing = false
+      clearTimeout(guard)
+    })
 }

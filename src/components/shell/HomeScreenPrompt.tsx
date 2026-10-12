@@ -20,7 +20,7 @@ function snooze() {
   } catch {}
 }
 
-export function InstallPrompt() {
+export function HomeScreenPrompt() {
   const [offer, setOffer] = useState<InstallEvent | null>(null)
 
   useEffect(() => {

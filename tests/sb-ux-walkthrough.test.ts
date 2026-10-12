@@ -1,5 +1,5 @@
 /**
- * SB-UX-03 -- the walk is built for a phone in a glove. Repointed in 58-15: the
+ * SB-UX-03 -- the run is built for a phone in a glove. ADR-0012: the run is the home view's checklist. Repointed in 58-15: the
  * two fixme stubs described the immersive step card and the desktop/mobile view
  * toggle (persisted to localStorage), both retired with the old walkthroughs. The
  * surviving behaviour is the glove-sized walk: the focus walk step and its
@@ -16,14 +16,11 @@ import path from 'node:path'
 
 const read = (rel: string) => fs.readFileSync(path.join(process.cwd(), rel), 'utf-8').replace(/\r\n/g, '\n')
 
-test('SB-UX-03: the walk step text uses the step type token and its actions are glove-sized', () => {
-  const step = read('src/components/focus/WalkStep.tsx')
-  expect(step).toContain('data-testid="walk-step-text"')
-  expect(step).toContain('text-step')
-  expect(step).toContain('min-h-tap-glove')
-})
-
-test('SB-UX-03: the review and send action is glove-sized, and the walker renders the walk step', () => {
-  expect(read('src/components/focus/ReviewAndSend.tsx')).toContain('min-h-tap-glove')
-  expect(read('src/components/focus/FocusWalker.tsx')).toContain('<WalkStep')
+test('SB-UX-03 (ADR-0012): every tick, the photo button, Send and Done are glove-sized', () => {
+  const view = read('src/components/home/ReadView.tsx')
+  expect(view).toContain('data-testid="step-tick"')
+  expect(view).toMatch(/data-testid="step-tick"[\s\S]*?size-tap-glove/)
+  expect(view).toMatch(/data-testid=\{has \? 'step-photo-retake' : 'step-photo-button'\}[\s\S]*?min-h-tap-glove/)
+  expect(view).toMatch(/data-testid="run-send-button"[\s\S]*?min-h-tap-glove/)
+  expect(view).toMatch(/data-testid="run-done"[\s\S]*?min-h-tap-glove/)
 })

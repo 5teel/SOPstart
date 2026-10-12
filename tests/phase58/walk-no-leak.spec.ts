@@ -1,8 +1,7 @@
 /**
- * Phase 58 -- FOC-04 (CLAUDE.md 2026-10-03): second-walk state does not leak.
- * Source-contract guards over the walk hook and the focus components; the
- * second-walk behaviour itself is proved by the deployed eval (58-18).
- * Registration: playwright.config.ts `phase58` project.
+ * Phase 58 -- FOC-04 (CLAUDE.md 2026-10-03), ADR-0012: a run's state does not leak.
+ * Source-contract guards over the run hook and the SOP view; the behaviour itself is
+ * proved by the deployed eval (start.eval RUN-*). Registration: playwright.config.ts `phase58`.
  */
 import { test, expect } from '@playwright/test'
 import fs from 'node:fs'
@@ -16,7 +15,9 @@ const stripComments = (src: string) =>
     .filter((l) => !/^\s*(\/\/|\/\*|\*\/|\*)/.test(l))
     .join('\n')
 
-const HOOK = stripComments(read('src/hooks/useWalk.ts'))
+const HOOK = stripComments(read('src/hooks/useRun.ts'))
+const VIEW = stripComments(read('src/components/home/ReadView.tsx'))
+const SHELL = stripComments(read('src/components/home/HomeShell.tsx'))
 const FOCUS_DIR = path.join(ROOT, 'src', 'components', 'focus')
 const focusFiles = () =>
   fs
@@ -24,71 +25,64 @@ const focusFiles = () =>
     .filter((f) => f.endsWith('.tsx'))
     .map((f) => ({ f, code: stripComments(read(`src/components/focus/${f}`)) }))
 
-test.describe('FOC-04 walk no-leak', () => {
-  test('walk state is useState, reset when the SOP or the server walk id changes, with no store or persisted cache', () => {
-    expect(HOOK).toContain('useState<WalkState | null>(initialWalk)')
-    expect(HOOK).toContain('const seed = `${sopId}:${initialWalk?.id')
-    expect(HOOK).toMatch(/if \(seed !== seenSeed\) \{[\s\S]*setWalk\(initialWalk\)[\s\S]*setPreviews\(\{\}\)/)
+test.describe('FOC-04 run no-leak (ADR-0012)', () => {
+  test('run state is useState in the hook, and the view is keyed by SOP id so a second SOP starts clean', () => {
+    expect(HOOK).toContain('useState<WalkState | null>(null)')
+    expect(SHELL).toMatch(/<ReadView\s+key=\{openRow\.id\}/)
     expect(HOOK).not.toMatch(/from '@\/stores\//)
     expect(HOOK).not.toMatch(/localStorage|sessionStorage|persist|indexedDB|completionStore/)
+    // Done after Send drops the run, so the next Start opens a fresh one.
+    expect(HOOK).toMatch(/const finish = useCallback\(\(\) => \{[\s\S]*setWalk\(null\)/)
   })
 
-  test('photos go through useStepPhotos keyed to the walk id, and thumbnails are keyed by walk id', () => {
+  test('photos go through useStepPhotos keyed to the run id', () => {
     expect(HOOK).toContain('useStepPhotos(walk?.id)')
-    expect(HOOK).toContain('`${walk.id}:${id}`')
     expect(HOOK).toContain('photoApi.addPhoto(walk.id,')
   })
 
-  test('every write goes through the server walk; state moves only from the walk it returns', () => {
-    for (const call of ['startWalk(', 'recordWalkStep(', 'startOverWalk(']) expect(HOOK, call).toContain(call)
+  test('every write goes through the server run; a row shows ticked only from the run it returns', () => {
+    for (const call of ['startWalk(', 'recordWalkStep(', 'startOverWalk(', 'submitCompletion({ walkId']) expect(HOOK, call).toContain(call)
     expect(HOOK).toMatch(/action: 'complete'/)
     expect(HOOK).toMatch(/action: 'photo'/)
-    // complete() and photo() advance only after a successful server walk.
-    expect(HOOK).toMatch(/setWalk\(res\.walk\)\s*\n\s*afterWrite\(res\.walk, id\)/)
+    expect(HOOK.match(/setWalk\(res\.walk\)/g)?.length).toBeGreaterThanOrEqual(3)
+    // Ticked is derived from the server run, never set locally.
+    expect(HOOK).toContain("new Set(Object.keys(walk?.done ?? {}))")
   })
 
-  test('review WR-05: a stale-walk refusal drops the local walk and re-reads the page; a locked step is said in its own words', () => {
-    for (const msg of ['Start the SOP again.', 'That step is not part of this SOP.']) expect(HOOK).toContain(`'${msg}':`)
-    // lockstep (63-16): the keys equal the strings the server actions return, character for character
-    const server = stripComments(read('src/actions/walk.ts')) + stripComments(read('src/actions/completions.ts'))
-    for (const msg of ['Start the SOP again.', 'That step is not part of this SOP.']) expect(server).toContain(`'${msg}'`)
-    expect(HOOK).toContain("export const LOCKED_STEP = 'Finish the steps before this one first.'")
-    const fn = HOOK.slice(HOOK.indexOf('const serverError = useCallback('), HOOK.indexOf('const afterWrite'))
-    expect(fn).toMatch(/setWalk\(null\)[\s\S]*setPhase\('browse'\)[\s\S]*router\.refresh\(\)/)
-    expect(fn).toContain("msg === 'Add a photo to continue.' || msg === LOCKED_STEP ? msg : fallback")
-    // every server refusal in complete(), photo() and startOver() goes through it
-    expect(HOOK).toContain('serverError(res.error, SAVE_ERROR)')
-    expect(HOOK).toContain('serverError(res.error, PHOTO_ERROR)')
-    expect(HOOK).toContain('serverError(res.error, res.error)')
-    expect(HOOK).not.toMatch(/return setError\(res\.error === 'Add a photo/)
-    expect(HOOK).not.toMatch(/'error' in res\) return setError\(/)
-  })
-
-  test('the step is synced to the URL with history.replaceState, never router.push', () => {
-    expect(HOOK).toContain('window.history.replaceState')
-    expect(HOOK).not.toMatch(/router\.push\(['"`]\?step/)
-    // The only router call is the Start-over handler moving to another version; no effect navigates.
-    expect(HOOK.match(/router\.(push|replace)\(/g)?.length).toBe(1)
+  test('reading writes nothing: no server action fires on opening, only from a press', () => {
+    // The view's only effects are the merge prefetch and scrolling the next step into view.
+    const effects = VIEW.match(/useEffect\(\(\) => \{[\s\S]*?\n {2}\}, \[[^\]]*\]\)/g) ?? []
+    expect(effects.length).toBe(2)
+    for (const e of effects) expect(e).not.toMatch(/run\.(begin|startOver|tick|photo|send)\(/)
     expect(HOOK).not.toMatch(/useEffect/)
   })
 
-  test('no focus file imports the old stores or pushes a step into the URL', () => {
-    for (const { f, code } of focusFiles()) {
+  test('a stale-run refusal drops the local run; a locked step or missing photo is said in its own words', () => {
+    for (const msg of ['Start the SOP again.', 'That step is not part of this SOP.']) expect(HOOK).toContain(`'${msg}':`)
+    // lockstep (63-16): the keys equal the strings the server actions return, character for character
+    const server = stripComments(read('src/actions/walk.ts')) + stripComments(read('src/actions/completions.ts'))
+    for (const msg of ['Start the SOP again.', 'That step is not part of this SOP.', 'Finish the steps before this one first.', 'Add a photo to continue.'])
+      expect(server).toContain(`'${msg}'`)
+    expect(HOOK).toMatch(/if \(STALE\[msg\]\) \{[\s\S]*setWalk\(null\)[\s\S]*setRunning\(false\)/)
+    expect(HOOK).toContain("'Finish the steps before this one first.'")
+    expect(HOOK).toContain("'Add a photo to continue.'")
+  })
+
+  test('no focus file or the view imports the old stores or pushes a step into the URL', () => {
+    for (const { f, code } of [...focusFiles(), { f: 'ReadView.tsx', code: VIEW }]) {
       expect(code, f).not.toMatch(/completionStore|stores\/walkthrough/)
       expect(code, f).not.toMatch(/router\.push\(['"`]\?step/)
     }
-    expect(HOOK).not.toContain('completionStore')
   })
 
-  test('review sends from the walk row, and the labels come only from primaryLabel (one classifier)', () => {
-    expect(read('src/components/focus/ReviewAndSend.tsx')).toContain('submitCompletion({ walkId')
-    for (const { f, code } of focusFiles()) {
-      expect(code, f).not.toMatch(/I understand — continue|I'm wearing it — continue/)
+  test('tick names come only from tickLabel (one classifier)', () => {
+    expect(VIEW).toContain('tickLabel(step.kind)')
+    for (const { f, code } of [...focusFiles(), { f: 'ReadView.tsx', code: VIEW }]) {
+      expect(code, f).not.toMatch(/'I understand the hazard'|"I'm wearing it"/)
     }
-    expect(read('src/components/focus/WalkStep.tsx')).toContain('primaryLabel(step.kind, isLast)')
   })
 
   test('the photo copy avoids the literal the Phase 55 photo-scan sweep forbids', () => {
-    for (const { f, code } of focusFiles()) expect(code, f).not.toContain(['Take', 'a photo'].join(' '))
+    for (const { f, code } of [...focusFiles(), { f: 'ReadView.tsx', code: VIEW }]) expect(code, f).not.toContain(['Take', 'a photo'].join(' '))
   })
 })

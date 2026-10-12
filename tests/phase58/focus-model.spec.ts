@@ -11,6 +11,7 @@ import {
   reviewMissing,
   kindLabel,
   primaryLabel,
+  tickLabel,
   railNumber,
   hashInput,
   type FocusStepLike,
@@ -91,6 +92,11 @@ test.describe('labels', () => {
     expect(primaryLabel('step', false)).toBe('Done — next step')
     expect(primaryLabel('check', false)).toBe('Confirmed — next step')
     for (const k of ['hazard', 'ppe', 'step', 'check'] as const) expect(primaryLabel(k, true)).toBe('Done — review')
+    // ADR-0012: the run checklist's tick names
+    expect(tickLabel('hazard')).toBe('I understand the hazard')
+    expect(tickLabel('ppe')).toBe("I'm wearing it")
+    expect(tickLabel('step')).toBe('Done')
+    expect(tickLabel('check')).toBe('Confirmed')
   })
 
   test('kind labels', () => {

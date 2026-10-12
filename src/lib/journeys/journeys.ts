@@ -120,7 +120,7 @@ export const JOURNEYS: Journey[] = [
       { id: 'missing', type: 'action', label: 'Ask for one', route: '/', detail: 'A search with no match offers Ask for one (it opens a request, with the search words as the note). An admin or safety manager also gets Write it.', branches: [
         { label: 'Request sent', to: 'e' },
       ] },
-      { id: 'read', type: 'screen', label: 'Read the SOP', route: '/', detail: 'On a computer the SOP takes the centre where the map was, and the menu and list fold away (Menu and SOP list in its header bring them back, ADR-0011); on a phone it takes the screen. Hazards and PPE first, then every step in order, the owner, the version and "Updated since you last did it" when a newer version was published. Back ("‹ Site map" / "‹ My SOPs") and Esc return to where you were.' },
+      { id: 'read', type: 'screen', label: 'Read the SOP', route: '/', detail: 'On a computer the SOP takes the centre where the map was, and the menu and list fold away (Menu and SOP list in its header bring them back, ADR-0011); on a phone it takes the screen. Reading writes nothing. Hazards and PPE first, then every step in order, the owner, the version and "Updated since you last did it" when a newer version was published. Back ("‹ Site map" / "‹ My SOPs") and Esc return to where you were.' },
       { id: 'go', type: 'decision', label: 'Ready to start?', branches: [
         { label: 'Press start', to: 'start' },
         { label: 'Just reading', to: 'e' },
@@ -129,7 +129,7 @@ export const JOURNEYS: Journey[] = [
       { id: 'request', type: 'action', label: 'Make a request', route: '/', detail: 'Under the SOP, a worker or supervisor can ask for a change to it or to be observed doing it. A focused dialog with the screen recessed; Send request answers under My requests.', branches: [
         { label: 'Request sent', to: 'e' },
       ] },
-      { id: 'start', type: 'screen', label: 'The SOP, running', route: '/sops/[sopId]', detail: 'See "Start a SOP".' },
+      { id: 'start', type: 'screen', label: 'The same list, as a checklist', route: '/', detail: 'See "Start a SOP" (ADR-0012).' },
       { id: 'e', type: 'end', label: 'SOP found' },
     ],
   },
@@ -138,24 +138,23 @@ export const JOURNEYS: Journey[] = [
     group: 'Worker',
     persona: 'Worker',
     title: 'Start a SOP and finish it',
-    summary: 'A worker starts a SOP on their phone or computer, does each step, captures the evidence the SOP asks for, and finishes with a tamper-proof record.',
+    summary: 'A worker starts a SOP where they read it: the same list of steps becomes a checklist, each tick is recorded, and they finish with a tamper-proof record (ADR-0012).',
     steps: [
-      { id: 's', type: 'start', label: 'Press start on Read', route: '/', detail: 'The start button plays a short merge, then opens the SOP on its own screen at its current step. If you already started it, it says "Picks up at step N of M"; "or begin from step 1" asks first and throws away the earlier ticks and photos only if you say so.' },
-      { id: 'run', type: 'screen', label: 'The SOP, running - one step at a time', route: '/sops/[sopId]', detail: 'A slim bar with Back and the title, a step rail and one reading column, and nothing from the home. Each press is saved on the server before the screen moves, so closing the page loses nothing. A worker always lands on the latest published version, or on the version they started. Back returns to where the SOP was opened from.' },
+      { id: 's', type: 'start', label: 'Press start on the SOP', route: '/', detail: 'The start merge plays centred over the SOP (the full one on the first start of the day, short after, none with reduced motion) and the SOPstart wordmark settles into the run bar: from now every tick is saved. If you started it before, it says "Picks up at step N of M"; "or begin from step 1" asks first and throws away the earlier ticks and photos only if you say so.' },
+      { id: 'run', type: 'screen', label: 'The checklist', route: '/', detail: 'The same steps you read, each with a glove-sized tick box. Steps tick in order (the next one is marked and scrolls into view; later ones wait) unless the SOP allows jumping ahead. Each tick is saved on the server before it shows, so closing the page loses nothing. Stop keeps the ticks and returns to reading.' },
       { id: 'kind', type: 'decision', label: 'What does the step need?', branches: [
-        { label: 'Just do it', to: 'next' },
-        { label: 'Acknowledge a hazard or PPE', to: 'next' },
-        { label: 'Add a photo', to: 'photo' },
+        { label: 'Just tick it', to: 'next' },
+        { label: 'Tick to acknowledge a hazard or PPE', to: 'next' },
+        { label: 'Add a photo, then tick', to: 'photo' },
       ] },
-      { id: 'photo', type: 'action', label: 'Add the photo the step asks for', detail: 'Compressed and uploaded straight away; the step cannot be finished until the photo is there. Retake replaces it.' },
+      { id: 'photo', type: 'action', label: 'Add the photo the step asks for', detail: 'On that step\'s own row. Compressed and uploaded straight away; the tick waits until the photo is there. Retake replaces it.' },
       { id: 'next', type: 'decision', label: 'More steps?', branches: [
-        { label: 'Yes - Next', to: 'run' },
-        { label: 'Last step done', to: 'review' },
+        { label: 'Yes - the next one is marked', to: 'run' },
+        { label: 'Every step ticked', to: 'complete' },
         { label: 'Stop', to: 'back' },
       ] },
-      { id: 'review', type: 'screen', label: 'Review - Ready to send?', route: '/sops/[sopId]', detail: 'Every step with its acknowledgement and photo. Nothing is written until Send for sign-off; a missing acknowledgement or photo lists what is still to do and blocks Send.' },
-      { id: 'complete', type: 'action', label: 'Send for sign-off', detail: 'Creates the append-only completion record and the worker\'s ledger row. Finishing IS the worker signature (D-09). Then one line, "Sent for sign-off", and Done.' },
-      { id: 'back', type: 'screen', label: 'Back to Read', route: '/', detail: 'Done or Stop returns to Read on the home, on the same SOP, so the next SOP is one tap away.' },
+      { id: 'complete', type: 'action', label: 'Send for sign-off', detail: 'At the foot of the list. Creates the append-only completion record and the worker\'s ledger row. Finishing IS the worker signature (D-09). Then "Sent for sign-off" and Done, which returns to reading the same SOP.' },
+      { id: 'back', type: 'screen', label: 'Back to reading', route: '/', detail: 'Stop or Done returns the same view to reading; the next SOP is one tap away in the list.' },
       { id: 'signoff', type: 'decision', label: 'Supervisor counter-sign required?', branches: [
         { label: 'Yes - it waits in Sign-offs', to: 'sup' },
         { label: 'No', to: 'e' },

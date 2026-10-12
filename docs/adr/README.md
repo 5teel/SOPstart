@@ -26,3 +26,4 @@ code, plans and phases follow it until a later ADR supersedes it.
 | [0009](0009-site-map-pictures.md) | The site map may carry pictures | Accepted | review only |
 | [0010](0010-tiered-site-map.md) | A tiered site map, packed by the org's choice | Accepted | `tests/phase63/site-tiers.spec.ts` |
 | [0011](0011-desktop-home-map-centre.md) | Desktop home: map centre, list right, Read folds both | Accepted | `tests/evals/home.eval.ts` HOME-03 |
+| [0012](0012-read-and-run-one-view.md) | Reading and doing a SOP are one view; the start merge marks the first record | Accepted | `tests/evals/start.eval.ts`, `tests/phase63/fuse-wiring.spec.ts` |

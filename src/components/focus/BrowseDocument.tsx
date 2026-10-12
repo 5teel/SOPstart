@@ -1,18 +1,16 @@
 'use client'
 
 /**
- * Browse state of the focus screen (D-05): every step in walk order, read only.
- * No completion exists here; "start" is the one primary and the page
- * decides whether to pass it. Text renders as plain React children only.
+ * The SOP page's read-only document (D-05): every step in walk order. ADR-0012: only draft and
+ * superseded versions show here (a live SOP is read and run on the home), so there is no start.
+ * Text renders as plain React children only.
  */
-import type { ReactNode } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { History, Lightbulb } from 'lucide-react'
 import { BEFORE_YOU_START, type WalkEntry } from '@/lib/sop/focus'
 import type { FocusSop, FocusStepRow } from '@/lib/sop/focus-read'
 import { focusHref } from '@/lib/sop/focus-path'
-import { Wordmark } from '@/components/brand/Wordmark'
 import { KindChip, isSignal } from '@/components/focus/KindChip'
 import { StandardLabels } from '@/components/sop/StandardLabels'
 import { ObjectiveLine } from '@/components/shell/ObjectiveLine'
@@ -32,15 +30,10 @@ export interface BrowseDocumentProps {
   supersededBy?: { id: string; version: number } | null
   /** D-12: a newer version was published since this worker last did it. */
   updatedSinceLastWalk?: boolean
-  /** Only passed for a live version a worker may walk. */
-  onStartWalking?: () => void
-  /** The page's resume card, shown above the steps when a walk is in progress. */
-  resumeSlot?: ReactNode
 }
 
-export function BrowseDocument({ data, order, from, supersededBy, updatedSinceLastWalk, onStartWalking, resumeSlot }: BrowseDocumentProps) {
+export function BrowseDocument({ data, order, from, supersededBy, updatedSinceLastWalk }: BrowseDocumentProps) {
   const { sop, totalMinutes } = data
-  const canStart = !!onStartWalking && !supersededBy
   const summary = [`${order.length} ${order.length === 1 ? 'step' : 'steps'}`, totalMinutes > 0 ? `about ${Math.round(totalMinutes)} min` : null]
     .filter(Boolean)
     .join(' · ')
@@ -90,8 +83,6 @@ export function BrowseDocument({ data, order, from, supersededBy, updatedSinceLa
             </div>
           )}
         </div>
-
-        {resumeSlot}
 
         {order.length === 0 ? (
           <div data-testid="focus-empty" className="flex flex-col items-center gap-2 py-16 text-center">
@@ -147,22 +138,6 @@ export function BrowseDocument({ data, order, from, supersededBy, updatedSinceLa
         )}
       </div>
 
-      {/* The resume card carries the one start when a walk is in progress. */}
-      {canStart && !resumeSlot && (
-        <div className="sticky bottom-0 border-t border-ink-200 bg-paper p-4">
-          <div className="mx-auto max-w-205">
-            <button
-              type="button"
-              data-testid="focus-start-walking"
-              onClick={onStartWalking}
-              aria-label="start"
-              className="flex min-h-tap-glove w-full items-center justify-center rounded-lg bg-ink-900"
-            >
-              <Wordmark variant="start" size="merge" onInk />
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

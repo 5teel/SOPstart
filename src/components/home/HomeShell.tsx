@@ -17,12 +17,11 @@ import { useEffect, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { ChevronLeft } from 'lucide-react'
 import { Wordmark } from '@/components/brand/Wordmark'
-import { ReadView } from '@/components/home/ReadView'
 import { SectionMenu } from '@/components/home/SectionMenu'
 import { SopList } from '@/components/home/SopList'
 import { TabBar } from '@/components/home/TabBar'
 import { AccountControl, type Site } from '@/components/shell/AccountControl'
-import { InstallPrompt } from '@/components/shell/InstallPrompt'
+import { HomeScreenPrompt } from '@/components/shell/HomeScreenPrompt'
 import { useLibrary } from '@/hooks/useLibrary'
 import { useRecentSops } from '@/hooks/useRecentSops'
 import { requestOverviewSection } from '@/lib/shell/overview-focus'
@@ -30,6 +29,9 @@ import { formatHome, HOME, homeFrom, resolveHome, type HomeState } from '@/lib/s
 import type { Packing } from '@/lib/library/iso-layout'
 
 const OPENING = () => <p className="p-4 text-ui text-ink-500">Opening…</p>
+// ADR-0012: the SOP view (reading and running) loads when a SOP opens, outside the gated home bundle.
+const loadReadView = () => import('@/components/home/ReadView').then((m) => m.ReadView)
+const ReadView = dynamic(loadReadView, { ssr: false, loading: OPENING })
 const SiteMap = dynamic(() => import('@/components/home/map/SiteMap').then((m) => m.SiteMap), { ssr: false, loading: OPENING })
 const MyRecordSection = dynamic(() => import('@/components/home/sections/MyRecordSection').then((m) => m.MyRecordSection), { ssr: false, loading: OPENING })
 const TrainingSection = dynamic(() => import('@/components/home/sections/TrainingSection').then((m) => m.TrainingSection), { ssr: false, loading: OPENING })
@@ -88,6 +90,11 @@ export function HomeShell({ siteName, siteId, sites, userEmail, userId, role, in
     stateRef.current = state
     areasRef.current = lib.areas
   })
+  // Warm the SOP view once the home is idle, so opening a SOP does not wait for its chunk.
+  useEffect(() => {
+    const t = setTimeout(() => void loadReadView().catch(() => undefined), 1500)
+    return () => clearTimeout(t)
+  }, [])
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape' || isTypingTarget(e.target)) return
@@ -147,6 +154,7 @@ export function HomeShell({ siteName, siteId, sites, userEmail, userId, role, in
       row={openRow}
       role={role}
       from={homeFrom({ ...HOME, sop: openRow.id, area: state.area })}
+      onOpenSop={openSop}
     />
   ) : state.sop ? (
     <div className="mx-auto max-w-3xl px-4 py-6 lg:px-8">
@@ -213,7 +221,7 @@ export function HomeShell({ siteName, siteId, sites, userEmail, userId, role, in
                   </button>
                 ))}
               </div>
-              <InstallPrompt />
+              <HomeScreenPrompt />
             </div>
           )}
           <div

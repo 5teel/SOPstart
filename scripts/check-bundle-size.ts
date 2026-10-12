@@ -94,7 +94,7 @@ const GATED_ROUTES: GatedRoute[] = [
       // loads, the home was hoisted into a shared chunk and every focus screen would pay for it.
       { label: 'home list (63-05, root page chunk only)', markers: ['Search SOPs, steps and tools'] },
       // Phase 63-15: the Start merge engine is a lazy module reached by import() from fuse.ts.
-      { label: 'fuse engine (lazy, 63-15)', markers: ['[fuse] target not found'] },
+      { label: 'fuse engine (lazy, 63-15, ADR-0012)', markers: ['Every tick is saved to your record'] },
     ],
   },
   {
@@ -122,7 +122,7 @@ const GATED_ROUTES: GatedRoute[] = [
       { label: 'Manage SOPs (lazy, 63-08)', markers: ['No drafts.'] },
       { label: 'Training (lazy, 63-09)', markers: ['Swap rows and columns'] },
       { label: 'My record (lazy, 63-09)', markers: ['Your first finished SOP lands here'] },
-      { label: 'fuse engine (lazy, 63-15)', markers: ['[fuse] target not found'] },
+      { label: 'fuse engine (lazy, 63-15, ADR-0012)', markers: ['Every tick is saved to your record'] },
     ],
   },
 ]

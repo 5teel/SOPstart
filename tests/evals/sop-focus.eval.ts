@@ -38,7 +38,7 @@ import {
 } from './lib/session'
 import { ensurePlantFixture, REAL_SOPSTART_ORG_ID, shot, watchConsole } from './lib/plant-fixture'
 import { deleteEvalCompletions } from './lib/completion-cleanup'
-import { primary, press, startWalking, stepOfKind, walkFixture, TINY_PNG } from './lib/walk'
+import { nextTick, press, rowOfKind, startWalking, walkFixture } from './lib/walk'
 
 export const SLOW = { timeout: 30_000 }
 const SHORT = { timeout: 10_000 }
@@ -97,80 +97,64 @@ test.describe('Phase 58 — the SOP focus screen (deployed)', () => {
       await ctx?.close()
     })
 
-    // ---------------------------------------------------- SC1 -- the focus frame
-    test('SC1 frame: opened from Read it holds only the SOP — Back + title, rail 300 px, column <= 820, the start button, no home chrome', async () => {
+    // ---------------------------------------------------- ADR-0012 -- one view: read, then run
+    test('RUN-01 a live SOP opens in the home view, reading: every step with its notes, no tick boxes, nothing written', async () => {
       test.setTimeout(180_000)
+      await deleteEvalCompletions(db, ids.walk)
       const page = await ctx.newPage()
       const errors = watchConsole(page)
 
-      // Read offers the start (the click itself is proved in the start eval); the focus address carries Read as its from.
-      await page.goto(`/?sop=${plantSopId}`)
-      await expect(page.getByTestId('read-view').locator('h1')).toHaveText(EVAL_PLANT_SOP_TITLE, SLOW)
-      await expect(page.getByTestId('read-start')).toHaveCount(1, SHORT)
-      await page.goto(`/sops/${plantSopId}?from=${fromRead(plantSopId)}`)
-      await expect(page).toHaveURL(new RegExp(`/sops/${plantSopId}\\?from=${fromRead(plantSopId)}$`), SLOW)
-      await expect(page.getByTestId('focus-screen')).toBeVisible(SLOW)
-      await expect(page.getByText(NOT_FOUND)).toHaveCount(0)
-
-      // The walk fixture's browse state, opened from its own Read.
+      // The SOP's own address sends a live SOP to the home view, keeping where it was opened from.
       await page.goto(`/sops/${ids.walk}?from=${fromRead(ids.walk)}`)
-      await expect(page.getByTestId('focus-screen')).toBeVisible(SLOW)
-      await expect(page.getByTestId('focus-screen')).toHaveAttribute('data-mode', 'browse')
-      await expect(page.getByTestId('focus-start-walking')).toBeVisible(SLOW)
-      for (const id of ['home', 'home-menu', 'home-list', 'home-reader', 'back-to-site', 'office-pane']) {
-        await expect(page.getByTestId(id), id).toHaveCount(0)
-      }
-      await expect(page.locator('[data-testid*="inbox"], [data-testid*="notification"]')).toHaveCount(0)
-      // Top bar: Back and the title, nothing else (no version chip on a live version).
-      await expect(page.getByTestId('focus-back')).toHaveCount(1)
-      await expect(page.getByTestId('focus-top-bar').locator('h1')).toContainText(EVAL_WALK_SOP_TITLE)
-      await expect(page.getByTestId('focus-version-chip')).toHaveCount(0)
+      await expect(page).toHaveURL(new RegExp(`/\\?sop=${ids.walk}$`), SLOW)
+      const view = page.getByTestId('read-view')
+      await expect(view.locator('h1')).toHaveText(EVAL_WALK_SOP_TITLE, SLOW)
+      await expect(view).toHaveAttribute('data-state', 'reading')
+      await expect(page.getByTestId('step-row').first()).toBeVisible(SLOW)
+      await expect(page.locator('[data-testid="step-row"][data-state="read"]')).toHaveCount(5)
+      await expect(page.getByTestId('step-tick')).toHaveCount(0)
+      await expect(view).toContainText('nothing is recorded until you start')
+      await expect(page.getByTestId('focus-screen')).toHaveCount(0)
+      await shot(page, '58-read-worker')
 
-      const rail = await page.getByTestId('focus-rail').boundingBox()
-      expect(Math.round(rail!.width)).toBe(300)
-      const maxWidth = await page.getByTestId('focus-browse').locator('> div').first().evaluate((el) => getComputedStyle(el).maxWidth)
-      expect(maxWidth).toBe('820px')
-      await shot(page, '58-browse-worker')
+      // Reading writes nothing: no run row for this SOP.
+      const { data: walks } = await db.from('sop_walks').select('id').eq('sop_id', ids.walk).eq('status', 'in_progress')
+      expect(walks ?? []).toEqual([])
       expect(errors, errors.join('\n')).toEqual([])
       await page.close()
     })
 
-    test('SC1 compiled CSS contains text-step, max-w-205, w-75, size-18 and bg-accent-signoff (a utility that compiles to nothing is invisible to every other check)', async () => {
+    test('RUN-01 compiled CSS contains size-tap-glove, max-w-205, w-75, size-18 and bg-accent-signoff (a utility that compiles to nothing is invisible to every other check)', async () => {
       const page = await ctx.newPage()
-      await page.goto(`/sops/${ids.walk}`)
-      await expect(page.getByTestId('focus-screen')).toBeVisible(SLOW)
+      await page.goto(`/?sop=${ids.walk}`)
+      await expect(page.getByTestId('read-view')).toBeVisible(SLOW)
       const hrefs = await page.$$eval('link[rel="stylesheet"]', (els) => els.map((e) => (e as HTMLLinkElement).href))
       expect(hrefs.length).toBeGreaterThan(0)
       const css = (await Promise.all(hrefs.map(async (h) => (await page.request.get(h)).text()))).join('\n')
-      for (const cls of ['text-step', 'max-w-205', 'w-75', 'size-18', 'bg-accent-signoff']) expect(css, cls).toContain(`.${cls}`)
+      for (const cls of ['size-tap-glove', 'max-w-205', 'w-75', 'size-18', 'bg-accent-signoff']) expect(css, cls).toContain(`.${cls}`)
       await page.close()
     })
 
-    // ---------------------------------------------------- SC2 -- the walk
-    test('SC2 walk: hazard, PPE and photo steps, locked rail, review, Send, sent — then Back to the place it came from; a second walk in the same session starts clean', async () => {
+    test('RUN-02 run: start, tick hazard, PPE, step, photo step and check in order, Send, Done; a second run in the same session starts clean', async () => {
       test.setTimeout(360_000)
       const page = await ctx.newPage()
       const errors = watchConsole(page)
 
       for (const pass of [0, 1]) {
-        await page.goto(`/sops/${ids.walk}?from=${fromRead(ids.walk)}`)
-        // The second pass inherits nothing: no resume card, no photo, step 1 of 5 again.
-        await expect(page.getByTestId('focus-start-walking')).toHaveCount(1, SLOW)
-        await expect(page.getByTestId('walk-resume')).toHaveCount(0)
+        await page.goto(`/?sop=${ids.walk}`)
+        // The second pass inherits nothing: no "Picks up", no photo, 0 of 5 again.
+        await expect(page.getByTestId('read-start')).toHaveCount(1, SLOW)
+        await expect(page.getByTestId('read-begin-again')).toHaveCount(0)
         await startWalking(page)
         await walkFixture(page, pass === 0)
-
-        if (pass === 0) {
-          await expect(page.getByTestId('walk-sent-back')).toHaveCount(1, SHORT)
-          await page.getByTestId('walk-sent-back').click()
-          // Back lands on the home with the SOP it came from open in Read.
-          await expect(page).toHaveURL(new RegExp(`/\\?sop=${ids.walk}$`), SLOW)
-          await expect(page.getByTestId('read-view').locator('h1')).toHaveText(EVAL_WALK_SOP_TITLE, SLOW)
-          await shot(page, '58-back-read')
-        }
+        await page.getByTestId('run-done').click()
+        // Done returns to reading the same SOP.
+        await expect(page.getByTestId('read-view')).toHaveAttribute('data-state', 'reading', SLOW)
+        await expect(page.getByTestId('run-bar')).toHaveCount(0)
+        if (pass === 0) await shot(page, '58-run-done-read')
       }
 
-      // Both walks were sent: two completions, one photo each, each its own walk id.
+      // Both runs were sent: two completions, one photo each.
       const { data: rows } = await db.from('sop_completions').select('id, status').eq('sop_id', ids.walk)
       expect(rows?.length).toBe(2)
       for (const r of rows ?? []) {
@@ -182,120 +166,115 @@ test.describe('Phase 58 — the SOP focus screen (deployed)', () => {
       await page.close()
     })
 
-    test('SC2 resume: reopening mid-walk offers the start with "Picks up at step 3 of 5"; Esc closes the Start over dialog; Start over begins again', async () => {
+    test('RUN-03 Stop keeps the ticks: "Picks up at step 3 of 5" (also after a reload); Esc closes the begin-again dialog; Start over begins again', async () => {
       test.setTimeout(240_000)
       await deleteEvalCompletions(db, ids.walk)
       const page = await ctx.newPage()
-      await page.goto(`/sops/${ids.walk}?from=${fromRead(ids.walk)}`)
+      await page.goto(`/?sop=${ids.walk}`)
       await startWalking(page)
       await press(page) // hazard
       await press(page) // PPE
-      await expect(page.getByTestId('walk-progress')).toHaveText('Step 3 of 5', SLOW)
+      await expect(page.getByTestId('run-progress')).toHaveText('2 of 5 ticked', SLOW)
 
-      // Back (progress is already on the server), then reopen.
-      await page.getByTestId('focus-back').click()
-      await expect(page).toHaveURL(new RegExp(`/\\?sop=${ids.walk}$`), SLOW)
-      await page.goto(`/sops/${ids.walk}?from=${fromRead(ids.walk)}`)
-      await expect(page.getByTestId('walk-resume-button')).toHaveCount(1, SLOW)
-      await expect(page.getByTestId('walk-resume')).toContainText('Picks up at step 3 of 5')
+      await page.getByTestId('run-stop').click()
+      await expect(page.getByTestId('read-view')).toHaveAttribute('data-state', 'reading', SLOW)
+      await expect(page.getByTestId('read-view')).toContainText('Picks up at step 3 of 5')
+      await page.reload()
+      await expect(page.getByTestId('read-view')).toContainText('Picks up at step 3 of 5', SLOW)
       await shot(page, '58-resume')
 
-      // Esc closes the dialog first and does not leave the screen.
-      await page.getByTestId('walk-start-over').click()
+      // Esc closes the dialog first and does not close the SOP.
+      await page.getByTestId('read-begin-again').click()
       await expect(page.getByTestId('walk-start-over-dialog')).toBeVisible(SHORT)
       await page.keyboard.press('Escape')
       await expect(page.getByTestId('walk-start-over-dialog')).toHaveCount(0)
-      await expect(page.getByTestId('focus-screen')).toBeVisible()
+      await expect(page.getByTestId('read-view')).toBeVisible()
 
-      await page.getByTestId('walk-start-over').click()
+      // Resume picks up at step 3.
+      await startWalking(page)
+      await expect(rowOfKind(page, 'step').first()).toHaveAttribute('data-state', 'next', SLOW)
+      await page.getByTestId('run-stop').click()
+
+      await page.getByTestId('read-begin-again').click()
       const confirm = page.getByTestId('walk-start-over-confirm')
       await expect(confirm).toHaveCount(1, SHORT)
       await confirm.click()
-      await expect(stepOfKind(page, 'hazard')).toHaveCount(1, SLOW)
-      await expect(page.getByTestId('walk-progress')).toHaveText('Step 1 of 5')
+      await expect(page.getByTestId('run-bar')).toBeVisible(SLOW)
+      await expect(page.getByTestId('run-progress')).toHaveText('0 of 5 ticked', SLOW)
+      await expect(rowOfKind(page, 'hazard')).toHaveAttribute('data-state', 'next')
+      await page.getByTestId('run-stop').click()
       await page.close()
     })
 
-    test('SC2 jump-ahead: with it on every row opens and unacknowledged hazard dots are hollow', async () => {
+    test('RUN-04 jump-ahead: with it on, every row is open and the last step ticks first', async () => {
       test.setTimeout(180_000)
       const page = await ctx.newPage()
-      await page.goto(`/sops/${ids.jump}`)
+      await page.goto(`/?sop=${ids.jump}`)
       await startWalking(page)
-      await expect(page.locator('[data-testid="focus-rail-row"][data-state="locked"]')).toHaveCount(0)
-      await expect(page.locator('[data-testid="focus-rail-row"] [data-hollow="true"]')).toHaveCount(1)
-      const rows = page.getByTestId('focus-rail-row')
-      const last = rows.last()
-      await expect(last).toHaveCount(1)
-      await last.click()
-      await expect(page.getByTestId('walk-step-text')).toHaveText('Start the press.', SLOW)
-      await shot(page, '58-walk-jump-on')
+      await expect(page.locator('[data-testid="step-row"][data-state="waiting"]')).toHaveCount(0, SLOW)
+      const last = page.getByTestId('step-row').last()
+      await expect(last).toContainText('Start the press.')
+      await last.getByTestId('step-tick').click()
+      await expect(last).toHaveAttribute('data-state', 'done', SLOW)
+      await shot(page, '58-run-jump-on')
+      await page.getByTestId('run-stop').click()
       await page.close()
     })
 
     // ---------------------------------------------------- SC5 -- addresses, versions, phone
-    test('SC5 addresses: an old tab address redirects to the bare focus address; a superseded or draft version never reaches a worker', async () => {
+    test('SC5 addresses: an old tab address and a superseded or draft version land on the live version in the home view; a draft-only SOP is not found', async () => {
       test.setTimeout(180_000)
       const page = await ctx.newPage()
 
       await page.goto(`/sops/${ids.walk}?${LEGACY_TAB}=walk&from=${fromRead(ids.walk)}`)
-      await expect(page).toHaveURL(new RegExp(`/sops/${ids.walk}\\?from=${fromRead(ids.walk)}$`), SLOW)
-      await expect(page.getByTestId('focus-screen')).toBeVisible(SLOW)
-      await page.goto(`/sops/${ids.walk}?${LEGACY_TAB}=read`)
-      await expect(page).toHaveURL(new RegExp(`/sops/${ids.walk}$`), SLOW)
+      await expect(page).toHaveURL(new RegExp(`/\\?sop=${ids.walk}$`), SLOW)
+      await expect(page.getByTestId('read-view')).toBeVisible(SLOW)
 
       // The superseded v2 id lands a worker on v3; the draft v4 id never opens.
       await page.goto(`/sops/${ids.lineageRoot}`)
-      await expect(page).toHaveURL(new RegExp(`/sops/${ids.lineageV3}`), SLOW)
-      await expect(page.getByTestId('focus-screen')).toHaveAttribute('data-version-state', 'live', SLOW)
-      await expect(page.getByTestId('focus-version-chip')).toHaveCount(0)
-      // the rail row and the step both carry the text, so assert it is there, not that it is unique
+      await expect(page).toHaveURL(new RegExp(`/\\?sop=${ids.lineageV3}$`), SLOW)
       await expect(page.getByText('Close the guard (l3).').first()).toBeVisible(SLOW)
       await page.goto(`/sops/${ids.lineageV4}`)
-      await expect(page).toHaveURL(new RegExp(`/sops/${ids.lineageV3}`), SLOW)
+      await expect(page).toHaveURL(new RegExp(`/\\?sop=${ids.lineageV3}$`), SLOW)
       await expect(page.getByText('(l4)')).toHaveCount(0)
 
       // A SOP that is only a draft is not found (rendered content, not the status code).
       await page.goto(`/sops/${ids.draft}`)
       await expect(page.getByText(NOT_FOUND)).toBeVisible(SLOW)
-      await expect(page.getByTestId('focus-screen')).toHaveCount(0)
       await page.close()
     })
 
-    test('SC5 phone (390x844): sticky dock, rail hidden behind "Steps · n of N", 28 px text; the rail opens as a full-screen sheet of 44 px rows', async () => {
+    test('SC5 phone (390x844): the run fills the screen, tick boxes are glove-sized, the next step is in view, no sideways scroll', async () => {
       test.setTimeout(180_000)
       await deleteEvalCompletions(db, ids.walk)
       const page = await ctx.newPage()
       await page.setViewportSize({ width: 390, height: 844 })
-      await page.goto(`/sops/${ids.walk}?from=${fromRead(ids.walk)}`)
+      await page.goto(`/?sop=${ids.walk}`)
       await startWalking(page)
-
-      await expect(page.getByTestId('focus-rail')).toBeHidden()
-      await expect(page.getByTestId('focus-steps-button')).toHaveText(/Steps · 1 of 5/)
-      const dock = await page.getByTestId('walk-dock').boundingBox()
-      expect(dock!.y + dock!.height).toBeGreaterThanOrEqual(830)
-      expect(await page.getByTestId('walk-step-text').evaluate((el) => getComputedStyle(el).fontSize)).toBe('28px')
-      await shot(page, '58-phone-walk')
-
-      await page.getByTestId('focus-steps-button').click()
-      await expect(page.getByTestId('focus-rail')).toBeVisible(SHORT)
-      const row = await page.getByTestId('focus-rail-row').first().boundingBox()
-      expect(row!.height).toBeGreaterThanOrEqual(44)
-      await shot(page, '58-phone-rail')
+      await press(page)
+      await page.waitForTimeout(800) // the next step scrolls into view
+      const box = await nextTick(page).boundingBox()
+      expect(box!.height).toBeGreaterThanOrEqual(60)
+      expect(box!.y).toBeGreaterThanOrEqual(0)
+      expect(box!.y + box!.height).toBeLessThanOrEqual(844)
+      const wide = await page.evaluate(() => document.documentElement.scrollWidth)
+      expect(wide).toBeLessThanOrEqual(390)
+      await shot(page, '58-phone-run')
+      await page.getByTestId('run-stop').click()
       await page.close()
     })
   })
 
   // The real SOPstart org is only ever READ (moved here from the retired sop-detail eval).
-  test('SC1 real-org SOP (OTG Probe Maintenance) opens in the focus screen browse state, read-only', async ({ page, context }) => {
+  test('SC1 real-org SOP (OTG Probe Maintenance) opens in the home view, reading, read-only', async ({ page, context }) => {
     test.setTimeout(180_000)
     const errors = watchConsole(page)
     await signInAs(context, 'admin')
     await page.goto('/sops/125cf9f1-547e-4cc6-8baf-813d9236a691')
-    await expect(page.getByTestId('focus-screen')).toBeVisible(SLOW)
     await expect(page.getByText(NOT_FOUND)).toHaveCount(0)
-    await expect(page.getByTestId('focus-top-bar').locator('h1')).toContainText('OTG Probe Maintenance', SLOW)
-    await expect(page.getByTestId('focus-browse-step').first()).toBeVisible(SLOW)
-    await shot(page, '58-browse-real-org')
+    await expect(page.getByTestId('read-view').locator('h1')).toContainText('OTG Probe Maintenance', SLOW)
+    await expect(page.getByTestId('step-row').first()).toBeVisible(SLOW)
+    await shot(page, '58-read-real-org')
     expect(errors, errors.join('\n')).toEqual([])
   })
 

@@ -98,11 +98,12 @@ test.describe.serial('Phase 56 -- simpler SOP + decision ledger (deployed)', () 
     await workerCtx?.close()
   })
 
-  /** Worker opens the SOP (browse state of the focus screen) and returns the standard labels in its summary card. */
+  /** Worker opens the SOP (ADR-0012: the home view, reading) and returns the SOP's own standard labels. */
   const workerLabels = async (page: Page, sopId: string) => {
     await page.goto(`/sops/${sopId}`)
-    await expect(page.getByTestId('focus-summary')).toBeVisible(SLOW)
-    return page.getByTestId('focus-summary').getByTestId('standard-label').allInnerTexts()
+    await expect(page.getByTestId('read-view').locator('h1')).toBeVisible(SLOW)
+    await expect(page.getByTestId('step-row').first()).toBeVisible(SLOW)
+    return page.getByTestId('read-standards').getByTestId('standard-label').allInnerTexts()
   }
 
   test('A -- every SOP has an ok conversion run; convert fixture counts match the known answer; library-linked SOPs converted', async () => {
@@ -172,11 +173,11 @@ test.describe.serial('Phase 56 -- simpler SOP + decision ledger (deployed)', () 
     console.log(`A: ${linkedSops.size} library-linked SOPs, all converted`)
   })
 
-  test('B -- the focus screen (browse) and the editor render the converted fixture', async () => {
+  test('B -- the SOP view (reading) and the editor render the converted fixture', async () => {
     const page = await workerCtx.newPage()
     const errors = watchConsole(page)
     await page.goto(`/sops/${sopIds.convert}`)
-    const browse = page.getByTestId('focus-browse')
+    const browse = page.getByTestId('read-view')
     await expect(browse).toBeVisible(SLOW)
     await expect(browse.getByText('Pinch point at the rollers.')).toHaveCount(1, SLOW)
     await expect(browse.getByText('Hot surface on the oven door.')).toHaveCount(1)
@@ -185,7 +186,7 @@ test.describe.serial('Phase 56 -- simpler SOP + decision ledger (deployed)', () 
     await expect(browse.getByText('Isolate the press.')).toHaveCount(1)
     await expect(browse.getByText('Photograph the isolation lock.')).toHaveCount(1)
     // Hazards and PPE come first in walking order (D-07).
-    const kinds = await browse.getByTestId('focus-browse-step').evaluateAll((els) => els.map((e) => e.getAttribute('data-kind')))
+    const kinds = await browse.getByTestId('step-row').evaluateAll((els) => els.map((e) => e.getAttribute('data-kind')))
     // Source order within them: the PPE card sits between the hazards of its own section, so assert the group, not the sequence.
     expect([...kinds.slice(0, 5)].sort()).toEqual(['hazard', 'hazard', 'hazard', 'hazard', 'ppe'])
     expect(['hazard', 'ppe']).not.toContain(kinds[5])

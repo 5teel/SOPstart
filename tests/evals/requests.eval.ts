@@ -303,7 +303,8 @@ test.describe('Phase 60 -- requests, notifications and objectives (deployed)', (
       await signInAs(ctx, 'siteWorker')
       const page = await ctx.newPage()
       await page.goto(`/sops/${sopId}`)
-      const summary = page.getByTestId('focus-summary')
+      // ADR-0012: a live SOP opens in the home view; the objective sits under its title.
+      const summary = page.getByTestId('read-view')
       await expect(summary.getByTestId('objective-line')).toContainText(text, SLOW)
       const trigger = page.getByTestId('request-composer-trigger')
       await expect(trigger).toHaveCount(1, SLOW)
@@ -315,10 +316,11 @@ test.describe('Phase 60 -- requests, notifications and objectives (deployed)', (
       await page.getByTestId('composer-send').click()
       await expect(page.getByTestId('request-sent')).toContainText('Request sent', SLOW)
 
-      // The walk state offers no request.
-      await page.getByTestId('focus-start-walking').or(page.getByTestId('walk-resume-button')).click()
-      await expect(page.getByTestId('focus-browse')).toHaveCount(0, SLOW)
+      // The running checklist offers no request.
+      await page.getByTestId('read-start').click()
+      await expect(page.getByTestId('run-bar')).toBeVisible(SLOW)
       await expect(page.getByTestId('request-composer-trigger')).toHaveCount(0)
+      await page.getByTestId('run-stop').click()
       await ctx.close()
     })
     // ---- 60-16: the bell, the overview, the loop and every notification trigger (by title, never by count) ----

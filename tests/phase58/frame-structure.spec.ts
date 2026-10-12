@@ -67,7 +67,9 @@ test.describe('FOC-01/FOC-03 focus frame', () => {
     const code = stripComments(PAGE)
     expect(code).toContain('resolveFocusTarget(')
     expect(code).toContain('notFound()')
-    expect(code).toContain('redirect(focusHref(target.id, { from, go, fresh }))')
+    expect(code).toContain('redirect(focusHref(target.id, { from }))')
+    // ADR-0012: a live SOP opened without edit is read and run on the home view.
+    expect(code).toContain("if (!editing && versionState === 'live') redirect(formatHome(")
     expect(code).toContain('<FocusWalker')
     expect(code).not.toMatch(/useEffect|useRouter|router\./)
     for (const banned of ['BackToSite', 'sop/plant', '@/components/shell', '@/components/admin', 'SopTabNav', 'WalkthroughSwitcher', 'ReadTab', 'useSopDetail']) {
@@ -77,9 +79,10 @@ test.describe('FOC-01/FOC-03 focus frame', () => {
     expect(stripComments(read('src/lib/sop/lineage-current.ts'))).toContain('ADMIN_ROLES.includes(role)')
   })
 
-  test('the focus walker makes no router call and mounts browse, walk, review, sent and resume in one frame (58-11)', () => {
+  test('the SOP page holds the editor and the read-only document only; nothing there starts a run (ADR-0012)', () => {
     const W = stripComments(read('src/components/focus/FocusWalker.tsx'))
-    for (const c of ['<BrowseDocument', '<WalkStep', '<ReviewAndSend', '<SentPanel', '<ResumeCard', '<FocusFrame']) expect(W, c).toContain(c)
+    for (const c of ['<BrowseDocument', '<FocusFrame']) expect(W, c).toContain(c)
+    for (const c of ['<WalkStep', '<ReviewAndSend', '<SentPanel', '<ResumeCard', 'startWalk', 'useRun']) expect(W, c).not.toContain(c)
     expect(W).not.toMatch(/router\./)
   })
 
@@ -137,12 +140,9 @@ test.describe('FOC-01/FOC-03 focus frame', () => {
     for (const { f, code } of focusFiles()) expect(code, f).not.toMatch(/router\.(push|replace)/)
   })
 
-  test('Start renders only when onStartWalking is passed and the version is not superseded (D-05, D-14)', () => {
+  test('the read-only document has no start (ADR-0012) and keeps its notices (D-05, D-14)', () => {
     const BROWSE = read('src/components/focus/BrowseDocument.tsx')
-    expect(BROWSE).toContain('const canStart = !!onStartWalking && !supersededBy')
-    expect(BROWSE).toMatch(/\{canStart && !resumeSlot && \(/)
-    expect(BROWSE).toContain('aria-label="start"')
-    expect(BROWSE).toContain('data-testid="focus-start-walking"')
+    expect(stripComments(BROWSE)).not.toContain('aria-label="start"')
     expect(BROWSE).toContain('Updated since you last did it')
     expect(BROWSE).toContain('This SOP has no steps yet.')
     // Browse creates no completion.

@@ -16,16 +16,12 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { EVAL_ENV_READY, EVAL_PLANT_SOP_TITLE, EVAL_SITE_ORG_NAME, EVAL_WALK_SOP_TITLE, signInAs } from './lib/session'
 import { ensurePlantFixture, REAL_SOPSTART_ORG_ID, shot, watchConsole } from './lib/plant-fixture'
 import { deleteEvalCompletions } from './lib/completion-cleanup'
+import { startWalking, walkFixture } from './lib/walk'
 
 const SLOW = { timeout: 30_000 }
 const OTG = '/sops/125cf9f1-547e-4cc6-8baf-813d9236a691'
 const NOT_FOUND = 'This page has moved or no longer exists.'
 
-// 1x1 PNG: compressPhoto redraws it to a JPEG, so this exercises the real compress -> signed PUT path.
-const TINY_PNG = Buffer.from(
-  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
-  'base64'
-)
 
 test.describe('Phase 55 — cut features (deployed)', () => {
   test.skip(!EVAL_ENV_READY, 'EVAL_BASE_URL/Supabase env not configured — self-skipping')
@@ -101,34 +97,9 @@ test.describe('Phase 55 — cut features (deployed)', () => {
       await signInAs(context, 'siteWorker')
       await page.goto(`/sops/${walkSopId}`)
 
-      // The focus screen (Phase 58): browse first, then one step at a time.
-      const start = page.getByTestId('focus-start-walking').or(page.getByTestId('walk-resume-button'))
-      await expect(start).toHaveCount(1, SLOW)
-      await start.click()
-      const primary = page.getByTestId('walk-primary')
-      await expect(primary).toHaveCount(1, SLOW)
-
-      // Hazard, PPE and the plain step: no photo needed.
-      for (const kind of ['hazard', 'ppe', 'step']) {
-        await expect(page.locator(`[data-testid="walk-step"][data-kind="${kind}"]`)).toHaveCount(1, SLOW)
-        await primary.click()
-      }
-
-      // The photo step: the primary stays disabled until one is uploaded.
-      await expect(primary).toBeDisabled(SLOW)
-      const input = page.getByTestId('step-photo-input')
-      await expect(input).toHaveCount(1, { timeout: 10_000 })
-      await input.setInputFiles({ name: 'guard.png', mimeType: 'image/png', buffer: TINY_PNG })
-      await expect(page.getByTestId('step-photo')).toHaveCount(1, { timeout: 60_000 })
-      await expect(primary).toBeEnabled(SLOW)
-      await primary.click()
-
-      // Last step, then review and send.
-      await expect(primary).toHaveText(/Done — review/, SLOW)
-      await primary.click()
-      await expect(page.getByTestId('walk-review')).toBeVisible(SLOW)
-      await page.getByTestId('walk-send').click()
-      await expect(page.getByTestId('walk-sent')).toBeVisible({ timeout: 60_000 })
+      // ADR-0012: the SOP opens in the home view; start turns its steps into the checklist.
+      await startWalking(page)
+      await walkFixture(page, false)
       await expect(page.getByText(/queued|saved for later|waiting to upload/i)).toHaveCount(0)
       await shot(page, 'cut-walk-phone')
       expect(errors, errors.join('\n')).toEqual([])

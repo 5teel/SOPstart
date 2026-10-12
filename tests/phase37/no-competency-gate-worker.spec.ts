@@ -36,9 +36,10 @@ const WORKER_SOP_DETAIL = path.join(ROOT, 'src', 'app', '(protected)', 'sops', '
 const FOCUS = (f: string) => path.join(ROOT, 'src', 'components', 'focus', f)
 const FOCUS_WORKER_FILES = [
   'FocusFrame.tsx', 'FocusTopBar.tsx', 'FocusRail.tsx', 'BrowseDocument.tsx', 'FocusWalker.tsx',
-  'WalkStep.tsx', 'ReviewAndSend.tsx', 'SentPanel.tsx', 'ResumeCard.tsx', 'KindChip.tsx',
+  'KindChip.tsx',
 ].map(FOCUS)
-const WALK_HOOK = path.join(ROOT, 'src', 'hooks', 'useWalk.ts')
+// ADR-0012: the run (ticks, photos, send) lives on the home view; useRun is its hook.
+const WALK_HOOK = path.join(ROOT, 'src', 'hooks', 'useRun.ts')
 const WALK_ACTIONS = path.join(ROOT, 'src', 'actions', 'walk.ts')
 // 63-19: the worker surfaces are the home (list, row, Read); the plant stage and machine body are gone.
 const HOME = (f: string) => path.join(ROOT, 'src', 'components', 'home', f)
@@ -48,7 +49,7 @@ const CLASSIFY = path.join(ROOT, 'src', 'lib', 'competency', 'classify.ts')
 const TARGETS: Array<{ label: string; file: string }> = [
   { label: 'worker SOP detail / walkthrough route page.tsx', file: WORKER_SOP_DETAIL },
   ...FOCUS_WORKER_FILES.map((file) => ({ label: `focus/${path.basename(file)}`, file })),
-  { label: 'useWalk.ts (the walk hook)', file: WALK_HOOK },
+  { label: 'useRun.ts (the run hook, ADR-0012)', file: WALK_HOOK },
   { label: 'walk.ts (walk server actions)', file: WALK_ACTIONS },
   { label: 'HomeShell.tsx (63-11: replaced the one screen)', file: HOME('HomeShell.tsx') },
   { label: 'SopList.tsx (the home list)', file: HOME('SopList.tsx') },

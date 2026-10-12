@@ -29,9 +29,10 @@ const WORKER_SOP_DETAIL = path.join(ROOT, 'src', 'app', '(protected)', 'sops', '
 const FOCUS = (f: string) => path.join(ROOT, 'src', 'components', 'focus', f)
 const FOCUS_WORKER_FILES = [
   'FocusFrame.tsx', 'FocusTopBar.tsx', 'FocusRail.tsx', 'BrowseDocument.tsx', 'FocusWalker.tsx',
-  'WalkStep.tsx', 'ReviewAndSend.tsx', 'SentPanel.tsx', 'ResumeCard.tsx', 'KindChip.tsx',
+  'KindChip.tsx',
 ].map(FOCUS)
-const WALK_HOOK = path.join(ROOT, 'src', 'hooks', 'useWalk.ts')
+// ADR-0012: the run (ticks, photos, send) lives on the home view; useRun is its hook.
+const WALK_HOOK = path.join(ROOT, 'src', 'hooks', 'useRun.ts')
 const WALK_ACTIONS = path.join(ROOT, 'src', 'actions', 'walk.ts')
 const PROFILE_COMPETENCY_SECTION = path.join(ROOT, 'src', 'components', 'profile', 'CompetencySection.tsx')
 

@@ -63,21 +63,17 @@ test.describe('worker list derives from the server (55-02)', () => {
   })
 })
 
-// Repointed in 58-15: the tabbed page, its walkthroughs, the completion store and
-// the builder autosave are replaced by the focus screen. The worker path is the
-// server page + FocusWalker + useWalk + the walk actions, and the editor writes
-// through useFocusAutosave.
+// Repointed in 58-15, then ADR-0012: the worker reads and runs a SOP on the home view
+// (ReadView + useRun + the walk actions); the SOP's own page keeps editing and non-live
+// versions, and the editor writes through useFocusAutosave.
 const FOCUS_WORKER = [
   'src/components/focus/FocusFrame.tsx',
   'src/components/focus/FocusTopBar.tsx',
   'src/components/focus/FocusRail.tsx',
   'src/components/focus/BrowseDocument.tsx',
   'src/components/focus/FocusWalker.tsx',
-  'src/components/focus/WalkStep.tsx',
-  'src/components/focus/ReviewAndSend.tsx',
-  'src/components/focus/SentPanel.tsx',
-  'src/components/focus/ResumeCard.tsx',
-  'src/hooks/useWalk.ts',
+  'src/components/home/ReadView.tsx',
+  'src/hooks/useRun.ts',
   'src/hooks/useFocusSop.ts',
   'src/actions/walk.ts',
   'src/app/(protected)/sops/[sopId]/page.tsx',
@@ -97,7 +93,7 @@ test.describe('SOP focus screen and Now card read the server (55-02, 58-15)', ()
     const page = code('src/app/(protected)/sops/[sopId]/page.tsx')
     expect(page).toContain('loadFocusSop(')
     expect(page).toContain('<FocusWalker')
-    expect(code('src/components/focus/FocusWalker.tsx')).toContain('useWalk(')
+    expect(code('src/components/home/ReadView.tsx')).toContain('useRun(')
   })
 
   test('the library sums step minutes from the server', () => {
@@ -142,16 +138,16 @@ test.describe('walk photos upload directly (55-03, 58-15)', () => {
     const hook = code('src/hooks/useStepPhotos.ts')
     expect(hook).toContain('export function useStepPhotos(activeCompletionId')
     expect(hook).toContain('p.completionId === activeCompletionId')
-    expect(code('src/hooks/useWalk.ts')).toContain('useStepPhotos(walk?.id)')
+    expect(code('src/hooks/useRun.ts')).toContain('useStepPhotos(walk?.id)')
   })
 
   test('the walk submits from the server walk row and nothing is queued', () => {
-    const send = code('src/components/focus/ReviewAndSend.tsx')
+    const send = code('src/hooks/useRun.ts')
     expect(send).toContain('submitCompletion({ walkId')
     expect(send).not.toContain('window.confirm')
     expect(send).not.toContain(OFFLINE)
-    expect(code('src/hooks/useWalk.ts')).toContain('useStepPhotos(')
-    for (const rel of ['src/components/focus/WalkStep.tsx', 'src/components/focus/ReviewAndSend.tsx', 'src/hooks/useWalk.ts']) {
+    expect(send).toContain('useStepPhotos(')
+    for (const rel of ['src/components/home/ReadView.tsx', 'src/hooks/useRun.ts']) {
       const src = code(rel)
       expect(src, rel).not.toContain('@/hooks/usePhotoQueue')
       expect(src, rel).not.toContain("'Queued'")

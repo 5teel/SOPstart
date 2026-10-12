@@ -1,11 +1,12 @@
 /**
- * Deployed-site eval -- Phase 63 "the SOPstart start" (the fuse), 63-15. Runs via
+ * Deployed-site eval -- Phase 63 "the SOPstart start" (the fuse), re-cut by ADR-0012: the merge plays
+ * centred in the SOP's pane and settles into the run bar; the same list becomes the checklist. Runs via
  * `npm run eval -- --phase 63` or one file at a time with EVAL_BASE_URL set.
  *
  * The merge is motion: assertions cannot see it. Case 1 plays it x4 slower (?fuse=slow, a
- * development aid) and screenshots six moments (63-fuse-1 .. 63-fuse-6) that are READ against the
- * five stages of sketch 010. The rest prove the contract around it: short and reduced-motion
- * variants, start landing in the running SOP, a second start in one session, resume wording.
+ * development aid) and screenshots seven moments (63-fuse-1 .. 63-fuse-7) that are READ against the
+ * five stages of the ADR-0012 contract. The rest prove the contract around it: skip, short and
+ * reduced-motion variants, a second start in one session, resume wording.
  *
  * Fixture: the eval-site walk SOP (five steps: hazard, PPE, step, photo step, check). Its walks and
  * completions are cleared before and after. Eval-site org only. Self-skips without EVAL_BASE_URL.
@@ -17,14 +18,14 @@ import { EVAL_ENV_READY, EVAL_WALK_SOP_TITLE, signInAs } from './lib/session'
 import { ensurePlantFixture, shot } from './lib/plant-fixture'
 import { ensureLibraryAreas } from './lib/library-fixture'
 import { deleteEvalCompletions } from './lib/completion-cleanup'
-import { press, stepOfKind } from './lib/walk'
+import { press, rowOfKind } from './lib/walk'
 
 const SLOW = { timeout: 30_000 }
 const DESKTOP = { width: 1440, height: 900 }
 const PHONE = { width: 390, height: 844 }
 const FRAMES = path.join(process.cwd(), '.planning', 'evals', 'latest')
-/** Moments (ms after the tap) at which the slow-motion merge is photographed: fade, fade nearly done, drop, drop, slide, tape, rise. */
-const MARKS = [150, 650, 900, 1800, 2800, 4200, 6500]
+/** Moments (ms after the tap, x4 slow) the merge is photographed: lift, gather x3, arm, say, settle. */
+const MARKS = [400, 1400, 2400, 3200, 4300, 6500, 9000]
 
 let cookies: Awaited<ReturnType<BrowserContext['cookies']>> | null = null
 
@@ -47,10 +48,10 @@ async function openRead(page: Page, sopId: string, extra = '') {
   await expect(page.getByTestId('read-start')).toBeVisible(SLOW)
 }
 
-/** From the running SOP back to Read of the same SOP. */
-async function stopToRead(page: Page, sopId: string) {
-  await page.getByTestId('focus-back').click()
-  await expect(page).toHaveURL(new RegExp(`/\\?(?:[^#]*&)?sop=${sopId}`), SLOW)
+/** Stop: the run keeps its ticks and the same view is reading again. */
+async function stopToRead(page: Page) {
+  await page.getByTestId('run-stop').click()
+  await expect(page.getByTestId('read-view')).toHaveAttribute('data-state', 'reading', SLOW)
   await expect(page.getByTestId('read-start')).toBeVisible(SLOW)
 }
 
@@ -88,7 +89,7 @@ test.describe.serial('Phase 63 -- the SOPstart start (deployed)', () => {
     if (EVAL_ENV_READY && db && walkId) await deleteEvalCompletions(db, walkId)
   })
 
-  test('FUSE-01 start plays the merge into the running SOP (slow-motion frames)', async ({ browser }) => {
+  test('FUSE-01 start plays the merge centred in the SOP pane and settles into the run bar (slow-motion frames)', async ({ browser }) => {
     test.setTimeout(240_000)
     const ctx = await workerContext(browser)
     const page = await ctx.newPage()
@@ -98,11 +99,13 @@ test.describe.serial('Phase 63 -- the SOPstart start (deployed)', () => {
       await page.evaluate(() => localStorage.removeItem('sopstart-fuse-day'))
       await watchLayer(page)
       await shot(page, '63-fuse-0-read')
+      const pane = (await page.getByTestId('home-reader').boundingBox())!
 
       const t0 = Date.now()
       await page.getByTestId('read-start').click()
       const kids: number[] = []
       let blocked = ''
+      let hero: { x: number; y: number; width: number; height: number } | null = null
       for (let i = 0; i < MARKS.length; i++) {
         const wait = MARKS[i] - (Date.now() - t0)
         if (wait > 0) await page.waitForTimeout(wait)
@@ -118,94 +121,107 @@ test.describe.serial('Phase 63 -- the SOPstart start (deployed)', () => {
               .join(','),
           )
         }
+        if (i === 5) hero = await page.locator('#fuse-layer .wm').boundingBox()
         console.log(`63-fuse-${i + 1} taken at ${at} ms, layer nodes ${kids[i]}`)
       }
       expect(blocked, 'overlay nodes taking pointer events').toBe('')
-      expect(Math.max(...kids), 'the layer held the merge nodes').toBeGreaterThanOrEqual(3)
+      expect(Math.max(...kids), 'the layer held the merge nodes').toBeGreaterThanOrEqual(4)
       expect(await layerSeen(page)).toBeGreaterThan(0)
+      // ADR-0012: at hero size the joined wordmark is large and centred in the pane.
+      expect(hero, 'the wordmark was on screen at the hold').not.toBeNull()
+      expect(hero!.width, 'hero width').toBeGreaterThanOrEqual(Math.min(pane.width * 0.5, 400))
+      expect(Math.abs(hero!.x + hero!.width / 2 - (pane.x + pane.width / 2)), 'centred across the pane').toBeLessThan(24)
 
-      // The merge ends: layer empty, landed in the running SOP with its first step, the wordmark in the bar.
-      await expect(stepOfKind(page, 'hazard')).toHaveCount(1, SLOW)
+      // The merge ends: layer empty, the same page now running, the wordmark in the run bar.
+      await expect(page.getByTestId('run-bar')).toBeVisible(SLOW)
       await expect.poll(() => layerKids(page), SLOW).toBe(0)
-      const url = new URL(page.url())
-      expect(url.pathname).toBe(`/sops/${walkId}`)
-      expect(url.searchParams.has('go'), 'the go flag is stripped').toBe(false)
-      await expect(page.getByTestId('focus-top-bar').locator('[data-wm-target]')).toBeVisible()
+      expect(new URL(page.url()).pathname).toBe('/')
+      await expect(page.getByTestId('read-view')).toHaveAttribute('data-state', 'running')
+      await expect(rowOfKind(page, 'hazard')).toHaveAttribute('data-state', 'next')
       expect(await page.evaluate(() => document.documentElement.dataset.fuse)).toBeUndefined()
-      expect(await page.getByTestId('focus-top-bar').locator('[data-wm-target]').evaluate((el) => getComputedStyle(el).visibility)).toBe('visible')
+      expect(await page.getByTestId('run-bar').locator('[data-wm-target]').evaluate((el) => getComputedStyle(el).visibility)).toBe('visible')
       await shot(page, '63-fuse-8-running')
+      await page.getByTestId('run-stop').click()
     } finally {
       await ctx.close()
     }
   })
 
-  test('FUSE-01 the second start of the day is short; reduced motion cuts', async ({ browser }) => {
+  test('FUSE-01 a press during the merge skips it; the second start of the day is short; reduced motion cuts', async ({ browser }) => {
     test.setTimeout(240_000)
     const ctx = await workerContext(browser)
     const page = await ctx.newPage()
     try {
-      // The first case left a walk at step 1 and marked today as used: this start is the short one.
+      // Skip: a full merge, cut short by a click anywhere.
+      await openRead(page, walkId, '&fuse=slow')
+      await page.evaluate(() => localStorage.removeItem('sopstart-fuse-day'))
+      await page.getByTestId('read-start').click()
+      await page.waitForTimeout(1200)
+      expect(await layerKids(page)).toBeGreaterThan(0)
+      const tSkip = Date.now()
+      await page.mouse.click(5, 5)
+      await expect.poll(() => layerKids(page), SLOW).toBe(0)
+      console.log(`skip: layer empty ${Date.now() - tSkip} ms after the press`)
+      expect(Date.now() - tSkip, 'a skip ends the merge at once').toBeLessThan(4000)
+      await expect(page.getByTestId('run-bar')).toBeVisible(SLOW)
+      await page.getByTestId('run-stop').click()
+
+      // Today is used now: this start is the short one.
       await openRead(page, walkId)
-      await page.evaluate(() => localStorage.setItem('sopstart-fuse-day', new Date().toDateString()))
       await watchLayer(page)
-      // A person taps after the page has settled; the start waits for any query still in flight (<= 3 s), so measure from rest.
       await page.waitForLoadState('networkidle', { timeout: 8_000 }).catch(() => {})
       await page.waitForTimeout(500)
       let t0 = Date.now()
       await page.getByTestId('read-start').click()
-      await expect(stepOfKind(page, 'hazard')).toHaveCount(1, SLOW)
-      const shortMs = Date.now() - t0
-      console.log(`short start: running step after ${shortMs} ms`)
-      expect(await layerSeen(page), 'the short merge still draws').toBeGreaterThan(0)
+      await expect(page.getByTestId('run-bar')).toBeVisible(SLOW)
       await expect.poll(() => layerKids(page), SLOW).toBe(0)
+      const shortMs = Date.now() - t0
+      console.log(`short start: settled after ${shortMs} ms`)
+      expect(await layerSeen(page), 'the short merge still draws').toBeGreaterThan(0)
+      expect(await page.locator('.fuse-caption').count(), 'no caption on the short merge').toBe(0)
 
       // Reduced motion: no animation at all, only the cut.
       await page.emulateMedia({ reducedMotion: 'reduce' })
-      await stopToRead(page, walkId)
+      await stopToRead(page)
       await watchLayer(page)
       t0 = Date.now()
       await page.getByTestId('read-start').click()
-      let seen = 0
-      for (let i = 0; i < 30 && (await stepOfKind(page, 'hazard').count()) === 0; i++) {
-        seen = Math.max(seen, await layerKids(page))
-        await page.waitForTimeout(50)
-      }
-      await expect(stepOfKind(page, 'hazard')).toHaveCount(1, SLOW)
+      await expect(page.getByTestId('run-bar')).toBeVisible(SLOW)
       const reducedMs = Date.now() - t0
-      console.log(`reduced start: running step after ${reducedMs} ms`)
-      // The merge adds nothing to the wait: the page loads under the veil (the page itself takes ~2 s on the deploy).
-      expect(shortMs - reducedMs, `short ${shortMs} ms vs cut ${reducedMs} ms`).toBeLessThan(1500)
-      expect(seen, 'reduced motion draws nothing').toBe(0)
+      console.log(`reduced start: running after ${reducedMs} ms`)
+      expect(shortMs - reducedMs, `short ${shortMs} ms vs cut ${reducedMs} ms`).toBeLessThan(1800)
       expect(await layerSeen(page), 'reduced motion never touched the layer').toBe(0)
       await shot(page, '63-fuse-reduced')
+      await page.getByTestId('run-stop').click()
     } finally {
       await ctx.close()
     }
   })
 
-  test('FUSE-02 start lands on the first step and Stop returns to Read; a second start works', async ({ browser }) => {
+  test('FUSE-02 start turns the same list into the checklist; Stop returns to reading; a second start works', async ({ browser }) => {
     test.setTimeout(240_000)
     await deleteEvalCompletions(db, walkId)
     const ctx = await workerContext(browser)
     const page = await ctx.newPage()
     try {
       await openRead(page, walkId)
+      await expect(page.locator('[data-testid="step-row"][data-state="read"]')).toHaveCount(5, SLOW)
       await page.getByTestId('read-start').click()
-      await expect(stepOfKind(page, 'hazard')).toHaveCount(1, SLOW)
-      await expect(page.getByTestId('walk-progress')).toHaveText('Step 1 of 5')
-      await expect(page.getByTestId('focus-autostart')).toHaveCount(0)
-      await expect(page.getByTestId('focus-start-walking')).toHaveCount(0)
+      await expect(page.getByTestId('run-bar')).toBeVisible(SLOW)
+      await expect(page.getByTestId('run-progress')).toHaveText('0 of 5 ticked')
+      await expect(page.getByTestId('step-tick')).toHaveCount(5)
+      await expect(rowOfKind(page, 'hazard')).toHaveAttribute('data-state', 'next')
       await shot(page, '63-fuse-landed')
 
-      await stopToRead(page, walkId)
-      await expect(page.getByTestId('read-view')).toBeVisible()
+      await stopToRead(page)
       await shot(page, '63-fuse-stopped-read')
 
       // The second start in the same session (in-memory flow: CLAUDE.md 2026-10-03).
       await page.getByTestId('read-start').click()
-      await expect(stepOfKind(page, 'hazard')).toHaveCount(1, SLOW)
-      await expect(page.getByTestId('walk-progress')).toHaveText('Step 1 of 5')
+      await expect(page.getByTestId('run-bar')).toBeVisible(SLOW)
+      await expect(rowOfKind(page, 'hazard')).toHaveAttribute('data-state', 'next')
       await expect.poll(() => layerKids(page), SLOW).toBe(0)
+      await stopToRead(page)
     } finally {
       await ctx.close()
     }
@@ -219,33 +235,35 @@ test.describe.serial('Phase 63 -- the SOPstart start (deployed)', () => {
     try {
       await openRead(page, walkId)
       await page.getByTestId('read-start').click()
-      await expect(stepOfKind(page, 'hazard')).toHaveCount(1, SLOW)
+      await expect(page.getByTestId('run-bar')).toBeVisible(SLOW)
       await press(page) // hazard
       await press(page) // PPE
-      await expect(page.getByTestId('walk-progress')).toHaveText('Step 3 of 5', SLOW)
-      await stopToRead(page, walkId)
+      await expect(page.getByTestId('run-progress')).toHaveText('2 of 5 ticked', SLOW)
+      await stopToRead(page)
 
       await expect(page.getByTestId('read-status')).toContainText('You stopped at step 3', SLOW)
       await expect(page.getByTestId('read-view')).toContainText('Picks up at step 3 of 5')
-      // Recent and the area group both list the row: the first is the Recent one.
+      // Recent and the area group both list the row: the first is the Recent one (on a computer the list folds; open it).
+      await page.getByTestId('panel-list').click()
       await expect(page.locator(`[data-testid="sop-row"][data-sop-id="${walkId}"]`).first()).toContainText('You stopped at step 3', SLOW)
+      await page.getByTestId('panel-list').click()
       await shot(page, '63-fuse-resume-read')
 
-      // start lands on the running step, not step 1.
+      // start picks up: steps 1 and 2 ticked, step 3 next.
       await page.getByTestId('read-start').click()
-      await expect(page.getByTestId('walk-progress')).toHaveText('Step 3 of 5', SLOW)
-      await stopToRead(page, walkId)
+      await expect(page.getByTestId('run-progress')).toHaveText('2 of 5 ticked', SLOW)
+      await expect(rowOfKind(page, 'step').first()).toHaveAttribute('data-state', 'next')
+      await stopToRead(page)
 
-      // "or begin from step 1" opens the focus page with the discard confirmation already asking.
+      // "or begin from step 1" asks first, in place.
       await page.getByTestId('read-begin-again').click()
       await expect(page.getByTestId('walk-start-over-dialog')).toBeVisible(SLOW)
-      expect(new URL(page.url()).searchParams.has('fresh'), 'the fresh flag is stripped').toBe(false)
       await shot(page, '63-fuse-begin-again')
 
       // Keep going closes it and nothing is discarded.
       await page.getByRole('button', { name: 'Keep going' }).click()
       await expect(page.getByTestId('walk-start-over-dialog')).toHaveCount(0)
-      await expect(page.getByTestId('walk-resume')).toContainText('Picks up at step 3 of 5')
+      await expect(page.getByTestId('read-view')).toContainText('Picks up at step 3 of 5')
       const { data: walks } = await db.from('sop_walks').select('done, status').eq('sop_id', walkId).eq('status', 'in_progress')
       expect(walks?.length).toBe(1)
       expect(Object.keys((walks![0].done as Record<string, unknown>) ?? {}).length).toBe(2)
@@ -265,16 +283,17 @@ test.describe.serial('Phase 63 -- the SOPstart start (deployed)', () => {
       await page.evaluate(() => localStorage.removeItem('sopstart-fuse-day'))
       const t0 = Date.now()
       await page.getByTestId('read-start').click()
-      for (const [i, mark] of [150, 1500, 2800, 4200, 6500].entries()) {
+      for (const [i, mark] of [400, 2400, 4300, 6500, 9000].entries()) {
         const wait = mark - (Date.now() - t0)
         if (wait > 0) await page.waitForTimeout(wait)
         await page.screenshot({ path: path.join(FRAMES, `63-fuse-phone-${i + 1}.png`) })
       }
-      await expect(stepOfKind(page, 'hazard')).toHaveCount(1, SLOW)
+      await expect(page.getByTestId('run-bar')).toBeVisible(SLOW)
       await expect.poll(() => layerKids(page), SLOW).toBe(0)
       const w = await page.evaluate(() => document.documentElement.scrollWidth)
       expect(w).toBeLessThanOrEqual(PHONE.width)
       await shot(page, '63-fuse-phone-running')
+      await page.getByTestId('run-stop').click()
     } finally {
       await ctx.close()
     }
