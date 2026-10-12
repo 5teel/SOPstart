@@ -90,9 +90,16 @@
       "capturedAt": "2026-10-08T06:00:00.000Z",
       "note": "Phase 63-11: the new SOP-first home replaced the one-screen shell on / (map, five section bodies, bell and objective line behind next/dynamic). Measured 831 KB; moved DOWN by hand 837 -> 831 (never up without a decision)."
     }
+,
+    {
+      "route": "/page",
+      "value": 831,
+      "capturedAt": "2026-10-12T00:00:00.000Z",
+      "note": "Raised 831 -> 834 by hand, signed off by Simon 2026-10-12 (ROADMAP 'Decisions: bundle baseline'). Diffed against a build of the parent commit 968c47a9: the site picker (2026-10-11) took /page to 833 KB, and ADR-0010's area tree (areas.ts, the list's tree filter and grouping) adds ~0.8 KB to the home's own chunk, measured 853,490 bytes = 833 KB after trimming."
+    }
   ],
   "routes": {
     "/sops/[sopId]/page": 802,
-    "/page": 831
+    "/page": 834
   }
 }

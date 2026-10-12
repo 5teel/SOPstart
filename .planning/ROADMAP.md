@@ -2388,3 +2388,7 @@ Plans:
 Phases 999.4 (AI-reviewer completeness rubric), 999.5 (document codes + register export), and 999.6 (risk/priority triage) were promoted into **v7.0 Phase 38: Guidance-Notes Adoptions**; Phase 999.7 (refresher re-walkthrough cadence) into **v7.0 Phase 36: Refresher Cadence + Version-Currency**.
 
 **Outcome:** 999.7 shipped in Phase 36. Phase 38 was deferred back to backlog on 2026-07-28 without being planned or started, re-entering above as 999.4 (rubric + triage, merged) and 999.5 (document codes + register). Phase 39 followed as 999.6. See § v7.0 scope-change note above for rationale.
+
+### Decisions: bundle baseline
+
+- **2026-10-12 — `/page` baseline 831 → 834 KB, signed off by Simon.** Diffed against a build of parent commit `968c47a9`: the site picker (2026-10-11) took `/page` to 833 KB; the tiered site map (ADR-0010) adds ~0.8 KB to the home's own chunk (area tree in `areas.ts`, list filter and grouping). Recorded in `.bundle-baseline.json` history.
