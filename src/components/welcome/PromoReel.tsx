@@ -224,18 +224,18 @@ function WalkPanel() {
       <div className="flex items-center gap-2 border-b border-ink-200 pb-2">
         <Wordmark size="bar" />
         <span className="grid font-label text-meta text-ink-700">
-          <span className="reel-gone col-start-1 row-start-1" style={leave(3.1)}>
+          <span className="reel-gone col-start-1 row-start-1" style={leave(3.6)}>
             2 of 4 ticked
           </span>
-          <span className="col-start-1 row-start-1" style={enter(3.2)}>
-            3 of 4 ticked
+          <span className="col-start-1 row-start-1" style={enter(3.7)}>
+            4 of 4 ticked
           </span>
         </span>
       </div>
       <ol className="flex flex-col">
         {RUN.map(([kind, text], i) => (
           <li key={text} className={`flex gap-2 border-b border-ink-200 py-2 ${i === 2 ? 'rounded-lg border-transparent bg-paper-2 px-1.5' : ''}`}>
-            <Box done={i < 2} at={i === 2 ? 2.9 : undefined} />
+            <Box done={i < 2} at={i === 2 ? 2.9 : i === 3 ? 3.4 : undefined} />
             <span className="min-w-0 flex-1">
               <KindChip kind={kind} />
               <span className="mt-0.5 block text-meta text-ink-900">{text}</span>
@@ -266,7 +266,7 @@ function WalkPanel() {
           </li>
         ))}
       </ol>
-      <span className="mt-2 flex min-h-tap items-center gap-2 rounded-lg bg-accent-ok/10 px-3" style={enter(3.6)}>
+      <span className="mt-2 flex min-h-tap items-center gap-2 rounded-lg bg-accent-ok/10 px-3" style={enter(4)}>
         <CheckCircle className="size-5 shrink-0 text-accent-ok" aria-hidden="true" />
         <span className="text-ui font-semibold text-ink-900">Sent for sign-off</span>
       </span>
