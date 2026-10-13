@@ -53,6 +53,12 @@ test.describe('promo reel', () => {
         await page.screenshot({ path: `.planning/evals/latest/welcome-${label}-${i + 1}-${id}-mid.png` })
         await page.waitForTimeout(4400)
         await shot(page, `welcome-${label}-${i + 1}-${id}`)
+        // A scene's panel fits its column: nothing (like Sent for sign-off) is cut off.
+        const column = page.getByTestId('reel-column')
+        if (await column.count()) {
+          const [scroll, client] = await column.evaluate((el) => [el.scrollHeight, el.clientHeight])
+          expect(scroll, `${id} panel is cut off at ${label} size`).toBeLessThanOrEqual(client + 1)
+        }
       }
       expect(errors).toEqual([])
     })

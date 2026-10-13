@@ -241,7 +241,7 @@ function WalkPanel() {
               <span className="mt-0.5 block text-meta text-ink-900">{text}</span>
               {i === 2 && (
                 <>
-                  <span className="relative mt-1.5 block w-full overflow-hidden rounded-lg border border-ink-200" style={cropStyle}>
+                  <span className="relative mt-1.5 block w-2/3 overflow-hidden rounded-lg border border-ink-200 lg:w-full" style={cropStyle}>
                     <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
                       <ellipse
                         cx="50"
@@ -505,7 +505,8 @@ export function PromoReel() {
       {column && (
         <section
           key={run}
-          className="absolute inset-x-3 bottom-20 flex max-h-[62dvh] flex-col gap-3 overflow-hidden lg:inset-x-auto lg:bottom-20 lg:right-6 lg:top-20 lg:max-h-none lg:w-112 lg:justify-center"
+          data-testid="reel-column"
+          className="absolute inset-x-3 bottom-20 flex max-h-[calc(100dvh-10rem)] flex-col gap-3 overflow-hidden lg:inset-x-auto lg:bottom-20 lg:right-6 lg:top-20 lg:max-h-none lg:w-112 lg:justify-center"
         >
           <div className="rounded-2xl bg-paper/90 p-4 shadow-lg backdrop-blur" style={enter(0.2)}>
             <p className="mono text-meta font-semibold uppercase text-accent-step">{scene.eyebrow}</p>
