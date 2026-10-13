@@ -46,7 +46,8 @@ test.describe('FOC-04 run no-leak (ADR-0012)', () => {
     expect(HOOK).toMatch(/action: 'photo'/)
     // ADR-0012 (amended): the tick is written through one queue; when it drains the rows follow the server's last answer.
     expect(HOOK).toContain('return enqueue(async () => {')
-    expect(HOOK).toContain('if (--pending.current === 0) setWalk(saved.current)')
+    expect(HOOK).toMatch(/if \(--pending\.current > 0\) return[\s\S]*setWalk\(saved\.current\)/)
+    expect(HOOK).toContain("window.addEventListener('beforeunload', holdUnload)")
     // Photos and Send wait for every queued tick first.
     expect(HOOK.match(/await queue\.current/g)?.length).toBe(2)
     expect(HOOK).toContain("new Set(Object.keys(walk?.done ?? {}))")

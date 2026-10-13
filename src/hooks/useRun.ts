@@ -25,6 +25,7 @@ const STALE: Record<string, string> = {
   'Start the SOP again.': 'This SOP was finished or started again somewhere else. Press start to carry on.',
   'That step is not part of this SOP.': 'This SOP changed since you started. Press start to carry on.',
 }
+const holdUnload = (e: BeforeUnloadEvent) => e.preventDefault()
 const SAID_AS_IS = new Set(['Add a photo to continue.', 'Finish the steps before this one first.', 'This SOP is not available to start.'])
 
 export function useRun({ sopId, order, allowForward, onMoved }: { sopId: string; order: WalkEntry[]; allowForward: boolean; onMoved(sopId: string): void }) {
@@ -47,15 +48,19 @@ export function useRun({ sopId, order, allowForward, onMoved }: { sopId: string;
   }, [])
   /** Run `write` after every earlier write; the rows follow the server once the queue is empty. */
   const enqueue = useCallback((write: () => Promise<WalkState | null>) => {
-    pending.current += 1
+    // While a tick is unsaved, leaving the page asks first.
+    if (++pending.current === 1) window.addEventListener('beforeunload', holdUnload)
+    const drained = () => {
+      if (--pending.current > 0) return
+      window.removeEventListener('beforeunload', holdUnload)
+      setWalk(saved.current)
+    }
     const run = queue.current.then(write).then(
       (w) => {
         if (w) saved.current = w
-        if (--pending.current === 0) setWalk(saved.current)
+        drained()
       },
-      () => {
-        if (--pending.current === 0) setWalk(saved.current)
-      },
+      drained,
     )
     queue.current = run
     return run

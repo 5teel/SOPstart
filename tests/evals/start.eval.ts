@@ -227,6 +227,54 @@ test.describe.serial('Phase 63 -- the SOPstart start (deployed)', () => {
     }
   })
 
+  test('PERF-01 a tick shows at once; three quick ticks are all saved (still there after a reload)', async ({ browser }) => {
+    test.setTimeout(240_000)
+    await deleteEvalCompletions(db, walkId)
+    const ctx = await workerContext(browser)
+    const page = await ctx.newPage()
+    try {
+      await openRead(page, walkId)
+      await page.getByTestId('read-start').click()
+      await expect(page.getByTestId('run-bar')).toBeVisible(SLOW)
+      await expect.poll(() => layerKids(page), SLOW).toBe(0)
+      // Click to ticked, measured in the page: the box must not wait on the server.
+      const shown: number[] = []
+      for (const kind of ['hazard', 'ppe', 'step'] as const) {
+        const row = rowOfKind(page, kind)
+        await expect(row.getByTestId('step-tick')).toBeEnabled(SLOW)
+        const ms = await row.evaluate(
+          (el) =>
+            new Promise<number>((resolve) => {
+              const t0 = performance.now()
+              const obs = new MutationObserver(() => {
+                if (el.getAttribute('data-state') === 'done') {
+                  obs.disconnect()
+                  resolve(performance.now() - t0)
+                }
+              })
+              obs.observe(el, { attributes: true, attributeFilter: ['data-state'] })
+              ;(el.querySelector('[data-testid="step-tick"]') as HTMLButtonElement).click()
+            }),
+        )
+        shown.push(Math.round(ms))
+      }
+      console.log(`tick shown after ${shown.join(' / ')} ms`)
+      for (const ms of shown) expect(ms).toBeLessThan(150)
+      await expect(page.getByTestId('run-progress')).toHaveText('3 of 5 ticked')
+      // The writes land in order on the server, then a reload picks up at step 4.
+      await expect
+        .poll(async () => {
+          const { data } = await db.from('sop_walks').select('done').eq('sop_id', walkId).eq('status', 'in_progress').maybeSingle()
+          return Object.keys((data?.done as Record<string, string> | null) ?? {}).length
+        }, SLOW)
+        .toBe(3)
+      await openRead(page, walkId)
+      await expect(page.getByTestId('read-view')).toContainText('Picks up at step 4 of 5', SLOW)
+    } finally {
+      await ctx.close()
+    }
+  })
+
   test('FUSE-02 a stopped SOP picks up at step N; begin from step 1 asks first', async ({ browser }) => {
     test.setTimeout(300_000)
     await deleteEvalCompletions(db, walkId)
