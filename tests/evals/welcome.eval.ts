@@ -56,8 +56,12 @@ test.describe('promo reel', () => {
         // A scene's panel fits its column: nothing (like Sent for sign-off) is cut off.
         const column = page.getByTestId('reel-column')
         if (await column.count()) {
-          const [scroll, client] = await column.evaluate((el) => [el.scrollHeight, el.clientHeight])
-          expect(scroll, `${id} panel is cut off at ${label} size`).toBeLessThanOrEqual(client + 1)
+          // Content only: the decorative tap rings (aria-hidden) spread past the edge as they fade.
+          const [bottom, limit] = await column.evaluate((el) => [
+            Math.max(...[...el.querySelectorAll('*')].filter((n) => !n.closest('[aria-hidden="true"]')).map((n) => n.getBoundingClientRect().bottom)),
+            el.getBoundingClientRect().bottom,
+          ])
+          expect(bottom, `${id} panel is cut off at ${label} size`).toBeLessThanOrEqual(limit + 1)
         }
       }
       expect(errors).toEqual([])
