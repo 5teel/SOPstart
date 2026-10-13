@@ -200,7 +200,11 @@ export function useRun({ sopId, order, allowForward, onMoved }: { sopId: string;
     }
   }, [walk, busy, refreshLibrary])
 
-  const stop = useCallback(() => {
+  /** Back to reading once every queued tick is saved, so "Picks up at step N" is the server's N. */
+  const stop = useCallback(async () => {
+    setBusy(true)
+    await queue.current
+    setBusy(false)
     setRunning(false)
     setError(null)
     refreshLibrary()

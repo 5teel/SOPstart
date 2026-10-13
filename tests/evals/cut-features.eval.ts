@@ -145,7 +145,8 @@ test.describe('Phase 55 — cut features (deployed)', () => {
     const errors = watchConsole(page)
     await signInAs(context, 'admin')
     await page.goto(OTG)
-    await expect(page.locator('main').getByRole('heading', { level: 1, name: /OTG Probe Maintenance/ })).toBeVisible(SLOW)
+    // ADR-0012: a live SOP's own address opens it on the home, reading.
+    await expect(page.getByTestId('read-view').getByRole('heading', { level: 1, name: /OTG Probe Maintenance/ })).toBeVisible(SLOW)
     await shot(page, 'cut-existing-sop')
 
     // Read-only: newest real-org completion, preferring one that has a photo.

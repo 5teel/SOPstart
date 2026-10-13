@@ -125,7 +125,7 @@ export function ReadView({ row, role, from, onOpenSop }: { row: LibraryRow; role
               {run.sent ? 'Sent for sign-off' : `${doneCount} of ${order.length} ticked`}
             </span>
             {!run.sent && (
-              <button type="button" data-testid="run-stop" onClick={run.stop} className="back ml-auto">
+              <button type="button" data-testid="run-stop" onClick={() => void run.stop()} className="back ml-auto">
                 Stop
               </button>
             )}

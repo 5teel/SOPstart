@@ -240,7 +240,7 @@ test.describe.serial('Phase 63 -- the SOPstart start (deployed)', () => {
       // Click to ticked, measured in the page: the box must not wait on the server.
       const shown: number[] = []
       for (const kind of ['hazard', 'ppe', 'step'] as const) {
-        const row = rowOfKind(page, kind)
+        const row = rowOfKind(page, kind).first()
         await expect(row.getByTestId('step-tick')).toBeEnabled(SLOW)
         const ms = await row.evaluate(
           (el) =>
