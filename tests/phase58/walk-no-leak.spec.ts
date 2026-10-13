@@ -32,7 +32,7 @@ test.describe('FOC-04 run no-leak (ADR-0012)', () => {
     expect(HOOK).not.toMatch(/from '@\/stores\//)
     expect(HOOK).not.toMatch(/localStorage|sessionStorage|persist|indexedDB|completionStore/)
     // Done after Send drops the run, so the next Start opens a fresh one.
-    expect(HOOK).toMatch(/const finish = useCallback\(\(\) => \{[\s\S]*setWalk\(null\)/)
+    expect(HOOK).toMatch(/const finish = useCallback\(\(\) => \{[\s\S]*show\(null\)/)
   })
 
   test('photos go through useStepPhotos keyed to the run id', () => {
@@ -40,12 +40,15 @@ test.describe('FOC-04 run no-leak (ADR-0012)', () => {
     expect(HOOK).toContain('photoApi.addPhoto(walk.id,')
   })
 
-  test('every write goes through the server run; a row shows ticked only from the run it returns', () => {
+  test('every write goes through the server run; a tick shows at once, writes queue in order and a failure falls back to the server', () => {
     for (const call of ['startWalk(', 'recordWalkStep(', 'startOverWalk(', 'submitCompletion({ walkId']) expect(HOOK, call).toContain(call)
     expect(HOOK).toMatch(/action: 'complete'/)
     expect(HOOK).toMatch(/action: 'photo'/)
-    expect(HOOK.match(/setWalk\(res\.walk\)/g)?.length).toBeGreaterThanOrEqual(3)
-    // Ticked is derived from the server run, never set locally.
+    // ADR-0012 (amended): the tick is written through one queue; when it drains the rows follow the server's last answer.
+    expect(HOOK).toContain('return enqueue(async () => {')
+    expect(HOOK).toContain('if (--pending.current === 0) setWalk(saved.current)')
+    // Photos and Send wait for every queued tick first.
+    expect(HOOK.match(/await queue\.current/g)?.length).toBe(2)
     expect(HOOK).toContain("new Set(Object.keys(walk?.done ?? {}))")
   })
 
@@ -63,7 +66,7 @@ test.describe('FOC-04 run no-leak (ADR-0012)', () => {
     const server = stripComments(read('src/actions/walk.ts')) + stripComments(read('src/actions/completions.ts'))
     for (const msg of ['Start the SOP again.', 'That step is not part of this SOP.', 'Finish the steps before this one first.', 'Add a photo to continue.'])
       expect(server).toContain(`'${msg}'`)
-    expect(HOOK).toMatch(/if \(STALE\[msg\]\) \{[\s\S]*setWalk\(null\)[\s\S]*setRunning\(false\)/)
+    expect(HOOK).toMatch(/if \(STALE\[msg\]\) \{[\s\S]*show\(null\)[\s\S]*setRunning\(false\)/)
     expect(HOOK).toContain("'Finish the steps before this one first.'")
     expect(HOOK).toContain("'Add a photo to continue.'")
   })

@@ -45,17 +45,16 @@ export function latestPublishedOf<T extends LineageRow>(rows: readonly T[], sopI
 const ADMIN_ROLES = ['admin', 'safety_manager']
 
 /**
- * Admins open the exact row asked for. Everyone else only ever sees published
- * content: the in-progress walk's version if they have one (D-12), otherwise
- * the latest published version; a lineage with no published row is not found (D-13).
+ * Admins open the exact row asked for. Everyone else only ever sees the latest
+ * published version (ADR-0012: a run is always on it); a lineage with no published
+ * row is not found (D-13).
  */
 export function resolveFocusTarget(input: {
   role: string
   requestedId: string
   lineage: readonly LineageRow[]
-  inProgressSopId?: string | null
 }): FocusTarget {
-  const { role, requestedId, lineage, inProgressSopId } = input
+  const { role, requestedId, lineage } = input
   const requested = lineage.find((r) => r.id === requestedId)
   if (!requested) return { kind: 'not_found' }
 
@@ -64,8 +63,7 @@ export function resolveFocusTarget(input: {
 
   if (ADMIN_ROLES.includes(role)) return { kind: 'open', id: requested.id, superseded: superseded(requested) }
 
-  const walking = inProgressSopId ? lineage.find((r) => r.id === inProgressSopId) : undefined
-  const target = walking ?? latest
+  const target = latest
   if (!target) return { kind: 'not_found' }
   return target.id === requestedId
     ? { kind: 'open', id: target.id, superseded: superseded(target) }

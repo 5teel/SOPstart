@@ -5,6 +5,7 @@
  * with the SOP, never a to-do (rule 2). Two lines: the title, then one meta line carrying the
  * area (left out under its own area heading), type, minutes and status.
  */
+import { useQueryClient } from '@tanstack/react-query'
 import type { LibraryRow } from '@/hooks/useLibrary'
 import type { RowStatus } from '@/lib/library/status'
 
@@ -31,6 +32,9 @@ export function SopRow({
   onOpen(id: string): void
 }) {
   const { status } = row
+  const qc = useQueryClient()
+  // Pointing at a row starts reading its SOP, so Read opens on cached steps (lazy: no bundle cost).
+  const warm = () => void import('@/hooks/useReadSop').then((m) => qc.prefetchQuery(m.readSopQuery(row.id))).catch(() => undefined)
   return (
     <button
       type="button"
@@ -38,6 +42,9 @@ export function SopRow({
       data-sop-id={row.id}
       aria-current={selected ? 'true' : undefined}
       onClick={() => onOpen(row.id)}
+      onPointerEnter={warm}
+      onPointerDown={warm}
+      onFocus={warm}
       className={`flex min-h-tap-row w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left hover:bg-paper-2 ${selected ? 'bg-paper-2' : ''}`}
     >
       <span className="min-w-0 flex-1">

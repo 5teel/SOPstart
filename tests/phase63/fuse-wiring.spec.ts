@@ -70,7 +70,7 @@ test.describe('fuse wiring (ADR-0012)', () => {
     expect(r).toContain("motion === 'full' && resumeAt === null && !over ? 'full' : 'short'")
     expect(r).toContain("closest('[data-testid=\"home-reader\"]')")
     // The run bar carries the settle target, and the chip leaves while running.
-    expect(r).toContain('data-wm-target')
+    expect(r).toContain('<Wordmark size="bar" target />')
     expect(r).toContain('{!running && <Wordmark variant="chip" size="merge" data-fuse="sop" />}')
     // The font check reads the first family only: next/font's unloaded fallback face made check() false on the deploy.
     expect(r).toContain("split(',')[0]")

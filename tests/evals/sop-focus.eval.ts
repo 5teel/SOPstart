@@ -350,12 +350,12 @@ test.describe('Phase 58 — the SOP focus screen (deployed)', () => {
       await expect(page.locator('[data-testid="edit-rail-row"][data-ticked="true"]')).toHaveCount(2, SLOW)
       await expect(page.getByTestId('publish-count')).toHaveText('Checked 2 of 4 steps', SLOW)
       await expect(page.getByRole('checkbox', { name: /I have checked this/ })).toHaveCount(2, SLOW)
-      // The admin switch is there, and flipping Walk / Edit is local: no reload.
+      // The admin switch is there, and flipping Read / Edit is local: no reload.
       await page.evaluate(() => {
         ;(window as unknown as { __nav: number }).__nav = 1
       })
       await expect(page.getByTestId('focus-mode-switch')).toHaveCount(1, SHORT)
-      await page.getByTestId('focus-mode-switch-walk').click()
+      await page.getByTestId('focus-mode-switch-read').click()
       await expect(page.getByTestId('edit-document')).toHaveCount(0, SLOW)
       await expect(page).not.toHaveURL(/mode=edit/)
       await page.getByTestId('focus-mode-switch-edit').click()

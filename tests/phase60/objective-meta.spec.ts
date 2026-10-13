@@ -115,13 +115,9 @@ test.describe('Objective line (60-13)', () => {
     expect(block).toContain('<ObjectiveSlot')
     expect(block).not.toMatch(/from\s+'@\/components\/requests\/ObjectiveEditor'/)
   })
-  test('browse offers "Make a request" for a live SOP only, through a lazy import', () => {
-    const browse = read('src/components/focus/BrowseDocument.tsx')
-    expect(browse).toMatch(/dynamic\(\(\) => import\('@\/components\/requests\/RequestComposer'\)/)
-    expect(browse).not.toMatch(/from\s+'@\/components\/requests\/RequestComposer'/)
-    expect(browse).toContain("sop.status === 'published' && !supersededBy")
-    expect(browse).toContain("kinds={['change_sop', 'observe_me']}")
-    // never in the walk state
+  test('"Make a request" lives in the home Read view (ADR-0012); the SOP page shows only drafts and old versions', () => {
+    expect(read('src/components/focus/BrowseDocument.tsx')).not.toContain('RequestComposer')
     expect(read('src/components/focus/FocusWalker.tsx')).not.toContain('RequestComposer')
+    expect(read('src/components/home/ReadView.tsx')).toContain("kinds={['change_sop', 'observe_me']}")
   })
 })

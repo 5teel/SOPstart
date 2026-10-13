@@ -120,9 +120,7 @@ export function ReadView({ row, role, from, onOpenSop }: { row: LibraryRow; role
         // The run bar: the whole wordmark means every tick is being recorded (ADR-0012).
         <div data-testid="run-bar" className="sticky top-0 z-10 border-b border-ink-200 bg-paper">
           <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-2.5 lg:px-8">
-            <span data-wm-target="">
-              <Wordmark size="bar" />
-            </span>
+            <Wordmark size="bar" target />
             <span data-testid="run-progress" className="font-label text-meta text-ink-700">
               {run.sent ? 'Sent for sign-off' : `${doneCount} of ${order.length} ticked`}
             </span>

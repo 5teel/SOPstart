@@ -49,48 +49,52 @@ const rows = <T,>(r: { data: T[] | null; error: Fail }): T[] => {
   return r.data ?? []
 }
 
-export function useReadSop(sopId: string | null) {
-  return useQuery({
-    queryKey: ['read-sop', sopId],
-    enabled: !!sopId,
-    staleTime: 1000 * 60 * 2,
-    queryFn: async () => {
-      const supabase = createClient()
-      const { data: sop, error } = await supabase
+/** One SOP as Read shows it. Also used to warm the cache when a row is pointed at. */
+export const readSopQuery = (sopId: string | null) => ({
+  queryKey: ['read-sop', sopId],
+  enabled: !!sopId,
+  staleTime: 1000 * 60 * 2,
+  queryFn: async () => {
+    const supabase = createClient()
+    // The SOP and its steps are read together; standards need the SOP's org, so they follow.
+    const [{ data: sop, error }, sec, st] = await Promise.all([
+      supabase
         .from('sops')
         .select('id, title, version, status, parent_sop_id, placement, category_slug, organisation_id, allow_forward_jump')
         .eq('id', sopId!)
-        .maybeSingle()
-      if (error) throw new Error(error.message)
-      if (!sop) return null
-      const row = sop as ReadSopMeta
+        .maybeSingle(),
+      supabase.from('sop_sections').select('id, title, sort_order').eq('sop_id', sopId!).order('sort_order', { ascending: true }),
+      supabase
+        .from('sop_focus_steps')
+        .select('id, section_id, kind, text, tip, photo_required, image_paths, time_estimate_minutes, sort_order')
+        .eq('sop_id', sopId!)
+        .order('sort_order', { ascending: true }),
+    ])
+    if (error) throw new Error(error.message)
+    if (!sop) return null
+    const row = sop as ReadSopMeta
 
-      const [sec, st, std, att] = await Promise.all([
-        supabase.from('sop_sections').select('id, title, sort_order').eq('sop_id', row.id).order('sort_order', { ascending: true }),
-        supabase
-          .from('sop_focus_steps')
-          .select('id, section_id, kind, text, tip, photo_required, image_paths, time_estimate_minutes, sort_order')
-          .eq('sop_id', row.id)
-          .order('sort_order', { ascending: true }),
-        supabase.from('standards').select('id, name').eq('organisation_id', row.organisation_id),
-        supabase.from('standard_attachments').select('standard_id, sop_id, section_id, focus_step_id').eq('organisation_id', row.organisation_id),
-      ])
-      // Step pictures: one batched signing call, under the reader's session.
-      const rawSteps = rows(st as { data: Omit<ReadStep, 'image_urls'>[] | null; error: Fail })
-      const paths = [...new Set(rawSteps.flatMap((s) => s.image_paths ?? []))]
-      const signed = new Map<string, string>()
-      if (paths.length > 0) {
-        const { data: urls } = await supabase.storage.from('sop-images').createSignedUrls(paths, 3600)
-        for (const u of urls ?? []) if (u.path && u.signedUrl) signed.set(u.path, u.signedUrl)
-      }
-      const assembled = assembleFocus({
-        sopId: row.id,
-        sections: rows(sec as { data: ReadSection[] | null; error: Fail }),
-        steps: rawSteps.map((s) => ({ ...s, image_urls: (s.image_paths ?? []).flatMap((p) => (signed.has(p) ? [signed.get(p)!] : [])) })),
-        standards: rows(std as { data: AssembleStandard[] | null; error: Fail }),
-        attachments: rows(att as { data: AssembleAttachment[] | null; error: Fail }),
-      })
-      return { sop: row, ...assembled }
-    },
-  })
+    // Step pictures: one batched signing call, under the reader's session, alongside the standards.
+    const rawSteps = rows(st as { data: Omit<ReadStep, 'image_urls'>[] | null; error: Fail })
+    const paths = [...new Set(rawSteps.flatMap((s) => s.image_paths ?? []))]
+    const [std, att, urls] = await Promise.all([
+      supabase.from('standards').select('id, name').eq('organisation_id', row.organisation_id),
+      supabase.from('standard_attachments').select('standard_id, sop_id, section_id, focus_step_id').eq('organisation_id', row.organisation_id),
+      paths.length > 0 ? supabase.storage.from('sop-images').createSignedUrls(paths, 3600).then((r) => r.data) : Promise.resolve(null),
+    ])
+    const signed = new Map<string, string>()
+    for (const u of urls ?? []) if (u.path && u.signedUrl) signed.set(u.path, u.signedUrl)
+    const assembled = assembleFocus({
+      sopId: row.id,
+      sections: rows(sec as { data: ReadSection[] | null; error: Fail }),
+      steps: rawSteps.map((s) => ({ ...s, image_urls: (s.image_paths ?? []).flatMap((p) => (signed.has(p) ? [signed.get(p)!] : [])) })),
+      standards: rows(std as { data: AssembleStandard[] | null; error: Fail }),
+      attachments: rows(att as { data: AssembleAttachment[] | null; error: Fail }),
+    })
+    return { sop: row, ...assembled }
+  },
+})
+
+export function useReadSop(sopId: string | null) {
+  return useQuery(readSopQuery(sopId))
 }

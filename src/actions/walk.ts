@@ -30,6 +30,7 @@ type Fail = { error: string }
 const startSchema = z.object({ sopId: uuid })
 const recordSchema = z.object({
   walkId: uuid,
+  sopId: uuid,
   stepId: uuid,
   action: z.enum(['complete', 'photo']),
   photo: z.object({ localId: uuid, storagePath: z.string().min(1).max(300) }).optional(),
@@ -51,7 +52,7 @@ async function openWalk(
   const { supabase, userId, organisationId } = ctx
   const { data: sop } = await supabase
     .from('sops')
-    .select('id, version, status')
+    .select('id, version, status, parent_sop_id')
     .eq('id', sopId)
     .eq('organisation_id', organisationId)
     .maybeSingle()
@@ -70,6 +71,22 @@ async function openWalk(
 
   const found = await existing()
   if (found.data) return { walk: toWalkState(found.data) }
+
+  // ADR-0012: a run is on the version the home shows. One left on another version of this SOP
+  // (it was republished mid-run) is closed, so it no longer reads as "stopped at step N".
+  const root = sop.parent_sop_id ?? sop.id
+  const { data: family } = await admin.from('sops').select('id').eq('organisation_id', organisationId).or(`id.eq.${root},parent_sop_id.eq.${root}`)
+  const others = (family ?? []).map((r) => r.id).filter((id) => id !== sopId)
+  if (others.length > 0) {
+    const { error: closeError } = await admin
+      .from('sop_walks')
+      .update({ status: 'abandoned', updated_at: new Date().toISOString() })
+      .eq('organisation_id', organisationId)
+      .eq('worker_id', userId)
+      .eq('status', 'in_progress')
+      .in('sop_id', others)
+    if (closeError) console.error('startWalk close older run error:', closeError)
+  }
 
   const { data: inserted, error } = await admin
     .from('sop_walks')
@@ -100,7 +117,7 @@ export async function startWalk(rawInput: unknown): Promise<{ walk: WalkState } 
 export async function recordWalkStep(rawInput: unknown): Promise<{ walk: WalkState } | Fail> {
   const parsed = recordSchema.safeParse(rawInput)
   if (!parsed.success) return { error: 'Invalid input' }
-  const { walkId, stepId, action, photo } = parsed.data
+  const { walkId, sopId, stepId, action, photo } = parsed.data
   if (action === 'photo' && !photo) return { error: 'Invalid input' }
 
   const ctx = await sessionOrFail()
@@ -108,18 +125,22 @@ export async function recordWalkStep(rawInput: unknown): Promise<{ walk: WalkSta
   const { supabase, userId, organisationId } = ctx
   const admin = createAdminClient()
 
-  const { data: row } = await admin
-    .from('sop_walks')
-    .select(WALK_COLUMNS)
-    .eq('id', walkId)
-    .eq('organisation_id', organisationId)
-    .eq('worker_id', userId)
-    .eq('status', 'in_progress')
-    .maybeSingle()
-  if (!row) return { error: 'Start the SOP again.' }
+  // The walk and its SOP are read together; the client's sopId only saves a round trip and
+  // must match the walk's own SOP.
+  const [{ data: row }, sop] = await Promise.all([
+    admin
+      .from('sop_walks')
+      .select(WALK_COLUMNS)
+      .eq('id', walkId)
+      .eq('organisation_id', organisationId)
+      .eq('worker_id', userId)
+      .eq('status', 'in_progress')
+      .maybeSingle(),
+    loadWalkSop(supabase, organisationId, sopId),
+  ])
+  if (!row || row.sop_id !== sopId) return { error: 'Start the SOP again.' }
   const walk = toWalkState(row)
 
-  const sop = await loadWalkSop(supabase, organisationId, walk.sop_id)
   const entry = sop?.order.find((e) => e.step.id === stepId)
   if (!sop || !entry) return { error: 'That step is not part of this SOP.' }
 

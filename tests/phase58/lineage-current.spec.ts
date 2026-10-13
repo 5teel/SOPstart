@@ -29,9 +29,6 @@ test.describe('resolveFocusTarget', () => {
     expect(resolveFocusTarget({ role: 'worker', requestedId: 'v1', lineage })).toEqual({ kind: 'redirect', id: 'v2' })
   })
 
-  test('worker with a walk in progress stays on that version (D-12)', () => {
-    expect(resolveFocusTarget({ role: 'worker', requestedId: 'v1', lineage, inProgressSopId: 'v1' })).toEqual({ kind: 'open', id: 'v1', superseded: true })
-  })
 
   test('worker never reaches a draft; no published row is not found (D-13)', () => {
     expect(resolveFocusTarget({ role: 'worker', requestedId: 'v3', lineage })).toEqual({ kind: 'redirect', id: 'v2' })

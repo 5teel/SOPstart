@@ -70,7 +70,9 @@ test.describe('FOC-04 walk actions', () => {
 
   test("the step belongs to the walk's SOP", () => {
     const b = body(walk, 'recordWalkStep')
-    expect(b).toContain('loadWalkSop(supabase, organisationId, walk.sop_id)')
+    // The SOP is read alongside the walk; the client's sopId must be the walk's own SOP.
+    expect(b).toContain('loadWalkSop(supabase, organisationId, sopId)')
+    expect(b).toContain("if (!row || row.sop_id !== sopId) return { error: 'Start the SOP again.' }")
     expect(b).toMatch(/sop\?\.order\.find\(\(e\) => e\.step\.id === stepId\)/)
     expect(b).toContain('That step is not part of this SOP.')
   })

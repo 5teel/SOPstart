@@ -141,11 +141,9 @@ test.describe('signoff actions', () => {
     expect(q).toContain(".neq('status', 'rejected')")
   })
 
-  test('review WR-04: the SOP focus page does not count a rejected walk as done (A-06)', () => {
+  test('review WR-04: the SOP page no longer reads completions (ADR-0012: the home owns the record)', () => {
     const page = strip(read('src/app/(protected)/sops/[sopId]/page.tsx'))
-    const at = page.indexOf("from('sop_completions')")
-    expect(at).toBeGreaterThan(-1)
-    expect(page.slice(at, at + 160)).toContain(".neq('status', 'rejected')")
+    expect(page).not.toContain("from('sop_completions')")
   })
 
   test('competency reads never count a rejected walk (A-06)', () => {

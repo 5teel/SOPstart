@@ -68,8 +68,14 @@ The merge is the moment the first becomes the second, so:
 - The walk screen's one-step cards, its review page and its browse page leave the worker path; the
   focus screen keeps only editing and non-live versions.
 - The home now loads the run code lazily on Start (the gated home bundle does not grow with it).
+- Amended 2026-10-13: a run is always on the version the home shows. A run left on an older version
+  (republished mid-run) is closed when the worker starts the current one; the list stops showing it as
+  "stopped". This replaces Phase 58 D-12 (finish on the version you started).
+- Amended 2026-10-13: a tick shows the moment it is pressed. Its write joins one queue so writes land
+  in order; a refused or failed write puts the rows back to the server's last answer and says so.
 
 ## How to comply
 - A new way into a SOP opens the home view (`/?sop=<id>`), never a separate reading page.
-- Nothing written to the server on opening or reading a SOP; every tick is written before it shows.
+- Nothing written to the server on opening or reading a SOP; every tick is written, in order, and a
+  failed write is undone on screen. Photos and Send wait for the queue.
 - The merge plays only from the run's Start/Resume, per the table above. Change the stages here first.

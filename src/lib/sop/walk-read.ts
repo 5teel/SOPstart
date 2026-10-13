@@ -58,15 +58,9 @@ export interface WalkSop {
 
 /** The SOP in `organisationId` as a walk order, or null when it is not in that org. */
 export async function loadWalkSop(client: SupabaseClient, organisationId: string, sopId: string): Promise<WalkSop | null> {
-  const { data: sop } = await client
-    .from('sops')
-    .select('id, allow_forward_jump')
-    .eq('id', sopId)
-    .eq('organisation_id', organisationId)
-    .maybeSingle()
-  if (!sop) return null
-
-  const [secRes, stepRes] = await Promise.all([
+  // One round trip: the SOP's org check and its rows are read together.
+  const [{ data: sop }, secRes, stepRes] = await Promise.all([
+    client.from('sops').select('id, allow_forward_jump').eq('id', sopId).eq('organisation_id', organisationId).maybeSingle(),
     client.from('sop_sections').select('id, title, sort_order').eq('sop_id', sopId),
     client
       .from('sop_focus_steps')
@@ -74,6 +68,7 @@ export async function loadWalkSop(client: SupabaseClient, organisationId: string
       .eq('sop_id', sopId)
       .eq('organisation_id', organisationId),
   ])
+  if (!sop) return null
   if (secRes.error || stepRes.error) throw new Error((secRes.error ?? stepRes.error)!.message)
 
   const steps = (stepRes.data ?? []) as Array<{

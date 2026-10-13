@@ -3,12 +3,13 @@
 /**
  * ADR-0012 -- a run of one SOP on the home: the same step list as reading, ticked.
  *
- * The server's sop_walks row is the truth (D-09): every tick and photo is written by
- * the walk actions first, and a row only shows ticked from the walk they return.
+ * The server's sop_walks row is the truth (D-09). A tick shows at once and its write
+ * joins one queue, so writes land in order; a refused write puts the rows back to the
+ * last walk the server returned. Photos and Send wait for the queue.
  * Reading writes nothing; this hook writes only from a person's press. State lives
  * here and resets with the view (HomeShell keys the view by SOP id).
  */
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { startOverWalk, startWalk, recordWalkStep } from '@/actions/walk'
 import { submitCompletion } from '@/actions/completions'
@@ -36,6 +37,29 @@ export function useRun({ sopId, order, allowForward, onMoved }: { sopId: string;
   // Local thumbnails for photos taken in this run, keyed by step id.
   const [previews, setPreviews] = useState<Record<string, string>>({})
   const photoApi = useStepPhotos(walk?.id)
+  // Writes run one after another; `saved` is the last walk the server returned.
+  const queue = useRef<Promise<unknown>>(Promise.resolve())
+  const pending = useRef(0)
+  const saved = useRef<WalkState | null>(null)
+  const show = useCallback((w: WalkState | null) => {
+    saved.current = w
+    setWalk(w)
+  }, [])
+  /** Run `write` after every earlier write; the rows follow the server once the queue is empty. */
+  const enqueue = useCallback((write: () => Promise<WalkState | null>) => {
+    pending.current += 1
+    const run = queue.current.then(write).then(
+      (w) => {
+        if (w) saved.current = w
+        if (--pending.current === 0) setWalk(saved.current)
+      },
+      () => {
+        if (--pending.current === 0) setWalk(saved.current)
+      },
+    )
+    queue.current = run
+    return run
+  }, [])
 
   const done = useMemo(() => new Set(Object.keys(walk?.done ?? {})), [walk])
   const acked = useMemo(() => new Set(Object.keys(walk?.acks ?? {})), [walk])
@@ -53,14 +77,14 @@ export function useRun({ sopId, order, allowForward, onMoved }: { sopId: string;
   const refused = useCallback(
     (msg: string, fallback: string) => {
       if (STALE[msg]) {
-        setWalk(null)
+        show(null)
         setRunning(false)
         refreshLibrary()
         return setError(STALE[msg])
       }
       setError(SAID_AS_IS.has(msg) ? msg : fallback)
     },
-    [refreshLibrary],
+    [refreshLibrary, show],
   )
 
   /** Open (or pick up) the run on the server. Resolves true when there is a run to show. */
@@ -70,14 +94,14 @@ export function useRun({ sopId, order, allowForward, onMoved }: { sopId: string;
     try {
       const res = await startWalk({ sopId })
       if ('error' in res) return (refused(res.error, res.error), false)
-      setWalk(res.walk)
+      show(res.walk)
       return true
     } catch {
       return (setError(SAVE_ERROR), false)
     } finally {
       setBusy(false)
     }
-  }, [sopId, refused])
+  }, [sopId, refused, show])
 
   /** "Begin from step 1": throw the run's ticks and photos away and open a fresh run on the latest version. */
   const startOver = useCallback(async (): Promise<boolean> => {
@@ -93,31 +117,41 @@ export function useRun({ sopId, order, allowForward, onMoved }: { sopId: string;
         onMoved(res.sopId)
         return false
       }
-      setWalk(res.walk)
+      show(res.walk)
       return true
     } catch {
       return (setError(SAVE_ERROR), false)
     } finally {
       setBusy(false)
     }
-  }, [walk, sopId, onMoved, refused])
+  }, [walk, sopId, onMoved, refused, show])
 
+  /** Shows the tick now; the write follows in the queue and a refusal undoes it. */
   const tick = useCallback(
-    async (stepId: string) => {
-      if (!walk || busy) return
-      setBusy(true)
+    (stepId: string) => {
+      if (!walk || busy || walk.done[stepId]) return
+      const kind = order.find((e) => e.step.id === stepId)?.step.kind
+      const now = new Date().toISOString()
       setError(null)
-      try {
-        const res = await recordWalkStep({ walkId: walk.id, stepId, action: 'complete' })
-        if ('error' in res) return refused(res.error, SAVE_ERROR)
-        setWalk(res.walk)
-      } catch {
-        setError(SAVE_ERROR)
-      } finally {
-        setBusy(false)
-      }
+      // Functional: two quick ticks before a render both land.
+      setWalk((w) =>
+        w && {
+          ...w,
+          done: { ...w.done, [stepId]: now },
+          acks: kind === 'hazard' || kind === 'ppe' ? { ...w.acks, [stepId]: now } : w.acks,
+        },
+      )
+      return enqueue(async () => {
+        try {
+          const res = await recordWalkStep({ walkId: walk.id, sopId: walk.sop_id, stepId, action: 'complete' })
+          if ('error' in res) return (refused(res.error, SAVE_ERROR), null)
+          return res.walk
+        } catch {
+          return (setError(SAVE_ERROR), null)
+        }
+      })
     },
-    [walk, busy, refused],
+    [walk, busy, order, enqueue, refused],
   )
 
   /** Compress and upload under the run id, then record it on the run. Retake replaces. */
@@ -129,9 +163,10 @@ export function useRun({ sopId, order, allowForward, onMoved }: { sopId: string;
       try {
         const up = await photoApi.addPhoto(walk.id, stepId, file)
         if (!up) return setError(PHOTO_ERROR)
-        const res = await recordWalkStep({ walkId: walk.id, stepId, action: 'photo', photo: { localId: up.localId, storagePath: up.path } })
+        await queue.current
+        const res = await recordWalkStep({ walkId: walk.id, sopId: walk.sop_id, stepId, action: 'photo', photo: { localId: up.localId, storagePath: up.path } })
         if ('error' in res) return refused(res.error, PHOTO_ERROR)
-        setWalk(res.walk)
+        show(res.walk)
         // ponytail: object URLs are not revoked; a run holds a handful of thumbnails.
         setPreviews((p) => ({ ...p, [stepId]: URL.createObjectURL(file) }))
       } catch {
@@ -140,7 +175,7 @@ export function useRun({ sopId, order, allowForward, onMoved }: { sopId: string;
         setBusy(false)
       }
     },
-    [walk, busy, photoApi, refused],
+    [walk, busy, photoApi, refused, show],
   )
 
   const send = useCallback(async () => {
@@ -148,6 +183,7 @@ export function useRun({ sopId, order, allowForward, onMoved }: { sopId: string;
     setBusy(true)
     setError(null)
     try {
+      await queue.current
       const res = await submitCompletion({ walkId: walk.id })
       if (!res.success) return setError(SEND_ERROR)
       setSent(true)
@@ -168,8 +204,8 @@ export function useRun({ sopId, order, allowForward, onMoved }: { sopId: string;
   const finish = useCallback(() => {
     setSent(false)
     setRunning(false)
-    setWalk(null)
-  }, [])
+    show(null)
+  }, [show])
 
   return {
     walk,

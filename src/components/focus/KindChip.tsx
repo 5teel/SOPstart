@@ -18,14 +18,6 @@ export const KIND_DOT: Record<FocusKind, string> = {
   check: 'bg-ink-700',
 }
 
-/** Hollow dot: the kind's border colour, no fill. */
-export const KIND_RING: Record<FocusKind, string> = {
-  hazard: 'border-accent-hazard',
-  ppe: 'border-accent-decision',
-  step: 'border-ink-300',
-  check: 'border-ink-700',
-}
-
 /** Only hazard and PPE need a tag where the step is read; an ordinary step is just the step. */
 export const isSignal = (kind: FocusKind) => kind === 'hazard' || kind === 'ppe'
 

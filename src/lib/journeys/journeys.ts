@@ -141,7 +141,7 @@ export const JOURNEYS: Journey[] = [
     summary: 'A worker starts a SOP where they read it: the same list of steps becomes a checklist, each tick is recorded, and they finish with a tamper-proof record (ADR-0012).',
     steps: [
       { id: 's', type: 'start', label: 'Press start on the SOP', route: '/', detail: 'The start merge plays centred over the SOP (the full one on the first start of the day, short after, none with reduced motion) and the SOPstart wordmark settles into the run bar: from now every tick is saved. If you started it before, it says "Picks up at step N of M"; "or begin from step 1" asks first and throws away the earlier ticks and photos only if you say so.' },
-      { id: 'run', type: 'screen', label: 'The checklist', route: '/', detail: 'The same steps you read, each with a glove-sized tick box. Steps tick in order (the next one is marked and scrolls into view; later ones wait) unless the SOP allows jumping ahead. Each tick is saved on the server before it shows, so closing the page loses nothing. Stop keeps the ticks and returns to reading.' },
+      { id: 'run', type: 'screen', label: 'The checklist', route: '/', detail: 'The same steps you read, each with a glove-sized tick box. Steps tick in order (the next one is marked and scrolls into view; later ones wait) unless the SOP allows jumping ahead. Each tick shows the moment it is pressed and is saved on the server in order; a save that fails is undone on screen and says so. Stop keeps the ticks and returns to reading.' },
       { id: 'kind', type: 'decision', label: 'What does the step need?', branches: [
         { label: 'Just tick it', to: 'next' },
         { label: 'Tick to acknowledge a hazard or PPE', to: 'next' },
@@ -413,7 +413,7 @@ export const JOURNEYS: Journey[] = [
         { label: 'No — Publish stays off and says why', to: 'edit' },
       ] },
       { id: 'publish', type: 'action', label: 'Publish v{n+1}', route: '/api/sops/[sopId]/publish', detail: 'The dialog says workers get the new version the next time they open it and the old one stays on record. If an approval chain applies it is sent to the approver instead.' },
-      { id: 'workers', type: 'screen', label: 'Workers land on the new version', route: '/sops/[sopId]', detail: 'An old address redirects to the live version, and a SOP already in progress finishes on the version it started on. The earlier versions are listed under This SOP in the editor rail, read-only.' },
+      { id: 'workers', type: 'screen', label: 'Workers land on the new version', route: '/sops/[sopId]', detail: 'An old address opens the live version on the home. A run left on an older version is closed when the worker starts the new one (ADR-0012). The earlier versions are listed under This SOP in the editor rail, read-only.' },
       { id: 'e', type: 'end', label: 'New version live' },
     ],
   },

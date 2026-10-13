@@ -47,13 +47,12 @@ test.describe('wordmark', () => {
     expect(hits).toEqual([])
   })
 
-  test('the focus top bar leads with the wordmark target and its leave control says Back or Stop', () => {
+  test('the SOP page top bar leads with the wordmark (not a merge target: ADR-0012) and leaves with Back', () => {
     const bar = read('src/components/focus/FocusTopBar.tsx')
-    expect(bar).toMatch(/<Wordmark [^>]*target/)
+    expect(bar).toContain('<Wordmark size="bar" />')
     expect(bar.indexOf('<Wordmark')).toBeLessThan(bar.indexOf('<h1'))
     expect(bar).toContain('onClick={onBack}')
-    expect(bar).toContain("backLabel = 'Back'")
-    expect(read('src/components/focus/FocusFrame.tsx')).toContain("backLabel={mode === 'walk' || mode === 'review' ? 'Stop' : 'Back'}")
+    expect(bar).not.toContain('Stop')
   })
 
   test('sign-in and welcome show the wordmark where the text logo was', () => {

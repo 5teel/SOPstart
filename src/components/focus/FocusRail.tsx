@@ -1,26 +1,18 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { Check, Lock, X } from 'lucide-react'
+import { X } from 'lucide-react'
 import { railNumber, type WalkEntry } from '@/lib/sop/focus'
 import type { FocusStepRow } from '@/lib/sop/focus-read'
-import { KIND_DOT, KIND_RING } from '@/components/focus/KindChip'
+import { KIND_DOT } from '@/components/focus/KindChip'
 import { useRegisterOverlay } from '@/hooks/useFocusBack'
-
-/** Browse rows are all plain. The walk (58-11) passes `rowState` to mark done, current and locked rows. */
-export type RailRowState = 'open' | 'done' | 'current' | 'locked'
 
 export interface FocusRailProps {
   order: WalkEntry<FocusStepRow>[]
   /** Below lg the rail is a full-screen sheet; this is its open state. */
   open: boolean
   onClose(): void
-  rowState?(entry: WalkEntry<FocusStepRow>): RailRowState
-  /** Jump-ahead walks: hazard / PPE rows not yet acknowledged show a hollow dot. */
-  hollowDot?(entry: WalkEntry<FocusStepRow>): boolean
-  /** Defaults to scrolling the column to the step. */
-  onPick?(entry: WalkEntry<FocusStepRow>): void
-  /** Phone only: the Walk / Edit switch moves here from the top bar (UI-SPEC). */
+  /** Phone only: the Read / Edit switch moves here from the top bar (UI-SPEC). */
   sheetTop?: ReactNode
 }
 
@@ -31,7 +23,8 @@ export function scrollToStep(stepId: string): void {
   el.focus({ preventScroll: true })
 }
 
-export function FocusRail({ order, open, onClose, rowState, hollowDot, onPick, sheetTop }: FocusRailProps) {
+/** The read-only document's step list: every row jumps to its step. */
+export function FocusRail({ order, open, onClose, sheetTop }: FocusRailProps) {
   useRegisterOverlay(open, onClose)
 
   let lastGroup: string | null = null
@@ -54,38 +47,20 @@ export function FocusRail({ order, open, onClose, rowState, hollowDot, onPick, s
       {order.map((entry) => {
         const header = entry.groupLabel !== lastGroup ? entry.groupLabel : null
         lastGroup = entry.groupLabel
-        const state = rowState?.(entry) ?? 'open'
-        const locked = state === 'locked'
         return (
           <div key={entry.step.id}>
             {header && <p className="section-heading px-4 pb-1 pt-4">{header}</p>}
             <button
               type="button"
               data-testid="focus-rail-row"
-              data-state={state}
-              aria-disabled={locked || undefined}
-              aria-current={state === 'current' ? 'step' : undefined}
               title={railNumber(entry)}
               onClick={() => {
-                if (locked) return
-                ;(onPick ?? ((e) => scrollToStep(e.step.id)))(entry)
+                scrollToStep(entry.step.id)
                 onClose()
               }}
-              className={`flex min-h-tap w-full items-center gap-2 px-4 text-left text-ui ${
-                state === 'current' ? 'bg-paper-1 font-semibold text-ink-900' : locked ? 'text-ink-600' : 'text-ink-700'
-              }`}
+              className="flex min-h-tap w-full items-center gap-2 px-4 text-left text-ui text-ink-700"
             >
-              {state === 'done' ? (
-                <Check className="size-4 shrink-0 text-accent-ok" aria-hidden="true" />
-              ) : locked ? (
-                <Lock className="size-4 shrink-0 text-ink-600" aria-hidden="true" />
-              ) : (
-                <span
-                  data-hollow={hollowDot?.(entry) ? 'true' : undefined}
-                  className={`size-2 shrink-0 rounded-full ${hollowDot?.(entry) ? `border ${KIND_RING[entry.step.kind]}` : KIND_DOT[entry.step.kind]}`}
-                  aria-hidden="true"
-                />
-              )}
+              <span className={`size-2 shrink-0 rounded-full ${KIND_DOT[entry.step.kind]}`} aria-hidden="true" />
               <span className="min-w-0 flex-1 truncate">{entry.step.text || 'New step'}</span>
             </button>
           </div>

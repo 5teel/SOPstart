@@ -229,11 +229,13 @@ export function useLibrary(userId: string) {
         .sort((x, y) => (x.sort ?? Number.MAX_SAFE_INTEGER) - (y.sort ?? Number.MAX_SAFE_INTEGER) || x.name.localeCompare(y.name, 'en', { sensitivity: 'base' }))
       const own = completionsByRoot.get(root) ?? []
       const latest = own.reduce<Completion | null>((best, c) => (!best || c.submitted_at > best.submitted_at ? c : best), null)
-      const walk = walkByRoot.get(root) ?? null
+      const anyWalk = walkByRoot.get(root) ?? null
+      // A run left on an older version is not resumable (ADR-0012): only this version's run counts.
+      const walk = anyWalk?.sop_id === s.id ? anyWalk : null
       const order = walk ? orderOf(walk.sop_id) : null
       const hasNewerVersion = !!latest && !!s.published_at && new Date(s.published_at) > new Date(latest.submitted_at)
       const minutes = minutesBySop.get(s.id)
-      const times = [latest?.submitted_at, walk?.updated_at].filter((t): t is string => !!t).sort()
+      const times = [latest?.submitted_at, anyWalk?.updated_at].filter((t): t is string => !!t).sort()
       return {
         id: s.id,
         rootId: root,

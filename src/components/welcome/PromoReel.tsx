@@ -5,8 +5,8 @@
  * template, ADR-0003) with a camera that glides between places while each
  * scene's caption and panel animate in. Storyboard and the rules it follows:
  * brag-output/brag-plan.md (hook -> reveal -> highlights -> 20 s Sign in).
- * The walk and step kinds reuse the app's own copy and colours (KindChip,
- * primaryLabel, the Sent for sign-off panel). Nothing is fetched.
+ * The checklist and step kinds reuse the app's own copy and colours (KindChip,
+ * tickLabel, the Sent for sign-off line). Nothing is fetched.
  *
  * Playback is driven by the active progress bar's CSS animation: its
  * animationend advances the scene, so pause is just animation-play-state and
@@ -18,7 +18,7 @@ import { Wordmark } from '@/components/brand/Wordmark'
 import { Camera, CheckCircle, FileText, Pause, Play, Sparkles } from 'lucide-react'
 import { SITE_PRESETS, presetImagePath } from '@/lib/site/presets'
 import { KindChip } from '@/components/focus/KindChip'
-import { primaryLabel, type FocusKind } from '@/lib/sop/focus'
+import { tickLabel, type FocusKind } from '@/lib/sop/focus'
 
 type Frac = ReadonlyArray<readonly [number, number]>
 
@@ -194,58 +194,82 @@ const cropStyle: CSSProperties = {
   aspectRatio: `${cropW * IW} / ${cropH * IH}`,
 }
 
-// Mirrors WalkStep: progress, "Step N of M", group label, kind chip, step
-// text, photo, primary button; then the real SentPanel copy.
+// Mirrors the run checklist (ADR-0012): the run bar, ticked rows, the next row with its
+// photo and tick box, a waiting row; then the Sent for sign-off line.
+const RUN: ReadonlyArray<[FocusKind, string]> = [
+  ['hazard', 'Pinch point at the peel plate'],
+  ['ppe', 'Cut-resistant gloves'],
+  ['step', 'Clear the label web at the peel plate.'],
+  ['check', 'Labels feeding square'],
+]
+
+function Box({ done, at }: { done: boolean; at?: number }) {
+  return (
+    <span className="relative grid size-8 shrink-0 place-items-center rounded-lg border-2 border-ink-900 bg-paper-1">
+      {done ? (
+        <span className="grid size-full place-items-center rounded bg-ink-900 text-micro font-bold text-paper">✓</span>
+      ) : at !== undefined ? (
+        <>
+          <span className="absolute inset-0 grid place-items-center rounded bg-ink-900 text-micro font-bold text-paper" style={enter(at + 0.2)}>✓</span>
+          <Tap at={at} style={{ left: '50%', top: '50%' }} />
+        </>
+      ) : null}
+    </span>
+  )
+}
+
 function WalkPanel() {
   return (
     <div className="mx-auto w-full max-w-72 rounded-2xl border-4 border-ink-900 bg-paper p-3 shadow-lg" style={enter(1.3)}>
-      <div className="flex flex-col gap-2">
-          <div className="h-1 rounded-full bg-ink-100">
-            <div className="h-1 w-full rounded-full bg-accent-step" />
-          </div>
-          <p className="mono text-meta text-ink-600">Step 7 of 7</p>
-          <p className="mono flex items-center gap-2 text-meta uppercase text-ink-600">
-            Clear a jam <KindChip kind="step" />
-          </p>
-          <p className="text-reading font-semibold text-ink-900">Clear the label web at the peel plate.</p>
-          <div className="relative w-full overflow-hidden rounded-lg border border-ink-200" style={cropStyle}>
-            <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
-              <ellipse
-                cx="50"
-                cy="52"
-                rx="17"
-                ry="21"
-                pathLength={1}
-                fill="none"
-                vectorEffect="non-scaling-stroke"
-                className="stroke-accent-hazard"
-                style={{ strokeWidth: 3, strokeDasharray: 1, animation: 'reel-draw 0.9s ease-in-out 1.8s both' }}
-              />
-            </svg>
-            <span className="absolute left-2 top-2 rounded bg-accent-hazard px-2 py-0.5 text-micro font-semibold text-white" style={enter(2.4)}>
-              Jam point
-            </span>
-            <span className="absolute bottom-2 right-2 flex items-center gap-1 rounded bg-paper/90 px-2 py-0.5 text-micro font-semibold text-ink-900" style={enter(2.6)}>
-              <Camera size={12} /> Photo added
-            </span>
-          </div>
-          <div className="grid">
-            <span
-              className="reel-gone relative col-start-1 row-start-1 flex min-h-tap-glove w-full items-center justify-center rounded-lg bg-ink-900 text-reading font-semibold text-paper"
-              style={leave(3.3)}
-            >
-              {primaryLabel('step', true)}
-              <Tap at={2.9} style={{ left: '50%', top: '50%' }} />
-            </span>
-            <span className="col-start-1 row-start-1 flex min-h-tap-glove items-center gap-2 rounded-lg bg-accent-ok/10 px-3" style={enter(3.4)}>
-              <CheckCircle className="size-6 shrink-0 text-accent-ok" aria-hidden="true" />
-              <span className="text-left">
-                <span className="block text-ui font-semibold text-ink-900">Sent for sign-off</span>
-                <span className="block text-meta text-ink-700">Your supervisor will check it.</span>
-              </span>
-            </span>
-          </div>
+      <div className="flex items-center gap-2 border-b border-ink-200 pb-2">
+        <Wordmark size="bar" />
+        <span className="grid font-label text-meta text-ink-700">
+          <span className="reel-gone col-start-1 row-start-1" style={leave(3.1)}>
+            2 of 4 ticked
+          </span>
+          <span className="col-start-1 row-start-1" style={enter(3.2)}>
+            3 of 4 ticked
+          </span>
+        </span>
       </div>
+      <ol className="flex flex-col">
+        {RUN.map(([kind, text], i) => (
+          <li key={text} className={`flex gap-2 border-b border-ink-200 py-2 ${i === 2 ? 'rounded-lg border-transparent bg-paper-2 px-1.5' : ''}`}>
+            <Box done={i < 2} at={i === 2 ? 2.9 : undefined} />
+            <span className="min-w-0 flex-1">
+              <KindChip kind={kind} />
+              <span className="mt-0.5 block text-meta text-ink-900">{text}</span>
+              {i === 2 && (
+                <>
+                  <span className="relative mt-1.5 block w-full overflow-hidden rounded-lg border border-ink-200" style={cropStyle}>
+                    <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
+                      <ellipse
+                        cx="50"
+                        cy="52"
+                        rx="17"
+                        ry="21"
+                        pathLength={1}
+                        fill="none"
+                        vectorEffect="non-scaling-stroke"
+                        className="stroke-accent-hazard"
+                        style={{ strokeWidth: 3, strokeDasharray: 1, animation: 'reel-draw 0.9s ease-in-out 1.8s both' }}
+                      />
+                    </svg>
+                    <span className="absolute bottom-1.5 right-1.5 flex items-center gap-1 rounded bg-paper/90 px-2 py-0.5 text-micro font-semibold text-ink-900" style={enter(2.4)}>
+                      <Camera size={12} /> Photo added
+                    </span>
+                  </span>
+                  <span className="mt-1 block text-micro text-ink-600">Tick: {tickLabel(kind)}</span>
+                </>
+              )}
+            </span>
+          </li>
+        ))}
+      </ol>
+      <span className="mt-2 flex min-h-tap items-center gap-2 rounded-lg bg-accent-ok/10 px-3" style={enter(3.6)}>
+        <CheckCircle className="size-5 shrink-0 text-accent-ok" aria-hidden="true" />
+        <span className="text-ui font-semibold text-ink-900">Sent for sign-off</span>
+      </span>
     </div>
   )
 }

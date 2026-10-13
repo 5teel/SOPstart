@@ -5,7 +5,6 @@
  * superseded versions show here (a live SOP is read and run on the home), so there is no start.
  * Text renders as plain React children only.
  */
-import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { History, Lightbulb } from 'lucide-react'
 import { BEFORE_YOU_START, type WalkEntry } from '@/lib/sop/focus'
@@ -16,23 +15,15 @@ import { StandardLabels } from '@/components/sop/StandardLabels'
 import { ObjectiveLine } from '@/components/shell/ObjectiveLine'
 import { placementLabel, placementSummary } from '@/lib/sop/placement'
 
-// Make a request: a lazy module (60 A-07), live SOPs only, never in the walk state.
-const RequestTrigger = dynamic(() => import('@/components/requests/RequestComposer').then((m) => m.RequestComposerTrigger), {
-  ssr: false,
-  loading: () => null,
-})
-
 export interface BrowseDocumentProps {
   data: FocusSop
   order: WalkEntry<FocusStepRow>[]
   from: string | null
-  /** The live version this one was replaced by (D-14). Hides start. */
+  /** The live version this one was replaced by (D-14). */
   supersededBy?: { id: string; version: number } | null
-  /** D-12: a newer version was published since this worker last did it. */
-  updatedSinceLastWalk?: boolean
 }
 
-export function BrowseDocument({ data, order, from, supersededBy, updatedSinceLastWalk }: BrowseDocumentProps) {
+export function BrowseDocument({ data, order, from, supersededBy }: BrowseDocumentProps) {
   const { sop, totalMinutes } = data
   const summary = [`${order.length} ${order.length === 1 ? 'step' : 'steps'}`, totalMinutes > 0 ? `about ${Math.round(totalMinutes)} min` : null]
     .filter(Boolean)
@@ -63,23 +54,9 @@ export function BrowseDocument({ data, order, from, supersededBy, updatedSinceLa
             {placementLabel(placementSummary(sop.placement, data.machines.map((m) => ({ name: m.name, department: m.department }))))}
           </p>
           {data.objective && <ObjectiveLine view={data.objective} />}
-          {updatedSinceLastWalk && (
-            <p data-testid="focus-updated" className="flex items-center gap-2 text-ui text-ink-700">
-              Updated since you last did it
-            </p>
-          )}
           {data.standards.sop.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
               <StandardLabels names={data.standards.sop.map((s) => s.name)} />
-            </div>
-          )}
-          {sop.status === 'published' && !supersededBy && (
-            <div className="self-start">
-              <RequestTrigger
-                kinds={['change_sop', 'observe_me']}
-                about={{ sops: [{ id: sop.id, title: sop.title ?? 'this SOP' }] }}
-                triggerStyle="text"
-              />
             </div>
           )}
         </div>

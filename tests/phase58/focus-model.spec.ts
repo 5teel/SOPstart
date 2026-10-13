@@ -10,7 +10,6 @@ import {
   isReachable,
   reviewMissing,
   kindLabel,
-  primaryLabel,
   tickLabel,
   railNumber,
   hashInput,
@@ -86,12 +85,7 @@ test.describe('review gaps', () => {
 })
 
 test.describe('labels', () => {
-  test('primary label per kind, and the last step always reviews', () => {
-    expect(primaryLabel('hazard', false)).toBe('I understand — continue')
-    expect(primaryLabel('ppe', false)).toBe("I'm wearing it — continue")
-    expect(primaryLabel('step', false)).toBe('Done — next step')
-    expect(primaryLabel('check', false)).toBe('Confirmed — next step')
-    for (const k of ['hazard', 'ppe', 'step', 'check'] as const) expect(primaryLabel(k, true)).toBe('Done — review')
+  test('tick label per kind', () => {
     // ADR-0012: the run checklist's tick names
     expect(tickLabel('hazard')).toBe('I understand the hazard')
     expect(tickLabel('ppe')).toBe("I'm wearing it")

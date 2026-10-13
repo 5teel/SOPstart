@@ -116,15 +116,6 @@ const KIND_LABEL: Record<FocusKind, string> = { hazard: 'Hazard', ppe: 'PPE', st
 
 export const kindLabel = (kind: FocusKind): string => KIND_LABEL[kind]
 
-const PRIMARY: Record<FocusKind, string> = {
-  hazard: 'I understand — continue',
-  ppe: "I'm wearing it — continue",
-  step: 'Done — next step',
-  check: 'Confirmed — next step',
-}
-
-export const primaryLabel = (kind: FocusKind, isLast: boolean): string => (isLast ? 'Done — review' : PRIMARY[kind])
-
 const TICK: Record<FocusKind, string> = { hazard: 'I understand the hazard', ppe: "I'm wearing it", step: 'Done', check: 'Confirmed' }
 
 /** ADR-0012: what ticking a step says, by kind (the run checklist's tick box). */

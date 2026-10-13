@@ -6,7 +6,6 @@ import { focusHref } from '@/lib/sop/focus-path'
 import { formatHome, homeFromToken } from '@/lib/shell/home-state'
 import { latestPublishedOf, resolveFocusTarget, type LineageRow } from '@/lib/sop/lineage-current'
 import { memberLabel, userLabels } from '@/lib/members/labels'
-import { toWalkState, WALK_COLUMNS } from '@/lib/sop/walk-read'
 import type { ParseJobSnapshot } from '@/hooks/useParseJob'
 import type { ParseJobStatus } from '@/types/sop'
 import { FocusWalker } from '@/components/focus/FocusWalker'
@@ -55,7 +54,6 @@ export default async function SopFocusPage({
     .eq('organisation_id', organisationId)
     .or(`id.eq.${root},parent_sop_id.eq.${root}`)
   const lineage = (family ?? []) as LineageRow[]
-  const lineageIds = lineage.map((r) => r.id)
 
   // Edit mode: asked for, or an admin opening a SOP that is still being read. The
   // server decides; a refusal falls back to the worker resolution (drafts stay hidden).
@@ -70,33 +68,21 @@ export default async function SopFocusPage({
     if (draft) redirect(focusHref(draft.id, { mode: 'edit', from }))
   }
 
-  const [walksRes, completionsRes, jobRes] = await Promise.all([
-    supabase
-      .from('sop_walks')
-      .select(WALK_COLUMNS)
-      .eq('organisation_id', organisationId)
-      .eq('worker_id', userId)
-      .eq('status', 'in_progress')
-      .in('sop_id', lineageIds),
-    // A rejected walk is not done (59 A-06), same as the competency reads.
-    supabase.from('sop_completions').select('sop_id').neq('status', 'rejected').eq('worker_id', userId).in('sop_id', lineageIds),
+  const jobRes =
     editing && requested.status !== 'published'
-      ? supabase
+      ? await supabase
           .from('parse_jobs')
           .select('status, error_message, current_stage, file_type, input_type, created_at')
           .eq('sop_id', sopId)
           .order('created_at', { ascending: false })
           .limit(1)
           .maybeSingle()
-      : Promise.resolve({ data: null }),
-  ])
-  const walks = walksRes.data ?? []
+      : { data: null }
 
   let target = resolveFocusTarget({
     role: role ?? 'worker',
     requestedId: sopId,
     lineage,
-    inProgressSopId: walks[0]?.sop_id ?? null,
   })
   if (editing) {
     // The exact row, whatever the worker resolution would have said (an approver editing a draft).
@@ -110,7 +96,7 @@ export default async function SopFocusPage({
   const data = await loadFocusSop(supabase, target.id)
   if (!data) notFound()
 
-  // The owner's name only goes to people who can open the editor (T-59-30): never browse or walk.
+  // The owner's name only goes to people who can open the editor (T-59-30): never the read-only document.
   const ownerId = data.sop.owner_user_id
   const owner =
     editing || isAdminRole
@@ -120,28 +106,14 @@ export default async function SopFocusPage({
         }
       : null
 
-  const walkRow = walks.find((w) => w.sop_id === target.id)
-  const walk = walkRow ? toWalkState(walkRow) : null
-
-  // A walk in progress finishes on the version it started on (D-12): it is live for that worker.
   const published = data.sop.status === 'published'
   const latest = latestPublishedOf(lineage, target.id)
-  const superseded = published && target.superseded && !walk
+  const superseded = published && target.superseded
   const versionState = !published ? 'draft' : superseded ? 'superseded' : 'live'
 
-  // ADR-0012: a live SOP is read and run in one place, the home view. This page keeps editing and
-  // draft / superseded versions only.
-  // ponytail: a run left on an older version (D-12) opens on the home's current row; carry the
-  // version id through if workers report losing a mid-run republish.
+  // ADR-0012: a live SOP is read and run in one place, the home view, always on its latest
+  // version. This page keeps editing and draft / superseded versions only.
   if (!editing && versionState === 'live') redirect(formatHome({ ...homeFromToken(from), s: 'sops', sop: target.id }))
-
-  // D-12: the worker has finished an earlier version of this SOP and not this one.
-  const doneOn = new Set((completionsRes.data ?? []).map((c) => c.sop_id as string))
-  const thisVersion = data.sop.version
-  const updatedSinceLastWalk =
-    published &&
-    !doneOn.has(target.id) &&
-    lineage.some((r) => doneOn.has(r.id) && (r.version ?? 0) < thisVersion)
 
   // The editor's first look: still being read, or ready to edit.
   const jobRow = jobRes.data as {
@@ -167,19 +139,18 @@ export default async function SopFocusPage({
     (data.sop.status === 'uploading' || data.sop.status === 'parsing' || (!!job && ['queued', 'processing', 'failed'].includes(job.status ?? '')))
   const initialMode = editing ? (stillReading ? 'parsing' : 'edit') : 'browse'
 
-  // The Walk / Edit switch and the editor's tick, AI check and Publish are for admins and safety
+  // The Read / Edit switch and the editor's tick, AI check and Publish are for admins and safety
   // managers only (D-06): an approver with edit access sees the editor, never the switch.
   // In browse the session client already proved the row is in the caller's organisation.
   const canEdit = isAdminRole && (editCtx ? editing : true)
 
   return (
     <FocusWalker
-      key={`${target.id}:${walk?.id ?? 'none'}`}
+      key={target.id}
       data={data}
       from={from}
       versionState={versionState}
       supersededBy={superseded && latest ? { id: latest.id, version: latest.version ?? 0 } : null}
-      updatedSinceLastWalk={updatedSinceLastWalk}
       initialMode={initialMode}
       job={job}
       canEdit={canEdit}

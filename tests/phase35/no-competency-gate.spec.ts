@@ -5,8 +5,8 @@
  * swapped to the competency_state/competencyState field names.
  *
  * Targets worker-facing files:
- *   - the focus screen worker files (58-15: frame, browse document, walker,
- *     walk steps, review/send panels, useWalk, walk actions)
+ *   - the worker files (58-15, ADR-0012: the focus frame and read-only document,
+ *     the home Read view, useRun, walk actions)
  *   - the worker SOP detail/walkthrough route page.tsx
  *   - src/components/profile/CompetencySection.tsx (not yet created --
  *     lands in plan 35-04; guarded with fs.existsSync + test.skip so Wave 1

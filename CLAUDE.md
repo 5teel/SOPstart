@@ -4,7 +4,7 @@
 
 ## What it is
 
-Multi-tenant SaaS PWA for New Zealand industrial sites (glass, packaging, machine shops; 50-500 SOPs). Admins upload Word/PDF SOPs, AI parses them into structured procedures, workers follow them on phone or desktop with photo capture, completion records and supervisor sign-off. Current shape: one SOP-first home (`/`) plus the SOP focus screen; see `.planning/HANDOFF.md` for where work stopped.
+Multi-tenant SaaS PWA for New Zealand industrial sites (glass, packaging, machine shops; 50-500 SOPs). Admins upload Word/PDF SOPs, AI parses them into structured procedures, workers follow them on phone or desktop with photo capture, completion records and supervisor sign-off. Current shape: one SOP-first home (`/`) where SOPs are read and run, plus the SOP page for editing; see `.planning/HANDOFF.md` for where work stopped.
 
 ## Stack
 
@@ -18,11 +18,11 @@ Multi-tenant SaaS PWA for New Zealand industrial sites (glass, packaging, machin
 
 ## Map
 
-- `src/app/` — `/` home, `welcome/`, `(auth)/` (login, sign-up, invite, join), `(protected)/` (`sops/[sopId]` focus screen with Browse / Walk / `?mode=edit`; `activity/[completionId]`; `admin/` sops new + upload, settings, ai-settings, agent; `pathways`, `uat`, `profile`, `pending`), `api/sops/` (parse, ai-prompt, restructure, transcribe, `[sopId]`)
-- `src/components/` — `home/` (HomeShell, SectionMenu, TabBar, SopList, ReadView, SiteMap), `focus/` (frame, browse, walk, lazy `admin/` editor), `sop/`, `brand/Wordmark.tsx`, `activity/`, `office/`, `requests/`
+- `src/app/` — `/` home, `welcome/`, `(auth)/` (login, sign-up, invite, join), `(protected)/` (`sops/[sopId]`: editor and draft / superseded versions, live SOPs redirect to the home; `activity/[completionId]`; `admin/` sops new + upload, settings, ai-settings, agent; `pathways`, `uat`, `profile`, `pending`), `api/sops/` (parse, ai-prompt, restructure, transcribe, `[sopId]`)
+- `src/components/` — `home/` (HomeShell, SectionMenu, TabBar, SopList, ReadView, SiteMap), `focus/` (frame, read-only document, lazy `admin/` editor), `sop/`, `brand/Wordmark.tsx`, `activity/`, `office/`, `requests/`
 - `src/actions/` — server actions (every export is a public POST endpoint)
 - `src/lib/` — `library/` (areas, isometric layout), `parsers/`, `supabase/` (client, server, admin, middleware), `auth/` (`getSessionContext`, `guards.ts`), `decisions/record.ts`, `validators/`
-- `src/hooks/` — `useWalk`, `useStepPhotos`, `useFocusSop`, `useReadSop`, `useLibrary`, `useCompletions`, `useFocusAutosave` …
+- `src/hooks/` — `useRun`, `useStepPhotos`, `useFocusSop`, `useReadSop`, `useLibrary`, `useCompletions`, `useFocusAutosave` …
 - For anything deeper: `graphify-out/GRAPH_REPORT.md`, `.planning/codebase/`.
 
 ## Data model essentials

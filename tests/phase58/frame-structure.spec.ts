@@ -143,7 +143,8 @@ test.describe('FOC-01/FOC-03 focus frame', () => {
   test('the read-only document has no start (ADR-0012) and keeps its notices (D-05, D-14)', () => {
     const BROWSE = read('src/components/focus/BrowseDocument.tsx')
     expect(stripComments(BROWSE)).not.toContain('aria-label="start"')
-    expect(BROWSE).toContain('Updated since you last did it')
+    // Only admins reach it (drafts and old versions), so the worker's "updated since" line left with the walk screen.
+    expect(BROWSE).not.toContain('Updated since you last did it')
     expect(BROWSE).toContain('This SOP has no steps yet.')
     // Browse creates no completion.
     expect(stripComments(BROWSE)).not.toMatch(/startWalk|submitCompletion|@\/actions/)
@@ -177,9 +178,9 @@ test.describe('FOC-01/FOC-03 focus frame', () => {
     expect(W).not.toMatch(/@\/components\/focus\/admin/)
   })
 
-  test('the page passes the mode, the job and canEdit to the walker, and the walker is still keyed to the SOP and the walk (58-13)', () => {
+  test('the page passes the mode, the job and canEdit to the walker, keyed to the SOP (58-13, ADR-0012)', () => {
     const code = stripComments(read('src/app/(protected)/sops/[sopId]/page.tsx'))
-    for (const prop of ['initialMode={initialMode}', 'job={job}', 'canEdit={canEdit}', "key={`${target.id}:${walk?.id ?? 'none'}`}"]) {
+    for (const prop of ['initialMode={initialMode}', 'job={job}', 'canEdit={canEdit}', 'key={target.id}']) {
       expect(code, prop).toContain(prop)
     }
   })
