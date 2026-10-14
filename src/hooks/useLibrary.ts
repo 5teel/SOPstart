@@ -12,7 +12,7 @@
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
-import { buildAreas, SITE_WIDE, type AreaDepartment, type AreaInputs, type AreaMachine, type LibraryArea } from '@/lib/library/areas'
+import { buildAreas, SITE_WIDE, SITE_WIDE_COLOUR, type AreaDepartment, type AreaInputs, type AreaMachine, type LibraryArea } from '@/lib/library/areas'
 import { sopTypeOf, type SopType } from '@/lib/library/sop-type'
 import { objectKindOf, type ObjectKind } from '@/lib/library/object-kind'
 import { rowStatus, type RowStatus } from '@/lib/library/status'
@@ -244,7 +244,7 @@ export function useLibrary(userId: string) {
         categorySlug: s.category_slug,
         areaId: area?.id ?? SITE_WIDE,
         areaName: area?.name ?? 'Site-wide',
-        colourVar: area?.colourVar ?? 'var(--area-1)',
+        colourVar: area?.colourVar ?? SITE_WIDE_COLOUR,
         type: sopTypeOf(s, linked.length > 0),
         kind: objectKindOf(linked[0]?.name ?? null),
         machine: linked[0]?.name ?? null,

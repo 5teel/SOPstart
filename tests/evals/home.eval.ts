@@ -548,7 +548,7 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
       const dots = page.getByTestId('dept-strip-dot')
       const n = await dots.count()
       expect(n).toBeGreaterThanOrEqual(2)
-      // Each dot is --area-N for its place in name order, the colour the map gives that area.
+      // Each dot is the area colour for its place in name order (steel is kept for Site-wide), the colour the map gives that area.
       const colours = await page.evaluate(() => {
         const probe = (v: string) => {
           const el = document.createElement('i')
@@ -559,10 +559,10 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
           return c
         }
         const dotColours = [...document.querySelectorAll('[data-testid="dept-strip-dot"]')].map((d) => getComputedStyle(d).backgroundColor)
-        return { dotColours, expected: dotColours.map((_, i) => probe(`var(--area-${(i % 8) + 1})`)) }
+        return { dotColours, expected: dotColours.map((_, i) => probe(`var(--area-${(i % 7) + 2})`)) }
       })
       expect(colours.dotColours).toEqual(colours.expected)
-      expect(new Set(colours.dotColours).size, 'departments are not all one default colour').toBe(Math.min(n, 8))
+      expect(new Set(colours.dotColours).size, 'departments are not all one default colour').toBe(Math.min(n, 7))
       // The canvas starts on screen, not under a stack of cards.
       const canvas = await page.getByTestId('site-save-status').boundingBox()
       expect(canvas?.y ?? 9999, 'the editor toolbar starts above the fold').toBeLessThan(DESKTOP.height * 0.6)

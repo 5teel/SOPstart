@@ -27,7 +27,7 @@ interface DepartmentsStripProps {
 
 const PACKING_LABEL = { balanced: 'Balanced', rows: 'Rows' } as const
 
-/** Departments in map order: each level by name, sub-areas under their parent. Index i wears --area-(i+1). */
+/** Departments in map order: each level by name, sub-areas under their parent. Index i wears areaColourVar(i). */
 export function treeOrder(departments: SiteDepartment[]): Array<{ dept: SiteDepartment; depth: number }> {
   const raw = new Map(departments.map((d) => [d.id, d.parent_id]))
   const parentOf = (id: string) => deptPath(raw, id).at(-2) ?? null

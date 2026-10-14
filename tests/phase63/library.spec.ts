@@ -60,7 +60,7 @@ test.describe('library classifier', () => {
     expect(areas.find((a) => a.name === 'Engineering')?.sopIds).toEqual([ALKALINE])
     expect(areas.find((a) => a.name === 'General')?.sopIds).toEqual([DOG])
     expect(areas.map((a) => a.index)).toEqual([1, 2, 3])
-    expect(areas.map((a) => a.colourVar)).toEqual(['var(--area-1)', 'var(--area-2)', 'var(--area-3)'])
+    expect(areas.map((a) => a.colourVar)).toEqual(['var(--area-2)', 'var(--area-3)', 'var(--area-4)'])
   })
 
   test('machines fall through when archived, missing or department-less; the first tag is by name', () => {
@@ -81,7 +81,7 @@ test.describe('library classifier', () => {
     expect(areaOf('a', inputs)).toBe(ENGINEERING)
   })
 
-  test('empty departments never draw, Site-wide is last and cycles colour after eight', () => {
+  test('empty departments never draw, Site-wide is last and steel; departments cycle the other seven', () => {
     expect(buildAreas([], real)).toEqual([])
     const depts = Array.from({ length: 9 }, (_, i) => ({ id: id(100 + i), name: `Dept ${i}`, archived: false }))
     const sops = [...depts.map((d, i) => `s${i}`), 'wide']
@@ -95,7 +95,9 @@ test.describe('library classifier', () => {
     expect(areas).toHaveLength(10)
     expect(areas[9].id).toBe(SITE_WIDE)
     expect(areas[9].name).toBe('Site-wide')
-    expect(areas[8].colourVar).toBe('var(--area-1)')
+    expect(areas[7].colourVar).toBe('var(--area-2)')
+    expect(areas[8].colourVar).toBe('var(--area-3)')
+    expect(areas[9].colourVar).toBe('var(--area-1)')
     expect(areas[8].index).toBe(9)
   })
 

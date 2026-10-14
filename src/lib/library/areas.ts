@@ -52,8 +52,13 @@ export interface LibraryArea {
 
 const byName = (a: string, b: string) => a.localeCompare(b, 'en', { sensitivity: 'base' })
 
-/** The one colour assignment: the i-th area (0-based) in name order. The map, key, list and Site & departments all use it. */
-export const areaColourVar = (i: number): string => `var(--area-${(i % 8) + 1})`
+/**
+ * The one colour assignment: the i-th department area (0-based) in name order cycles the seven
+ * colours after steel. The map, key, list and Site & departments all use it.
+ */
+export const areaColourVar = (i: number): string => `var(--area-${(i % 7) + 2})`
+/** Site-wide is always steel (--area-1), so it never changes with the department count. */
+export const SITE_WIDE_COLOUR = 'var(--area-1)'
 
 export function areaOf(sopId: string, inputs: AreaInputs): string {
   const active = new Map(inputs.departments.filter((d) => !d.archived).map((d) => [d.id, d]))
@@ -125,7 +130,7 @@ export function buildAreas(visibleSopIds: readonly string[], inputs: AreaInputs)
       depth: path.length - 1,
       total: all.reduce((s, q) => s + (q.includes(id) ? count(q) : 0), 0),
       index: i + 1,
-      colourVar: areaColourVar(i),
+      colourVar: id === SITE_WIDE ? SITE_WIDE_COLOUR : areaColourVar(i),
     }
   })
 }
