@@ -83,11 +83,22 @@ async function openAiCompatCall(
     body.tool_choice = { type: 'function', function: { name: opts.tool.name } }
   }
 
-  const res = await fetch(`${base}/chat/completions`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  })
+  const post = () =>
+    fetch(`${base}/chat/completions`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+  let res = await post()
+  // Thinking-mode models (e.g. Qwen 3.8) reject a forced tool_choice with a 400:
+  // retry once with `auto` — the tool is the only one offered.
+  if (res.status === 400 && body.tool_choice) {
+    const errText = await res.clone().text().catch(() => '')
+    if (/tool_choice/i.test(errText)) {
+      body.tool_choice = 'auto'
+      res = await post()
+    }
+  }
   if (!res.ok) {
     const errText = await res.text().catch(() => '')
     throw new Error(`${provider} ${res.status}: ${errText.slice(0, 400)}`)
