@@ -149,4 +149,19 @@ test.describe('design tokens — one source of truth', () => {
     expect(theme).toMatch(/\.signal-hazard \{ --signal: var\(--sign-warning\)/)
     expect(theme).toMatch(/\.signal-ppe \{ --signal: var\(--sign-mandatory\)/)
   })
+
+  // ADR-0014: the map's area hues, hazard paint and status marks stay off the AS 1319 sign colours.
+  test('the site map stays off the sign colours', () => {
+    const theme = fs.readFileSync(path.join(SRC, 'styles', 'blueprint-theme.css'), 'utf-8')
+    for (const [, c, h] of theme.matchAll(/--area-\d:\s*oklch\([\d.]+ ([\d.]+) ([\d.]+)\)/g)) {
+      const hue = Number(h)
+      const near = [25, 85, 150, 255].some((s) => Math.min(Math.abs(hue - s), 360 - Math.abs(hue - s)) < 20)
+      expect(near && Number(c) > 0.03, `area hue ${h}`).toBe(false)
+    }
+    const shapes = fs.readFileSync(path.join(SRC, 'components', 'home', 'map', 'MapShapes.tsx'), 'utf-8')
+    expect(shapes).toMatch(/'hazard-dark': \{ fill: 'var\(--sign-warning\)' \}/)
+    const status = fs.readFileSync(path.join(SRC, 'lib', 'library', 'status.ts'), 'utf-8')
+    const row = fs.readFileSync(path.join(SRC, 'components', 'home', 'SopRow.tsx'), 'utf-8')
+    for (const src of [status, row]) expect(src).not.toMatch(/accent-(signoff|step|ok)/)
+  })
 })

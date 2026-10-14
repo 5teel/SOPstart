@@ -6,7 +6,7 @@
  * Exports:
  *  - listDepartments()          — DepartmentWithCounts[] for the caller's org
  *  - createDepartment()         — insert with org_id from JWT
- *  - updateDepartment()         — name/code/colour/icon/owner/parent (ADR-0010)
+ *  - updateDepartment()         — name/code/icon/owner/parent (ADR-0010; colour is the map's area colour, ADR-0013)
  *  - archiveDepartment()        — flag-only, never DELETE (REQ-6)
  *  - setDepartmentOwner()       — must verify userId ∈ organisation_members (D-03, T-25-03)
  *  - assignMemberDepartments()  — replace-semantics junction write (REQ-4)
@@ -64,7 +64,6 @@ const UpdateDepartmentInput = z.object({
   id:          z.string().uuid(),
   name:        z.string().min(1).max(100).optional(),
   code:        z.string().min(1).max(6).transform(v => v.toUpperCase()).optional(),
-  colour:      z.enum(DEPT_COLOURS).optional(),
   icon:        z.string().max(4).nullable().optional(),
   ownerUserId: z.string().uuid().nullable().optional(),
   /** ADR-0010: the department this one sits inside on the site map; null is top level. */
@@ -246,7 +245,6 @@ export async function updateDepartment(
   const updates: Record<string, any> = { updated_at: new Date().toISOString() }
   if (parsed.data.name        !== undefined) updates.name          = parsed.data.name
   if (parsed.data.code        !== undefined) updates.code          = parsed.data.code
-  if (parsed.data.colour      !== undefined) updates.colour        = parsed.data.colour
   if (parsed.data.icon        !== undefined) updates.icon          = parsed.data.icon
   if (parsed.data.ownerUserId !== undefined) updates.owner_user_id = parsed.data.ownerUserId
   if (parsed.data.parentId    !== undefined) {

@@ -271,7 +271,8 @@ export default function SiteEditor({
           {machines.flatMap((m) => {
             const polygon = dragPolygon && m.id === selectedId ? dragPolygon : m.polygon
             const points = polygon.flat()
-            const colour = m.colour ?? tokens.zone
+            // Area colours arrive as CSS variable references; the canvas needs the resolved value.
+            const colour = (m.colour?.startsWith('var(') ? getComputedStyle(document.documentElement).getPropertyValue(m.colour.slice(4, -1)).trim() : m.colour) || tokens.zone
             const isSelected = m.id === selectedId
             const [cx, cy] = centroid(polygon)
             return [

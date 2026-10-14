@@ -580,8 +580,8 @@ export const JOURNEYS: Journey[] = [
     summary: 'An admin creates departments, gives them people and an owner, and uses them to organise SOPs and the site map.',
     steps: [
       { id: 's', type: 'start', label: 'Need to organise by department' },
-      { id: 'depts', type: 'screen', label: 'Departments strip — edit mode', route: '/', detail: 'Manage SOPs with view=site carries the departments strip: add, rename, recolour, remove. The old /admin/departments address redirects there.' },
-      { id: 'create', type: 'action', label: 'Create department', detail: 'A name and a colour.' },
+      { id: 'depts', type: 'screen', label: 'Departments strip — edit mode', route: '/', detail: 'Manage SOPs with view=site carries the departments strip: add, rename, remove; each department wears its map area colour. The old /admin/departments address redirects there.' },
+      { id: 'create', type: 'action', label: 'Create department', detail: 'A name; the colour follows the map.' },
       { id: 'owner', type: 'action', label: 'Add people and an owner', detail: 'In People, open a person: their departments, and Owner on one of them.' },
       { id: 'e', type: 'end', label: 'Department ready' },
     ],

@@ -19,7 +19,7 @@ import { HEIGHT, TILE, project } from '@/lib/library/iso'
 import { machineArt, objectBox } from '@/lib/library/site-art'
 import { inArea, type LibraryArea } from '@/lib/library/areas'
 import type { ObjectKind } from '@/lib/library/object-kind'
-import type { RowStatus } from '@/lib/library/status'
+import { STATUS_GLYPH, type RowStatus } from '@/lib/library/status'
 import { MapKey } from './MapKey'
 import { Bay, MapObject, PLATE_H, Plate } from './MapShapes'
 
@@ -47,13 +47,6 @@ export interface SiteMapProps {
   renderObjective?(areaId: string | null): ReactNode
   /** Drawing size in CSS px before it is measured (first paint / static renders). Default 660 x 700. */
   initialSize?: { w: number; h: number }
-}
-
-const STATUS_FILL: Record<RowStatus['kind'], string> = {
-  signed: 'var(--accent-signoff)',
-  waiting: 'var(--accent-decision)',
-  updated: 'var(--accent-step)',
-  stopped: 'var(--ink-900)',
 }
 
 // A floor's top face as an affine map of plan coordinates, so painted lines and walkways lie on it.
@@ -439,8 +432,8 @@ export function SiteMap({ areas, rows, area, onArea, onOpenSop, orgName, packing
                 {clip(l.row.title, 28)}
               </text>
               {l.row.status && (
-                <text x={l.lx} y={l.ly + l.fs * 1.15} textAnchor="middle" fontSize={l.fs * 0.82} style={{ fill: STATUS_FILL[l.row.status.kind] }}>
-                  ● {clip(l.row.status.text.split(' · ')[0], 30)}
+                <text x={l.lx} y={l.ly + l.fs * 1.15} textAnchor="middle" fontSize={l.fs * 0.82} style={{ fill: STATUS_GLYPH[l.row.status.kind][1] }}>
+                  {STATUS_GLYPH[l.row.status.kind][0]} {clip(l.row.status.text.split(' · ')[0], 30)}
                 </text>
               )}
             </g>

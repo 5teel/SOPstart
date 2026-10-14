@@ -9,11 +9,16 @@ import { useQueryClient } from '@tanstack/react-query'
 import type { LibraryRow } from '@/hooks/useLibrary'
 import type { RowStatus } from '@/lib/library/status'
 
+/**
+ * The status mark, sized and shaped here (ADR-0013): only "waiting" carries a colour (caution amber);
+ * the rest are ink, told apart by shape. Green and blue belong to the AS 1319 signs.
+ * The map draws the same marks from STATUS_GLYPH (`@/lib/library/status`).
+ */
 export const DOT: Record<RowStatus['kind'], string> = {
-  signed: 'bg-accent-signoff',
-  waiting: 'bg-accent-decision',
-  updated: 'bg-accent-step',
-  stopped: 'bg-ink-900',
+  signed: 'size-2 shrink-0 bg-ink-900',
+  waiting: 'size-2 shrink-0 rotate-45 bg-accent-decision',
+  updated: 'size-2 shrink-0 rounded-full border border-ink-900',
+  stopped: 'size-2 shrink-0 rounded-full bg-ink-900',
 }
 
 export function SopRow({
@@ -60,7 +65,7 @@ export function SopRow({
           {status && (
             <span data-testid="sop-row-status" className="inline-flex items-center gap-1.5">
               <span aria-hidden="true">·</span>
-              <i aria-hidden="true" className={`size-2 shrink-0 rounded-full ${DOT[status.kind]}`} />
+              <i aria-hidden="true" className={DOT[status.kind]} />
               {status.text}
             </span>
           )}

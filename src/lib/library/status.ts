@@ -35,3 +35,11 @@ export function rowStatus(i: RowStatusInput): RowStatus | null {
   if (c.status === 'signed_off') return { kind: 'signed', text: `Signed off ${nzDay(c.submittedAt, i.now)}` }
   return null
 }
+
+/** The status marks as text glyphs for the SVG map, matching SopRow's DOT (ADR-0013): only waiting is coloured. */
+export const STATUS_GLYPH: Record<RowStatus['kind'], [glyph: string, fill: string]> = {
+  signed: ['■', 'var(--ink-900)'],
+  waiting: ['◆', 'var(--accent-decision)'],
+  updated: ['○', 'var(--ink-900)'],
+  stopped: ['●', 'var(--ink-900)'],
+}

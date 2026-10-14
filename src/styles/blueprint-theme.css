@@ -208,15 +208,19 @@
   /* Library areas on the site map, assigned in order. A data palette, distinct
    * from the semantic accents: an area colour says WHERE in the library, never
    * whether something is wrong. Design base 2026-10-10: one muted lightness and
-   * chroma, eight hues, so no area shares a value with a safety accent. */
-  --area-1: oklch(0.62 0.07 210);
-  --area-2: oklch(0.62 0.07 255);
-  --area-3: oklch(0.62 0.07 300);
-  --area-4: oklch(0.62 0.07 175);
-  --area-5: oklch(0.62 0.07 140);
-  --area-6: oklch(0.62 0.02 260);
-  --area-7: oklch(0.62 0.07 75);
-  --area-8: oklch(0.62 0.07 0);
+   * chroma, eight hues, so no area shares a value with a safety accent. ADR-0013: no area
+   * sits on an AS 1319 sign hue (red ~25, yellow ~85, green ~150, blue ~255). */
+  --area-1: oklch(0.62 0.05 210);  /* steel */
+  --area-2: oklch(0.62 0.05 330);  /* mauve */
+  --area-3: oklch(0.62 0.05 300);  /* plum */
+  --area-4: oklch(0.62 0.05 175);  /* teal */
+  --area-5: oklch(0.62 0.02 60);   /* stone */
+  --area-6: oklch(0.62 0.02 260);  /* slate */
+  --area-7: oklch(0.62 0.05 50);   /* clay */
+  --area-8: oklch(0.62 0.05 115);  /* olive */
+
+  /* Map packaging (cardboard): a neutral sand, not a safety colour. */
+  --map-card: oklch(0.78 0.035 70);
 }
 
 /* ---------- SCOPED ONLY UNDER body[data-theme="paper"] ---------- */

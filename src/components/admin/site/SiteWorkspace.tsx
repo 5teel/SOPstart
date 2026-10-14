@@ -15,6 +15,8 @@ import { SiteEditorLoader } from './SiteEditorLoader'
 import { deleteSiteMachine, setSopMachines, upsertSiteMachine } from '@/actions/site'
 import { createDepartment } from '@/actions/departments'
 import { DEPT_COLOURS } from '@/lib/site/departments'
+import { areaColourVar } from '@/lib/library/areas'
+import { treeOrder } from './DepartmentsStrip'
 import type { Point, SiteData, SiteDepartment, SiteMachine, SiteSopOption, SopMachineLink } from '@/lib/validators/site'
 import type { SceneEditorMachine } from '@/lib/site/scene'
 
@@ -236,11 +238,13 @@ export function SiteWorkspace({ layout, machines: initialMachines, links: initia
   }
 
   const deptById = new Map(departments.map((d) => [d.id, d]))
+  // A department wears its map area colour (ADR-0013), not the stored column.
+  const areaColour = new Map(treeOrder(departments).map(({ dept }, i) => [dept.id, areaColourVar(i)]))
   const sceneMachines: SceneEditorMachine[] = machines.map((m) => ({
     id: m.id,
     name: m.name,
     polygon: m.polygon,
-    colour: m.department_id ? (deptById.get(m.department_id)?.colour ?? null) : null,
+    colour: m.department_id ? (areaColour.get(m.department_id) ?? null) : null,
   }))
 
   return (
@@ -339,7 +343,7 @@ export function SiteWorkspace({ layout, machines: initialMachines, links: initia
                       <span className="min-w-0 flex-1">
                         <span className="block truncate font-label text-ui text-ink-900">{machine.name}</span>
                         <span className="mt-0.5 flex items-center gap-1.5 text-meta text-ink-500">
-                          {dept && <span className="h-2 w-2 rounded-full" style={{ backgroundColor: dept.colour }} />}
+                          {dept && <span className="h-2 w-2 rounded-full" style={{ backgroundColor: areaColour.get(dept.id) }} />}
                           {dept ? dept.name : 'No department'}
                         </span>
                       </span>

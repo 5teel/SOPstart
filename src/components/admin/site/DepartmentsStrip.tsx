@@ -1,9 +1,10 @@
 'use client'
 
 /**
- * Phase 57 (D-08, D-22, PLC-05): add, rename, recolour and remove departments
- * from the site editor -- no departments screen. A department is a name and a
- * colour; its zone stays the hull of its machines. Remove is refused by the
+ * Phase 57 (D-08, D-22, PLC-05): add, rename and remove departments
+ * from the site editor -- no departments screen. A department is a name; its
+ * colour is its map area colour by order (ADR-0013 retired the picker: an admin
+ * could paint a department a safety-sign colour). Its zone stays the hull of its machines. Remove is refused by the
  * server while a machine, a SOP visibility rule, a person or a library item
  * still uses it.
  *
@@ -26,8 +27,8 @@ interface DepartmentsStripProps {
 
 const PACKING_LABEL = { balanced: 'Balanced', rows: 'Rows' } as const
 
-/** Departments in map order: each level by name, sub-areas under their parent. */
-function treeOrder(departments: SiteDepartment[]): Array<{ dept: SiteDepartment; depth: number }> {
+/** Departments in map order: each level by name, sub-areas under their parent. Index i wears --area-(i+1). */
+export function treeOrder(departments: SiteDepartment[]): Array<{ dept: SiteDepartment; depth: number }> {
   const raw = new Map(departments.map((d) => [d.id, d.parent_id]))
   const parentOf = (id: string) => deptPath(raw, id).at(-2) ?? null
   const byName = (a: SiteDepartment, b: SiteDepartment) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' })
@@ -66,19 +67,6 @@ function DepartmentRow({ dept, areaIndex, depth, parents, onChanged }: { dept: S
     if ('error' in result) {
       setName(dept.name)
       setMessage("Couldn't rename - try again")
-      return
-    }
-    onChanged()
-  }
-
-  async function pickColour(colour: (typeof DEPT_COLOURS)[number]) {
-    if (colour === dept.colour) return
-    setPending(true)
-    setMessage(null)
-    const result = await updateDepartment({ id: dept.id, colour })
-    setPending(false)
-    if ('error' in result) {
-      setMessage("Couldn't change the colour - try again")
       return
     }
     onChanged()
@@ -160,22 +148,6 @@ function DepartmentRow({ dept, areaIndex, depth, parents, onChanged }: { dept: S
           ))}
         </select>
       </label>
-      <div className="flex flex-wrap gap-1.5">
-        {DEPT_COLOURS.map((colour) => (
-          <button
-            key={colour}
-            type="button"
-            data-testid="dept-strip-colour"
-            data-colour={colour}
-            aria-label={`Colour ${colour}`}
-            aria-pressed={colour === dept.colour}
-            disabled={pending}
-            onClick={() => void pickColour(colour)}
-            className={`h-6 w-6 rounded-full border ${colour === dept.colour ? 'border-ink-900' : 'border-ink-200'}`}
-            style={{ backgroundColor: colour }}
-          />
-        ))}
-      </div>
       {refused && (
         <p data-testid="dept-strip-refused" role="alert" className="text-meta text-accent-hazard">
           {refused}

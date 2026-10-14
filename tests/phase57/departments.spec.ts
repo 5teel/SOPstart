@@ -127,12 +127,14 @@ const WORKSPACE = read('src', 'components', 'admin', 'site', 'SiteWorkspace.tsx'
 const EMPTY = read('src', 'components', 'admin', 'site', 'SiteEmptyState.tsx')
 
 test.describe('PLC-05 strip', () => {
-  test('one row per department with a dot, rename, eight colours and remove', () => {
-    for (const id of ['dept-strip"', 'dept-strip-row', 'dept-strip-rename', 'dept-strip-colour', 'dept-strip-remove', 'dept-strip-refused', 'dept-strip-add-name', 'dept-strip-add"']) {
+  test('one row per department with a dot, rename and remove; no colour picker (ADR-0013)', () => {
+    for (const id of ['dept-strip"', 'dept-strip-row', 'dept-strip-rename', 'dept-strip-remove', 'dept-strip-refused', 'dept-strip-add-name', 'dept-strip-add"']) {
       expect(STRIP, id).toContain(`data-testid="${id.replace(/"$/, '')}"`)
     }
     expect(STRIP).toContain('data-dept-id={dept.id}')
-    expect(STRIP).toContain('DEPT_COLOURS.map(')
+    expect(STRIP).not.toContain('dept-strip-colour')
+    expect(STRIP).not.toContain('pickColour')
+    expect(ACTIONS).not.toContain('updates.colour')
   })
 
   test('no literal hex in the strip', () => {
@@ -141,13 +143,11 @@ test.describe('PLC-05 strip', () => {
 
   test('each control is wired to a named handler that calls the action', () => {
     expect(STRIP).toMatch(/onClick=\{\(\) => void handleRemove\(\)\}/)
-    expect(STRIP).toMatch(/onClick=\{\(\) => void pickColour\(colour\)\}/)
     expect(STRIP).toMatch(/onClick=\{\(\) => void handleAdd\(\)\}/)
     expect(STRIP).toMatch(/onBlur=\{\(\) => void commitRename\(\)\}/)
     expect(STRIP).toContain("if (e.key === 'Enter')")
     expect(STRIP).toMatch(/async function handleRemove[\s\S]*?archiveDepartment\(/)
     expect(STRIP).toMatch(/async function commitRename[\s\S]*?updateDepartment\(/)
-    expect(STRIP).toMatch(/async function pickColour[\s\S]*?updateDepartment\(/)
     expect(STRIP).toMatch(/async function handleAdd[\s\S]*?createDepartment\(/)
   })
 

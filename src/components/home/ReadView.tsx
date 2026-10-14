@@ -156,7 +156,7 @@ export function ReadView({ row, role, from, onOpenSop }: { row: LibraryRow; role
         )}
         {status && !running && (
           <p data-testid="read-status" className="mt-3 flex items-center gap-1.5 text-ui text-ink-600">
-            <i aria-hidden="true" className={`size-2 shrink-0 rounded-full ${DOT[status.kind]}`} />
+            <i aria-hidden="true" className={DOT[status.kind]} />
             {status.text}
           </p>
         )}
