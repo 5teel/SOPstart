@@ -25,7 +25,7 @@ const DESKTOP = { width: 1440, height: 900 }
 const PHONE = { width: 390, height: 844 }
 const FRAMES = path.join(process.cwd(), '.planning', 'evals', 'latest')
 /** Moments (ms after the tap, x4 slow) the merge is photographed: lift, gather x3, arm, say, settle. */
-const MARKS = [400, 1400, 2400, 3200, 4300, 6500, 9000]
+const MARKS = [400, 2000, 4000, 6300, 9000, 11500, 15500]
 
 let cookies: Awaited<ReturnType<BrowserContext['cookies']>> | null = null
 
@@ -189,7 +189,7 @@ test.describe.serial('Phase 63 -- the SOPstart start (deployed)', () => {
       await expect(page.getByTestId('run-bar')).toBeVisible(SLOW)
       const reducedMs = Date.now() - t0
       console.log(`reduced start: running after ${reducedMs} ms`)
-      expect(shortMs - reducedMs, `short ${shortMs} ms vs cut ${reducedMs} ms`).toBeLessThan(1800)
+      expect(shortMs - reducedMs, `short ${shortMs} ms vs cut ${reducedMs} ms`).toBeLessThan(2800)
       expect(await layerSeen(page), 'reduced motion never touched the layer').toBe(0)
       await shot(page, '63-fuse-reduced')
       await page.getByTestId('run-stop').click()

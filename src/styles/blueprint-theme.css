@@ -192,15 +192,16 @@
   /* Motion: only where it shows a change of state, never while the user waits.
    * The Start merge, in order: the button body fades leaving "start"; SOP drops into line;
    * they slide together; the tape slides in from the left; the logo rises into the header.
-   * Full plays on the first Start of the day, short (x0.3) after; reduced motion = none. */
-  --ease-fuse:        cubic-bezier(.5, 0, .2, 1);
+   * Full plays on the first Start of the day, short (x0.6) after; reduced motion = none.
+   * Moves are slow enough to follow by eye, and the ease is symmetric: speeds up and slows down at the same rate. */
+  --ease-fuse:        cubic-bezier(.45, 0, .55, 1);
   --dur-fuse-fade:    180ms;
-  --dur-fuse-gather:  560ms;  /* ADR-0012: SOP and start travel to the pane's centre and grow */
-  --dur-fuse-tape:    420ms;
+  --dur-fuse-gather:  1400ms;  /* ADR-0012: SOP and start travel to the pane's centre and grow */
+  --dur-fuse-tape:    900ms;
   --dur-fuse-hold:    900ms;  /* full merge only: the caption reads */
-  --dur-fuse-rise:    480ms;
+  --dur-fuse-rise:    1200ms;
   --fuse-hero-max:    520px;  /* the joined wordmark's widest, centred in the SOP's pane */
-  --fuse-short-scale: 0.3;
+  --fuse-short-scale: 0.6;
   --dur-map-zoom:     520ms;
   --dur-panel-fold:   600ms;  /* desktop side panels fold away while a SOP is open (ADR-0011) */  /* site map: whole site <-> one area */
   --dur-hover-lift:   160ms;
