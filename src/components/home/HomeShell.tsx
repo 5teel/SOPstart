@@ -4,7 +4,7 @@
  *
  * Desktop: section menu, the SOP list, and a reader pane (Read for the open SOP, the site map
  * otherwise); the other sections take the width beside the menu. Phone: no menu, a bottom tab
- * bar, and My SOPs has a List | Site map toggle. Which of these shows is decided by CSS
+ * bar, and My SOPs has a Site map | List toggle that opens on the site map. Which of these shows is decided by CSS
  * (lg:), never by reading the window in render, so the first paint matches the server.
  *
  * All in-page state (section, SOP, area, tab, pin, view) changes through select(), which sets
@@ -66,7 +66,8 @@ function isTypingTarget(t: EventTarget | null): boolean {
 
 export function HomeShell({ siteName, siteId, sites, userEmail, userId, role, initial, packing }: HomeShellProps) {
   const [state, setState] = useState<HomeState>(() => resolveHome(initial, role))
-  const [phoneMap, setPhoneMap] = useState(false)
+  // Phone: My SOPs opens on the site map; List is the other tab.
+  const [phoneMap, setPhoneMap] = useState(true)
   // Desktop, while a SOP is open: the menu and the list fold away and the reader can open either (ADR-0011).
   const [menuOpen, setMenuOpen] = useState(false)
   const [listOpen, setListOpen] = useState(false)
@@ -210,7 +211,7 @@ export function HomeShell({ siteName, siteId, sites, userEmail, userId, role, in
                 <Wordmark size="menu" />
               </div>
               <div className="view-tabs px-4" role="group" aria-label="View">
-                {([false, true] as const).map((m) => (
+                {([true, false] as const).map((m) => (
                   <button
                     key={String(m)}
                     type="button"

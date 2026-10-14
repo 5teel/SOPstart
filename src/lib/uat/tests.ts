@@ -776,7 +776,7 @@ export const UAT_TESTS: UatTest[] = [
     title: 'The home on a phone',
     status: 'active',
     summary:
-      'On a phone the home is one column: a tab bar for the sections, a List | Site map switch, and Read that takes the whole screen.',
+      'On a phone the home is one column: a tab bar for the sections, a Site map | List switch that opens on the site map, and Read that takes the whole screen.',
     tryIt: [
       'Open the home on your phone.',
       'Use the tab bar at the foot to move between sections.',

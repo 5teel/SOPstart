@@ -680,17 +680,23 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
 
   // ------------------------------------------------------------------ MAP-04
 
-  test('MAP-04 phone: tab bar, List | Site map, numbered markers and key, Read with back link, no sideways scroll', async ({ browser }) => {
+  test('MAP-04 phone: tab bar, Site map | List opening on the map, numbered markers and key, Read with back link, no sideways scroll', async ({ browser }) => {
     test.setTimeout(240_000)
     await asRole(browser, 'siteWorker', PHONE, async (page) => {
       const errors = watchConsole(page)
       await page.goto('/')
-      await listReady(page)
+      // My SOPs opens on the site map; Site map is the first tab.
+      await expect(page.getByTestId('site-map')).toBeVisible(SLOW)
+      await expect(page.getByTestId('phone-view-map')).toHaveAttribute('aria-pressed', 'true')
+      await expect(page.getByTestId('sop-list')).toBeHidden()
+      const tabs = await page.locator('[data-testid^="phone-view-"]').evaluateAll((els) => els.map((el) => el.getAttribute('data-testid')))
+      expect(tabs, 'Site map is the first tab').toEqual(['phone-view-map', 'phone-view-list'])
       await expect(page.getByTestId('home-menu')).toBeHidden()
       await expect(page.getByTestId('home-tabbar')).toBeVisible(SLOW)
       await expect(page.getByTestId('home-tab-sops')).toBeVisible()
       await expect(page.getByTestId('home-tab-record')).toBeVisible()
-      await expect(page.getByTestId('phone-view-list')).toHaveAttribute('aria-pressed', 'true')
+      await page.getByTestId('phone-view-list').click()
+      await listReady(page)
       await noSideways(page, 'list')
       await shot(page, '63-home-phone-list')
 
@@ -741,7 +747,7 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
           window.dispatchEvent(e)
         })
       await page.goto('/')
-      await listReady(page)
+      await expect(page.getByTestId('site-map')).toBeVisible(SLOW)
       await expect(page.getByTestId('install-prompt')).toHaveCount(0)
       await offer()
       await expect(page.getByTestId('install-prompt')).toBeVisible()
@@ -750,7 +756,7 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
       await page.getByTestId('install-later').click()
       await expect(page.getByTestId('install-prompt')).toHaveCount(0)
       await page.reload()
-      await listReady(page)
+      await expect(page.getByTestId('site-map')).toBeVisible(SLOW)
       await offer()
       await page.waitForTimeout(300)
       await expect(page.getByTestId('install-prompt')).toHaveCount(0)

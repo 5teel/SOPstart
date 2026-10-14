@@ -182,10 +182,10 @@ export const JOURNEYS: Journey[] = [
     group: 'Worker',
     persona: 'Worker',
     title: 'On a phone',
-    summary: 'The same home in one column: a tab bar for the sections, a List | Site map switch, and Read that takes the whole screen.',
+    summary: 'The same home in one column: a tab bar for the sections, a Site map | List switch that opens on the site map, and Read that takes the whole screen.',
     steps: [
       { id: 's', type: 'start', label: 'Opens the site on a phone' },
-      { id: 'tabs', type: 'screen', label: 'Tab bar and List | Site map', route: '/', detail: 'The tab bar at the foot holds the sections the role may open (a worker has SOPs and My record). At the top the wordmark sits beside a List | Site map switch.' },
+      { id: 'tabs', type: 'screen', label: 'Tab bar and Site map | List', route: '/', detail: 'The tab bar at the foot holds the sections the role may open (a worker has SOPs and My record). At the top the wordmark sits beside a Site map | List switch; My SOPs opens on the site map.' },
       { id: 'key', type: 'screen', label: 'Site map with a numbered key', route: '/', detail: 'The map shows numbered areas; the key under it names each one and gives its SOP count, so nothing depends on tiny labels. Tap a number to open that area.' },
       { id: 'read', type: 'screen', label: 'Read takes the screen', route: '/', detail: 'An open SOP covers the list; a back link at the top returns to it. Start opens the running SOP, with Back and Stop at the top.' },
       { id: 'e', type: 'end', label: 'Back on the list' },
