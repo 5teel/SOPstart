@@ -166,7 +166,8 @@ test.describe.serial('Phase 63 -- the SOPstart start (deployed)', () => {
       await expect(page.getByTestId('run-bar')).toBeVisible(SLOW)
       await page.getByTestId('run-stop').click()
 
-      // Today is used now: this start is the short one.
+      // Today is used now: this start is the short one, timed at real speed (drop the x4 judging flag).
+      await page.evaluate(() => sessionStorage.removeItem('sopstart-fuse-slow'))
       await openRead(page, walkId)
       await watchLayer(page)
       await page.waitForLoadState('networkidle', { timeout: 8_000 }).catch(() => {})
