@@ -153,8 +153,8 @@ export const JOURNEYS: Journey[] = [
         { label: 'Every step ticked', to: 'complete' },
         { label: 'Stop', to: 'back' },
       ] },
-      { id: 'complete', type: 'action', label: 'Send for sign-off', detail: 'At the foot of the list. Creates the append-only completion record and the worker\'s ledger row. Finishing IS the worker signature (D-09). Then "Sent for sign-off" and Done, which returns to reading the same SOP.' },
-      { id: 'back', type: 'screen', label: 'Back to reading', route: '/', detail: 'Stop or Done returns the same view to reading; the next SOP is one tap away in the list.' },
+      { id: 'complete', type: 'action', label: 'Send for sign-off', detail: 'At the foot of the list. Creates the append-only completion record and the worker\'s ledger row. Finishing IS the worker signature (D-09). The button says "Sending your record…" while it saves; then a popup says what was recorded (steps, photos, time) with Back to home or Review what you sent.' },
+      { id: 'back', type: 'screen', label: 'Back to reading', route: '/', detail: 'Stop returns the same view to reading; Back to home after Send closes the SOP.' },
       { id: 'signoff', type: 'decision', label: 'Supervisor counter-sign required?', branches: [
         { label: 'Yes - it waits in Sign-offs', to: 'sup' },
         { label: 'No', to: 'e' },

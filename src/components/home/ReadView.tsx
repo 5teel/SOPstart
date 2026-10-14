@@ -11,7 +11,7 @@ import { useEffect, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
-import { Camera, Check, Lightbulb } from 'lucide-react'
+import { Camera, Check, Lightbulb, Loader2 } from 'lucide-react'
 import { getSopOwner } from '@/actions/sop-owner'
 import { Wordmark } from '@/components/brand/Wordmark'
 import { captureSlowFlag, motionMode, playFuse, prefetchFuse, slowFactor } from '@/lib/brand/fuse'
@@ -46,7 +46,7 @@ function wordmarkFontReady(el: Element): boolean {
 
 const OWNER_ROLES = ['supervisor', 'admin', 'safety_manager']
 
-export function ReadView({ row, role, from, onOpenSop }: { row: LibraryRow; role: string | null; from: string; onOpenSop(id: string): void }) {
+export function ReadView({ row, role, from, onOpenSop, onClose }: { row: LibraryRow; role: string | null; from: string; onOpenSop(id: string): void; onClose(): void }) {
   const { data, isLoading } = useReadSop(row.id)
   const supervisorUp = !!role && OWNER_ROLES.includes(role)
   const canEdit = role === 'admin' || role === 'safety_manager'
@@ -64,6 +64,12 @@ export function ReadView({ row, role, from, onOpenSop }: { row: LibraryRow; role
   // Where a run stands: this view's own run, else what the library knows (a run left on another day).
   const resumeAt = run.walk ? Math.min(currentIndex(order, run.done) + 1, order.length) : status?.kind === 'stopped' ? status.step : null
   const [asking, setAsking] = useState(false)
+  // After Send: the popup says what was recorded until the worker picks home or review.
+  const [reviewing, setReviewing] = useState(false)
+  const goHome = () => {
+    run.finish()
+    onClose()
+  }
 
   useEffect(() => {
     captureSlowFlag()
@@ -188,7 +194,7 @@ export function ReadView({ row, role, from, onOpenSop }: { row: LibraryRow; role
             </span>
           </div>
         )}
-        {run.error && (
+        {run.error && !(running && allDone) && (
           <p role="alert" data-testid="walk-error" className="mt-2 text-ui text-accent-escalate">
             {run.error}
           </p>
@@ -296,9 +302,9 @@ export function ReadView({ row, role, from, onOpenSop }: { row: LibraryRow; role
           <div data-testid="run-send" className="mt-6 flex flex-col gap-3 rounded-lg border border-ink-200 bg-paper-1 p-4">
             {run.sent ? (
               <>
-                <p data-testid="run-sent" className="text-reading font-semibold text-ink-900">Sent for sign-off. Your supervisor signs it off.</p>
-                <button type="button" data-testid="run-done" onClick={run.finish} className="min-h-tap-glove rounded-lg bg-ink-900 text-reading font-semibold text-paper">
-                  Done
+                <p className="text-reading font-semibold text-ink-900">Sent for sign-off at {run.sent}. Your supervisor signs it off.</p>
+                <button type="button" data-testid="run-done" onClick={goHome} className="min-h-tap-glove rounded-lg bg-ink-900 text-reading font-semibold text-paper">
+                  Back to home
                 </button>
               </>
             ) : (
@@ -307,20 +313,70 @@ export function ReadView({ row, role, from, onOpenSop }: { row: LibraryRow; role
                   All {order.length} steps ticked{run.photoSteps.size > 0 ? ` · ${run.photoSteps.size} photo${run.photoSteps.size === 1 ? '' : 's'}` : ''}.
                 </p>
                 {run.missing.length > 0 && <p className="text-ui text-ink-600">Still to do: {run.missing.map((m) => m.text).join(', ')}.</p>}
+                {run.error && (
+                  <p role="alert" data-testid="walk-error" className="text-ui text-accent-escalate">
+                    {run.error}
+                  </p>
+                )}
                 <button
                   type="button"
                   data-testid="run-send-button"
                   disabled={run.busy || run.missing.length > 0}
                   onClick={() => void run.send()}
-                  className="min-h-tap-glove rounded-lg bg-ink-900 text-reading font-semibold text-paper disabled:opacity-60"
+                  aria-busy={run.sending}
+                  className={`inline-flex min-h-tap-glove items-center justify-center gap-2 rounded-lg bg-ink-900 text-reading font-semibold text-paper ${run.sending ? '' : 'disabled:opacity-60'}`}
                 >
-                  Send for sign-off
+                  {run.sending ? (
+                    <>
+                      <Loader2 className="size-5 animate-spin" aria-hidden="true" />
+                      Sending your record…
+                    </>
+                  ) : (
+                    'Send for sign-off'
+                  )}
                 </button>
               </>
             )}
           </div>
         )}
       </div>
+
+      {run.sent && !reviewing && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/40 p-4"
+          onKeyDown={(e) => {
+            if (e.key !== 'Escape') return
+            e.preventDefault()
+            setReviewing(true)
+          }}
+        >
+          <div role="dialog" aria-modal="true" aria-labelledby="run-sent-title" data-testid="run-sent-dialog" className="flex w-full max-w-sm flex-col gap-4 rounded-2xl bg-paper-1 p-6">
+            <span className="grid size-12 place-items-center rounded-full bg-accent-ok text-paper">
+              <Check className="size-7" aria-hidden="true" />
+            </span>
+            <h2 id="run-sent-title" data-testid="run-sent" className="text-xl font-semibold text-ink-900">
+              Sent for sign-off
+            </h2>
+            <div>
+              <p className="text-ui text-ink-600">Recorded at {run.sent}</p>
+              <p className="text-reading font-semibold text-ink-900">{row.title}</p>
+              <ul className="mt-2 flex flex-col gap-1 text-reading text-ink-700">
+                <li>All {order.length} steps ticked</li>
+                {run.photoSteps.size > 0 && <li>{run.photoSteps.size} photo{run.photoSteps.size === 1 ? '' : 's'}</li>}
+              </ul>
+            </div>
+            <p className="text-reading text-ink-700">Your supervisor gets it next and signs it off.</p>
+            <div className="flex flex-col gap-2">
+              <button type="button" data-testid="run-sent-home" autoFocus onClick={goHome} className="min-h-tap-glove w-full rounded-lg bg-ink-900 text-reading font-semibold text-paper">
+                Back to home
+              </button>
+              <button type="button" data-testid="run-sent-review" onClick={() => setReviewing(true)} className="min-h-tap-glove w-full rounded-lg border border-ink-300 text-reading text-ink-900">
+                Review what you sent
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {asking && (
         <div

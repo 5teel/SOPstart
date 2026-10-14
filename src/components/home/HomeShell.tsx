@@ -155,6 +155,7 @@ export function HomeShell({ siteName, siteId, sites, userEmail, userId, role, in
       role={role}
       from={homeFrom({ ...HOME, sop: openRow.id, area: state.area })}
       onOpenSop={openSop}
+      onClose={back}
     />
   ) : state.sop ? (
     <div className="mx-auto max-w-3xl px-4 py-6 lg:px-8">

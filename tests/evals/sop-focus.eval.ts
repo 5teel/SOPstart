@@ -147,11 +147,17 @@ test.describe('Phase 58 — the SOP focus screen (deployed)', () => {
         await expect(page.getByTestId('read-begin-again')).toHaveCount(0)
         await startWalking(page)
         await walkFixture(page, pass === 0)
+        // The popup says what was recorded; review leaves the ticked list showing, then Back to home closes the SOP.
+        const dialog = page.getByTestId('run-sent-dialog')
+        await expect(dialog).toContainText('All 5 steps ticked')
+        await expect(dialog).toContainText(pass === 0 ? '1 photo' : 'Recorded at')
+        await page.getByTestId('run-sent-review').click()
+        await expect(dialog).toHaveCount(0)
+        await expect(page.getByTestId('run-bar')).toContainText('Sent for sign-off')
+        if (pass === 0) await shot(page, '58-run-sent-review')
         await page.getByTestId('run-done').click()
-        // Done returns to reading the same SOP.
-        await expect(page.getByTestId('read-view')).toHaveAttribute('data-state', 'reading', SLOW)
-        await expect(page.getByTestId('run-bar')).toHaveCount(0)
-        if (pass === 0) await shot(page, '58-run-done-read')
+        await expect(page.getByTestId('read-view')).toHaveCount(0, SLOW)
+        if (pass === 0) await shot(page, '58-run-done-home')
       }
 
       // Both runs were sent: two completions, one photo each.

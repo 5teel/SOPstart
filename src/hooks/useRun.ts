@@ -32,7 +32,9 @@ export function useRun({ sopId, order, allowForward, onMoved }: { sopId: string;
   const qc = useQueryClient()
   const [walk, setWalk] = useState<WalkState | null>(null)
   const [running, setRunning] = useState(false)
-  const [sent, setSent] = useState(false)
+  /** When the run was sent ("2:41 pm"), null until then. */
+  const [sent, setSent] = useState<string | null>(null)
+  const [sending, setSending] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   // Local thumbnails for photos taken in this run, keyed by step id.
@@ -186,17 +188,19 @@ export function useRun({ sopId, order, allowForward, onMoved }: { sopId: string;
   const send = useCallback(async () => {
     if (!walk || busy) return
     setBusy(true)
+    setSending(true)
     setError(null)
     try {
       await queue.current
       const res = await submitCompletion({ walkId: walk.id })
       if (!res.success) return setError(SEND_ERROR)
-      setSent(true)
+      setSent(new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }))
       refreshLibrary()
     } catch {
       setError(SEND_ERROR)
     } finally {
       setBusy(false)
+      setSending(false)
     }
   }, [walk, busy, refreshLibrary])
 
@@ -211,7 +215,7 @@ export function useRun({ sopId, order, allowForward, onMoved }: { sopId: string;
   }, [refreshLibrary])
 
   const finish = useCallback(() => {
-    setSent(false)
+    setSent(null)
     setRunning(false)
     show(null)
   }, [show])
@@ -221,6 +225,7 @@ export function useRun({ sopId, order, allowForward, onMoved }: { sopId: string;
     running,
     setRunning,
     sent,
+    sending,
     busy: busy || photoApi.uploadingCount > 0,
     error,
     done,
