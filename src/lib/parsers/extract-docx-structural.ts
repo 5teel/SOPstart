@@ -375,13 +375,17 @@ function getPStyle(el: Element): string | null {
 }
 
 function paragraphText(scope: Element): string {
-  // Collect <w:t> text nodes in document order WITHIN this paragraph or cell.
-  // Multiple paragraphs inside a cell concatenate with a space separator.
-  const ts = scope.getElementsByTagNameNS(NS_W, 't')
+  // Collect <w:t> text in document order WITHIN this paragraph or cell. Runs join
+  // with no separator: Word splits words across runs ("When a S" + "ection"), so a
+  // space only goes in at paragraph starts and at run-level tabs and breaks.
+  const els = scope.getElementsByTagNameNS(NS_W, '*')
   let out = ''
-  for (let i = 0; i < ts.length; i++) {
-    out += ts.item(i)?.textContent ?? ''
-    out += ' '
+  for (let i = 0; i < els.length; i++) {
+    const el = els.item(i) as Element
+    const name = el.localName
+    if (name === 't') out += el.textContent ?? ''
+    else if (name === 'p') out += ' '
+    else if ((name === 'tab' || name === 'br' || name === 'cr') && (el.parentNode as Element | null)?.localName === 'r') out += ' '
   }
   return out.replace(/\s+/g, ' ').trim()
 }

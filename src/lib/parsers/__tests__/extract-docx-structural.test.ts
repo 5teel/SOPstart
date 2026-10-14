@@ -106,6 +106,17 @@ test.describe('extract-docx-structural — alignment invariants on EN-FOR-03-042
   })
 })
 
+test.describe('extract-docx-structural — run joining', () => {
+  // Word splits words across runs ("When a S" + "ection is stopped:"); runs must join without a space.
+  test('words split across runs stay whole on EN-FOR-02-001', async () => {
+    const { doc } = await extractDocxStructural(await load('EN-FOR-02-001 Forming Safety.docx'))
+    const text = structuredDocToPrompt(doc)
+    expect(text).toContain('When a Section is stopped:')
+    expect(text).toContain('Blank Side Removal Permit Process')
+    expect(text).not.toMatch(/\bS ection\b|\bS ide Removal\b/)
+  })
+})
+
 test.describe('structured-doc-to-prompt', () => {
   test('emits procedural-hint line and per-row [IMG N] tokens', async () => {
     const buf = await load('EN-FOR-03-042 Gob Delivery Setup - Deflectors.docx')
