@@ -21,9 +21,10 @@ code, plans and phases follow it until a later ADR supersedes it.
 | [0004](0004-design-principles.md) | Design principles — attention follows the objectives | Accepted | `tests/lint/design-principles.spec.ts` · `tests/lint/design-tokens.spec.ts` |
 | [0005](0005-library-map-replaces-rooms.md) | The library map replaces rooms | Accepted | `tests/lint/no-rooms.spec.ts` |
 | [0006](0006-typography.md) | Typography: Inter for reading, Saira for labels | Accepted (caps-label rule superseded by ADR-0007) | `tests/lint/typography.spec.ts` |
-| [0007](0007-design-base.md) | The design base — colour for safety, shared controls, sentence-case headings | Accepted | review only |
+| [0007](0007-design-base.md) | The design base — colour for safety, shared controls, sentence-case headings | Accepted (hazard/PPE colours superseded by ADR-0013) | review only |
 | [0008](0008-ledger-every-action.md) | Every action a person takes is written to the decision ledger | Accepted | `tests/lint/ledger-every-action.spec.ts` |
 | [0009](0009-site-map-pictures.md) | The site map may carry pictures | Accepted | review only |
 | [0010](0010-tiered-site-map.md) | A tiered site map, packed by the org's choice | Accepted | `tests/phase63/site-tiers.spec.ts` |
 | [0011](0011-desktop-home-map-centre.md) | Desktop home: map centre, list right, Read folds both | Accepted | `tests/evals/home.eval.ts` HOME-03 |
 | [0012](0012-read-and-run-one-view.md) | Reading and doing a SOP are one view; the start merge marks the first record | Accepted | `tests/evals/start.eval.ts`, `tests/phase63/fuse-wiring.spec.ts` |
+| [0013](0013-safety-sign-colours.md) | Step kinds wear the AS 1319 safety sign colours and shapes | Accepted | `tests/lint/design-tokens.spec.ts` |

@@ -33,6 +33,8 @@
   --color-accent-step: var(--accent-step);
   --color-accent-ok: var(--accent-ok);
   --color-accent-hazard: var(--accent-hazard);
+  --color-sign-warning: var(--sign-warning);
+  --color-sign-mandatory: var(--sign-mandatory);
   --color-accent-mcu: var(--accent-mcu);
   --color-ai: var(--ai);
   --color-brand-yellow: var(--brand-yellow);
@@ -120,6 +122,12 @@
   --accent-ok:       #16a34a;  /* green  — verified / all clear */
   --accent-hazard:   #b91c1c;  /* red-700  — hazard pill text (red-50/red-300 pill) */
   --accent-mcu:      #0e7490;  /* cyan-700 — inspect pill text (cyan-50/cyan-300 pill) */
+
+  /* AS 1319 sign colours (ADR-0013), approximating AS 2700 Y14 and B23. A hazard step is a
+   * warning sign (yellow, black triangle, ink text); PPE is a mandatory sign (blue circle,
+   * white text). Red stays for danger and for failures that block a worker. */
+  --sign-warning:    #ffc20e;
+  --sign-mandatory:  #005eb8;
 
   /* Neutral steps the components referenced but the scale never defined.
    * Zinc-aligned, consistent with the ink-* ramp above. */
@@ -278,9 +286,13 @@ body[data-theme="paper"] {
 
   /* Safety signal (ISO 3864 / ANSI Z535): a 1 px frame and a solid strip carrying the caps word. */
   .signal { overflow: hidden; border: 1px solid var(--signal); border-radius: var(--radius-lg); background: color-mix(in srgb, var(--signal) 6%, white); }
-  .signal-strip { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: var(--signal); color: var(--paper); font-family: var(--font-label); font-size: var(--text-meta); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
-  .signal-hazard { --signal: var(--accent-hazard); }
-  .signal-ppe { --signal: var(--accent-decision); }
+  .signal-strip { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: var(--signal); color: var(--signal-ink, var(--paper)); font-family: var(--font-label); font-size: var(--text-meta); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+  .signal-hazard { --signal: var(--sign-warning); --signal-ink: var(--ink-900); }
+  .signal-ppe { --signal: var(--sign-mandatory); }
+
+  /* AS 1319 shapes for the step-kind marks (ADR-0013): warning is a yellow triangle with a black edge. */
+  .sign-triangle { position: relative; display: inline-block; flex-shrink: 0; width: 0.75rem; height: 0.6875rem; background: var(--ink-900); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+  .sign-triangle::after { content: ''; position: absolute; inset: 3px 2.5px 1.5px; background: var(--sign-warning); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
 }
 
 /* Native checkboxes and radios in ink, not the browser's blue. */

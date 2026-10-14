@@ -1,6 +1,6 @@
 # ADR-0007: The design base — colour for safety, shared controls, sentence-case headings
 
-- **Status:** Accepted
+- **Status:** Accepted (rule 1's hazard/PPE colours superseded by ADR-0013)
 - **Date:** 2026-10-10
 - **Decided by:** Simon (chose the "Impeccable" review as the base for later design passes)
 - **Supersedes:** ADR-0006 in part — its rule "labels and tags are caps, weight 700, +0.06em". The rest of ADR-0006 (faces, 12 px floor, tabular digits) stands.

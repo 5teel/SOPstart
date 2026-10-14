@@ -60,7 +60,7 @@ export function FocusRail({ order, open, onClose, sheetTop }: FocusRailProps) {
               }}
               className="flex min-h-tap w-full items-center gap-2 px-4 text-left text-ui text-ink-700"
             >
-              <span className={`size-2 shrink-0 rounded-full ${KIND_DOT[entry.step.kind]}`} aria-hidden="true" />
+              <span className={KIND_DOT[entry.step.kind]} aria-hidden="true" />
               <span className="min-w-0 flex-1 truncate">{entry.step.text || 'New step'}</span>
             </button>
           </div>

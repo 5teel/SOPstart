@@ -133,9 +133,20 @@ test.describe('design tokens — one source of truth', () => {
 
   test('every token utility a component may use is declared in the @theme block', () => {
     const theme = fs.readFileSync(path.join(SRC, 'styles', 'blueprint-theme.css'), 'utf-8')
-    for (const t of ['accent-step', 'accent-ok', 'accent-hazard', 'accent-mcu', 'ai', 'brand-yellow', 'steel-900', 'steel-700', 'ink-200', 'ink-400', 'ink-600', 'paper-1']) {
+    for (const t of ['accent-step', 'accent-ok', 'accent-hazard', 'sign-warning', 'sign-mandatory', 'accent-mcu', 'ai', 'brand-yellow', 'steel-900', 'steel-700', 'ink-200', 'ink-400', 'ink-600', 'paper-1']) {
       expect(theme, t).toMatch(new RegExp(`--color-${t}:\\s*var\\(--${t}\\)`))
       expect(theme, t).toMatch(new RegExp(`\\n\\s*--${t}:\\s`))
     }
+  })
+
+  // ADR-0013: step kinds wear the AS 1319 sign colours, set in one place.
+  test('hazard is a warning sign and PPE a mandatory sign', () => {
+    const chip = fs.readFileSync(path.join(SRC, 'components', 'focus', 'KindChip.tsx'), 'utf-8')
+    expect(chip).toMatch(/hazard: 'bg-sign-warning text-ink-900'/)
+    expect(chip).toMatch(/ppe: 'bg-sign-mandatory text-paper'/)
+    expect(chip).toMatch(/hazard: 'sign-triangle'/)
+    const theme = fs.readFileSync(path.join(SRC, 'styles', 'blueprint-theme.css'), 'utf-8')
+    expect(theme).toMatch(/\.signal-hazard \{ --signal: var\(--sign-warning\)/)
+    expect(theme).toMatch(/\.signal-ppe \{ --signal: var\(--sign-mandatory\)/)
   })
 })

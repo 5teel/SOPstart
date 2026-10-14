@@ -80,7 +80,7 @@ export function EditRail({ sopId, initial, open, onClose, flaggedStepIds, footer
                   }}
                   className="flex min-h-tap w-full items-center gap-2 px-4 text-left text-ui text-ink-700"
                 >
-                  <span className={`size-2 shrink-0 rounded-full ${KIND_DOT[step.kind]}`} aria-hidden="true" />
+                  <span className={KIND_DOT[step.kind]} aria-hidden="true" />
                   <span className="min-w-0 flex-1 truncate">{step.text || 'New step'}</span>
                   {flagged && <span className="size-2 shrink-0 rounded-full bg-ai" data-testid="edit-rail-flag" aria-label="Flagged" />}
                   {ticked ? (
