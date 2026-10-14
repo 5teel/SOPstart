@@ -102,6 +102,7 @@ Distilled rules below. **Full dated log with the stories: `docs/LEARNINGS.md` â€
 - Fixtures key on their own markers; shared eval orgs mean no "exactly N" assertions; author and run each eval case against the deploy as plans land.
 
 **Data / infra**
+- Thinking-mode models (Claude 5+, Qwen 3.8) reject a forced tool_choice: structured calls go through `llmToolCall` only. Flat PDF text scrambles step order; evals must check order, not just coverage.
 - Fail-open pipelines omit failed steps from upserts; all jobs erroring at $0 cost is an outage, not "no findings". Keep model IDs current.
 - `PGRST205 â€¦ schema cache` is a stale cache, not a missing table. Table renames do not rewrite SQL function bodies. Check `supabase migration list` before `db push`.
 - Before `git worktree remove`, delete any `node_modules` junction with `cmd /c rmdir`. Worktrees branch from the session-start commit, so cross-wave plans run on the main tree.
