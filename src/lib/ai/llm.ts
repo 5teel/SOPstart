@@ -154,14 +154,20 @@ export async function llmText(opts: LlmCallOpts): Promise<string> {
  */
 export async function llmToolCall(opts: LlmCallOpts & { tool: LlmTool }): Promise<unknown> {
   if (providerForModel(opts.model) === 'anthropic') {
-    const res = await getAnthropicClient().messages.create({
-      model: opts.model,
-      max_tokens: opts.maxTokens ?? 8192,
-      ...(opts.system ? { system: opts.system } : {}),
-      messages: opts.messages,
-      tools: [opts.tool as Anthropic.Tool],
-      tool_choice: { type: 'tool', name: opts.tool.name },
-    })
+    // Claude 5+ thinks by default and rejects a forced tool_choice (400), so
+    // those models get `auto` (the tool is the only one offered and the prompt
+    // names it) plus headroom for thinking tokens. Streamed: large max_tokens.
+    const forced = Number(opts.model.match(/^claude-[a-z]+-(\d+)/)?.[1] ?? 0) < 5
+    const res = await getAnthropicClient()
+      .messages.stream({
+        model: opts.model,
+        max_tokens: (opts.maxTokens ?? 8192) + (forced ? 0 : 16000),
+        ...(opts.system ? { system: opts.system } : {}),
+        messages: opts.messages,
+        tools: [opts.tool as Anthropic.Tool],
+        tool_choice: forced ? { type: 'tool', name: opts.tool.name } : { type: 'auto' },
+      })
+      .finalMessage()
     const block = res.content.find((b) => b.type === 'tool_use' && b.name === opts.tool.name)
     if (!block || block.type !== 'tool_use') {
       throw new Error(`${opts.model} returned no structured output — tool_use block missing`)
