@@ -128,7 +128,7 @@ export function ReadView({ row, role, from, onOpenSop, onClose }: { row: Library
   let lastGroup: string | null = null
 
   return (
-    <div data-testid="read-view" data-state={running ? 'running' : 'reading'} className="pb-24">
+    <div data-testid="read-view" data-state={running ? 'running' : 'reading'} className={running ? '' : 'pb-24'}>
       {running && (
         // The run bar: the whole wordmark means every tick is being recorded (ADR-0012).
         <div data-testid="run-bar" className="sticky top-0 z-10 border-b border-ink-200 bg-paper">
@@ -201,7 +201,7 @@ export function ReadView({ row, role, from, onOpenSop, onClose }: { row: Library
             </span>
           </div>
         )}
-        {run.error && !(running && allDone) && (
+        {run.error && !running && (
           <p role="alert" data-testid="walk-error" className="mt-2 text-ui text-accent-escalate">
             {run.error}
           </p>
@@ -320,48 +320,58 @@ export function ReadView({ row, role, from, onOpenSop, onClose }: { row: Library
           </ol>
         )}
 
-        {running && allDone && (
-          <div data-testid="run-send" className="mt-6 flex flex-col gap-3 rounded-lg border border-ink-200 bg-paper-1 p-4">
+      </div>
+
+      {running && (
+        // Pinned to the foot of the pane for the whole run; Send wakes up once every step is ticked.
+        <div data-testid="run-send" className="sticky bottom-0 z-10 border-t border-ink-200 bg-paper">
+          <div className="mx-auto flex max-w-3xl flex-col gap-2 px-4 py-3 lg:px-8">
             {run.sent ? (
-              <>
-                <p className="text-reading font-semibold text-ink-900">Sent for sign-off at {run.sent}. Your supervisor signs it off.</p>
-                <button type="button" data-testid="run-done" onClick={goHome} className="min-h-tap-glove rounded-lg bg-ink-900 text-reading font-semibold text-paper">
+              <div className="flex flex-wrap items-center gap-3">
+                <p className="min-w-0 flex-1 text-ui font-semibold text-ink-900">Sent for sign-off at {run.sent}.</p>
+                <button type="button" data-testid="run-done" onClick={goHome} className="min-h-tap-glove rounded-lg bg-ink-900 px-6 text-reading font-semibold text-paper">
                   Back to home
                 </button>
-              </>
+              </div>
             ) : (
               <>
-                <p className="text-reading text-ink-900">
-                  All {order.length} steps ticked{run.photoSteps.size > 0 ? ` · ${run.photoSteps.size} photo${run.photoSteps.size === 1 ? '' : 's'}` : ''}.
-                </p>
-                {run.missing.length > 0 && <p className="text-ui text-ink-600">Still to do: {run.missing.map((m) => m.text).join(', ')}.</p>}
                 {run.error && (
                   <p role="alert" data-testid="walk-error" className="text-ui text-accent-escalate">
                     {run.error}
                   </p>
                 )}
-                <button
-                  type="button"
-                  data-testid="run-send-button"
-                  disabled={run.busy || run.missing.length > 0}
-                  onClick={() => void run.send()}
-                  aria-busy={run.sending}
-                  className={`inline-flex min-h-tap-glove items-center justify-center gap-2 rounded-lg bg-ink-900 text-reading font-semibold text-paper ${run.sending ? '' : 'disabled:opacity-60'}`}
-                >
-                  {run.sending ? (
-                    <>
-                      <Loader2 className="size-5 animate-spin" aria-hidden="true" />
-                      Sending your record…
-                    </>
-                  ) : (
-                    'Send for sign-off'
-                  )}
-                </button>
+                {allDone && run.missing.length > 0 && <p className="text-ui text-ink-600">Still to do: {run.missing.map((m) => m.text).join(', ')}.</p>}
+                <div className="flex items-center gap-3">
+                  <p className="min-w-0 flex-1 text-ui text-ink-700">
+                    {allDone
+                      ? `All ${order.length} steps ticked${run.photoSteps.size > 0 ? ` · ${run.photoSteps.size} photo${run.photoSteps.size === 1 ? '' : 's'}` : ''}.`
+                      : `${order.length - doneCount} of ${order.length} still to tick`}
+                  </p>
+                  <button
+                    type="button"
+                    data-testid="run-send-button"
+                    disabled={!allDone || run.busy || run.missing.length > 0}
+                    onClick={() => void run.send()}
+                    aria-busy={run.sending}
+                    className={`inline-flex min-h-tap-glove shrink-0 items-center justify-center gap-2 rounded-lg px-5 text-reading font-semibold ${
+                      allDone ? 'bg-ink-900 text-paper' : 'bg-paper-2 text-ink-500'
+                    } ${run.sending ? '' : 'disabled:opacity-60'}`}
+                  >
+                    {run.sending ? (
+                      <>
+                        <Loader2 className="size-5 animate-spin" aria-hidden="true" />
+                        Sending…
+                      </>
+                    ) : (
+                      'Send for sign-off'
+                    )}
+                  </button>
+                </div>
               </>
             )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {run.sent && !reviewing && (
         <div

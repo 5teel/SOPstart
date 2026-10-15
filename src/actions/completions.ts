@@ -1,6 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { after } from 'next/server'
 import { z } from 'zod'
 import { getSessionContext } from '@/lib/auth/session-context'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -31,7 +32,13 @@ export async function submitCompletion(
   const parsed = z.object({ walkId: z.string().uuid() }).strict().safeParse(rawInput)
   if (!parsed.success) return { success: false, error: 'Invalid input' }
 
+  // Stage timings, one log line per send (the app runs in Singapore, the database in Sydney:
+  // every serial round trip counts).
+  const t0 = Date.now()
+  const marks: string[] = []
+  const mark = (name: string) => marks.push(`${name}=${Date.now() - t0}`)
   const { userId, organisationId } = await getSessionContext()
+  mark('session')
   if (!userId) return { success: false, error: 'Not authenticated' }
   if (!organisationId) return { success: false, error: 'No organisation found' }
 
@@ -47,9 +54,11 @@ export async function submitCompletion(
   const walk = toWalkState(row)
   if (row.status === 'submitted') return { success: true, completionId: walk.id }
   if (row.status !== 'in_progress') return { success: false, error: 'Start the SOP again.' }
+  mark('walk')
 
   const sop = await loadWalkSop(admin, organisationId, walk.sop_id)
   if (!sop || sop.order.length === 0) return { success: false, error: 'This SOP has no steps to send.' }
+  mark('sop')
 
   // Whatever the jump-ahead setting: every acknowledgement, required photo and step.
   const missing = [
@@ -98,6 +107,7 @@ export async function submitCompletion(
   // 23505 = unique_violation: the completion row was already written by an
   // earlier attempt. Fall through so a retry can still add the photo rows that
   // attempt failed to save.
+  mark('insert')
   const isRetry = insertError?.code === '23505'
   if (insertError && !isRetry) {
     console.error('submitCompletion insert error:', insertError)
@@ -145,6 +155,7 @@ export async function submitCompletion(
     }
   }
 
+  mark('photos')
   const { error: walkError } = await admin
     .from('sop_walks')
     .update({ status: 'submitted', submitted_at: new Date().toISOString(), updated_at: new Date().toISOString() })
@@ -157,30 +168,36 @@ export async function submitCompletion(
     return { success: false, error: 'Failed to submit completion.' }
   }
 
-  // The worker's own ledger row (D-22). Its failure never undoes the completion.
-  const signed = await recordSignature({ completionId: walk.id, sopId: walk.sop_id, role: 'worker' })
-  if (!signed.success) console.error('submitCompletion signature error:', signed.error)
+  mark('walk_done')
 
-  // D-08: tell whoever signs this off. After the ledger row; never fails the submit.
-  try {
-    const recipients = await signOffRecipients(organisationId, userId)
-    if (recipients.length > 0) {
-      const [labels, { data: sopRow }] = await Promise.all([
-        userLabels([userId]),
-        admin.from('sops').select('title').eq('id', walk.sop_id).eq('organisation_id', organisationId).maybeSingle(),
-      ])
-      const title = notificationTitle({ kind: 'signoff', sop: sopRow?.title ?? 'a SOP', name: labels.get(userId)?.fullName ?? null })
-      const place = notificationPlace('signoff')
-      const key = dedupeKey({ kind: 'signoff', completionId: walk.id })
-      await notify(
-        organisationId,
-        recipients.map((uid) => ({ userId: uid, kind: 'signoff' as const, title, place, subjectType: 'sop', subjectId: walk.sop_id, dedupeKey: key })),
-      )
+  // The completion is saved: the worker sees Sent now. The worker's own ledger row (D-22) and the
+  // sign-off notification (D-08) follow after the response; neither ever undoes the completion.
+  after(async () => {
+    const signed = await recordSignature({ completionId: walk.id, sopId: walk.sop_id, role: 'worker' })
+    if (!signed.success) console.error('submitCompletion signature error:', signed.error)
+    mark('signature')
+    try {
+      const recipients = await signOffRecipients(organisationId, userId)
+      if (recipients.length > 0) {
+        const [labels, { data: sopRow }] = await Promise.all([
+          userLabels([userId]),
+          admin.from('sops').select('title').eq('id', walk.sop_id).eq('organisation_id', organisationId).maybeSingle(),
+        ])
+        const title = notificationTitle({ kind: 'signoff', sop: sopRow?.title ?? 'a SOP', name: labels.get(userId)?.fullName ?? null })
+        const place = notificationPlace('signoff')
+        const key = dedupeKey({ kind: 'signoff', completionId: walk.id })
+        await notify(
+          organisationId,
+          recipients.map((uid) => ({ userId: uid, kind: 'signoff' as const, title, place, subjectType: 'sop', subjectId: walk.sop_id, dedupeKey: key })),
+        )
+      }
+    } catch (err) {
+      console.error('submitCompletion sign-off notification failed:', err)
     }
-  } catch (err) {
-    console.error('submitCompletion sign-off notification failed:', err)
-  }
-  return { success: true, completionId: walk.id, logged: signed.success && signed.logged }
+    mark('notified')
+    console.log(`[submitCompletion] ms ${marks.join(' ')}`)
+  })
+  return { success: true, completionId: walk.id }
 }
 
 // ---------------------------------------------------------------
