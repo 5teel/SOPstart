@@ -1159,6 +1159,9 @@ export type Database = {
       sops: {
         Row: {
           allow_forward_jump: boolean
+          clear_approved_at: string | null
+          clear_approved_by: string | null
+          clear_version: Json | null
           objective: string | null
           applicable_equipment: string[] | null
           approval_snapshot: Json | null
@@ -1201,6 +1204,9 @@ export type Database = {
         }
         Insert: {
           allow_forward_jump?: boolean
+          clear_approved_at?: string | null
+          clear_approved_by?: string | null
+          clear_version?: Json | null
           objective?: string | null
           applicable_equipment?: string[] | null
           approval_snapshot?: Json | null
@@ -1242,6 +1248,9 @@ export type Database = {
         }
         Update: {
           allow_forward_jump?: boolean
+          clear_approved_at?: string | null
+          clear_approved_by?: string | null
+          clear_version?: Json | null
           objective?: string | null
           applicable_equipment?: string[] | null
           approval_snapshot?: Json | null

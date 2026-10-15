@@ -574,3 +574,36 @@ export async function setSopCategory(
   })
   return { success: true, logged: rec.ok }
 }
+
+/**
+ * ADR-0015: an admin who has read the clear version and its check lets workers see it (approve), or
+ * takes it back (approve: false). Approval is pinned to the clear version it was given for.
+ */
+export async function setClearVersionApproval(input: { sopId: string; approve: boolean; createdAt: string }): Promise<{ ok: true; logged: boolean } | { error: string }> {
+  const parsed = z.object({ sopId: z.string().uuid(), approve: z.boolean(), createdAt: z.string().min(1).max(40) }).safeParse(input)
+  if (!parsed.success) return { error: 'Invalid request' }
+  const { sopId, approve, createdAt } = parsed.data
+  const ctx = await requireAdminContext()
+  if ('error' in ctx) return { error: ctx.error }
+  if (!ctx.organisationId) return { error: 'No organisation found' }
+
+  // Only the clear version the admin read: a newer one written since then is not approved by this click.
+  const { data, error } = await createAdminClient()
+    .from('sops')
+    .update({ clear_approved_at: approve ? new Date().toISOString() : null, clear_approved_by: approve ? ctx.user.id : null })
+    .eq('id', sopId)
+    .eq('organisation_id', ctx.organisationId)
+    .eq('clear_version->>createdAt', createdAt)
+    .select('id')
+  if (error) return { error: error.message }
+  if (!data?.length) return { error: 'This clear version has changed since you opened it. Reopen the SOP and read it again.' }
+
+  const rec = await recordDecision({
+    kind: approve ? 'approve' : 'reject',
+    subject: { kind: 'clear_version', id: sopId },
+    sopId,
+    summary: approve ? 'Approved the clear version for workers' : 'Withdrew the clear version from workers',
+    details: { clear_version_created_at: createdAt },
+  })
+  return { ok: true, logged: rec.ok }
+}

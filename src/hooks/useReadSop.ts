@@ -9,6 +9,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
 import type { FocusKind } from '@/lib/sop/focus'
+import type { ClearVersion } from '@/lib/parsers/enhance-sop'
 import { assembleFocus, type AssembleAttachment, type AssembleStandard } from '@/lib/sop/focus-assemble'
 
 export interface ReadSopMeta {
@@ -21,6 +22,9 @@ export interface ReadSopMeta {
   category_slug: string | null
   organisation_id: string
   allow_forward_jump: boolean
+  /** ADR-0015: the read-only clear version; workers see it only once clear_approved_at is set. */
+  clear_version: ClearVersion | null
+  clear_approved_at: string | null
 }
 
 export interface ReadSection {
@@ -60,7 +64,7 @@ export const readSopQuery = (sopId: string | null) => ({
     const [{ data: sop, error }, sec, st] = await Promise.all([
       supabase
         .from('sops')
-        .select('id, title, version, status, parent_sop_id, placement, category_slug, organisation_id, allow_forward_jump')
+        .select('id, title, version, status, parent_sop_id, placement, category_slug, organisation_id, allow_forward_jump, clear_version, clear_approved_at')
         .eq('id', sopId!)
         .maybeSingle(),
       supabase.from('sop_sections').select('id, title, sort_order').eq('sop_id', sopId!).order('sort_order', { ascending: true }),
@@ -76,7 +80,8 @@ export const readSopQuery = (sopId: string | null) => ({
 
     // Step pictures: one batched signing call, under the reader's session, alongside the standards.
     const rawSteps = rows(st as { data: Omit<ReadStep, 'image_urls'>[] | null; error: Fail })
-    const paths = [...new Set(rawSteps.flatMap((s) => s.image_paths ?? []))]
+    const clearPaths = (row.clear_version?.sections ?? []).flatMap((s) => s.steps.flatMap((t) => t.image_paths))
+    const paths = [...new Set([...rawSteps.flatMap((s) => s.image_paths ?? []), ...clearPaths])]
     const [std, att, urls] = await Promise.all([
       supabase.from('standards').select('id, name').eq('organisation_id', row.organisation_id),
       supabase.from('standard_attachments').select('standard_id, sop_id, section_id, focus_step_id').eq('organisation_id', row.organisation_id),
@@ -91,7 +96,7 @@ export const readSopQuery = (sopId: string | null) => ({
       standards: rows(std as { data: AssembleStandard[] | null; error: Fail }),
       attachments: rows(att as { data: AssembleAttachment[] | null; error: Fail }),
     })
-    return { sop: row, ...assembled }
+    return { sop: row, ...assembled, signed }
   },
 })
 

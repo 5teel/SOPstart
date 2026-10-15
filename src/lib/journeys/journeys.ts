@@ -120,7 +120,7 @@ export const JOURNEYS: Journey[] = [
       { id: 'missing', type: 'action', label: 'Ask for one', route: '/', detail: 'A search with no match offers Ask for one (it opens a request, with the search words as the note). An admin or safety manager also gets Write it.', branches: [
         { label: 'Request sent', to: 'e' },
       ] },
-      { id: 'read', type: 'screen', label: 'Read the SOP', route: '/', detail: 'On a computer the SOP takes the centre where the map was, and the menu and list fold away (Menu and SOP list in its header bring them back, ADR-0011); on a phone it takes the screen. Reading writes nothing. Hazards and PPE first, then every step in order, the owner, the version and "Updated since you last did it" when a newer version was published. Back ("‹ Site map" / "‹ My SOPs") and Esc return to where you were.' },
+      { id: 'read', type: 'screen', label: 'Read the SOP', route: '/', detail: 'On a computer the SOP takes the centre where the map was, and the menu and list fold away (Menu and SOP list in its header bring them back, ADR-0011); on a phone it takes the screen. Reading writes nothing. Hazards and PPE first, then every step in order, the owner, the version and "Updated since you last did it" when a newer version was published. Back ("‹ Site map" / "‹ My SOPs") and Esc return to where you were. It opens on the SOP as written; once an admin has approved it, "Clear version" beside it shows the same SOP rewritten for easy reading (ADR-0015). Start always runs the version as written.' },
       { id: 'go', type: 'decision', label: 'Ready to start?', branches: [
         { label: 'Press start', to: 'start' },
         { label: 'Just reading', to: 'e' },
@@ -324,13 +324,29 @@ export const JOURNEYS: Journey[] = [
       { id: 's', type: 'start', label: 'Has an existing SOP doc' },
       { id: 'picker', type: 'screen', label: 'New SOP method picker', route: '/admin/sops/new', detail: 'The New SOP button in Manage SOPs (admin roles) lands here directly. 3 tiles, Upload first: Upload a document · Draft it with AI · Start blank. The type-vs-talk choice moved off this screen onto /admin/sops/new/ai.' },
       { id: 'up', type: 'screen', label: 'Upload', route: '/admin/sops/upload', detail: 'Drag in .docx/.pdf/.xlsx/.pptx/photo.' },
-      { id: 'parse', type: 'action', label: 'AI parses the document', detail: 'Async pipeline (30–120s); extracts sections, steps, hazards.' },
+      { id: 'parse', type: 'action', label: 'AI parses the document', detail: 'Async pipeline (30–120s); a direct translation of every line, in order (the steps). A few minutes later a clear version is written beside it and checked by a second AI (ADR-0015); workers see it only after an admin approves it in Read.' },
       { id: 'status', type: 'decision', label: 'Parse result?', branches: [
         { label: 'Done → check each step', to: 'editor' },
         { label: 'Failed → Try again, or Back', to: 'editor' },
       ] },
       { id: 'editor', type: 'screen', label: 'The editor — reading view, then check each step', route: '/sops/[sopId]', detail: 'The upload opens the SOP in the editor at once (no reload). While it is read the screen shows the stage, what is happening, a rough time left and skeleton steps, never an empty page; a failed read shows its error with Try again and Back. When it finishes the steps appear in place: tick each one, run the AI check, then Publish.' },
       { id: 'e', type: 'end', label: 'Draft ready to check' },
+    ],
+  },
+  {
+    id: 'approve-clear-version',
+    group: 'Create an SOP',
+    persona: 'SOP Admin',
+    title: 'Approve the clear version',
+    summary: 'An admin reads the AI rewrite of a live SOP beside the version as written and lets workers see it (ADR-0015).',
+    steps: [
+      { id: 's', type: 'start', label: 'A live SOP has a clear version' },
+      { id: 'read', type: 'screen', label: 'Read the SOP, Clear version', route: '/', detail: 'Admins and safety managers see "Clear version · not approved" beside "As written". It shows the independent check (points that could cause harm or change the meaning) and the gaps for the document owner above the rewritten steps.' },
+      { id: 'ok', type: 'decision', label: 'Reads right?', branches: [
+        { label: 'Approve for workers', to: 'e' },
+        { label: 'Leave it unapproved', to: 'e' },
+      ] },
+      { id: 'e', type: 'end', label: 'Workers see Clear version (or not); Take it back from workers withdraws it' },
     ],
   },
   {

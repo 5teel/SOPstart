@@ -16,6 +16,7 @@ import { getSopOwner } from '@/actions/sop-owner'
 import { Wordmark } from '@/components/brand/Wordmark'
 import { captureSlowFlag, motionMode, playFuse, prefetchFuse, slowFactor } from '@/lib/brand/fuse'
 import { KindChip, isSignal } from '@/components/focus/KindChip'
+import { ClearView } from '@/components/home/ClearView'
 import { DOT } from '@/components/home/SopRow'
 import { StandardLabels } from '@/components/sop/StandardLabels'
 import { WorkerObjective } from '@/components/shell/WorkerObjective'
@@ -64,6 +65,10 @@ export function ReadView({ row, role, from, onOpenSop, onClose }: { row: Library
   // Where a run stands: this view's own run, else what the library knows (a run left on another day).
   const resumeAt = run.walk ? Math.min(currentIndex(order, run.done) + 1, order.length) : status?.kind === 'stopped' ? status.step : null
   const [asking, setAsking] = useState(false)
+  // ADR-0015: the document as written first; the clear version one tap away once an admin approves it (admins see it before).
+  const [view, setView] = useState<'direct' | 'clear'>('direct')
+  const clear = data?.sop.clear_version ?? null
+  const showClear = !!clear && (!!data?.sop.clear_approved_at || canEdit)
   // After Send: the popup says what was recorded until the worker picks home or review.
   const [reviewing, setReviewing] = useState(false)
   const goHome = () => {
@@ -89,6 +94,8 @@ export function ReadView({ row, role, from, onOpenSop, onClose }: { row: Library
   const onStart = (e: React.MouseEvent<HTMLButtonElement>, over = false) => {
     if (starting.current) return
     starting.current = true
+    // The checklist is always the version as written: ticks, photos and sign-off attach to it.
+    setView('direct')
     const open = async () => {
       if (await (over ? run.startOver() : run.begin())) run.setRunning(true)
     }
@@ -212,8 +219,23 @@ export function ReadView({ row, role, from, onOpenSop, onClose }: { row: Library
           </div>
         )}
 
+        {!running && showClear && (
+          <div className="mt-5">
+            <span className="seg" role="group" aria-label="Version" data-testid="read-version">
+              <button type="button" aria-pressed={view === 'direct'} data-testid="read-version-direct" onClick={() => setView('direct')}>
+                As written
+              </button>
+              <button type="button" aria-pressed={view === 'clear'} data-testid="read-version-clear" onClick={() => setView('clear')}>
+                Clear version{data?.sop.clear_approved_at ? '' : ' · not approved'}
+              </button>
+            </span>
+          </div>
+        )}
+
         <div className="mt-6" />
-        {isLoading || !data ? (
+        {!running && view === 'clear' && clear && data ? (
+          <ClearView sopId={row.id} clear={clear} approvedAt={data.sop.clear_approved_at} canApprove={canEdit} signed={data.signed} />
+        ) : isLoading || !data ? (
           <div aria-busy="true" className="space-y-3 pt-2">
             <div className="h-5 w-3/4 animate-pulse rounded bg-paper-2 motion-reduce:animate-none" />
             <div className="h-5 w-1/2 animate-pulse rounded bg-paper-2 motion-reduce:animate-none" />

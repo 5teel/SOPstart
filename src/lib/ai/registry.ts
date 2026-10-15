@@ -87,16 +87,30 @@ export const AI_MODELS = {
   'parse-simple': {
     capability: 'llm',
     provider: 'anthropic',
-    defaultId: 'claude-haiku-4-5-20251001',
+    defaultId: 'claude-sonnet-5-5',
     envVar: 'PARSE_SIMPLE_MODEL',
     description: 'Full SOP parse for simple documents (parsers/sop-parser.ts)',
   },
   'parse-complex': {
     capability: 'llm',
     provider: 'anthropic',
-    defaultId: 'claude-sonnet-4-6',
+    defaultId: 'claude-sonnet-5-5',
     envVar: 'PARSE_COMPLEX_MODEL',
     description: 'Full SOP parse for complex documents (parsers/sop-parser.ts)',
+  },
+  'parse-enhance': {
+    capability: 'llm',
+    provider: 'anthropic',
+    defaultId: 'claude-sonnet-5-5',
+    envVar: 'PARSE_ENHANCE_MODEL',
+    description: 'Clear version of a parsed SOP, from the direct translation (parsers/enhance-sop.ts, ADR-0015)',
+  },
+  'parse-enhance-check': {
+    capability: 'llm',
+    provider: 'openrouter',
+    defaultId: 'openai/gpt-5.6-sol',
+    envVar: 'PARSE_ENHANCE_CHECK_MODEL',
+    description: 'Cross-family check that the clear version kept every fact and locked order (parsers/enhance-sop.ts, ADR-0015)',
   },
   'draft-verify': {
     capability: 'llm',

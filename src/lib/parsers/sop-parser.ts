@@ -7,7 +7,7 @@ import { TITLE_CONVENTIONS } from './sop-title'
 // Tool definition matching ParsedSopSchema for structured output — provider-
 // agnostic: the llm adapter converts it to the Anthropic or OpenAI-compatible
 // tool shape depending on which model AI Settings resolves for this org.
-const SOP_TOOL: LlmTool = {
+export const SOP_TOOL: LlmTool = {
   name: 'create_sop',
   description: 'Create a structured SOP from the analysed source material',
   input_schema: {
@@ -157,6 +157,19 @@ const SYSTEM_PROMPT_WITH_TITLE = SYSTEM_PROMPT + `
 ### 8. TITLE NAMING — follow these conventions exactly
 ${TITLE_CONVENTIONS}`
 
+// ADR-0015: the direct translation. Overrides sections 2, 3, 4 and 5 where they conflict, so the
+// worker can lay it beside the original and find every line in the same place.
+const FAITHFUL_MODE = `
+
+### 9. DIRECT TRANSLATION MODE — overrides sections 2, 3, 4 and 5 where they conflict
+This output is the faithful direct translation of the source. A reader must be able to lay it beside the original and find every line, in the same order.
+- ORDER: keep the source order exactly — sections, steps, list items and table rows in the order they appear. Do not move content between sections; front-matter stays at the front, appendices stay at the end.
+- ONE STEP PER SOURCE STEP: each numbered step, list item or procedural table row becomes one step. Split only where the source itself numbers or bullets sub-steps. Never merge two source steps.
+- WORDING: copy each instruction as written. You may only fix spacing, obvious misspellings and broken punctuation. Do not rephrase, shorten, expand abbreviations, or change voice.
+- TABLE ROWS: a row's step text goes in \`text\`, its hazard in \`warning\`, its controls in \`caution\`, its risk rating appended to \`caution\` as "Risk: <rating>".
+- Tick-box grids: list only the ticked items, under the grid's own heading.
+- No photo suggestions (no 📷 tips) and no added time estimates.`
+
 const FORMAT_HINTS: Partial<Record<SourceFileType | 'prompt', string>> = {
   xlsx: '\n\nNote: This text was extracted from an Excel spreadsheet. Treat table headers as section titles, preserve numerical tolerances exactly.',
   pptx: '\n\nNote: This text was extracted from a PowerPoint presentation. Each slide title is a likely section heading.',
@@ -234,11 +247,11 @@ export async function parseSop(
   optsOrInputType?:
     | SourceFileType
     | 'prompt'
-    | { sourceMode?: SourceFileType | 'prompt'; detailLevel?: number; models?: ParseModelOverrides },
+    | { sourceMode?: SourceFileType | 'prompt'; detailLevel?: number; models?: ParseModelOverrides; faithful?: boolean },
   detailLevelLegacy: number = 3,
 ): Promise<ParsedSop> {
   // Normalise legacy positional and new opts shape into a single opts object.
-  const opts: { sourceMode?: SourceFileType | 'prompt'; detailLevel?: number; models?: ParseModelOverrides } =
+  const opts: { sourceMode?: SourceFileType | 'prompt'; detailLevel?: number; models?: ParseModelOverrides; faithful?: boolean } =
     typeof optsOrInputType === 'object' && optsOrInputType !== null
       ? optsOrInputType
       : { sourceMode: optsOrInputType ?? undefined, detailLevel: detailLevelLegacy }
@@ -274,12 +287,16 @@ export async function parseSop(
     // output unparseable (surfaced by GLM on prod). All current parse models
     // support ≥16k output.
     maxTokens: 16000,
-    system: SYSTEM_PROMPT_WITH_TITLE,
+    system: SYSTEM_PROMPT_WITH_TITLE + (opts.faithful ? FAITHFUL_MODE : ''),
     messages: [{ role: 'user', content: userContent }],
     tool: SOP_TOOL,
   })) as Record<string, unknown>
 
-  // Map to ParsedSop type (ensure defaults for nullable fields)
+  return toParsedSop(raw, `[Parsed by ${model}, triage: ${triageText}${opts.faithful ? ', direct translation' : ''}]`)
+}
+
+/** Maps a create_sop tool result to ParsedSop, defaulting nullable fields and dropping empty steps. */
+export function toParsedSop(raw: Record<string, unknown>, notesSuffix: string): ParsedSop {
   const parsed: ParsedSop = {
     title: (raw.title as string) ?? 'Untitled SOP',
     sop_number: (raw.sop_number as string) ?? null,
@@ -290,7 +307,7 @@ export async function parseSop(
     applicable_equipment: (raw.applicable_equipment as string[]) ?? null,
     required_certifications: (raw.required_certifications as string[]) ?? null,
     overall_confidence: (raw.overall_confidence as number) ?? 0.7,
-    parse_notes: `${(raw.parse_notes as string) ?? ''} [Parsed by ${model}, triage: ${triageText}]`.trim(),
+    parse_notes: `${(raw.parse_notes as string) ?? ''} ${notesSuffix}`.trim(),
     sections: ((raw.sections as Array<Record<string, unknown>>) ?? []).map((s, i) => ({
       order: (s.order as number) ?? i + 1,
       type: (s.type as string) ?? 'procedure',

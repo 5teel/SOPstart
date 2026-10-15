@@ -29,3 +29,4 @@ code, plans and phases follow it until a later ADR supersedes it.
 | [0012](0012-read-and-run-one-view.md) | Reading and doing a SOP are one view; the start merge marks the first record | Accepted | `tests/evals/start.eval.ts`, `tests/phase63/fuse-wiring.spec.ts` |
 | [0013](0013-safety-sign-colours.md) | Step kinds wear the AS 1319 safety sign colours and shapes | Accepted | `tests/lint/design-tokens.spec.ts` |
 | [0014](0014-site-map-colours.md) | The site map stays off the safety sign colours | Accepted | `tests/lint/design-tokens.spec.ts` · `tests/phase57/departments.spec.ts` |
+| [0015](0015-direct-and-clear-versions.md) | Every SOP has a direct translation (the record) and a clear version workers see once an admin approves it | Accepted | `tests/evals/clear-version.eval.ts` |

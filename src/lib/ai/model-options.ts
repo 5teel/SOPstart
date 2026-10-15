@@ -35,6 +35,8 @@ const ANTHROPIC_LLM_OPTIONS: readonly AiModelOption[] = [
   { id: 'claude-sonnet-4-6', label: 'Claude Sonnet 4.6', note: 'balanced' },
   { id: 'claude-sonnet-5', label: 'Claude Sonnet 5', note: 'most capable Sonnet' },
   { id: 'claude-opus-4-8', label: 'Claude Opus 4.8', note: 'highest quality · $$$' },
+  { id: 'claude-sonnet-5-5', label: 'Claude Sonnet 5.5', note: 'best on the SOP eval · default' },
+  { id: 'claude-opus-5-5', label: 'Claude Opus 5.5', note: 'highest quality · $$$' },
 ]
 
 const DEEPGRAM_STT_OPTIONS: readonly AiModelOption[] = [
@@ -46,6 +48,11 @@ export const AI_MODEL_OPTIONS: Record<AiModelKey, readonly AiModelOption[]> = {
   'parse-triage': [...ANTHROPIC_LLM_OPTIONS, ...CROSS_PROVIDER_LLM_OPTIONS],
   'parse-simple': [...ANTHROPIC_LLM_OPTIONS, ...CROSS_PROVIDER_LLM_OPTIONS],
   'parse-complex': [...ANTHROPIC_LLM_OPTIONS, ...CROSS_PROVIDER_LLM_OPTIONS],
+  'parse-enhance': ANTHROPIC_LLM_OPTIONS,
+  'parse-enhance-check': [
+    { id: 'openai/gpt-5.6-sol', label: 'GPT-5.6 Sol', note: 'via OpenRouter · a different family from the writer', provider: 'openrouter' },
+    { id: 'openai/gpt-5.6-luna', label: 'GPT-5.6 Luna', note: 'via OpenRouter · cheap', provider: 'openrouter' },
+  ],
   'draft-verify': ANTHROPIC_LLM_OPTIONS,
   synthesis: ANTHROPIC_LLM_OPTIONS,
   'vision-image-describe': [
@@ -65,6 +72,8 @@ export const AI_MODEL_LABELS: Record<AiModelKey, string> = {
   'parse-triage': 'Parse triage model',
   'parse-simple': 'Parse model (simple docs)',
   'parse-complex': 'Parse model (complex docs)',
+  'parse-enhance': 'Clear version model',
+  'parse-enhance-check': 'Clear version check model',
   'draft-verify': 'Draft verification model',
   synthesis: 'Synthesis model',
   'vision-image-describe': 'Image description model',

@@ -15,6 +15,7 @@ import { getOrgAiModels, resolveOrgModel } from '@/lib/ai/org-settings'
 import { ensureSopTitle } from '@/lib/parsers/sop-title'
 import { uploadExtractedImages } from '@/lib/parsers/image-uploader'
 import { triggerReviewerOnParseCompletion } from '@/lib/parsers/parse-pipeline'
+import { writeClearVersion } from '@/lib/parsers/enhance-sop'
 import { writeFocusStepsForSop } from '@/lib/sop/focus-write'
 import type { ParsedSop } from '@/lib/validators/sop'
 import { normaliseToCategorySlug } from '@/lib/sop-categories'
@@ -188,8 +189,10 @@ export async function POST(request: NextRequest) {
     // overrides from AI Settings (org setting > env > registry default).
     await setStage('drafting')
     const orgModels = organisationId ? await getOrgAiModels(admin, organisationId) : {}
+    // ADR-0015: the sections are the direct translation; the clear version is written beside them below.
     const parsed: ParsedSop = await parseSop(extractedText, {
       sourceMode: fileType,
+      faithful: true,
       models: {
         triage: resolveOrgModel('parse-triage', orgModels),
         simple: resolveOrgModel('parse-simple', orgModels),
@@ -359,6 +362,18 @@ export async function POST(request: NextRequest) {
     // MUST NOT await — parse-completion response should not block on
     // Anthropic latency. Failures are logged inside the helper.
     void triggerReviewerOnParseCompletion(job.id)
+
+    // ADR-0015: the clear version (a few minutes of model time) lands after the job completes. Same
+    // fire-and-forget as the reviewer; a failure leaves the SOP with its direct translation only.
+    void writeClearVersion(admin, {
+      organisationId,
+      sopId,
+      sourceText: extractedText,
+      direct: parsed,
+      images: uploadedImages,
+      model: resolveOrgModel('parse-enhance', orgModels),
+      checkModel: resolveOrgModel('parse-enhance-check', orgModels),
+    }).catch((err) => console.error('[parse] clear version failed:', err instanceof Error ? err.message : err))
 
     return NextResponse.json({ success: true, sopId })
   } catch (error) {
