@@ -78,6 +78,12 @@ async function asRole<T>(browser: Browser, role: EvalRole, viewport: { width: nu
 }
 
 const row = (page: Page, sopId: string) => page.locator(`[data-testid="sop-row"][data-sop-id="${sopId}"]`)
+/** Open a fixture SOP from the list; ADR-0016: when its row is not showing, search for it by title. */
+async function openRow(page: Page, sopId: string, title: string) {
+  const r = row(page, sopId).last()
+  if (!(await r.isVisible())) await page.getByTestId('sop-search').fill(title)
+  await r.click()
+}
 const plate = (page: Page, areaId: string) => page.locator(`[data-testid="map-area"][data-area-id="${areaId}"]`)
 const sectionIds = (page: Page) => page.locator('[data-testid^="home-section-"]').evaluateAll((els) => els.map((e) => (e as HTMLElement).dataset.testid))
 const viewBox = async (page: Page) => ((await page.getByTestId('site-map').getAttribute('viewBox')) ?? '').split(/\s+/).map(Number)
@@ -381,7 +387,7 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
       await listReady(page)
       const h1 = page.getByTestId('read-view').locator('h1')
 
-      await row(page, lib.sopIds.packing).last().click()
+      await openRow(page, lib.sopIds.packing, EVAL_AREA_SOPS.packing)
       await expect(h1).toHaveText(EVAL_AREA_SOPS.packing, SLOW)
       await expect(page.getByTestId('read-steps').locator('> li').first()).toContainText('Moving equipment nearby.', SLOW)
 
@@ -408,7 +414,7 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
       await expect(page.getByTestId('panel-list')).toHaveAttribute('aria-pressed', 'true')
 
       // With the list open, open the second SOP without going back: the list stays open.
-      await row(page, lib.sopIds.lab).last().click()
+      await openRow(page, lib.sopIds.lab, EVAL_AREA_SOPS.lab)
       await expect(h1).toHaveText(EVAL_AREA_SOPS.lab, SLOW)
       await expect(meta(page)).toContainText('EVAL Area Lab', SLOW)
       await expect(meta(page)).not.toContainText('EVAL Area Packing')
@@ -416,7 +422,7 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
       await expect(page).toHaveURL(new RegExp(`sop=${lib.sopIds.lab}`), SLOW)
 
       // And back to the first: nothing carried over from the second.
-      await row(page, lib.sopIds.packing).last().click()
+      await openRow(page, lib.sopIds.packing, EVAL_AREA_SOPS.packing)
       await expect(h1).toHaveText(EVAL_AREA_SOPS.packing, SLOW)
       await expect(meta(page)).not.toContainText('EVAL Area Lab')
       await expect(page.getByTestId('home-list')).toBeVisible()
@@ -704,7 +710,7 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
       await shot(page, '63-home-phone-list')
 
       // From the list, Read's back link names the list.
-      await row(page, lib.sopIds.packing).last().click()
+      await openRow(page, lib.sopIds.packing, EVAL_AREA_SOPS.packing)
       await expect(page.getByTestId('read-view')).toBeVisible(SLOW)
       await expect(page.getByTestId('read-back')).toContainText('My SOPs')
       await noSideways(page, 'read from list')
