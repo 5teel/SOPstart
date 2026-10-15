@@ -1,0 +1,30 @@
+# SOPstart on Fly.io, Sydney (next to the Supabase database, ap-southeast-2).
+app = 'sopstart'
+primary_region = 'syd'
+
+[build]
+  # Public values baked into the browser bundle (they ship to every browser anyway).
+  [build.args]
+    NEXT_PUBLIC_SUPABASE_URL = "https://gknxhqinzjvuupccyojv.supabase.co"
+    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY = "sb_publishable_j9R0p-RQS1uOay-DyWiG6Q_vMDyiDcp"
+    NEXT_PUBLIC_SITE_URL = "https://sopstart.com"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  # Always on: parse, the clear version and the sign-off ledger finish after the response.
+  auto_stop_machines = 'off'
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [[http_service.checks]]
+    grace_period = '30s'
+    interval = '15s'
+    method = 'GET'
+    path = '/api/version'
+    timeout = '5s'
+
+[[vm]]
+  memory = '2gb'
+  cpu_kind = 'shared'
+  cpus = 2

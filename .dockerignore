@@ -1,0 +1,22 @@
+.git
+node_modules
+.next
+.env
+.env.*
+.autoresearch
+.planning
+.playwright-mcp
+.agents
+.codex
+graphify-out
+generated_imgs
+requirements
+test-results
+playwright-report
+SOPstart - Raw SOPs
+*.zip
+/*.png
+/*.pptx
+/*.txt
+/*.yml
+/*.stackdump
