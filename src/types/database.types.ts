@@ -69,6 +69,7 @@ export type Database = {
       organisations: {
         Row: {
           created_at: string
+          hidden_from_picker: boolean
           id: string
           invite_code: string
           name: string
@@ -76,6 +77,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          hidden_from_picker?: boolean
           id?: string
           invite_code?: string
           name: string
@@ -83,6 +85,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          hidden_from_picker?: boolean
           id?: string
           invite_code?: string
           name?: string

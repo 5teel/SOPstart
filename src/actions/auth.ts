@@ -9,7 +9,6 @@ import { getSessionContext } from '@/lib/auth/session-context'
 import { roleHome } from '@/lib/auth/role-home'
 import { safeNextPath } from '@/lib/auth/next-redirect'
 import { recordDecision } from '@/lib/decisions/record'
-import { hiddenSiteIds } from '@/lib/auth/sites'
 import { deleteOrgMember } from '@/lib/members/remove'
 import type { TablesInsert, TablesUpdate } from '@/types/database.types'
 import type { AppRole } from '@/types/auth'
@@ -48,6 +47,8 @@ export async function switchSite(orgId: string): Promise<{ error?: string }> {
     .eq('organisation_id', orgId)
     .maybeSingle()
   if (!member) return { error: 'You are not a member of that site.' }
+  const { data: site } = await createAdminClient().from('organisations').select('hidden_from_picker').eq('id', orgId).maybeSingle()
+  if (site?.hidden_from_picker) return { error: 'That site is hidden.' }
   const { error } = await supabase.auth.updateUser({ data: { active_org_id: orgId } })
   if (error) return { error: "That didn't work. Try again." }
   await supabase.auth.refreshSession()
@@ -55,31 +56,35 @@ export async function switchSite(orgId: string): Promise<{ error?: string }> {
 }
 
 // ─────────────────────────────────────────────
-// setSiteHidden — 2026-10-15. Someone in several sites keeps one out of their own site
-// picker (Settings → Your site picker). Stored beside active_org_id in the user's metadata;
-// it changes only what this person's picker lists, so like switchSite it is not a ledger row.
-// The site you are in cannot be hidden.
+// setSiteHidden — 2026-10-15. An admin of a site hides it from every member's site picker
+// (Settings → Sites in the picker), or brings it back. Members and data are untouched;
+// switchSite refuses a hidden site. The site you are in cannot be hidden. Ledger: one
+// settings_change row in the session's site naming the site changed (recordDecision takes
+// its org from the session only).
 // ─────────────────────────────────────────────
 
-export async function setSiteHidden(orgId: string, hidden: boolean): Promise<{ error?: string }> {
+export async function setSiteHidden(orgId: string, hidden: boolean): Promise<{ error?: string; logged?: boolean }> {
   if (!z.string().uuid().safeParse(orgId).success || typeof hidden !== 'boolean') return { error: 'Unknown site.' }
-  const { supabase, userId, organisationId } = await getSessionContext()
+  const { userId, organisationId } = await getSessionContext()
   if (!userId) return { error: 'Not authenticated' }
   if (hidden && orgId === organisationId) return { error: 'Switch to another site before hiding this one.' }
-  const { data: member } = await createAdminClient()
+  const admin = createAdminClient()
+  const { data: member } = await admin
     .from('organisation_members')
-    .select('id')
+    .select('role')
     .eq('user_id', userId)
     .eq('organisation_id', orgId)
     .maybeSingle()
-  if (!member) return { error: 'You are not a member of that site.' }
-  const { data } = await supabase.auth.getUser()
-  const now = hiddenSiteIds(data.user?.user_metadata)
-  const next = hidden ? [...new Set([...now, orgId])] : now.filter((id) => id !== orgId)
-  const { error } = await supabase.auth.updateUser({ data: { hidden_site_ids: next } })
-  if (error) return { error: "That didn't work. Try again." }
-  await supabase.auth.refreshSession()
-  return {}
+  if (!member || !['admin', 'safety_manager'].includes(member.role)) return { error: 'Only an admin of that site can hide it.' }
+  const { data: org, error } = await admin.from('organisations').update({ hidden_from_picker: hidden }).eq('id', orgId).select('name')
+  if (error || !org?.length) return { error: "That didn't work. Try again." }
+  const rec = await recordDecision({
+    kind: 'settings_change',
+    subject: { kind: 'site', id: orgId },
+    summary: hidden ? 'Hid a site from every site picker' : 'Showed a site in the site picker again',
+    details: { site: org[0].name },
+  })
+  return { logged: rec.ok }
 }
 
 // ─────────────────────────────────────────────

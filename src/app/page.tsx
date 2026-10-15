@@ -41,8 +41,8 @@ export default async function Home({
     const [{ data: org }, mine] = await Promise.all([
       // '*' carries site_map_packing (00077), which database.types.ts predates.
       supabase.from('organisations').select('*').eq('id', organisationId).maybeSingle(),
-      // The caller's own sites for the picker (2026-10-11), less the ones they hid in Settings.
-      supabase.auth.getClaims().then(({ data }) => mySites(userId, data?.claims?.user_metadata)),
+      // The caller's own sites for the picker (2026-10-11), less the ones an admin hid.
+      mySites(userId),
       ensureReviewDueNotifications(organisationId, userId),
     ])
     if (org?.name) siteName = org.name

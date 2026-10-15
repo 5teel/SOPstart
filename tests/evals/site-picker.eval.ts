@@ -1,9 +1,9 @@
 /**
- * Deployed-site eval -- Settings → Your site picker (2026-10-15): someone in several sites hides one
- * from their own site picker and brings it back. The site they are in cannot be hidden.
+ * Deployed-site eval -- Settings → Sites in the picker (2026-10-15): an admin of two sites hides one
+ * from every member's site picker and brings it back. The site they are in cannot be hidden.
  *
- * Fixture: the eval-site admin is made a worker of a second eval-only site for the run, and taken
- * out of it (and its hidden list cleared) after. Self-skips without EVAL_BASE_URL.
+ * Fixture: the eval-site admin is made an admin of a second eval-only site for the run, and taken
+ * out of it (and the site shown again) after. Self-skips without EVAL_BASE_URL.
  */
 import { test, expect, type Browser } from '@playwright/test'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
@@ -21,7 +21,7 @@ async function open(browser: Browser, path: string) {
   return { ctx, page }
 }
 
-test.describe.serial('Your site picker (deployed)', () => {
+test.describe.serial('Sites in the picker (deployed)', () => {
   test.skip(!EVAL_ENV_READY, 'EVAL_BASE_URL/Supabase env not configured -- self-skipping')
 
   let db: SupabaseClient
@@ -31,8 +31,9 @@ test.describe.serial('Your site picker (deployed)', () => {
 
   const reset = async () => {
     await db.from('organisation_members').delete().eq('user_id', userId).eq('organisation_id', secondId)
+    await db.from('organisations').update({ hidden_from_picker: false }).eq('id', secondId)
     const { data } = await db.auth.admin.getUserById(userId)
-    await db.auth.admin.updateUserById(userId, { user_metadata: { ...data.user?.user_metadata, hidden_site_ids: [], active_org_id: homeId } })
+    await db.auth.admin.updateUserById(userId, { user_metadata: { ...data.user?.user_metadata, active_org_id: homeId } })
   }
 
   test.beforeAll(async () => {
@@ -46,7 +47,7 @@ test.describe.serial('Your site picker (deployed)', () => {
     homeId = own!.find((m) => (m.organisations as unknown as { name: string }).name !== SECOND)!.organisation_id
     secondId = org?.id ?? (await db.from('organisations').insert({ name: SECOND }).select('id').single()).data!.id
     await reset()
-    const { error } = await db.from('organisation_members').insert({ organisation_id: secondId, user_id: userId, role: 'worker' })
+    const { error } = await db.from('organisation_members').insert({ organisation_id: secondId, user_id: userId, role: 'admin' })
     if (error) throw new Error(error.message)
   })
 
@@ -54,7 +55,7 @@ test.describe.serial('Your site picker (deployed)', () => {
     if (EVAL_ENV_READY && db && userId && secondId) await reset()
   })
 
-  test('SITES-01 hiding a site in Settings takes it out of the picker; the site you are in cannot be hidden', async ({ browser }) => {
+  test('SITES-01 hiding a site in Settings takes it out of the picker for everyone; the site you are in cannot be hidden', async ({ browser }) => {
     const { ctx, page } = await open(browser, '/admin/settings')
     try {
       const card = page.getByTestId('site-picker-settings')
@@ -71,6 +72,8 @@ test.describe.serial('Your site picker (deployed)', () => {
       await page.goto('/')
       await expect(page.getByTestId('home-org').first()).toBeAttached(SLOW)
       await expect(page.getByTestId('site-switch')).toHaveCount(0)
+      const { data: row } = await db.from('organisations').select('hidden_from_picker').eq('id', secondId).single()
+      expect(row?.hidden_from_picker).toBe(true)
     } finally {
       await ctx.close()
     }

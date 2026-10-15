@@ -54,7 +54,7 @@ const SECTIONS = [
 
 export default async function AdminSettingsPage() {
   // Auth guard — shared per-request session context (JWT verified locally).
-  const { supabase, userId, role, organisationId } = await getSessionContext()
+  const { userId, role, organisationId } = await getSessionContext()
   if (!userId) redirect('/login')
 
   if (!role || !['admin', 'safety_manager'].includes(role)) {
@@ -74,7 +74,7 @@ export default async function AdminSettingsPage() {
     getApprovalChains(),
     getOrgMembers(),
     getObservationLabels(),
-    supabase.auth.getClaims().then(({ data }) => mySites(userId, data?.claims?.user_metadata)),
+    mySites(userId),
   ])
 
   const chains: Record<string, ChainStep[]> =
@@ -137,13 +137,13 @@ export default async function AdminSettingsPage() {
         <ObservationLabelsCard initial={observationLabels} />
       </div>
 
-      {sites.length > 1 && (
+      {sites.filter((s) => s.admin).length > 1 && (
         <div className="mt-8">
           <div className="flex items-center gap-3 mb-3">
-            <span className="pill">YOU</span>
-            <h2 className="mono text-lg font-semibold text-[var(--ink-900)]">Your site picker</h2>
+            <span className="pill">SITES</span>
+            <h2 className="mono text-lg font-semibold text-[var(--ink-900)]">Sites in the picker</h2>
           </div>
-          <SitePickerCard sites={sites} currentId={organisationId} />
+          <SitePickerCard sites={sites.filter((s) => s.admin)} currentId={organisationId} />
         </div>
       )}
     </div>

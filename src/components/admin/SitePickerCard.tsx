@@ -1,7 +1,7 @@
 'use client'
 /**
- * Settings → Your site picker (2026-10-15): someone in several sites chooses which ones their
- * site picker lists. Only their own picker changes; the site you are in always stays.
+ * Settings → Sites in the picker (2026-10-15): an admin of several sites hides one from every
+ * member's site picker, or brings it back. The site you are in cannot be hidden.
  */
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -27,7 +27,7 @@ export function SitePickerCard({ sites, currentId }: { sites: MySite[]; currentI
   }
   return (
     <div data-testid="site-picker-settings" className="blueprint-frame flex flex-col gap-1">
-      <p className="pb-1 text-ui text-ink-700">Untick a site to hide it from your site picker. Only your picker changes; nobody else&apos;s.</p>
+      <p className="pb-1 text-ui text-ink-700">Untick a site to hide it from everyone&apos;s site picker. Nobody can switch to a hidden site; its people and SOPs stay as they are. Tick it to bring it back.</p>
       {sites.map((s) => {
         const current = s.id === currentId
         return (
