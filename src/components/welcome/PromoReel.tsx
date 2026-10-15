@@ -14,6 +14,7 @@
  */
 import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from 'react'
 import Link from 'next/link'
+import { ENQUIRIES_EMAIL } from '@/lib/contact'
 import { Wordmark } from '@/components/brand/Wordmark'
 import { Camera, CheckCircle, FileText, Pause, Play, Sparkles } from 'lucide-react'
 import { SITE_PRESETS, presetImagePath } from '@/lib/site/presets'
@@ -483,12 +484,21 @@ export function PromoReel() {
       {/* Header */}
       <header className="absolute inset-x-0 top-0 z-10 flex items-center justify-between p-4">
         <span className="rounded-lg bg-paper/90 px-3 py-2 shadow-lg backdrop-blur"><Wordmark size="header" /></span>
-        <Link
-          href="/login"
-          className="flex min-h-tap items-center rounded-lg bg-ink-900 px-5 text-ui font-semibold text-white shadow-lg hover:opacity-90"
-        >
-          Sign in
-        </Link>
+        <div className="flex items-center gap-2">
+          <a
+            href={`mailto:${ENQUIRIES_EMAIL}`}
+            data-testid="enquiries"
+            className="flex min-h-tap items-center rounded-lg bg-paper/90 px-4 text-ui font-semibold text-ink-900 shadow-lg backdrop-blur hover:bg-paper"
+          >
+            Enquiries
+          </a>
+          <Link
+            href="/login"
+            className="flex min-h-tap items-center rounded-lg bg-ink-900 px-5 text-ui font-semibold text-white shadow-lg hover:opacity-90"
+          >
+            Sign in
+          </Link>
+        </div>
       </header>
 
       {scene.id === 'hook' && (

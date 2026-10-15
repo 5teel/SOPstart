@@ -77,7 +77,12 @@ function base64url(s: string) {
 
 /** Install an authenticated session for `role` into a Playwright context. */
 export async function signInAs(context: BrowserContext, role: EvalRole) {
-  const session = await mintSession(EVAL_USERS[role])
+  return signInAsEmail(context, EVAL_USERS[role])
+}
+
+/** Same, for a throwaway account an eval created itself. */
+export async function signInAsEmail(context: BrowserContext, email: string) {
+  const session = await mintSession(email)
   const value = 'base64-' + base64url(JSON.stringify(session))
   const name = `sb-${PROJECT_REF}-auth-token`
   const host = new URL(EVAL_BASE_URL).hostname

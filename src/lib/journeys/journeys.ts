@@ -57,7 +57,7 @@ export const JOURNEYS: Journey[] = [
     summary: 'An existing member signs in and lands on their home screen.',
     steps: [
       { id: 's', type: 'start', label: 'Has an account' },
-      { id: 'welcome', type: 'screen', label: 'Promo reel', route: '/welcome', detail: 'A signed-out visit to / lands here: a looping reel over a template site (machines and SOPs, consistent structure, visual steps, AI building). Sign in leads to the login screen.' },
+      { id: 'welcome', type: 'screen', label: 'Promo reel', route: '/welcome', detail: 'A signed-out visit to / lands here: a looping reel over a template site (machines and SOPs, consistent structure, visual steps, AI building). Sign in leads to the login screen; Enquiries opens an email to SOPstart.' },
       { id: 'login', type: 'screen', label: 'Login screen', route: '/login' },
       { id: 'auth', type: 'action', label: 'Enter email + password', detail: 'Supabase Auth verifies and sets a session. roleHome(role) sends every role to the home, or to /pending when there is no role (UX-01, Phase 57).' },
       { id: 'role', type: 'decision', label: 'Role?', branches: [
@@ -65,7 +65,7 @@ export const JOURNEYS: Journey[] = [
         { label: 'No role yet', to: 'pending-home' },
       ] },
       { id: 'one-screen', type: 'screen', label: 'The home - search and the SOP list', route: '/', detail: 'Every role lands here (Phase 63). Admins and safety managers also see the Sign-offs, People, Training and Manage SOPs sections.' },
-      { id: 'pending-home', type: 'screen', label: 'Account pending', route: '/pending', detail: 'Holding screen until an admin assigns a role.' },
+      { id: 'pending-home', type: 'screen', label: 'Account pending', route: '/pending', detail: 'Holding screen for an account that cannot open a site yet. A new account waits here for a SOPstart admin to approve it (ADR-0018): Waiting for approval, with Check again; a turned-down account says so. Otherwise it waits for an admin to give it a role.' },
       { id: 'e', type: 'end', label: 'Signed in' },
     ],
   },
@@ -310,6 +310,7 @@ export const JOURNEYS: Journey[] = [
       { id: 'team', type: 'screen', label: 'People - people and roles', route: '/', detail: 'The People section opens on a department board: every department with its people grouped by role, each marked Signs off, Assigns or Approves. Who can do what shows one row per person and one column per authority. Clicking a person opens the person sheet (role, departments, the workers a supervisor signs off, objective, removal). The old /admin/team address redirects here.' },
       { id: 'site', type: 'screen', label: 'Site map - edit mode', route: '/', detail: 'The plant-floor scene and its machines (Phase 51) - draw/name/tag machines, link SOPs to them. In Manage SOPs with view=site; the old /admin/site address redirects there.' },
       { id: 'settings', type: 'screen', label: 'Settings hub', route: '/admin/settings', detail: 'Groups AI Settings, a link to Departments (site edit mode), the AI agent layer, and the approval-chain editor under one home.' },
+      { id: 'approvals', type: 'screen', label: 'New accounts', route: '/admin/approvals', detail: 'SOPstart (platform) admins only, from the New accounts card in Settings (ADR-0018). Everyone waiting: email, the site and role they were invited to, when. Approve or Turn down; each is logged in the ledger. Turned-down accounts are listed below and can still be approved.' },
       { id: 'ai', type: 'screen', label: 'AI Settings', route: '/admin/ai-settings', detail: 'Reached from the Settings hub. Per-organisation AI model overrides (parse pipeline) + read-only view of every env-managed model.' },
       { id: 'e', type: 'end', label: 'On the chosen path' },
     ],

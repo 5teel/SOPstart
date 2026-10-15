@@ -54,7 +54,7 @@ const SECTIONS = [
 
 export default async function AdminSettingsPage() {
   // Auth guard — shared per-request session context (JWT verified locally).
-  const { userId, role, organisationId } = await getSessionContext()
+  const { supabase, userId, role, organisationId } = await getSessionContext()
   if (!userId) redirect('/login')
 
   if (!role || !['admin', 'safety_manager'].includes(role)) {
@@ -76,6 +76,14 @@ export default async function AdminSettingsPage() {
     getObservationLabels(),
     mySites(userId),
   ])
+  // ADR-0018: a SOPstart (platform) admin also sees the accounts waiting for approval.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: isPlatform } = await (supabase as any).rpc('is_platform_admin')
+  const waiting =
+    isPlatform === true
+      ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ((await (supabase as any).from('user_approvals').select('user_id', { count: 'exact', head: true }).eq('status', 'pending')).count ?? 0)
+      : null
 
   const chains: Record<string, ChainStep[]> =
     'success' in chainsResult && chainsResult.success
@@ -104,6 +112,13 @@ export default async function AdminSettingsPage() {
 
 
       <div className="grid gap-3 sm:grid-cols-2">
+        {waiting !== null && (
+          <Link href="/admin/approvals" data-testid="settings-approvals" className="blueprint-frame block transition-shadow hover:shadow-[0_0_0_1px_var(--ink-900)]">
+            <p className="mono text-micro text-[var(--ink-500)] uppercase tracking-widest mb-2">SOPSTART</p>
+            <h3 className="text-base font-semibold text-[var(--ink-900)] mb-1">New accounts{waiting > 0 ? ` (${waiting} waiting)` : ''}</h3>
+            <p className="text-sm text-[var(--ink-500)]">Approve or turn down everyone who signs in for the first time.</p>
+          </Link>
+        )}
         {SECTIONS.map((section) => (
           <Link
             key={section.href}
