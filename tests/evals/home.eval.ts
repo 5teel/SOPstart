@@ -535,7 +535,7 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
             return { t: el.textContent, lines: new Set([...r.getClientRects()].map((b) => Math.round(b.top))).size, w: el.scrollWidth - el.clientWidth }
           }),
         )
-        expect(tabs.length, 'admin has six tabs').toBe(6)
+        expect(tabs.length, 'admin has five tabs').toBe(5)
         for (const tab of tabs) {
           expect(tab.lines, `tab "${tab.t}" wraps (${current} current)`).toBe(1)
           expect(tab.w, `tab "${tab.t}" overflows (${current} current)`).toBeLessThanOrEqual(0)

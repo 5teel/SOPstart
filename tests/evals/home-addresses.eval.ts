@@ -160,7 +160,7 @@ test.describe.serial('Phase 63 -- home addresses (deployed)', () => {
           from: `/?place=dept:${formingId}`,
           search: `?area=${formingId}`,
           check: async () => {
-            await expect(page.getByTestId('area-filter')).toContainText('In Forming', SLOW)
+            await expect(page.getByTestId('area-filter').getByRole('heading')).toHaveText('Forming', SLOW)
           },
         },
       ]

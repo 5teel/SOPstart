@@ -428,12 +428,12 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       await page.close()
     })
 
-    test('idle supervisor: a true empty inbox reads "Nothing waiting for you." with a two-segment tab control (Inbox, Requests) and no chips or cleared-today line (59-09, 60-11)', async () => {
+    test('idle supervisor: a true empty inbox reads "Nothing waiting for you." with a three-segment tab control (Inbox, Requests, Mine) and no chips or cleared-today line (59-09, 60-11)', async () => {
       const page = await idleCtx.newPage()
       await openOffice(page)
       await expect(page.getByTestId('office-empty')).toHaveText('Nothing waiting for you.', SLOW)
       await expect(page.getByRole('tablist', { name: 'Tabs' })).toHaveCount(1)
-      await expect(page.getByRole('tab')).toHaveCount(2)
+      await expect(page.getByRole('tab')).toHaveCount(3)
       await expect(page.getByTestId('office-tab-requests')).toHaveCount(1)
       await expect(page.getByTestId('office-chip')).toHaveCount(0)
       await expect(page.getByTestId('office-cleared-today')).toHaveCount(0)
@@ -506,7 +506,7 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       await openOffice(page)
 
       // A supervisor has the Inbox and Requests: a two-segment tab control, no chips, no cleared-today line.
-      await expect(page.getByRole('tab')).toHaveCount(2, SLOW)
+      await expect(page.getByRole('tab')).toHaveCount(3, SLOW) // Inbox, Requests, Mine
       await expect(page.getByTestId('office-chip')).toHaveCount(0)
       await expect(page.getByTestId('office-cleared-today')).toHaveCount(0)
 
@@ -857,14 +857,14 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       expect(errors).toEqual([])
       await page.close()
     })
-    test('supervisor Sign-offs: Inbox and Requests only, a tab they lack falls back to the inbox, People is the list (59-13, 60-11)', async () => {
+    test('supervisor Sign-offs: Inbox, Requests and Mine only, a tab they lack falls back to the inbox, People is the list (59-13, 60-11)', async () => {
       const page = await supervisorCtx.newPage()
       const errors = watchConsole(page)
       for (const address of ['/?s=signoffs', '/?s=signoffs&tab=people', '/?s=signoffs&tab=access', '/?s=signoffs&tab=decisions']) {
         await page.goto(address)
         await expect(page.getByTestId('office-pane'), address).toHaveCount(1, SLOW)
         await expect(page.getByTestId('office-pane'), address).toHaveAttribute('data-tab', 'inbox', SLOW)
-        await expect(page.getByRole('tab'), address).toHaveCount(2)
+        await expect(page.getByRole('tab'), address).toHaveCount(3)
         await expect(page.getByTestId('office-chip'), address).toHaveCount(0)
         await expect(page.getByTestId('people-tab'), address).toHaveCount(0)
       }

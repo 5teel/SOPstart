@@ -71,7 +71,7 @@ test.describe('Phase 60 -- requests, notifications and objectives (deployed)', (
       await deleteEvalRequestRows(db, siteOrgId).catch(() => null)
     })
 
-    test('supervisor Requests tab: the tab bar shows Inbox and Requests, the request has its count, accept opens the SOP (60-11)', async ({ browser }) => {
+    test('supervisor Requests tab: the tab bar shows Inbox, Requests and Mine, the request has its count, accept opens the SOP (60-11)', async ({ browser }) => {
       test.setTimeout(180_000)
       const note = `EVAL supervisor request ${runId}`
       const { data: sop } = await db.from('sops').select('id').eq('organisation_id', siteOrgId).eq('title', EVAL_SITE_SOP_TITLE).limit(1).single()
@@ -89,7 +89,7 @@ test.describe('Phase 60 -- requests, notifications and objectives (deployed)', (
       const page = await ctx.newPage()
       await page.goto('/?s=signoffs')
       await expect(page.getByTestId('office-pane')).toHaveCount(1, SLOW)
-      await expect(page.getByRole('tab')).toHaveCount(2, SLOW)
+      await expect(page.getByRole('tab')).toHaveCount(3, SLOW)
       await page.getByTestId('office-tab-requests').click()
       const row = page.getByTestId('request-row').filter({ hasText: note })
       await expect(row).toHaveCount(1, SLOW)
