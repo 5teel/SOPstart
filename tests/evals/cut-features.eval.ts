@@ -67,6 +67,8 @@ test.describe('Phase 55 — cut features (deployed)', () => {
 
     await expect(page.getByTestId('home')).toBeVisible(SLOW)
     await expect(page.getByTestId('sop-list')).toBeVisible(SLOW)
+    // ADR-0016: SOPs show once an area is stepped into.
+    await page.getByTestId('area-group').filter({ hasText: 'Forming' }).click()
     await expect(page.getByTestId('sop-row').filter({ hasText: EVAL_PLANT_SOP_TITLE }).first()).toBeVisible(SLOW)
     await expect(page.getByTestId('site-map')).toBeVisible(SLOW)
     await expect(page.getByTestId('plant-ask-mic')).toHaveCount(0)

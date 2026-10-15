@@ -96,10 +96,10 @@ async function pressObject(obj: Locator) {
   }
 }
 
-/** Wait for the list to hold rows (the library query landed). */
+/** Wait for the list to hold its areas (the library query landed; ADR-0016: SOP rows show once you step in). */
 async function listReady(page: Page) {
   await expect(page.getByTestId('sop-list')).toBeVisible(SLOW)
-  await expect(page.getByTestId('sop-row').first()).toBeVisible(SLOW)
+  await expect(page.getByTestId('area-group').first()).toBeVisible(SLOW)
 }
 
 /** The page never scrolls sideways (phone). */
@@ -235,41 +235,42 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
 
       // By area: the four fixture areas are group headers by name.
       for (const name of EVAL_AREA_NAMES) await expect(page.getByTestId('area-group').filter({ hasText: name }), name).toHaveCount(1, SLOW)
-      // Under its area heading a row names its type, not the area again (2026-10-12).
-      for (const [title, type] of [[EVAL_AREA_SOPS.packing, 'Process'], [EVAL_AREA_SOPS.lab, 'Inspection'], [EVAL_AREA_SOPS.site, 'Emergency'], [EVAL_PLANT_SOP_TITLE, 'Machine']]) {
-        const r = page.getByTestId('sop-row').filter({ hasText: title }).last()
-        await expect(r, title).toContainText(type, SLOW)
-        await expect(r, title).not.toContainText(' · ' + type) // no "Area · Type" here
-      }
-      // Grouped by type, each row names its area and type.
-      const meta: Array<[string, string]> = [
-        [EVAL_AREA_SOPS.packing, 'EVAL Area Packing · Process'],
-        [EVAL_AREA_SOPS.lab, 'EVAL Area Lab · Inspection'],
-        [EVAL_AREA_SOPS.site, 'Site-wide · Emergency'],
-        [EVAL_PLANT_SOP_TITLE, 'Forming · Machine'],
-      ]
+      // ADR-0016: All SOPs is a framed list of areas with counts; nothing else is open until you pick one.
+      await expect(page.getByTestId('area-group').filter({ hasText: EVAL_AREA_NAMES[0] })).toContainText(/\d+ SOPs?/, SLOW)
       await shot(page, '63-home-list-area')
-
-      // By type: Machine, Process, Inspection, Emergency each hold their fixture SOP.
+      // Grouped by type: a type is stepped into like an area, and its rows name area and type.
+      const meta: Array<[string, string, string]> = [
+        ['Process', EVAL_AREA_SOPS.packing, 'EVAL Area Packing · Process'],
+        ['Inspection', EVAL_AREA_SOPS.lab, 'EVAL Area Lab · Inspection'],
+        ['Emergency', EVAL_AREA_SOPS.site, 'Site-wide · Emergency'],
+        ['Machine', EVAL_PLANT_SOP_TITLE, 'Forming · Machine'],
+      ]
       await page.getByRole('button', { name: 'Type', exact: true }).click()
-      for (const [title, m] of meta) await expect(page.getByTestId('sop-row').filter({ hasText: title }).last(), title).toContainText(m, SLOW)
-      const group = (t: string) => page.locator('h3').filter({ hasText: new RegExp(`^${t}\\s*\\d+$`) }).locator('..')
-      await expect(group('Machine')).toContainText(EVAL_PLANT_SOP_TITLE, SLOW)
-      await expect(group('Process')).toContainText(EVAL_AREA_SOPS.packing, SLOW)
-      await expect(group('Inspection')).toContainText(EVAL_AREA_SOPS.lab, SLOW)
-      await expect(group('Emergency')).toContainText(EVAL_AREA_SOPS.site, SLOW)
       await shot(page, '63-home-list-type')
+      for (const [type, title, m] of meta) {
+        await page.getByTestId('type-group').filter({ hasText: type }).click()
+        await expect(page.getByTestId('type-filter')).toContainText(type, SLOW)
+        await expect(page.getByTestId('sop-row').filter({ hasText: title }).first(), title).toContainText(m, SLOW)
+        await page.getByTestId('type-back').click()
+      }
 
       // Recent: open two SOPs, newest first.
+      // Stepped into through its type (ADR-0016), then back to the top of the list.
       const open = async (id: string) => {
+        const type = id === lib.sopIds.packing ? 'Process' : 'Inspection'
+        await page.getByTestId('type-group').filter({ hasText: type }).click()
         await row(page, id).last().click()
         await expect(page.getByTestId('read-view')).toBeVisible(SLOW)
         await expect(page).toHaveURL(new RegExp(`sop=${id}`), SLOW)
       }
       await open(lib.sopIds.packing)
-      await page.getByTestId('read-back').click() // Read folds the list away (ADR-0011)
+      const top = async () => {
+        await page.getByTestId('read-back').click() // Read folds the list away (ADR-0011)
+        if (await page.getByTestId('type-back').count()) await page.getByTestId('type-back').click()
+      }
+      await top()
       await open(lib.sopIds.lab)
-      await page.getByTestId('read-back').click()
+      await top()
       await expect(page.getByTestId('sop-row').nth(0)).toHaveAttribute('data-sop-id', lib.sopIds.lab, SLOW)
       await expect(page.getByTestId('sop-row').nth(1)).toHaveAttribute('data-sop-id', lib.sopIds.packing, SLOW)
       await expect(page.getByTestId('sop-list').getByText('Recent', { exact: true })).toBeVisible()
@@ -295,6 +296,8 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
 
       await page.goto('/')
       await listReady(page)
+      // ADR-0016: Recent and Most used share one shelf; pick Most used.
+      await page.getByTestId('sop-shelf').getByRole('button', { name: 'Most used', exact: true }).click()
       const most = page.getByTestId('sop-row').filter({ hasText: EVAL_WALK_SOP_TITLE }).filter({ hasText: /done \d+×/ })
       await expect(most.first()).toBeVisible(SLOW)
       await expect(page.getByTestId('sop-list').getByText('Most used', { exact: true })).toBeVisible()

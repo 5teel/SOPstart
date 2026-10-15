@@ -87,7 +87,7 @@ export function RequestRow({ request, onDone }: { request: OfficeRequest; onDone
       data-key={request.id}
       data-kind={request.kind}
       data-agent={request.agent ? 'true' : 'false'}
-      className={`min-h-tap-row border-b border-ink-100 px-4 py-3 ${pending ? 'opacity-60' : ''}`}
+      className={`min-h-tap-row bg-paper-1 px-4 py-3 ${pending ? 'opacity-60' : ''}`}
     >
       <div className="flex gap-3">
         <span className={`mt-1 size-3 shrink-0 rounded-full ${request.agent ? 'bg-ink-300' : 'bg-accent-measure'}`} aria-hidden />

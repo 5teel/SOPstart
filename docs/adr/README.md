@@ -30,3 +30,4 @@ code, plans and phases follow it until a later ADR supersedes it.
 | [0013](0013-safety-sign-colours.md) | Step kinds wear the AS 1319 safety sign colours and shapes | Accepted | `tests/lint/design-tokens.spec.ts` |
 | [0014](0014-site-map-colours.md) | The site map stays off the safety sign colours | Accepted | `tests/lint/design-tokens.spec.ts` · `tests/phase57/departments.spec.ts` |
 | [0015](0015-direct-and-clear-versions.md) | Every SOP has a direct translation (the record) and a clear version workers see once an admin approves it | Accepted | `tests/evals/clear-version.eval.ts` |
+| [0016](0016-lists-delineated-and-stepped.md) | Lists are framed rows; long lists are stepped into (areas or types, then SOPs) | Accepted | `tests/phase63/sop-list.spec.ts`, `tests/evals/home.eval.ts` HOME-02 |

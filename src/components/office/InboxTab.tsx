@@ -199,7 +199,7 @@ export function InboxTab({
   for (const g of ghosts) rows.splice(Math.min(g.index, rows.length), 0, { item: g.item, ghost: g })
 
   return (
-    <ul ref={listRef} data-testid="office-list">
+    <ul ref={listRef} data-testid="office-list" className="list">
       {rows.map(({ item, ghost }) => (
         <InboxRow
           key={item.key}

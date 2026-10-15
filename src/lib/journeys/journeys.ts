@@ -110,11 +110,11 @@ export const JOURNEYS: Journey[] = [
     summary: 'A worker finds the right SOP from the home and reads it before starting work.',
     steps: [
       { id: 's', type: 'start', label: 'Needs to do a task' },
-      { id: 'home', type: 'screen', label: 'The home - search and the SOP list', route: '/', detail: 'Every signed-in role lands here. Search runs over SOP titles, steps and tools. Below it sit Recent (the SOPs you opened last), Most used, and All SOPs, grouped by area or by type.' },
+      { id: 'home', type: 'screen', label: 'The home - search and the SOP list', route: '/', detail: 'Every signed-in role lands here. Search runs over SOP titles, steps and tools. Below it one shelf switches Recent (the SOPs you opened last) and Most used, then All SOPs lists the areas (or types) with their counts: pick one to see its SOPs, Back to return (ADR-0016).' },
       { id: 'pick', type: 'decision', label: 'How do they find it?', branches: [
         { label: 'Type in search', to: 'read' },
         { label: 'Pick from Recent or Most used', to: 'read' },
-        { label: 'Open All SOPs, by area or by type', to: 'read' },
+        { label: 'Step into an area or type under All SOPs', to: 'read' },
         { label: 'Nothing matches', to: 'missing' },
       ] },
       { id: 'missing', type: 'action', label: 'Ask for one', route: '/', detail: 'A search with no match offers Ask for one (it opens a request, with the search words as the note). An admin or safety manager also gets Write it.', branches: [

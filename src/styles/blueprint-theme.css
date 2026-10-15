@@ -289,6 +289,17 @@ body[data-theme="paper"] {
   .tag { display: inline-flex; align-items: center; padding: 0.125rem 0.5rem; border: 1px solid var(--ink-300); border-radius: 0.25rem; font-family: var(--font-label); font-size: var(--text-micro); font-weight: 600; color: var(--ink-700); white-space: nowrap; }
   .tag-warn { border-color: var(--accent-decision); background: var(--tint-decision-bg); color: var(--ink-900); }
 
+  /* Lists (ADR-0016): a framed group of rows on a white card, each row its own band divided by a
+   * hairline; a row that opens something ends in a chevron (.list-chev). Selected = grey band. */
+  .list { display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--ink-200); border-radius: var(--radius-lg); background: var(--paper-1); }
+  .list > * + * { border-top: 1px solid var(--ink-200); }
+  .list-row { display: flex; width: 100%; align-items: center; gap: 0.75rem; min-height: var(--spacing-tap-glove); padding: 0.625rem 0.875rem; text-align: left; background: var(--paper-1); }
+  .list-row:hover { background: var(--paper-2); }
+  .list-row[aria-current="true"] { background: var(--paper-2); }
+  .list-chev { flex-shrink: 0; margin-left: auto; color: var(--ink-400); }
+  /* The label over a list: quiet, with its count and any switch on the right. */
+  .list-head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin: 1.25rem 0 0.5rem; padding: 0 0.25rem; }
+
   /* Safety signal (ISO 3864 / ANSI Z535): a 1 px frame and a solid strip carrying the caps word. */
   .signal { overflow: hidden; border: 1px solid var(--signal); border-radius: var(--radius-lg); background: color-mix(in srgb, var(--signal) 6%, white); }
   .signal-strip { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: var(--signal); color: var(--signal-ink, var(--paper)); font-family: var(--font-label); font-size: var(--text-meta); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }

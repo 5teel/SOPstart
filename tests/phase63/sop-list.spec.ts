@@ -83,7 +83,10 @@ test.describe('sop list', () => {
       expect(s, t).toContain(t)
     }
     expect(s).toContain('aria-pressed')
-    expect(s).toContain('data-testid="area-group"')
+    // ADR-0016: areas and types are rows to step into, built by one drill() helper.
+    expect(s).toContain("'area-group'")
+    expect(s).toContain("'type-group'")
+    expect(s).toContain('className="list"')
     expect(s).toContain('data-testid="area-filter"')
   })
 

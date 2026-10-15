@@ -1,11 +1,12 @@
 'use client'
 /**
- * Phase 63 -- one row of the SOP list (sketch 009 `row`). The area colour is the swatch
+ * Phase 63 -- one row of the SOP list (sketch 009 `row`), a .list-row band (ADR-0016). The area colour is the swatch
  * only (ADR-0004 rule 8); the status is information about the person's own history
  * with the SOP, never a to-do (rule 2). Two lines: the title, then one meta line carrying the
  * area (left out under its own area heading), type, minutes and status.
  */
 import { useQueryClient } from '@tanstack/react-query'
+import { ChevronRight } from 'lucide-react'
 import type { LibraryRow } from '@/hooks/useLibrary'
 import type { RowStatus } from '@/lib/library/status'
 
@@ -50,7 +51,7 @@ export function SopRow({
       onPointerEnter={warm}
       onPointerDown={warm}
       onFocus={warm}
-      className={`flex min-h-tap-row w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left hover:bg-paper-2 ${selected ? 'bg-paper-2' : ''}`}
+      className="list-row min-h-tap-row"
     >
       <span className="min-w-0 flex-1">
         <span className="block text-reading font-semibold leading-snug text-ink-900">{row.title}</span>
@@ -71,6 +72,7 @@ export function SopRow({
           )}
         </span>
       </span>
+      <ChevronRight size={18} aria-hidden="true" className="list-chev" />
     </button>
   )
 }

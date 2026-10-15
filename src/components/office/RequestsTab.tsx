@@ -104,7 +104,7 @@ export function RequestsTab({ onReceipt }: { onReceipt(r: RowDone): void }) {
   }
 
   return (
-    <ul ref={listRef} data-testid="requests-list">
+    <ul ref={listRef} data-testid="requests-list" className="list">
       {requests.map((request) => (
         <RequestRow key={request.id} request={request} onDone={(r) => void handleDone(request.id, r)} />
       ))}

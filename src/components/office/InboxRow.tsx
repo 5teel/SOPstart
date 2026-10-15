@@ -255,7 +255,7 @@ export function InboxRow({
       data-kind={item.kind}
       data-severity={item.severity}
       aria-hidden={leaving ? true : undefined}
-      className={`min-h-tap-row border-b border-ink-100 px-4 py-3 transition-all duration-200 motion-reduce:transition-none ${
+      className={`min-h-tap-row bg-paper-1 px-4 py-3 transition-all duration-200 motion-reduce:transition-none ${
         leaving === 'go' ? 'max-h-0 overflow-hidden border-0 py-0 opacity-0' : leaving === 'ready' ? 'max-h-60 overflow-hidden' : ''
       } ${pending ? 'opacity-60' : ''}`}
     >
