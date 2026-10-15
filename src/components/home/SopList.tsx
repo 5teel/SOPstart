@@ -179,18 +179,19 @@ export function SopList({
           {(recent.length > 0 || mostUsed.length > 0) && (
             <>
               <div className="list-head">
-                <span className="seg seg-quiet" data-testid="sop-shelf">
-                  {recent.length > 0 && (
+                {recent.length > 0 && mostUsed.length > 0 ? (
+                  <span className="seg seg-quiet" data-testid="sop-shelf">
                     <button type="button" aria-pressed={shelfNow === 'recent'} onClick={() => setShelf('recent')}>
                       Recent
                     </button>
-                  )}
-                  {mostUsed.length > 0 && (
                     <button type="button" aria-pressed={shelfNow === 'most'} onClick={() => setShelf('most')}>
                       Most used
                     </button>
-                  )}
-                </span>
+                  </span>
+                ) : (
+                  // Only one shelf has rows: its name is a heading, not a one-button switch.
+                  <span className="section-heading">{recent.length > 0 ? 'Recent' : 'Most used'}</span>
+                )}
               </div>
               <div className="list">
                 {shelfNow === 'recent'
