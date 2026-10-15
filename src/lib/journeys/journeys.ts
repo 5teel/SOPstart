@@ -199,7 +199,7 @@ export const JOURNEYS: Journey[] = [
     summary: 'Every role sees their own finished SOPs, what they have been told and what they have asked for, in one section.',
     steps: [
       { id: 's', type: 'start', label: 'Wants to check what they have done' },
-      { id: 'record', type: 'screen', label: 'My record', route: '/', detail: 'The My record section: the SOPs you have finished, newest first, with their sign-off state. The old /activity address redirects here. Sections with nothing in them are absent.' },
+      { id: 'record', type: 'screen', label: 'My record', route: '/', detail: 'Your own record: the SOPs you have finished, newest first, with their sign-off state. For a worker it is the whole My record section; for a supervisor or admin it is the Mine tab of Sign-offs. The old /activity and ?s=record addresses open it. Sections with nothing in them are absent.' },
       { id: 'one', type: 'screen', label: 'One completion', route: '/activity/[completionId]', detail: 'The steps, photos, status and any reason it was sent back. Only the person who did it can open it; anyone else is sent to their own section. Back returns to My record.' },
       { id: 'notif', type: 'action', label: 'Open a notification', route: '/sops/[sopId]', detail: 'The bell is a dot when something is unread. Opening a row marks it read and goes to where it points: a SOP, a section of the home or the sign-offs.' },
       { id: 'myreq', type: 'action', label: 'My requests', route: '/', detail: 'Asked of you, You asked and Answered. Withdraw a request you raised, decline an ask with a reason, or stop asking.' },

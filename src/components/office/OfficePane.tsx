@@ -9,7 +9,7 @@
  * list and an onTab callback. This file never touches the address bar, never calls the
  * router and never navigates from an effect.
  */
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import Link from 'next/link'
 import { Check } from 'lucide-react'
 import { OFFICE_TABS, type OfficeTab } from '@/lib/shell/office-tabs'
@@ -23,6 +23,7 @@ import { PeopleTab } from './PeopleTab'
 const TAB_LABEL: Record<OfficeTab, string> = {
   inbox: 'Inbox',
   requests: 'Requests',
+  mine: 'Mine',
   decisions: 'Decisions',
   people: 'People & authority',
   access: 'SOP access',
@@ -48,12 +49,15 @@ export function OfficePane({
   tabs,
   onTab,
   initialSop = null,
+  mine = null,
 }: {
   tab: OfficeTab | null
   tabs: ReadonlyArray<OfficeTab>
   onTab(t: OfficeTab): void
   /** Pins the Access tab to one SOP; the page has already UUID-gated it. */
   initialSop?: string | null
+  /** The Mine tab's body (your own record); the caller supplies it so this pane stays free of the home's panels. */
+  mine?: ReactNode
 }) {
   // A tab the caller did not offer resolves to the first one at render time, never by redirect.
   const tab: OfficeTab = requested && tabs.includes(requested) ? requested : (tabs[0] ?? 'inbox')
@@ -159,6 +163,7 @@ export function OfficePane({
         </header>
 
         <div id="office-tabpanel" role={tabs.length > 1 ? 'tabpanel' : undefined} className="px-4 pb-8">
+          {tab === 'mine' && mine}
           {tab === 'decisions' && <DecisionsTab />}
           {tab === 'people' && <PeopleTab onReceipt={(r) => setReceipt({ ...r, tab })} />}
           {tab === 'requests' && <RequestsTab onReceipt={(r) => setReceipt({ ...r, tab })} />}

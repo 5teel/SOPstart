@@ -607,7 +607,7 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       await page.close()
 
       // The worker's own record shows it sent back (not done) with the reason; the old "Sent back: N" count is gone (ADR-0004 rule 2).
-      await workerPage.goto('/?s=record')
+      await workerPage.goto('/?s=signoffs&tab=mine')
       await expect(workerPage.getByTestId('section-record')).toBeVisible(SLOW)
       await expect(workerPage.getByText(REASON, { exact: true }).first()).toBeVisible(SLOW)
       await shot(workerPage, '59-worker-sent-back')

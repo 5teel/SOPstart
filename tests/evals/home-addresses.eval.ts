@@ -121,9 +121,10 @@ test.describe.serial('Phase 63 -- home addresses (deployed)', () => {
         {
           name: 'smoko',
           from: '/?place=smoko',
-          search: '?s=record',
+          search: '?s=signoffs&tab=mine',
           check: async () => {
-            await expect(page.getByTestId('section-record').getByRole('heading', { name: 'My record' })).toBeVisible(SLOW)
+            await expect(page.getByTestId('office-tab-mine')).toHaveAttribute('aria-selected', 'true', SLOW)
+            await expect(page.getByTestId('section-record')).toBeVisible(SLOW)
           },
         },
         {
@@ -179,7 +180,7 @@ test.describe.serial('Phase 63 -- home addresses (deployed)', () => {
     await asRole(browser, 'siteAdmin', async (page) => {
       const errors = watchConsole(page)
       const cases: Array<{ name: string; from: string; search: string; testid: string }> = [
-        { name: 'activity', from: '/activity', search: '?s=record', testid: 'section-record' },
+        { name: 'activity', from: '/activity', search: '?s=signoffs&tab=mine', testid: 'section-record' },
         { name: 'training', from: '/admin/training', search: '?s=training', testid: 'section-training' },
         { name: 'team', from: '/admin/team', search: '?s=people', testid: 'section-people' },
         { name: 'governance', from: '/governance', search: '?s=signoffs', testid: 'section-signoffs' },
@@ -203,8 +204,8 @@ test.describe.serial('Phase 63 -- home addresses (deployed)', () => {
       await expect(page.getByTestId('home-section-sops')).toHaveAttribute('aria-current', 'page', SLOW)
       await expect(page.getByTestId('section-training')).toHaveCount(0)
       await page.goto('/activity')
-      await atAddress(page, '?s=record')
-      await expect(page.getByTestId('section-record')).toBeVisible(SLOW)
+      await atAddress(page, '?s=signoffs&tab=mine')
+      await expect(page.getByTestId('section-record').getByRole('heading', { name: 'My record' })).toBeVisible(SLOW)
       await shot(page, '63-addr-redirect-worker-activity')
     })
   })
@@ -226,7 +227,7 @@ test.describe.serial('Phase 63 -- home addresses (deployed)', () => {
       })
       if (error) throw new Error(`notification seed failed: ${error.message}`)
 
-      await page.goto('/?s=record')
+      await page.goto('/?s=record') // the old My record address still opens it
       const row = page.getByTestId('notification-row').filter({ hasText: NOTE_TITLE })
       await expect(row).toBeVisible(SLOW)
       await shot(page, '63-addr-note-before')
@@ -258,11 +259,11 @@ test.describe.serial('Phase 63 -- home addresses (deployed)', () => {
 
       await page.goto(`/activity/${completionId}`)
       const back = page.getByTestId('back-to-site').locator('a')
-      await expect(back).toHaveAttribute('href', '/?s=record', SLOW)
-      await expect(page.getByRole('link', { name: 'My record' })).toHaveAttribute('href', '/?s=record', SLOW)
+      await expect(back).toHaveAttribute('href', '/?s=signoffs&tab=mine', SLOW)
+      await expect(page.getByRole('link', { name: 'My record' })).toHaveAttribute('href', '/?s=signoffs&tab=mine', SLOW)
       await shot(page, '63-addr-completion-worker')
       await back.click()
-      await atAddress(page, '?s=record')
+      await atAddress(page, '?s=signoffs&tab=mine')
       await expect(page.getByTestId('section-record')).toBeVisible(SLOW)
     })
 

@@ -25,7 +25,7 @@ import { HomeScreenPrompt } from '@/components/shell/HomeScreenPrompt'
 import { useLibrary } from '@/hooks/useLibrary'
 import { useRecentSops } from '@/hooks/useRecentSops'
 import { requestOverviewSection } from '@/lib/shell/overview-focus'
-import { formatHome, HOME, homeFrom, resolveHome, type HomeState } from '@/lib/shell/home-state'
+import { formatHome, HOME, homeFrom, MINE, resolveHome, type HomeState } from '@/lib/shell/home-state'
 import type { Packing } from '@/lib/library/iso-layout'
 
 const OPENING = () => <p className="p-4 text-ui text-ink-500">Opening…</p>
@@ -33,7 +33,6 @@ const OPENING = () => <p className="p-4 text-ui text-ink-500">Opening…</p>
 const loadReadView = () => import('@/components/home/ReadView').then((m) => m.ReadView)
 const ReadView = dynamic(loadReadView, { ssr: false, loading: OPENING })
 const SiteMap = dynamic(() => import('@/components/home/map/SiteMap').then((m) => m.SiteMap), { ssr: false, loading: OPENING })
-const MyRecordSection = dynamic(() => import('@/components/home/sections/MyRecordSection').then((m) => m.MyRecordSection), { ssr: false, loading: OPENING })
 const TrainingSection = dynamic(() => import('@/components/home/sections/TrainingSection').then((m) => m.TrainingSection), { ssr: false, loading: OPENING })
 const SignOffsSection = dynamic(() => import('@/components/home/sections/SignOffsSection').then((m) => m.SignOffsSection), { ssr: false, loading: OPENING })
 const PeopleSection = dynamic(() => import('@/components/home/sections/PeopleSection').then((m) => m.PeopleSection), { ssr: false, loading: OPENING })
@@ -129,7 +128,7 @@ export function HomeShell({ siteName, siteId, sites, userEmail, userId, role, in
   const bell = (
     <NotificationBell
       onOpen={() => {
-        select({ ...HOME, s: 'record' })
+        select(MINE)
         requestOverviewSection('notifications')
       }}
     />
@@ -183,12 +182,10 @@ export function HomeShell({ siteName, siteId, sites, userEmail, userId, role, in
 
   const body = (() => {
     switch (state.s) {
-      case 'record':
-        return <MyRecordSection role={role} onHome={select} />
       case 'training':
         return <TrainingSection />
       case 'signoffs':
-        return <SignOffsSection role={role} tab={state.tab} onTab={(t) => select({ ...state, tab: t })} />
+        return <SignOffsSection role={role} tab={state.tab} onTab={(t) => select({ ...state, tab: t })} onHome={select} />
       case 'people':
         return <PeopleSection role={role} tab={state.tab} pin={state.pin} onTab={(t) => select({ ...state, tab: t })} />
       case 'manage':

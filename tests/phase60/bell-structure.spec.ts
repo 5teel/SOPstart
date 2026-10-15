@@ -52,6 +52,6 @@ test.describe('Notification bell (60-16)', () => {
     expect(s, rel).toContain("import('@/components/shell/NotificationBell')")
     expect(s, rel).not.toMatch(/from '@\/components\/shell\/NotificationBell'/)
     expect(s, rel).toContain("requestOverviewSection('notifications')")
-    expect(s, rel).toContain("s: 'record'")
+    expect(s, rel).toContain('select(MINE)')
   })
 })

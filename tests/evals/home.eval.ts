@@ -171,8 +171,9 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
       await expect(page.getByTestId('home')).toBeVisible(SLOW)
       await listReady(page)
       await expect(page.getByTestId('home-section-sops')).toBeVisible(SLOW)
-      await expect(page.getByTestId('home-section-record')).toBeVisible(SLOW)
-      expect(await sectionIds(page)).toEqual(['home-section-sops', 'home-section-record'])
+      // A worker's Sign-offs section is their own record, named My record (2026-10-15).
+      await expect(page.getByTestId('home-section-signoffs')).toHaveText('My record', SLOW)
+      expect(await sectionIds(page)).toEqual(['home-section-sops', 'home-section-signoffs'])
       await expect(page.getByTestId('home-section-manage')).toHaveCount(0)
 
       // The chrome and the list say no room word. Row titles are fixture names (one holds "walk"), so strip them first.
@@ -195,11 +196,12 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
     await asRole(browser, 'siteSupervisor', DESKTOP, async (page) => {
       await page.goto('/')
       await listReady(page)
-      expect(await sectionIds(page)).toEqual(['home-section-sops', 'home-section-record', 'home-section-signoffs'])
+      expect(await sectionIds(page)).toEqual(['home-section-sops', 'home-section-signoffs'])
       await page.getByTestId('home-section-signoffs').click()
       await expect(page.getByTestId('office-pane')).toBeVisible(SLOW)
       await expect(page.getByTestId('office-tab-inbox')).toBeVisible(SLOW)
       await expect(page.getByTestId('office-tab-requests')).toBeVisible(SLOW)
+      await expect(page.getByTestId('office-tab-mine')).toBeVisible(SLOW)
       await expect(page.getByTestId('office-tab-decisions')).toHaveCount(0)
     })
 
@@ -209,15 +211,14 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
         await listReady(page)
         expect(await sectionIds(page), role).toEqual([
           'home-section-sops',
-          'home-section-record',
-          'home-section-training',
           'home-section-signoffs',
+          'home-section-training',
           'home-section-people',
           'home-section-manage',
         ])
         await page.getByTestId('home-section-signoffs').click()
         await expect(page.getByTestId('office-pane')).toBeVisible(SLOW)
-        for (const t of ['inbox', 'requests', 'decisions']) await expect(page.getByTestId(`office-tab-${t}`), `${role} ${t}`).toBeVisible(SLOW)
+        for (const t of ['inbox', 'requests', 'mine', 'decisions']) await expect(page.getByTestId(`office-tab-${t}`), `${role} ${t}`).toBeVisible(SLOW)
         if (role === 'siteAdmin') await shot(page, '63-home-sections-admin')
       })
     }
@@ -506,7 +507,8 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
       await expect(page).toHaveURL(/s=manage&view=site/)
       await shot(page, '63-home-section-site')
 
-      await page.getByTestId('home-section-record').click()
+      await page.getByTestId('home-section-signoffs').click()
+      await page.getByTestId('office-tab-mine').click()
       await expect(page.getByTestId('section-record')).toBeVisible(SLOW)
       await expect(page.getByTestId('section-record').getByText(/\d+ finished/)).toBeVisible(SLOW)
       // The Notifications panel renders only when the person has some (the bell case below seeds one).
@@ -523,7 +525,7 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
       const box = await carry.boundingBox()
       expect(box?.height ?? 0, 'Carry on height').toBeGreaterThanOrEqual(44)
       await noSideways(page, 'manage drafts')
-      // Six tabs at 390 px: every label stays on one line, the current (bold) one too -- the 13 px
+      // Five tabs at 390 px: every label stays on one line, the current (bold) one too -- the 13 px
       // floor wrapped "My record" and a bold "Sign-offs".
       const tabsFit = async (current: string) => {
         const tabs = await page.locator('[data-testid^="home-tab-"]').evaluateAll((els) =>
@@ -541,11 +543,15 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
       }
       await tabsFit('manage')
       await shot(page, '63-home-phone-manage')
-      for (const s of ['signoffs', 'record']) {
-        await page.getByTestId(`home-tab-${s}`).click()
-        await expect(page.getByTestId(`home-tab-${s}`)).toHaveAttribute('aria-current', 'page')
-        if (s === 'signoffs') await expect(page.getByTestId('office-row').first()).toBeVisible(SLOW)
-        else await expect(page.getByRole('heading', { name: 'My record' })).toBeVisible(SLOW)
+      for (const s of ['signoffs', 'mine']) {
+        if (s === 'signoffs') {
+          await page.getByTestId('home-tab-signoffs').click()
+          await expect(page.getByTestId('home-tab-signoffs')).toHaveAttribute('aria-current', 'page')
+          await expect(page.getByTestId('office-row').first()).toBeVisible(SLOW)
+        } else {
+          await page.getByTestId('office-tab-mine').click()
+          await expect(page.getByTestId('section-record')).toBeVisible(SLOW)
+        }
         await page.waitForLoadState('networkidle', { timeout: 10_000 }).catch(() => {})
         await tabsFit(s)
         await noSideways(page, s)
@@ -604,7 +610,7 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
       await expect(page.getByTestId('section-record')).toBeVisible(SLOW)
       await expect(page.locator('[data-testid="overview-notifications"] h2')).toBeFocused(SLOW)
       await expect(page.getByTestId('notification-row').filter({ hasText: '63 eval bell dot' })).toBeVisible(SLOW)
-      await expect(page).toHaveURL(/[?&]s=record/)
+      await expect(page).toHaveURL(/[?&]s=signoffs&tab=mine/)
       await shot(page, '63-home-bell-record')
     })
   })
@@ -704,7 +710,7 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
       await expect(page.getByTestId('home-menu')).toBeHidden()
       await expect(page.getByTestId('home-tabbar')).toBeVisible(SLOW)
       await expect(page.getByTestId('home-tab-sops')).toBeVisible()
-      await expect(page.getByTestId('home-tab-record')).toBeVisible()
+      await expect(page.getByTestId('home-tab-signoffs')).toHaveText('My record')
       await page.getByTestId('phone-view-list').click()
       await listReady(page)
       await noSideways(page, 'list')

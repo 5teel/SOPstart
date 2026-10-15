@@ -50,7 +50,7 @@ test.describe('record and training', () => {
     expect(fs.existsSync('src/app/(protected)/admin/training/page.tsx')).toBe(false)
     expect(RECORD).toContain("import { CompletionList } from '@/components/home/sections/CompletionList'")
     const cfg = fs.readFileSync('next.config.ts', 'utf8')
-    expect(cfg).toMatch(/source: '\/activity',\s*destination: '\/\?s=record',\s*permanent: false/)
+    expect(cfg).toMatch(/source: '\/activity',\s*destination: '\/\?s=signoffs&tab=mine',\s*permanent: false/)
     expect(cfg).toMatch(/source: '\/admin\/training',\s*destination: '\/\?s=training',\s*permanent: false/)
   })
 })

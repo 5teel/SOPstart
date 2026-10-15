@@ -8,7 +8,7 @@
  */
 export function backForPath(pathname: string): string | null {
   if (pathname === '/pending' || pathname.startsWith('/sops/')) return null
-  if (pathname === '/activity' || pathname.startsWith('/activity/')) return '/?s=record'
+  if (pathname === '/activity' || pathname.startsWith('/activity/')) return '/?s=signoffs&tab=mine'
   if (pathname === '/admin/training') return '/?s=training'
   if (pathname === '/admin/settings' || pathname === '/admin/sops/new' || pathname.startsWith('/admin/sops/new/') || pathname === '/admin/sops/upload') {
     return '/?s=manage'

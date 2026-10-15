@@ -395,7 +395,7 @@ test.describe('Phase 60 -- requests, notifications and objectives (deployed)', (
     }
     /** My record: notifications and my requests. */
     async function openRecord(page: Page) {
-      await page.goto('/?s=record')
+      await page.goto('/?s=signoffs&tab=mine')
       await expect(page.getByTestId('section-record')).toBeVisible(SLOW)
     }
 

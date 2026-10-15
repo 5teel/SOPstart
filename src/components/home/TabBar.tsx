@@ -7,7 +7,6 @@ import { sectionsForRole, type Section } from '@/lib/shell/home-state'
 
 const SHORT: Record<Section, string> = {
   sops: 'SOPs',
-  record: 'Record', // ponytail: 'My record' wraps at 390 px with six tabs at 13 px
   training: 'Training',
   signoffs: 'Sign-offs',
   people: 'People',
@@ -33,7 +32,7 @@ export function TabBar({ role, section, onSelect }: { role: string | null; secti
           onClick={() => onSelect(s)}
           className="min-h-tap flex-1 whitespace-nowrap px-0.5 text-meta text-ink-500 aria-[current=page]:font-bold aria-[current=page]:text-ink-900"
         >
-          {SHORT[s]}
+          {s === 'signoffs' && role === 'worker' ? 'My record' : SHORT[s]}
         </button>
       ))}
     </nav>

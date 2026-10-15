@@ -7,6 +7,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import {
   HOME,
+  MINE,
   SECTIONS,
   backForPath,
   formatHome,
@@ -17,6 +18,7 @@ import {
   legacyToHome,
   parseHome,
   resolveHome,
+  sectionLabel,
   sectionsForRole,
   tabsFor,
   type HomeState,
@@ -30,14 +32,17 @@ const state = (p: Partial<HomeState>): HomeState => ({ ...HOME, ...p })
 
 test.describe('home state', () => {
   test('sections and tabs by role', () => {
-    expect(sectionsForRole('worker')).toEqual(['sops', 'record'])
-    expect(sectionsForRole('supervisor')).toEqual(['sops', 'record', 'signoffs'])
-    expect(sectionsForRole('admin')).toEqual(['sops', 'record', 'training', 'signoffs', 'people', 'manage'])
+    expect(sectionsForRole('worker')).toEqual(['sops', 'signoffs'])
+    expect(sectionsForRole('supervisor')).toEqual(['sops', 'signoffs'])
+    expect(sectionsForRole('admin')).toEqual(['sops', 'signoffs', 'training', 'people', 'manage'])
     expect(sectionsForRole('safety_manager')).toEqual(SECTIONS)
     expect(sectionsForRole(null)).toEqual(['sops'])
-    expect(tabsFor('signoffs', 'supervisor')).toEqual(['inbox', 'requests'])
-    expect(tabsFor('signoffs', 'admin')).toEqual(['inbox', 'requests', 'decisions'])
-    expect(tabsFor('signoffs', 'safety_manager')).toEqual(['inbox', 'requests', 'decisions'])
+    expect(tabsFor('signoffs', 'worker')).toEqual(['mine'])
+    expect(tabsFor('signoffs', 'supervisor')).toEqual(['inbox', 'requests', 'mine'])
+    expect(tabsFor('signoffs', 'admin')).toEqual(['inbox', 'requests', 'mine', 'decisions'])
+    expect(tabsFor('signoffs', 'safety_manager')).toEqual(['inbox', 'requests', 'mine', 'decisions'])
+    expect(sectionLabel('signoffs', 'worker')).toBe('My record')
+    expect(sectionLabel('signoffs', 'supervisor')).toBe('Sign-offs')
     expect(tabsFor('people', 'admin')).toEqual(['people', 'access'])
     expect(tabsFor('people', 'safety_manager')).toEqual(['people', 'access'])
     expect(tabsFor('people', 'supervisor')).toEqual([])
@@ -52,7 +57,7 @@ test.describe('home state', () => {
       state({ sop: U1 }),
       state({ area: U2 }),
       state({ area: 'site-wide', sop: U1 }),
-      state({ s: 'record' }),
+      MINE,
       state({ s: 'training' }),
       state({ s: 'signoffs' }),
       state({ s: 'signoffs', tab: 'requests' }),
@@ -70,11 +75,11 @@ test.describe('home state', () => {
   test('parseHome drops anything not whitelisted', () => {
     expect(parseHome('s=admin')).toEqual(HOME)
     expect(parseHome('sop=not-a-uuid&area=//evil.com')).toEqual(HOME)
-    expect(parseHome(`s=record&sop=${U1}&area=site-wide`)).toEqual(state({ s: 'record' })) // sop/area only in sops
+    expect(parseHome(`s=record&sop=${U1}&area=site-wide`)).toEqual(MINE) // the old My record address; sop/area only in sops
     expect(parseHome('s=sops&tab=access')).toEqual(HOME)
     expect(parseHome(`s=people&pin=${U1}`)).toEqual(state({ s: 'people' })) // pin only with access
     expect(parseHome('s=signoffs&tab=access')).toEqual(state({ s: 'signoffs' }))
-    expect(parseHome('s=record&view=site')).toEqual(state({ s: 'record' }))
+    expect(parseHome('s=signoffs&tab=mine&view=site')).toEqual(MINE)
     expect(parseHome(`?sop=${U1.toUpperCase()}`)).toEqual(state({ sop: U1 }))
   })
 
@@ -86,7 +91,8 @@ test.describe('home state', () => {
     expect(resolveHome(state({ s: 'signoffs', tab: 'decisions' }), 'admin')).toEqual(state({ s: 'signoffs', tab: 'decisions' }))
     expect(resolveHome(state({ s: 'people', tab: 'access', pin: U1 }), 'admin')).toEqual(state({ s: 'people', tab: 'access', pin: U1 }))
     expect(resolveHome(state({ sop: U1 }), null)).toEqual(state({ sop: U1 }))
-    expect(resolveHome(state({ s: 'record' }), null)).toEqual(HOME)
+    expect(resolveHome(MINE, null)).toEqual(HOME)
+    expect(resolveHome(MINE, 'worker')).toEqual(MINE)
   })
 
   test('legacy place tokens map to the new addresses', () => {
@@ -97,7 +103,7 @@ test.describe('home state', () => {
     expect(legacyToHome('office', 'people')).toEqual(state({ s: 'people' }))
     expect(legacyToHome('office', 'access', U1)).toEqual(state({ s: 'people', tab: 'access', pin: U1 }))
     expect(legacyToHome('office', 'access', 'x')).toEqual(state({ s: 'people', tab: 'access' }))
-    expect(legacyToHome('smoko')).toEqual(state({ s: 'record' }))
+    expect(legacyToHome('smoko')).toEqual(MINE)
     expect(legacyToHome('workshop')).toEqual(state({ s: 'manage' }))
     expect(legacyToHome('noticeboard')).toEqual(HOME)
     expect(legacyToHome('edit')).toEqual(state({ s: 'manage', view: 'site' }))
@@ -135,16 +141,17 @@ test.describe('home state', () => {
   test('Back for a bridged path', () => {
     expect(backForPath('/pending')).toBeNull()
     expect(backForPath(`/sops/${U1}`)).toBeNull()
-    expect(backForPath('/activity')).toBe('/?s=record')
-    expect(backForPath(`/activity/${U1}`)).toBe('/?s=record')
+    expect(backForPath('/activity')).toBe('/?s=signoffs&tab=mine')
+    expect(backForPath(`/activity/${U1}`)).toBe('/?s=signoffs&tab=mine')
     expect(backForPath('/admin/training')).toBe('/?s=training')
     for (const p of ['/admin/settings', '/admin/sops/new', '/admin/sops/new/ai', '/admin/sops/upload']) {
       expect(backForPath(p), p).toBe('/?s=manage')
     }
     expect(backForPath('/anything/else')).toBe('/')
-    for (const [p, sec] of [['/activity', 'record'], ['/admin/training', 'training'], ['/admin/settings', 'manage']] as const) {
+    for (const [p, sec] of [['/admin/training', 'training'], ['/admin/settings', 'manage']] as const) {
       expect(backForPath(p), p).toBe(formatHome(state({ s: sec }))) // back-path.ts holds literals
     }
+    expect(backForPath('/activity')).toBe(formatHome(MINE))
   })
 
   test('legacy paths redirect to fixed templates', () => {

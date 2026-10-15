@@ -7,7 +7,7 @@
  * only ever land on the home.
  */
 import { focusHref } from '@/lib/sop/focus-path'
-import { formatHome, HOME } from '@/lib/shell/home-state'
+import { formatHome, HOME, MINE } from '@/lib/shell/home-state'
 import type { NotificationKind } from '@/lib/notifications/kinds'
 
 export function notificationPlace(kind: NotificationKind, subject: { sopId?: string | null } = {}): string {
@@ -17,7 +17,7 @@ export function notificationPlace(kind: NotificationKind, subject: { sopId?: str
     case 'signoff':
       return formatHome({ ...HOME, s: 'signoffs' })
     case 'request_answered':
-      return formatHome({ ...HOME, s: 'record' })
+      return formatHome(MINE)
     case 'new_version':
     case 'asked':
       return focusHref(subject.sopId ?? '') // throws on anything but a UUID

@@ -760,14 +760,14 @@ export const UAT_TESTS: UatTest[] = [
       'Press Back and notice where you land.',
       'Type /activity into the browser.',
     ],
-    links: [{ label: 'My record', href: '/?s=record' }],
+    links: [{ label: 'My record', href: '/?s=signoffs&tab=mine' }],
     questions: [
       { id: 'record-found', text: 'Was it easy to find the SOP you had just finished?' },
       { id: 'back-to-record', text: 'Did Back from a completion take you to My record?' },
       { id: 'old-address-record', text: 'Did the old /activity address take you to My record?' },
     ],
     background:
-      'Phase 63 (63-09, 63-14): MyRecordSection + CompletionList on /?s=record; /activity redirects there in next.config.ts; /activity/[completionId] stays as the completion page.',
+      'Phase 63 (63-09, 63-14): MyRecordSection + CompletionList on /?s=signoffs&tab=mine (the Sign-offs Mine tab since 2026-10-15; for a worker the whole section); /activity redirects there in next.config.ts; /activity/[completionId] stays as the completion page.',
   },
   {
     id: 'p63-phone',

@@ -20,7 +20,7 @@ test.describe('home shell', () => {
 
   test('the map and every section body are lazy', () => {
     const s = shell()
-    for (const m of ['SiteMap', 'MyRecordSection', 'TrainingSection', 'SignOffsSection', 'PeopleSection', 'ManageSection']) {
+    for (const m of ['SiteMap', 'TrainingSection', 'SignOffsSection', 'PeopleSection', 'ManageSection']) {
       expect(s, m).toMatch(new RegExp(`const ${m} = dynamic\\(\\(\\) => import\\('@/components/home/(?:map|sections)/${m}'\\)`))
       expect(s, m).not.toMatch(new RegExp(`import \\{[^}]*\\b${m}\\b[^}]*\\} from`))
     }
@@ -55,7 +55,7 @@ test.describe('home shell', () => {
 
   test('the bell opens My record at Notifications', () => {
     const s = shell()
-    expect(s).toContain("select({ ...HOME, s: 'record' })")
+    expect(s).toContain('select(MINE)')
     expect(s).toContain("requestOverviewSection('notifications')")
   })
 

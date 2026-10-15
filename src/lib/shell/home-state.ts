@@ -11,10 +11,11 @@
  */
 import { isSafePlace } from '@/lib/notifications/places'
 
-export const SECTIONS = ['sops', 'record', 'training', 'signoffs', 'people', 'manage'] as const
+// My record is the Sign-offs section's Mine tab (2026-10-15); a worker sees only that tab, under the name My record.
+export const SECTIONS = ['sops', 'signoffs', 'training', 'people', 'manage'] as const
 export type Section = (typeof SECTIONS)[number]
 
-const TABS = ['inbox', 'requests', 'decisions', 'people', 'access'] as const
+const TABS = ['inbox', 'requests', 'mine', 'decisions', 'people', 'access'] as const
 export type HomeTab = (typeof TABS)[number]
 
 export interface HomeState {
@@ -28,6 +29,12 @@ export interface HomeState {
 }
 
 export const HOME: HomeState = { s: 'sops', sop: null, area: null, tab: null, pin: null, view: null }
+/** Your own record: the Sign-offs Mine tab. */
+export const MINE: HomeState = { ...HOME, s: 'signoffs', tab: 'mine' }
+
+/** The menu name: a worker's only tab is their own record, so the section is called that. */
+export const sectionLabel = (s: Section, role: string | null): string =>
+  ({ sops: 'My SOPs', signoffs: role === 'worker' ? 'My record' : 'Sign-offs', training: 'Training', people: 'People', manage: 'Manage SOPs' })[s]
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 const uuid = (v: string | null | undefined): string | null => (v && UUID.test(v) ? v.toLowerCase() : null)
@@ -35,15 +42,15 @@ const isAdminish = (role: string | null) => role === 'admin' || role === 'safety
 
 export function sectionsForRole(role: string | null): ReadonlyArray<Section> {
   if (isAdminish(role)) return SECTIONS
-  if (role === 'supervisor') return ['sops', 'record', 'signoffs']
-  if (role === 'worker') return ['sops', 'record']
+  if (role === 'supervisor' || role === 'worker') return ['sops', 'signoffs']
   return ['sops']
 }
 
 export function tabsFor(section: Section, role: string | null): ReadonlyArray<HomeTab> {
   if (section === 'signoffs') {
-    if (isAdminish(role)) return ['inbox', 'requests', 'decisions']
-    if (role === 'supervisor') return ['inbox', 'requests']
+    if (isAdminish(role)) return ['inbox', 'requests', 'mine', 'decisions']
+    if (role === 'supervisor') return ['inbox', 'requests', 'mine']
+    if (role === 'worker') return ['mine']
   }
   if (section === 'people' && isAdminish(role)) return ['people', 'access']
   return []
@@ -54,7 +61,7 @@ function norm(x: { s: Section; sop?: string | null; area?: string | null; tab?: 
   const s = x.s
   const area = x.area === 'site-wide' ? x.area : uuid(x.area)
   let tab: HomeTab | null = null
-  if (s === 'signoffs' && (x.tab === 'requests' || x.tab === 'decisions')) tab = x.tab
+  if (s === 'signoffs' && (x.tab === 'requests' || x.tab === 'decisions' || x.tab === 'mine')) tab = x.tab
   if (s === 'people' && x.tab === 'access') tab = 'access'
   return {
     s,
@@ -68,6 +75,7 @@ function norm(x: { s: Section; sop?: string | null; area?: string | null; tab?: 
 
 export function parseHome(search: string | URLSearchParams | null | undefined): HomeState {
   const q = typeof search === 'string' ? new URLSearchParams(search.replace(/^\?/, '')) : (search ?? new URLSearchParams())
+  if (q.get('s') === 'record') return MINE // the old My record address
   const s = SECTIONS.find((x) => x === q.get('s')) ?? 'sops'
   return norm({ s, sop: q.get('sop'), area: q.get('area'), tab: q.get('tab'), pin: q.get('pin'), view: q.get('view') })
 }
@@ -99,7 +107,7 @@ export function legacyToHome(place: string | null | undefined, tab?: string | nu
       if (tab === 'people' || tab === 'access') return norm({ s: 'people', tab, pin: sop })
       return norm({ s: 'signoffs', tab })
     case 'smoko':
-      return { ...HOME, s: 'record' }
+      return MINE
     case 'workshop':
       return { ...HOME, s: 'manage' }
     case 'edit':

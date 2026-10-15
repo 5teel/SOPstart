@@ -86,7 +86,7 @@ test.describe('Notification kinds, titles and places (60-03)', () => {
 
   test('places come from fixed templates; a bad SOP id throws', () => {
     for (const k of ['approve_next', 'review_due', 'signoff'] as const) expect(notificationPlace(k)).toBe('/?s=signoffs')
-    expect(notificationPlace('request_answered')).toBe('/?s=record')
+    expect(notificationPlace('request_answered')).toBe('/?s=signoffs&tab=mine')
     expect(notificationPlace('new_version', { sopId: SOP })).toBe(`/sops/${SOP}`)
     expect(notificationPlace('asked', { sopId: SOP })).toBe(`/sops/${SOP}`)
     expect(() => notificationPlace('asked', { sopId: 'not-a-uuid' })).toThrow()

@@ -41,7 +41,8 @@ test.describe('office sections', () => {
 
   test('tabsFor over both sections equals tabsForRole for every role (gates unchanged, R2)', () => {
     for (const role of ROLES) {
-      const union = new Set([...tabsFor('signoffs', role), ...tabsFor('people', role)])
+      // Mine is your own record, not an Office tab (2026-10-15)
+      const union = new Set([...tabsFor('signoffs', role), ...tabsFor('people', role)].filter((t) => t !== 'mine'))
       expect([...union].sort()).toEqual([...tabsForRole(role)].sort())
     }
   })

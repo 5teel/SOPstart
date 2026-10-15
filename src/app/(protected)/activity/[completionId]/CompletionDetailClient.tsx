@@ -71,7 +71,7 @@ export function CompletionDetailClient({
       {/* Sticky header */}
       <div className="sticky top-0 z-20 bg-[var(--paper)] border-b border-[var(--ink-100)] px-4 flex items-center gap-3 h-14">
         <Link
-          href="/?s=record"
+          href="/?s=signoffs&tab=mine"
           className="flex items-center gap-1.5 text-[var(--ink-500)] hover:text-[var(--ink-900)] transition-colors"
         >
           <ArrowLeft size={18} />

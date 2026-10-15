@@ -5,16 +5,7 @@
  */
 import { Wordmark } from '@/components/brand/Wordmark'
 import { AccountControl, type Site } from '@/components/shell/AccountControl'
-import { sectionsForRole, type Section } from '@/lib/shell/home-state'
-
-export const SECTION_LABEL: Record<Section, string> = {
-  sops: 'My SOPs',
-  record: 'My record',
-  training: 'Training',
-  signoffs: 'Sign-offs',
-  people: 'People',
-  manage: 'Manage SOPs',
-}
+import { sectionLabel, sectionsForRole, type Section } from '@/lib/shell/home-state'
 
 export function SectionMenu({
   role,
@@ -54,7 +45,7 @@ export function SectionMenu({
                 s === 'manage' ? 'mt-3 border-t border-ink-200 pt-1 text-ui text-ink-500' : 'text-reading text-ink-900'
               }`}
             >
-              {SECTION_LABEL[s]}
+              {sectionLabel(s, role)}
             </button>
           ))}
         </nav>

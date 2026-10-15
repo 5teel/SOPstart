@@ -76,11 +76,11 @@ const nextConfig: NextConfig = {
         destination: '/?s=manage&view=site',
         permanent: false,
       },
-      // Phase 63 (HOME-04): the activity list lives in My record, the training screens in Training. Fixed destinations;
+      // Phase 63 (HOME-04): the activity list lives in My record (the Sign-offs Mine tab), the training screens in Training. Fixed destinations;
       // /activity/[completionId] stays a page, and the exact source below does not match it.
       {
         source: '/activity',
-        destination: '/?s=record',
+        destination: '/?s=signoffs&tab=mine',
         permanent: false,
       },
       {
