@@ -64,7 +64,8 @@ test.describe.serial('Your site picker (deployed)', () => {
       const other = card.locator(`[data-testid="site-picker-row"]:not([data-site="${SECOND}"]) input`)
       await expect(other).toBeDisabled()
       await expect(second).toBeChecked()
-      await second.uncheck()
+      // The tick moves at once; wait for the save itself before leaving the page.
+      await Promise.all([page.waitForResponse((r) => r.request().method() === 'POST', SLOW), second.uncheck()])
       await expect(second).not.toBeChecked(SLOW)
       await shot(page, 'sites-01-settings-hidden')
       await page.goto('/')
@@ -80,7 +81,7 @@ test.describe.serial('Your site picker (deployed)', () => {
     try {
       const second = page.getByTestId('site-picker-settings').locator(`[data-site="${SECOND}"] input`)
       await expect(second).not.toBeChecked(SLOW)
-      await second.check()
+      await Promise.all([page.waitForResponse((r) => r.request().method() === 'POST', SLOW), second.check()])
       await expect(second).toBeChecked(SLOW)
       await page.goto('/')
       await expect(page.locator('[data-testid="site-switch"]').first().locator('option')).toHaveCount(2, SLOW)
