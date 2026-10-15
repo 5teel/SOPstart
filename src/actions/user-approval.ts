@@ -35,6 +35,6 @@ export async function decideNewUser(userId: string, approve: boolean): Promise<{
     subject: { kind: 'user', id: parsed.data.userId },
     summary: parsed.data.approve ? 'Approved a new account' : 'Turned down a new account',
   })
-  revalidatePath('/approvals')
+  revalidatePath('/admin/approvals')
   return { logged: rec.ok }
 }

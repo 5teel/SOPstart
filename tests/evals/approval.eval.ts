@@ -102,7 +102,8 @@ test.describe.serial('ADR-0018 -- new accounts wait for approval (deployed)', ()
       await expect(row).toContainText('Invited to')
       await shot(admin.page, 'approval-04-list')
       await row.getByTestId('approval-approve').click()
-      await expect(row.getByTestId('approval-done')).toHaveText('Approved', SLOW)
+      // Approved, it leaves the waiting list (the page re-renders after the action).
+      await expect(row).toHaveCount(0, SLOW)
     } finally {
       await admin.ctx.close()
     }
