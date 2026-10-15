@@ -1,0 +1,19 @@
+# Push to master deploys SOPstart to Fly.io, Sydney (ADR-0017). The image records the commit
+# (GIT_SHA) so /api/version tells the deployed-eval runner which commit is live.
+name: Deploy to Fly
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+concurrency:
+  group: fly-deploy
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl deploy --remote-only --build-arg GIT_SHA=${{ github.sha }}
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

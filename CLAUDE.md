@@ -14,7 +14,7 @@ Multi-tenant SaaS PWA for New Zealand industrial sites (glass, packaging, machin
 - AI parsing: OpenAI (GPT); reviewer/verifier: Anthropic. File parsing in `src/lib/parsers/` (mammoth, unpdf, tesseract.js, pptx/xlsx/video-audio extractors)
 - React Hook Form + Zod; Lucide icons; Playwright for all tests
 - **Online-only since Phase 55**: `public/sw.js` is a kill-switch that unregisters old service workers. Do not reintroduce Serwist / Dexie / idb-keyval.
-- Dev port 4200. Deploy: push `master` → Railway (healthcheck `/api/version`).
+- Dev port 4200. Deploy: push `master` → GitHub Action → Fly.io Sydney (ADR-0017; healthcheck `/api/version`). App and database must share a region.
 
 ## Map
 
@@ -69,7 +69,7 @@ npm run eval -- --phase <N>    # deployed evals against sopstart.com
 
 ## Deployed evals (no manual UAT)
 
-Every phase touching a user-facing surface ships `tests/evals/<area>.eval.ts` and runs `npm run eval -- --phase <N>` after pushing (waits for Railway to serve HEAD). Fixtures: `eval-admin@sopstart.com`, `eval-worker@sopstart.com` (`node scripts/eval-fixtures.mjs`); sessions minted by `tests/evals/lib/session.ts`. Output in `.planning/evals/latest/` and `<N>-EVAL.md`. **Read the screenshots before declaring a pass.** Escalate to Simon only with a specific failing screenshot.
+Every phase touching a user-facing surface ships `tests/evals/<area>.eval.ts` and runs `npm run eval -- --phase <N>` after pushing (waits for the host to serve HEAD). Fixtures: `eval-admin@sopstart.com`, `eval-worker@sopstart.com` (`node scripts/eval-fixtures.mjs`); sessions minted by `tests/evals/lib/session.ts`. Output in `.planning/evals/latest/` and `<N>-EVAL.md`. **Read the screenshots before declaring a pass.** Escalate to Simon only with a specific failing screenshot.
 
 ## Learnings
 
