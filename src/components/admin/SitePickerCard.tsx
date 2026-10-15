@@ -12,13 +12,18 @@ export function SitePickerCard({ sites, currentId }: { sites: MySite[]; currentI
   const router = useRouter()
   const [busy, setBusy] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  // The tick moves at once; a refused save puts it back.
+  const [shown, setShown] = useState<Record<string, boolean>>(() => Object.fromEntries(sites.map((s) => [s.id, !s.hidden])))
   const toggle = async (id: string, show: boolean) => {
     setBusy(id)
     setError(null)
+    setShown((m) => ({ ...m, [id]: show }))
     const r = await setSiteHidden(id, !show)
     setBusy(null)
-    if (r.error) setError(r.error)
-    else router.refresh()
+    if (r.error) {
+      setError(r.error)
+      setShown((m) => ({ ...m, [id]: !show }))
+    } else router.refresh()
   }
   return (
     <div data-testid="site-picker-settings" className="blueprint-frame flex flex-col gap-1">
@@ -30,7 +35,7 @@ export function SitePickerCard({ sites, currentId }: { sites: MySite[]; currentI
             <input
               type="checkbox"
               className="size-5"
-              checked={!s.hidden || current}
+              checked={shown[s.id] || current}
               disabled={current || busy !== null}
               onChange={(e) => void toggle(s.id, e.target.checked)}
             />

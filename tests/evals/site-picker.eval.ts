@@ -27,11 +27,12 @@ test.describe.serial('Your site picker (deployed)', () => {
   let db: SupabaseClient
   let userId: string
   let secondId: string
+  let homeId: string
 
   const reset = async () => {
     await db.from('organisation_members').delete().eq('user_id', userId).eq('organisation_id', secondId)
     const { data } = await db.auth.admin.getUserById(userId)
-    await db.auth.admin.updateUserById(userId, { user_metadata: { ...data.user?.user_metadata, hidden_site_ids: [] } })
+    await db.auth.admin.updateUserById(userId, { user_metadata: { ...data.user?.user_metadata, hidden_site_ids: [], active_org_id: homeId } })
   }
 
   test.beforeAll(async () => {
@@ -40,6 +41,9 @@ test.describe.serial('Your site picker (deployed)', () => {
     const { data: users } = await db.auth.admin.listUsers({ perPage: 1000 })
     userId = users.users.find((u) => u.email === EVAL_USERS.siteAdmin)!.id
     const { data: org } = await db.from('organisations').select('id').eq('name', SECOND).maybeSingle()
+    // The admin stays in their own site: a second membership must not become the active one.
+    const { data: own } = await db.from('organisation_members').select('organisation_id, organisations ( name )').eq('user_id', userId).eq('role', 'admin')
+    homeId = own!.find((m) => (m.organisations as unknown as { name: string }).name !== SECOND)!.organisation_id
     secondId = org?.id ?? (await db.from('organisations').insert({ name: SECOND }).select('id').single()).data!.id
     await reset()
     const { error } = await db.from('organisation_members').insert({ organisation_id: secondId, user_id: userId, role: 'worker' })
