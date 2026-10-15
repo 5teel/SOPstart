@@ -1,7 +1,6 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { after } from 'next/server'
 import { z } from 'zod'
 import { getSessionContext } from '@/lib/auth/session-context'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -171,8 +170,9 @@ export async function submitCompletion(
   mark('walk_done')
 
   // The completion is saved: the worker sees Sent now. The worker's own ledger row (D-22) and the
-  // sign-off notification (D-08) follow after the response; neither ever undoes the completion.
-  after(async () => {
+  // sign-off notification (D-08) follow, fire-and-forget like the parse route's reviewer: next/server
+  // after() held the action's response open until they finished (~2 s). Neither undoes the completion.
+  void (async () => {
     const signed = await recordSignature({ completionId: walk.id, sopId: walk.sop_id, role: 'worker' })
     if (!signed.success) console.error('submitCompletion signature error:', signed.error)
     mark('signature')
@@ -196,7 +196,7 @@ export async function submitCompletion(
     }
     mark('notified')
     console.log(`[submitCompletion] ms ${marks.join(' ')}`)
-  })
+  })()
   return { success: true, completionId: walk.id }
 }
 
