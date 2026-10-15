@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { getSessionContext } from '@/lib/auth/session-context'
 import { ProtectedProviders, type AppRole } from '@/components/providers/ProtectedProviders'
 import { HomeShell } from '@/components/home/HomeShell'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { mySites } from '@/lib/auth/sites'
 import { ensureReviewDueNotifications } from '@/lib/notifications/ensure-review-due'
 import { formatHome, legacyToHome, parseHome } from '@/lib/shell/home-state'
 import { PACKINGS, type Packing } from '@/lib/library/iso-layout'
@@ -38,20 +38,17 @@ export default async function Home({
   let packing: Packing = 'balanced'
   let sites: { id: string; name: string }[] = []
   if (organisationId) {
-    const [{ data: org }, { data: mine }] = await Promise.all([
+    const [{ data: org }, mine] = await Promise.all([
       // '*' carries site_map_packing (00077), which database.types.ts predates.
       supabase.from('organisations').select('*').eq('id', organisationId).maybeSingle(),
-      // The caller's own memberships across sites, for the site picker (2026-10-11).
-      createAdminClient().from('organisation_members').select('organisations ( id, name )').eq('user_id', userId),
+      // The caller's own sites for the picker (2026-10-11), less the ones they hid in Settings.
+      supabase.auth.getClaims().then(({ data }) => mySites(userId, data?.claims?.user_metadata)),
       ensureReviewDueNotifications(organisationId, userId),
     ])
     if (org?.name) siteName = org.name
     const p = (org as { site_map_packing?: string } | null)?.site_map_packing
     if (PACKINGS.includes(p as Packing)) packing = p as Packing
-    sites = (mine ?? [])
-      .map((m) => m.organisations as unknown as { id: string; name: string } | null)
-      .filter((o): o is { id: string; name: string } => !!o)
-      .sort((a, b) => a.name.localeCompare(b.name))
+    sites = mine.filter((o) => !o.hidden || o.id === organisationId).map(({ id, name }) => ({ id, name }))
   }
 
   const query = new URLSearchParams()

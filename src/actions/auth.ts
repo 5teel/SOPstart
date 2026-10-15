@@ -9,6 +9,7 @@ import { getSessionContext } from '@/lib/auth/session-context'
 import { roleHome } from '@/lib/auth/role-home'
 import { safeNextPath } from '@/lib/auth/next-redirect'
 import { recordDecision } from '@/lib/decisions/record'
+import { hiddenSiteIds } from '@/lib/auth/sites'
 import { deleteOrgMember } from '@/lib/members/remove'
 import type { TablesInsert, TablesUpdate } from '@/types/database.types'
 import type { AppRole } from '@/types/auth'
@@ -48,6 +49,34 @@ export async function switchSite(orgId: string): Promise<{ error?: string }> {
     .maybeSingle()
   if (!member) return { error: 'You are not a member of that site.' }
   const { error } = await supabase.auth.updateUser({ data: { active_org_id: orgId } })
+  if (error) return { error: "That didn't work. Try again." }
+  await supabase.auth.refreshSession()
+  return {}
+}
+
+// ─────────────────────────────────────────────
+// setSiteHidden — 2026-10-15. Someone in several sites keeps one out of their own site
+// picker (Settings → Your site picker). Stored beside active_org_id in the user's metadata;
+// it changes only what this person's picker lists, so like switchSite it is not a ledger row.
+// The site you are in cannot be hidden.
+// ─────────────────────────────────────────────
+
+export async function setSiteHidden(orgId: string, hidden: boolean): Promise<{ error?: string }> {
+  if (!z.string().uuid().safeParse(orgId).success || typeof hidden !== 'boolean') return { error: 'Unknown site.' }
+  const { supabase, userId, organisationId } = await getSessionContext()
+  if (!userId) return { error: 'Not authenticated' }
+  if (hidden && orgId === organisationId) return { error: 'Switch to another site before hiding this one.' }
+  const { data: member } = await createAdminClient()
+    .from('organisation_members')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('organisation_id', orgId)
+    .maybeSingle()
+  if (!member) return { error: 'You are not a member of that site.' }
+  const { data } = await supabase.auth.getUser()
+  const now = hiddenSiteIds(data.user?.user_metadata)
+  const next = hidden ? [...new Set([...now, orgId])] : now.filter((id) => id !== orgId)
+  const { error } = await supabase.auth.updateUser({ data: { hidden_site_ids: next } })
   if (error) return { error: "That didn't work. Try again." }
   await supabase.auth.refreshSession()
   return {}

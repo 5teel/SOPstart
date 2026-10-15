@@ -666,6 +666,7 @@ export const JOURNEYS: Journey[] = [
       { id: 's', type: 'start', label: 'Belongs to several sites' },
       { id: 'home', type: 'screen', label: 'Home', route: '/', detail: 'The account control at the foot of the menu shows a site picker instead of the site name when you belong to more than one site.' },
       { id: 'pick', type: 'action', label: 'Pick a site', detail: 'switchSite() checks the membership and saves the choice; the page reloads into that site with its own SOPs, people and site map.' },
+      { id: 'hide', type: 'action', label: 'Hide a site from your picker', route: '/admin/settings', detail: 'Admins: Settings → Your site picker lists every site you belong to. Untick one to keep it out of your own picker (tick it to bring it back). Nobody else’s picker changes, and the site you are in cannot be hidden.' },
       { id: 'e', type: 'end', label: 'Working in the chosen site' },
     ],
   },

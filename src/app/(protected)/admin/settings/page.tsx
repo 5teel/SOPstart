@@ -9,6 +9,8 @@ import { ApprovalChainEditor, type ChainMember } from '@/components/admin/govern
 import { ObservationLabelsCard } from '@/components/admin/observations/ObservationLabelsCard'
 import type { ChainStep } from '@/lib/governance/approvals'
 import { SOP_CATEGORIES } from '@/lib/sop-categories'
+import { mySites } from '@/lib/auth/sites'
+import { SitePickerCard } from '@/components/admin/SitePickerCard'
 
 export const metadata: Metadata = {
   title: 'Settings — SOPstart',
@@ -52,7 +54,7 @@ const SECTIONS = [
 
 export default async function AdminSettingsPage() {
   // Auth guard — shared per-request session context (JWT verified locally).
-  const { userId, role } = await getSessionContext()
+  const { supabase, userId, role, organisationId } = await getSessionContext()
   if (!userId) redirect('/login')
 
   if (!role || !['admin', 'safety_manager'].includes(role)) {
@@ -68,10 +70,11 @@ export default async function AdminSettingsPage() {
   // still see and clear a pre-migration chain keyed by a legacy value that
   // has no vocabulary equivalent. The three reads are independent — run
   // concurrently.
-  const [chainsResult, membersResult, observationLabels] = await Promise.all([
+  const [chainsResult, membersResult, observationLabels, sites] = await Promise.all([
     getApprovalChains(),
     getOrgMembers(),
     getObservationLabels(),
+    supabase.auth.getClaims().then(({ data }) => mySites(userId, data?.claims?.user_metadata)),
   ])
 
   const chains: Record<string, ChainStep[]> =
@@ -133,6 +136,16 @@ export default async function AdminSettingsPage() {
         </div>
         <ObservationLabelsCard initial={observationLabels} />
       </div>
+
+      {sites.length > 1 && (
+        <div className="mt-8">
+          <div className="flex items-center gap-3 mb-3">
+            <span className="pill">YOU</span>
+            <h2 className="mono text-lg font-semibold text-[var(--ink-900)]">Your site picker</h2>
+          </div>
+          <SitePickerCard sites={sites} currentId={organisationId} />
+        </div>
+      )}
     </div>
   )
 }
