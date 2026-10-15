@@ -227,10 +227,12 @@ test.describe('review fixes (55-review)', () => {
     const body = actionBody('submitCompletion')
     expect(body).not.toContain('startsWith')
     expect(body).toContain('`${photoPrefix}${p.localId}.jpg`')
-    expect(body).toContain("insertError?.code === '23505'")
-    expect(body).toContain("'Photos could not be saved. Please try again.'")
-    // the duplicate-key retry path must still reach the photo insert, not return early
-    expect(body).not.toMatch(/23505'\)\s*\{\s*return/)
+    // One transaction (00080 complete_walk): any failed write is reported as a failure, and a retry
+    // finds its completion and adds only the photo rows it has not saved.
+    expect(body).toMatch(/if \(completeError\) \{[\s\S]*?success: false/)
+    const sql = code('supabase/migrations/00080_complete_walk.sql')
+    expect(sql).toContain('on conflict (id) do nothing')
+    expect(sql).toMatch(/where not exists \([\s\S]*?storage_path = x->>'storagePath'/)
   })
 
   test('WR-03: a failed autosave is retried and the pending edit is never dropped (58-15: useFocusAutosave)', () => {

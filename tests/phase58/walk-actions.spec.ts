@@ -138,20 +138,21 @@ test.describe('FOC-04 walk actions', () => {
     expect(b).toMatch(/\.from\('sop_walks'\)[\s\S]*?\.eq\('organisation_id', organisationId\)[\s\S]*?\.eq\('worker_id', userId\)/)
     expect(b).toContain('reviewMissing(')
     expect(b).toContain("row.status === 'submitted'")
-    // the missing check runs before anything is inserted, and not conditional on allow_forward_jump
-    expect(b.indexOf('reviewMissing(')).toBeLessThan(b.indexOf(".from('sop_completions')"))
+    // the missing check runs before anything is written, and not conditional on allow_forward_jump
+    expect(b.indexOf('reviewMissing(')).toBeLessThan(b.indexOf("rpc('complete_walk'"))
     expect(b).not.toContain('allow_forward_jump')
     // hash and ids come from the server's own order and the walk id
     expect(b).toContain('hashInput(sop.order)')
     expect(b).toContain('const localId = walk.id')
     expect(b).toContain('const photoStoragePaths = walk.photos')
-    // walk marked submitted only after the completion insert, then the worker's signature
-    const sent = b.indexOf(".from('sop_completions')")
-    const marked = b.indexOf("status: 'submitted'")
+    // one transaction writes the completion, then marks the walk submitted; the worker's signature follows
+    const sent = b.indexOf("rpc('complete_walk'")
     const signed = b.indexOf('await recordSignature(')
     expect(sent).toBeGreaterThan(-1)
-    expect(marked).toBeGreaterThan(sent)
-    expect(signed).toBeGreaterThan(marked)
+    expect(signed).toBeGreaterThan(sent)
+    const sql = fs.readFileSync('supabase/migrations/00080_complete_walk.sql', 'utf8')
+    expect(sql.indexOf('insert into sop_completions')).toBeGreaterThan(-1)
+    expect(sql.indexOf("set status = 'submitted'")).toBeGreaterThan(sql.indexOf('insert into sop_completions'))
     expect(b).toContain("role: 'worker'")
   })
 
@@ -181,6 +182,6 @@ test.describe('FOC-04 walk actions', () => {
     expect(b).toContain("z.object({ walkId: z.string().uuid() }).strict().safeParse(rawInput)")
     expect(b).not.toContain('rawInput.')
     expect(b).toContain('`${organisationId}/completions/${localId}/`')
-    expect(b).toContain("insertError?.code === '23505'")
+    expect(b).toContain("rpc('complete_walk'")
   })
 })

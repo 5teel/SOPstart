@@ -50,7 +50,7 @@
     { "file": "src/actions/objectives.ts", "function": "confirmObjective", "status": "hook", "anchor": "confirmObjectiveCore(", "kind": "objective_confirmed", "plan": 60 }
   ],
   "delegatedHooks": [
-    { "file": "src/actions/completions.ts", "function": "submitCompletion", "calls": "recordSignature(", "after": ".from('sop_completions')", "kind": "sign_off", "note": "Send for sign-off (D-22): the worker's signature row and its ledger row are written by recordSignature, after the completion insert" },
+    { "file": "src/actions/completions.ts", "function": "submitCompletion", "calls": "recordSignature(", "after": "rpc('complete_walk'", "kind": "sign_off", "note": "Send for sign-off (D-22): the worker's signature row and its ledger row are written by recordSignature, after the completion transaction (complete_walk)" },
     { "file": "src/actions/completions.ts", "function": "signOffCompletion", "calls": "recordSignature(", "after": ".update({ status: newStatus })", "kind": "countersign", "note": "Office sign-off (59): the supervisor counter-signature and the approval's one ledger row are written by recordSignature after the status change" }
   ],
   "allow": [

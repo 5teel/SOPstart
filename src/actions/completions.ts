@@ -13,8 +13,14 @@ import { dedupeKey, notificationTitle } from '@/lib/notifications/kinds'
 import { notificationPlace } from '@/lib/notifications/places'
 import { userLabels } from '@/lib/members/labels'
 import { createHash } from 'node:crypto'
-import { hashInput, reviewMissing } from '@/lib/sop/focus'
-import { loadWalkSop, toWalkState, WALK_COLUMNS } from '@/lib/sop/walk-read'
+import { toWalkState, WALK_COLUMNS } from '@/lib/sop/walk-read'
+import { hashInput, reviewMissing, walkOrder, type FocusKind } from '@/lib/sop/focus'
+
+interface EmbeddedSop {
+  organisation_id: string
+  sop_sections: Array<{ id: string; title: string; sort_order: number }>
+  sop_focus_steps: Array<{ id: string; section_id: string; kind: FocusKind; text: string; photo_required: boolean; sort_order: number; organisation_id: string }>
+}
 
 // ---------------------------------------------------------------
 // submitCompletion -- Send for sign-off
@@ -23,7 +29,7 @@ import { loadWalkSop, toWalkState, WALK_COLUMNS } from '@/lib/sop/walk-read'
 // nothing the client says about steps, hash or photos is read. The completion id is the
 // walk id, which makes the insert its own idempotency key.
 // submitted_at is deliberately OMITTED -- the DB DEFAULT now() is the authoritative server timestamp.
-// On conflict (23505 duplicate key): idempotent retry -- missing photo rows are added, then success.
+// One transaction (complete_walk): a retry finds its completion and adds only the missing photo rows.
 // ---------------------------------------------------------------
 export async function submitCompletion(
   rawInput: unknown
@@ -42,9 +48,10 @@ export async function submitCompletion(
   if (!organisationId) return { success: false, error: 'No organisation found' }
 
   const admin = createAdminClient()
+  // The walk and its SOP's sections and steps in one round trip (embedded through sop_id).
   const { data: row } = await admin
     .from('sop_walks')
-    .select(WALK_COLUMNS)
+    .select(`${WALK_COLUMNS}, sop:sops!inner ( organisation_id, sop_sections ( id, title, sort_order ), sop_focus_steps ( id, section_id, kind, text, photo_required, sort_order, organisation_id ) )`)
     .eq('id', parsed.data.walkId)
     .eq('organisation_id', organisationId)
     .eq('worker_id', userId)
@@ -55,9 +62,15 @@ export async function submitCompletion(
   if (row.status !== 'in_progress') return { success: false, error: 'Start the SOP again.' }
   mark('walk')
 
-  const sop = await loadWalkSop(admin, organisationId, walk.sop_id)
-  if (!sop || sop.order.length === 0) return { success: false, error: 'This SOP has no steps to send.' }
-  mark('sop')
+  const embedded = (row as unknown as { sop: EmbeddedSop | null }).sop
+  if (!embedded || embedded.organisation_id !== organisationId) return { success: false, error: 'Start the SOP again.' }
+  const sop = {
+    order: walkOrder(
+      embedded.sop_sections,
+      embedded.sop_focus_steps.filter((st) => st.organisation_id === organisationId),
+    ),
+  }
+  if (sop.order.length === 0) return { success: false, error: 'This SOP has no steps to send.' }
 
   // Whatever the jump-ahead setting: every acknowledgement, required photo and step.
   const missing = [
@@ -89,84 +102,24 @@ export async function submitCompletion(
     return { success: false, error: 'Invalid photo path.' }
   }
 
-  const { error: insertError } = await admin
-    .from('sop_completions')
-    .insert({
-      id: localId,
-      organisation_id: organisationId,
-      sop_id: walk.sop_id,
-      worker_id: userId,               // the signed-in worker (RLS key)
-      sop_version: walk.sop_version,
-      content_hash: createHash('sha256').update(hashInput(sop.order)).digest('hex'),
-      step_data: stepData,
-      // jsonb on the DB side; the generated Json union does not admit typed object arrays.
-      step_ack_trace: ackTrace as unknown as Json,
-    })
-
-  // 23505 = unique_violation: the completion row was already written by an
-  // earlier attempt. Fall through so a retry can still add the photo rows that
-  // attempt failed to save.
-  mark('insert')
-  const isRetry = insertError?.code === '23505'
-  if (insertError && !isRetry) {
-    console.error('submitCompletion insert error:', insertError)
+  // One transaction (00080 complete_walk): the completion (the walk id is its idempotency key),
+  // the photo rows a retry has not yet saved, and the walk marked submitted.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error: completeError } = await (admin as any).rpc('complete_walk', {
+    p_walk_id: localId,
+    p_org: organisationId,
+    p_worker: userId,
+    p_sop_id: walk.sop_id,
+    p_sop_version: walk.sop_version,
+    p_hash: createHash('sha256').update(hashInput(sop.order)).digest('hex'),
+    p_step_data: stepData,
+    p_ack_trace: ackTrace,
+    p_photos: photoStoragePaths.map((p) => ({ stepId: p.stepId, storagePath: p.storagePath, contentType: p.contentType })),
+  })
+  if (completeError) {
+    console.error('submitCompletion complete_walk error:', completeError)
     return { success: false, error: 'Failed to submit completion.' }
   }
-
-  // Insert completion_photos records for each uploaded photo
-  if (photoStoragePaths.length > 0) {
-    let toInsert = photoStoragePaths
-    if (isRetry) {
-      // Only the worker who wrote the completion may attach photos to it, and
-      // rows an earlier attempt did save are not duplicated.
-      const { data: existing } = await admin
-        .from('sop_completions')
-        .select('worker_id, organisation_id')
-        .eq('id', localId)
-        .single()
-      if (!existing || existing.worker_id !== userId || existing.organisation_id !== organisationId) {
-        return { success: false, error: 'Failed to submit completion.' }
-      }
-      const { data: saved } = await admin
-        .from('completion_photos')
-        .select('storage_path')
-        .eq('completion_id', localId)
-        .eq('organisation_id', organisationId)
-      const have = new Set((saved ?? []).map((r) => r.storage_path))
-      toInsert = photoStoragePaths.filter((p) => !have.has(p.storagePath))
-    }
-
-    if (toInsert.length > 0) {
-      const { error: photoError } = await admin.from('completion_photos').insert(
-        toInsert.map((p) => ({
-          organisation_id: organisationId,
-          completion_id: localId,
-          step_id: p.stepId,
-          storage_path: p.storagePath,
-          content_type: p.contentType,
-        }))
-      )
-      if (photoError) {
-        // The client keeps the walk open and resubmits; the retry saves the missing rows.
-        console.error('submitCompletion photo insert error:', photoError)
-        return { success: false, error: 'Photos could not be saved. Please try again.' }
-      }
-    }
-  }
-
-  mark('photos')
-  const { error: walkError } = await admin
-    .from('sop_walks')
-    .update({ status: 'submitted', submitted_at: new Date().toISOString(), updated_at: new Date().toISOString() })
-    .eq('id', walk.id)
-    .eq('organisation_id', organisationId)
-    .eq('worker_id', userId)
-  if (walkError) {
-    // The completion exists; a retry finds it (23505 path) and finishes the walk.
-    console.error('submitCompletion walk update error:', walkError)
-    return { success: false, error: 'Failed to submit completion.' }
-  }
-
   mark('walk_done')
 
   // The completion is saved: the worker sees Sent now. The worker's own ledger row (D-22) and the
