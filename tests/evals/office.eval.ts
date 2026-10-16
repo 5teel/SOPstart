@@ -918,9 +918,37 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       const training = page.getByTestId('section-training')
       await expect(training).toBeVisible(SLOW)
       await expect(training.getByRole('heading', { name: 'Training' })).toBeVisible(SLOW)
-      await expect(training.locator('table').or(training.getByText('No people with required SOPs in this cut.'))).toBeVisible(SLOW)
+      await expect(training.getByTestId('training-lanes')).toBeVisible(SLOW)
       await expect(page).toHaveURL(/[?&]s=training/)
       await shot(page, '59-training-section')
+      expect(errors).toEqual([])
+      await page.close()
+    })
+
+    test('the training lanes (ADR-0019): five lanes by SOP, groups open, and one person by person', async () => {
+      const page = await adminCtx.newPage()
+      const errors = watchConsole(page)
+      await page.goto('/?s=training')
+      const lanes = page.getByTestId('section-training').getByTestId('training-lanes')
+      await expect(lanes).toBeVisible(SLOW)
+      await expect(lanes.getByText('Loading…')).toHaveCount(0, SLOW)
+      const empty = lanes.getByText('No people with required SOPs in this department.')
+      if (await empty.isVisible()) {
+        await shot(page, 'adr19-lanes-empty')
+        expect(errors).toEqual([])
+        return page.close()
+      }
+      for (const name of ['Not started', 'Read it', 'Observed', 'Waiting for you', 'Signed off']) {
+        await expect(lanes.locator('.lane-head').getByText(name, { exact: true })).toBeVisible()
+      }
+      await lanes.getByRole('button', { name: /^(Open all|Close all)$/ }).click()
+      if ((await lanes.getByRole('button', { name: 'Close all' }).count()) === 0) await lanes.getByRole('button', { name: 'Open all' }).click()
+      await expect(lanes.getByTestId('lanes-sop').first()).toBeVisible(SLOW)
+      await shot(page, 'adr19-lanes-by-sop')
+      await lanes.getByTestId('lanes-face').first().click()
+      await expect(lanes.getByTestId('lanes-person-head')).toBeVisible(SLOW)
+      await expect(lanes.getByText(/\d+ of \d+ signed off/)).toBeVisible()
+      await shot(page, 'adr19-lanes-by-person')
       expect(errors).toEqual([])
       await page.close()
     })

@@ -33,3 +33,4 @@ code, plans and phases follow it until a later ADR supersedes it.
 | [0016](0016-lists-delineated-and-stepped.md) | Lists are framed rows; long lists are stepped into (areas or types, then SOPs) | Accepted | `tests/phase63/sop-list.spec.ts`, `tests/evals/home.eval.ts` HOME-02 |
 | [0017](0017-hosting-sydney.md) | The app is hosted on Fly.io in Sydney, next to the Supabase database | Accepted | `fly.toml`, `.github/workflows/fly-deploy.yml` |
 | [0018](0018-new-accounts-need-approval.md) | Every new account waits for a SOPstart admin's approval (access-token gate) | Accepted | `supabase/migrations/00081_user_approval.sql`, `src/actions/user-approval.ts` |
+| [0019](0019-training-lanes.md) | Training is shown as lanes, not a matrix of pills | Accepted | `tests/phase63/training-lanes.spec.ts` · `tests/evals/home.eval.ts` HOME-04 |

@@ -492,9 +492,8 @@ test.describe.serial('Phase 63 -- SOP-first home (deployed)', () => {
       const training = page.getByTestId('section-training')
       await expect(training).toBeVisible(SLOW)
       await expect(training.getByText('Loading…')).toHaveCount(0, SLOW)
-      await expect(training.getByText('Loading matrix…')).toHaveCount(0, SLOW)
-      await expect(training.getByText(/Could not load the training matrix/)).toHaveCount(0)
-      await expect(training.locator('table').or(training.getByText('No people with required SOPs in this cut.'))).toBeVisible(SLOW)
+            await expect(training.getByText(/Could not load training/)).toHaveCount(0)
+      await expect(training.getByTestId('training-lanes')).toBeVisible(SLOW)
       await shot(page, '63-home-section-training')
 
       await page.getByTestId('home-section-manage').click()

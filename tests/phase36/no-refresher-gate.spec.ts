@@ -12,7 +12,7 @@
  * render to a worker OR influence a worker path -- StatePill.tsx (the shared
  * chip renderer consumed by all three competency surfaces),
  * TrainingRecordSection.tsx (per-worker record panel), and
- * TrainingMatrixView.tsx (a supervisor surface, but the same north star
+ * TrainingLanes.tsx (a supervisor surface, but the same north star
  * applies: nothing here may disable or lock a worker's underlying access).
  *
  * IMPORTANT distinction (do NOT "fix" this regex into uselessness): a chip
@@ -60,7 +60,7 @@ const WALK_ACTIONS = path.join(ROOT, 'src', 'actions', 'walk.ts')
 const HOME = (f: string) => path.join(ROOT, 'src', 'components', 'home', f)
 const STATE_PILL = path.join(ROOT, 'src', 'components', 'admin', 'competency', 'StatePill.tsx')
 const TRAINING_RECORD_SECTION = path.join(ROOT, 'src', 'components', 'admin', 'competency', 'TrainingRecordSection.tsx')
-const TRAINING_MATRIX_VIEW = path.join(ROOT, 'src', 'components', 'admin', 'competency', 'TrainingMatrixView.tsx')
+const TRAINING_LANES = path.join(ROOT, 'src', 'components', 'admin', 'competency', 'TrainingLanes.tsx')
 
 const TARGETS: Array<{ label: string; file: string }> = [
   { label: 'worker SOP detail / walkthrough route page.tsx', file: WORKER_SOP_DETAIL },
@@ -74,7 +74,7 @@ const TARGETS: Array<{ label: string; file: string }> = [
   { label: 'ReadView.tsx (Read)', file: HOME('ReadView.tsx') },
   { label: 'StatePill.tsx (shared chip renderer)', file: STATE_PILL },
   { label: 'TrainingRecordSection.tsx (per-worker record panel)', file: TRAINING_RECORD_SECTION },
-  { label: 'TrainingMatrixView.tsx (supervisor matrix surface)', file: TRAINING_MATRIX_VIEW },
+  { label: 'TrainingLanes.tsx (the training lanes, ADR-0019)', file: TRAINING_LANES },
   { label: 'useLibrary.ts (the list read; 63-20: the old worker list hook is gone)', file: path.join(ROOT, 'src', 'hooks', 'useLibrary.ts') },
 ]
 

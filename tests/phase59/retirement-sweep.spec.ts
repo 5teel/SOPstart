@@ -103,7 +103,7 @@ test.describe('retire: governance, team and access pages (59-14)', () => {
     // A-05 / D-13: what the training bridge and the Office still mount
     for (const f of [
       'src/components/admin/org-model/PersonPanel.tsx',
-      'src/components/admin/competency/TrainingMatrixView.tsx',
+      'src/components/admin/competency/TrainingLanes.tsx',
       'src/components/observations/AssessmentRequestsPanel.tsx',
       'src/components/admin/governance/OwnerPicker.tsx',
       'src/components/admin/governance/ApprovalChainEditor.tsx',

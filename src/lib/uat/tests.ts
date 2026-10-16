@@ -351,11 +351,31 @@ export const UAT_TESTS: UatTest[] = [
   },
 
   {
+    id: 'adr19-training-lanes',
+    dateAdded: '2026-10-16',
+    category: 'Training lanes',
+    title: 'Open Training: can you tell how far each person has got on each SOP?',
+    status: 'active',
+    summary:
+      'Training now shows lanes instead of a table of coloured labels. Each SOP is a row; people sit in the lane they have reached: Not started, Read it, Observed, Waiting for you, Signed off.',
+    tryIt: [
+      'Open the Training section and pick a department.',
+      'Open a group of SOPs and look at where the faces sit.',
+      'Click someone\'s face to see all their SOPs on their own.',
+    ],
+    links: [{ label: 'Training', href: '/?s=training' }],
+    questions: [
+      { id: 'lanes-clear', text: 'Could you tell how far each person has got without reading any labels?' },
+      { id: 'person-clear', text: 'Was one person\'s view clear about what they still have to do?' },
+      { id: 'groups-help', text: 'Did the groups make a long list of SOPs easier to get through?' },
+    ],
+  },
+  {
     id: 'p35-training-matrix',
     dateAdded: '2026-07-24',
     category: 'Phase 35 — Training matrix & records',
     title: 'Open the Training matrix — do you see each person\'s training state per SOP?',
-    status: 'active',
+    status: 'archived', // ADR-0019: the matrix became the training lanes
     summary:
       'Team now has a third view: a Matrix showing, for each person and each procedure they need to know, whether they\'ve read it, been watched doing it, or been signed off.',
     tryIt: [

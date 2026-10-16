@@ -309,6 +309,51 @@ body[data-theme="paper"] {
   /* AS 1319 shapes for the step-kind marks (ADR-0013): warning is a yellow triangle with a black edge. */
   .sign-triangle { position: relative; display: inline-block; flex-shrink: 0; width: 0.75rem; height: 0.6875rem; background: var(--ink-900); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
   .sign-triangle::after { content: ''; position: absolute; inset: 3px 2.5px 1.5px; background: var(--sign-warning); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+
+  /* Training lanes (ADR-0019, sketch 012 F): where a face sits is how far that person has got.
+   * A row is a SOP (or a group of them); five lanes run left to right in training order. Under
+   * 768 px a row stacks and each lane names itself; empty lanes drop out. */
+  .lanes { overflow: hidden; border: 1px solid var(--ink-200); border-radius: var(--radius-lg); background: var(--paper-1); }
+  .lane-row { display: grid; grid-template-columns: minmax(12rem, 1.3fr) repeat(5, minmax(0, 1fr)); }
+  .lane-row + .lane-row { border-top: 1px solid var(--ink-200); }
+  .lane-row > * { display: flex; flex-wrap: wrap; align-content: flex-start; align-items: center; gap: 0.375rem; min-width: 0; min-height: var(--spacing-tap-glove); padding: 0.625rem; border-left: 1px solid var(--ink-200); }
+  .lane-row > :first-child { border-left: 0; flex-wrap: nowrap; gap: 0.625rem; text-align: left; }
+  .lane-head > * { min-height: 0; align-content: flex-end; background: var(--paper-2); font-size: var(--text-meta); font-weight: 600; color: var(--ink-700); }
+  .lane-head small { display: block; width: 100%; font-size: var(--text-micro); font-weight: 400; color: var(--ink-500); }
+  .lane-group > * { background: var(--paper-2); }
+  .lane-group > :first-child { font-weight: 600; color: var(--ink-900); }
+  .lane-group > :first-child:hover { background: var(--ink-100); }
+  .lane-sub > :first-child { padding-left: 2rem; }
+  .lane-row [data-lane="wait"] { background: var(--tint-decision-bg); }
+  .lane-row [data-lane="signed"] { background: color-mix(in srgb, var(--ink-900) 4%, var(--paper-1)); }
+  .lane-row.lane-focus > * { box-shadow: inset 0 2px 0 var(--ink-900), inset 0 -2px 0 var(--ink-900); }
+  .lane-count { display: flex; flex-direction: column; gap: 0.25rem; width: 100%; font-size: var(--text-meta); color: var(--ink-600); }
+  .lane-count b { font-family: var(--font-label); font-size: var(--text-reading); color: var(--ink-900); }
+  .lane-fill { height: 0.3125rem; overflow: hidden; border-radius: 9999px; background: var(--paper-1); box-shadow: inset 0 0 0 1px var(--ink-200); }
+  .lane-fill > i { display: block; height: 100%; background: var(--ink-900); }
+  /* A person's place on one SOP: a track from the first lane to theirs, ending in words. */
+  .lane-person > :not(:first-child) { flex-wrap: nowrap; padding-left: 0; padding-right: 0; }
+  .lane-track { flex: 1; height: 0.375rem; background: var(--ink-900); }
+  .lane-track-start { margin-left: 0.625rem; border-radius: 9999px 0 0 9999px; }
+  .lane-label { flex-shrink: 0; display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0.375rem; margin: 0 0.625rem; padding: 0.25rem 0.625rem; border: 1.5px solid var(--ink-900); border-radius: 9999px; background: var(--paper-1); font-size: var(--text-micro); font-weight: 600; color: var(--ink-900); }
+  .lane-label-quiet { border-color: var(--ink-300); font-weight: 500; color: var(--ink-500); }
+  .lane-note { font-size: var(--text-micro); font-weight: 600; color: var(--accent-decision); }
+  .lane-note-quiet { font-size: var(--text-micro); font-weight: 500; color: var(--ink-500); }
+  /* A person as a face: initials in an ink circle, first name beside it. */
+  .face { display: inline-flex; align-items: center; gap: 0.375rem; min-height: 2rem; padding: 0.1875rem 0.625rem 0.1875rem 0.1875rem; border: 1px solid var(--ink-300); border-radius: 9999px; background: var(--paper-1); font-size: var(--text-micro); color: var(--ink-900); }
+  .face:hover, .face[aria-pressed="true"] { border-color: var(--ink-900); }
+  .face[aria-pressed="true"] { box-shadow: 0 0 0 1px var(--ink-900); }
+  .face-av { display: inline-grid; place-items: center; flex-shrink: 0; width: 1.5rem; height: 1.5rem; border-radius: 9999px; background: var(--ink-900); color: var(--paper); font-family: var(--font-label); font-size: var(--text-micro); font-weight: 700; }
+  .face-av-lg { width: 3rem; height: 3rem; font-size: var(--text-reading); }
+  @media (max-width: 767px) {
+    .lane-row { grid-template-columns: 1fr; }
+    .lane-head { display: none; }
+    .lane-row > * { min-height: 0; border-left: 0; }
+    .lane-row > :not(:first-child):empty { display: none; }
+    .lane-row > [data-lane]:not(:empty)::before { content: attr(data-name); width: 100%; font-size: var(--text-micro); font-weight: 600; color: var(--ink-500); }
+    .lane-person > :not(:first-child):not([data-here]) { display: none; }
+    .lane-person .lane-track { display: none; }
+  }
 }
 
 /* Native checkboxes and radios in ink, not the browser's blue. */

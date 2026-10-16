@@ -183,7 +183,7 @@ export function HomeShell({ siteName, siteId, sites, userEmail, userId, role, in
   const body = (() => {
     switch (state.s) {
       case 'training':
-        return <TrainingSection />
+        return <TrainingSection rows={lib.rows} areas={lib.areas} />
       case 'signoffs':
         return <SignOffsSection role={role} tab={state.tab} onTab={(t) => select({ ...state, tab: t })} onHome={select} />
       case 'people':
