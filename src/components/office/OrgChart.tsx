@@ -232,7 +232,7 @@ export function OrgChart({
     const uniq = [...new Map(ppl.map((m) => [m.id, m])).values()]
     if (lens === 'who') {
       const k = uniq.filter((m) => has(auth(m), power)).length
-      if (uniq.length === 0) return <span>Nobody here yet</span>
+      if (uniq.length === 0) return <span>0 people</span>
       return k > 0 ? <span>{k} {k === 1 ? POWER_WORDS[power] : POWER_PLURAL[power]}</span> : <span className="tag tag-warn">Nobody here {POWER_WORDS[power]}</span>
     }
     if (lens === 'training') {
