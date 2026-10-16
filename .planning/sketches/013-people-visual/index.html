@@ -74,21 +74,58 @@
   .who tr.grp td { background: var(--paper-2); text-align: left; font-weight: 600; padding: 6px 10px; }
   .who tbody tr:not(.grp):hover td { background: var(--paper-2); }
   .colcount { display: block; font-family: var(--font-label); font-weight: 700; color: var(--ink-900); }
+  /* D: one org chart carrying every People + SOP access function */
+  .dhead { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 8px 0 10px; }
+  .dhead .sp { flex: 1; }
+  .joincode { display: inline-flex; align-items: center; gap: 8px; padding: 0 12px; min-height: var(--tap); border: 1px dashed var(--ink-300); border-radius: var(--radius-lg); color: var(--ink-600); }
+  .joincode b { font-family: var(--font-label); letter-spacing: .08em; color: var(--ink-900); }
+  .lensbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; min-height: 52px; padding: 4px 12px; margin-bottom: 10px; border: 1px solid var(--ink-200); border-radius: var(--radius-lg); background: var(--paper-1); }
+  .lensbar .answer { color: var(--ink-600); }
+  .lensbar .answer b { color: var(--ink-900); }
+  .lensbar select { min-height: 38px; border: 1px solid var(--ink-300); border-radius: var(--radius-lg); padding: 0 10px; background: var(--paper-1); font: inherit; }
+  #chartD { min-height: 600px; }
+  .pc { display: inline-flex; flex-direction: column; align-items: stretch; gap: 3px; border: 1px solid var(--ink-300); border-radius: 12px; padding: 4px 10px 4px 4px; background: var(--paper-1); font-size: 12px; min-height: 32px; text-align: left; transition: opacity .15s; }
+  .pc .top { display: flex; align-items: center; gap: 6px; }
+  .pc .why2 { padding-left: 30px; color: var(--ink-600); font-size: 11px; }
+  .pc .pbar { margin-left: 30px; height: 5px; border-radius: 99px; background: var(--paper-2); box-shadow: inset 0 0 0 1px var(--ink-200); overflow: hidden; width: 90px; }
+  .pc .pbar i { display: block; height: 100%; background: var(--ink-900); }
+  .pc.vacant { border-style: dashed; color: var(--ink-500); background: transparent; }
+  .pc.vacant:hover { border-color: var(--ink-900); color: var(--ink-900); }
+  .pc.invited { border-style: dashed; }
+  .pc.sel { box-shadow: 0 0 0 2px var(--ink-900); border-color: var(--ink-900); }
+  .pc.lit { border-color: var(--ink-900); }
+  #chartD.dim-mode .pc:not(.lit):not(.sel), #chartD.dim-mode .dn:not(.lit) { opacity: .35; }
+  .dn { transition: opacity .15s; }
+  .dn.lit { border-color: var(--ink-900); }
+  .dn .dsub { font-size: 11px; color: var(--ink-600); margin-top: 4px; }
+  .dn .dsub.warn { display: inline-block; padding: 1px 6px; border-radius: 3px; background: var(--tint-decision-bg); border: 1px solid var(--accent-decision); color: var(--ink-900); }
+  .dn .fatbar { height: 8px; border-radius: 99px; background: var(--paper-2); box-shadow: inset 0 0 0 1px var(--ink-200); overflow: hidden; margin-top: 6px; }
+  .dn .fatbar i { display: block; height: 100%; background: var(--ink-900); }
+  .dn.clickable { cursor: pointer; }
+  .sheet h4 { margin: 18px 0 6px; font-size: var(--text-reading); }
+  .sheet .row2 { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--ink-200); }
+  .sheet .chk { display: flex; align-items: center; gap: 10px; min-height: 40px; }
+  .sheet .chk input { width: 18px; height: 18px; accent-color: var(--ink-900); }
+  .danger { color: var(--accent-escalate); border-color: var(--accent-escalate); }
+  .inviteform { display: flex; flex-direction: column; gap: 10px; }
+  .inviteform input, .inviteform select { min-height: var(--tap); border: 1px solid var(--ink-300); border-radius: var(--radius-lg); padding: 0 12px; font: inherit; background: var(--paper-1); }
 </style>
 </head>
 <body>
 <nav id="variant-nav">
   <b style="margin-right:8px">013 People</b>
-  <button class="t active" data-v="a">A: Cards with icons</button>
+  <button class="t" data-v="a">A: Cards with icons</button>
   <button class="t" data-v="b">B: Org chart</button>
   <button class="t" data-v="c">C: Who can do what</button>
+  <span class="note">· round 2 →</span>
+  <button class="t active" data-v="d">D: Org chart, everything in it</button>
   <span class="sp"></span>
   <span class="note">Width</span>
   <button class="t active" data-w="desk">Desktop</button>
   <button class="t" data-w="phone">Phone 390</button>
 </nav>
 
-<div class="variant active" id="variant-a"><div class="frame">
+<div class="variant" id="variant-a"><div class="frame">
   <p class="why"><b>A · Cards with icons.</b> Today's department cards, with three changes: initials faces, the Signs off / Assigns / Approves text tags become a row of icons (grey when they can't), and every person carries a small training bar from the Training section. Open someone: the sheet says what they can do in sentences with the same icons, and shows their training at a glance with a link through.</p>
   <h2>People</h2>
   <div class="head"><span class="meta">8 people · 3 departments · 1 without a department</span><span class="sp"></span><button class="btn">Invite someone</button></div>
@@ -109,6 +146,22 @@
   <h2>People</h2>
   <div class="head"><div class="seg"><button>Chart</button><button>Departments</button><button aria-pressed="true">Who can do what</button></div><span class="sp"></span><button class="btn">Invite someone</button></div>
   <div class="grid-wrap"><table class="who" id="who"></table></div>
+</div></div>
+
+<div class="variant active" id="variant-d"><div class="frame">
+  <p class="why"><b>D · Org chart, everything in it.</b> One chart is the whole People section, and the other tab (SOP access) folds into it. A quiet <b>Show</b> switch changes what the chart tells you, in words and bars, never new symbols: <b>People</b> (who is where, click someone to see who they look after) · <b>Who can…</b> (sign off, approve, publish, manage people) · <b>Training</b> (a bar on everyone) · <b>SOP access</b> (pick a SOP: who can see it, click a department to give or take access). Click an empty seat to invite someone straight into it. Click a person for the sheet that does everything else.</p>
+  <h2>People</h2>
+  <div class="dhead">
+    <span class="meta" id="countD"></span><span class="sp"></span>
+    <span class="joincode">Join code <b>K7Q-42M</b><button class="tag">New code</button></span>
+    <button class="btn" onclick="openInvite()">Invite someone</button>
+  </div>
+  <div class="lensbar">
+    <span class="meta">Show</span>
+    <div class="seg-quiet" id="lensSeg"></div>
+    <span id="lensExtra" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"></span>
+  </div>
+  <div class="chart bg-grid" id="chartD"><svg class="wires" id="wiresD"></svg><div class="tree" id="treeD"></div></div>
 </div></div>
 
 <aside class="drawer" id="drawer"></aside>
@@ -250,7 +303,123 @@ document.querySelectorAll('[data-w]').forEach(b => b.onclick = () => {
   document.body.classList.toggle('phone', b.dataset.w === 'phone')
   requestAnimationFrame(drawTree)
 })
-renderA(); renderB(); renderC()
+// ---------------------------------------------------------------- D: org chart with every function
+const INVITED = [{ id: 'i1', email: 'tama.r@visy.co.nz', dept: 'hotend', role: 'Operator', when: '14 Oct' }]
+const SOPS = ['IS machine swabbing', 'Mould change, section 6', 'Lehr belt start-up', 'Forklift pre-start check', 'Hot glass handling', 'Lockout and isolation']
+// SOP access: departments granted, plus people granted by name (patch-bay vocabulary: direct / personal)
+const ACCESS = {
+  'IS machine swabbing': { depts: ['forming'], people: [] },
+  'Mould change, section 6': { depts: ['forming', 'maint'], people: [] },
+  'Lehr belt start-up': { depts: ['hotend'], people: ['p7'] },
+  'Forklift pre-start check': { depts: ['forming', 'hotend', 'maint'], people: [] },
+  'Hot glass handling': { depts: ['forming', 'hotend'], people: [] },
+  'Lockout and isolation': { depts: ['maint'], people: ['p3'] },
+}
+const POWER_WORDS = { signoff: 'signs off', approves: 'approves changes', publishes: 'publishes', people: 'manages people' }
+let lens = 'people', power = 'signoff', accessSop = SOPS[1], selD = null
+function renderD() {
+  document.getElementById('countD').textContent = `${PEOPLE.length} people · ${DEPTS.length} departments · ${INVITED.length} invited, not joined yet`
+  document.getElementById('lensSeg').innerHTML = [['people', 'People'], ['who', 'Who can…'], ['training', 'Training'], ['access', 'SOP access']]
+    .map(([k, t]) => `<button aria-pressed="${lens === k}" onclick="lens='${k}';selD=null;renderD()">${t}</button>`).join('')
+  const ex = document.getElementById('lensExtra')
+  const holders = PEOPLE.filter(p => p.a[power])
+  const canSee = id => { const p = byId(id), a = ACCESS[accessSop]; return a.depts.includes(p.dept) || a.people.includes(id) }
+  if (lens === 'who') ex.innerHTML = `<div class="seg-quiet">${Object.entries(POWER_WORDS).map(([k, t]) => `<button aria-pressed="${power === k}" onclick="power='${k}';renderD()">${t[0].toUpperCase() + t.slice(1)}</button>`).join('')}</div><span class="answer"><b>${holders.length}</b> ${holders.length === 1 ? 'person' : 'people'}: ${holders.map(p => p.name).join(', ')}</span>`
+  else if (lens === 'access') { const a = ACCESS[accessSop]; ex.innerHTML = `<select onchange="accessSop=this.value;renderD()">${SOPS.map(s => `<option ${s === accessSop ? 'selected' : ''}>${s}</option>`).join('')}</select><span class="answer">Seen by <b>${a.depts.map(d => DEPTS.find(x => x.id === d).name).join(', ')}</b>${a.people.length ? ` and by name <b>${a.people.map(i => byId(i).name).join(', ')}</b>` : ''}. Click a department to give or take access.</span>` }
+  else if (lens === 'training') ex.innerHTML = `<span class="answer">Bars show how many of the SOPs each person's work needs they are signed off on.</span><button class="btn-quiet">Open Training ›</button>`
+  else ex.innerHTML = `<span class="answer">${selD && byId(selD).sup ? `<b>${byId(selD).name}</b> looks after ${byId(selD).sup.map(i => byId(i).name).join(', ')}` : 'Click someone to open them. Lines show who a supervisor looks after.'}</span>`
+
+  const lit = p => lens === 'who' ? !!p.a[power] : lens === 'access' ? canSee(p.id) : false
+  const chip = p => {
+    let extra = ''
+    if (lens === 'who' && p.a[power]) extra = `<span class="why2">${POWER_WORDS[power]}${power === 'signoff' ? ` ${p.a.signoff} SOPs` : ''}</span>`
+    if (lens === 'training') extra = p.tr[1] ? `<span class="pbar"><i style="width:${(p.tr[0] / p.tr[1]) * 100}%"></i></span><span class="why2">${p.tr[0]} of ${p.tr[1]} signed off</span>` : `<span class="why2">no SOPs required</span>`
+    if (lens === 'access' && canSee(p.id)) extra = `<span class="why2">${ACCESS[accessSop].people.includes(p.id) && !ACCESS[accessSop].depts.includes(p.dept) ? 'by name' : 'through department'}</span>`
+    if (lens === 'people' && p.sup) extra = `<span class="why2">looks after ${p.sup.length}</span>`
+    return `<button class="pc${lit(p) ? ' lit' : ''}${selD === p.id ? ' sel' : ''}" data-p="${p.id}" onclick="event.stopPropagation();pickD('${p.id}')"><span class="top"><span class="av sm">${initials(p.name)}</span>${p.name}</span>${extra}</button>`
+  }
+  const seat = (d, r) => `<button class="pc vacant" onclick="event.stopPropagation();openInvite('${d.id}','${r.name}')"><span class="top"><span class="av sm vacant">+</span>Empty seat · invite</span></button>`
+  const inv = (d, r) => INVITED.filter(i => i.dept === d.id && i.role === r.name).map(i => `<span class="pc invited"><span class="top"><span class="av sm vacant">${i.email[0].toUpperCase()}</span>${i.email}</span><span class="why2">invited ${i.when} · not joined yet</span></span>`).join('')
+  const dsub = d => {
+    const ppl = PEOPLE.filter(p => p.dept === d.id)
+    if (lens === 'who') { const n = ppl.filter(p => p.a[power]).length; return n ? `<div class="dsub">${n} ${POWER_WORDS[power]}</div>` : `<div class="dsub warn">Nobody here ${POWER_WORDS[power]}</div>` }
+    if (lens === 'training') { const a = ppl.reduce((s, p) => s + p.tr[0], 0), b = ppl.reduce((s, p) => s + p.tr[1], 0); return `<div class="fatbar"><i style="width:${b ? (a / b) * 100 : 0}%"></i></div><div class="dsub">${a} of ${b} signed off</div>` }
+    if (lens === 'access') return ACCESS[accessSop].depts.includes(d.id) ? `<div class="dsub"><b>Can see it</b> · click to take away</div>` : `<div class="dsub">Can't see it · click to give access</div>`
+    return `<div class="dsub">${ppl.length} people</div>`
+  }
+  const dLit = d => lens === 'access' && ACCESS[accessSop].depts.includes(d.id) || lens === 'who' // every department carries its count or its gap, so none fades
+  document.getElementById('treeD').innerHTML = `<div class="node root" id="rootD">Visy Glass · Auckland</div>
+    <div class="depts">${DEPTS.map(d => `<div class="dnode"><div class="node dn${dLit(d) ? ' lit' : ''}${lens === 'access' ? ' clickable' : ''}" onclick="event.stopPropagation();toggleAccess('${d.id}')"><div class="kicker" style="justify-content:center"><span class="area-dot" style="background:var(--area-${d.area})"></span>Department</div><b>${d.name}</b>${dsub(d)}</div>
+      <div class="roles">${d.roles.map(r => {
+        const ppl = PEOPLE.filter(p => p.dept === d.id && p.role === r.name), invs = INVITED.filter(i => i.dept === d.id && i.role === r.name).length
+        return `<div class="node rnode"><div class="kicker">Role</div><div class="rt">${r.name}<span class="cap">${ppl.length} of ${r.plan}</span></div><div class="chips">${ppl.map(chip).join('')}${inv(d, r)}${Array.from({ length: Math.max(0, r.plan - ppl.length - invs) }, () => seat(d, r)).join('')}</div></div>`
+      }).join('')}<button class="tag" style="align-self:center">+ Add a role</button></div></div>`).join('')}
+      <div class="dnode"><div class="node" style="border-style:dashed"><div class="kicker" style="justify-content:center">Site-wide</div><b>No department</b></div>
+      <div class="node rnode"><div class="chips">${PEOPLE.filter(p => !p.dept).map(chip).join('')}</div></div><button class="tag" style="align-self:center">+ Add a department</button></div></div>`
+  const chart = document.getElementById('chartD')
+  chart.classList.toggle('dim-mode', lens === 'who' || lens === 'access' || (lens === 'people' && !!selD && !!byId(selD).sup))
+  if (lens === 'people' && selD && byId(selD).sup) chart.querySelectorAll('.pc').forEach(c => c.classList.toggle('lit', byId(selD).sup.includes(c.dataset.p)))
+  requestAnimationFrame(drawD)
+}
+function drawD() {
+  const chart = document.getElementById('chartD'); if (!chart.offsetParent) return
+  const box = chart.getBoundingClientRect(), root = centre(document.getElementById('rootD'), box)
+  let out = [...chart.querySelectorAll('.dnode > .node:first-child')].map(n => { const c = centre(n, box); return `<path d="M${root.x} ${root.bottom} C${root.x} ${root.bottom + 20}, ${c.x} ${c.top - 20}, ${c.x} ${c.top}" stroke="var(--ink-300)" stroke-width="1.5" fill="none"/>` }).join('')
+  if (lens === 'people' && selD && byId(selD).sup) {
+    const s = centre(chart.querySelector(`[data-p="${selD}"]`), box)
+    const floor = Math.max(...[...chart.querySelectorAll('.rnode')].map(n => centre(n, box).bottom)) + 50
+    byId(selD).sup.forEach(id => { const t = centre(chart.querySelector(`[data-p="${id}"]`), box); out += `<path d="M${s.x} ${s.bottom} C${s.x} ${floor}, ${t.x} ${floor}, ${t.x} ${t.bottom}" stroke="var(--ink-900)" stroke-width="2" fill="none"/><circle cx="${t.x}" cy="${t.bottom}" r="3.5" fill="var(--ink-900)"/>` })
+  }
+  document.getElementById('wiresD').innerHTML = out
+}
+function toggleAccess(did) {
+  if (lens !== 'access') return
+  const a = ACCESS[accessSop].depts, i = a.indexOf(did)
+  i >= 0 ? a.splice(i, 1) : a.push(did)
+  renderD()
+}
+function pickD(id) { selD = id; renderD(); openSheetD(id) }
+function openSheetD(id) {
+  const p = byId(id), d = DEPTS.find(x => x.id === p.dept), lookedAfterBy = PEOPLE.filter(x => x.sup?.includes(p.id))
+  const sees = SOPS.filter(s => ACCESS[s].depts.includes(p.dept) || ACCESS[s].people.includes(p.id))
+  const workers = PEOPLE.filter(x => x.id !== p.id && x.sys === 'Worker')
+  document.getElementById('drawer').innerHTML = `<div class="sheet">
+    <button class="drawer-x" onclick="closeD()">✕</button>
+    <div style="display:flex;gap:14px;align-items:center;margin-top:4px"><span class="av lg">${initials(p.name)}</span><div><h2>${p.name}</h2><span class="meta">${p.role || p.sys} · ${d ? d.name : 'No department'}</span></div></div>
+    <h4>Where they sit</h4>
+    <div class="row2"><span>Department</span><select class="chip">${DEPTS.map(x => `<option ${x.id === p.dept ? 'selected' : ''}>${x.name}</option>`).join('')}<option ${!p.dept ? 'selected' : ''}>No department</option></select></div>
+    <div class="row2"><span>Role on site</span><select class="chip"><option>${p.role || '—'}</option></select></div>
+    <div class="row2"><span>Access level</span><select class="chip">${['Worker', 'Supervisor', 'Safety manager', 'Admin'].map(r => `<option ${r === p.sys ? 'selected' : ''}>${r}</option>`).join('')}</select></div>
+    <h4>What ${p.name.split(' ')[0]} can do</h4>
+    ${Object.entries(POWER_WORDS).map(([k, t]) => `<label class="chk"><input type="checkbox" ${p.a[k] ? 'checked' : ''}> ${t[0].toUpperCase() + t.slice(1)}${k === 'signoff' && p.a.signoff ? ` <span class="meta">(${p.a.signoff} SOPs)</span>` : ''}</label>`).join('')}
+    <h4>${p.sys === 'Worker' ? 'Looked after by' : 'Looks after'}</h4>
+    ${p.sys === 'Worker' ? `<div class="meta">${lookedAfterBy.map(x => x.name).join(', ') || 'Nobody yet'}</div>` : workers.map(w => `<label class="chk"><input type="checkbox" ${p.sup?.includes(w.id) ? 'checked' : ''}> ${w.name} <span class="meta">${DEPTS.find(x => x.id === w.dept)?.name || ''}</span></label>`).join('')}
+    <h4>Training</h4>
+    <div class="snap"><div style="flex:1;display:flex;gap:10px;align-items:center">${tbar(p)}</div><button class="btn-quiet">Open in Training ›</button></div>
+    <h4>SOPs they can see</h4>
+    <div class="meta" style="line-height:1.6">${sees.join(' · ') || 'None'}</div>
+    <button class="tag" style="margin-top:8px">+ Give access to a SOP by name</button>
+    <h4>Objective</h4>
+    <div class="meta">Signed off on Lockout and isolation by December.</div>
+    <div style="margin-top:24px;padding-top:12px;border-top:1px solid var(--ink-200)"><button class="btn-quiet danger">Remove from the site</button></div></div>`
+  document.getElementById('drawer').classList.add('open')
+}
+function closeD() { document.getElementById('drawer').classList.remove('open'); selD = null; renderD() }
+function openInvite(did, role) {
+  document.getElementById('drawer').innerHTML = `<div class="sheet"><button class="drawer-x" onclick="closeD()">✕</button><h2 style="margin-top:8px">Invite someone</h2>
+    <p class="meta">${did ? `Into an empty seat: <b>${role}</b> in <b>${DEPTS.find(x => x.id === did).name}</b>.` : 'They join with the role you pick. You can seat them on the chart after.'}</p>
+    <div class="inviteform"><input placeholder="Email address">
+    <select>${DEPTS.map(x => `<option ${x.id === did ? 'selected' : ''}>${x.name}</option>`).join('')}<option>No department</option></select>
+    <select><option>${role || 'Operator'}</option></select>
+    <select><option>Worker</option><option>Supervisor</option><option>Safety manager</option><option>Admin</option></select>
+    <button class="btn">Send invite</button></div></div>`
+  document.getElementById('drawer').classList.add('open')
+}
+document.getElementById('chartD').addEventListener('click', () => { if (selD) closeD() })
+window.addEventListener('resize', () => requestAnimationFrame(drawD))
+document.querySelector('[data-v="d"]').addEventListener('click', () => requestAnimationFrame(drawD))
+
+renderA(); renderB(); renderC(); renderD()
 </script>
 </body>
 </html>

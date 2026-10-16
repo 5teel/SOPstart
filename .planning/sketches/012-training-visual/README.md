@@ -19,6 +19,11 @@ Open `.planning/sketches/012-training-visual/index.html`. Use the Desktop / Phon
 - **B: Training passports**: no matrix up front. Framed person rows with a shape strip and bar; step into a person for a Read → Observed → Signed off ladder per SOP, with the first-step photo. The matrix moves behind "Whole department".
 - **C: By SOP**: SOP cards with photo, coverage bar and faces of who signed off; step into one to see its people in four columns.
 
+### Round 2 (2026-10-16)
+Simon: "the glyphs just require users to learn a new glyph language … I want to reduce the amount of info the user has to parse." Round 2 uses only position, fill and plain words.
+- **D: Lanes** (opens first): one row per SOP, five lanes in training order (Not started · Read it · Observed · Waiting for you · Signed off). Where a face sits is the state; Assess lives in the waiting lane; exceptions are words on the face.
+- **E: Progress first**: one number and bar per department, then one bar and one sentence per person naming what is still to do. The matrix survives only as the audit export.
+
 ## What to look for
 - Do the ink shapes read without the key? Is amber-only-for-waiting enough signal?
 - A (audit density) vs B (person story) vs C (procedure story): which question does an admin bring to this page first?

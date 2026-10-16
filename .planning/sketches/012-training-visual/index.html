@@ -80,14 +80,45 @@
   .col .p:hover { background: var(--paper-2); }
   .col.wait { border-color: var(--accent-decision); }
   .area-dot { width: 8px; height: 8px; border-radius: 99px; display: inline-block; }
+  /* D: lanes (position = state, no symbols) */
+  .lanes { border: 1px solid var(--ink-200); border-radius: var(--radius-lg); background: var(--paper-1); overflow-x: auto; }
+  .lane-row { display: grid; grid-template-columns: 240px repeat(5, minmax(120px, 1fr)); min-width: 860px; }
+  .lane-row + .lane-row { border-top: 1px solid var(--ink-200); }
+  .lane-row > div { padding: 10px; border-left: 1px solid var(--ink-200); display: flex; flex-wrap: wrap; gap: 6px; align-content: flex-start; min-height: 72px; }
+  .lane-row > div:first-child { border-left: 0; align-items: center; gap: 10px; flex-wrap: nowrap; }
+  .lane-row.hdr > div { min-height: 0; font-weight: 600; font-size: var(--text-meta); color: var(--ink-700); align-items: flex-end; background: var(--paper-2); }
+  .lane-row.hdr > div span { display: block; width: 100%; font-weight: 400; color: var(--ink-500); font-size: 12px; }
+  .lane-row > div.done { background: color-mix(in srgb, var(--ink-900) 4%, white); }
+  .lane-row > div.waitlane { background: var(--tint-decision-bg); }
+  .face { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px 3px 3px; border: 1px solid var(--ink-300); border-radius: 999px; background: var(--paper-1); font-size: 12px; min-height: 30px; }
+  .face:hover { border-color: var(--ink-900); }
+  .face small { color: var(--accent-decision); font-weight: 600; }
+  .face small.q { color: var(--ink-500); font-weight: 500; }
+  .lane-flow { display: flex; align-items: center; gap: 6px; color: var(--ink-500); font-size: 12px; margin: 0 0 10px; }
+
+  /* E: progress first (fill = how far along, words for the rest) */
+  .depts { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+  .dcard { text-align: left; border: 1px solid var(--ink-200); border-radius: var(--radius-lg); background: var(--paper-1); padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .dcard:hover, .dcard[aria-current="true"] { border-color: var(--ink-900); }
+  .big { font: 700 34px/1 var(--font-label); }
+  .big span { font-size: 18px; color: var(--ink-500); font-weight: 600; }
+  .fat { height: 14px; border-radius: 99px; background: var(--paper-2); box-shadow: inset 0 0 0 1px var(--ink-200); overflow: hidden; }
+  .fat i { display: block; height: 100%; background: var(--ink-900); }
+  .fat.thin { height: 8px; }
+  .todo { font-size: var(--text-meta); color: var(--ink-600); margin-top: 4px; line-height: 1.5; }
+  .todo b { color: var(--ink-900); font-weight: 600; }
+  .todo .flag { color: var(--ink-900); background: var(--tint-decision-bg); border-radius: 3px; padding: 0 4px; }
 </style>
 </head>
 <body>
 <nav id="variant-nav">
   <b style="margin-right:8px">012 Training</b>
-  <button class="t active" data-v="a">A: Glyph grid</button>
+  <button class="t" data-v="a">A: Glyph grid</button>
   <button class="t" data-v="b">B: Training passports</button>
   <button class="t" data-v="c">C: By SOP</button>
+  <span class="note">· round 2 →</span>
+  <button class="t active" data-v="d">D: Lanes</button>
+  <button class="t" data-v="e">E: Progress first</button>
   <span class="sp"></span>
   <span class="note">Width</span>
   <button class="t active" data-w="desk">Desktop</button>
@@ -95,7 +126,7 @@
 </nav>
 
 <!-- A ------------------------------------------------------------------- -->
-<div class="variant active" id="variant-a"><div class="frame">
+<div class="variant" id="variant-a"><div class="frame">
   <p class="why"><b>A · Glyph grid.</b> Today's matrix, with every pill replaced by one ink shape and every "3/5 competent · 1 needs support…" sentence replaced by a bar. Requests become cards and stay on screen when empty. Click any cell: the person's training ladder opens on the right with that SOP lit.</p>
   <h2>Training</h2>
   <div class="list-head"><span class="section-heading">Waiting for you to assess</span><button class="seg-quiet" onclick="toggleEmpty()"><span aria-pressed="false" style="display:inline-flex;align-items:center">Show empty state</span></button></div>
@@ -129,6 +160,25 @@
   <div class="list-head"><span class="section-heading">Waiting for you to assess</span></div>
   <div class="reqs-slot"></div>
   <div id="cBody"></div>
+</div></div>
+
+<!-- D ------------------------------------------------------------------- -->
+<div class="variant active" id="variant-d"><div class="frame">
+  <p class="why"><b>D · Lanes.</b> Nothing to learn: where a face sits <i>is</i> how far that person has got. One row per SOP, five lanes left to right in the order training happens. Faces drift right as people progress; a row with everyone on the right is done. Waiting for sign-off is its own lane with the Assess button in it, so the requests panel is no longer needed. Exceptions are written in words on the face.</p>
+  <h2>Training</h2>
+  <div class="filters" style="margin-top:12px"><div class="seg" id="deptSegD"></div></div>
+  <div class="lanes" id="lanesD"></div>
+</div></div>
+
+<!-- E ------------------------------------------------------------------- -->
+<div class="variant" id="variant-e"><div class="frame">
+  <p class="why"><b>E · Progress first.</b> One number and one bar per department answer "are we OK?" before anything else. Pick a department and each person gets one bar and one sentence: how many of their SOPs are signed off, and the ones still to do, in words. Open someone for their ladder. The full matrix is only in the export.</p>
+  <h2>Training</h2>
+  <div class="list-head"><span class="section-heading">Waiting for you to assess</span></div>
+  <div class="reqs-slot"></div>
+  <div class="list-head"><span class="section-heading">Signed off on the SOPs their work needs</span><button class="btn-quiet">Export for audit</button></div>
+  <div class="depts" id="deptsE"></div>
+  <div id="peopleE"></div>
 </div></div>
 
 <aside class="drawer" id="drawer"></aside>
@@ -336,7 +386,55 @@ document.querySelectorAll('[data-w]').forEach(b => b.onclick = () => {
   document.querySelectorAll('[data-w]').forEach(x => x.classList.toggle('active', x === b))
   document.body.classList.toggle('phone', b.dataset.w === 'phone')
 })
-renderReqs(); renderA(); renderB(); renderC()
+// ---------------------------------------------------------------- D: lanes
+let dDept = 'forming'
+const first = n => n.split(' ')[0]
+function renderD() {
+  document.getElementById('deptSegD').innerHTML = DEPTS.map(d => `<button aria-pressed="${d.id === dDept}" onclick="dDept='${d.id}';renderD()"><span class="area-dot" style="background:var(--area-${d.area})"></span>${d.name}</button>`).join('')
+  const ppl = PEOPLE.filter(p => p.dept === dDept), sops = SOPS.filter(s => s.depts.includes(dDept))
+  const LANES = [
+    { k: 'none', t: 'Not started', sub: 'hasn’t run it yet' },
+    { k: 'read', t: 'Read it', sub: 'ran it on their own' },
+    { k: 'obs', t: 'Observed', sub: 'watched doing it' },
+    { k: 'wait', t: 'Waiting for you', sub: 'asked to be signed off', cls: 'waitlane' },
+    { k: 'signed', t: 'Signed off', sub: 'competent', cls: 'done' },
+  ]
+  const face = (p, s, c) => `<button class="face" onclick="openPerson('${p.id}','${s.id}')"><span class="av sm">${initials(p.name)}</span>${first(p.name)}${c.support ? ' <small>needs support</small>' : ''}${c.old ? ' <small class="q">old version</small>' : ''}</button>`
+  document.getElementById('lanesD').innerHTML =
+    `<div class="lane-row hdr"><div>SOP</div>${LANES.map(l => `<div class="${l.cls || ''}">${l.t}<span>${l.sub}</span></div>`).join('')}</div>` +
+    sops.map(s => `<div class="lane-row"><div>${thumb(s)}<div><b>${s.title}</b><div class="meta">v${s.v}</div></div></div>${LANES.map(l => {
+      const here = ppl.filter(p => cell(p, s).st === l.k)
+      return `<div class="${l.cls || ''}">${here.map(p => face(p, s, cell(p, s))).join('')}${l.k === 'wait' && here.length ? `<button class="btn" style="min-height:36px;width:100%" onclick="openPerson('${here[0].id}','${s.id}')">Assess</button>` : ''}</div>`
+    }).join('')}</div>`).join('')
+}
+
+// ---------------------------------------------------------------- E: progress first
+let eDept = null
+function renderE() {
+  const pct = cs => cs.length ? cs.filter(c => c.st === 'signed').length / cs.length : 0
+  document.getElementById('deptsE').innerHTML = DEPTS.map(d => {
+    const ppl = PEOPLE.filter(p => p.dept === d.id), cs = ppl.flatMap(p => required(p).map(s => cell(p, s)))
+    const n = cs.filter(c => c.st === 'signed').length
+    return `<button class="dcard" aria-current="${eDept === d.id}" onclick="eDept='${d.id}';renderE()">
+      <div style="display:flex;align-items:center;gap:8px"><span class="area-dot" style="background:var(--area-${d.area})"></span><b>${d.name}</b><span class="meta" style="margin-left:auto">${ppl.length} people</span></div>
+      <div class="big">${n}<span> of ${cs.length}</span></div><div class="fat"><i style="width:${pct(cs) * 100}%"></i></div></button>`
+  }).join('')
+  if (!eDept) { document.getElementById('peopleE').innerHTML = `<p class="meta" style="margin-top:14px">Pick a department to see its people.</p>`; return }
+  const d = dept(eDept), ppl = PEOPLE.filter(p => p.dept === eDept)
+  const IN = { read: 'read it', obs: 'observed', wait: 'waiting for you', none: 'not started' }
+  document.getElementById('peopleE').innerHTML = `<div class="list-head"><span class="section-heading">${d.name}</span></div><div class="list">${ppl.map(p => {
+    const sops = required(p), cs = sops.map(s => cell(p, s)), n = cs.filter(c => c.st === 'signed').length
+    const left = sops.map((s, i) => [s, cs[i]]).filter(([, c]) => c.st !== 'signed' || c.old || c.support)
+    const words = left.length
+      ? 'Still to do: ' + left.map(([s, c]) => `<b>${s.title}</b> (${c.old ? 'signed off an old version' : IN[c.st]}${c.support ? ', <span class="flag">needs support</span>' : ''})`).join(', ')
+      : 'Signed off on everything their work needs.'
+    return `<button class="list-row" style="align-items:flex-start" onclick="openPerson('${p.id}')"><span class="av">${initials(p.name)}</span>
+      <div style="flex:1;min-width:0"><div style="display:flex;gap:12px;align-items:center"><b style="min-width:120px">${p.name}</b><div class="fat thin" style="flex:1;max-width:260px"><i style="width:${(n / cs.length) * 100}%"></i></div><span class="meta">${n} of ${cs.length}</span></div>
+      <div class="todo">${words}</div></div><span class="list-chev">›</span></button>`
+  }).join('')}</div>`
+}
+
+renderReqs(); renderA(); renderB(); renderC(); renderD(); renderE()
 </script>
 </body>
 </html>
