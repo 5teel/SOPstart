@@ -9,11 +9,9 @@ const saira = Saira_Semi_Condensed({ weight: ['500', '600', '700', '800'], subse
 export const metadata: Metadata = {
   title: PRODUCT_NAME,
   description: PRODUCT_DESCRIPTION,
+  // favicon.ico comes from src/app/favicon.ico (file convention)
   icons: {
-    icon: [
-      { url: '/favicon.svg', type: 'image/svg+xml' },
-      { url: '/favicon.ico', sizes: '32x32' },
-    ],
+    icon: [{ url: '/icons/icon-192-any.png', sizes: '192x192', type: 'image/png' }],
     apple: '/apple-touch-icon.png',
   },
 }
