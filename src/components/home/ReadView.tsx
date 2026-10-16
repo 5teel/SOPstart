@@ -23,7 +23,7 @@ import { WorkerObjective } from '@/components/shell/WorkerObjective'
 import { useReadSop } from '@/hooks/useReadSop'
 import { useRun } from '@/hooks/useRun'
 import type { LibraryRow } from '@/hooks/useLibrary'
-import { currentIndex, tickLabel, walkOrder } from '@/lib/sop/focus'
+import { BEFORE_YOU_START, currentIndex, tickLabel, walkOrder } from '@/lib/sop/focus'
 import { focusHref } from '@/lib/sop/focus-path'
 
 // Raise and ask are lazy modules (60 A-07).
@@ -254,7 +254,13 @@ export function ReadView({ row, role, from, onOpenSop, onClose }: { row: Library
               const names = (data.standards.steps[step.id] ?? []).map((s) => s.name)
               return (
                 <li key={step.id} className="contents">
-                  {header && <p className="section-heading pb-1 pt-5">{header}</p>}
+                  {header && (
+                    // A section's standards sit on its heading, as they did on the old browse page (Phase 56 C).
+                    <h2 className="section-heading flex flex-wrap items-center gap-2 pb-1 pt-5">
+                      {header}
+                      {header !== BEFORE_YOU_START && <StandardLabels names={(data.standards.sections[step.section_id] ?? []).map((s) => s.name)} />}
+                    </h2>
+                  )}
                   <div
                     ref={isNext ? nextRef : undefined}
                     data-testid="step-row"

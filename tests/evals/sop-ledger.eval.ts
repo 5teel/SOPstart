@@ -124,11 +124,22 @@ test.describe.serial('Phase 56 -- simpler SOP + decision ledger (deployed)', () 
     const inScope = (sops ?? []).filter((s) => (s.created_at as string) <= lastRunAt)
     // 'EVAL focus ...' are Phase 58 fixtures: editor-native (new:/edit: keys) or still parsing, which the retired
     // converter leaves alone by rule, so they never get a run row (58-18).
-    const bad = inScope.filter(
+    const noRun = inScope.filter(
       (s) => !NEEDS_SIMON_TITLES.includes(s.title as string) && !((s.title as string | null) ?? '').startsWith('EVAL focus') && !latest.get(s.id as string)?.ok,
     )
-    expect(bad.map((s) => s.title), 'SOPs without an ok conversion run').toEqual([])
-    console.log(`A: ${inScope.length} of ${sops?.length} SOPs predate the last run; all have an ok latest run`)
+    // Since 58-14 the converter only fills SOPs with zero steps; a SOP that already has steps (written by
+    // the editor, or a fixture another eval inserted) is native and never gets a run row. Only a SOP with
+    // neither a run nor a step is unconverted.
+    const withSteps = new Set<string>()
+    for (let i = 0; i < noRun.length; i += 200) {
+      const ids = noRun.slice(i, i + 200).map((s) => s.id as string)
+      const { data: rows, error: stepErr } = await db.from('sop_focus_steps').select('sop_id').in('sop_id', ids)
+      expect(stepErr).toBeNull()
+      for (const r of rows ?? []) withSteps.add(r.sop_id as string)
+    }
+    const bad = noRun.filter((s) => !withSteps.has(s.id as string))
+    expect(bad.map((s) => s.title), 'SOPs with neither a conversion run nor steps').toEqual([])
+    console.log(`A: ${inScope.length} of ${sops?.length} SOPs predate the last run; each has an ok run or native steps`)
 
     const { data: steps, error: stepsErr } = await db
       .from('sop_focus_steps')

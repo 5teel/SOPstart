@@ -231,12 +231,21 @@ async function createEphemeralJunction(
 test.afterAll(async () => {
   if (!LIVE_ENV_READY) return
   const admin = serviceClient()
+  const failed: string[] = []
   for (const orgId of cleanupOrgIds) {
-    await admin.from('organisations').delete().eq('id', orgId)
+    // sop_section_blocks.block_id does not cascade from blocks, so the org delete is refused (23503)
+    // while a junction row points at one of its blocks; clear those first. A silent failure here
+    // leaked ~50 probe orgs into the shared database (2026-10-16).
+    const { data: blocks } = await admin.from('blocks').select('id').eq('organisation_id', orgId)
+    const blockIds = ((blocks ?? []) as Array<{ id: string }>).map((b) => b.id)
+    if (blockIds.length) await admin.from('sop_section_blocks').delete().in('block_id', blockIds)
+    const { error, data } = await admin.from('organisations').delete().eq('id', orgId).select('id')
+    if (error || !data?.length) failed.push(`${orgId}: ${error?.message ?? 'no row deleted'}`)
   }
   for (const userId of cleanupUserIds) {
     await admin.auth.admin.deleteUser(userId).catch(() => {})
   }
+  expect(failed, `probe orgs left behind:\n${failed.join('\n')}`).toEqual([])
 })
 
 // ---------------------------------------------------------------------------

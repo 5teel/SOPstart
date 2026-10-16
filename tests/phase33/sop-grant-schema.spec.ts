@@ -164,6 +164,8 @@ test.describe('Real live insert — SOP-target grant, cross-tenant rejected', ()
     const email = `p33-sgs-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@example-phase33-test.invalid`
     const { data: userResp } = await admin.auth.admin.createUser({ email, email_confirm: true })
     const userId = userResp!.user!.id
+    // A failed expectation must not leak the two orgs and the user into the shared database (2026-10-16).
+    try {
     await admin.from('organisation_members').insert({ organisation_id: orgAId, user_id: userId, role: 'admin' })
 
     const { data: orgBSop } = await admin
@@ -201,9 +203,11 @@ test.describe('Real live insert — SOP-target grant, cross-tenant rejected', ()
     const { data: rows } = await admin.from('access_grants').select('id').in('organisation_id', [orgAId, orgBId])
     expect(rows ?? []).toHaveLength(0)
 
-    // Cleanup — org delete cascades sops/access_grants/members.
-    await admin.from('organisations').delete().eq('id', orgAId)
-    await admin.from('organisations').delete().eq('id', orgBId)
-    await admin.auth.admin.deleteUser(userId).catch(() => {})
+    } finally {
+      // Cleanup — org delete cascades sops/access_grants/members.
+      await admin.from('organisations').delete().eq('id', orgAId)
+      await admin.from('organisations').delete().eq('id', orgBId)
+      await admin.auth.admin.deleteUser(userId).catch(() => {})
+    }
   })
 })
