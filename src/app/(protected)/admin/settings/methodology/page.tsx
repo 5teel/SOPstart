@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
 import { getSessionContext } from '@/lib/auth/session-context'
 
 export const metadata: Metadata = {
@@ -70,10 +69,7 @@ export default async function MethodologyPage() {
 
   return (
     <div data-testid="methodology" className="mx-auto max-w-3xl px-4 py-8 text-ui text-ink-700">
-      <Link href="/admin/settings" className="text-meta font-semibold text-ink-600 underline-offset-2 hover:underline">
-        ← Settings
-      </Link>
-      <h1 className="mt-3 text-2xl font-semibold text-ink-900">How SOPstart improves a SOP</h1>
+      <h1 className="text-2xl font-semibold text-ink-900">How SOPstart improves a SOP</h1>
       <p className="mt-2">
         When you upload a SOP, SOPstart keeps two versions side by side: an exact copy of your document, and a clear version
         rewritten for the people who use it. This page explains how the clear version is made and what comes first.
