@@ -24,7 +24,7 @@ Paper/ink engineering-drawing system (established in the blueprint-redesign expl
 | 008 | one-screen-site | If the whole app is one screen (isometric site + sidebar), where does the real work render — docked panel, sheet over the map, or step inside the room? | A (three panes; an open SOP takes the whole screen — map and list removed) | mvp, simplification, navigation, isometric, one-screen, data-model |
 | 009 | sop-first-home | If safe SOP use is the whole point, what is the home, and how does starting a SOP feel? | A (library + reader; isometric site map of library areas in the reader pane, one object per SOP) | home, navigation, brand, motion, worker, phone, isometric |
 | 010 | wordmark | What should the SOPstart wordmark look like, given it is assembled live from the SOP chip and the Start button? | 6e in Saira Semi Condensed (ink SOP chip + "start", continuous hazard tape; merge = drop, slide together, tape in from left) | brand, wordmark, motion, icon |
-| 012 | training-visual | How does Training show who is competent on what at a glance (glyph grid / passports / by SOP)? | pending | training, competency, records, visual |
+| 012 | training-visual | How does Training show who is competent on what at a glance (glyph grid / passports / by SOP)? | F (lanes: position = state; SOP groups collapse with per-lane counts; By person view with a progress bar through the lanes; no glyphs) | training, competency, records, visual |
 | 013 | people-visual | How does People show who is where and who may do what (icon cards / org chart with supervision trace / icon grid)? | pending | people, org-model, authority, visual |
 
 ## Decisions

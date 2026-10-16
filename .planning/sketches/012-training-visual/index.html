@@ -96,6 +96,34 @@
   .face small.q { color: var(--ink-500); font-weight: 500; }
   .lane-flow { display: flex; align-items: center; gap: 6px; color: var(--ink-500); font-size: 12px; margin: 0 0 10px; }
 
+  /* F: lanes grouped + by person */
+  .grp-row > div { min-height: 52px; background: var(--paper-2); }
+  .grp-row > div:first-child { cursor: pointer; font-weight: 600; }
+  .grp-row .chev { display: inline-block; width: 14px; transition: transform .15s; color: var(--ink-500); }
+  .grp-row.open .chev { transform: rotate(90deg); }
+  .cnt { display: flex; flex-direction: column; gap: 4px; width: 100%; font-size: var(--text-meta); color: var(--ink-600); }
+  .cnt b { font: 700 18px/1 var(--font-label); color: var(--ink-900); }
+  .cnt .mini { height: 5px; border-radius: 99px; background: var(--paper-1); box-shadow: inset 0 0 0 1px var(--ink-200); overflow: hidden; }
+  .cnt .mini i { display: block; height: 100%; background: var(--ink-900); }
+  .cnt.zero { color: var(--ink-400); }
+  .lane-row.sub > div:first-child { padding-left: 34px; }
+  .lane-row.hl > div { box-shadow: inset 0 2px 0 var(--ink-900), inset 0 -2px 0 var(--ink-900); }
+  .lane-row.prow-f > div { align-content: center; align-items: center; padding-left: 0; padding-right: 0; flex-wrap: nowrap; }
+  .lane-row.prow-f > div:first-child { padding-left: 34px; padding-right: 10px; }
+  .trk { display: block; height: 6px; background: var(--ink-900); flex: 1; }
+  .trk.start { margin-left: 10px; border-radius: 99px 0 0 99px; }
+  .lbl { flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px; margin: 0 10px 0 0; padding: 4px 10px; border: 1.5px solid var(--ink-900); border-radius: 999px; background: var(--paper-1); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .lbl.first { margin-left: 10px; }
+  .lbl.faint { border-color: var(--ink-300); color: var(--ink-500); font-weight: 500; }
+  .lbl small { color: var(--accent-decision); font-weight: 600; }
+  .lbl small.q { color: var(--ink-500); }
+  .fbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 12px 0; }
+  .fbar .sp { flex: 1; }
+  .who-strip { display: flex; gap: 6px; flex-wrap: wrap; }
+  .who-strip .face[aria-pressed="true"] { border-color: var(--ink-900); box-shadow: 0 0 0 1px var(--ink-900); }
+  .phead { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin: 4px 0 12px; }
+  .allsigned { color: var(--ink-600); font-size: var(--text-meta); }
+
   /* E: progress first (fill = how far along, words for the rest) */
   .depts { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
   .dcard { text-align: left; border: 1px solid var(--ink-200); border-radius: var(--radius-lg); background: var(--paper-1); padding: 16px; display: flex; flex-direction: column; gap: 10px; }
@@ -117,8 +145,10 @@
   <button class="t" data-v="b">B: Training passports</button>
   <button class="t" data-v="c">C: By SOP</button>
   <span class="note">· round 2 →</span>
-  <button class="t active" data-v="d">D: Lanes</button>
+  <button class="t" data-v="d">D: Lanes</button>
   <button class="t" data-v="e">E: Progress first</button>
+  <span class="note">· round 3 →</span>
+  <button class="t active" data-v="f">F: Lanes, grouped + by person ★</button>
   <span class="sp"></span>
   <span class="note">Width</span>
   <button class="t active" data-w="desk">Desktop</button>
@@ -163,11 +193,25 @@
 </div></div>
 
 <!-- D ------------------------------------------------------------------- -->
-<div class="variant active" id="variant-d"><div class="frame">
+<div class="variant" id="variant-d"><div class="frame">
   <p class="why"><b>D · Lanes.</b> Nothing to learn: where a face sits <i>is</i> how far that person has got. One row per SOP, five lanes left to right in the order training happens. Faces drift right as people progress; a row with everyone on the right is done. Waiting for sign-off is its own lane with the Assess button in it, so the requests panel is no longer needed. Exceptions are written in words on the face.</p>
   <h2>Training</h2>
   <div class="filters" style="margin-top:12px"><div class="seg" id="deptSegD"></div></div>
   <div class="lanes" id="lanesD"></div>
+</div></div>
+
+<!-- F ------------------------------------------------------------------- -->
+<div class="variant active" id="variant-f"><div class="frame">
+  <p class="why"><b>F · Lanes, grouped + by person.</b> D's lanes with two additions. <b>Groups:</b> SOPs sit under their library area; a closed group shows how many people are in each lane, so a 200-SOP bank is a handful of rows. Groups start closed; open one to see its faces. <b>By person:</b> the same five lanes for one person, one row per SOP, and a bar that runs left to right as far as they have got. Groups where they are signed off on everything stay closed and say so. Click any face in By SOP to jump to that person.</p>
+  <h2>Training</h2>
+  <div class="fbar">
+    <div class="seg" id="fViewSeg"></div>
+    <div class="seg" id="fDeptSeg"></div>
+    <span class="sp"></span>
+    <button class="btn-quiet" onclick="fAll()" id="fAllBtn">Open all</button>
+  </div>
+  <div id="fPersonHead"></div>
+  <div class="lanes" id="lanesF"></div>
 </div></div>
 
 <!-- E ------------------------------------------------------------------- -->
@@ -434,7 +478,97 @@ function renderE() {
   }).join('')}</div>`
 }
 
-renderReqs(); renderA(); renderB(); renderC(); renderD(); renderE()
+// ---------------------------------------------------------------- F: lanes, grouped + by person
+// A bigger bank (24 Forming SOPs in five library areas) so grouping has something to collapse.
+const FGROUPS = [
+  { id: 'is', name: 'IS machines', depts: ['forming'], sops: ['IS machine swabbing', 'Section stop and start', 'Plunger change', 'Baffle adjustment', 'Invert mechanism check', 'Takeout tong change', 'Section lubrication', 'Blank side cooling check'] },
+  { id: 'mould', name: 'Moulds and changeover', depts: ['forming', 'maint'], sops: ['Mould change, section 6', 'Neck ring change', 'Mould preheat', 'Job change, full machine', 'Gob shear blade change'] },
+  { id: 'plant', name: 'Mobile plant', depts: ['forming', 'hotend', 'maint'], sops: ['Forklift pre-start check', 'Pallet jack use', 'Overhead crane lift'] },
+  { id: 'iso', name: 'Isolation and safety', depts: ['forming', 'hotend', 'maint'], sops: ['Lockout and isolation', 'Hot glass handling', 'Confined space entry', 'Working at height'] },
+  { id: 'qc', name: 'Quality checks', depts: ['forming', 'hotend'], sops: ['Hot end coating check', 'Wall thickness check', 'Lehr belt start-up', 'Defect sample pull'] },
+]
+const FSOPS = FGROUPS.flatMap(g => g.sops.map((t, i) => ({ id: g.id + i, title: t, group: g.id, v: 1 + ((t.length * 7) % 5), icon: ['gear', 'blade', 'fork', 'lock', 'hand', 'belt'][(t.length + i) % 6] })))
+const SKILL = { p1: .72, p2: .45, p3: .97, p4: .12, p5: .6, p6: .35, p7: .9, p8: .4 }
+function hash(str) { let h = 2166136261; for (const ch of str) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619) } return ((h >>> 0) % 1000) / 1000 }
+function fcell(p, s) {
+  const r = hash(p.id + s.id), k = SKILL[p.id]
+  // ponytail: fake but stable spread; skill pushes people right
+  const st = r < k * .85 ? 'signed' : r < k * .85 + .06 ? 'wait' : r < k * .85 + .16 ? 'obs' : r < k * .85 + .34 ? 'read' : 'none'
+  return { st, support: st === 'obs' && hash(s.id + p.id) > .8, old: st === 'signed' && hash(s.id + p.id + 'v') > .9 }
+}
+const fGroupsFor = d => FGROUPS.filter(g => g.depts.includes(d))
+const fSopsOf = g => FSOPS.filter(s => s.group === g.id)
+const LANES_F = [
+  { k: 'none', t: 'Not started', sub: 'hasn’t run it yet' },
+  { k: 'read', t: 'Read it', sub: 'ran it on their own' },
+  { k: 'obs', t: 'Observed', sub: 'watched doing it' },
+  { k: 'wait', t: 'Waiting for you', sub: 'asked to be signed off', cls: 'waitlane' },
+  { k: 'signed', t: 'Signed off', sub: 'competent', cls: 'done' },
+]
+let fView = 'sop', fDept = 'forming', fPerson = null, fFocus = null, fOpen = null
+function fDefaultOpen() {
+  // By SOP: every group closed; the lane counts on the group rows say where to look.
+  // By person: open the groups they are not yet signed off on everything in.
+  fOpen = fView === 'sop' ? new Set()
+    : new Set(fGroupsFor(fDept).filter(g => fSopsOf(g).some(s => fcell(byId(PEOPLE, fPerson), s).st !== 'signed')).map(g => g.id))
+}
+function fAll() { const gs = fGroupsFor(fDept); fOpen = fOpen.size === gs.length ? new Set() : new Set(gs.map(g => g.id)); renderF() }
+function fToggle(id) { fOpen.has(id) ? fOpen.delete(id) : fOpen.add(id); renderF() }
+function fGoPerson(pid, sid) { fView = 'person'; fPerson = pid; fFocus = sid || null; fDefaultOpen(); if (sid) fOpen.add(FSOPS.find(s => s.id === sid).group); renderF() }
+function fHeader() { return `<div class="lane-row hdr"><div>${fView === 'sop' ? 'SOP' : 'SOP'}</div>${LANES_F.map(l => `<div class="${l.cls || ''}">${l.t}<span>${l.sub}</span></div>`).join('')}</div>` }
+function fCount(n, total, unit, lane) {
+  return `<div class="${lane.cls || ''}"><span class="cnt${n ? '' : ' zero'}"><span><b>${n || '–'}</b> ${n ? (unit || (n === 1 ? 'person' : 'people')) : ''}</span>${n ? `<span class="mini"><i style="width:${(n / total) * 100}%"></i></span>` : ''}</span></div>`
+}
+function renderF() {
+  if (!fOpen) fDefaultOpen()
+  document.getElementById('fViewSeg').innerHTML = `<button aria-pressed="${fView === 'sop'}" onclick="fView='sop';fFocus=null;fDefaultOpen();renderF()">By SOP</button><button aria-pressed="${fView === 'person'}" onclick="fView='person';fPerson=fPerson||PEOPLE.find(p=>p.dept===fDept).id;fDefaultOpen();renderF()">By person</button>`
+  document.getElementById('fDeptSeg').innerHTML = DEPTS.map(d => `<button aria-pressed="${d.id === fDept}" onclick="fDept='${d.id}';fPerson=PEOPLE.find(p=>p.dept==='${d.id}').id;fDefaultOpen();renderF()"><span class="area-dot" style="background:var(--area-${d.area})"></span>${d.name}</button>`).join('')
+  const groups = fGroupsFor(fDept), ppl = PEOPLE.filter(p => p.dept === fDept)
+  document.getElementById('fAllBtn').textContent = fOpen.size === groups.length ? 'Close all' : 'Open all'
+  const ph = document.getElementById('fPersonHead')
+
+  if (fView === 'sop') {
+    ph.innerHTML = ''
+    const face = (p, s, c) => `<button class="face" onclick="fGoPerson('${p.id}','${s.id}')"><span class="av sm">${initials(p.name)}</span>${first(p.name)}${c.support ? ' <small>needs support</small>' : ''}${c.old ? ' <small class="q">old version</small>' : ''}</button>`
+    document.getElementById('lanesF').innerHTML = fHeader() + groups.map(g => {
+      const sops = fSopsOf(g), open = fOpen.has(g.id), total = sops.length * ppl.length
+      const head = `<div class="lane-row grp-row${open ? ' open' : ''}"><div onclick="fToggle('${g.id}')"><span class="chev">›</span>${g.name}<span class="meta" style="font-weight:400">${sops.length} SOPs</span></div>${LANES_F.map(l => fCount(sops.reduce((n, s) => n + ppl.filter(p => fcell(p, s).st === l.k).length, 0), total, null, l)).join('')}</div>`
+      if (!open) return head
+      return head + sops.map(s => `<div class="lane-row sub"><div>${thumb(s)}<div><b>${s.title}</b><div class="meta">v${s.v}</div></div></div>${LANES_F.map(l => {
+        const here = ppl.filter(p => fcell(p, s).st === l.k)
+        return `<div class="${l.cls || ''}">${here.map(p => face(p, s, fcell(p, s))).join('')}${l.k === 'wait' && here.length ? `<button class="btn" style="min-height:36px;width:100%" onclick="openPerson('${here[0].id}')">Assess</button>` : ''}</div>`
+      }).join('')}</div>`).join('')
+    }).join('')
+    return
+  }
+
+  // By person
+  const p = byId(PEOPLE, fPerson), mine = groups.flatMap(fSopsOf), cs = mine.map(s => fcell(p, s)), n = cs.filter(c => c.st === 'signed').length
+  ph.innerHTML = `<div class="who-strip" style="margin-bottom:12px">${ppl.map(x => `<button class="face" aria-pressed="${x.id === fPerson}" onclick="fGoPerson('${x.id}')"><span class="av sm">${initials(x.name)}</span>${first(x.name)}</button>`).join('')}</div>
+    <div class="phead"><span class="av lg">${initials(p.name)}</span><div><h2>${p.name}</h2><span class="meta">${p.role} · ${dept(p.dept).name}</span></div>
+    <div style="display:flex;gap:10px;align-items:center;min-width:260px"><div class="fat thin" style="flex:1"><i style="width:${(n / cs.length) * 100}%"></i></div><span class="meta">${n} of ${cs.length} signed off</span></div>
+    <span style="flex:1"></span><button class="btn">+ Record observation</button><button class="btn-quiet">Export</button></div>`
+  const IDX = { none: 0, read: 1, obs: 2, wait: 3, signed: 4 }
+  document.getElementById('lanesF').innerHTML = fHeader() + groups.map(g => {
+    const sops = fSopsOf(g), open = fOpen.has(g.id), counts = LANES_F.map(l => sops.filter(s => fcell(p, s).st === l.k).length)
+    const all = counts[4] === sops.length
+    const head = `<div class="lane-row grp-row${open ? ' open' : ''}"><div onclick="fToggle('${g.id}')"><span class="chev">›</span>${g.name}<span class="meta" style="font-weight:400">${all ? 'all ' + sops.length + ' signed off' : sops.length + ' SOPs'}</span></div>${LANES_F.map((l, i) => fCount(counts[i], sops.length, counts[i] === 1 ? 'SOP' : 'SOPs', l)).join('')}</div>`
+    if (!open) return head
+    return head + sops.map(s => {
+      const c = fcell(p, s), at = IDX[c.st]
+      const words = { none: 'Not started', read: 'Read it · 3 Oct', obs: 'Observed · 9 Oct', wait: 'Asked 14 Oct', signed: `Signed off v${c.old ? s.v - 1 : s.v}` }[c.st]
+      const flag = (c.support ? ' <small>needs support</small>' : '') + (c.old ? ` <small class="q">now v${s.v}</small>` : '')
+      return `<div class="lane-row sub prow-f${fFocus === s.id ? ' hl' : ''}"><div>${thumb(s)}<div><b>${s.title}</b><div class="meta">v${s.v}</div></div></div>${LANES_F.map((l, i) => {
+        if (c.st === 'none') return `<div class="${l.cls || ''}">${i === 0 ? `<span class="lbl faint first">Not started</span>` : ''}</div>`
+        if (i < at) return `<div class="${l.cls || ''}"><span class="trk${i === 0 ? ' start' : ''}"></span></div>`
+        if (i === at) return `<div class="${l.cls || ''}">${i > 0 ? '' : ''}<span class="trk${i === 0 ? ' start' : ''}" style="flex:0 0 ${i === 0 ? 0 : 10}px"></span>${c.st === 'wait' ? `<button class="btn" style="min-height:34px;margin-right:10px" onclick="openPerson('${p.id}')">Assess</button>` : `<span class="lbl">${words}${flag}</span>`}</div>`
+        return `<div class="${l.cls || ''}"></div>`
+      }).join('')}</div>`
+    }).join('')
+  }).join('')
+}
+
+renderReqs(); renderA(); renderB(); renderC(); renderD(); renderE(); renderF()
 </script>
 </body>
 </html>

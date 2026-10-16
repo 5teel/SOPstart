@@ -2,7 +2,7 @@
 sketch: 012
 name: training-visual
 question: "How does the Training section show who is competent on what at a glance, instead of a text table of pills and sentences?"
-winner: null
+winner: "F"
 tags: [training, competency, records, admin, visual]
 ---
 
@@ -23,6 +23,10 @@ Open `.planning/sketches/012-training-visual/index.html`. Use the Desktop / Phon
 Simon: "the glyphs just require users to learn a new glyph language … I want to reduce the amount of info the user has to parse." Round 2 uses only position, fill and plain words.
 - **D: Lanes** (opens first): one row per SOP, five lanes in training order (Not started · Read it · Observed · Waiting for you · Signed off). Where a face sits is the state; Assess lives in the waiting lane; exceptions are words on the face.
 - **E: Progress first**: one number and bar per department, then one bar and one sentence per person naming what is still to do. The matrix survives only as the audit export.
+
+### Round 3 (2026-10-16), winner F
+Simon picked D (Lanes) and asked for a person-focused lanes view and grouping that collapses the SOP column for large banks.
+- **F: Lanes, grouped + by person** ★: SOPs grouped by library area; a closed group row shows how many people sit in each lane (number + fill), all groups start closed. **By person** keeps the five lanes, one row per SOP, with a bar running left to right to how far they have got and the date in words; groups where they are signed off on everything stay closed and say so. Faces in By SOP jump to that person. A, B, C (glyphs) rejected: a new symbol language to learn.
 
 ## What to look for
 - Do the ink shapes read without the key? Is amber-only-for-waiting enough signal?
