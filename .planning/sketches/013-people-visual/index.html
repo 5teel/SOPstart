@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>013 · People, made visual</title>
+<link rel="stylesheet" href="../themes/sopstart-base.css">
+<style>
+  .ic { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+  .ic-row { display: inline-flex; gap: 6px; color: var(--ink-700); }
+  .ic-row .off { color: var(--ink-300); }
+  .bar { display: flex; height: 6px; border-radius: 99px; overflow: hidden; background: var(--paper-2); box-shadow: inset 0 0 0 1px var(--ink-200); width: 72px; }
+  .bar > i { display: block; height: 100%; background: var(--ink-900); }
+  .head { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 4px 0 16px; }
+  .head .sp { flex: 1; }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; color: var(--ink-600); font-size: var(--text-meta); margin-bottom: 12px; }
+  .legend span { display: inline-flex; gap: 5px; align-items: center; }
+
+  /* A: department cards */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 12px; }
+  .dcard { border: 1px solid var(--ink-200); border-radius: var(--radius-lg); background: var(--paper-1); overflow: hidden; }
+  .dcard.nodept { border-style: dashed; background: transparent; }
+  .dcard h3 { display: flex; align-items: center; gap: 8px; margin: 0; padding: 12px 14px; font-size: var(--text-reading); border-bottom: 1px solid var(--ink-200); }
+  .dcard h3 .meta { margin-left: auto; font-weight: 400; }
+  .rolelbl { padding: 8px 14px 2px; font-size: var(--text-micro); color: var(--ink-500); font-family: var(--font-label); font-weight: 600; }
+  .prow { display: flex; align-items: center; gap: 10px; width: 100%; min-height: var(--tap-glove); padding: 8px 14px; text-align: left; }
+  .prow:hover { background: var(--paper-2); }
+  .prow .nm { flex: 1; min-width: 0; }
+  .prow .nm b { display: block; }
+  .prow .tr { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+  .area-dot { width: 10px; height: 10px; border-radius: 99px; display: inline-block; flex-shrink: 0; }
+  .sheet-sec { margin-top: 18px; }
+  .can { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; }
+  .can .ic { margin-top: 2px; }
+  .can.off { color: var(--ink-400); }
+  .snap { display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid var(--ink-200); border-radius: var(--radius-lg); }
+  .snap .bar { width: 120px; height: 8px; }
+  .snap .g { width: 16px; height: 16px; }
+  .snap .glyphs { display: flex; gap: 2px; flex-wrap: wrap; }
+  .field { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--ink-200); }
+
+  /* B: org chart */
+  .chart { position: relative; overflow-x: auto; border: 1px solid var(--ink-200); border-radius: var(--radius-lg); padding: 24px; min-height: 560px; }
+  .chart svg.wires { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; }
+  .tree { position: relative; display: flex; flex-direction: column; align-items: center; gap: 40px; min-width: 980px; }
+  .node { background: var(--paper-1); border: 1.5px solid var(--ink-300); border-radius: var(--radius-lg); padding: 10px 12px; }
+  .node.root { border: 2px solid var(--ink-900); font-weight: 700; padding: 10px 18px; }
+  .kicker { font-family: var(--font-label); font-size: 11px; font-weight: 600; color: var(--ink-500); display: flex; align-items: center; gap: 6px; }
+  .depts { display: flex; gap: 24px; align-items: flex-start; }
+  .dnode { display: flex; flex-direction: column; gap: 10px; align-items: stretch; }
+  .dnode > .node { text-align: center; }
+  .roles { display: flex; flex-direction: column; gap: 10px; }
+  .rnode { min-width: 220px; }
+  .rnode .rt { display: flex; justify-content: space-between; align-items: center; font-weight: 600; margin-bottom: 8px; }
+  .cap { font-family: var(--font-label); font-weight: 700; font-size: 12px; color: var(--ink-600); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pchip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--ink-300); border-radius: 999px; padding: 3px 10px 3px 3px; background: var(--paper-1); font-size: 12px; min-height: 30px; transition: opacity .15s; }
+  .pchip.vacant { border-style: dashed; color: var(--ink-500); background: transparent; }
+  .pchip .sv { color: var(--ink-500); }
+  .pchip.lit { border-color: var(--ink-900); box-shadow: 0 0 0 2px var(--ink-900); }
+  .chart.tracing .pchip:not(.lit), .chart.tracing .node:not(.has-lit):not(.root) { opacity: .35; }
+  .trace-bar { min-height: 44px; display: flex; align-items: center; gap: 10px; margin-bottom: 10px; padding: 0 12px; border: 1px solid var(--ink-200); border-radius: var(--radius-lg); background: var(--paper-1); color: var(--ink-600); }
+
+  /* C: icon grid */
+  .grid-wrap { overflow-x: auto; border: 1px solid var(--ink-200); border-radius: var(--radius-lg); background: var(--paper-1); }
+  table.who { border-collapse: collapse; width: 100%; }
+  .who th, .who td { border-bottom: 1px solid var(--ink-200); padding: 8px 10px; text-align: center; }
+  .who thead th { font-weight: 500; font-size: var(--text-meta); color: var(--ink-600); vertical-align: bottom; }
+  .who thead th .ic { display: block; margin: 0 auto 4px; width: 20px; height: 20px; color: var(--ink-900); }
+  .who td.name, .who th.name { text-align: left; }
+  .who td.name { display: flex; align-items: center; gap: 10px; }
+  .who td .ic { width: 20px; height: 20px; color: var(--ink-900); }
+  .who td .no { color: var(--ink-300); }
+  .who tr.grp td { background: var(--paper-2); text-align: left; font-weight: 600; padding: 6px 10px; }
+  .who tbody tr:not(.grp):hover td { background: var(--paper-2); }
+  .colcount { display: block; font-family: var(--font-label); font-weight: 700; color: var(--ink-900); }
+</style>
+</head>
+<body>
+<nav id="variant-nav">
+  <b style="margin-right:8px">013 People</b>
+  <button class="t active" data-v="a">A: Cards with icons</button>
+  <button class="t" data-v="b">B: Org chart</button>
+  <button class="t" data-v="c">C: Who can do what</button>
+  <span class="sp"></span>
+  <span class="note">Width</span>
+  <button class="t active" data-w="desk">Desktop</button>
+  <button class="t" data-w="phone">Phone 390</button>
+</nav>
+
+<div class="variant active" id="variant-a"><div class="frame">
+  <p class="why"><b>A · Cards with icons.</b> Today's department cards, with three changes: initials faces, the Signs off / Assigns / Approves text tags become a row of icons (grey when they can't), and every person carries a small training bar from the Training section. Open someone: the sheet says what they can do in sentences with the same icons, and shows their training at a glance with a link through.</p>
+  <h2>People</h2>
+  <div class="head"><span class="meta">8 people · 3 departments · 1 without a department</span><span class="sp"></span><button class="btn">Invite someone</button></div>
+  <div class="legend" id="legendA"></div>
+  <div class="cards" id="cardsA"></div>
+</div></div>
+
+<div class="variant" id="variant-b"><div class="frame">
+  <p class="why"><b>B · Org chart.</b> Sketch 001's winning node chart, finally built from data that already exists: site → departments → roles, each role with its people and its filled-of-planned count, empty seats dashed (not an error). Click anyone who supervises: lines draw to the people they look after and everyone else fades, the same trace as SOP access. Click empty space to reset.</p>
+  <h2>People</h2>
+  <div class="head"><div class="seg"><button aria-pressed="true">Chart</button><button>Departments</button><button>Who can do what</button></div><span class="sp"></span><button class="btn">Invite someone</button></div>
+  <div class="trace-bar" id="traceBar">Click a supervisor to see who they look after.</div>
+  <div class="chart bg-grid" id="chart"><svg class="wires" id="wires"></svg><div class="tree" id="tree"></div></div>
+</div></div>
+
+<div class="variant" id="variant-c"><div class="frame">
+  <p class="why"><b>C · Who can do what.</b> The authority table as an icon grid: one icon per power in the header with how many people hold it, a filled icon where the person has it, a faint dash where they don't. Grouped by department so gaps jump out (e.g. Hot end has nobody who signs off). A training column ties it to the Training section.</p>
+  <h2>People</h2>
+  <div class="head"><div class="seg"><button>Chart</button><button>Departments</button><button aria-pressed="true">Who can do what</button></div><span class="sp"></span><button class="btn">Invite someone</button></div>
+  <div class="grid-wrap"><table class="who" id="who"></table></div>
+</div></div>
+
+<aside class="drawer" id="drawer"></aside>
+
+<script>
+const I = {
+  signoff: '<path d="M4 20h16"/><path d="M6 16l3-1 9-9a2 2 0 00-3-3l-9 9-1 3z"/>',
+  supervises: '<circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><path d="M16 4a3 3 0 010 6M21 20c0-2-1-4-3-5"/>',
+  assigns: '<path d="M4 6h10M4 12h10M4 18h6"/><path d="M15 15l3 3 4-5"/>',
+  approves: '<rect x="4" y="14" width="16" height="6" rx="1"/><path d="M12 14V9M8 5h8l-1 4H9z"/>',
+  publishes: '<path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v4h16v-4"/>',
+  people: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/><path d="M18 3l3 3"/>',
+}
+const POWERS = [
+  { k: 'signoff', label: 'Signs off', no: 'Does not sign off SOPs', sentence: n => `Signs off ${n} SOP${n === 1 ? '' : 's'} after someone runs them` },
+  { k: 'supervises', label: 'Supervises', no: 'Does not look after anyone', sentence: n => `Looks after ${n} worker${n === 1 ? '' : 's'}` },
+  { k: 'assigns', label: 'Assigns', no: 'Does not give out SOPs', sentence: () => 'Gives people SOPs to learn' },
+  { k: 'approves', label: 'Approves', no: 'Does not approve SOP changes', sentence: () => 'Approves SOP changes (Machine, Process)' },
+  { k: 'publishes', label: 'Publishes', no: 'Does not publish SOPs', sentence: () => 'Publishes new SOP versions' },
+  { k: 'people', label: 'Manages people', no: 'Does not manage people', sentence: () => 'Invites people and changes roles' },
+]
+const icon = (k, cls = 'ic') => `<svg class="${cls}" viewBox="0 0 24 24">${I[k]}</svg>`
+const DEPTS = [
+  { id: 'forming', name: 'Forming', area: 1, roles: [{ name: 'Shift lead', plan: 1 }, { name: 'Operator', plan: 4 }] },
+  { id: 'hotend', name: 'Hot end', area: 2, roles: [{ name: 'Operator', plan: 3 }] },
+  { id: 'maint', name: 'Maintenance', area: 4, roles: [{ name: 'Fitter', plan: 2 }] },
+]
+const PEOPLE = [
+  { id: 'p3', name: 'Chloe Park', role: 'Shift lead', dept: 'forming', sys: 'Supervisor', a: { signoff: 6, supervises: 3, assigns: 1 }, tr: [6, 6], sup: ['p1', 'p2', 'p4'] },
+  { id: 'p1', name: 'Aroha Ngata', role: 'Operator', dept: 'forming', sys: 'Worker', a: {}, tr: [4, 6] },
+  { id: 'p2', name: 'Ben Taufa', role: 'Operator', dept: 'forming', sys: 'Worker', a: {}, tr: [2, 6] },
+  { id: 'p4', name: 'Dev Sharma', role: 'Operator', dept: 'forming', sys: 'Worker', a: {}, tr: [0, 6] },
+  { id: 'p5', name: 'Hemi Walker', role: 'Operator', dept: 'hotend', sys: 'Worker', a: {}, tr: [2, 3] },
+  { id: 'p6', name: 'Lucy Chen', role: 'Operator', dept: 'hotend', sys: 'Worker', a: {}, tr: [1, 3] },
+  { id: 'p7', name: 'Mike Rolleston', role: 'Fitter', dept: 'maint', sys: 'Supervisor', a: { signoff: 4, supervises: 3, approves: 1 }, tr: [4, 4], sup: ['p8', 'p5', 'p6'] },
+  { id: 'p8', name: 'Sione Latu', role: 'Fitter', dept: 'maint', sys: 'Worker', a: {}, tr: [1, 4] },
+  { id: 'p9', name: 'Joe Rolleston', role: '', dept: null, sys: 'Admin', a: { assigns: 1, approves: 1, publishes: 1, people: 1 }, tr: [0, 0] },
+]
+const initials = n => n.split(' ').map(w => w[0]).join('')
+const pct = p => p.tr[1] ? p.tr[0] / p.tr[1] : 0
+const tbar = p => p.tr[1] ? `<span class="bar"><i style="width:${pct(p) * 100}%"></i></span><span class="meta">${p.tr[0]}/${p.tr[1]} signed off</span>` : `<span class="meta">No SOPs required</span>`
+const icons = p => `<span class="ic-row">${POWERS.map(w => `<span class="${p.a[w.k] ? '' : 'off'}" title="${w.label}${p.a[w.k] ? '' : ' (no)'}">${icon(w.k)}</span>`).join('')}</span>`
+const byId = id => PEOPLE.find(p => p.id === id)
+
+// ---------------------------------------------------------------- A
+function renderA() {
+  document.getElementById('legendA').innerHTML = POWERS.map(w => `<span>${icon(w.k)}${w.label}</span>`).join('')
+  const row = p => `<button class="prow" onclick="openSheet('${p.id}')"><span class="av">${initials(p.name)}</span>
+    <span class="nm"><b>${p.name}</b>${icons(p)}</span><span class="tr">${tbar(p)}</span><span class="list-chev">›</span></button>`
+  const none = PEOPLE.filter(p => !p.dept)
+  document.getElementById('cardsA').innerHTML =
+    `<div class="dcard nodept"><h3>No department <span class="meta">${none.length}</span></h3>${none.map(row).join('')}</div>` +
+    DEPTS.map(d => {
+      const ppl = PEOPLE.filter(p => p.dept === d.id)
+      const signers = ppl.filter(p => p.a.signoff).length
+      return `<div class="dcard"><h3><span class="area-dot" style="background:var(--area-${d.area})"></span>${d.name}<span class="meta">${ppl.length} people</span></h3>
+        ${signers ? '' : `<div style="padding:10px 14px 0"><span class="tag tag-warn">Nobody here signs off</span></div>`}
+        ${d.roles.map(r => `<div class="rolelbl">${r.name}</div>${ppl.filter(p => p.role === r.name).map(row).join('')}`).join('')}</div>`
+    }).join('')
+}
+function openSheet(id) {
+  const p = byId(id), d = DEPTS.find(x => x.id === p.dept)
+  const sup = PEOPLE.filter(x => x.sup?.includes(p.id))
+  document.getElementById('drawer').innerHTML = `
+    <button class="drawer-x" onclick="document.getElementById('drawer').classList.remove('open')">✕</button>
+    <div style="display:flex;gap:14px;align-items:center;margin-top:4px"><span class="av lg">${initials(p.name)}</span><div><h2>${p.name}</h2><span class="meta">${p.role || p.sys} · ${d ? d.name : 'No department'}</span></div></div>
+    <div class="sheet-sec"><div class="section-heading" style="margin-bottom:6px">What ${p.name.split(' ')[0]} can do</div>
+      ${POWERS.map(w => `<div class="can${p.a[w.k] ? '' : ' off'}">${icon(w.k)}<span>${p.a[w.k] ? w.sentence(p.a[w.k]) : w.no}</span></div>`).join('')}</div>
+    <div class="sheet-sec"><div class="section-heading" style="margin-bottom:8px">Training</div>
+      <div class="snap"><div style="flex:1">${p.tr[1] ? `<div style="display:flex;gap:10px;align-items:center">${tbar(p)}</div>` : '<span class="meta">No SOPs required</span>'}</div><button class="btn-quiet">Open in Training ›</button></div></div>
+    <div class="sheet-sec">
+      <div class="field"><span>Role</span><select class="chip"><option>${p.sys}</option></select></div>
+      <div class="field"><span>Departments</span><span>${d ? `<span class="tag"><span class="area-dot" style="background:var(--area-${d.area});width:8px;height:8px"></span>&nbsp;${d.name}</span>` : ''} <button class="tag">+</button></span></div>
+      <div class="field"><span>${p.sup ? 'Supervises' : 'Supervised by'}</span><span class="stack">${(p.sup ? p.sup.map(byId) : sup).map(x => `<span class="av sm" title="${x.name}">${initials(x.name)}</span>`).join(' ') || '<span class="meta">Nobody</span>'}</span></div>
+    </div>`
+  document.getElementById('drawer').classList.add('open')
+}
+
+// ---------------------------------------------------------------- B
+let traced = null
+function renderB() {
+  const chip = p => `<button class="pchip" data-p="${p.id}" onclick="event.stopPropagation();trace('${p.id}')"><span class="av sm">${initials(p.name)}</span>${p.name}${p.sup ? `<span class="sv" title="Supervises ${p.sup.length}">${icon('supervises', 'ic')}</span>` : ''}</button>`
+  const vacant = n => Array.from({ length: n }, () => `<span class="pchip vacant"><span class="av sm vacant">+</span>Empty seat</span>`).join('')
+  document.getElementById('tree').innerHTML = `<div class="node root" id="root">Visy Glass · Auckland</div>
+    <div class="depts">${DEPTS.map(d => `<div class="dnode"><div class="node" data-d="${d.id}"><div class="kicker" style="justify-content:center"><span class="area-dot" style="background:var(--area-${d.area})"></span>Department</div><b>${d.name}</b></div>
+      <div class="roles">${d.roles.map(r => {
+        const ppl = PEOPLE.filter(p => p.dept === d.id && p.role === r.name)
+        return `<div class="node rnode"><div class="kicker">Role</div><div class="rt">${r.name}<span class="cap">${ppl.length}/${r.plan}</span></div><div class="chips">${ppl.map(chip).join('')}${vacant(Math.max(0, r.plan - ppl.length))}</div></div>`
+      }).join('')}</div></div>`).join('')}
+      <div class="dnode"><div class="node" style="border-style:dashed"><div class="kicker" style="justify-content:center">Site-wide</div><b>No department</b></div>
+      <div class="node rnode"><div class="chips">${PEOPLE.filter(p => !p.dept).map(chip).join('')}</div></div></div></div>`
+  requestAnimationFrame(drawTree)
+}
+function centre(el, box) { const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2 - box.left, top: r.top - box.top, bottom: r.bottom - box.top, y: r.top + r.height / 2 - box.top, l: r.left - box.left, r: r.right - box.left } }
+function drawTree() {
+  const chart = document.getElementById('chart'), box = chart.getBoundingClientRect(), svg = document.getElementById('wires')
+  const root = centre(document.getElementById('root'), box)
+  let out = [...chart.querySelectorAll('.dnode > .node:first-child')].map(n => { const c = centre(n, box); return `<path d="M${root.x} ${root.bottom} C${root.x} ${root.bottom + 20}, ${c.x} ${c.top - 20}, ${c.x} ${c.top}" stroke="var(--ink-300)" stroke-width="1.5" fill="none"/>` }).join('')
+  if (traced) {
+    const s = centre(chart.querySelector(`[data-p="${traced}"]`), box)
+    // Arcs loop under the role boxes so they never cross a name
+    const floor = Math.max(...[...chart.querySelectorAll('.rnode')].map(n => centre(n, box).bottom)) + 50
+    byId(traced).sup.forEach(id => { const t = centre(chart.querySelector(`[data-p="${id}"]`), box); out += `<path d="M${s.x} ${s.bottom} C${s.x} ${floor}, ${t.x} ${floor}, ${t.x} ${t.bottom}" stroke="var(--ink-900)" stroke-width="2" fill="none"/><circle cx="${t.x}" cy="${t.bottom}" r="3.5" fill="var(--ink-900)"/>` })
+  }
+  svg.innerHTML = out
+}
+function trace(id) {
+  const p = byId(id), chart = document.getElementById('chart')
+  if (!p.sup || traced === id) { traced = null } else traced = id
+  chart.classList.toggle('tracing', !!traced)
+  chart.querySelectorAll('.pchip').forEach(c => c.classList.toggle('lit', !!traced && (c.dataset.p === traced || p.sup.includes(c.dataset.p))))
+  chart.querySelectorAll('.node').forEach(n => n.classList.toggle('has-lit', !!n.querySelector('.pchip.lit')))
+  document.getElementById('traceBar').innerHTML = traced ? `<b>${p.name}</b> looks after ${p.sup.map(i => byId(i).name).join(', ')} <span class="sp" style="flex:1"></span><button class="btn-quiet" onclick="openSheetB('${id}')">Open ${p.name.split(' ')[0]}</button>` : 'Click a supervisor to see who they look after.'
+  drawTree()
+}
+function openSheetB(id) { openSheet(id) }
+document.getElementById('chart').addEventListener('click', () => traced && trace(traced))
+window.addEventListener('resize', () => requestAnimationFrame(drawTree))
+
+// ---------------------------------------------------------------- C
+function renderC() {
+  const count = k => PEOPLE.filter(p => p.a[k]).length
+  const groups = [...DEPTS.map(d => ({ name: d.name, area: d.area, ppl: PEOPLE.filter(p => p.dept === d.id) })), { name: 'No department', ppl: PEOPLE.filter(p => !p.dept) }]
+  document.getElementById('who').innerHTML = `<thead><tr><th class="name">Person</th>${POWERS.map(w => `<th>${icon(w.k)}${w.label}<span class="colcount">${count(w.k)}</span></th>`).join('')}<th>Training</th></tr></thead><tbody>
+    ${groups.map(g => `<tr class="grp"><td colspan="${POWERS.length + 2}">${g.area ? `<span class="area-dot" style="background:var(--area-${g.area})"></span> ` : ''}${g.name} <span class="meta">${g.ppl.length}</span>${g.ppl.some(p => p.a.signoff) || !g.area ? '' : ' &nbsp;<span class="tag tag-warn">Nobody here signs off</span>'}</td></tr>
+      ${g.ppl.map(p => `<tr onclick="openSheet('${p.id}')" style="cursor:pointer"><td class="name"><span class="av sm">${initials(p.name)}</span><span><b>${p.name}</b><div class="meta">${p.role || p.sys}</div></span></td>
+        ${POWERS.map(w => `<td>${p.a[w.k] ? icon(w.k) + (typeof p.a[w.k] === 'number' && p.a[w.k] > 1 ? `<div class="meta">${p.a[w.k]}</div>` : '') : '<span class="no">—</span>'}</td>`).join('')}
+        <td><div style="display:flex;gap:6px;align-items:center;justify-content:center">${tbar(p)}</div></td></tr>`).join('')}`).join('')}</tbody>`
+}
+
+document.querySelectorAll('[data-v]').forEach(b => b.onclick = () => {
+  document.querySelectorAll('[data-v]').forEach(x => x.classList.toggle('active', x === b))
+  document.querySelectorAll('.variant').forEach(v => v.classList.toggle('active', v.id === 'variant-' + b.dataset.v))
+  document.getElementById('drawer').classList.remove('open')
+  if (b.dataset.v === 'b') requestAnimationFrame(drawTree)
+})
+document.querySelectorAll('[data-w]').forEach(b => b.onclick = () => {
+  document.querySelectorAll('[data-w]').forEach(x => x.classList.toggle('active', x === b))
+  document.body.classList.toggle('phone', b.dataset.w === 'phone')
+  requestAnimationFrame(drawTree)
+})
+renderA(); renderB(); renderC()
+</script>
+</body>
+</html>

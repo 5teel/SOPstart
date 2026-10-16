@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>012 · Training, made visual</title>
+<link rel="stylesheet" href="../themes/sopstart-base.css">
+<style>
+  /* Stacked coverage bar: signed · observed · read · not started, amber sliver for waiting */
+  .bar { display: flex; height: 8px; border-radius: 99px; overflow: hidden; background: var(--paper-2); box-shadow: inset 0 0 0 1px var(--ink-200); min-width: 60px; }
+  .bar > i { display: block; height: 100%; }
+  .bar .s { background: var(--ink-900); } .bar .o { background: var(--ink-600); } .bar .r { background: var(--ink-300); } .bar .w { background: var(--accent-decision); }
+
+  /* Requests (T4) */
+  .reqs { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 10px; }
+  .req { display: flex; gap: 12px; align-items: center; padding: 12px; border: 1px solid var(--ink-200); border-radius: var(--radius-lg); background: var(--paper-1); }
+  .req .who { flex: 1; min-width: 0; }
+  .req .who b { display: block; }
+  .req .acts { display: flex; flex-direction: column; gap: 6px; }
+  .empty { display: flex; gap: 12px; align-items: center; padding: 14px; border: 1px dashed var(--ink-300); border-radius: var(--radius-lg); color: var(--ink-600); }
+
+  /* A: glyph grid */
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 4px 0 12px; }
+  .grid-wrap { overflow-x: auto; border: 1px solid var(--ink-200); border-radius: var(--radius-lg); background: var(--paper-1); }
+  table.mx { border-collapse: collapse; width: auto; }
+  .mx th, .mx td { border-bottom: 1px solid var(--ink-200); padding: 0; }
+  .mx thead th { vertical-align: bottom; padding: 8px 6px; font-weight: 500; text-align: left; }
+  .mx thead th.sop { width: 74px; }
+  .mx thead th.sop .nm { display: block; writing-mode: vertical-rl; transform: rotate(180deg); height: 130px; font-size: var(--text-meta); line-height: 1.2; }
+  .mx thead th.sop .bar { margin-top: 8px; min-width: 0; }
+  .mx thead th.sop .meta { display: block; margin-top: 4px; font-size: 11px; }
+  .mx th.person { position: sticky; left: 0; background: var(--paper-1); text-align: left; padding: 8px 12px; min-width: 230px; z-index: 1; }
+  .mx th.person .row { display: flex; gap: 10px; align-items: center; }
+  .mx th.person .bar { margin-top: 6px; width: 120px; }
+  .mx td { text-align: center; }
+  .mx td button { width: 100%; min-height: 48px; display: grid; place-items: center; }
+  .mx td button:hover { background: var(--paper-2); }
+  .mx tr.focus th.person, .mx tr.focus td { background: var(--paper-2); }
+  .key { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 10px; color: var(--ink-600); font-size: var(--text-meta); }
+  .key span { display: inline-flex; align-items: center; gap: 4px; }
+
+  /* Ladder (T2) */
+  .ladder { display: grid; grid-template-columns: auto 1fr auto 1fr auto; align-items: center; gap: 0; margin-top: 8px; max-width: 420px; }
+  .ladder .stop { width: 18px; height: 18px; border-radius: 99px; border: 2px solid var(--ink-300); background: var(--paper-1); }
+  .ladder .stop.on { border-color: var(--ink-900); background: var(--ink-900); }
+  .ladder .stop.wait { border-color: var(--accent-decision); background: var(--accent-decision); transform: rotate(45deg) scale(.85); border-radius: 2px; }
+  .ladder .rail { height: 2px; background: var(--ink-200); }
+  .ladder .rail.on { background: var(--ink-900); }
+  .ladder-lbl { display: grid; grid-template-columns: 1fr 1fr 1fr; max-width: 420px; margin-top: 4px; font-size: 11px; color: var(--ink-500); }
+  .ladder-lbl span:nth-child(2) { text-align: center; } .ladder-lbl span:nth-child(3) { text-align: right; }
+  .ladder-lbl .on { color: var(--ink-900); font-weight: 600; }
+  .rec { display: flex; gap: 12px; padding: 12px 14px; }
+  .rec .body { flex: 1; min-width: 0; }
+  .rec.hl { background: var(--paper-2); }
+  .note { margin-top: 6px; font-size: var(--text-meta); color: var(--ink-600); }
+  .note .tag { margin-right: 4px; }
+
+  /* B: passports */
+  .prow .ladder-mini { display: flex; gap: 3px; margin-top: 6px; flex-wrap: wrap; }
+  .prow .ladder-mini .g { width: 16px; height: 16px; }
+  .passport-head { display: flex; gap: 14px; align-items: center; margin: 12px 0 4px; }
+  .back { display: inline-flex; align-items: center; gap: 4px; min-height: var(--tap); padding: 0 14px 0 8px; border: 1px solid var(--ink-300); border-radius: var(--radius-lg); background: var(--paper-1); font-weight: 600; }
+  .bigstat { display: flex; gap: 20px; margin: 8px 0 4px; flex-wrap: wrap; }
+  .bigstat div { font-size: var(--text-meta); color: var(--ink-600); }
+  .bigstat b { display: block; font: 700 28px/1 var(--font-label); color: var(--ink-900); }
+
+  /* C: by SOP */
+  .sopgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+  .sopcard { text-align: left; border: 1px solid var(--ink-200); border-radius: var(--radius-lg); background: var(--paper-1); padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+  .sopcard:hover { border-color: var(--ink-900); }
+  .sopcard .top { display: flex; gap: 10px; align-items: center; }
+  .stack { display: flex; }
+  .stack .av { margin-left: -6px; box-shadow: 0 0 0 2px var(--paper-1); }
+  .stack .av:first-child { margin-left: 0; }
+  .cols { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 12px; }
+  body.phone .cols { grid-template-columns: 1fr; }
+  .col { border: 1px solid var(--ink-200); border-radius: var(--radius-lg); background: var(--paper-1); padding: 10px; min-height: 160px; }
+  .col h4 { display: flex; align-items: center; gap: 6px; margin: 0 0 8px; font-size: var(--text-meta); }
+  .col .p { display: flex; gap: 8px; align-items: center; padding: 6px 4px; border-radius: var(--radius); }
+  .col .p:hover { background: var(--paper-2); }
+  .col.wait { border-color: var(--accent-decision); }
+  .area-dot { width: 8px; height: 8px; border-radius: 99px; display: inline-block; }
+</style>
+</head>
+<body>
+<nav id="variant-nav">
+  <b style="margin-right:8px">012 Training</b>
+  <button class="t active" data-v="a">A: Glyph grid</button>
+  <button class="t" data-v="b">B: Training passports</button>
+  <button class="t" data-v="c">C: By SOP</button>
+  <span class="sp"></span>
+  <span class="note">Width</span>
+  <button class="t active" data-w="desk">Desktop</button>
+  <button class="t" data-w="phone">Phone 390</button>
+</nav>
+
+<!-- A ------------------------------------------------------------------- -->
+<div class="variant active" id="variant-a"><div class="frame">
+  <p class="why"><b>A · Glyph grid.</b> Today's matrix, with every pill replaced by one ink shape and every "3/5 competent · 1 needs support…" sentence replaced by a bar. Requests become cards and stay on screen when empty. Click any cell: the person's training ladder opens on the right with that SOP lit.</p>
+  <h2>Training</h2>
+  <div class="list-head"><span class="section-heading">Waiting for you to assess</span><button class="seg-quiet" onclick="toggleEmpty()"><span aria-pressed="false" style="display:inline-flex;align-items:center">Show empty state</span></button></div>
+  <div class="reqs-slot"></div>
+
+  <div class="list-head"><span class="section-heading">Who is trained on what</span><button class="btn-quiet">Export CSV</button></div>
+  <div class="filters">
+    <div class="seg" id="deptSeg"></div>
+  </div>
+  <div class="grid-wrap"><table class="mx" id="mx"></table></div>
+  <div class="key">
+    <span><i class="g g-none"></i>Not started</span><span><i class="g g-read"></i>Read</span><span><i class="g g-obs"></i>Observed</span>
+    <span><i class="g g-signed"></i>Signed off</span><span><i class="g g-wait"></i>Waiting for sign-off</span>
+    <span><i class="g g-obs support"></i>Needs support</span><span><i class="g g-signed old"></i>&nbsp;&nbsp;On an old version</span>
+  </div>
+</div></div>
+
+<!-- B ------------------------------------------------------------------- -->
+<div class="variant" id="variant-b"><div class="frame">
+  <p class="why"><b>B · Training passports.</b> No matrix up front. One framed row per person (ADR-0016), each with a strip of their required SOPs as shapes and a coverage bar. Step into a person to see their passport: a Read → Observed → Signed off ladder per SOP with the SOP's first-step photo. The matrix moves behind "Whole department" for audits.</p>
+  <h2>Training</h2>
+  <div class="list-head"><span class="section-heading">Waiting for you to assess</span></div>
+  <div class="reqs-slot"></div>
+  <div id="bBody"></div>
+</div></div>
+
+<!-- C ------------------------------------------------------------------- -->
+<div class="variant" id="variant-c"><div class="frame">
+  <p class="why"><b>C · By SOP.</b> Starts from the procedure, not the person: each SOP is a card with its first-step photo, a coverage bar and the faces of who has signed off. Step into a SOP and its people sit in four columns, Not started · Read · Observed · Signed off, so the next assessment is obvious without a due list.</p>
+  <h2>Training</h2>
+  <div class="list-head"><span class="section-heading">Waiting for you to assess</span></div>
+  <div class="reqs-slot"></div>
+  <div id="cBody"></div>
+</div></div>
+
+<aside class="drawer" id="drawer"></aside>
+
+<script>
+// ---------------------------------------------------------------- data (Visy glass, real-ish)
+const DEPTS = [
+  { id: 'forming', name: 'Forming', area: 1 },
+  { id: 'hotend', name: 'Hot end', area: 2 },
+  { id: 'maint', name: 'Maintenance', area: 4 },
+]
+const SOPS = [
+  { id: 's1', title: 'IS machine swabbing', v: 4, icon: 'gear', depts: ['forming'] },
+  { id: 's2', title: 'Mould change, section 6', v: 3, icon: 'gear', depts: ['forming', 'maint'] },
+  { id: 's3', title: 'Gob shear blade change', v: 2, icon: 'blade', depts: ['forming', 'maint'] },
+  { id: 's4', title: 'Lehr belt start-up', v: 5, icon: 'belt', depts: ['hotend'] },
+  { id: 's5', title: 'Forklift pre-start check', v: 2, icon: 'fork', depts: ['forming', 'hotend', 'maint'] },
+  { id: 's6', title: 'Hot glass handling', v: 3, icon: 'hand', depts: ['forming', 'hotend'] },
+  { id: 's7', title: 'Lockout and isolation', v: 6, icon: 'lock', depts: ['maint', 'forming'] },
+]
+const PEOPLE = [
+  { id: 'p1', name: 'Aroha Ngata', role: 'Operator', dept: 'forming' },
+  { id: 'p2', name: 'Ben Taufa', role: 'Operator', dept: 'forming' },
+  { id: 'p3', name: 'Chloe Park', role: 'Shift lead', dept: 'forming' },
+  { id: 'p4', name: 'Dev Sharma', role: 'Operator', dept: 'forming' },
+  { id: 'p5', name: 'Hemi Walker', role: 'Operator', dept: 'hotend' },
+  { id: 'p6', name: 'Lucy Chen', role: 'Operator', dept: 'hotend' },
+  { id: 'p7', name: 'Mike Rolleston', role: 'Fitter', dept: 'maint' },
+  { id: 'p8', name: 'Sione Latu', role: 'Fitter', dept: 'maint' },
+]
+// state: none | read | obs | wait | signed ; flags: support, old
+const S = {
+  p1: { s1: 'signed', s2: 'signed', s3: 'obs', s5: 'signed', s6: 'signed', s7: 'read' },
+  p2: { s1: 'signed', s2: 'wait', s3: 'read', s5: 'signed', s6: 'obs!', s7: 'none' },
+  p3: { s1: 'signed', s2: 'signed', s3: 'signed', s5: 'signed~', s6: 'signed', s7: 'signed' },
+  p4: { s1: 'read', s2: 'none', s3: 'none', s5: 'read', s6: 'read', s7: 'none' },
+  p5: { s4: 'signed', s5: 'signed', s6: 'wait' },
+  p6: { s4: 'obs', s5: 'read', s6: 'signed~' },
+  p7: { s2: 'signed', s3: 'signed', s5: 'signed', s7: 'signed' },
+  p8: { s2: 'obs!', s3: 'read', s5: 'wait', s7: 'signed' },
+}
+const REQUESTS = [
+  { p: 'p2', s: 's2', when: '14 Oct' },
+  { p: 'p5', s: 's6', when: '15 Oct' },
+  { p: 'p8', s: 's5', when: '16 Oct' },
+]
+const ICONS = {
+  gear: '<circle cx="15" cy="12" r="5"/><path d="M15 3v3M15 18v3M6 12h3M21 12h3M9 6l2 2M19 16l2 2M21 6l-2 2M9 18l2-2"/>',
+  blade: '<path d="M4 18L20 6M8 18l12-9M20 6v12H4"/>',
+  belt: '<rect x="3" y="9" width="24" height="6" rx="3"/><circle cx="7" cy="12" r="1.5"/><circle cx="23" cy="12" r="1.5"/><path d="M10 6h10"/>',
+  fork: '<path d="M5 20V8h8l4 6v6M5 14h12M21 4v16h6"/><circle cx="8" cy="20" r="2"/><circle cx="15" cy="20" r="2"/>',
+  hand: '<path d="M9 21V10a2 2 0 014 0v5M13 9a2 2 0 014 0v6M17 11a2 2 0 014 0v4c0 4-3 6-6 6h-2c-3 0-4-2-4-2"/>',
+  lock: '<rect x="8" y="11" width="14" height="10" rx="2"/><path d="M11 11V8a4 4 0 018 0v3"/>',
+}
+const byId = (arr, id) => arr.find(x => x.id === id)
+const initials = n => n.split(' ').map(w => w[0]).join('')
+const dept = id => byId(DEPTS, id)
+const thumb = s => `<span class="thumb"><svg viewBox="0 0 30 24">${ICONS[s.icon]}</svg></span>`
+const required = p => SOPS.filter(s => s.depts.includes(p.dept))
+const cell = (p, s) => {
+  const raw = (S[p.id] || {})[s.id] || 'none'
+  return { st: raw.replace(/[!~]/, ''), support: raw.includes('!'), old: raw.includes('~') }
+}
+const LABEL = { none: 'Not started', read: 'Read', obs: 'Observed', wait: 'Waiting for sign-off', signed: 'Signed off' }
+const glyph = c => `<i class="g g-${c.st}${c.support ? ' support' : ''}${c.old ? ' old' : ''}" title="${LABEL[c.st]}${c.support ? ' · needs support' : ''}${c.old ? ' · old version' : ''}"></i>`
+function bar(cells) {
+  const n = cells.length || 1, c = k => cells.filter(x => x.st === k).length
+  const seg = (k, cls) => c(k) ? `<i class="${cls}" style="width:${(c(k) / n) * 100}%"></i>` : ''
+  return `<span class="bar">${seg('signed', 's')}${seg('wait', 'w')}${seg('obs', 'o')}${seg('read', 'r')}</span>`
+}
+const signedOf = cells => `${cells.filter(c => c.st === 'signed').length}/${cells.length} signed off`
+
+// ---------------------------------------------------------------- requests (T4)
+let showEmpty = false
+function toggleEmpty() { showEmpty = !showEmpty; document.querySelector('#variant-a .seg-quiet span').setAttribute('aria-pressed', showEmpty); renderReqs() }
+function renderReqs() {
+  const html = showEmpty
+    ? `<div class="empty"><i class="g g-signed"></i><div><b>Nothing waiting.</b> When someone asks to be signed off on a SOP, it shows here.</div></div>`
+    : `<div class="reqs">${REQUESTS.map(r => {
+        const p = byId(PEOPLE, r.p), s = byId(SOPS, r.s)
+        return `<div class="req"><span class="av">${initials(p.name)}</span>
+          <div class="who"><b>${p.name}</b><span class="meta">${s.title} · asked ${r.when}</span></div>
+          ${thumb(s)}
+          <div class="acts"><button class="btn" onclick="openPerson('${p.id}','${s.id}')">Assess</button></div></div>`
+      }).join('')}</div>`
+  document.querySelectorAll('.reqs-slot').forEach(el => el.innerHTML = html)
+}
+
+// ---------------------------------------------------------------- person drawer / passport body (T2)
+function ladder(c) {
+  const lvl = { none: 0, read: 1, obs: 2, wait: 3, signed: 3 }[c.st]
+  const stop = i => `<span class="stop${i <= lvl ? (i === 3 && c.st === 'wait' ? ' wait' : ' on') : ''}"></span>`
+  const rail = i => `<span class="rail${i < lvl ? ' on' : ''}"></span>`
+  const lbl = (i, t) => `<span class="${i <= lvl ? 'on' : ''}">${t}</span>`
+  return `<div class="ladder">${stop(1)}${rail(1)}${stop(2)}${rail(2)}${stop(3)}</div>
+    <div class="ladder-lbl">${lbl(1, 'Read')}${lbl(2, 'Observed')}${lbl(3, c.st === 'wait' ? 'Waiting' : 'Signed off')}</div>`
+}
+function recordRows(p, focus) {
+  return required(p).map(s => {
+    const c = cell(p, s)
+    const notes = [
+      c.support && `<span class="tag tag-warn">Needs support</span>Last observed 9 Oct, by Chloe Park`,
+      c.old && `<span class="tag">Old version</span>Signed off on v${s.v - 1}; the SOP is now v${s.v}`,
+      c.st === 'signed' && !c.old && `Signed off v${s.v} · 2 Sep · by Chloe Park`,
+      c.st === 'wait' && `Ran it 14 Oct · waiting for a sign-off`,
+    ].filter(Boolean)
+    return `<div class="rec${s.id === focus ? ' hl' : ''}" id="rec-${s.id}">${thumb(s)}<div class="body">
+      <b>${s.title}</b> <span class="meta">v${s.v}</span>${ladder(c)}
+      ${notes.map(n => `<div class="note">${n}</div>`).join('')}</div></div>`
+  }).join('')
+}
+function openPerson(pid, focus) {
+  const p = byId(PEOPLE, pid), cells = required(p).map(s => cell(p, s))
+  document.getElementById('drawer').innerHTML = `
+    <button class="drawer-x" onclick="closeDrawer()">✕</button>
+    <div class="passport-head"><span class="av lg">${initials(p.name)}</span><div><h2>${p.name}</h2><span class="meta">${p.role} · ${dept(p.dept).name}</span></div></div>
+    <div style="display:flex;gap:10px;align-items:center;margin:10px 0 14px">${bar(cells)}<span class="meta">${signedOf(cells)}</span></div>
+    <div style="display:flex;gap:8px;margin-bottom:14px"><button class="btn">+ Record observation</button><button class="btn-quiet">Export</button></div>
+    <div class="list">${recordRows(p, focus)}</div>`
+  document.getElementById('drawer').classList.add('open')
+  document.querySelectorAll('.mx tr').forEach(tr => tr.classList.toggle('focus', tr.dataset.p === pid))
+  if (focus) document.getElementById('rec-' + focus)?.scrollIntoView({ block: 'center' })
+}
+function closeDrawer() { document.getElementById('drawer').classList.remove('open'); document.querySelectorAll('.mx tr').forEach(tr => tr.classList.remove('focus')) }
+
+// ---------------------------------------------------------------- A: glyph grid
+let aDept = 'forming'
+function renderA() {
+  document.getElementById('deptSeg').innerHTML = DEPTS.map(d => `<button aria-pressed="${d.id === aDept}" onclick="aDept='${d.id}';renderA()"><span class="area-dot" style="background:var(--area-${d.area})"></span>${d.name}</button>`).join('')
+  const ppl = PEOPLE.filter(p => p.dept === aDept), sops = SOPS.filter(s => s.depts.includes(aDept))
+  const head = `<thead><tr><th class="person"><span class="meta">${ppl.length} people · ${sops.length} SOPs</span></th>${sops.map(s => {
+    const cs = ppl.map(p => cell(p, s))
+    return `<th class="sop"><span class="nm">${s.title}</span>${bar(cs)}<span class="meta">${cs.filter(c => c.st === 'signed').length}/${cs.length}</span></th>`
+  }).join('')}</tr></thead>`
+  const body = ppl.map(p => {
+    const cs = sops.map(s => cell(p, s))
+    return `<tr data-p="${p.id}"><th class="person"><div class="row"><span class="av sm">${initials(p.name)}</span><div><b>${p.name}</b><div class="meta">${p.role}</div></div></div>
+      <div style="display:flex;gap:8px;align-items:center">${bar(cs)}<span class="meta">${signedOf(cs)}</span></div></th>
+      ${sops.map((s, i) => `<td><button onclick="openPerson('${p.id}','${s.id}')">${glyph(cs[i])}</button></td>`).join('')}</tr>`
+  }).join('')
+  document.getElementById('mx').innerHTML = head + '<tbody>' + body + '</tbody>'
+}
+
+// ---------------------------------------------------------------- B: passports
+let bPerson = null
+function renderB() {
+  const el = document.getElementById('bBody')
+  if (bPerson) {
+    const p = byId(PEOPLE, bPerson), cells = required(p).map(s => cell(p, s)), n = k => cells.filter(c => c.st === k).length
+    el.innerHTML = `<div style="margin-top:16px"><button class="back" onclick="bPerson=null;renderB()">‹ Everyone</button></div>
+      <div class="passport-head"><span class="av lg">${initials(p.name)}</span><div><h2>${p.name}</h2><span class="meta">${p.role} · ${dept(p.dept).name}</span></div>
+      <span style="flex:1"></span><button class="btn">+ Record observation</button></div>
+      <div class="bigstat"><div><b>${n('signed')}</b>Signed off</div><div><b>${n('wait')}</b>Waiting</div><div><b>${n('obs')}</b>Observed</div><div><b>${n('read')}</b>Read</div><div><b>${n('none')}</b>Not started</div></div>
+      <div class="list-head"><span class="section-heading">SOPs ${p.name.split(' ')[0]}'s work needs</span><button class="btn-quiet">Export</button></div>
+      <div class="list">${recordRows(p)}</div>`
+    return
+  }
+  el.innerHTML = DEPTS.map(d => {
+    const ppl = PEOPLE.filter(p => p.dept === d.id)
+    return `<div class="list-head"><span class="section-heading"><span class="area-dot" style="background:var(--area-${d.area})"></span> ${d.name}</span><button class="btn-quiet">Whole department ▦</button></div>
+      <div class="list">${ppl.map(p => {
+        const sops = required(p), cs = sops.map(s => cell(p, s))
+        return `<button class="list-row prow" onclick="bPerson='${p.id}';renderB()"><span class="av">${initials(p.name)}</span>
+          <div style="flex:1;min-width:0"><b>${p.name}</b> <span class="meta">${p.role}</span>
+          <div class="ladder-mini">${cs.map(glyph).join('')}</div></div>
+          <div style="width:150px;display:flex;flex-direction:column;gap:4px;align-items:flex-end">${bar(cs)}<span class="meta">${signedOf(cs)}</span></div>
+          <span class="list-chev">›</span></button>`
+      }).join('')}</div>`
+  }).join('')
+}
+
+// ---------------------------------------------------------------- C: by SOP
+let cSop = null
+function renderC() {
+  const el = document.getElementById('cBody')
+  const ppl = s => PEOPLE.filter(p => s.depts.includes(p.dept))
+  if (cSop) {
+    const s = byId(SOPS, cSop), list = ppl(s)
+    const col = (k, title, g) => {
+      const who = list.filter(p => cell(p, s).st === k)
+      return `<div class="col${k === 'wait' ? ' wait' : ''}"><h4><i class="g g-${g}"></i>${title} <span class="meta">${who.length}</span></h4>
+        ${who.map(p => { const c = cell(p, s); return `<button class="p" onclick="openPerson('${p.id}','${s.id}')" style="width:100%"><span class="av sm">${initials(p.name)}</span><span style="flex:1;text-align:left">${p.name}<div class="meta">${dept(p.dept).name}</div></span>${c.support ? '<span class="tag tag-warn">Support</span>' : ''}${c.old ? '<span class="tag">Old v</span>' : ''}</button>` }).join('') || '<span class="meta">Nobody</span>'}</div>`
+    }
+    el.innerHTML = `<div style="margin-top:16px"><button class="back" onclick="cSop=null;renderC()">‹ All SOPs</button></div>
+      <div class="passport-head">${thumb(s)}<div><h2>${s.title}</h2><span class="meta">v${s.v} · needed by ${s.depts.map(d => dept(d).name).join(', ')}</span></div></div>
+      <div class="cols">${col('none', 'Not started', 'none')}${col('read', 'Read', 'read')}${col('obs', 'Observed', 'obs')}${col('signed', 'Signed off', 'signed')}</div>
+      ${list.some(p => cell(p, s).st === 'wait') ? `<div class="cols" style="grid-template-columns:1fr">${col('wait', 'Waiting for sign-off', 'wait')}</div>` : ''}`
+    return
+  }
+  el.innerHTML = `<div class="list-head"><span class="section-heading">SOPs people need</span><div class="seg-quiet"><span aria-pressed="true" style="display:inline-flex;align-items:center">All</span>${DEPTS.map(d => `<span style="display:inline-flex;align-items:center">${d.name}</span>`).join('')}</div></div>
+    <div class="sopgrid">${SOPS.map(s => {
+      const list = ppl(s), cs = list.map(p => cell(p, s)), signed = list.filter(p => cell(p, s).st === 'signed')
+      return `<button class="sopcard" onclick="cSop='${s.id}';renderC()"><div class="top">${thumb(s)}<div><b>${s.title}</b><div class="meta">v${s.v} · ${list.length} people</div></div></div>
+        ${bar(cs)}<div style="display:flex;justify-content:space-between;align-items:center"><span class="stack">${signed.slice(0, 5).map(p => `<span class="av sm">${initials(p.name)}</span>`).join('')}</span><span class="meta">${signedOf(cs)}</span></div></button>`
+    }).join('')}</div>`
+}
+
+// ---------------------------------------------------------------- chrome
+document.querySelectorAll('[data-v]').forEach(b => b.onclick = () => {
+  document.querySelectorAll('[data-v]').forEach(x => x.classList.toggle('active', x === b))
+  document.querySelectorAll('.variant').forEach(v => v.classList.toggle('active', v.id === 'variant-' + b.dataset.v))
+  closeDrawer()
+})
+document.querySelectorAll('[data-w]').forEach(b => b.onclick = () => {
+  document.querySelectorAll('[data-w]').forEach(x => x.classList.toggle('active', x === b))
+  document.body.classList.toggle('phone', b.dataset.w === 'phone')
+})
+renderReqs(); renderA(); renderB(); renderC()
+</script>
+</body>
+</html>
