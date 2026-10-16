@@ -30,6 +30,21 @@ if (!flag('--no-wait')) {
   }
   console.log()
   if (served !== head) { console.error(`deploy not live: serving ${served?.slice(0, 7) ?? 'unknown'}, want ${head.slice(0, 7)}`); process.exit(2) }
+  // One request seeing the new sha is not enough: Fly rolls two machines about a minute apart, and a
+  // page whose HTML came from the new one and its scripts from the old one never hydrates (2026-10-16,
+  // HOME-01). Wait for the deploy workflow to finish, i.e. every machine is on HEAD.
+  process.stdout.write('waiting for every machine ')
+  let done = null
+  while (Date.now() < deadline) {
+    try {
+      const runs = JSON.parse(execSync(`gh run list --workflow "Deploy to Fly" --commit ${head} --limit 1 --json status,conclusion`).toString())
+      if (runs[0]?.status === 'completed') { done = runs[0].conclusion; break }
+    } catch { done = 'unknown'; break } // no gh: fall back to the sha check alone
+    process.stdout.write('.')
+    await new Promise((r) => setTimeout(r, 15_000))
+  }
+  console.log()
+  if (done !== 'success' && done !== 'unknown') { console.error(`deploy workflow ${done ?? 'still running'}`); process.exit(2) }
   console.log('deploy is live')
 }
 

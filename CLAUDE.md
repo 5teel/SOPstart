@@ -99,6 +99,7 @@ Distilled rules below. **Full dated log with the stories: `docs/LEARNINGS.md` â€
 - New `tests/lint/*.spec.ts` must be in a Playwright project regex (check with `--list`).
 - Deletion guards assert no references, not just no file; when moving code or removing a control, grep `tests/` for its literals and test ids.
 - Live probes share one Supabase OTP budget: run the full suite once per gate, never loop it.
+- Deployed evals start when the "Deploy to Fly" workflow for HEAD has completed, not when one request sees the new sha (two machines roll a minute apart).
 - A hanging click = empty locator: assert `toHaveCount(1)` before raising timeouts. Assert rendered content, not HTTP status, for `notFound()`.
 - Fixtures key on their own markers; shared eval orgs mean no "exactly N" assertions; author and run each eval case against the deploy as plans land.
 
