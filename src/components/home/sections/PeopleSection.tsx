@@ -18,18 +18,22 @@ export function PeopleSection({
   tab,
   pin,
   onTab,
+  siteName,
+  onPinSop,
 }: {
   role: string | null
   tab: HomeTab | null
   pin: string | null
   onTab(t: HomeTab): void
+  siteName: string
+  onPinSop(sopId: string): void
 }) {
   return (
     <section data-testid="section-people" className="flex flex-col">
       <div className="px-4 pt-4">
         <h2 className="text-xl font-semibold text-ink-900">People</h2>
       </div>
-      <OfficePane tab={tab} tabs={tabsFor('people', role)} onTab={onTab} initialSop={pin} />
+      <OfficePane tab={tab} tabs={tabsFor('people', role)} onTab={onTab} initialSop={pin} siteName={siteName} onPinSop={onPinSop} />
     </section>
   )
 }

@@ -35,6 +35,7 @@ import { authorityLines, authorityOf, ROLE_ORDER, ROLE_PLURAL, ROLE_WORDS, type 
 import type { Department } from '@/types/sop'
 import type { AppRole } from '@/types/auth'
 import type { RowDone } from './InboxRow'
+import { OrgChart } from './OrgChart'
 
 const PEOPLE_KEY = ['office-people']
 const AUTHORITY_KEY = ['office-people-authority']
@@ -46,7 +47,7 @@ const SELECT =
 const EMAIL_OK = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const FAILED_COPY = "That didn't work. Nothing was changed — try again."
 
-type View = 'departments' | 'authority'
+type View = 'chart' | 'departments' | 'authority'
 
 const nameOf = (m: TeamMember) => m.email ?? `${ROLE_WORDS[m.role]} (${m.user_id.slice(0, 8)})`
 
@@ -418,7 +419,7 @@ function AuthorityGrid({
   )
 }
 
-export function PeopleTab({ onReceipt }: { onReceipt(r: RowDone): void }) {
+export function PeopleTab({ onReceipt, siteName = '', onPinSop }: { onReceipt(r: RowDone): void; siteName?: string; onPinSop?(sopId: string): void }) {
   const role = useRole()
   const isAdmin = role === 'admin'
   const qc = useQueryClient()
@@ -436,7 +437,7 @@ export function PeopleTab({ onReceipt }: { onReceipt(r: RowDone): void }) {
   const invited: InvitedPerson[] = data?.invited ?? []
   const refetch = () => qc.invalidateQueries({ queryKey: PEOPLE_KEY })
 
-  const [view, setView] = useState<View>('departments')
+  const [view, setView] = useState<View>('chart')
   const [openId, setOpenId] = useState<string | null>(null)
   const open = members.find((m) => m.id === openId) ?? null
 
@@ -581,16 +582,20 @@ export function PeopleTab({ onReceipt }: { onReceipt(r: RowDone): void }) {
   const total = members.length + invited.length
   const emailValid = EMAIL_OK.test(email.trim())
   const unplaced = members.filter((m) => m.department_ids.length === 0).length
+  const liveDepts = departments.filter((d) => !d.archived).length
 
   return (
     <div data-testid="people-tab" className="flex flex-col gap-4 pt-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <span className="mono text-meta text-ink-600">
-          {total === 1 ? '1 person' : `${total} people`} · {departments.length === 1 ? '1 department' : `${departments.length} departments`}
+          {total === 1 ? '1 person' : `${total} people`} · {liveDepts === 1 ? '1 department' : `${liveDepts} departments`}
           {unplaced > 0 ? ` · ${unplaced} without a department` : ''}
         </span>
         <div className="flex flex-wrap items-center gap-2">
           <span className="seg">
+            <button type="button" data-testid="people-view-chart" aria-pressed={view === 'chart'} onClick={() => setView('chart')}>
+              Chart
+            </button>
             <button type="button" data-testid="people-view-departments" aria-pressed={view === 'departments'} onClick={() => setView('departments')}>
               Departments
             </button>
@@ -690,6 +695,22 @@ export function PeopleTab({ onReceipt }: { onReceipt(r: RowDone): void }) {
           <p className="section-heading">Just you so far.</p>
           <p className="text-ui text-ink-500">Invite someone to give them access to the site.</p>
         </div>
+      ) : view === 'chart' ? (
+        <OrgChart
+          siteName={siteName}
+          members={members}
+          invited={invited}
+          departments={departments}
+          auth={auth}
+          supervision={authData.supervision}
+          openUserId={open?.user_id ?? null}
+          onOpen={openPerson}
+          onInvite={() => {
+            setInviteOpen(true)
+            requestAnimationFrame(() => document.querySelector('[data-testid="people-invite-form"]')?.scrollIntoView({ block: 'center' }))
+          }}
+          onChangeAccess={(sopId) => onPinSop?.(sopId)}
+        />
       ) : view === 'departments' ? (
         <>
           <Legend />

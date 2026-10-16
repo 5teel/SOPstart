@@ -187,7 +187,7 @@ export function HomeShell({ siteName, siteId, sites, userEmail, userId, role, in
       case 'signoffs':
         return <SignOffsSection role={role} tab={state.tab} onTab={(t) => select({ ...state, tab: t })} onHome={select} />
       case 'people':
-        return <PeopleSection role={role} tab={state.tab} pin={state.pin} onTab={(t) => select({ ...state, tab: t })} />
+        return <PeopleSection role={role} tab={state.tab} pin={state.pin} onTab={(t) => select({ ...state, tab: t })} siteName={siteName} onPinSop={(sopId) => select({ ...state, tab: 'access', pin: sopId })} />
       case 'manage':
         return <ManageSection view={state.view} onView={(v) => select({ ...state, view: v })} />
       default:

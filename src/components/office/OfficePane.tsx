@@ -50,6 +50,8 @@ export function OfficePane({
   onTab,
   initialSop = null,
   mine = null,
+  siteName = '',
+  onPinSop,
 }: {
   tab: OfficeTab | null
   tabs: ReadonlyArray<OfficeTab>
@@ -58,6 +60,10 @@ export function OfficePane({
   initialSop?: string | null
   /** The Mine tab's body (your own record); the caller supplies it so this pane stays free of the home's panels. */
   mine?: ReactNode
+  /** The site's name, the root of the People chart. */
+  siteName?: string
+  /** Opens the Access tab pinned to one SOP (the People chart's "Change who sees it"). */
+  onPinSop?(sopId: string): void
 }) {
   // A tab the caller did not offer resolves to the first one at render time, never by redirect.
   const tab: OfficeTab = requested && tabs.includes(requested) ? requested : (tabs[0] ?? 'inbox')
@@ -165,7 +171,7 @@ export function OfficePane({
         <div id="office-tabpanel" role={tabs.length > 1 ? 'tabpanel' : undefined} className="px-4 pb-8">
           {tab === 'mine' && mine}
           {tab === 'decisions' && <DecisionsTab />}
-          {tab === 'people' && <PeopleTab onReceipt={(r) => setReceipt({ ...r, tab })} />}
+          {tab === 'people' && <PeopleTab onReceipt={(r) => setReceipt({ ...r, tab })} siteName={siteName} onPinSop={onPinSop} />}
           {tab === 'requests' && <RequestsTab onReceipt={(r) => setReceipt({ ...r, tab })} />}
           {tab === 'inbox' && (
             <InboxTab chip={chip} onChip={setChip} onReceipt={(r) => setReceipt({ ...r, tab })} />

@@ -721,6 +721,44 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       expect(errors).toEqual([])
       await page.close()
     })
+    test('the People chart (ADR-0020): Show switches, Find a person, Open all, SOP access, phone width', async () => {
+      const page = await adminCtx.newPage()
+      const errors = watchConsole(page)
+      await page.goto('/?s=people')
+      const chart = page.getByTestId('org-chart')
+      await expect(chart).toBeVisible(SLOW)
+      await expect(chart.getByTestId('org-person').first()).toBeVisible(SLOW)
+      await shot(page, 'adr20-chart-people')
+      // Who can: holders keep their words, departments say how many or that nobody does.
+      await chart.getByTestId('org-lens-who').click()
+      await expect(chart.getByText(/\d+ (person|people) (signs off|sign off)/)).toBeVisible()
+      await shot(page, 'adr20-chart-who')
+      // Find a person: the match stays lit, everyone else fades.
+      await chart.getByTestId('org-lens-people').click()
+      await chart.getByTestId('org-find').fill('eval-site-worker2')
+      await expect(chart.locator('.org-person.org-lit')).toHaveCount(1)
+      await chart.getByTestId('org-find').fill('')
+      // Open all / Close all folds every department to one row and back.
+      const toggle = chart.getByTestId('org-toggle-all')
+      const before = await toggle.textContent()
+      await toggle.click()
+      await expect(toggle).not.toHaveText(before ?? '')
+      await shot(page, 'adr20-chart-toggled')
+      // SOP access: pick a SOP and the chart says how many people can see it.
+      await chart.getByTestId('org-lens-access').click()
+      const pick = chart.getByTestId('org-access-sop')
+      await expect(pick.locator('option').nth(1)).toBeAttached(SLOW)
+      await pick.selectOption({ index: 1 })
+      await expect(chart.getByText(/Seen by \d+ of \d+ people/)).toBeVisible(SLOW)
+      await shot(page, 'adr20-chart-access')
+      await page.setViewportSize({ width: 390, height: 844 })
+      await chart.getByTestId('org-lens-people').click()
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true)
+      await shot(page, 'adr20-chart-phone')
+      expect(errors).toEqual([])
+      await page.close()
+    })
+
     test('people: department board, who-can-do-what grid, invite with a role, Invited chip, role change both ways in the person sheet, remove with confirmation (59-11, 2026-10-11)', async () => {
       const page = await adminCtx.newPage()
       const errors = watchConsole(page)
@@ -728,7 +766,9 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       await expect(page.getByTestId('people-tab')).toHaveCount(1, SLOW)
       expect(await page.getByTestId('section-people').evaluate((el) => el.getBoundingClientRect().width)).toBeGreaterThanOrEqual(560)
 
-      // The board opens first: departments, people grouped by role, the authority legend.
+      // The chart opens first (ADR-0020); the board is the Departments view.
+      await expect(page.getByTestId('org-chart')).toBeVisible(SLOW)
+      await page.getByTestId('people-view-departments').click()
       await expect(page.getByTestId('people-board')).toBeVisible(SLOW)
       await expect(page.getByTestId('people-legend')).toBeVisible()
       await expect(page.getByTestId('people-department').first()).toBeVisible(SLOW)

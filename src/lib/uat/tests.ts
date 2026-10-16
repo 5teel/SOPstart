@@ -351,6 +351,26 @@ export const UAT_TESTS: UatTest[] = [
   },
 
   {
+    id: 'adr20-people-chart',
+    dateAdded: '2026-10-16',
+    category: 'People chart',
+    title: 'Open People: can you see who sits where, and find your way round a big site?',
+    status: 'active',
+    summary:
+      'People now opens on a chart of the site: departments, the roles in them and the people in each role. A Show switch changes what the chart tells you: who can sign off, how far people are with training, and who can see a SOP. Departments fold up so a big site stays readable.',
+    tryIt: [
+      'Open People. Click a department to fold it up or open it.',
+      'Type a name in Find a person.',
+      'Switch Show to Who can…, then Training, then SOP access and pick a SOP.',
+    ],
+    links: [{ label: 'People', href: '/?s=people' }],
+    questions: [
+      { id: 'chart-clear', text: 'Could you tell who sits in which department and role?' },
+      { id: 'fold-help', text: 'Did folding departments and Find a person make the site easier to get round?' },
+      { id: 'show-clear', text: 'Was each Show option clear without any explanation?' },
+    ],
+  },
+  {
     id: 'adr19-training-lanes',
     dateAdded: '2026-10-16',
     category: 'Training lanes',

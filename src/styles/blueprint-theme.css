@@ -345,6 +345,27 @@ body[data-theme="paper"] {
   .face[aria-pressed="true"] { box-shadow: 0 0 0 1px var(--ink-900); }
   .face-av { display: inline-grid; place-items: center; flex-shrink: 0; width: 1.5rem; height: 1.5rem; border-radius: 9999px; background: var(--ink-900); color: var(--paper); font-family: var(--font-label); font-size: var(--text-micro); font-weight: 700; }
   .face-av-lg { width: 3rem; height: 3rem; font-size: var(--text-reading); }
+  /* The People chart (ADR-0020, sketch 013 D): the site on grid paper, departments as cards that
+   * fold to one summary row, job roles inside, people as faces. Lit / dim answer the Show switch. */
+  .org-chart { display: flex; flex-direction: column; align-items: center; gap: 1.25rem; padding: 1.25rem; border: 1px solid var(--ink-200); border-radius: var(--radius-lg); }
+  .org-root { padding: 0.5rem 1.125rem; border: 2px solid var(--ink-900); border-radius: var(--radius-lg); background: var(--paper-1); font-weight: 700; color: var(--ink-900); }
+  .org-depts { display: grid; width: 100%; grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); align-items: start; gap: 0.75rem; }
+  .org-dept { position: relative; overflow: hidden; border: 1.5px solid var(--ink-300); border-radius: var(--radius-lg); background: var(--paper-1); transition: opacity 150ms ease; }
+  .org-depts > .org-dept::before { content: ''; position: absolute; left: 50%; top: 0; width: 1px; height: 0.5rem; background: var(--ink-300); }
+  .org-dept .org-dept { border-width: 1px; }
+  .org-dept-dashed { border-style: dashed; background: transparent; }
+  .org-dept-head { display: flex; width: 100%; align-items: center; gap: 0.625rem; min-height: var(--spacing-tap-glove); padding: 0.625rem 0.875rem; text-align: left; }
+  button.org-dept-head:hover { background: var(--paper-2); }
+  .org-dept-body { padding: 0 0.875rem 0.875rem; }
+  .org-role { display: flex; flex-direction: column; gap: 0.375rem; padding: 0.5rem 0.625rem; border: 1px solid var(--ink-200); border-radius: var(--radius-lg); }
+  .org-person { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 0.1875rem; max-width: 100%; min-height: 2rem; padding: 0.1875rem 0.625rem 0.1875rem 0.1875rem; border: 1px solid var(--ink-300); border-radius: 0.75rem; background: var(--paper-1); font-size: var(--text-micro); color: var(--ink-900); text-align: left; transition: opacity 150ms ease; }
+  button.org-person:hover { border-color: var(--ink-900); }
+  .org-person-note { padding-left: 1.875rem; font-size: var(--text-micro); color: var(--ink-600); }
+  .org-seat { border-style: dashed; background: transparent; color: var(--ink-500); }
+  .org-seat-av { background: transparent; border: 1.5px dashed var(--ink-400); color: var(--ink-500); }
+  .org-lit { border-color: var(--ink-900); }
+  .org-sel { border-color: var(--ink-900); box-shadow: 0 0 0 2px var(--ink-900); }
+  .org-dim { opacity: 0.35; }
   @media (max-width: 767px) {
     .lane-row { grid-template-columns: 1fr; }
     .lane-head { display: none; }
