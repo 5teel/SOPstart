@@ -322,10 +322,10 @@ export function OrgChart({
           const editing = g.roleId !== null && edit?.roleId === g.roleId
           const picking = g.roleId !== null && seatPick === g.roleId
           return (
-            <div key={g.key} className="org-role" data-testid={g.roleId ? 'org-role' : undefined}>
+            <div key={g.key} className="org-role" data-testid={g.roleId ? 'org-role' : undefined} data-role-name={g.roleId ? g.name : undefined}>
               {editing ? (
                 <div className="flex flex-wrap items-end gap-2">
-                  <label className="flex min-w-0 flex-1 flex-col gap-1 text-micro text-ink-500">
+                  <label className="flex w-full flex-col gap-1 text-micro text-ink-500">
                     Role
                     <input className={input} value={edit.name} onChange={(e) => setEdit({ ...edit, name: e.target.value })} data-testid="org-role-name" />
                   </label>
@@ -441,7 +441,7 @@ export function OrgChart({
         {adding === n.dept.id ? (
           <div className="org-role" data-testid="org-role-add-form">
             <div className="flex flex-wrap items-end gap-2">
-              <label className="flex min-w-0 flex-1 flex-col gap-1 text-micro text-ink-500">
+              <label className="flex w-full flex-col gap-1 text-micro text-ink-500">
                 New role
                 <input className={input} placeholder="e.g. Operator, night shift" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} data-testid="org-role-new-name" />
               </label>

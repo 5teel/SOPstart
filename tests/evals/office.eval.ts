@@ -778,7 +778,7 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
         await lab.getByTestId('org-role-new-name').fill(roleName)
         await lab.getByTestId('org-role-new-seats').fill('2')
         await lab.getByTestId('org-role-new-save').click()
-        const role = lab.getByTestId('org-role').filter({ hasText: roleName })
+        const role = lab.locator(`[data-testid="org-role"][data-role-name="${roleName}"]`)
         await expect(role).toHaveCount(1, SLOW)
         await expect(role).toContainText('0 of 2')
         await expect(role.getByTestId('org-seat')).toHaveCount(2)
@@ -801,7 +801,7 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
         await role.getByTestId('org-role-remove').click()
         await expect(role.getByTestId('org-role-remove')).toContainText(`Remove ${roleName}`)
         await role.getByTestId('org-role-remove').click()
-        await expect(lab.getByTestId('org-role').filter({ hasText: roleName })).toHaveCount(0, SLOW)
+        await expect(role).toHaveCount(0, SLOW)
         // Each change landed in the ledger.
         const { data: rows } = await db.from('decisions').select('details').eq('organisation_id', siteOrgId).eq('kind', 'department_change').order('created_at', { ascending: false }).limit(10)
         const actions = (rows ?? []).map((r: { details: { action?: string } | null }) => r.details?.action)
