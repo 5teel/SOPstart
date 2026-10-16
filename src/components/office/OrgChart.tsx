@@ -343,8 +343,8 @@ export function OrgChart({
               ) : (
                 <div className="flex items-baseline justify-between gap-2">
                   <span className="text-meta font-semibold text-ink-900">{g.name}</span>
-                  <span className="flex items-baseline gap-2">
-                    {g.cap && <span className="mono text-micro text-ink-600">{g.cap}</span>}
+                  <span className="flex shrink-0 items-baseline gap-2">
+                    {g.cap && <span className="mono whitespace-nowrap text-micro text-ink-600">{g.cap}</span>}
                     {g.roleId && (
                       <button
                         type="button"
