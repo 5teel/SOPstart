@@ -353,6 +353,8 @@ body[data-theme="paper"] {
     .lane-row > [data-lane]:not(:empty)::before { content: attr(data-name); width: 100%; font-size: var(--text-micro); font-weight: 600; color: var(--ink-500); }
     .lane-person > :not(:first-child):not([data-here]) { display: none; }
     .lane-person .lane-track { display: none; }
+    .lane-person > [data-lane]::before { display: none; }
+    .lane-row.lane-focus > * { box-shadow: none; background: var(--paper-2); }
   }
 }
 
