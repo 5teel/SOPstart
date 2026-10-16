@@ -120,7 +120,7 @@ const GATED_ROUTES: GatedRoute[] = [
       // Phase 63-11: the home's map and section bodies are lazy modules reached from HomeShell.
       { label: 'site map (lazy, 63-10)', markers: ['Esc for the whole site'] },
       { label: 'Manage SOPs (lazy, 63-08)', markers: ['No drafts.'] },
-      { label: 'Training (lazy, 63-09)', markers: ['Swap rows and columns'] },
+      { label: 'Training (lazy, 63-09; lanes since ADR-0019)', markers: ['ran it on their own'] },
       { label: 'My record (lazy, 63-09)', markers: ['Your first finished SOP lands here'] },
       { label: 'fuse engine (lazy, 63-15, ADR-0012)', markers: ['Every tick is saved to your record'] },
     ],
