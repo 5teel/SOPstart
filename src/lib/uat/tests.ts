@@ -362,6 +362,7 @@ export const UAT_TESTS: UatTest[] = [
       'Open People. Click a department to fold it up or open it.',
       'Type a name in Find a person.',
       'Switch Show to Who can…, then Training, then SOP access and pick a SOP.',
+      'Open a department, add a role with two seats, and put someone in one of the seats.',
     ],
     links: [{ label: 'People', href: '/?s=people' }],
     questions: [

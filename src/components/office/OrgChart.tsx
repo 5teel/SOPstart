@@ -14,13 +14,15 @@
  * Built for large organisations: departments collapse to one summary row, Open all / Close all,
  * and Find a person opens the departments that hold a match. Large charts start closed.
  *
- * A face opens the existing person sheet (PeopleTab owns it); an empty seat opens the invite form.
- * Reads only; every write stays on the sheet, the invite form and the access tab.
+ * A face opens the existing person sheet (PeopleTab owns it). ADR-0021: job roles are edited here --
+ * + Add a role, Edit (rename, seats, take people out, remove), and an empty seat that seats someone
+ * from the department or opens the invite form. Every other write stays on the sheet, the invite
+ * form and the SOP access tab.
  */
 
 import { useMemo, useState } from 'react'
-import { useQueries, useQuery } from '@tanstack/react-query'
-import { listOrgTree } from '@/actions/org-model'
+import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query'
+import { createRole, listOrgTree, removeRole, setRoleSeat, updateRole } from '@/actions/org-model'
 import { getTrainingMatrix } from '@/actions/competency'
 import { libraryQueryFn } from '@/hooks/useLibrary'
 import { createClient } from '@/lib/supabase/client'
@@ -84,6 +86,46 @@ export function OrgChart({
   const [sopId, setSopId] = useState<string>('')
   const [find, setFind] = useState('')
   const [open, setOpen] = useState<Set<string> | null>(null)
+
+  // Job roles (ADR-0021): one form open at a time.
+  const qc = useQueryClient()
+  const [adding, setAdding] = useState<string | null>(null)
+  const [draft, setDraft] = useState({ name: '', seats: '1' })
+  const [edit, setEdit] = useState<{ roleId: string; name: string; seats: string; confirm: boolean } | null>(null)
+  const [seatPick, setSeatPick] = useState<string | null>(null)
+  const [busy, setBusy] = useState(false)
+  const [fail, setFail] = useState<{ place: string; text: string } | null>(null)
+  const seatsOf = (v: string) => (/^\d+$/.test(v.trim()) ? Number(v) : NaN)
+
+  // Every write is wrapped: a thrown action (network drop) must not leave the form stuck busy.
+  async function run(place: string, call: () => Promise<object>, after: () => void) {
+    setBusy(true)
+    setFail(null)
+    try {
+      const r = await call()
+      if ('error' in r) return setFail({ place, text: String((r as { error: string }).error) })
+      after()
+      await qc.invalidateQueries({ queryKey: ['office-org-tree'] })
+      void qc.invalidateQueries({ queryKey: ['training-tree'] })
+    } catch {
+      setFail({ place, text: 'Could not save. Check the connection and try again.' })
+    } finally {
+      setBusy(false)
+    }
+  }
+  const addRole = (departmentId: string) => {
+    const seats = seatsOf(draft.seats)
+    if (Number.isNaN(seats)) return setFail({ place: departmentId, text: 'Seats is a whole number.' })
+    return run(departmentId, () => createRole({ departmentId, name: draft.name, budgetedCount: seats }), () => setAdding(null))
+  }
+  const saveRole = (roleId: string) => {
+    const seats = seatsOf(edit?.seats ?? '')
+    if (Number.isNaN(seats)) return setFail({ place: roleId, text: 'Seats is a whole number.' })
+    return run(roleId, () => updateRole({ id: roleId, name: edit!.name, budgetedCount: seats }), () => setEdit(null))
+  }
+  const dropRole = (roleId: string) => run(roleId, () => removeRole(roleId), () => setEdit(null))
+  const seat = (roleId: string, memberId: string, seated: boolean) =>
+    run(roleId, () => setRoleSeat({ roleId, memberId, seated }), () => setSeatPick(null))
 
   const live = departments.filter((d) => !d.archived)
   const treeQ = useQuery({ queryKey: ['office-org-tree'], queryFn: () => listOrgTree() })
@@ -261,38 +303,177 @@ export function OrgChart({
     const here = inDept(n.dept.id)
     const roles = rolesOf(n.dept.id)
     const seated = new Set<string>()
-    const groups = roles.map((r) => {
+    const groups: Array<{ key: string; roleId: string | null; name: string; cap: string; ppl: TeamMember[]; seats: number; planned: number }> = roles.map((r) => {
       const ppl = r.people.filter((p) => !p.isVacancy && p.id).map((p) => byUser.get(p.id!)).filter((m): m is TeamMember => !!m)
       ppl.forEach((m) => seated.add(m.id))
-      return { key: r.id, name: r.name, cap: `${r.filledCount} of ${r.budgetedCount}`, ppl, seats: Math.max(0, r.budgetedCount - r.filledCount) }
+      return { key: r.id, roleId: r.id, name: r.name, cap: `${r.filledCount} of ${r.budgetedCount}`, ppl, seats: Math.max(0, r.budgetedCount - r.filledCount), planned: r.budgetedCount }
     })
     const rest = here.filter((m) => !seated.has(m.id))
     for (const role of ROLE_ORDER) {
       const ppl = rest.filter((m) => m.role === role)
-      if (ppl.length) groups.push({ key: role, name: ROLE_PLURAL[role], cap: '', ppl, seats: 0 })
+      if (ppl.length) groups.push({ key: role, roleId: null, name: ROLE_PLURAL[role], cap: '', ppl, seats: 0, planned: 0 })
     }
+    const input = 'min-h-tap rounded-lg border border-ink-300 bg-paper-1 px-3 text-ui text-ink-900'
+    const quiet = 'min-h-tap rounded-lg border border-ink-300 bg-paper-1 px-3 text-ui font-semibold text-ink-900 disabled:opacity-50'
+    const primary = 'min-h-tap rounded-lg bg-ink-900 px-3 text-ui font-semibold text-paper disabled:opacity-50'
     return (
       <div className="flex flex-col gap-2">
-        {groups.map((g) => (
-          <div key={g.key} className="org-role">
-            <div className="flex items-baseline justify-between gap-2">
-              <span className="text-meta font-semibold text-ink-900">{g.name}</span>
-              {g.cap && <span className="mono text-micro text-ink-600">{g.cap}</span>}
-            </div>
-            <div className="flex flex-wrap gap-1.5">
-              {g.ppl.map(chip)}
-              {Array.from({ length: g.seats }, (_, i) => (
-                <button key={i} type="button" className="org-person org-seat" data-testid="org-seat" onClick={onInvite}>
-                  <span className="flex items-center gap-1.5">
-                    <span className="face-av org-seat-av">+</span>
-                    Empty seat · invite
+        {groups.map((g) => {
+          const editing = g.roleId !== null && edit?.roleId === g.roleId
+          const picking = g.roleId !== null && seatPick === g.roleId
+          return (
+            <div key={g.key} className="org-role" data-testid={g.roleId ? 'org-role' : undefined}>
+              {editing ? (
+                <div className="flex flex-wrap items-end gap-2">
+                  <label className="flex min-w-0 flex-1 flex-col gap-1 text-micro text-ink-500">
+                    Role
+                    <input className={input} value={edit.name} onChange={(e) => setEdit({ ...edit, name: e.target.value })} data-testid="org-role-name" />
+                  </label>
+                  <label className="flex w-20 flex-col gap-1 text-micro text-ink-500">
+                    Seats
+                    <input type="number" min={0} className={input} value={edit.seats} onChange={(e) => setEdit({ ...edit, seats: e.target.value })} data-testid="org-role-seats" />
+                  </label>
+                  <button type="button" className={primary} disabled={busy} onClick={() => void saveRole(g.roleId!)} data-testid="org-role-save">
+                    Save
+                  </button>
+                  <button type="button" className={quiet} disabled={busy} onClick={() => setEdit(null)}>
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-baseline justify-between gap-2">
+                  <span className="text-meta font-semibold text-ink-900">{g.name}</span>
+                  <span className="flex items-baseline gap-2">
+                    {g.cap && <span className="mono text-micro text-ink-600">{g.cap}</span>}
+                    {g.roleId && (
+                      <button
+                        type="button"
+                        className="text-micro font-semibold text-ink-600 underline-offset-2 hover:underline"
+                        data-testid="org-role-edit"
+                        onClick={() => {
+                          setEdit({ roleId: g.roleId!, name: g.name, seats: String(g.planned), confirm: false })
+                          setSeatPick(null)
+                          setFail(null)
+                        }}
+                      >
+                        Edit
+                      </button>
+                    )}
                   </span>
-                </button>
-              ))}
+                </div>
+              )}
+              <div className="flex flex-wrap gap-1.5">
+                {g.ppl.map((m) =>
+                  editing ? (
+                    <span key={m.id} className="flex items-center gap-1">
+                      {chip(m)}
+                      <button type="button" className="text-micro font-semibold text-ink-600 underline" disabled={busy} onClick={() => void seat(g.roleId!, m.user_id, false)} data-testid="org-role-unseat">
+                        Take out
+                      </button>
+                    </span>
+                  ) : (
+                    chip(m)
+                  ),
+                )}
+                {!editing &&
+                  Array.from({ length: g.seats }, (_, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      className="org-person org-seat"
+                      data-testid="org-seat"
+                      onClick={() => {
+                        setSeatPick(picking ? null : g.roleId)
+                        setEdit(null)
+                        setFail(null)
+                      }}
+                    >
+                      <span className="flex items-center gap-1.5">
+                        <span className="face-av org-seat-av">+</span>
+                        Empty seat
+                      </span>
+                    </button>
+                  ))}
+              </div>
+              {picking && (
+                <div className="flex flex-col gap-1.5 border-t border-ink-200 pt-2" data-testid="org-seat-pick">
+                  <span className="text-micro text-ink-500">Put someone in this seat</span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {here
+                      .filter((m) => !g.ppl.some((p) => p.id === m.id))
+                      .sort((a, b) => Number(seated.has(a.id)) - Number(seated.has(b.id)))
+                      .map((m) => (
+                        <button key={m.id} type="button" className="face" disabled={busy} onClick={() => void seat(g.roleId!, m.user_id, true)} data-testid="org-seat-person">
+                          <span className="face-av">{initials(label(m))}</span>
+                          {shortName(label(m))}
+                        </button>
+                      ))}
+                    {here.length === 0 && <span className="text-meta text-ink-500">Nobody in this department yet.</span>}
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <button type="button" className={quiet} onClick={onInvite}>
+                      Invite someone new
+                    </button>
+                    <button type="button" className={quiet} onClick={() => setSeatPick(null)}>
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+              {editing && (
+                <div className="flex flex-wrap items-center gap-2 border-t border-ink-200 pt-2">
+                  <button
+                    type="button"
+                    className={`${quiet} text-accent-escalate`}
+                    disabled={busy}
+                    data-testid="org-role-remove"
+                    onClick={() => (edit.confirm ? void dropRole(g.roleId!) : setEdit({ ...edit, confirm: true }))}
+                  >
+                    {edit.confirm ? `Remove ${g.name}${g.ppl.length ? ` (${g.ppl.length} ${g.ppl.length === 1 ? 'person leaves' : 'people leave'} it)` : ''}` : 'Remove role'}
+                  </button>
+                </div>
+              )}
+              {fail && fail.place === g.roleId && <span className="text-micro text-accent-escalate">{fail.text}</span>}
             </div>
+          )
+        })}
+        {groups.length === 0 && n.children.length === 0 && adding !== n.dept.id && <span className="text-meta text-ink-500">Nobody here yet.</span>}
+        {adding === n.dept.id ? (
+          <div className="org-role" data-testid="org-role-add-form">
+            <div className="flex flex-wrap items-end gap-2">
+              <label className="flex min-w-0 flex-1 flex-col gap-1 text-micro text-ink-500">
+                New role
+                <input className={input} placeholder="e.g. Operator, night shift" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} data-testid="org-role-new-name" />
+              </label>
+              <label className="flex w-20 flex-col gap-1 text-micro text-ink-500">
+                Seats
+                <input type="number" min={0} className={input} value={draft.seats} onChange={(e) => setDraft({ ...draft, seats: e.target.value })} data-testid="org-role-new-seats" />
+              </label>
+              <button type="button" className={primary} disabled={busy || !draft.name.trim()} onClick={() => void addRole(n.dept.id)} data-testid="org-role-new-save">
+                Add
+              </button>
+              <button type="button" className={quiet} disabled={busy} onClick={() => setAdding(null)}>
+                Cancel
+              </button>
+            </div>
+            {fail && fail.place === n.dept.id && <span className="text-micro text-accent-escalate">{fail.text}</span>}
           </div>
-        ))}
-        {groups.length === 0 && n.children.length === 0 && <span className="text-meta text-ink-500">Nobody here yet.</span>}
+        ) : (
+          <button
+            type="button"
+            className="tag self-start"
+            data-testid="org-role-add"
+            onClick={() => {
+              setAdding(n.dept.id)
+              setDraft({ name: '', seats: '1' })
+              setEdit(null)
+              setSeatPick(null)
+              setFail(null)
+            }}
+          >
+            + Add a role
+          </button>
+        )}
         {n.children.length > 0 && <div className="flex flex-col gap-2">{n.children.map(deptCard)}</div>}
       </div>
     )

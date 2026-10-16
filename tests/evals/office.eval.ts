@@ -759,6 +759,61 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       await page.close()
     })
 
+    test('job roles on the chart (ADR-0021): add a role, seat someone, change seats, take out, remove', async () => {
+      const page = await adminCtx.newPage()
+      const errors = watchConsole(page)
+      const roleName = `EVAL Role ${Date.now()}`
+      const { departmentIds } = await ensureLibraryAreas(db)
+      const { error: seedErr } = await db.from('member_departments').upsert([{ member_id: workerId, department_id: departmentIds.lab }], { onConflict: 'member_id,department_id' })
+      if (seedErr) throw new Error(`roles seed failed: ${seedErr.message}`)
+      try {
+        await page.goto('/?s=people')
+        const chart = page.getByTestId('org-chart')
+        await expect(chart).toBeVisible(SLOW)
+        const lab = chart.getByTestId('org-department').filter({ hasText: EVAL_AREA_NAMES[2] })
+        await expect(lab).toHaveCount(1, SLOW)
+        if ((await lab.getAttribute('data-open')) === null) await lab.locator('.org-dept-head').click()
+        // Add a role with two seats.
+        await lab.getByTestId('org-role-add').click()
+        await lab.getByTestId('org-role-new-name').fill(roleName)
+        await lab.getByTestId('org-role-new-seats').fill('2')
+        await lab.getByTestId('org-role-new-save').click()
+        const role = lab.getByTestId('org-role').filter({ hasText: roleName })
+        await expect(role).toHaveCount(1, SLOW)
+        await expect(role).toContainText('0 of 2')
+        await expect(role.getByTestId('org-seat')).toHaveCount(2)
+        // Seat the worker from the department.
+        await role.getByTestId('org-seat').first().click()
+        await role.getByTestId('org-seat-pick').getByTestId('org-seat-person').filter({ hasText: 'eval-site-worker' }).first().click()
+        await expect(role).toContainText('1 of 2', SLOW)
+        await expect(role.getByTestId('org-person')).toHaveCount(1)
+        await shot(page, 'adr21-role-seated')
+        // Change seats to three, then take the worker out.
+        await role.getByTestId('org-role-edit').click()
+        await role.getByTestId('org-role-seats').fill('3')
+        await role.getByTestId('org-role-save').click()
+        await expect(role).toContainText('1 of 3', SLOW)
+        await role.getByTestId('org-role-edit').click()
+        await role.getByTestId('org-role-unseat').click()
+        await expect(role.getByTestId('org-person')).toHaveCount(0, SLOW)
+        // Remove takes two clicks.
+        await role.getByTestId('org-role-edit').click()
+        await role.getByTestId('org-role-remove').click()
+        await expect(role.getByTestId('org-role-remove')).toContainText(`Remove ${roleName}`)
+        await role.getByTestId('org-role-remove').click()
+        await expect(lab.getByTestId('org-role').filter({ hasText: roleName })).toHaveCount(0, SLOW)
+        // Each change landed in the ledger.
+        const { data: rows } = await db.from('decisions').select('details').eq('organisation_id', siteOrgId).eq('kind', 'department_change').order('created_at', { ascending: false }).limit(10)
+        const actions = (rows ?? []).map((r: { details: { action?: string } | null }) => r.details?.action)
+        for (const a of ['role_create', 'role_seat', 'role_update', 'role_unseat', 'role_remove']) expect(actions, a).toContain(a)
+        expect(errors).toEqual([])
+      } finally {
+        await db.from('roles').delete().eq('organisation_id', siteOrgId).like('name', 'EVAL Role %')
+        await db.from('member_departments').delete().eq('department_id', departmentIds.lab).eq('member_id', workerId)
+        await page.close()
+      }
+    })
+
     test('people: department board, who-can-do-what grid, invite with a role, Invited chip, role change both ways in the person sheet, remove with confirmation (59-11, 2026-10-11)', async () => {
       const page = await adminCtx.newPage()
       const errors = watchConsole(page)
