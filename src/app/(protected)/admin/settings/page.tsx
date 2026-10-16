@@ -44,6 +44,12 @@ const SECTIONS = [
       'Managed on the site map: edit the site, then use the departments strip. SOPs, content and people all reference them.',
   },
   {
+    href: '/admin/settings/methodology',
+    eyebrow: 'AI',
+    title: 'How SOPs are improved',
+    description: 'In plain words: how SOPstart turns an uploaded SOP into a clear version, and what it puts first.',
+  },
+  {
     href: '/admin/agent',
     eyebrow: 'AI',
     title: 'AI agent',
