@@ -36,14 +36,16 @@ import type { Department } from '@/types/sop'
 // ponytail: a cut this small reads better open; past it, groups start closed.
 const OPEN_ALL_UNDER = 12
 
+// A person with no display name arrives as their email; show the part before the @.
+const shortName = (name: string) => (name.includes('@') ? name.split('@')[0]! : name)
 const initials = (name: string) =>
-  name
-    .split(/\s+/)
+  shortName(name)
+    .split(/[\s._-]+/)
     .filter(Boolean)
     .slice(0, 2)
     .map((w) => w[0]!.toUpperCase())
     .join('') || '?'
-const firstName = (name: string) => name.split(/\s+/)[0] || name
+const firstName = (name: string) => shortName(name).split(/\s+/)[0] || name
 const day = (iso: string | null) => (iso ? new Date(iso).toLocaleDateString('en-NZ', { day: 'numeric', month: 'short' }) : '')
 
 interface Group {

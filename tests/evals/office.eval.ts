@@ -47,6 +47,7 @@ import {
 } from './lib/session'
 import { ensurePlantFixture, REAL_SOPSTART_ORG_ID, shot, watchConsole } from './lib/plant-fixture'
 import { deleteEvalCompletions } from './lib/completion-cleanup'
+import { ensureLibraryAreas, EVAL_AREA_NAMES } from './lib/library-fixture'
 import { newMachineCode } from '@/lib/site/scene'
 
 export const SLOW = { timeout: 30_000 }
@@ -928,29 +929,39 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
     test('the training lanes (ADR-0019): five lanes by SOP, groups open, and one person by person', async () => {
       const page = await adminCtx.newPage()
       const errors = watchConsole(page)
-      await page.goto('/?s=training')
-      const lanes = page.getByTestId('section-training').getByTestId('training-lanes')
-      await expect(lanes).toBeVisible(SLOW)
-      await expect(lanes.getByText('Loading…')).toHaveCount(0, SLOW)
-      const empty = lanes.getByText('No people with required SOPs in this department.')
-      if (await empty.isVisible()) {
-        await shot(page, 'adr19-lanes-empty')
+      // Seed: the two eval workers join EVAL Area Lab, which has the lab SOP tagged to it (library fixture).
+      const { departmentIds } = await ensureLibraryAreas(db)
+      const seeded = [workerId, worker2Id].map((member_id) => ({ member_id, department_id: departmentIds.lab }))
+      const { error: seedErr } = await db.from('member_departments').upsert(seeded, { onConflict: 'member_id,department_id' })
+      if (seedErr) throw new Error(`lanes seed failed: ${seedErr.message}`)
+      try {
+        await page.goto('/?s=training')
+        const lanes = page.getByTestId('section-training').getByTestId('training-lanes')
+        await expect(lanes).toBeVisible(SLOW)
+        await lanes.getByRole('button', { name: EVAL_AREA_NAMES[2], exact: true }).click()
+        await expect(lanes.getByText('Loading…')).toHaveCount(0, SLOW)
+        for (const name of ['Not started', 'Read it', 'Observed', 'Waiting for you', 'Signed off']) {
+          await expect(lanes.locator('.lane-head')).toContainText(name, SLOW)
+        }
+        // A small cut opens its groups; make sure they are open either way.
+        if ((await lanes.getByRole('button', { name: 'Open all' }).count()) > 0) await lanes.getByRole('button', { name: 'Open all' }).click()
+        await expect(lanes.getByTestId('lanes-sop').first()).toBeVisible(SLOW)
+        await expect(lanes.getByTestId('lanes-face').first()).toBeVisible()
+        await shot(page, 'adr19-lanes-by-sop')
+        await lanes.getByTestId('lanes-face').first().click()
+        await expect(lanes.getByTestId('lanes-person-head')).toBeVisible(SLOW)
+        await expect(lanes.getByText(/\d+ of \d+ signed off/)).toBeVisible()
+        await expect(lanes.getByTestId('lanes-person-sop').first()).toBeVisible()
+        await shot(page, 'adr19-lanes-by-person')
+        await page.setViewportSize({ width: 390, height: 844 })
+        await expect(lanes.getByTestId('lanes-person-sop').first()).toBeVisible()
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true)
+        await shot(page, 'adr19-lanes-phone')
         expect(errors).toEqual([])
-        return page.close()
+      } finally {
+        await db.from('member_departments').delete().eq('department_id', departmentIds.lab).in('member_id', [workerId, worker2Id])
+        await page.close()
       }
-      for (const name of ['Not started', 'Read it', 'Observed', 'Waiting for you', 'Signed off']) {
-        await expect(lanes.locator('.lane-head').getByText(name, { exact: true })).toBeVisible()
-      }
-      await lanes.getByRole('button', { name: /^(Open all|Close all)$/ }).click()
-      if ((await lanes.getByRole('button', { name: 'Close all' }).count()) === 0) await lanes.getByRole('button', { name: 'Open all' }).click()
-      await expect(lanes.getByTestId('lanes-sop').first()).toBeVisible(SLOW)
-      await shot(page, 'adr19-lanes-by-sop')
-      await lanes.getByTestId('lanes-face').first().click()
-      await expect(lanes.getByTestId('lanes-person-head')).toBeVisible(SLOW)
-      await expect(lanes.getByText(/\d+ of \d+ signed off/)).toBeVisible()
-      await shot(page, 'adr19-lanes-by-person')
-      expect(errors).toEqual([])
-      await page.close()
     })
     test('a non-owner completion address lands on Sign-offs; the walker still sees their own (59-15)', async () => {
       test.setTimeout(180_000)
