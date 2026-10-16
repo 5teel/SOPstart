@@ -152,8 +152,9 @@ export function ReadView({ row, role, from, onOpenSop, onClose }: { row: Library
       <div className="mx-auto max-w-3xl px-4 pt-6 lg:px-8">
         {!running && <Wordmark variant="chip" size="merge" data-fuse="sop" />}
         <h1 className="mb-1.5 mt-2.5 text-2xl font-semibold text-ink-900">{row.title}</h1>
-        <p className="font-label text-meta text-ink-600">
+        <p data-testid="read-meta" className="font-label text-meta text-ink-600">
           <i aria-hidden="true" className="mr-1 inline-block size-2 rounded align-baseline" style={{ background: row.colourVar }} />
+          {row.machine ? `${row.machine} · ` : ''}
           {row.areaName} · {row.type} · v{row.version ?? 1}
           {owner ? ` · owner ${owner}` : ''}
           {row.minutes ? ` · ~${row.minutes} min` : ''}

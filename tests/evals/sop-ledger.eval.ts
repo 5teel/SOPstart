@@ -282,13 +282,14 @@ test.describe.serial('Phase 56 -- simpler SOP + decision ledger (deployed)', () 
 
   test('D -- placement: machine + department, or Whole site', async () => {
     const page = await workerCtx.newPage()
+    // A live SOP opens in the home's Read (ADR-0012); its meta line names the machine and the area, or Site-wide.
     await page.goto(`/sops/${sopIds.plant}`)
-    const meta = page.getByTestId('sop-meta')
+    const meta = page.getByTestId('read-meta')
     await expect(meta).toContainText('EVAL Press', SLOW)
     await expect(meta).toContainText('Forming')
     await shot(page, 'ledger-d-machine')
     await page.goto(`/sops/${sopIds.walk}`)
-    await expect(page.getByTestId('sop-meta')).toContainText('Whole site', SLOW)
+    await expect(page.getByTestId('read-meta')).toContainText('Site-wide', SLOW)
     await shot(page, 'ledger-d-whole-site')
     await page.close()
   })
