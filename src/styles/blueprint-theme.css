@@ -266,6 +266,12 @@ body[data-theme="paper"] {
   .seg-quiet > * { min-height: calc(var(--spacing-tap) - 0.375rem); padding: 0 0.75rem; border-radius: calc(var(--radius-lg) - 0.1875rem); font-size: var(--text-meta); }
   .seg-quiet > [aria-pressed="true"], .seg-quiet > [aria-selected="true"] { background: var(--paper-1); color: var(--ink-900); box-shadow: 0 0 0 1px var(--ink-300); }
 
+  /* Fill variant: on a phone the choices share the full width so none is cut off; from sm it is a plain .seg. */
+  @media (max-width: 639px) {
+    .seg-fill { display: flex; width: 100%; }
+    .seg-fill > * { flex: 1 1 auto; justify-content: center; padding: 0 0.5rem; }
+  }
+
   /* View tabs: the top tier of a screen (which view you are in). Full width, equal halves, an ink
    * underline under the current one; deliberately unlike .seg, which picks options inside a view. */
   .view-tabs { display: flex; border-bottom: 1px solid var(--ink-200); }
@@ -706,6 +712,14 @@ body[data-theme="paper"] .col {
   display: flex;
   flex-direction: column;
   gap: 5px;
+}
+/* Phone: the two columns stack and the wires go (they would cross the stack); lit/dim and the
+ * "Who can see this?" panel still say what reaches what. */
+@media (max-width: 639px) {
+  body[data-theme="paper"] .bay { padding: 12px; }
+  body[data-theme="paper"] .bay-svg { display: none; }
+  body[data-theme="paper"] .cols { flex-direction: column; gap: 20px; }
+  body[data-theme="paper"] .col { width: 100%; }
 }
 body[data-theme="paper"] .col h2 {
   font-size: var(--text-meta);

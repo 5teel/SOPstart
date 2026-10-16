@@ -93,6 +93,7 @@ Distilled rules below. **Full dated log with the stories: `docs/LEARNINGS.md` â€
 - One classifier per question in one module; `step_number` is section-scoped.
 - After a new lazy module or layout import, run `npm run build` and record the gate number.
 - Judge a build by its exit code, never a grepped tail; when removing UI text, grep `scripts/` (bundle markers) as well as `tests/`.
+- A scroll box holding `sr-only` or absolute children needs `relative`, or they widen the page; icon redesigns bump the icon filenames (phones cache by URL).
 
 **Tests / evals**
 - Guards grep comments too: describe banned patterns in words; guards strip comments after normalising CRLF.

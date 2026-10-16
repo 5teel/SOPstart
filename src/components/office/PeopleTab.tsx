@@ -317,11 +317,12 @@ function AuthorityGrid({
   const TD = 'border-b border-ink-100 px-3 py-3 align-top text-ui'
   return (
     <div className="flex flex-col gap-3">
-      <div className="overflow-x-auto">
+      {/* relative: the sr-only labels are absolute and would otherwise escape the scroll box and widen the page */}
+      <div className="relative overflow-x-auto">
         <table data-testid="people-grid" className="w-full min-w-200 border-collapse">
           <thead>
             <tr>
-              <th className={TH}>Person</th>
+              <th className={`${TH} sticky left-0 z-10 bg-paper`}>Person</th>
               <th className={TH}>Role</th>
               <th className={TH}>Departments</th>
               <th className={TH}>Signs off work</th>
@@ -351,7 +352,7 @@ function AuthorityGrid({
                   }}
                   className="cursor-pointer hover:bg-paper-2 focus-visible:outline-2 focus-visible:outline-accent-step"
                 >
-                  <td className={`${TD} max-w-60`}>
+                  <td className={`${TD} sticky left-0 z-10 max-w-40 bg-paper sm:max-w-60`}>
                     <span className="block truncate font-semibold text-ink-900" title={nameOf(m)}>
                       {nameOf(m)}
                     </span>
@@ -586,35 +587,33 @@ export function PeopleTab({ onReceipt, siteName = '', onPinSop }: { onReceipt(r:
 
   return (
     <div data-testid="people-tab" className="flex flex-col gap-4 pt-3">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <span className="mono text-meta text-ink-600">
+      <div className="flex flex-wrap items-center gap-3">
+        <span className="mono flex-1 text-meta text-ink-600">
           {total === 1 ? '1 person' : `${total} people`} · {liveDepts === 1 ? '1 department' : `${liveDepts} departments`}
           {unplaced > 0 ? ` · ${unplaced} without a department` : ''}
         </span>
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="seg">
-            <button type="button" data-testid="people-view-chart" aria-pressed={view === 'chart'} onClick={() => setView('chart')}>
-              Chart
-            </button>
-            <button type="button" data-testid="people-view-departments" aria-pressed={view === 'departments'} onClick={() => setView('departments')}>
-              Departments
-            </button>
-            <button type="button" data-testid="people-view-authority" aria-pressed={view === 'authority'} onClick={() => setView('authority')}>
-              Who can do what
-            </button>
-          </span>
-          <div className="flex flex-col items-end gap-1">
-            <button
-              type="button"
-              data-testid="people-invite"
-              disabled={!isAdmin}
-              onClick={() => setInviteOpen((o) => !o)}
-              className="min-h-tap rounded-lg bg-ink-900 px-4 text-ui font-semibold text-paper disabled:opacity-50"
-            >
-              Invite someone
-            </button>
-            {!isAdmin && <span className="text-meta text-ink-500">Only an admin can invite people.</span>}
-          </div>
+        <span className="seg seg-fill order-last sm:order-none">
+          <button type="button" data-testid="people-view-chart" aria-pressed={view === 'chart'} onClick={() => setView('chart')}>
+            Chart
+          </button>
+          <button type="button" data-testid="people-view-departments" aria-pressed={view === 'departments'} onClick={() => setView('departments')}>
+            Departments
+          </button>
+          <button type="button" data-testid="people-view-authority" aria-pressed={view === 'authority'} onClick={() => setView('authority')}>
+            Who can do what
+          </button>
+        </span>
+        <div className="flex flex-col items-end gap-1">
+          <button
+            type="button"
+            data-testid="people-invite"
+            disabled={!isAdmin}
+            onClick={() => setInviteOpen((o) => !o)}
+            className="min-h-tap rounded-lg bg-ink-900 px-4 text-ui font-semibold text-paper disabled:opacity-50"
+          >
+            Invite someone
+          </button>
+          {!isAdmin && <span className="text-meta text-ink-500">Only an admin can invite people.</span>}
         </div>
       </div>
 

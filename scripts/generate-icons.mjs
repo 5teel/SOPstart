@@ -1,5 +1,6 @@
 // Renders the SOP chip + hazard tape (sketch 010 wordmark) into the favicon and PWA icons.
 // Run from the repo root after a wordmark change: node scripts/generate-icons.mjs
+// Bump the -vN suffix (here, manifest.ts and layout.tsx) on every redesign: phones cache home-screen icons by URL.
 import { writeFileSync } from 'node:fs'
 import { chromium } from 'playwright'
 import sharp from 'sharp'
@@ -32,10 +33,10 @@ const mask = await shot(512, 0, 0.8)
 await b.close()
 
 const png = (buf, s) => sharp(buf).resize(s, s).png().toBuffer()
-writeFileSync(P + 'public/icons/icon-192-any.png', await png(tab, 192))
-writeFileSync(P + 'public/icons/icon-192.png', await png(mask, 192))
-writeFileSync(P + 'public/icons/icon-512.png', mask)
-writeFileSync(P + 'public/apple-touch-icon.png', await png(bleed, 180))
+writeFileSync(P + 'public/icons/icon-192-any-v2.png', await png(tab, 192))
+writeFileSync(P + 'public/icons/icon-192-v2.png', await png(mask, 192))
+writeFileSync(P + 'public/icons/icon-512-v2.png', mask)
+writeFileSync(P + 'public/apple-touch-icon-v2.png', await png(bleed, 180))
 
 // ICO with PNG payloads (16/32/48)
 const sizes = [16, 32, 48], imgs = await Promise.all(sizes.map(s => png(tab, s)))

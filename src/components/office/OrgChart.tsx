@@ -559,7 +559,7 @@ export function OrgChart({
     <div className="flex flex-col gap-3" data-testid="org-chart">
       <div className="flex flex-wrap items-center gap-2 rounded-lg border border-ink-200 bg-paper-1 px-3 py-2">
         <span className="text-meta text-ink-500">Show</span>
-        <span className="seg seg-quiet">
+        <span className="seg seg-quiet seg-fill">
           {([['people', 'People'], ['who', 'Who can…'], ['training', 'Training'], ['access', 'SOP access']] as const).map(([k, t]) => (
             <button key={k} type="button" data-testid={`org-lens-${k}`} aria-pressed={lens === k} onClick={() => setLens(k)}>
               {t}

@@ -755,6 +755,12 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       await chart.getByTestId('org-lens-people').click()
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true)
       await shot(page, 'adr20-chart-phone')
+      // Who can do what scrolls inside its own box; its hidden labels once widened the page to 739 px.
+      await page.getByTestId('people-view-authority').click()
+      await expect(page.getByTestId('people-grid')).toBeVisible()
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true)
+      await shot(page, 'adr20-grid-phone')
+      await page.getByTestId('people-view-chart').click()
       expect(errors).toEqual([])
       await page.close()
     })

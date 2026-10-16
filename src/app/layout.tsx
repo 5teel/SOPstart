@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   description: PRODUCT_DESCRIPTION,
   // favicon.ico comes from src/app/favicon.ico (file convention)
   icons: {
-    icon: [{ url: '/icons/icon-192-any.png', sizes: '192x192', type: 'image/png' }],
-    apple: '/apple-touch-icon.png',
+    icon: [{ url: '/icons/icon-192-any-v2.png', sizes: '192x192', type: 'image/png' }],
+    apple: '/apple-touch-icon-v2.png',
   },
 }
 
