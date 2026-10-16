@@ -796,8 +796,7 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
         await role.getByTestId('org-role-edit').click()
         await role.getByTestId('org-role-unseat').click()
         await expect(role.getByTestId('org-person')).toHaveCount(0, SLOW)
-        // Remove takes two clicks.
-        await role.getByTestId('org-role-edit').click()
+        // Remove takes two clicks; the edit form is still open after Take out.
         await role.getByTestId('org-role-remove').click()
         await expect(role.getByTestId('org-role-remove')).toContainText(`Remove ${roleName}`)
         await role.getByTestId('org-role-remove').click()
