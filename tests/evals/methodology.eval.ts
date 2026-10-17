@@ -11,9 +11,11 @@ const SLOW = { timeout: 30_000 }
 test.describe('methodology page', () => {
   test.skip(!EVAL_ENV_READY, 'eval env not configured')
 
-  test('admin: Settings links to it, it reads in plain words, at desktop and phone width', async ({ page, context }) => {
+  test('admin: the menu opens Settings, Settings links to it, it reads in plain words, at desktop and phone width', async ({ page, context }) => {
     await signInAs(context, 'siteAdmin')
-    await page.goto('/admin/settings')
+    await page.goto('/')
+    await page.getByTestId('shell-settings').click()
+    await expect(page).toHaveURL(/\/admin\/settings$/, SLOW)
     await page.getByRole('link', { name: /How SOPs are improved/ }).click()
     await expect(page).toHaveURL(/\/admin\/settings\/methodology$/, SLOW)
     const body = page.getByTestId('methodology')
@@ -31,5 +33,6 @@ test.describe('methodology page', () => {
     await page.goto('/admin/settings/methodology')
     await expect(page.getByTestId('methodology')).toHaveCount(0)
     await expect(page.getByTestId('home')).toBeVisible(SLOW)
+    await expect(page.getByTestId('shell-settings')).toHaveCount(0)
   })
 })

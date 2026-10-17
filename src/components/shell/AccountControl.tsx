@@ -3,7 +3,7 @@
 /**
  * Quiet account control at the foot of the menu (D-15b): who you are and where,
  * then one link per row -- an account menu, not a navigation bar. Admins also get
- * the two maps (Pathways, Feedback). Sign out is last and separated. Someone in more than
+ * Settings and the two maps (Pathways, Feedback). Sign out is last and separated. Someone in more than
  * one site picks the site here (2026-10-11); the page reloads into it.
  */
 import { useState } from 'react'
@@ -66,6 +66,9 @@ export function AccountControl({ email, isAdmin, org, orgId, sites = [] }: { ema
       </Link>
       {isAdmin && (
         <>
+          <Link href="/admin/settings" data-testid="shell-settings" className={LINK}>
+            Settings
+          </Link>
           <Link href="/pathways" className={LINK}>
             Pathways
           </Link>
