@@ -14,7 +14,7 @@ test.describe('methodology page', () => {
   test('admin: the menu opens Settings, Settings links to it, it reads in plain words, at desktop and phone width', async ({ page, context }) => {
     await signInAs(context, 'siteAdmin')
     await page.goto('/')
-    await page.getByTestId('shell-settings').click()
+    await page.getByTestId('shell-settings').filter({ visible: true }).click()
     await expect(page).toHaveURL(/\/admin\/settings$/, SLOW)
     await page.getByRole('link', { name: /How SOPs are improved/ }).click()
     await expect(page).toHaveURL(/\/admin\/settings\/methodology$/, SLOW)
