@@ -220,7 +220,11 @@ export const JOURNEYS: Journey[] = [
       { id: 'tabs', type: 'decision', label: 'Which tab?', branches: [
         { label: 'Inbox (supervisor, admin, safety manager)', to: 'ok' },
         { label: 'Requests (the same roles)', to: 'requests' },
+        { label: 'Mine - their own record (the same roles; a worker has only this, called My record)', to: 'mine' },
         { label: 'Decisions (admin, safety manager)', to: 'decisions' },
+      ] },
+      { id: 'mine', type: 'screen', label: 'Sign-offs - Mine', route: '/', detail: 'Your own finished SOPs and their sign-off state. See "My record, notifications and requests".', branches: [
+        { label: 'Done', to: 'e' },
       ] },
       { id: 'requests', type: 'screen', label: 'Sign-offs - Requests', route: '/', detail: 'Open requests newest first: Accept or Decline with a reason. Agent-raised rows carry the agent chip; the answer is logged and the asker told.', branches: [
         { label: 'Done', to: 'e' },
@@ -245,7 +249,7 @@ export const JOURNEYS: Journey[] = [
     summary: 'A supervisor watches a worker perform a SOP in person and records a verdict + optional note — supervisor-initiated counter-evidence to worker-initiated completions (D-01/D-03).',
     steps: [
       { id: 's', type: 'start', label: 'Watched a worker perform a SOP' },
-      { id: 'team', type: 'screen', label: 'Training matrix — person record', route: '/', detail: 'In the Training section (admins and safety managers). Click a matrix cell to open the record for that person and SOP; "Record observation" pre-fills the worker. Supervisors have no Record observation button yet (a gap recorded in the capability matrix).' },
+      { id: 'team', type: 'screen', label: 'Training lanes, by person', route: '/', detail: 'In the Training section (admins and safety managers). Click a face in the lanes to switch to that person; "+ Record observation" in the By person header, or on their training record, pre-fills the worker. Supervisors have no Training section and no Record observation button yet (a gap recorded in the capability matrix).' },
       { id: 'modal', type: 'screen', label: 'Record observation modal', detail: 'Shared modal: worker chip, SOP picker (assigned-first), verdict buttons, optional note. "Permanent record — cannot be edited or deleted after saving" (D-08).' },
       { id: 'assessor-check', type: 'decision', label: 'Recording "performed to SOP"? Is the recorder a signed-off assessor on this SOP? (ASR-01 gate — "needs support" is never gated, D-04)', branches: [
         { label: 'Signed off — proceed as normal', to: 'save' },
@@ -267,7 +271,7 @@ export const JOURNEYS: Journey[] = [
     steps: [
       { id: 's', type: 'start', label: 'Supervisor tapped "Request assessment"' },
       { id: 'notify', type: 'action', label: 'Request sent', detail: 'requestAssessorReview() notifies every admin/safety manager in the org; repeat taps are deduped.' },
-      { id: 'team', type: 'screen', label: 'Training page — assessment requests', route: '/', detail: 'In the Training section. AssessmentRequestsPanel lists open requests: who asked, which SOP.' },
+      { id: 'team', type: 'screen', label: 'Training - assessment requests', route: '/', detail: 'At the top of the Training section, open requests: who asked, which SOP. The person also sits in the Waiting for you lane for that SOP.' },
       { id: 'assess', type: 'action', label: 'Assess now', detail: 'Opens the same Record observation modal, preset to that person + SOP.' },
       { id: 'save', type: 'action', label: 'Save observation', detail: 'A "performed to SOP" verdict here signs the supervisor off — the assessor gate resolves for them with no further overrides needed (D-05).' },
       { id: 'e', type: 'end', label: 'Request resolved' },
@@ -296,7 +300,7 @@ export const JOURNEYS: Journey[] = [
     summary: 'An admin signs in and lands on the home - search and the SOP list beside the site map. The section menu (Sign-offs, People, Training, Manage SOPs) carries the admin surfaces; every page they open has a Back to the home.',
     steps: [
       { id: 's', type: 'start', label: 'Signed in as admin / safety manager' },
-      { id: 'home', type: 'screen', label: 'Admin home', route: '/', detail: 'roleHome(admin) lands here. The section menu opens Sign-offs (Inbox, Requests, Decisions), People (people and access), Training and Manage SOPs (drafts, New SOP, the site editor). Profile, Sign out, Pathways and Feedback sit in the account control at the foot of the menu.' },
+      { id: 'home', type: 'screen', label: 'Admin home', route: '/', detail: 'roleHome(admin) lands here. The section menu opens Sign-offs (Inbox, Requests, Mine, Decisions), People (the chart, and SOP access), Training and Manage SOPs (drafts, New SOP, the site editor). Profile, Settings, Pathways, Feedback and Sign out sit in the account control at the foot of the menu (Settings, Pathways and Feedback for admins and safety managers only).' },
       { id: 'menu', type: 'decision', label: 'Open another admin surface? (the section menu: Sign-offs · Manage SOPs · People · Training; Settings is a page of its own, opened from the account menu)', branches: [
         { label: 'Manage SOPs', to: 'sops' },
         { label: 'Sign-offs', to: 'gov' },
@@ -307,7 +311,7 @@ export const JOURNEYS: Journey[] = [
       ] },
       { id: 'gov', type: 'screen', label: 'Sign-offs - Inbox', route: '/', detail: 'The Sign-offs section opens on the Inbox: one action per row - no owner, review overdue, awaiting approval, sign-off, stuck converting - counted chips and an All clear empty state (Phase 54 D-01/D-02, Phase 59). The old /governance address redirects here.' },
       { id: 'sops', type: 'screen', label: 'Manage SOPs - SOPs that are not published yet', route: '/', detail: 'Manage SOPs lists every SOP that is not published yet, with New SOP; Edit opens the SOP in the focus editor. Who sees a SOP is edited on the SOP access tab of People.' },
-      { id: 'team', type: 'screen', label: 'People - people and roles', route: '/', detail: 'The People section opens on a department board: every department with its people grouped by role, each marked Signs off, Assigns or Approves. Who can do what shows one row per person and one column per authority. Clicking a person opens the person sheet (role, departments, the workers a supervisor signs off, objective, removal). The old /admin/team address redirects here.' },
+      { id: 'team', type: 'screen', label: 'People - the chart', route: '/', detail: 'The People section opens on the chart (ADR-0020): departments, job roles with their seats, and people. Departments and Who can do what are the other two views. Clicking a person opens the person sheet (role, departments, the workers a supervisor signs off, objective, removal). See "People, authority and access". The old /admin/team address redirects here.' },
       { id: 'site', type: 'screen', label: 'Site map - edit mode', route: '/', detail: 'The plant-floor scene and its machines (Phase 51) - draw/name/tag machines, link SOPs to them. In Manage SOPs with view=site; the old /admin/site address redirects there.' },
       { id: 'settings', type: 'screen', label: 'Settings hub', route: '/admin/settings', detail: 'Opened from Settings in the account menu (admins and safety managers). Groups AI Settings, How SOPs are improved, a link to Departments (site edit mode), the AI agent layer, and the approval-chain editor under one home.' },
       { id: 'method', type: 'screen', label: 'How SOPs are improved', route: '/admin/settings/methodology', detail: 'Reached from the Settings hub (admins and safety managers). A plain-words account of the clear version (ADR-0015): the four stages, what comes first, what the rewrite changes and never does, open items for the owner, and the second check.' },
@@ -509,7 +513,7 @@ export const JOURNEYS: Journey[] = [
       { id: 's', type: 'start', label: 'Set up the team' },
       { id: 'chart', type: 'screen', label: 'People - the chart', route: '/', detail: 'The People section (admins and safety managers only) opens on the chart (ADR-0020): the site, its departments (nested ones inside their parent), job roles with filled-of-planned seats, and people as faces. Show switches what it says: People (open a supervisor and the people they look after light up), Who can (sign off, approve, publish, manage people; a department says when nobody can), Training (a bar on everyone in an open department), SOP access (pick a SOP: who can see it; Change who sees it opens the SOP access tab pinned to it). Departments fold to one row; Open all / Close all and Find a person keep a large site readable.' },
       { id: 'roles', type: 'action', label: 'Add or change a job role', detail: 'In an open department: + Add a role (name and seats); Edit a role to rename it, change its seats, take people out or remove it (a second click says who leaves it); an empty seat puts someone from the department in it or invites someone new (ADR-0021). A job role never changes anyone\'s access level.' },
-      { id: 'team', type: 'screen', label: 'People & authority - the department board', route: '/', detail: 'The Departments view of the People section: each department with its people grouped by role, each marked Signs off, Assigns or Approves. People with no department come first. Invite by email from the header (admin only).' },
+      { id: 'team', type: 'screen', label: 'People - the Departments view', route: '/', detail: 'The Departments view of the People section: each department with its people grouped by role, each marked Signs off, Assigns or Approves. People with no department come first. Invite by email from the header (admin only).' },
       { id: 'grid', type: 'screen', label: 'Who can do what', route: '/', detail: 'The same people as a grid: departments, signs off work, assigns SOPs, approves SOPs (by category), publishes, manages people.' },
       { id: 'sheet', type: 'action', label: 'Open a person', detail: 'The person sheet says in plain words what they can do. An admin changes the role, sets departments (and a department owner), ticks the workers a supervisor signs off, sets an objective, or removes them.' },
       { id: 'access', type: 'screen', label: 'SOP access', route: '/', detail: 'The SOP access tab: who can see which SOPs, in plain language. See "Choose who sees a SOP".' },
@@ -640,7 +644,7 @@ export const JOURNEYS: Journey[] = [
     summary: 'The team reviews design directions and before/after changes and leaves structured feedback for analysis.',
     steps: [
       { id: 's', type: 'start', label: 'Asked to review' },
-      { id: 'menu', type: 'action', label: 'Open the account control', detail: 'Pathways + Feedback live in the account control at the foot of the list — internal team tooling, admin only (UX-08).' },
+      { id: 'menu', type: 'action', label: 'Open the account control', detail: 'Pathways and Feedback live in the account control at the foot of the menu: internal team tooling, admins and safety managers only (UX-08).' },
       { id: 'paths', type: 'screen', label: 'Review current workflows', route: '/pathways', detail: 'See how the app works today (this page).' },
       { id: 'uat', type: 'screen', label: 'Feedback hub', route: '/uat' },
       { id: 'open', type: 'action', label: 'Open a test → compare before/after' },
@@ -654,12 +658,11 @@ export const JOURNEYS: Journey[] = [
     group: 'Everyone',
     persona: 'Everyone',
     title: 'Manage your account',
-    summary: 'A member views and updates their own profile and preferences.',
+    summary: 'A member opens Profile from the account control to see their account and their training evidence. Nothing on it is edited.',
     steps: [
       { id: 's', type: 'start', label: 'Open your account' },
-      { id: 'profile', type: 'screen', label: 'Profile', route: '/profile', detail: 'Your details, preferences, and sign out.' },
-      { id: 'save', type: 'action', label: 'Update details' },
-      { id: 'e', type: 'end', label: 'Account updated' },
+      { id: 'profile', type: 'screen', label: 'Profile', route: '/profile', detail: 'Your email, Observations about you, My competency, and Sign out. Read-only.' },
+      { id: 'e', type: 'end', label: 'Account checked' },
     ],
   },
   {

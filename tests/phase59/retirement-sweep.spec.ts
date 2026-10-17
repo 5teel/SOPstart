@@ -88,7 +88,7 @@ test.describe('retire: governance, team and access pages (59-14)', () => {
     'src/components/admin/RoleAssignmentTable.tsx',
     'src/lib/org-model/auto-layout.ts',
   ]
-  const SYMBOLS = /\b(GovernanceInbox|GovernanceQueueRow|TeamViewShell|OrgChartCanvas|OrgColumnsBoard|RoleAssignmentTable|ViewToggle|layoutOrgTree|createRole|assignRoleMembers|setDepartmentArea)\b/
+  const SYMBOLS = /\b(GovernanceInbox|GovernanceQueueRow|TeamViewShell|OrgChartCanvas|OrgColumnsBoard|RoleAssignmentTable|ViewToggle|layoutOrgTree|assignRoleMembers|setDepartmentArea)\b/
 
   test('the three page directories are gone', () => {
     for (const d of GONE_DIRS) expect(fs.existsSync(path.join(ROOT, d)), d).toBe(false)
@@ -110,10 +110,16 @@ test.describe('retire: governance, team and access pages (59-14)', () => {
     ]) expect(fs.existsSync(path.join(ROOT, f)), f).toBe(true)
   })
 
-  test('org-model.ts exports listOrgTree and no write action (T-59-52)', () => {
+  // ADR-0021 (2026-10-16) brought job-role writes back to org-model.ts (createRole is the chart's
+  // + Add a role); T-59-52 now holds as: only those four writes, each behind the admin guard first.
+  test('org-model.ts exports listOrgTree and only the ADR-0021 role writes, each admin-guarded (T-59-52)', () => {
     const src = stripComments(read('src/actions/org-model.ts'))
-    expect(src.match(/^export (async )?function \w+/gm)).toEqual(['export async function listOrgTree'])
-    expect(src).not.toMatch(/\.(insert|update|delete|upsert)\(/)
+    const names = (src.match(/^export async function \w+/gm) ?? []).map((m) => m.split(' ').pop())
+    expect(names).toEqual(['listOrgTree', 'createRole', 'updateRole', 'removeRole', 'setRoleSeat'])
+    for (const n of names) {
+      const at = src.indexOf(`export async function ${n}`)
+      expect(src.slice(at, at + 400), n).toContain('await requireAdmin()')
+    }
   })
 
   test('no src file links to the retired addresses (anchored on href or a router call, so the proxy source strings are not counted)', () => {
