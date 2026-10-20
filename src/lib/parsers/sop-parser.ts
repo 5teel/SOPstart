@@ -135,7 +135,7 @@ The source may be provided as a STRUCTURED document with explicit block markers.
 - \`CAPTION (for IMG N): <text>\` — a caption describing image N.
 - \`TABLE #<n> (<R> rows)\` … \`END TABLE #<n>\` — a table. Each row is one line.
 - Inside a table: \`HEADER: c0=«…» | c1=«…» | …\` or \`ROW <i>: c0=«…» | c1=«…» [IMG N]\` — cells delimited by \`|\`. Images inside \`c<col>=…\` belong to THAT cell only.
-- After a procedural table opens, you may see hints like \`-- PROCEDURAL: stepCol=0 imagesCol=1 commentsCol=2\`. When that hint is present, the step instruction is in cell c0 of each row and the images for that step are in cell c1 of the SAME row.
+- After a procedural table opens, you may see hints like \`-- PROCEDURAL: stepCol=0 imagesCol=1 commentsCol=2\`. When that hint is present, the step instruction is in cell c0 of each row and the images for that step are in cell c1 of the SAME row. Text in the comments column (often headed "Plant Specific") is a note for that step: put it in \`tip\`, never in \`warning\` or \`caution\`, unless the cell itself starts with WARNING, CAUTION or DANGER.
 
 ### IMAGES — Attribute every [IMG N] token using structural containment
 You MUST populate \`image_indexes\` on each step using the structural location of \`[IMG N]\` tokens — NOT by stream proximity.

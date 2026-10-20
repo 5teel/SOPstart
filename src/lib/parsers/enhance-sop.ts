@@ -7,6 +7,7 @@ import { llmToolCall, type LlmTool } from '@/lib/ai/llm'
 import { SOP_TOOL, toParsedSop } from './sop-parser'
 import { ENHANCE_RULES, ORDER_JUDGEMENT, ENHANCE_RISKS } from './enhance-rules'
 import { runJevChecks, type JevSummary } from './jev-checks'
+import { pictogramLabels, placeSigns, type Pictogram } from './clear-signs'
 
 export interface EnhanceChange {
   kind: 'split' | 'moved' | 'grouped' | 'reworded' | 'deduplicated' | 'relocated' | 'removed_boilerplate' | 'placeholder' | 'conflict_flagged' | 'other'
@@ -185,7 +186,9 @@ export interface ClearVersion {
     type: string
     title: string
     content: string | null
-    steps: Array<{ text: string; warning: string | null; caution: string | null; tip: string | null; image_paths: string[] }>
+    /** ADR-0023: the source's hazard pictograms, on the hazards section. */
+    image_paths?: string[]
+    steps: Array<{ text: string; warning: string | null; caution: string | null; tip: string | null; image_paths: string[]; signs?: Pictogram[] }>
   }>
   changes: EnhanceChange[]
   openItems: string[]
@@ -228,6 +231,13 @@ export async function writeClearVersion(
     check: e.check,
     jev: e.jev,
   }
+  // ADR-0023: the hazard sections' pictograms (parse attaches them to the section), signs placed on steps by Jev.
+  const labels = pictogramLabels(args.sourceText)
+  const pictos = args.direct.sections
+    .filter((s) => s.type === 'hazards')
+    .flatMap((s) => s.image_indexes ?? [])
+    .flatMap((n) => (path.has(n) ? [{ label: labels.get(n) ?? null, path: path.get(n)! }] : []))
+  await placeSigns(clear, pictos)
   const { error } = await admin
     .from('sops')
     .update({ clear_version: clear, clear_approved_at: null, clear_approved_by: null })

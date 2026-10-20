@@ -47,24 +47,27 @@ const byOrder = <T extends { id: string; sort_order: number }>(a: T, b: T) =>
 
 const isBefore = (kind: FocusKind) => kind === 'hazard' || kind === 'ppe'
 
-/** D-07: every hazard and PPE step first (source order), then every section's remaining steps in sequence. */
+/**
+ * D-07 as narrowed by ADR-0023: the hazard and PPE steps of sections made only of hazard / PPE steps come
+ * first (source order) as "Before you start"; a hazard or PPE step inside a section of steps stays on the
+ * step it guards. Then every section's remaining steps in sequence.
+ */
 export function walkOrder<S extends FocusStepLike>(
   sections: readonly FocusSectionLike[],
   steps: readonly S[],
 ): WalkEntry<S>[] {
   const flat: Omit<WalkEntry<S>, 'index'>[] = []
+  const up = new Set<Omit<WalkEntry<S>, 'index'>>()
   for (const section of [...sections].sort(byOrder)) {
     const own = steps.filter((s) => s.section_id === section.id).sort(byOrder)
-    own.forEach((step, i) =>
-      flat.push({
-        step,
-        groupLabel: isBefore(step.kind) ? BEFORE_YOU_START : section.title,
-        sectionTitle: section.title,
-        sectionPos: i + 1,
-      }),
-    )
+    const before = own.every((s) => isBefore(s.kind))
+    own.forEach((step, i) => {
+      const e = { step, groupLabel: before ? BEFORE_YOU_START : section.title, sectionTitle: section.title, sectionPos: i + 1 }
+      flat.push(e)
+      if (before) up.add(e)
+    })
   }
-  const ordered = [...flat.filter((e) => isBefore(e.step.kind)), ...flat.filter((e) => !isBefore(e.step.kind))]
+  const ordered = [...flat.filter((e) => up.has(e)), ...flat.filter((e) => !up.has(e))]
   return ordered.map((e, i) => ({ ...e, index: i + 1 }))
 }
 

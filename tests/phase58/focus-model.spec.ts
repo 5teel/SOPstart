@@ -27,15 +27,21 @@ const st = (id: string, section_id: string, kind: FocusKind, sort_order: number,
   sort_order,
 })
 
-const sections = [sec('A', 'Mirror Cleaning', 0), sec('B', 'Shutdown', 1)]
-const steps = [st('s1', 'A', 'step', 0), st('h1', 'A', 'hazard', 1), st('p1', 'B', 'ppe', 0), st('c1', 'B', 'check', 1)]
+const sections = [sec('A', 'Mirror Cleaning', 0), sec('B', 'Shutdown', 1), sec('H', 'Safety', 2)]
+const steps = [st('s1', 'A', 'step', 0), st('h1', 'H', 'hazard', 0), st('p1', 'H', 'ppe', 1), st('x1', 'B', 'step', 0), st('c1', 'B', 'check', 1)]
 
 test.describe('FOC-03 walk order', () => {
-  test('hazard and PPE first, then every section in sequence; index is 1-based', () => {
+  test('hazard / PPE-only sections first, then every section in sequence; index is 1-based', () => {
     const order = walkOrder(sections, steps)
-    expect(order.map((e) => e.step.id)).toEqual(['h1', 'p1', 's1', 'c1'])
-    expect(order.map((e) => e.index)).toEqual([1, 2, 3, 4])
-    expect(order.map((e) => e.groupLabel)).toEqual(['Before you start', 'Before you start', 'Mirror Cleaning', 'Shutdown'])
+    expect(order.map((e) => e.step.id)).toEqual(['h1', 'p1', 's1', 'x1', 'c1'])
+    expect(order.map((e) => e.index)).toEqual([1, 2, 3, 4, 5])
+    expect(order.map((e) => e.groupLabel)).toEqual(['Before you start', 'Before you start', 'Mirror Cleaning', 'Shutdown', 'Shutdown'])
+  })
+
+  test('ADR-0023: a caution inside a section of steps stays before the step it guards', () => {
+    const own = [st('k1', 'A', 'hazard', 0), st('k2', 'A', 'step', 1), st('k3', 'A', 'step', 2)]
+    const order = walkOrder([sec('A', 'Measure', 0)], own)
+    expect(order.map((e) => [e.step.id, e.groupLabel])).toEqual([['k1', 'Measure'], ['k2', 'Measure'], ['k3', 'Measure']])
   })
 
   test('no hazard/PPE keeps section then sort order; equal sort_order falls back to id', () => {
@@ -46,7 +52,7 @@ test.describe('FOC-03 walk order', () => {
   test('railNumber counts within the section, never from step_number', () => {
     const order = walkOrder(sections, steps)
     const h1 = order.find((e) => e.step.id === 'h1')!
-    expect(railNumber(h1)).toBe('Mirror Cleaning · 2')
+    expect(railNumber(h1)).toBe('Safety · 1')
     expect(railNumber(order.find((e) => e.step.id === 'c1')!)).toBe('Shutdown · 2')
   })
 
@@ -56,7 +62,7 @@ test.describe('FOC-03 walk order', () => {
 })
 
 test.describe('FOC-04 reachability', () => {
-  const order = walkOrder(sections, steps) // h1 p1 s1 c1
+  const order = walkOrder(sections, steps) // h1 p1 s1 x1 c1
 
   test('default: done steps and the first not-done step only', () => {
     const done = new Set(['h1'])

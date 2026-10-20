@@ -16,6 +16,7 @@ import {
   type FocusStepDraft,
 } from '@/lib/sop/convert'
 import type { Section } from '@/lib/sop/sections'
+import { pictogramLabels, placeSigns } from '@/lib/parsers/clear-signs'
 
 type Row = Partial<Section['sop_steps'][number]>
 
@@ -359,5 +360,20 @@ test.describe('registry parity', () => {
       'StepBlock', 'StepWithPhotosBlock', 'TextBlock', 'VisualBlock', 'VoiceNoteBlock', 'ZoneBlock',
     ]
     expect([...HANDLED_TYPES].sort()).toEqual([...stored].sort())
+  })
+})
+
+test.describe('ADR-0023 clear-version signs', () => {
+  test('pictogram labels come from the structured source by image index', () => {
+    const m = pictogramLabels('ROW 1: c0=«Danger» [IMG 0] | c1=«Hot Surface» [IMG 3] | c2=«(empty)»')
+    expect([...m]).toEqual([[0, 'Danger'], [3, 'Hot Surface']])
+  })
+
+  test('pictograms land on the clear hazards section; unlabelled ones never reach Jev', async () => {
+    const step = { text: 'Touch the die with the probe.', warning: null, caution: null, tip: null, image_paths: [] }
+    const clear = { sections: [{ type: 'procedure', title: 'Measure', content: null, steps: [step] }, { type: 'hazards', title: 'Hazards', content: 'x', steps: [] }], openItems: [] } as never
+    await placeSigns(clear, [{ label: null, path: 'p/img_0.png' }])
+    expect((clear as { sections: Array<{ image_paths?: string[] }> }).sections[1].image_paths).toEqual(['p/img_0.png'])
+    expect(step).not.toHaveProperty('signs')
   })
 })

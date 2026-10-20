@@ -129,6 +129,7 @@ export function ClearView({ sopId, clear, approvedAt, canApprove, signed }: { so
             {s.type === 'ppe' && <KindChip kind="ppe" />}
           </p>
           {s.content && <p className="whitespace-pre-line py-2 text-reading text-ink-900">{s.content}</p>}
+          {(s.image_paths ?? []).length > 0 && <Signs urls={(s.image_paths ?? []).flatMap((p) => (signed.has(p) ? [{ url: signed.get(p)!, label: null }] : []))} />}
           <ol className="m-0 list-none p-0">
             {s.steps.map((t, ti) => (
               <li key={ti} data-testid="clear-step" className="flex gap-3 border-b border-ink-200 py-3">
@@ -141,6 +142,7 @@ export function ClearView({ sopId, clear, approvedAt, canApprove, signed }: { so
                     </p>
                   )}
                   <p className="text-reading text-ink-900">{t.text}</p>
+                  {(t.signs ?? []).length > 0 && <Signs urls={(t.signs ?? []).flatMap((g) => (signed.has(g.path) ? [{ url: signed.get(g.path)!, label: g.label }] : []))} />}
                   {t.caution && (
                     <p className="text-ui text-ink-900">
                       <span className="mr-1 font-semibold">Caution</span>
@@ -164,6 +166,20 @@ export function ClearView({ sopId, clear, approvedAt, canApprove, signed }: { so
             ))}
           </ol>
         </section>
+      ))}
+    </div>
+  )
+}
+
+/** ADR-0023: hazard pictograms as a row of signs; a step's signs carry their names. */
+function Signs({ urls }: { urls: Array<{ url: string; label: string | null }> }) {
+  return (
+    <div data-testid="clear-signs" className="flex flex-wrap gap-2">
+      {urls.map(({ url, label }) => (
+        <figure key={url} className="m-0 flex w-18 flex-col items-center gap-1">
+          <img src={url} alt={label ?? ''} loading="lazy" decoding="async" className="size-18 rounded-lg border border-ink-200 bg-paper-1 object-contain p-1" />
+          {label && <figcaption className="text-center text-meta text-ink-700">{label}</figcaption>}
+        </figure>
       ))}
     </div>
   )

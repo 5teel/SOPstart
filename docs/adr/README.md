@@ -37,3 +37,4 @@ code, plans and phases follow it until a later ADR supersedes it.
 | [0020](0020-people-chart.md) | People opens on one org chart that collapses and answers every People question | Accepted | `tests/phase63/org-chart.spec.ts` · `tests/evals/office.eval.ts` |
 | [0021](0021-job-roles-on-the-chart.md) | Job roles are edited on the People chart | Accepted | `tests/phase63/job-roles.spec.ts` · `tests/evals/office.eval.ts` |
 | [0022](0022-jev-checks-the-clear-version.md) | Jev checks the clear version first; the LLM check settles its flags | Accepted | `tests/lint/jev-one-door.spec.ts` · `tests/evals/clear-version.eval.ts` |
+| [0023](0023-hazards-where-they-apply.md) | Hazards show where they apply: step cautions stay on their step; the clear version places pictograms on steps with Jev, listed for approval | Accepted | `tests/phase58/focus-model.spec.ts` · `tests/evals/hazard-pictograms.eval.ts` |

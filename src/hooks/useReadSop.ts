@@ -80,7 +80,7 @@ export const readSopQuery = (sopId: string | null) => ({
 
     // Step pictures: one batched signing call, under the reader's session, alongside the standards.
     const rawSteps = rows(st as { data: Omit<ReadStep, 'image_urls'>[] | null; error: Fail })
-    const clearPaths = (row.clear_version?.sections ?? []).flatMap((s) => s.steps.flatMap((t) => t.image_paths))
+    const clearPaths = (row.clear_version?.sections ?? []).flatMap((s) => [...(s.image_paths ?? []), ...s.steps.flatMap((t) => [...t.image_paths, ...(t.signs ?? []).map((g) => g.path)])])
     const paths = [...new Set([...rawSteps.flatMap((s) => s.image_paths ?? []), ...clearPaths])]
     const [std, att, urls] = await Promise.all([
       supabase.from('standards').select('id, name').eq('organisation_id', row.organisation_id),
