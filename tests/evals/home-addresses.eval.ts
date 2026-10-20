@@ -284,14 +284,14 @@ test.describe.serial('Phase 63 -- home addresses (deployed)', () => {
     })
   })
 
-  test('HOME-05 signed-out / still shows the promo reel', async ({ browser }) => {
+  test('HOME-05 signed-out / still shows the homepage', async ({ browser }) => {
     test.setTimeout(120_000)
     const ctx = await browser.newContext({ viewport: DESKTOP, baseURL: process.env.EVAL_BASE_URL })
     try {
       const page = await ctx.newPage()
       await page.goto('/')
       await expect(page).toHaveURL(/\/welcome$/, SLOW)
-      await expect(page.getByTestId('promo-reel')).toHaveAttribute('data-scene', /.+/, { timeout: 25_000 })
+      await expect(page.getByTestId('homepage')).toBeVisible({ timeout: 25_000 })
       await expect(page.getByTestId('home')).toHaveCount(0)
       await shot(page, '63-addr-signed-out')
     } finally {

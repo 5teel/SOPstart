@@ -29,7 +29,7 @@
  *   retired URLs redirect to the one screen ................ home-addresses (old addresses and retired pages)
  *   real org overview and per-room zoom shots, read only ... EVAL-01 (real org map and list)
  *   pathways map reports zero unmapped screens ............. DOCS-01
- *   signed-out root shows the promo reel ................... home-addresses "signed-out root still shows the promo reel"
+ *   signed-out root shows the homepage ..................... home-addresses "signed-out / still shows the homepage"
  */
 import { test, expect, type Browser, type BrowserContext, type Locator, type Page } from '@playwright/test'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'

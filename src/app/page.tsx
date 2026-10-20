@@ -8,8 +8,8 @@ import { formatHome, legacyToHome, parseHome } from '@/lib/shell/home-state'
 import { PACKINGS, type Packing } from '@/lib/library/iso-layout'
 
 /**
- * `/` sends a visitor to the promo reel at /welcome (its own route, so the
- * reel never weighs on this page's bundle) and is the SOP-first home for a
+ * `/` sends a visitor to the homepage at /welcome (its own route, so the
+ * homepage never weighs on this page's bundle) and is the SOP-first home for a
  * signed-in member.
  * The branch is decided here, on the server, from the session -- never by a
  * client redirect (CLAUDE.md 2026-09-29). An old `?place=` address is redirected

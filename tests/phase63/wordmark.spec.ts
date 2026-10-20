@@ -57,6 +57,6 @@ test.describe('wordmark', () => {
 
   test('sign-in and welcome show the wordmark where the text logo was', () => {
     expect(read('src/app/(auth)/layout.tsx')).toContain('<Wordmark size="hero" />')
-    expect(read('src/components/welcome/PromoReel.tsx')).toContain('<Wordmark')
+    expect(read('src/components/welcome/Homepage.tsx')).toContain('<Wordmark')
   })
 })
