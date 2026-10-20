@@ -104,9 +104,18 @@ export function BrowseDocument({ data, order, from, supersededBy }: BrowseDocume
                         </p>
                       </div>
                     )}
-                    {step.image_urls.map((img) => (
-                      <img key={img.path} src={img.url} alt="" loading="lazy" decoding="async" className="max-h-96 w-full rounded-lg object-contain" />
-                    ))}
+                    {isSignal(step.kind) && step.image_urls.length > 0 ? (
+                      // Hazard / PPE pictograms read as a row of signs, not stacked photos.
+                      <div className="flex flex-wrap gap-2">
+                        {step.image_urls.map((img) => (
+                          <img key={img.path} src={img.url} alt="" loading="lazy" decoding="async" className="size-18 rounded-lg border border-ink-200 bg-paper-1 object-contain p-1" />
+                        ))}
+                      </div>
+                    ) : (
+                      step.image_urls.map((img) => (
+                        <img key={img.path} src={img.url} alt="" loading="lazy" decoding="async" className="max-h-96 w-full rounded-lg object-contain" />
+                      ))
+                    )}
                   </article>
                 </div>
               )

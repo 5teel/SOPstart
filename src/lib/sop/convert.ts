@@ -519,14 +519,46 @@ function fromRows(section: Section, before: SourceCounts): Slot[] {
   if (!lines.length) return out
   before.byType['row:content'] = (before.byType['row:content'] ?? 0) + 1
   if (isHazardSection(section)) {
-    before.hazardSources += lines.length
-    lines.forEach((l, i) => push({ kind: 'hazard', text: l, sourceKey: `row:${section.id}:content:${i}` }))
+    const items = hazardItems(lines)
+    // Section-level pictograms (parse attaches them with no step) sit on the list row, else the last row.
+    const pictograms = (section.sop_images ?? []).filter((i) => !i.step_id).map((i) => i.storage_path)
+    const list = items.findIndex((t) => t.list)
+    const at = list === -1 ? items.length - 1 : list
+    before.hazardSources += items.length
+    items.forEach((t, i) =>
+      push({ kind: 'hazard', text: t.text, imagePaths: i === at ? pictograms : [], sourceKey: `row:${section.id}:content:${i}` }),
+    )
   } else if (isPpeSection(section)) {
     before.ppeSources++
     before.ppeItems.push(...lines)
     push({ kind: 'ppe', text: lines.join('\n'), sourceKey: `row:${section.id}:content` })
   } else push({ kind: 'step', text: lines.join('\n'), sourceKey: `row:${section.id}:content` })
   return out
+}
+
+const BULLET = /^[-•*·]\s+/
+
+/**
+ * One hazard row per line, except a lead-in ending ":" and the bullets under it, which are one row
+ * ("Hazard symbols shown: Danger, Burn"): eleven pictogram labels are one fact to read, not eleven ticks.
+ * `list` marks a row that names several hazards (where the section's pictograms go).
+ */
+export function hazardItems(lines: string[]): Array<{ text: string; list: boolean }> {
+  const out: Array<{ text: string; list: boolean }> = []
+  for (let i = 0; i < lines.length; i++) {
+    const lead = lines[i]
+    const bullets: string[] = []
+    if (lead.endsWith(':')) while (i + 1 < lines.length && BULLET.test(lines[i + 1])) bullets.push(lines[++i].replace(BULLET, ''))
+    if (bullets.length) out.push({ text: `${lead} ${bullets.join(', ')}`, list: true })
+    else out.push({ text: lead.replace(BULLET, ''), list: isNameList(lead) })
+  }
+  return out
+}
+
+/** "Hazard pictograms shown: Danger; Hot Surface; Burn" — two or more short names after the colon, not a sentence with commas. */
+function isNameList(line: string): boolean {
+  const parts = line.slice(line.indexOf(':') + 1).split(/[;,]/).map((p) => p.trim().replace(/\.$/, '')).filter(Boolean)
+  return line.includes(':') && parts.length >= 2 && parts.every((p) => p.split(/\s+/).length <= 4)
 }
 
 /**

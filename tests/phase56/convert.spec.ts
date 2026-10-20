@@ -8,6 +8,7 @@ import path from 'node:path'
 import {
   HANDLED_TYPES,
   checkGate,
+  hazardItems,
   conversionHash,
   convertSop,
   planFocusStepWrites,
@@ -222,6 +223,26 @@ test.describe('kinds', () => {
     })
     expect(c.after).toMatchObject({ hazard: 2, ppe: 1 })
     expect(c.gate.ok).toBe(true)
+  })
+
+  test('a pictogram list is one hazard row carrying the section pictograms', () => {
+    const s = section({ id: 'h', title: 'Safety', section_type: 'hazards', content: 'Observe site rules.\n\nHazard symbols shown:\n- Danger\n- Hot Surface\n- Burn' })
+    ;(s as unknown as { sop_images: unknown[] }).sop_images = [
+      { step_id: null, storage_path: 'p/0.png' }, { step_id: null, storage_path: 'p/1.png' }, { step_id: null, storage_path: 'p/2.png' },
+    ]
+    const c = convertSop({ sopId: 'x', sopImagePaths: [], sections: [s] })
+    expect(c.steps.map((d) => [d.text, d.imagePaths.length])).toEqual([
+      ['Observe site rules.', 0],
+      ['Hazard symbols shown: Danger, Hot Surface, Burn', 3],
+    ])
+    expect(c.gate.ok).toBe(true)
+  })
+
+  test('a one-line pictogram list takes the pictograms, not a sentence with commas before it', () => {
+    expect(hazardItems([
+      'Safety requirements: observe the site rules, as well as all local, regional, and national requirements.',
+      'Hazard pictograms shown: Danger; Flying Debris; Burn.',
+    ]).map((i) => i.list)).toEqual([false, true])
   })
 
   test('tools and time zip by array index, or union onto the first step', () => {

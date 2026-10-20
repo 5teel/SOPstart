@@ -33,6 +33,12 @@ export const SOP_TOOL: LlmTool = {
             type: { type: 'string', description: 'e.g. hazards, ppe, procedure, emergency, scope, tools, cleanup' },
             title: { type: 'string' },
             content: { type: 'string', nullable: true, description: 'For narrative sections (Hazards, PPE, Scope)' },
+            image_indexes: {
+              type: 'array',
+              items: { type: 'integer' },
+              nullable: true,
+              description: 'Indexes of [IMG N] tokens inside this section\'s narrative content (e.g. hazard or PPE pictograms). Never an index a step already has.',
+            },
             steps: {
               type: 'array',
               nullable: true,
@@ -138,6 +144,7 @@ The non-negotiable rules:
 - If an image appears inside a cell of a procedural table (stepCol/imagesCol/commentsCol hint present), it belongs to the STEP extracted from THAT ROW. Do not assign it to a step from a different row even if the token would be "close" in the linearised text.
 - If an image appears in a non-procedural cell, list item, or paragraph, it belongs to that block's step / hazard / note.
 - Each image index appears in AT MOST one step's \`image_indexes\`.
+- Pictograms in a hazard or PPE table or grid with no steps (e.g. \`c0=«Hot Surface» [IMG 3]\`) go in that SECTION's \`image_indexes\`, and the section content lists their labels after one lead-in line, e.g. "Hazard symbols shown:\\n- Hot Surface\\n- Burn". An index is on a section or a step, never both.
 - If you cannot confidently anchor an image (cover image, appendix figure, header decoration), leave its index OUT of every step. The server will surface those at section level for admin review.
 - If a step has no images, return \`image_indexes: []\` (or null).
 - Do NOT keep \`[IMG N]\` tokens inside the step's \`text\` field — the brackets are metadata only.
@@ -328,6 +335,7 @@ export function toParsedSop(raw: Record<string, unknown>, notesSuffix: string): 
       type: (s.type as string) ?? 'procedure',
       title: (s.title as string) ?? 'Untitled Section',
       content: (s.content as string) ?? null,
+      image_indexes: (s.image_indexes as number[] | null) ?? null,
       steps: s.steps
         ? (s.steps as Array<Record<string, unknown>>)
             .map((st, j) => ({

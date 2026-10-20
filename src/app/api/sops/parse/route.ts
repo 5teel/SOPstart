@@ -265,6 +265,20 @@ export async function POST(request: NextRequest) {
       }
       if (firstSectionId === null) firstSectionId = sectionRow.id
 
+      // Pictograms in a step-less hazard / PPE section: section-level images the converter puts on its hazard row.
+      for (const idx of (section.image_indexes ?? []).filter((n) => !attachedImageIndexes.has(n))) {
+        const img = uploadedImages.find((u) => u.index === idx)
+        if (!img) continue
+        await admin.from('sop_images').insert({
+          sop_id: sopId,
+          section_id: sectionRow.id,
+          step_id: null,
+          storage_path: img.storagePath,
+          content_type: img.contentType,
+        })
+        attachedImageIndexes.add(idx)
+      }
+
       // Insert steps if present
       if (section.steps && section.steps.length > 0) {
         for (const step of section.steps) {

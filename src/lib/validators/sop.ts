@@ -32,6 +32,8 @@ export const SopSectionSchema = z.object({
   type: z.string(),
   title: z.string(),
   content: z.string().nullable(),
+  /** Pictograms in a step-less hazard / PPE section. */
+  image_indexes: z.array(z.number().int()).nullable().optional(),
   steps: z.array(SopStepSchema).nullable(),
   confidence: z.number().min(0).max(1),
 })

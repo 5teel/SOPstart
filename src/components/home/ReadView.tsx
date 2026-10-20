@@ -307,9 +307,18 @@ export function ReadView({ row, role, from, onOpenSop, onClose }: { row: Library
                           </span>
                         </p>
                       )}
-                      {step.image_urls.map((url) => (
-                        <img key={url} src={url} alt="" loading="lazy" decoding="async" className="max-h-64 w-fit max-w-full rounded-lg object-contain" />
-                      ))}
+                      {isSignal(step.kind) && step.image_urls.length > 0 ? (
+                        // Hazard / PPE pictograms read as a row of signs, not stacked photos.
+                        <div className="flex flex-wrap gap-2">
+                          {step.image_urls.map((url) => (
+                            <img key={url} src={url} alt="" loading="lazy" decoding="async" className="size-18 rounded-lg border border-ink-200 bg-paper-1 object-contain p-1" />
+                          ))}
+                        </div>
+                      ) : (
+                        step.image_urls.map((url) => (
+                          <img key={url} src={url} alt="" loading="lazy" decoding="async" className="max-h-64 w-fit max-w-full rounded-lg object-contain" />
+                        ))
+                      )}
                       {running && step.photo_required && (
                         <PhotoSlot
                           has={run.photoSteps.has(step.id)}
