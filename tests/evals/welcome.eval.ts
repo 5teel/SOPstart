@@ -2,65 +2,79 @@
  * Deployed-site eval: the signed-out homepage at /welcome.
  *
  * Signed out (no session minted, so no OTP budget spent). Proves the root sends a
- * visitor to the homepage, the brandmark animates in on the left, every story
- * section and module renders and animates in when scrolled to, at desktop and
- * phone size, with no sideways scroll. Screenshots are read by eye.
+ * visitor to the homepage; the page is one screen (no vertical scroll); the
+ * slides change on their own and stop once the visitor takes over; every slide
+ * fits its screen at desktop and phone size; no Potenco and no founder details.
+ * One screenshot per slide, read by eye.
  *
  * Self-skips when EVAL_BASE_URL is unset.
  */
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
 import { EVAL_ENV_READY } from './lib/session'
 import { shot, watchConsole } from './lib/plant-fixture'
 
-const STORIES = ['accessible', 'accountable', 'tracked', 'secure', 'modules']
-const MODULES = ['SOPs', 'PMs', 'Lockout / tagout', 'Safety meetings', 'Permits to work']
+const SLIDES = ['intro', 'accessible', 'accountable', 'tracked', 'secure', 'modules']
+const current = (page: Page) => page.locator('[data-testid="slide"][data-in]')
+const noPageScroll = (page: Page) =>
+  page.evaluate(() => document.documentElement.scrollHeight <= innerHeight && document.documentElement.scrollWidth <= innerWidth)
 
 test.describe('homepage', () => {
   test.skip(!EVAL_ENV_READY, 'EVAL_BASE_URL not set')
 
-  test('a signed-out visit to / lands on the homepage, brandmark first', async ({ page }) => {
+  test('a signed-out visit to / lands on the homepage, which changes slides on its own until touched', async ({ page }) => {
+    test.setTimeout(60_000)
     const errors = watchConsole(page)
     await page.setViewportSize({ width: 1440, height: 900 })
     await page.goto('/')
     await expect(page).toHaveURL(/\/welcome$/)
-    await expect(page.getByTestId('homepage')).toBeVisible()
-    const mark = page.getByRole('img', { name: 'SOPstart' }).first()
-    await expect(mark).toBeVisible()
+    await expect(page.getByRole('img', { name: 'SOPstart' }).first()).toBeVisible()
     await expect(page.getByRole('link', { name: 'Sign in' }).first()).toHaveAttribute('href', '/login')
-    await page.waitForTimeout(3500) // the brandmark and the lead lines have landed
+    await expect(current(page)).toHaveAttribute('id', 'intro')
+    await page.waitForTimeout(3500) // the wordmark has gathered and its tape swept in
     await shot(page, 'welcome-desktop-entry')
-    // Desktop: the brandmark side stays put while the story scrolls.
-    const before = await mark.boundingBox()
-    await page.mouse.wheel(0, 2500)
-    await page.waitForTimeout(500)
-    expect((await mark.boundingBox())?.y).toBe(before?.y)
+    expect(await noPageScroll(page)).toBe(true)
+    // Autoplay moves on by itself.
+    await expect(current(page)).toHaveAttribute('id', 'accessible', { timeout: 12_000 })
+    // A manual pick stops it.
+    await page.getByTestId('slide-dot').nth(3).click()
+    await expect(current(page)).toHaveAttribute('id', 'tracked')
+    await page.waitForTimeout(11_000)
+    await expect(current(page)).toHaveAttribute('id', 'tracked')
+    await expect(page.getByRole('button', { name: 'Play' })).toBeVisible()
+    await expect(page.getByText(/Potenco|founder|Simon Scott/i)).toHaveCount(0)
     expect(errors).toEqual([])
   })
 
   for (const [label, size] of [
     ['desktop', { width: 1440, height: 900 }],
+    ['laptop', { width: 1280, height: 720 }],
     ['phone', { width: 390, height: 844 }],
   ] as const) {
-    test(`HOME-01 every section and module renders and animates in (${label})`, async ({ page }) => {
+    test(`HOME-01 every slide fits one screen (${label})`, async ({ page }) => {
       test.setTimeout(90_000)
       const errors = watchConsole(page)
       await page.setViewportSize(size)
       await page.goto('/welcome')
-      for (const id of STORIES) {
-        const s = page.locator(`#${id}`)
-        await s.scrollIntoViewIfNeeded()
-        await expect(s).toHaveAttribute('data-in', '')
-        await page.waitForTimeout(3500) // the example's animation has played out
-        await shot(page, `welcome-${label}-${id}`)
-        // Animated in: nothing in the section is left invisible.
-        const hidden = await s.evaluate((el) => [...el.querySelectorAll('.hp-a')].filter((n) => getComputedStyle(n).opacity !== '1').length)
+      const dots = page.getByTestId('slide-dot')
+      await expect(dots).toHaveCount(SLIDES.length)
+      for (const [i, id] of SLIDES.entries()) {
+        await dots.nth(i).click()
+        const s = current(page)
+        await expect(s).toHaveAttribute('id', id)
+        await page.waitForTimeout(3800) // the example's animation has played out
+        await shot(page, `welcome-${label}-${i + 1}-${id}`)
+        const [overflow, hidden] = await s.evaluate((el) => {
+          const box = el.getBoundingClientRect()
+          const shown = [...el.querySelectorAll('*')].filter((n) => n.getBoundingClientRect().width > 0)
+          return [
+            shown.filter((n) => n.getBoundingClientRect().bottom > box.bottom + 1 || n.getBoundingClientRect().top < box.top - 1).length,
+            shown.filter((n) => n.classList.contains('hp-a') && getComputedStyle(n).opacity !== '1').length,
+          ]
+        })
+        expect(overflow, `${id} is cut off at ${label} size`).toBe(0)
         expect(hidden, `${id} has elements still hidden`).toBe(0)
+        expect(await noPageScroll(page), `${id} scrolls the page at ${label} size`).toBe(true)
       }
-      for (const m of MODULES) await expect(page.locator('#modules').getByRole('heading', { name: m, exact: true })).toHaveCount(1)
-      await expect(page.getByTestId('enquiries-cta')).toHaveAttribute('href', 'mailto:enquiries@sopstart.com')
-      await expect(page.getByText(/founder|Simon Scott|20 years/i)).toHaveCount(0)
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
-      await page.screenshot({ path: `.planning/evals/latest/home-${label}-full.png`, fullPage: true })
       expect(errors).toEqual([])
     })
   }
