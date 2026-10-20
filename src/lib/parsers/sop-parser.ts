@@ -3,6 +3,7 @@ import type { SourceFileType } from '@/types/sop'
 import { PARSE_TRIAGE_MODEL, PARSE_SIMPLE_MODEL, PARSE_COMPLEX_MODEL } from '@/lib/agent-layer/model-constants'
 import { llmText, llmToolCall, type LlmTool } from '@/lib/ai/llm'
 import { TITLE_CONVENTIONS } from './sop-title'
+import { textOnlyProcedures } from './jev-checks'
 
 // Tool definition matching ParsedSopSchema for structured output — provider-
 // agnostic: the llm adapter converts it to the Anthropic or OpenAI-compatible
@@ -297,6 +298,9 @@ export async function parseSop(
   if (isHollowParse(parsed)) {
     throw new Error(`${model} returned the procedure sections with no steps. Try again, or pick another parse model in AI Settings.`)
   }
+  // ADR-0022: a procedure written as text instead of steps can't be ticked; say so (fail-open).
+  const textOnly = await textOnlyProcedures(parsed).catch((e) => (console.error('[SOP Parser] Jev section check failed:', e instanceof Error ? e.message : e), []))
+  if (textOnly.length) parsed.parse_notes = `${parsed.parse_notes} NEEDS REVIEW: instructions written as text with no steps in: ${textOnly.join('; ')}.`
   return parsed
 }
 

@@ -6,6 +6,7 @@ import { aiModel } from '@/lib/ai/registry'
 import { llmToolCall, type LlmTool } from '@/lib/ai/llm'
 import { SOP_TOOL, toParsedSop } from './sop-parser'
 import { ENHANCE_RULES, ORDER_JUDGEMENT, ENHANCE_RISKS } from './enhance-rules'
+import { runJevChecks, type JevSummary } from './jev-checks'
 
 export interface EnhanceChange {
   kind: 'split' | 'moved' | 'grouped' | 'reworded' | 'deduplicated' | 'relocated' | 'removed_boilerplate' | 'placeholder' | 'conflict_flagged' | 'other'
@@ -24,6 +25,8 @@ export interface EnhancedSop {
   openItems: string[]
   orderLocked: Array<{ steps: string[]; reason: string }>
   check: { model: string; passed: boolean; issues: EnhanceCheckIssue[] } | null
+  /** ADR-0022: Jev's fact, number and step checks; its flags were handed to the check model. */
+  jev: JevSummary | null
   model: string
 }
 
@@ -128,13 +131,13 @@ Report every place where the clear version:
 - changes the order of an order-locked sequence without a matching "moved" entry in the CHANGES list, or moves protection after the exposure it guards (reordered);
 - adds a fact, value, tool, method or step that is not in the direct translation (invented);
 - leaves an owner placeholder, conflict note or [Moved] marker in worker-facing text (unflagged_placeholder).
-Do not report allowed changes. Then call report_check with an empty list if there are no problems.`
+Do not report allowed changes. When a FAST CLASSIFIER FLAGS list is given, settle every flag from the texts: report it as an issue only if it is a real problem, and still check everything else. Then call report_check with an empty list if there are no problems.`
 
 /** Writes the clear version from the direct translation, then checks it with a model from another family. */
 export async function enhanceSop(
   sourceText: string,
   direct: ParsedSop,
-  opts: { model?: string; checkModel?: string | null } = {},
+  opts: { model?: string; checkModel?: string | null; jev?: boolean } = {},
 ): Promise<EnhancedSop> {
   const model = opts.model ?? aiModel('parse-enhance')
   const raw = (await llmToolCall({
@@ -147,6 +150,9 @@ export async function enhanceSop(
   if (!raw?.sop) throw new Error('clear version: no sop in the tool result')
   const sop = toParsedSop(raw.sop, `[Clear version by ${model}]`)
 
+  // ADR-0022: Jev runs first (seconds, fractions of a cent); its flags point the check model at what to settle.
+  const jev = opts.jev === false ? null : await runJevChecks(direct, sop)
+  if (jev?.error) console.error('[clear version] Jev checks failed:', jev.error)
   const checkModel = opts.checkModel === undefined ? aiModel('parse-enhance-check') : opts.checkModel
   let check: EnhancedSop['check'] = null
   if (checkModel) {
@@ -154,13 +160,21 @@ export async function enhanceSop(
       model: checkModel,
       maxTokens: 16000,
       system: CHECK_SYSTEM,
-      messages: [{ role: 'user', content: `DIRECT TRANSLATION:\n${JSON.stringify(direct)}\n\nCLEAR VERSION:\n${JSON.stringify(sop)}\n\nCHANGES the writer recorded:\n${JSON.stringify(raw.changes ?? [])}` }],
+      messages: [{ role: 'user', content: `DIRECT TRANSLATION:\n${JSON.stringify(direct)}\n\nCLEAR VERSION:\n${JSON.stringify(sop)}\n\nCHANGES the writer recorded:\n${JSON.stringify(raw.changes ?? [])}${jevFlagsText(jev)}` }],
       tool: CHECK_TOOL,
     })) as { issues?: EnhanceCheckIssue[] }
     const issues = r?.issues ?? []
     check = { model: checkModel, passed: !issues.some((i) => i.severity !== 'minor'), issues }
   }
-  return { sop, changes: raw.changes ?? [], openItems: raw.open_items ?? [], orderLocked: raw.order_locked ?? [], check, model }
+  return { sop, changes: raw.changes ?? [], openItems: raw.open_items ?? [], orderLocked: raw.order_locked ?? [], check, jev, model }
+}
+
+function jevFlagsText(jev: JevSummary | null): string {
+  if (!jev || (!jev.factFlags.length && !jev.numberFlags.length)) return ''
+  const why = { not_covered: 'judged', unsure: 'unsure it is covered', condition: 'condition may be dropped' } as const
+  const facts = jev.factFlags.map((f) => `- [${f.label}, ${why[f.reason]}${f.reason === 'not_covered' ? ` ${f.verdict}` : ''}] "${f.text}"`)
+  const nums = jev.numberFlags.map((n) => `- the value ${n.value} is ${n.side === 'missing' ? 'in the direct translation but not the clear version' : 'in the clear version but not the direct translation'}: "${n.context}"`)
+  return `\n\nFAST CLASSIFIER FLAGS (direct-translation facts and values to settle):\n${[...facts, ...nums].join('\n')}`
 }
 
 /** What sops.clear_version holds (ADR-0015). Read-only: runs, photos and sign-offs stay on the direct translation. */
@@ -177,6 +191,7 @@ export interface ClearVersion {
   openItems: string[]
   orderLocked: EnhancedSop['orderLocked']
   check: EnhancedSop['check']
+  jev?: JevSummary | null
 }
 
 /**
@@ -211,6 +226,7 @@ export async function writeClearVersion(
     openItems: e.openItems,
     orderLocked: e.orderLocked,
     check: e.check,
+    jev: e.jev,
   }
   const { error } = await admin
     .from('sops')

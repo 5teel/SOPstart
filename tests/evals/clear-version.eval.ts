@@ -49,6 +49,8 @@ test.describe.serial('ADR-0015 -- direct translation and clear version (deployed
       openItems: ['Step 1: the source does not say how to restart the press.'],
       orderLocked: [],
       check: { model: 'eval-seed', passed: false, issues: [{ severity: 'major', kind: 'altered', direct: 'Isolate the press', clear: CLEAR_STEP, note: 'Eval seeded point to look at.' }] },
+      // ADR-0022: Jev's step checks
+      jev: { model: 'eval-seed', facts: 1, factFlags: [], numberFlags: [], stepNotes: [{ section: 'Make safe', step: 1, text: CLEAR_STEP, problem: 'more_than_one_action' }], costUsd: 0 },
     }
     const { error } = await db.from('sops').update({ clear_version: clear, clear_approved_at: null, clear_approved_by: null }).eq('id', sopId)
     if (error) throw new Error(error.message)
@@ -77,6 +79,9 @@ test.describe.serial('ADR-0015 -- direct translation and clear version (deployed
       await expect(page.getByTestId('clear-view')).toBeVisible(SLOW)
       await expect(page.getByTestId('clear-check')).toContainText('Eval seeded point to look at.')
       await expect(page.getByTestId('clear-open-items')).toContainText('1 gap for the document owner')
+      await expect(page.getByTestId('clear-step-notes')).toContainText('1 step to tidy before workers use it')
+      await page.getByTestId('clear-step-notes').locator('summary').click()
+      await expect(page.getByTestId('clear-step-notes')).toContainText('Make safe, step 1: two or more things to do in one step')
       await expect(page.getByTestId('clear-step')).toContainText(CLEAR_STEP)
       await shot(page, 'clear-01-admin-unapproved')
       await page.getByTestId('clear-approve').click()

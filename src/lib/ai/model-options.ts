@@ -65,6 +65,7 @@ export const AI_MODEL_OPTIONS: Record<AiModelKey, readonly AiModelOption[]> = {
   ],
   'stt-batch': DEEPGRAM_STT_OPTIONS,
   'ocr-fallback': [{ id: 'eng', label: 'Tesseract (English)', note: 'runs locally · free' }],
+  'clear-fact-check': [{ id: 'jev-1.13.0', label: 'Jev 1.13', note: 'TypeSafe · pinned (ADR-0022)', provider: 'typesafe' }],
 }
 
 /** Human-readable default labels per use case (AiModelSelect label prop fallback). */
@@ -80,6 +81,7 @@ export const AI_MODEL_LABELS: Record<AiModelKey, string> = {
   embed: 'Embedding model',
   'stt-batch': 'Transcription model',
   'ocr-fallback': 'OCR engine',
+  'clear-fact-check': 'Clear version fast check',
 }
 
 /**

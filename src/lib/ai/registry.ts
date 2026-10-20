@@ -43,6 +43,7 @@ export type AiCapability =
   | 'embedding'
   | 'vision'
   | 'ocr'
+  | 'classifier'
   | 'diffusion'
   | 'video'
 
@@ -52,6 +53,7 @@ export type AiProvider =
   | 'deepgram'
   | 'voyage'
   | 'openrouter'
+  | 'typesafe'
   | 'local'
 
 /** Which env var must be set for each provider's API access. */
@@ -61,6 +63,7 @@ export const PROVIDER_ENV_KEYS: Record<AiProvider, string | null> = {
   deepgram: 'DEEPGRAM_API_KEY',
   voyage: 'VOYAGE_API_KEY',
   openrouter: 'OPENROUTER_API_KEY',
+  typesafe: 'TYPESAFE_API_KEY',
   local: null, // runs in-process (tesseract.js), no key
 }
 
@@ -161,6 +164,15 @@ export const AI_MODELS = {
     defaultId: 'eng', // tesseract.js language pack
     envVar: 'OCR_LANGUAGE',
     description: 'Tesseract OCR for scanned/photographed documents (parsers/ocr-fallback.ts)',
+  },
+
+  // ---- Classifier (TypeSafe Jev) -------------------------------------------
+  'clear-fact-check': {
+    capability: 'classifier',
+    provider: 'typesafe',
+    defaultId: 'jev-1.13.0', // pinned: thresholds in jev-checks.ts were tuned on this version
+    envVar: 'CLEAR_FACT_CHECK_MODEL',
+    description: 'Fast calibrated checks of the clear version: facts, numbers, step quality (parsers/jev-checks.ts, ADR-0022)',
   },
 
   // ---- Diffusion / video generation ---------------------------------------

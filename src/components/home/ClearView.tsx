@@ -11,6 +11,14 @@ import { Lightbulb } from 'lucide-react'
 import { setClearVersionApproval } from '@/actions/sops'
 import { KindChip } from '@/components/focus/KindChip'
 import type { ClearVersion } from '@/lib/parsers/enhance-sop'
+import type { StepNote } from '@/lib/parsers/jev-checks'
+
+// ADR-0022: Jev's step checks, in plain words.
+const STEP_PROBLEM: Record<StepNote['problem'], string> = {
+  more_than_one_action: 'two or more things to do in one step',
+  information_only: 'information, with nothing to do',
+  no_warning_where_exposed: 'the worker is close to hot, moving, pressurised or live parts here, but the step has no warning',
+}
 
 const day = (iso: string) => new Date(iso).toLocaleDateString('en-NZ', { day: 'numeric', month: 'short', year: 'numeric' })
 
@@ -20,6 +28,7 @@ export function ClearView({ sopId, clear, approvedAt, canApprove, signed }: { so
   const [error, setError] = useState<string | null>(null)
   const issues = clear.check?.issues ?? []
   const serious = issues.filter((i) => i.severity !== 'minor')
+  const stepNotes = clear.jev?.stepNotes ?? []
 
   const decide = async (approve: boolean) => {
     setBusy(true)
@@ -73,6 +82,24 @@ export function ClearView({ sopId, clear, approvedAt, canApprove, signed }: { so
               <ul className="mt-2 list-disc pl-5 text-ui text-ink-700">
                 {clear.openItems.map((o, k) => (
                   <li key={k}>{o}</li>
+                ))}
+              </ul>
+            </details>
+          )}
+          {stepNotes.length > 0 && (
+            <details data-testid="clear-step-notes">
+              <summary className="cursor-pointer text-ui font-semibold text-ink-900">
+                {stepNotes.length} step{stepNotes.length === 1 ? '' : 's'} to tidy before workers use it
+              </summary>
+              <ul className="mt-2 flex flex-col gap-2 text-ui text-ink-700">
+                {stepNotes.map((s, k) => (
+                  <li key={k}>
+                    <span className="font-semibold text-ink-900">
+                      {s.section}, step {s.step}:
+                    </span>{' '}
+                    {STEP_PROBLEM[s.problem]}
+                    <span className="block text-ink-600">“{s.text}”</span>
+                  </li>
                 ))}
               </ul>
             </details>

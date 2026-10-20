@@ -36,3 +36,4 @@ code, plans and phases follow it until a later ADR supersedes it.
 | [0019](0019-training-lanes.md) | Training is shown as lanes, not a matrix of pills | Accepted | `tests/phase63/training-lanes.spec.ts` · `tests/evals/home.eval.ts` HOME-04 |
 | [0020](0020-people-chart.md) | People opens on one org chart that collapses and answers every People question | Accepted | `tests/phase63/org-chart.spec.ts` · `tests/evals/office.eval.ts` |
 | [0021](0021-job-roles-on-the-chart.md) | Job roles are edited on the People chart | Accepted | `tests/phase63/job-roles.spec.ts` · `tests/evals/office.eval.ts` |
+| [0022](0022-jev-checks-the-clear-version.md) | Jev checks the clear version first; the LLM check settles its flags | Accepted | `tests/lint/jev-one-door.spec.ts` · `tests/evals/clear-version.eval.ts` |
