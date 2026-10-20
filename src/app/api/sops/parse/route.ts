@@ -215,8 +215,9 @@ export async function POST(request: NextRequest) {
 
     // 7. Write parsed data to database: sections + steps rows, then focus steps
     // (D-19). No block layout and no library-block links are written any more.
-    // Update SOP metadata
-    await admin
+    // Update SOP metadata. A failed write must fail the job, or the SOP stays 'uploading' with no title
+    // while its sections and clear version land (seen 2026-10-20).
+    const { error: metaError } = await admin
       .from('sops')
       .update({
         title: parsed.title,
@@ -234,6 +235,7 @@ export async function POST(request: NextRequest) {
         updated_at: new Date().toISOString(),
       })
       .eq('id', sopId)
+    if (metaError) throw new Error(`Saving the SOP details failed: ${metaError.message}`)
 
     // Track which image indexes have been attached to a step so we can surface
     // unattributed images (cover photos, appendix figures) at SOP-level rather
