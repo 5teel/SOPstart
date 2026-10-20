@@ -40,13 +40,10 @@ test.describe('promo reel', () => {
       await page.setViewportSize(size)
       await page.goto('/welcome')
       for (const heading of [
-        'Sites run on SOPs. Most SOPs fall into a gap.',
-        'The same problems show up on every site',
+        'SOPs your people actually follow',
         'We take care of the SOPs. You run the site.',
         'From the document on the shelf to a signed-off record',
-        'Why manage your SOPs in SOPstart',
-        'Start with one department',
-        'Built for a gap we kept seeing on worksites',
+        'A safer, faster site with the paperwork done',
       ]) {
         const h = page.getByRole('heading', { name: heading })
         await expect(h).toHaveCount(1)
@@ -56,6 +53,8 @@ test.describe('promo reel', () => {
         await img.scrollIntoViewIfNeeded()
         await expect.poll(() => img.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth > 0)).toBe(true)
       }
+      // A sales page, not a bio: no founder or career details.
+      await expect(page.getByText(/founder|Simon Scott|20 years/i)).toHaveCount(0)
       await expect(page.getByTestId('enquiries-cta')).toHaveAttribute('href', 'mailto:enquiries@sopstart.com')
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
       await page.screenshot({ path: `.planning/evals/latest/home-${label}-full.png`, fullPage: true })
