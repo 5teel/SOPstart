@@ -286,7 +286,7 @@ export function Homepage() {
       {/* Call to action */}
       <Section className="bg-ink-900">
         <div className="flex flex-col items-center text-center">
-          <Wordmark size="hero" onInk />
+          <p className="mb-4"><Wordmark size="hero" onInk /></p>
           <H2 onInk>Safe work, one step at a time.</H2>
           <p className="mt-4 max-w-xl text-reading text-ink-300">Tell us about your site and we will show you SOPstart with your own SOPs.</p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
