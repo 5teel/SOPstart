@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * The signed-out promo reel at /welcome: one site picture (the bottling
+ * The signed-out promo reel, the hero of the homepage at /welcome: one site picture (the bottling
  * template, ADR-0003) with a camera that glides between places while each
  * scene's caption and panel animate in. Storyboard and the rules it follows:
  * brag-output/brag-plan.md (hook -> reveal -> highlights -> 20 s Sign in).
@@ -457,7 +457,7 @@ export function PromoReel() {
   const Panel = PANELS[scene.id]
 
   return (
-    <main ref={stageRef} data-testid="promo-reel" data-scene={scene.id} className="reel fixed inset-0 overflow-hidden bg-paper">
+    <section ref={stageRef} data-testid="promo-reel" data-scene={scene.id} className="reel relative h-dvh overflow-hidden bg-paper">
       <style>{STYLES}</style>
 
       {/* Camera */}
@@ -485,6 +485,12 @@ export function PromoReel() {
       <header className="absolute inset-x-0 top-0 z-10 flex items-center justify-between p-4">
         <span className="rounded-lg bg-paper/90 px-3 py-2 shadow-lg backdrop-blur"><Wordmark size="header" /></span>
         <div className="flex items-center gap-2">
+          <a
+            href="#how-it-works"
+            className="hidden min-h-tap items-center rounded-lg bg-paper/90 px-4 text-ui font-semibold text-ink-900 shadow-lg backdrop-blur hover:bg-paper sm:flex"
+          >
+            How it works
+          </a>
           <a
             href={`mailto:${ENQUIRIES_EMAIL}`}
             data-testid="enquiries"
@@ -587,6 +593,6 @@ export function PromoReel() {
           ))}
         </div>
       </nav>
-    </main>
+    </section>
   )
 }

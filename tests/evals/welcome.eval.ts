@@ -30,6 +30,39 @@ test.describe('promo reel', () => {
     expect(errors).toEqual([])
   })
 
+  // The homepage below the reel: every section renders, with its screenshots loaded and no sideways scroll.
+  for (const [label, size] of [
+    ['desktop', { width: 1440, height: 900 }],
+    ['phone', { width: 390, height: 844 }],
+  ] as const) {
+    test(`HOME-01 the homepage sections render (${label})`, async ({ page }) => {
+      const errors = watchConsole(page)
+      await page.setViewportSize(size)
+      await page.goto('/welcome')
+      for (const heading of [
+        'Sites run on SOPs. Most SOPs fall into a gap.',
+        'The same problems show up on every site',
+        'We take care of the SOPs. You run the site.',
+        'From the document on the shelf to a signed-off record',
+        'Why manage your SOPs in SOPstart',
+        'Start with one department',
+        'Built for a gap we kept seeing on worksites',
+      ]) {
+        const h = page.getByRole('heading', { name: heading })
+        await expect(h).toHaveCount(1)
+        await h.scrollIntoViewIfNeeded()
+      }
+      for (const img of await page.locator('#how-it-works img').all()) {
+        await img.scrollIntoViewIfNeeded()
+        await expect.poll(() => img.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth > 0)).toBe(true)
+      }
+      await expect(page.getByTestId('enquiries-cta')).toHaveAttribute('href', 'mailto:enquiries@sopstart.com')
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+      await page.screenshot({ path: `.planning/evals/latest/home-${label}-full.png`, fullPage: true })
+      expect(errors).toEqual([])
+    })
+  }
+
   for (const [label, size] of [
     ['desktop', { width: 1440, height: 900 }],
     ['phone', { width: 390, height: 844 }],
