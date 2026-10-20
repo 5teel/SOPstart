@@ -228,9 +228,10 @@ test.describe('kinds', () => {
   test('a pictogram list is one hazard row carrying the section pictograms', () => {
     const s = section({ id: 'h', title: 'Safety', section_type: 'hazards', content: 'Observe site rules.\n\nHazard symbols shown:\n- Danger\n- Hot Surface\n- Burn' })
     ;(s as unknown as { sop_images: unknown[] }).sop_images = [
-      { step_id: null, storage_path: 'p/0.png' }, { step_id: null, storage_path: 'p/1.png' }, { step_id: null, storage_path: 'p/2.png' },
+      { step_id: null, storage_path: 'p/img_10.png' }, { step_id: null, storage_path: 'p/img_2.png' }, { step_id: null, storage_path: 'p/img_0.png' },
     ]
     const c = convertSop({ sopId: 'x', sopImagePaths: [], sections: [s] })
+    expect(c.steps[1].imagePaths).toEqual(['p/img_0.png', 'p/img_2.png', 'p/img_10.png'])
     expect(c.steps.map((d) => [d.text, d.imagePaths.length])).toEqual([
       ['Observe site rules.', 0],
       ['Hazard symbols shown: Danger, Hot Surface, Burn', 3],

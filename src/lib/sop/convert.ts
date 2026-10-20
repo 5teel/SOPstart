@@ -521,7 +521,9 @@ function fromRows(section: Section, before: SourceCounts): Slot[] {
   if (isHazardSection(section)) {
     const items = hazardItems(lines)
     // Section-level pictograms (parse attaches them with no step) sit on the list row, else the last row.
+    // Upload order is not source order; the path carries the source index (img_3.png), so sort numerically.
     const pictograms = (section.sop_images ?? []).filter((i) => !i.step_id).map((i) => i.storage_path)
+      .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
     const list = items.findIndex((t) => t.list)
     const at = list === -1 ? items.length - 1 : list
     before.hazardSources += items.length
