@@ -106,6 +106,7 @@ Distilled rules below. **Full dated log with the stories: `docs/LEARNINGS.md` �
 
 **Data / infra**
 - Thinking-mode models (Claude 5+, Qwen 3.8) reject a forced tool_choice: structured calls go through `llmToolCall` only. Flat PDF text scrambles step order; evals must check order, not just coverage.
+- A parse with no steps and a bare procedure title is a failure (`isHollowParse`, GLM 5.2 direct translation); the analogue eval is `.autoresearch/analogue/` (run.ts → score.ts → jev.ts).
 - Fail-open pipelines omit failed steps from upserts; all jobs erroring at $0 cost is an outage, not "no findings". Keep model IDs current; an org's `ai_model_settings` rows beat registry defaults.
 - DOCX `<w:t>` runs join with no separator (Word splits words across runs); spaces only at paragraphs, tabs and breaks.
 - `PGRST205 … schema cache` is a stale cache, not a missing table. Table renames do not rewrite SQL function bodies. Check `supabase migration list` before `db push`.

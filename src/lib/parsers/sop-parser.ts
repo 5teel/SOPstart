@@ -292,7 +292,18 @@ export async function parseSop(
     tool: SOP_TOOL,
   })) as Record<string, unknown>
 
-  return toParsedSop(raw, `[Parsed by ${model}, triage: ${triageText}${opts.faithful ? ', direct translation' : ''}]`)
+  const parsed = toParsedSop(raw, `[Parsed by ${model}, triage: ${triageText}${opts.faithful ? ', direct translation' : ''}]`)
+  // GLM 5.2 in direct-translation mode returned every procedure section empty with no error (2026-10-20).
+  if (isHollowParse(parsed)) {
+    throw new Error(`${model} returned the procedure sections with no steps. Try again, or pick another parse model in AI Settings.`)
+  }
+  return parsed
+}
+
+/** True when the parse has no steps at all and at least one procedure/cleanup section is a bare title. */
+export function isHollowParse(p: ParsedSop): boolean {
+  if (p.sections.some((s) => s.steps?.length)) return false
+  return p.sections.some((s) => (s.type === 'procedure' || s.type === 'cleanup') && !s.content?.trim())
 }
 
 /** Maps a create_sop tool result to ParsedSop, defaulting nullable fields and dropping empty steps. */
