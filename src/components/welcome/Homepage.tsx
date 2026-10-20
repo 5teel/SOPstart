@@ -471,14 +471,6 @@ export function Homepage() {
           <p className="hp-lead mt-4 hidden max-w-md text-reading text-ink-300 lg:block" style={d(2.9)}>
             SOPs, PMs, lockout / tagout, safety meetings and permits to work, in one place everyone on site can use.
           </p>
-          <a
-            href={`mailto:${ENQUIRIES_EMAIL}`}
-            data-testid="enquiries-cta"
-            className="hp-lead mt-8 hidden min-h-tap-row w-fit items-center rounded-lg bg-paper px-8 text-reading font-semibold text-ink-900 hover:bg-paper-2 lg:flex"
-            style={d(3.2)}
-          >
-            See it with your own SOPs
-          </a>
         </div>
         <div className="flex items-center gap-2">
           <a href={`mailto:${ENQUIRIES_EMAIL}`} data-testid="enquiries" className={`${pill} text-paper hover:bg-ink-700`}>
