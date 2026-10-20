@@ -28,6 +28,9 @@ const STYLES = `
 @keyframes hp-gather-l { from { opacity: 0; transform: translateX(-0.35em) } to { opacity: 1; transform: none } }
 @keyframes hp-gather-r { from { opacity: 0; transform: translateX(0.35em) } to { opacity: 1; transform: none } }
 @keyframes hp-sweep { from { clip-path: inset(0 100% 0 0) } to { clip-path: inset(0 0 0 0) } }
+@keyframes hp-arrive { from { opacity: 0; transform: translateX(3rem) } to { opacity: 1; transform: none } }
+/* The story arrives once the two words have joined, while the tape is still sweeping in. */
+.hp-story { --arrive: calc(var(--dur-fuse-gather) + 0.6s); animation: hp-arrive 0.9s var(--ease-fuse) var(--arrive) both }
 .hp-mark .wm-sop { animation: hp-gather-l var(--dur-fuse-gather) var(--ease-fuse) 0.2s both }
 .hp-mark .wm-start { animation: hp-gather-r var(--dur-fuse-gather) var(--ease-fuse) 0.2s both }
 .hp-mark .wm::after { animation: hp-sweep var(--dur-fuse-tape) var(--ease-fuse) calc(var(--dur-fuse-gather) + 0.2s) both }
@@ -35,13 +38,14 @@ const STYLES = `
 @media (min-width: 64rem) { .hp-mark .wm { font-size: calc(var(--wm-size-hero) * 1.5) } }
 .hp-lead { animation: hp-in 0.6s ease-out var(--d, 0s) both }
 .hp-slide .hp-a { opacity: 0 }
-.hp-slide[data-in] .hp-a { animation: hp-in 0.5s ease-out var(--d, 0s) both }
+.hp-slide[data-in] .hp-a { animation: hp-in 0.5s ease-out calc(var(--d, 0s) + var(--wait, 0s)) both }
+.hp-slide[data-first] { --wait: calc(var(--arrive) + 0.4s) }
 .hp-slide[data-in] .hp-p { animation-name: hp-pop }
 .hp-slide .hp-g { transform: scaleX(0); transform-origin: left }
-.hp-slide[data-in] .hp-g { animation: hp-grow 1.4s ease-in-out var(--d, 0s) both }
+.hp-slide[data-in] .hp-g { animation: hp-grow 1.4s ease-in-out calc(var(--d, 0s) + var(--wait, 0s)) both }
 @media (max-height: 820px) { .hp-tall { display: none } }
 @media (prefers-reduced-motion: reduce) {
-  .hp-mark *, .hp-mark .wm::after, .hp-lead { animation: none !important }
+  .hp-mark *, .hp-mark .wm::after, .hp-lead, .hp-story { animation: none !important }
   .hp-slide .hp-a { opacity: 1; animation: none !important }
   .hp-slide .hp-g { transform: none; animation: none !important }
 }
@@ -440,12 +444,15 @@ export function Homepage() {
   const still = useSyncExternalStore(subscribeMotion, () => window.matchMedia(MOTION).matches, () => false)
   const [idx, setIdx] = useState(0)
   const [auto, setAuto] = useState(true)
+  // The opening slide waits for the story to arrive, the first time only.
+  const [first, setFirst] = useState(true)
   const playing = auto && !still
   const touchX = useRef<number | null>(null)
 
   // Any manual move stops the autoplay; Play resumes it.
   const go = (i: number) => {
     setAuto(false)
+    setFirst(false)
     setIdx((i + SLIDES.length) % SLIDES.length)
   }
   useEffect(() => {
@@ -484,7 +491,7 @@ export function Homepage() {
 
       {/* Right: the slides */}
       <main
-        className="relative flex min-h-0 flex-1 flex-col"
+        className="hp-story relative flex min-h-0 flex-1 flex-col"
         aria-roledescription="carousel"
         aria-label="What SOPstart does"
         onTouchStart={(e) => (touchX.current = e.touches[0].clientX)}
@@ -502,6 +509,7 @@ export function Homepage() {
               id={s.id}
               data-testid="slide"
               data-in={i === idx ? '' : undefined}
+              data-first={first && i === 0 ? '' : undefined}
               aria-roledescription="slide"
               aria-label={`${i + 1} of ${SLIDES.length}: ${s.label}`}
               aria-hidden={i !== idx}
@@ -542,8 +550,11 @@ export function Homepage() {
                     <span
                       key={idx}
                       className="block h-full w-full origin-left bg-ink-900"
-                      style={{ animation: `hp-fill ${SLIDE_MS}ms linear both` }}
-                      onAnimationEnd={() => setIdx((idx + 1) % SLIDES.length)}
+                      style={{ animation: `hp-fill ${SLIDE_MS}ms linear ${first ? "var(--arrive)" : "0s"} both` }}
+                      onAnimationEnd={() => {
+                        setFirst(false)
+                        setIdx((idx + 1) % SLIDES.length)
+                      }}
                     />
                   )}
                 </span>

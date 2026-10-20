@@ -27,6 +27,10 @@ test.describe('homepage', () => {
     await page.setViewportSize({ width: 1440, height: 900 })
     await page.goto('/')
     await expect(page).toHaveURL(/\/welcome$/)
+    // The story arrives after the wordmark's two words have joined, before its tape is done.
+    await page.waitForTimeout(1000)
+    expect(Number(await page.locator('main').evaluate((el) => getComputedStyle(el).opacity))).toBeLessThan(0.1)
+    await page.screenshot({ path: '.planning/evals/latest/welcome-desktop-joining.png' })
     await expect(page.getByRole('img', { name: 'SOPstart' }).first()).toBeVisible()
     await expect(page.getByRole('link', { name: 'Sign in' }).first()).toHaveAttribute('href', '/login')
     await expect(current(page)).toHaveAttribute('id', 'intro')
@@ -34,7 +38,7 @@ test.describe('homepage', () => {
     await shot(page, 'welcome-desktop-entry')
     expect(await noPageScroll(page)).toBe(true)
     // Autoplay moves on by itself.
-    await expect(current(page)).toHaveAttribute('id', 'accessible', { timeout: 12_000 })
+    await expect(current(page)).toHaveAttribute('id', 'accessible', { timeout: 15_000 })
     // A manual pick stops it.
     await page.getByTestId('slide-dot').nth(3).click()
     await expect(current(page)).toHaveAttribute('id', 'tracked')
