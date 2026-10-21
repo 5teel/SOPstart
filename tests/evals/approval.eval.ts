@@ -60,11 +60,17 @@ test.describe.serial('ADR-0018 -- new accounts wait for approval (deployed)', ()
   test('APPR-01 signed out: the welcome page has Sign in and Enquiries; the login page has Enquiries', async ({ page }) => {
     await page.goto('/welcome')
     await expect(page.getByRole('link', { name: 'Sign in' }).first()).toHaveAttribute('href', '/login', SLOW)
-    await expect(page.getByTestId('enquiries')).toHaveAttribute('href', /^mailto:.+@sopstart\.com$/)
-    await shot(page, 'approval-01-welcome')
-    await page.goto('/login')
-    await expect(page.getByTestId('enquiries')).toHaveAttribute('href', /^mailto:/, SLOW)
-    await shot(page, 'approval-02-login')
+    // Enquiries opens the address (a bare mailto looked dead with no mail app set up).
+    for (const [path, name] of [['/welcome', 'approval-01-welcome'], ['/login', 'approval-02-login']] as const) {
+      if (path === '/login') await page.goto(path)
+      await page.getByTestId('enquiries').click(SLOW)
+      await expect(page.getByTestId('enquiries-popover')).toBeVisible()
+      await expect(page.getByTestId('enquiries-popover')).toContainText('enquiries@sopstart.com')
+      await expect(page.getByTestId('enquiries-email')).toHaveAttribute('href', 'mailto:enquiries@sopstart.com')
+      await shot(page, name)
+      await page.getByRole('button', { name: 'Close' }).click()
+      await expect(page.getByTestId('enquiries-popover')).toBeHidden()
+    }
   })
 
   test('APPR-02 an invited account with a site waits: the home and its data stay shut', async ({ browser }) => {

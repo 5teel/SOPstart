@@ -57,7 +57,7 @@ export const JOURNEYS: Journey[] = [
     summary: 'An existing member signs in and lands on their home screen.',
     steps: [
       { id: 's', type: 'start', label: 'Has an account' },
-      { id: 'welcome', type: 'screen', label: 'Homepage', route: '/welcome', detail: 'A signed-out visit to / lands here: one screen with the brandmark on the left and slides on the right that change on their own until touched (intro, accessible, accountable, fully tracked, secure, then the modules: SOPs, PMs, lockout / tagout, safety meetings, permits to work). Sign in leads to the login screen; Enquiries and Get in touch open an email to SOPstart.' },
+      { id: 'welcome', type: 'screen', label: 'Homepage', route: '/welcome', detail: 'A signed-out visit to / lands here: one screen with the brandmark on the left and slides on the right that change on their own until touched (intro, accessible, accountable, fully tracked, secure, then the modules: SOPs, PMs, lockout / tagout, safety meetings, permits to work). Sign in leads to the login screen; Enquiries opens a popup with the SOPstart enquiries address to copy or open in email (same on the login screen).' },
       { id: 'login', type: 'screen', label: 'Login screen', route: '/login' },
       { id: 'auth', type: 'action', label: 'Enter email + password', detail: 'Supabase Auth verifies and sets a session. roleHome(role) sends every role to the home, or to /pending when there is no role (UX-01, Phase 57).' },
       { id: 'role', type: 'decision', label: 'Role?', branches: [

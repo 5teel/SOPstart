@@ -13,7 +13,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from 'react'
 import { Check, ChevronLeft, ChevronRight, ClipboardCheck, FileText, Lock, Pause, Play, ShieldCheck, Users, Wrench } from 'lucide-react'
-import { ENQUIRIES_EMAIL } from '@/lib/contact'
+import { Enquiries } from '@/components/contact/Enquiries'
 import { Wordmark } from '@/components/brand/Wordmark'
 import { KindChip } from '@/components/focus/KindChip'
 import type { FocusKind } from '@/lib/sop/focus'
@@ -480,9 +480,7 @@ export function Homepage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <a href={`mailto:${ENQUIRIES_EMAIL}`} data-testid="enquiries" className={`${pill} text-paper hover:bg-ink-700`}>
-            Enquiries
-          </a>
+          <Enquiries className={`${pill} text-paper hover:bg-ink-700`} />
           <Link href="/login" className={`${pill} bg-paper text-ink-900 hover:bg-paper-2`}>
             Sign in
           </Link>
