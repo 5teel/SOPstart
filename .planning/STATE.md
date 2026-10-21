@@ -306,6 +306,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 
 ### Roadmap Evolution
 
+- Phase 64 added (2026-10-21): Leavers and Suspended Members — membership states replace hard delete; first step of the security / passkey plan
 - Phase 63 added (2026-10-08): SOP-first Home, Library Site Map and the SOPstart Start — implements sketches 009 A and 010 under ADR-0004; retires the room metaphor; supersedes ADR-0003
 
 - v7.0 roadmap created (2026-07-19): 6 phases (34-39) mapping all 23 v7.0 REQ-IDs — Phase 34 Supervisor Observations, Phase 35 Competency Classifier + Training Matrix + Records, Phase 36 Refresher Cadence + Version-Currency, Phase 37 Assessor Governance, Phase 38 Guidance-Notes Adoptions (promotes backlog 999.4-999.6), Phase 39 AI-Prioritized Maintenance Schedule (absorbs Phase 31 rollforward). Backlog 999.7 promoted into Phase 36.

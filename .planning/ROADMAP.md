@@ -1718,6 +1718,7 @@ Executes 55 → 56 → 57 → 58 → 59 → 60 → 61 → 62, strictly sequentia
 - [~] **Phase 61: The Workshop & the Smoko Room** - MOVED OUT OF GSD 2026-10-06: tracked as todo pieces A-H in the Claude Doc https://claude.ai/code/artifact/16b59e56-b699-4972-81e8-d946f140234f
 - [~] **Phase 62: Removal Certified, Addresses & Maps** - MOVED OUT OF GSD 2026-10-06: tracked as clean-up todos in the Claude Doc https://claude.ai/code/artifact/16b59e56-b699-4972-81e8-d946f140234f
 - [x] **Phase 63: SOP-first Home, Library Site Map and the SOPstart Start** - The home becomes find · read · start (sketch 009 A + the library site map); rooms retired; the SOPstart wordmark and the start merge (sketch 010); "walk" leaves the screen
+- [ ] **Phase 64: Leavers and Suspended Members** - Suspend / has-left membership states replace the hard delete; sign out everywhere; records kept under the name; owner handover list; reinstate
 
 ### Phase 55: Cut the Dropped Features & One Organisation
 
@@ -2204,6 +2205,42 @@ Plans:
 **Wave 10** *(blocked on Wave 9 completion)*
 
 - [x] 63-21-PLAN.md — Full deployed eval with every screenshot read and a fix round, build + full suite once, sign-off, requirements, Learnings
+
+### Phase 64: Leavers and Suspended Members
+
+**Goal:** Removing someone stops their access at once and keeps their record. A membership has a state (active, suspended, left) instead of being hard-deleted; "Suspend" and "Has left" in People sign the person out everywhere and RLS stops their data access on the next request; their completions, sign-offs and ledger rows stay under their name; SOPs and pending sign-offs they owned land in a "needs a new owner" list for the safety manager; a suspended member can be reinstated; every action writes a ledger row (ADR-0008).
+**Requirements**: MEMB-01, MEMB-02, MEMB-03, MEMB-04, MEMB-05, MEMB-06, MEMB-07, MEMB-08, MEMB-09, MEMB-10, MEMB-11, MEMB-12, MEMB-13
+**Depends on:** Phase 63
+**Plans:** 6 plans
+**Same-commit duties:** new ADR (membership states replace hard delete) · `.planning/codebase/CAPABILITY-MATRIX.md` · `src/lib/journeys/journeys.ts` + `src/lib/uat/tests.ts` · deployed eval `tests/evals/people.eval.ts` (or extend `office.eval.ts`)
+**Context:** first step of the security plan discussed 2026-10-21 (passkeys, admin aal2 and recovery follow in later phases). Gap today: `removeMember` (`src/actions/auth.ts:461`) deletes the membership row but leaves sessions live and no owner handover; `src/actions/governance.ts:395` notes the missing "deactivated" state.
+
+**Execution:** strictly sequential on the main tree (one wave per plan), one push and one deployed eval run at a time; each eval waits for the "Deploy to Fly" workflow of its own HEAD. Migration 00082 is applied live in 64-01 before any app code reads `status` (it is backwards compatible with the deployed code; `--rollback` restores the old helper and hook bodies).
+
+Plans:
+**Wave 1**
+
+- [ ] 64-01-PLAN.md — Migration 00082 (status column, UPDATE lock, RLS helpers re-check the row, hook skips non-active rows, raw-claim policies closed, revoke_user_sessions, ledger kinds), ADR-0024, applier with audit / rollback; applied live and proven
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 64-02-PLAN.md — State module and suspendMember / markMemberLeft / reinstateMember (D-05 rules, sign-out, ledger); paused page; invite / join / accept / switch / role paths state-aware
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 64-03-PLAN.md — People UI (Suspend, Has left, Reinstate, Suspended tag, Former staff); Remove path deleted; people.eval.ts proves cut-off, paused page, reinstate, re-invite
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 64-04-PLAN.md — Membership-reader sweep (active-only checks, recipients, pickers), "(left)" / "(suspended)" labels, member-status guard
+
+**Wave 5** *(blocked on Wave 4 completion)*
+
+- [ ] 64-05-PLAN.md — Needs a new owner in the Sign-offs inbox, reassignApprovalStep, OwnerPicker reuse; handover eval case
+
+**Wave 6** *(blocked on Wave 5 completion)*
+
+- [ ] 64-06-PLAN.md — Full deployed eval with every screenshot read, build + full suite once, sign-off, requirements, Learnings
 
 ## Progress
 
