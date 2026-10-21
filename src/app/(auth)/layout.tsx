@@ -14,10 +14,10 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           <p className="mt-3 text-ink-500 text-sm">Step-by-step SOP guidance for your team</p>
         </div>
         <RouteTransition>{children}</RouteTransition>
-        <p className="mt-8 text-center text-ui text-ink-500">
+        <div className="mt-8 text-center text-ui text-ink-500">
           New to SOPstart?{' '}
           <Enquiries className="font-semibold text-ink-900 underline" />
-        </p>
+        </div>
       </div>
     </div>
   )

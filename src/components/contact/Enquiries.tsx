@@ -26,7 +26,7 @@ export function Enquiries({ className, label = 'Enquiries' }: { className?: stri
         id="enquiries-popover"
         popover="auto"
         data-testid="enquiries-popover"
-        className="m-auto w-full max-w-sm rounded-2xl border border-ink-200 bg-paper-1 p-6 text-ink-900 shadow-lg backdrop:bg-ink-900/40"
+        className="m-auto w-full max-w-sm rounded-2xl text-left border border-ink-200 bg-paper-1 p-6 text-ink-900 shadow-lg backdrop:bg-ink-900/40"
       >
         <h2 className="text-xl font-semibold">Get in touch</h2>
         <p className="mt-2 text-reading text-ink-600">Email us and we will get back to you.</p>
