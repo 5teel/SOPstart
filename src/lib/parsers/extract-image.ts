@@ -1,24 +1,14 @@
-import OpenAI from 'openai'
 import sharp from 'sharp'
-import { aiModel } from '@/lib/ai/registry'
+import { transcribeScan } from './ocr-fallback'
 
-// Lazy-initialized to avoid throwing at module load time during Next.js static analysis
-let openai: OpenAI | null = null
-function getOpenAI(): OpenAI {
-  if (!openai) {
-    openai = new OpenAI() // reads OPENAI_API_KEY from env
-  }
-  return openai
-}
-
-const MAX_BYTES = 4 * 1024 * 1024 // 4MB — GPT-4o vision limit
+const MAX_BYTES = 3.5 * 1024 * 1024 // Claude takes 5MB of base64 per image; 3.5MB raw stays under it
 
 export interface ImageExtractionResult {
   text: string
 }
 
 /**
- * Extracts text from image files (jpg, png, heic, heif) using GPT-4o vision.
+ * Extracts text from image files (jpg, png, heic, heif) with Claude (transcribeScan).
  *
  * Server-side preprocessing with sharp:
  * - Auto-rotate from EXIF
@@ -45,30 +35,5 @@ export async function extractImage(buffer: ArrayBuffer): Promise<ImageExtraction
       .toBuffer()
   }
 
-  const base64 = processed.toString('base64')
-
-  const response = await getOpenAI().chat.completions.create({
-    model: aiModel('vision-image-describe'),
-    messages: [
-      {
-        role: 'user',
-        content: [
-          {
-            type: 'text',
-            text: 'Extract all text from this SOP document image. Preserve numbered lists, table structures (use | pipe separators for columns), headings, warnings, cautions, and section titles. If you see page numbers, note them. Output the raw text content only — no commentary.',
-          },
-          {
-            type: 'image_url',
-            image_url: {
-              url: `data:image/jpeg;base64,${base64}`,
-              detail: 'high',
-            },
-          },
-        ],
-      },
-    ],
-    max_tokens: 4096,
-  })
-
-  return { text: response.choices[0]?.message?.content ?? '' }
+  return { text: await transcribeScan(processed, 'image/jpeg') }
 }

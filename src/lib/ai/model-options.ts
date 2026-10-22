@@ -55,16 +55,15 @@ export const AI_MODEL_OPTIONS: Record<AiModelKey, readonly AiModelOption[]> = {
   ],
   'draft-verify': ANTHROPIC_LLM_OPTIONS,
   synthesis: ANTHROPIC_LLM_OPTIONS,
-  'vision-image-describe': [
-    { id: 'gpt-4o-2024-08-06', label: 'GPT-4o', note: 'current default' },
-    { id: 'gpt-4o-mini', label: 'GPT-4o mini', note: 'cheaper · lower detail' },
-  ],
   embed: [
     { id: 'voyage-3.5', label: 'Voyage 3.5', note: 'retrieval-specialised' },
     { id: 'voyage-3', label: 'Voyage 3', note: 'previous generation' },
   ],
   'stt-batch': DEEPGRAM_STT_OPTIONS,
-  'ocr-fallback': [{ id: 'eng', label: 'Tesseract (English)', note: 'runs locally · free' }],
+  'ocr-fallback': [
+    { id: 'claude-opus-5-5', label: 'Claude Opus 5.5', note: 'best on the scan bake-off · default' },
+    { id: 'claude-sonnet-5-5', label: 'Claude Sonnet 5.5', note: 'cheaper · not bake-off tested' },
+  ],
   'clear-fact-check': [{ id: 'jev-1.13.0', label: 'Jev 1.13', note: 'TypeSafe · pinned (ADR-0022)', provider: 'typesafe' }],
 }
 
@@ -77,10 +76,9 @@ export const AI_MODEL_LABELS: Record<AiModelKey, string> = {
   'parse-enhance-check': 'Clear version check model',
   'draft-verify': 'Draft verification model',
   synthesis: 'Synthesis model',
-  'vision-image-describe': 'Image description model',
   embed: 'Embedding model',
   'stt-batch': 'Transcription model',
-  'ocr-fallback': 'OCR engine',
+  'ocr-fallback': 'Scan reading model',
   'clear-fact-check': 'Clear version fast check',
 }
 

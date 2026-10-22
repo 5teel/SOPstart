@@ -11,7 +11,7 @@ Multi-tenant SaaS PWA for New Zealand industrial sites (glass, packaging, machin
 - Next.js 16.2 (App Router), React 19, TypeScript 5, Tailwind CSS 4
 - Supabase: Postgres + Auth + Storage + RLS (anon key env name: `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`)
 - TanStack React Query (server state); Zustand only in `useFocusAutosave`
-- AI parsing: OpenAI (GPT); reviewer/verifier: Anthropic. File parsing in `src/lib/parsers/` (mammoth, unpdf, tesseract.js, pptx/xlsx/video-audio extractors)
+- AI parsing: OpenAI (GPT); reviewer/verifier: Anthropic. File parsing in `src/lib/parsers/` (mammoth, unpdf, pptx/xlsx/video-audio extractors); scanned PDFs and photos are read by Claude (`ocr-fallback.ts`, ownership context against refusals)
 - React Hook Form + Zod; Lucide icons; Playwright for all tests
 - **Online-only since Phase 55**: `public/sw.js` is a kill-switch that unregisters old service workers. Do not reintroduce Serwist / Dexie / idb-keyval.
 - Dev port 4200. Deploy: push `master` → GitHub Action → Fly.io Sydney (ADR-0017; healthcheck `/api/version`). App and database must share a region.

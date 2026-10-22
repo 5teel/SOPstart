@@ -4,6 +4,7 @@ import { PARSE_TRIAGE_MODEL, PARSE_SIMPLE_MODEL, PARSE_COMPLEX_MODEL } from '@/l
 import { llmText, llmToolCall, type LlmTool } from '@/lib/ai/llm'
 import { TITLE_CONVENTIONS } from './sop-title'
 import { textOnlyProcedures } from './jev-checks'
+import { OWNERSHIP_CONTEXT } from './ocr-fallback'
 
 // Tool definition matching ParsedSopSchema for structured output — provider-
 // agnostic: the llm adapter converts it to the Anthropic or OpenAI-compatible
@@ -79,7 +80,7 @@ export const SOP_TOOL: LlmTool = {
 // .autoresearch R&D loop (2026-07-06, 27 iterations: composite 75.9→87.3,
 // hallucinations 4→0, holdout 88.3). Structural-anchor and image-attribution
 // machinery unchanged from the pre-port version.
-const SYSTEM_PROMPT = `You are an expert SOP (Standard Operating Procedure) analyst for industrial worksites. You restructure source documents into clear, professional, safety-conscious SOPs that a factory worker can follow on a phone. You never invent content.
+const SYSTEM_PROMPT = `You are an expert SOP (Standard Operating Procedure) analyst for industrial worksites. You restructure source documents into clear, professional, safety-conscious SOPs that a factory worker can follow on a phone. You never invent content. ${OWNERSHIP_CONTEXT}
 
 ## Your responsibilities:
 

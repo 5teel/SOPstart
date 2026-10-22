@@ -9,7 +9,7 @@ import { extractXlsx } from '@/lib/parsers/extract-xlsx'
 import { extractPptx } from '@/lib/parsers/extract-pptx'
 import { extractTxt } from '@/lib/parsers/extract-txt'
 import { extractImage } from '@/lib/parsers/extract-image'
-import { ocrFallback } from '@/lib/parsers/ocr-fallback'
+import { transcribeScan } from '@/lib/parsers/ocr-fallback'
 import { parseSop } from '@/lib/parsers/sop-parser'
 import { getOrgAiModels, resolveOrgModel } from '@/lib/ai/org-settings'
 import { ensureSopTitle } from '@/lib/parsers/sop-title'
@@ -147,7 +147,6 @@ export async function POST(request: NextRequest) {
       extractedText = result.text
       // PDF image extraction skipped for v1 (Research Pitfall 5)
     } else if (fileType === 'image') {
-      // GPT-4o vision is the primary OCR for image files (replaces Tesseract)
       const result = await extractImage(buffer)
       extractedText = result.text
       isOcr = true
@@ -162,14 +161,11 @@ export async function POST(request: NextRequest) {
       extractedText = result.text
     }
 
-    // 3. OCR fallback if text extraction yielded too little content (scanned PDFs)
-    if (extractedText.length < 50 && fileType !== 'image') {
-      // Likely a scanned PDF or image-only document
-      const ocr = await ocrFallback(buffer, fileType === 'pdf' ? 'application/pdf' : 'image/jpeg')
-      if (ocr.text.length > extractedText.length) {
-        extractedText = ocr.text
-        isOcr = true
-      }
+    // 3. A PDF with no text layer is a scan: Claude reads the PDF itself.
+    if (extractedText.length < 50 && fileType === 'pdf') {
+      await setStage('transcribing')
+      extractedText = await transcribeScan(buffer, 'application/pdf')
+      isOcr = true
     }
 
     if (extractedText.length < 10) {

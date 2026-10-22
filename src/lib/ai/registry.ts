@@ -130,15 +130,6 @@ export const AI_MODELS = {
     description: 'Agent-metadata synthesis: tags, entities, assessment (agent-layer/synthesis.ts)',
   },
 
-  // ---- Vision (OpenAI) -------------------------------------------------
-  'vision-image-describe': {
-    capability: 'vision',
-    provider: 'openai',
-    defaultId: 'gpt-4o-2024-08-06',
-    envVar: 'VISION_DESCRIBE_MODEL',
-    description: 'Describe extracted document images for step matching (parsers/extract-image.ts)',
-  },
-
   // ---- Embeddings (Voyage) ---------------------------------------------
   embed: {
     capability: 'embedding',
@@ -157,13 +148,13 @@ export const AI_MODELS = {
     description: 'Batch video/audio transcription (parsers/transcribe-audio.ts)',
   },
 
-  // ---- OCR (local) -------------------------------------------------------
+  // ---- OCR (Anthropic) -----------------------------------------------------
   'ocr-fallback': {
     capability: 'ocr',
-    provider: 'local',
-    defaultId: 'eng', // tesseract.js language pack
-    envVar: 'OCR_LANGUAGE',
-    description: 'Tesseract OCR for scanned/photographed documents (parsers/ocr-fallback.ts)',
+    provider: 'anthropic',
+    defaultId: 'claude-opus-5-5', // won the 2026-10-23 OCR bake-off: 99.8% of words back from degraded scans
+    envVar: 'OCR_MODEL',
+    description: 'Reads scanned PDFs and photographed pages (parsers/ocr-fallback.ts, extract-image.ts)',
   },
 
   // ---- Classifier (TypeSafe Jev) -------------------------------------------

@@ -8,6 +8,7 @@ import { SOP_TOOL, toParsedSop } from './sop-parser'
 import { ENHANCE_RULES, ORDER_JUDGEMENT, ENHANCE_RISKS } from './enhance-rules'
 import { runJevChecks, type JevSummary } from './jev-checks'
 import { pictogramLabels, placeSigns, type Pictogram } from './clear-signs'
+import { OWNERSHIP_CONTEXT } from './ocr-fallback'
 
 export interface EnhanceChange {
   kind: 'split' | 'moved' | 'grouped' | 'reworded' | 'deduplicated' | 'relocated' | 'removed_boilerplate' | 'placeholder' | 'conflict_flagged' | 'other'
@@ -63,7 +64,7 @@ const ENHANCE_TOOL: LlmTool = {
   },
 }
 
-const ENHANCE_SYSTEM = `You write the clear version of an industrial SOP. You are given the source document and its direct translation (a faithful, line-by-line structured copy). Rewrite the direct translation so the worker understands it quickly and does the job correctly and safely.
+const ENHANCE_SYSTEM = `You write the clear version of an industrial SOP. You are given the source document and its direct translation (a faithful, line-by-line structured copy). Rewrite the direct translation so the worker understands it quickly and does the job correctly and safely. ${OWNERSHIP_CONTEXT}
 
 ${AUDIENCE}
 
