@@ -57,7 +57,7 @@ export const JOURNEYS: Journey[] = [
     summary: 'An existing member signs in and lands on their home screen.',
     steps: [
       { id: 's', type: 'start', label: 'Has an account' },
-      { id: 'welcome', type: 'screen', label: 'Homepage', route: '/welcome', detail: 'A signed-out visit to / lands here: one screen with the brandmark on the left and slides on the right that change on their own until touched (intro, accessible, accountable, fully tracked, secure, then the modules: SOPs, PMs, lockout / tagout, safety meetings, permits to work). Sign in leads to the login screen; Enquiries opens a popup with the SOPstart enquiries address to copy or open in email (same on the login screen).' },
+      { id: 'welcome', type: 'screen', label: 'Homepage', route: '/welcome', detail: 'A signed-out visit to / lands here: one screen with the brandmark on the left and slides on the right that change on their own until touched (intro, how it works, accessible, accountable, audit-ready, the modules: SOPs, PMs, lockout / tagout, safety meetings, permits to work, then founding sites). Send us 3 SOPs (left panel on a computer, and the last slide) opens the enquiries address with the free conversion offer. Sign in leads to the login screen; Enquiries opens a popup with the SOPstart enquiries address to copy or open in email (same on the login screen). Privacy and Terms link to the two public pages below.' },
       { id: 'login', type: 'screen', label: 'Login screen', route: '/login' },
       { id: 'auth', type: 'action', label: 'Enter email + password', detail: 'Supabase Auth verifies and sets a session. roleHome(role) sends every role to the home, or to /pending when there is no role (UX-01, Phase 57).' },
       { id: 'role', type: 'decision', label: 'Role?', branches: [
@@ -67,6 +67,19 @@ export const JOURNEYS: Journey[] = [
       { id: 'one-screen', type: 'screen', label: 'The home - search and the SOP list', route: '/', detail: 'Every role lands here (Phase 63). Admins and safety managers also see the Sign-offs, People, Training and Manage SOPs sections.' },
       { id: 'pending-home', type: 'screen', label: 'Account pending', route: '/pending', detail: 'Holding screen for an account that cannot open a site yet. A new account waits here for a SOPstart admin to approve it (ADR-0018): Waiting for approval, with Check again; a turned-down account says so. Otherwise it waits for an admin to give it a role.' },
       { id: 'e', type: 'end', label: 'Signed in' },
+    ],
+  },
+  {
+    id: 'read-legal',
+    group: 'Getting started',
+    persona: 'Visitor',
+    title: 'Read the privacy and terms pages',
+    summary: 'A visitor checks how SOPstart handles data before their site signs up.',
+    steps: [
+      { id: 's', type: 'start', label: 'On the homepage' },
+      { id: 'privacy', type: 'screen', label: 'Privacy', route: '/privacy', detail: 'Public: what SOPstart collects, who handles it (Sydney hosting, AI providers) and how to ask for it.' },
+      { id: 'terms', type: 'screen', label: 'Terms of use', route: '/terms', detail: 'Public: accounts, your content, AI-made SOPs are drafts until approved, liability.' },
+      { id: 'e', type: 'end', label: 'Back to the homepage' },
     ],
   },
   {

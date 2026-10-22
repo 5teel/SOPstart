@@ -78,14 +78,14 @@ function Story({ eyebrow, title, intro, points, example }: { eyebrow: string; ti
         <p className="hp-a font-label text-meta font-semibold uppercase text-ink-500">{eyebrow}</p>
         <h2 className="hp-a mt-2 text-2xl font-semibold text-ink-900 lg:text-4xl" style={d(0.1)}>{title}</h2>
         <p className="hp-a mt-3 text-reading text-ink-600" style={d(0.2)}>{intro}</p>
-        <ul className="hp-tall mt-6 hidden flex-col gap-2 lg:flex">
+        {points.length > 0 && <ul className="hp-tall mt-6 hidden flex-col gap-2 lg:flex">
           {points.map((p, i) => (
             <li key={p} className="hp-a flex gap-3 text-reading text-ink-900" style={d(0.3 + i * 0.1)}>
               <Check className="mt-0.5 size-5 shrink-0 text-accent-ok" aria-hidden="true" />
               {p}
             </li>
           ))}
-        </ul>
+        </ul>}
       </div>
       <div aria-hidden="true" className="mx-auto w-full max-w-md">{example}</div>
     </div>
@@ -182,32 +182,94 @@ function TrackedExample() {
   )
 }
 
-const ACCESS = [
-  ['Worker', 'Their SOPs and their own record'],
-  ['Supervisor', 'Their team and its sign-offs'],
-  ['Admin', 'The whole site and its SOPs'],
-  ['Safety manager', 'Every record, read in full'],
+const FLOW = [
+  ['Send', 'Your SOPs as they are: Word, PDF or scans.'],
+  ['Convert', 'SOPstart turns them into clear steps, hazards and PPE first.'],
+  ['Approve', 'Your people check them. Nothing reaches the floor before that.'],
+  ['Run', 'Followed one step at a time, on any phone or screen.'],
+  ['Sign off', 'A supervisor signs the job off, and it is on record.'],
 ] as const
 
-function SecureExample() {
+function FlowExample() {
   return (
     <Card>
-      <div className="flex items-center gap-2">
-        <span className="hp-a hp-p grid size-9 place-items-center rounded-full bg-ink-900 text-paper" style={d(0.3)}>
-          <Lock className="size-4" />
-        </span>
-        <p className="text-ui font-semibold text-ink-900">Clearwater Beverages · who sees what</p>
-      </div>
-      <ul className="mt-3 flex flex-col">
-        {ACCESS.map(([role, sees], i) => (
-          <li key={role} className="hp-a flex justify-between gap-3 border-b border-ink-200 py-2 text-ui" style={d(0.6 + i * 0.25)}>
-            <span className="font-semibold text-ink-900">{role}</span>
-            <span className="text-right text-ink-600">{sees}</span>
+      <ol className="flex flex-col gap-3 border-l-2 border-ink-200 pl-5">
+        {FLOW.map(([step, what], i) => (
+          <li key={step} className="hp-a relative" style={d(0.4 + i * 0.35)}>
+            <span className="absolute -left-8 top-0 grid size-6 place-items-center rounded-full bg-ink-900 text-micro font-semibold text-paper">{i + 1}</span>
+            <p className="text-ui font-semibold text-ink-900">{step}</p>
+            <p className="text-meta text-ink-600">{what}</p>
+          </li>
+        ))}
+      </ol>
+    </Card>
+  )
+}
+
+// -- Founding sites --------------------------------------------------------------
+
+// The offer reads the same wherever it is opened.
+const OFFER = {
+  label: 'Send us 3 SOPs',
+  title: 'Send us 3 SOPs',
+  body: 'Attach three of your SOPs (Word, PDF or scans) to an email. We convert them for free and show you them running on your own site.',
+  subject: 'Three SOPs to convert',
+}
+
+const SENT = ['Filler changeover.docx', 'Shrink wrapper jam.pdf', 'Forklift pre-start (scan).jpg']
+
+function FoundingExample() {
+  return (
+    <Card>
+      <Label>You send</Label>
+      <ul className="mt-2 flex flex-col">
+        {SENT.map((f, i) => (
+          <li key={f} className="flex items-center justify-between gap-3 border-b border-ink-200 py-2 text-ui">
+            <span className="flex min-w-0 items-center gap-2 text-ink-900">
+              <FileText className="size-4 shrink-0 text-ink-500" />
+              <span className="truncate">{f}</span>
+            </span>
+            <span className="hp-a hp-p flex shrink-0 items-center gap-1 font-semibold text-ink-900" style={d(0.6 + i * 0.4)}>
+              <Check className="size-4 text-accent-ok" /> Converted
+            </span>
           </li>
         ))}
       </ul>
-      <p className="hp-a mt-3 text-meta text-ink-600" style={d(1.7)}>Other organisations: nothing, ever.</p>
+      <p className="hp-a mt-3 text-meta text-ink-600" style={d(1.9)}>Free, with no commitment to buy.</p>
     </Card>
+  )
+}
+
+const legal = 'underline-offset-4 hover:underline'
+
+function Founding() {
+  return (
+    <div className="grid w-full items-center gap-6 xl:grid-cols-2 xl:gap-10">
+      <div>
+        <p className="hp-a font-label text-meta font-semibold uppercase text-ink-500">Founding sites</p>
+        <h2 className="hp-a mt-2 text-2xl font-semibold text-ink-900 lg:text-4xl" style={d(0.1)}>Be one of the first sites on SOPstart</h2>
+        <p className="hp-a mt-3 text-reading text-ink-600" style={d(0.2)}>
+          Send us three of your SOPs. We convert them for free and show you them running on your own site.
+        </p>
+        <ul className="hp-tall mt-6 hidden flex-col gap-2 lg:flex">
+          {['Your first three SOPs converted, free', 'Shown on a map of your own site', 'No commitment to buy', 'Founding sites help decide what we build next'].map((p, i) => (
+            <li key={p} className="hp-a flex gap-3 text-reading text-ink-900" style={d(0.3 + i * 0.1)}>
+              <Check className="mt-0.5 size-5 shrink-0 text-accent-ok" aria-hidden="true" />
+              {p}
+            </li>
+          ))}
+        </ul>
+        <div className="hp-a mt-6 flex flex-wrap items-center gap-x-6 gap-y-3" style={d(0.7)}>
+          <Enquiries id="offer-slide" {...OFFER} className="flex min-h-tap-glove items-center rounded-lg bg-ink-900 px-6 text-reading font-semibold text-paper hover:opacity-90" />
+          <span className="text-meta text-ink-500">
+            <Link href="/privacy" className={legal}>Privacy</Link> · <Link href="/terms" className={legal}>Terms</Link>
+          </span>
+        </div>
+      </div>
+      <div aria-hidden="true" className="mx-auto w-full max-w-md">
+        <FoundingExample />
+      </div>
+    </div>
   )
 }
 
@@ -334,7 +396,7 @@ function Intro() {
   return (
     <div className="grid w-full items-center gap-6 xl:grid-cols-2 xl:gap-10">
       <div>
-        <p className="hp-a font-label text-meta font-semibold uppercase text-ink-500">Safety software for industrial sites</p>
+        <p className="hp-a font-label text-meta font-semibold uppercase text-ink-500">Built for New Zealand industrial sites</p>
         <h2 className="hp-a mt-2 text-3xl font-semibold text-ink-900 lg:text-4xl" style={d(0.1)}>Every procedure, where the work happens.</h2>
         <p className="hp-a mt-4 text-reading text-ink-600" style={d(0.3)}>
           Send us the documents you already have. SOPstart turns them into clear steps your people follow on the floor, records every job as it is done, and keeps every version on file.
@@ -356,6 +418,19 @@ function Intro() {
 
 const SLIDES: { id: string; label: string; body: ReactNode }[] = [
   { id: 'intro', label: 'SOPstart', body: <Intro /> },
+  {
+    id: 'how',
+    label: 'How it works',
+    body: (
+      <Story
+        eyebrow="How it works"
+        title="From the documents you have to the job done right"
+        intro="Your existing SOPs become the steps people follow on the floor, and every job done comes back as a record."
+        points={[]}
+        example={<FlowExample />}
+      />
+    ),
+  },
   {
     id: 'accessible',
     label: 'Accessible',
@@ -393,42 +468,25 @@ const SLIDES: { id: string; label: string; body: ReactNode }[] = [
     ),
   },
   {
-    id: 'tracked',
-    label: 'Fully tracked',
+    id: 'audit',
+    label: 'Audit-ready',
     body: (
       <Story
-        eyebrow="Full document tracking"
-        title="Every version, every change, on file"
-        intro="Your SOPs come in as they are: Word, PDF or scans. Nothing reaches the floor until your people approve it, and every change after that is tracked."
+        eyebrow="Audit-ready"
+        title="Every version, every job, on file"
+        intro="Nothing reaches the floor until your people approve it. After that, every change, job and sign-off is recorded, and each person sees only what their role needs."
         points={[
-          'The copy on the floor is always the approved one',
+          'Shows the training, instruction and supervision the Health and Safety at Work Act 2015 asks of you',
           'Each document has an owner and a review date',
           'A change log that can only be added to, never edited',
-          'Ready for any audit or incident review',
+          'Access by role, hosted in Australia, encrypted in transit and at rest',
         ]}
         example={<TrackedExample />}
       />
     ),
   },
-  {
-    id: 'secure',
-    label: 'Secure',
-    body: (
-      <Story
-        eyebrow="Secure"
-        title="Your data, securely managed"
-        intro="Each organisation's data is kept apart in the database itself, and each person sees only what their role needs."
-        points={[
-          'Access by role: worker, supervisor, admin, safety manager',
-          'Hosted in Australia, encrypted in transit and at rest',
-          'New accounts approved before they see anything',
-          'Every action logged to a record that cannot be rewritten',
-        ]}
-        example={<SecureExample />}
-      />
-    ),
-  },
   { id: 'modules', label: 'Modules', body: <Modules /> },
+  { id: 'founding', label: 'Founding sites', body: <Founding /> },
 ]
 
 const MOTION = '(prefers-reduced-motion: reduce)'
@@ -474,16 +532,22 @@ export function Homepage() {
           <h1 className="hp-mark">
             <Wordmark onInk />
           </h1>
-          <p className="hp-lead mt-8 hidden max-w-md text-4xl font-semibold lg:block" style={d(2.6)}>Safe work, one step at a time.</p>
+          <p className="hp-lead mt-8 hidden max-w-md text-4xl font-semibold lg:block" style={d(2.6)}>Your SOPs are written. Are they followed?</p>
           <p className="hp-lead mt-4 hidden max-w-md text-reading text-ink-300 lg:block" style={d(2.9)}>
-            SOPs, PMs, lockout / tagout, safety meetings and permits to work, in one place everyone on site can use.
+            Safe work, one step at a time: SOPs, PMs, lockout / tagout, safety meetings and permits to work, in one place everyone on site can use.
           </p>
+          <div className="hp-lead mt-8 hidden lg:block" style={d(3.2)}>
+            <Enquiries id="offer" {...OFFER} className="flex min-h-tap-glove items-center rounded-lg bg-paper px-6 text-reading font-semibold text-ink-900 hover:bg-paper-2" />
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <Enquiries className={`${pill} text-paper hover:bg-ink-700`} />
-          <Link href="/login" className={`${pill} bg-paper text-ink-900 hover:bg-paper-2`}>
+          <Link href="/login" className={`${pill} border border-ink-500 text-paper hover:bg-ink-700`}>
             Sign in
           </Link>
+          <span className="ml-auto hidden text-meta text-ink-300 lg:block">
+            <Link href="/privacy" className={legal}>Privacy</Link> · <Link href="/terms" className={legal}>Terms</Link>
+          </span>
         </div>
       </aside>
 

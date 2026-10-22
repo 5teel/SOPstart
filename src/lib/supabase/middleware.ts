@@ -41,9 +41,9 @@ export async function updateSession(request: NextRequest) {
   // The kill-switch worker must reach signed-out browsers: a redirected
   // service-worker script fails the update check and the old worker stays.
   const isServiceWorkerScript = path === '/sw.js'
-  // The signed-out homepage: static content, no tenant data.
-  const isWelcome = path === '/welcome'
-  const isPublicRoute = path === '/' || isWelcome || isAuthRoute || isSchemaIntrospection || isVersionRoute || isServiceWorkerScript
+  // The signed-out homepage and its privacy and terms pages: static content, no tenant data.
+  const isPublicPage = path === '/welcome' || path === '/privacy' || path === '/terms'
+  const isPublicRoute = path === '/' || isPublicPage || isAuthRoute || isSchemaIntrospection || isVersionRoute || isServiceWorkerScript
 
   if (!isPublicRoute && !claims) {
     // Phase 53 PHN-02: preserve the requested path (e.g. a scanned /m/<code>
