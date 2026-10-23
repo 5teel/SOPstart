@@ -375,6 +375,27 @@ export const UAT_TESTS: UatTest[] = [
     ],
   },
   {
+    id: 'phase65-passkeys',
+    dateAdded: '2026-10-24',
+    category: 'Signing in',
+    title: "Sign in with your phone's face or fingerprint unlock",
+    status: 'active',
+    summary:
+      'You can now add a passkey on your Profile and then sign in with your face, fingerprint or screen lock instead of typing your password. Your password still works.',
+    tryIt: [
+      'On your own phone, sign in to sopstart.com the usual way and open Profile.',
+      "Under Passkeys, tap Add a passkey and follow your phone's prompt.",
+      'Sign out, then on the login screen tap Sign in with a passkey.',
+      'Back on Profile, remove the passkey and try Sign in with a passkey again.',
+    ],
+    links: [{ label: 'Profile', href: '/profile' }, { label: 'Login', href: '/login' }],
+    questions: [
+      { id: 'add-easy', text: 'Was adding a passkey easy?' },
+      { id: 'sign-in-faster', text: 'Was signing in with the passkey quicker than typing your password?' },
+      { id: 'removed-clear', text: 'After you removed it, did the login screen tell you plainly that it did not work?' },
+    ],
+  },
+  {
     id: 'adr20-people-chart',
     dateAdded: '2026-10-16',
     category: 'People chart',

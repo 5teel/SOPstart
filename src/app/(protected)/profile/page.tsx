@@ -3,6 +3,7 @@ import { getSessionContext } from '@/lib/auth/session-context'
 import { LogoutButton } from '@/components/profile/LogoutButton'
 import { ObservationsSection } from '@/components/profile/ObservationsSection'
 import { CompetencySection } from '@/components/profile/CompetencySection'
+import { PasskeysSection } from '@/components/profile/PasskeysSection'
 
 export default async function ProfilePage() {
   const { userId, userEmail } = await getSessionContext()
@@ -25,6 +26,9 @@ export default async function ProfilePage() {
           <span className="text-sm text-[var(--ink-900)]">{userEmail}</span>
         </div>
       </section>
+
+      {/* Passkeys (Phase 65, ADR-0027) */}
+      <PasskeysSection />
 
       {/* Observations about you (OBS-02) */}
       <ObservationsSection />

@@ -39,6 +39,7 @@
     { "file": "src/actions/auth.ts", "function": "updateMemberRoleSafe", "status": "hook", "key": "organisation_members", "kind": "role_change", "plan": 59 }
   ],
   "extraHooks": [
+    { "file": "src/actions/passkeys.ts", "function": "recordPasskeyChange", "status": "hook", "anchor": "passkeysOf(userId)", "kind": "passkey_added/passkey_removed", "plan": 65, "note": "The change happens in Supabase Auth (browser ceremony, or the admin delete here); the row follows a check against the admin passkey list (ADR-0027)" },
     { "file": "src/actions/ai-fields.ts", "function": "applyAiWrite", "status": "hook", "anchor": "gateWrite(", "kind": "ai_field_write", "actor": "agent", "plan": 8 },
     { "file": "src/actions/members.ts", "function": "applyMemberState", "status": "hook", "anchor": "changeMemberState(", "kind": "member_suspended/member_left/member_reinstated", "plan": 64 },
     { "file": "src/actions/requests.ts", "function": "answerRequest", "status": "hook", "anchor": "claimOpenRequest(", "kind": "request_accepted/request_declined", "plan": 60 },

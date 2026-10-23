@@ -58,6 +58,7 @@ const LIVE_WRITERS: string[] = [
   'src/actions/objectives.ts#setObjective',
   'src/actions/objectives.ts#clearObjective',
   'src/actions/objectives.ts#confirmObjective',
+  'src/actions/passkeys.ts#recordPasskeyChange',
 ]
 // performPublish is hooked outside the gate body (56-05).
 const PUBLISH_GUARD_LIVE = true

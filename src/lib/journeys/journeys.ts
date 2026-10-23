@@ -54,11 +54,18 @@ export const JOURNEYS: Journey[] = [
     group: 'Getting started',
     persona: 'Everyone',
     title: 'Log in',
-    summary: 'An existing member signs in and lands on their home screen.',
+    summary: 'An existing member signs in, with a passkey or with their email and password, and lands on their home screen.',
     steps: [
       { id: 's', type: 'start', label: 'Has an account' },
       { id: 'welcome', type: 'screen', label: 'Homepage', route: '/welcome', detail: 'A signed-out visit to / lands here: one screen with the brandmark on the left and slides on the right that change on their own until touched (intro, how it works, accessible, accountable, audit-ready, the modules: SOPs, PMs, lockout / tagout, safety meetings, permits to work, then founding sites). Send us 3 SOPs (left panel on a computer, and the last slide) opens the enquiries address with the free conversion offer. Sign in leads to the login screen; Enquiries opens a popup with the SOPstart enquiries address to copy or open in email (same on the login screen). Privacy and Terms link to the two public pages below.' },
-      { id: 'login', type: 'screen', label: 'Login screen', route: '/login' },
+      { id: 'login', type: 'screen', label: 'Login screen', route: '/login', detail: 'Sign in with a passkey sits above the email and password form; it is hidden in a browser that cannot use passkeys (Phase 65).' },
+      { id: 'how', type: 'decision', label: 'Passkey or password?', branches: [
+        { label: 'Has a passkey on this phone or computer', to: 'passkey' },
+        { label: 'Email and password', to: 'auth' },
+      ] },
+      { id: 'passkey', type: 'action', label: 'Sign in with a passkey', detail: 'Face, fingerprint or screen lock (ADR-0027). The page then reloads and the proxy sends the person to their role home or the ?next= address, as after a password. A cancelled, removed or unknown passkey shows a plain sentence and the password form stays.', branches: [
+        { label: 'Signed in', to: 'role' },
+      ] },
       { id: 'auth', type: 'action', label: 'Enter email + password', detail: 'Supabase Auth verifies and sets a session. roleHome(role) sends every role to the home, or to /pending when there is no role (UX-01, Phase 57).' },
       { id: 'role', type: 'decision', label: 'Role?', branches: [
         { label: 'Worker, supervisor, safety manager or admin', to: 'one-screen' },
@@ -673,10 +680,11 @@ export const JOURNEYS: Journey[] = [
     group: 'Everyone',
     persona: 'Everyone',
     title: 'Manage your account',
-    summary: 'A member opens Profile from the account control to see their account and their training evidence. Nothing on it is edited.',
+    summary: 'A member opens Profile from the account control to see their account and their training evidence, and adds or removes passkeys for signing in.',
     steps: [
       { id: 's', type: 'start', label: 'Open your account' },
-      { id: 'profile', type: 'screen', label: 'Profile', route: '/profile', detail: 'Your email, Observations about you, My competency, and Sign out. Read-only.' },
+      { id: 'profile', type: 'screen', label: 'Profile', route: '/profile', detail: 'Your email, Passkeys, Observations about you, My competency, and Sign out.' },
+      { id: 'passkeys', type: 'action', label: 'Add, rename or remove a passkey', detail: 'Add a passkey runs the phone or computer prompt; each passkey shows its name and the day it was added, with Rename and Remove (asks first). Adding and removing each write a ledger row, Added a passkey / Removed a passkey (ADR-0027, ADR-0008).' },
       { id: 'e', type: 'end', label: 'Account checked' },
     ],
   },
