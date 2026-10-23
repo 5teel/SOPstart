@@ -88,3 +88,18 @@ As the eval-site admin (`eval-site-admin@sopstart.com` in "SOPstart Eval Site", 
 | 50 newest `public.decisions` rows for the org | 11.002 ms | 11.251 ms | 11.291 ms |
 
 Stop threshold for Task 3: either query more than 3x slower AND above 50 ms.
+
+## EXPLAIN after
+
+Same probe after 00082 went live (2026-10-23), warm run, two audit runs:
+
+| Query | Before (runs 1-2) | After run 1 | After run 2 | Ratio |
+|---|---|---|---|---|
+| `select count(*) from public.sops` (18 rows) | 0.095 - 0.096 ms | 0.228 ms | 0.258 ms | about 2.4x |
+| 50 newest `public.decisions` rows | 11.0 - 11.3 ms | 27.26 ms | 26.72 ms | about 2.4x |
+
+Neither is more than 3x slower, and both are far under 50 ms, so the stop threshold is not hit. The extra cost is one indexed `organisation_members` lookup per policy evaluation. Upgrade path if lists grow: wrap helper calls in policies as `(select current_organisation_id())` so Postgres evaluates them once per statement.
+
+## Live assertion run (2026-10-23)
+
+`node scripts/apply-phase64-migration.mjs --assert-only`: all PASS. The suspended probe (rolled back) on `eval-site-worker2` in "SOPstart Eval Site": active claims gave the site, `worker` and 18 sops; after setting the row to suspended the same claims gave NULL organisation, NULL role, 0 sops, 0 members, and the hook returned organisation null and role `pending`. The active probe as the eval-site admin returned the site, `admin`, 18 sops and 6 members with no recursion error. The uat_feedback insert policy accepted an own-row insert. After the run: 0 non-active membership rows and 0 probe rows left behind.

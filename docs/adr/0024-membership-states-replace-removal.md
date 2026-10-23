@@ -28,7 +28,7 @@
 - **Reinstating within the hour revives an old access token** until it expires. Accepted: it is the same person with the same rights again.
 - **`walkthrough_progress` and `uat_feedback` own-row arms stay.** They hold no tenant data about the site.
 - **The generated-videos policy is dropped.** It read `app_metadata`, matched nothing, and video generation left the product in Phase 55.
-- **Per-policy cost:** each policy evaluation does an indexed lookup on `organisation_members` instead of reading JSON. Measured as the eval-site admin on the live project: `count(*)` over `sops` 0.095 ms and the 50 newest decisions 11.0 ms before the change (after-numbers in `.planning/phases/64-leavers-and-suspended-members/64-BASELINE.md`). Upgrade path if it ever matters: wrap helper calls in policies as `(select current_organisation_id())` so Postgres caches them per statement.
+- **Per-policy cost:** each policy evaluation does an indexed lookup on `organisation_members` instead of reading JSON. Measured as the eval-site admin on the live project (`.planning/phases/64-leavers-and-suspended-members/64-BASELINE.md`): `count(*)` over `sops` 0.095 ms before and about 0.25 ms after; the 50 newest decisions 11.0 ms before and about 27 ms after (about 2.4x, far under 50 ms). Upgrade path if it ever matters: wrap helper calls in policies as `(select current_organisation_id())` so Postgres caches them per statement.
 - **Applied before the app code.** The migration is backwards compatible with the deployed app (default `active`, same helper values for active members, `role` still updatable), so it ships first and later plans assume it.
 
 ## How to comply
