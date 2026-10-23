@@ -350,18 +350,22 @@ export async function reassignApprovalStep(
 
   const label = memberLabel((await userLabels([userId])).get(userId))
   const next = steps.map((st, i) => (i === nextIndex ? { userId, label } : st))
+  // Compare-and-swap on what was read (64-REVIEW LO-01): a send-back and resubmit in the meantime
+  // (same or new version, new snapshot) matches zero rows instead of being overwritten.
   const { data: updated, error } = await supabase
     .from('sops')
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .update({ approval_snapshot: next } as any)
     .eq('id', sopId)
     .eq('approval_state', 'pending')
+    .eq('version', sop.version)
+    .eq('approval_snapshot', JSON.stringify(steps))
     .select('id')
   if (error) {
     console.error('[reassignApprovalStep] update error', error)
     return { error: error.message }
   }
-  if (!updated || updated.length === 0) return { error: 'SOP not found' }
+  if (!updated || updated.length === 0) return { error: 'That has already changed. Refresh and try again.' }
 
   const rec = await recordDecision({
     kind: 'owner_change',

@@ -146,3 +146,13 @@ test.describe('reassignApprovalStep hardening (ME-02, LO-01, LO-02, LO-07)', () 
     expect(s.indexOf('approved.some(')).toBeLessThan(s.indexOf('.update('))
   })
 })
+
+test.describe('reassignApprovalStep write (LO-01)', () => {
+  test('the write is a compare-and-swap on version and the snapshot it read; zero rows asks for a refresh', () => {
+    const s = body(src('src/actions/approvals.ts'), 'reassignApprovalStep')
+    const w = s.slice(s.indexOf('.update('), s.indexOf(".select('id')", s.indexOf('.update(')))
+    expect(w).toContain(".eq('version', sop.version)")
+    expect(w).toContain(".eq('approval_snapshot', JSON.stringify(steps))")
+    expect(s).toContain("return { error: 'That has already changed. Refresh and try again.' }")
+  })
+})
