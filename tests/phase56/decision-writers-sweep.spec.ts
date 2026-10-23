@@ -63,6 +63,8 @@ const LIVE_WRITERS: string[] = [
   'src/actions/mfa.ts#issueRecoveryCodes',
   'src/actions/mfa.ts#redeemRecoveryCode',
   'src/actions/mfa.ts#resetMemberFactors',
+  'src/actions/members.ts#issueSigninCode',
+  'src/actions/auth.ts#signInWithCode',
 ]
 // performPublish is hooked outside the gate body (56-05).
 const PUBLISH_GUARD_LIVE = true

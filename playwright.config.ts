@@ -37,7 +37,7 @@ export default defineConfig({
     {
       name: 'phase15-stubs',
       testMatch:
-        /(sub-trade-rls-backward-compat|sub-trade-assignment|no-static-admin-lens-import|version-route-public|no-bulk-verify-ui|no-undefined-css-tokens|design-tokens|sops-select-policies-org-scoped|rls-org-scope|use-viewport|no-dead-internal-hrefs|no-scheduled-jobs|design-principles|typography|no-walk-words|no-rooms|ledger-every-action|jev-one-door|member-status|passkeys|elevated-aal2)\.spec\.ts$/,
+        /(sub-trade-rls-backward-compat|sub-trade-assignment|no-static-admin-lens-import|version-route-public|no-bulk-verify-ui|no-undefined-css-tokens|design-tokens|sops-select-policies-org-scoped|rls-org-scope|use-viewport|no-dead-internal-hrefs|no-scheduled-jobs|design-principles|typography|no-walk-words|no-rooms|ledger-every-action|jev-one-door|member-status|passkeys|elevated-aal2|signin-codes)\.spec\.ts$/,
       use: { browserName: 'chromium' },
     },
     {
@@ -771,6 +771,13 @@ export default defineConfig({
       name: 'phase66',
       testDir: '.',
       testMatch: /tests\/phase66\/.*\.(spec|test)\.ts$/,
+      use: { browserName: 'chromium' },
+    },
+    {
+      // Phase 67 (in-person sign-in codes, ADR-0029).
+      name: 'phase67',
+      testDir: '.',
+      testMatch: /tests\/phase67\/.*\.(spec|test)\.ts$/,
       use: { browserName: 'chromium' },
     },
   ],

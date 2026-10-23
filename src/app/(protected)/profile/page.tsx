@@ -6,9 +6,10 @@ import { CompetencySection } from '@/components/profile/CompetencySection'
 import { PasskeysSection } from '@/components/profile/PasskeysSection'
 import { SecondStepSection } from '@/components/profile/SecondStepSection'
 import { isElevatedRole } from '@/lib/auth/elevated'
+import { SetPasswordSection } from '@/components/profile/SetPasswordSection'
 
 export default async function ProfilePage() {
-  const { userId, userEmail, memberRole, aal } = await getSessionContext()
+  const { userId, userEmail, memberRole, aal, mustSetPassword } = await getSessionContext()
 
   if (!userId) {
     redirect('/login')
@@ -17,6 +18,8 @@ export default async function ProfilePage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 space-y-4">
       <h1 className="text-xl font-semibold text-[var(--ink-900)] mb-2">Profile</h1>
+
+      {mustSetPassword && <SetPasswordSection />}
 
       {/* Account info */}
       <section className="blueprint-frame p-5">

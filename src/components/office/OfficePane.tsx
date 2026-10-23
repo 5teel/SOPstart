@@ -19,6 +19,8 @@ import { RequestsTab } from './RequestsTab'
 import { InboxChips, InboxTab, inboxItemsOf, useOfficeInbox, type ChipKey } from './InboxTab'
 import type { RowDone } from './InboxRow'
 import { PeopleTab } from './PeopleTab'
+import { SigninCodeWorkers } from './SigninCode'
+import { useRole } from '@/components/providers/RoleProvider'
 
 const TAB_LABEL: Record<OfficeTab, string> = {
   inbox: 'Inbox',
@@ -65,6 +67,7 @@ export function OfficePane({
   /** Opens the Access tab pinned to one SOP (the People chart's "Change who sees it"). */
   onPinSop?(sopId: string): void
 }) {
+  const role = useRole()
   // A tab the caller did not offer resolves to the first one at render time, never by redirect.
   const tab: OfficeTab = requested && tabs.includes(requested) ? requested : (tabs[0] ?? 'inbox')
 
@@ -176,6 +179,7 @@ export function OfficePane({
           {tab === 'inbox' && (
             <InboxTab chip={chip} onChip={setChip} onReceipt={(r) => setReceipt({ ...r, tab })} />
           )}
+          {tab === 'inbox' && role === 'supervisor' && <SigninCodeWorkers />}
           {tab === 'access' && (
             <div className="overflow-x-auto px-2 pb-8">
               <AdminAccessLens pinnedSopId={initialSop ?? undefined} />

@@ -95,3 +95,32 @@ export function authorityLines(a: Authority): string[] {
   if (lines.length === 0) lines.push('Follows SOPs and sends them for sign-off.')
   return lines
 }
+
+// Phase 67 / ADR-0029: who may give a sign-in code.
+/**
+ * D-01. The caller's effective role (an elevated person without aal2 counts as a worker, Phase 66).
+ * - a supervisor: the active workers they supervise;
+ * - a safety manager: any active worker or supervisor;
+ * - an admin: anyone active, and an admin or safety manager has their second steps reset too.
+ * Never yourself, never someone suspended or departed.
+ */
+export function mayIssueSigninCode(input: {
+  callerId: string
+  callerRole: string | null
+  subjectId: string
+  subjectRole: AppRole
+  subjectStatus: string
+  supervises: boolean
+}): boolean {
+  const { callerId, callerRole, subjectId, subjectRole, subjectStatus, supervises } = input
+  if (callerId === subjectId || subjectStatus !== 'active') return false
+  if (callerRole === 'admin') return true
+  if (callerRole === 'safety_manager') return subjectRole === 'worker' || subjectRole === 'supervisor'
+  if (callerRole === 'supervisor') return subjectRole === 'worker' && supervises
+  return false
+}
+
+/** An admin issuing for an elevated person resets that person's second steps first (D-01 row 3). */
+export function resetsSecondSteps(subjectRole: AppRole): boolean {
+  return subjectRole === 'admin' || subjectRole === 'safety_manager'
+}

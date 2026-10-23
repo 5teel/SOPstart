@@ -27,13 +27,14 @@ import { listDepartments } from '@/actions/departments'
 import { markMemberLeft, reinstateMember, suspendMember } from '@/actions/members'
 import { getPeopleAuthorityData, setSupervision } from '@/actions/people'
 import { resetMemberFactors } from '@/actions/mfa'
+import { SigninCodeButton } from './SigninCode'
 import { DChip } from '@/components/admin/departments/DChip'
 import { DepartmentPicker } from '@/components/admin/departments/DepartmentPicker'
 import { useRole } from '@/components/providers/RoleProvider'
 import { useObjectives } from '@/components/shell/ObjectiveLine'
 import { ObjectiveSlot } from '@/components/shell/ObjectiveSlot'
 import { OFFICE_INBOX_KEY } from '@/lib/shell/query-keys'
-import { authorityLines, authorityOf, ROLE_ORDER, ROLE_PLURAL, ROLE_WORDS, type Authority } from '@/lib/members/authority'
+import { authorityLines, authorityOf, mayIssueSigninCode, resetsSecondSteps, ROLE_ORDER, ROLE_PLURAL, ROLE_WORDS, type Authority } from '@/lib/members/authority'
 import type { Department } from '@/types/sop'
 import type { AppRole } from '@/types/auth'
 import type { RowDone } from './InboxRow'
@@ -852,6 +853,8 @@ export function PeopleTab({ onReceipt, siteName = '', onPinSop }: { onReceipt(r:
           a={auth(open)}
           mine={open.user_id === data.currentUserId}
           isAdmin={isAdmin}
+          viewerRole={role}
+          onReceipt={onReceipt}
           departments={departments}
           deptMap={deptMap}
           members={members}
@@ -902,6 +905,8 @@ function PersonSheet({
   a,
   mine,
   isAdmin,
+  viewerRole,
+  onReceipt,
   departments,
   deptMap,
   members,
@@ -923,6 +928,9 @@ function PersonSheet({
   a: Authority
   mine: boolean
   isAdmin: boolean
+  /** The viewer's effective role (Phase 67: who may give a sign-in code, D-01). */
+  viewerRole: string | null
+  onReceipt(r: RowDone): void
   departments: Department[]
   deptMap: Map<string, Department>
   members: TeamMember[]
@@ -1126,6 +1134,14 @@ function PersonSheet({
                 Reinstate
               </button>
             )}
+            {mayIssueSigninCode({
+              callerId: 'viewer',
+              callerRole: viewerRole,
+              subjectId: m.user_id,
+              subjectRole: m.role,
+              subjectStatus: m.status,
+              supervises: false,
+            }) && <SigninCodeButton userId={m.user_id} label={label} resets={resetsSecondSteps(m.role)} onReceipt={onReceipt} />}
             {isAdmin && !resetAsk && (
               <button
                 type="button"

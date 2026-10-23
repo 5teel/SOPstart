@@ -289,6 +289,9 @@ function samples(sopId: string): Record<DecisionKind, DecisionInput> {
     mfa_reset: { kind: 'mfa_reset', subject: { kind: 'person', id: randomUUID() }, sopId: null, summary: 'Reset a person’s sign-in steps', details: { ...probe, factors_removed: 1 } },
     recovery_codes_issued: { kind: 'recovery_codes_issued', subject: { kind: 'person', id: randomUUID() }, sopId: null, summary: 'Made new recovery codes', details: { ...probe, count: 10 } },
     recovery_code_used: { kind: 'recovery_code_used', subject: { kind: 'person', id: randomUUID() }, sopId: null, summary: 'Used a recovery code', details: { ...probe, factors_removed: 1 } },
+    // Phase 67 (ADR-0029): both rows name the person the code was for.
+    signin_code_issued: { kind: 'signin_code_issued', subject: { kind: 'person', id: randomUUID() }, sopId: null, summary: 'Gave a person a sign-in code', details: { ...probe, code_id: randomUUID(), role: 'worker' } },
+    signin_code_used: { kind: 'signin_code_used', subject: { kind: 'person', id: randomUUID() }, sopId: null, summary: 'Signed in with a code from a supervisor', details: { ...probe, code_id: randomUUID(), issued_by: randomUUID() } },
   }
 }
 

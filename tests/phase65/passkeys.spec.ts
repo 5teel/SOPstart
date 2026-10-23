@@ -100,7 +100,7 @@ test.describe('passkey ledger kinds (00085)', () => {
     expect(m).not.toBeNull()
     const kinds = [...m![1].matchAll(/'([a-z_]+)'/g)].map((x) => x[1])
     // 00086 (Phase 66) widened the list again with the five MFA kinds.
-    const at85 = DECISION_KINDS.filter((k) => !/^(mfa_|recovery_code)/.test(k))
+    const at85 = DECISION_KINDS.filter((k) => !/^(mfa_|recovery_code|signin_code)/.test(k))
     expect(new Set(kinds)).toEqual(new Set(at85))
     expect(kinds.length).toBe(at85.length)
     expect(sql).not.toMatch(/\b(policy|create table|create function|grant)\b/i)

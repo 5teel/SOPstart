@@ -11,7 +11,7 @@ import { nzStartOfDayIso } from '@/lib/office/format'
 import { DECISION_GROUPS, KIND_GROUPS, KIND_WORDS, CLEARED_KINDS, PAGE_SIZE, cursorFilter } from '@/lib/decisions/read'
 
 const MIGRATION = fs.readFileSync(path.join(process.cwd(), 'supabase/migrations/00073_office_ledger.sql'), 'utf8')
-const MIGRATION_60 = fs.readFileSync(path.join(process.cwd(), 'supabase/migrations/00086_mfa_recovery_codes.sql'), 'utf8')
+const MIGRATION_60 = fs.readFileSync(path.join(process.cwd(), 'supabase/migrations/00088_signin_codes.sql'), 'utf8')
 
 test.describe('ledger read', () => {
   test('every DECISION_KINDS value sits in exactly one KIND_GROUPS group (59-02)', () => {
@@ -48,7 +48,7 @@ test.describe('ledger read', () => {
     expect([...CLEARED_KINDS]).toEqual(['countersign', 'reject', 'approve', 'owner_change', 'review'])
   })
 
-  test('the latest migration kind list (00086_mfa_recovery_codes.sql) equals DECISION_KINDS, including the 59 kinds (59-02, repointed by 60-02, ADR-0008, 64-01, 65 and 66)', () => {
+  test('the latest migration kind list (00088_signin_codes.sql) equals DECISION_KINDS, including the 59 kinds (59-02, repointed by 60-02, ADR-0008, 64-01, 65, 66 and 67)', () => {
     const m = MIGRATION_60.match(/check\s*\(\s*kind\s+in\s*\(([^)]*)\)/i)
     expect(m).not.toBeNull()
     const kinds = [...m![1].matchAll(/'([a-z_]+)'/g)].map((x) => x[1])

@@ -127,7 +127,7 @@ console.log('[2/3] 00086 assertions')
   check('attempt cap: 5 allowed, the 6th refused, a new window after 15 minutes', cap.seq === 'yyyyyny', cap.seq)
   const [k] = await sql(`SELECT pg_get_constraintdef(oid) AS d FROM pg_constraint WHERE conname = 'decisions_kind_check'`)
   const kinds = [...k.d.matchAll(/'([a-z_]+)'::text/g)].map((m) => m[1])
-  check('decisions_kind_check has 44 kinds incl. the five MFA kinds', kinds.length === 44 &&
+  check('decisions_kind_check has at least 44 kinds incl. the five MFA kinds (00088 adds two)', kinds.length >= 44 &&
     ['mfa_enrolled', 'mfa_removed', 'mfa_reset', 'recovery_codes_issued', 'recovery_code_used'].every((n) => kinds.includes(n)), `${kinds.length} kinds`)
   const [n] = await sql(`SELECT pg_get_constraintdef(oid) AS d FROM pg_constraint WHERE conname = 'notifications_kind_check'`)
   check('notifications_kind_check accepts signin_reset', n.d.includes("'signin_reset'"))

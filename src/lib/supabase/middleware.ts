@@ -96,6 +96,17 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
+  // Phase 67 / ADR-0029: after a sign-in code the person sets a new password before going on.
+  // signInWithCode sets app_metadata.must_set_password (service role, so the person cannot clear
+  // it themselves) and setNewPassword clears it and refreshes the token. Every page sends them
+  // to Profile; API routes pass, so Profile's own sections still load.
+  const mustSetPassword = !!claims && (claims as { app_metadata?: Record<string, unknown> }).app_metadata?.['must_set_password'] === true
+  if (mustSetPassword && path !== '/profile' && !path.startsWith('/api/') && !isPublicPage && !isServiceWorkerScript) {
+    const redirect = NextResponse.redirect(new URL('/profile?set-password=1', request.url))
+    response.cookies.getAll().forEach((c) => redirect.cookies.set(c))
+    return redirect
+  }
+
   // Phase 66 / ADR-0028: an admin or safety manager reaches an admin screen only with an aal2
   // session. The role here is the token's claim, which only routes; the page and every action
   // re-check through getSessionContext(), and RLS through public.is_elevated().

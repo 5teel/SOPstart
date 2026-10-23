@@ -375,6 +375,27 @@ export const UAT_TESTS: UatTest[] = [
     ],
   },
   {
+    id: 'phase67-signin-code',
+    dateAdded: '2026-10-24',
+    category: 'Signing in',
+    title: 'Getting a locked-out worker back in with a code',
+    status: 'active',
+    summary:
+      'A worker who forgot their password or lost their phone asks their supervisor or an admin, in person, for a sign-in code. They type their email and the code on the login screen, then set a new password. The code works once, for 30 minutes.',
+    tryIt: [
+      'As an admin, open People, tap a worker, then tap Give a sign-in code. Read the code shown.',
+      'On another phone or a private window, open sopstart.com, tap Got a code from your supervisor?, type the worker\'s email and the code.',
+      'Set a new password (type it twice), then check you reach the home.',
+      'Try the same code again: it should be refused.',
+    ],
+    links: [{ label: 'People', href: '/?s=people' }, { label: 'Login', href: '/login' }],
+    questions: [
+      { id: 'give-easy', text: 'Was it easy to find Give a sign-in code and read the code out?' },
+      { id: 'use-easy', text: 'Was it clear on the login screen where to type the code?' },
+      { id: 'password-ok', text: 'Was setting the new password straightforward?' },
+    ],
+  },
+  {
     id: 'phase66-second-step',
     dateAdded: '2026-10-24',
     category: 'Signing in',

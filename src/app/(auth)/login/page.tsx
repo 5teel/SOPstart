@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import LoginForm from '@/components/auth/LoginForm'
 import { PasskeySignIn } from '@/components/auth/PasskeySignIn'
+import { SigninCodeForm } from '@/components/auth/SigninCodeForm'
 import Link from 'next/link'
 import { safeNextPath } from '@/lib/auth/next-redirect'
 
@@ -23,6 +24,7 @@ export default async function LoginPage({
       </h2>
       <PasskeySignIn next={next} />
       <LoginForm next={next} />
+      <SigninCodeForm />
 
       {/* Prominent join card below the form */}
       <div className="mt-6 rounded-lg border border-[var(--ink-100)] bg-white p-4 text-center">

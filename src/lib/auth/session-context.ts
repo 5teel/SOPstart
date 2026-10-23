@@ -18,6 +18,8 @@ export interface SessionContext {
   aal: string | null
   /** memberRole is elevated and the session has not proved the second step. */
   needsSecondStep: boolean
+  /** Phase 67 / ADR-0029: signed in with a code and has not set a new password yet (app_metadata). */
+  mustSetPassword: boolean
   organisationId: string | null
 }
 
@@ -39,7 +41,7 @@ export const getSessionContext = cache(async (): Promise<SessionContext> => {
   const { data, error } = await supabase.auth.getClaims()
   const claims = data?.claims
   if (error || !claims?.sub) {
-    return { supabase, userId: null, userEmail: null, role: null, memberRole: null, aal: null, needsSecondStep: false, organisationId: null }
+    return { supabase, userId: null, userEmail: null, role: null, memberRole: null, aal: null, needsSecondStep: false, mustSetPassword: false, organisationId: null }
   }
 
   // Org-aware membership lookup (LR-05): scope to the caller's JWT org when
@@ -67,6 +69,7 @@ export const getSessionContext = cache(async (): Promise<SessionContext> => {
     memberRole,
     aal,
     needsSecondStep: secondStep,
+    mustSetPassword: (claims as { app_metadata?: Record<string, unknown> }).app_metadata?.['must_set_password'] === true,
     organisationId: member?.organisation_id ?? null,
   }
 })

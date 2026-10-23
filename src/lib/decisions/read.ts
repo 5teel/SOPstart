@@ -37,7 +37,7 @@ export const KIND_GROUPS: Record<Exclude<DecisionGroupKey, 'all'>, ReadonlyArray
   reviews: ['review', 'cadence_change'],
   ai: ['ai_finding_cleared', 'ai_field_write', 'verify', 'verify_withdrawn'],
   people: ['role_change', 'member_invited', 'member_removed', 'member_suspended', 'member_left', 'member_reinstated', 'supervisor_linked', 'supervisor_unlinked', 'department_change'],
-  setup: ['access_change', 'site_change', 'settings_change', 'passkey_added', 'passkey_removed', 'mfa_enrolled', 'mfa_removed', 'mfa_reset', 'recovery_codes_issued', 'recovery_code_used'],
+  setup: ['access_change', 'site_change', 'settings_change', 'passkey_added', 'passkey_removed', 'mfa_enrolled', 'mfa_removed', 'mfa_reset', 'recovery_codes_issued', 'recovery_code_used', 'signin_code_issued', 'signin_code_used'],
   other: ['observation', 'objective_set', 'objective_cleared', 'objective_confirmed'],
 }
 
@@ -88,6 +88,8 @@ export const KIND_WORDS: Record<DecisionKind, string> = {
   mfa_reset: 'Reset sign-in steps',
   recovery_codes_issued: 'Made recovery codes',
   recovery_code_used: 'Used a recovery code',
+  signin_code_issued: 'Gave a sign-in code',
+  signin_code_used: 'Signed in with a code',
 }
 
 /**

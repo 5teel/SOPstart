@@ -165,9 +165,10 @@ const KINDS = [
   'member_suspended', 'member_left', 'member_reinstated',
   'passkey_added', 'passkey_removed',
   'mfa_enrolled', 'mfa_removed', 'mfa_reset', 'recovery_codes_issued', 'recovery_code_used',
+  'signin_code_issued', 'signin_code_used',
 ]
 await assertSql(
-  'decisions_kind_check accepts all 44 kinds',
+  'decisions_kind_check accepts all 46 kinds',
   `SELECT pg_get_constraintdef(oid) AS def FROM pg_constraint
     WHERE conrelid = 'public.decisions'::regclass AND conname = 'decisions_kind_check'`,
   (rows) => {

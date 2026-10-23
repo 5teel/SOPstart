@@ -62,6 +62,13 @@ export const JOURNEYS: Journey[] = [
       { id: 'how', type: 'decision', label: 'Passkey or password?', branches: [
         { label: 'Has a passkey on this phone or computer', to: 'passkey' },
         { label: 'Email and password', to: 'auth' },
+        { label: 'Locked out: got a code from a supervisor', to: 'code' },
+      ] },
+      { id: 'code', type: 'action', label: 'Sign in with a code', detail: "Phase 67 (ADR-0029): Got a code from your supervisor? opens an email field and a code field. The code was given in person by their supervisor or an admin from People. A good code works once: it signs the person out everywhere else and in here. Any failure (wrong, used, expired or unknown email) gives the same sentence: That code didn't work. Ask your supervisor for a new one. Five wrong tries void the code.", branches: [
+        { label: 'Code worked', to: 'set-password' },
+      ] },
+      { id: 'set-password', type: 'screen', label: 'Set a new password', route: '/profile', detail: "Profile opens with Set a new password at the top (new password, typed twice). Every other page sends them back here until it is done; Add a passkey is on the same screen. Then the home, or Confirm it's you for an admin or safety manager, who sets up their authenticator app again.", branches: [
+        { label: 'Password set', to: 'role' },
       ] },
       { id: 'passkey', type: 'action', label: 'Sign in with a passkey', detail: 'Face, fingerprint or screen lock (ADR-0027). The page then reloads and the proxy sends the person to their role home or the ?next= address, as after a password. A cancelled, removed or unknown passkey shows a plain sentence and the password form stays.', branches: [
         { label: 'Signed in', to: 'role' },
@@ -241,7 +248,7 @@ export const JOURNEYS: Journey[] = [
     summary: 'A supervisor, safety manager or admin checks a worker\'s finished SOP and signs it off, creating a second immutable record.',
     steps: [
       { id: 's', type: 'start', label: 'Completion submitted' },
-      { id: 'inbox', type: 'screen', label: 'Sign-offs - Inbox', route: '/', detail: 'The Sign-offs section opens on the Inbox: one action per row. Completions waiting for review sit here for the supervisor (their own workers) and the admin (everyone). Open a row and the steps, photos and who/when expand in place; nobody signs off their own completion.' },
+      { id: 'inbox', type: 'screen', label: 'Sign-offs - Inbox', route: '/', detail: 'The Sign-offs section opens on the Inbox: one action per row. Completions waiting for review sit here for the supervisor (their own workers) and the admin (everyone). Open a row and the steps, photos and who/when expand in place; nobody signs off their own completion. Below a supervisor\'s Inbox, Your workers lists the workers they supervise, each with Give a sign-in code for one who is locked out (Phase 67, ADR-0029).' },
       { id: 'tabs', type: 'decision', label: 'Which tab?', branches: [
         { label: 'Inbox (supervisor, admin, safety manager)', to: 'ok' },
         { label: 'Requests (the same roles)', to: 'requests' },
@@ -540,7 +547,7 @@ export const JOURNEYS: Journey[] = [
       { id: 'roles', type: 'action', label: 'Add or change a job role', detail: 'In an open department: + Add a role (name and seats); Edit a role to rename it, change its seats, take people out or remove it (a second click says who leaves it); an empty seat puts someone from the department in it or invites someone new (ADR-0021). A job role never changes anyone\'s access level.' },
       { id: 'team', type: 'screen', label: 'People - the Departments view', route: '/', detail: 'The Departments view of the People section: each department with its people grouped by role, each marked Signs off, Assigns or Approves. People with no department come first. Invite by email from the header (admin only).' },
       { id: 'grid', type: 'screen', label: 'Who can do what', route: '/', detail: 'The same people as a grid: departments, signs off work, assigns SOPs, approves SOPs (by category), publishes, manages people.' },
-      { id: 'sheet', type: 'action', label: 'Open a person', detail: 'The person sheet says in plain words what they can do. An admin changes the role, sets departments (and a department owner), ticks the workers a supervisor signs off, sets an objective, or suspends them or marks them as left (they move to Former staff; Reinstate brings them back, same history). Reset sign-in steps (admins, not on yourself; asks first) clears their authenticator app and recovery codes so they set one up again; it is logged and every other admin is told (Phase 66, ADR-0028).' },
+      { id: 'sheet', type: 'action', label: 'Open a person', detail: 'The person sheet says in plain words what they can do. An admin changes the role, sets departments (and a department owner), ticks the workers a supervisor signs off, sets an objective, or suspends them or marks them as left (they move to Former staff; Reinstate brings them back, same history). Give a sign-in code (Phase 67, ADR-0029: an admin for anyone active, a safety manager for workers and supervisors; never yourself) shows an 8-character code once, with the person\'s name and the time it stops working; for an admin or safety manager it asks first and also clears their second steps. Reset sign-in steps (admins, not on yourself; asks first) clears their authenticator app and recovery codes so they set one up again; it is logged and every other admin is told (Phase 66, ADR-0028).' },
       { id: 'former', type: 'screen', label: 'Former staff', route: '/', detail: 'Below the People views, a folded Former staff list holds everyone marked as left; their records stay under their name and their sheet offers Reinstate.' },
       { id: 'handover', type: 'screen', label: 'Needs a new owner', route: '/', detail: 'In Sign-offs, the Needs a new owner chip in the Inbox lists what a suspended or departed person was looking after (SOPs, departments, approvals, approval chains, asks, workers with no supervisor); each row is fixed with the owner picker or the usual action.' },
       { id: 'access', type: 'screen', label: 'SOP access', route: '/', detail: 'The SOP access tab: who can see which SOPs, in plain language. See "Choose who sees a SOP".' },

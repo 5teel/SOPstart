@@ -11,6 +11,7 @@ import { safeNextPath } from '@/lib/auth/next-redirect'
 import { needsSecondStep, verifyHref } from '@/lib/auth/elevated'
 import { recordDecision } from '@/lib/decisions/record'
 import { changeMemberState, isLastAdminError } from '@/lib/members/state'
+import { SIGNIN_CODE_REFUSAL, hashSigninCode, normaliseSigninCode } from '@/lib/members/signin-code'
 import type { TablesInsert, TablesUpdate } from '@/types/database.types'
 import type { AppRole, MemberStatus } from '@/types/auth'
 import {
@@ -122,6 +123,84 @@ export async function loginWithEmail(
   const dest = safeNextPath(next) ?? roleHome(claims['user_role'] as string | undefined)
   // Phase 66 / ADR-0028: an admin or safety manager proves the second step before anything else.
   redirect(needsSecondStep(claims['user_role'] as string | undefined, claims['aal']) ? verifyHref(dest) : dest)
+}
+
+// ─────────────────────────────────────────────
+// signInWithCode -- Phase 67 / ADR-0029. Unauthenticated: the email and the code a supervisor or
+// admin gave the person in person. One plain refusal for every failure (unknown email, wrong,
+// used, expired or void code, a person no longer active), so it never says whether an email
+// exists. Every try against the person's open code counts in the database (signin_code_try);
+// at 5 the code is void. A good code is marked used, the person is signed out everywhere (a
+// lost phone may still be signed in), a fresh session is minted on this response's cookies, the
+// use is logged, and the server sends them to Profile to set a new password. The proxy holds
+// them there until they do (app_metadata.must_set_password).
+// ─────────────────────────────────────────────
+const signinCodeSchema = z.object({ email: z.string().trim().email().max(320), code: z.string().max(40) })
+
+export async function signInWithCode(input: { email: string; code: string }): Promise<{ error: string }> {
+  const parsed = signinCodeSchema.safeParse(input)
+  const pepper = process.env.RECOVERY_PEPPER
+  if (!parsed.success || !pepper || pepper.length < 32) return { error: SIGNIN_CODE_REFUSAL }
+  const code = normaliseSigninCode(parsed.data.code)
+  // A malformed code still counts against the open code: the hash of nothing matches nothing.
+  const hash = code ? hashSigninCode(code, pepper) : 'malformed'
+  const admin = createAdminClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: hit, error: tryError } = await (admin as any).rpc('signin_code_try', { p_email: parsed.data.email, p_hash: hash })
+  if (tryError || !hit?.user_id) return { error: SIGNIN_CODE_REFUSAL }
+  const subjectId = hit.user_id as string
+
+  const { data: got } = await admin.auth.admin.getUserById(subjectId)
+  const email = got?.user?.email
+  if (!email) return { error: SIGNIN_CODE_REFUSAL }
+  await admin.rpc('revoke_user_sessions', { p_user_id: subjectId })
+  // Set before the session is minted, so the new access token already carries it.
+  const flagged = await admin.auth.admin.updateUserById(subjectId, { app_metadata: { must_set_password: true } })
+  if (flagged.error) return { error: SIGNIN_CODE_REFUSAL }
+  // No email is sent: the link is generated and verified here, never delivered.
+  const { data: link, error: linkError } = await admin.auth.admin.generateLink({ type: 'magiclink', email })
+  if (linkError || !link?.properties?.hashed_token) return { error: SIGNIN_CODE_REFUSAL }
+  const supabase = await createClient()
+  const { error: otpError } = await supabase.auth.verifyOtp({ token_hash: link.properties.hashed_token, type: 'magiclink' })
+  if (otpError) return { error: SIGNIN_CODE_REFUSAL }
+
+  await recordDecision({
+    kind: 'signin_code_used',
+    subject: { kind: 'person', id: subjectId },
+    summary: 'Signed in with a code from a supervisor',
+    details: { code_id: hit.code_id, issued_by: hit.issued_by },
+  })
+  redirect('/profile?set-password=1')
+}
+
+// ─────────────────────────────────────────────
+// setNewPassword -- Phase 67. After a sign-in code: the session user sets a new password, the
+// hold flag is cleared and the session refreshed (so the token no longer carries it), then the
+// server sends them home, or to /verify when they are an admin or safety manager (their second
+// steps were reset when the code was given). Not a ledger row: the code's use is.
+// ─────────────────────────────────────────────
+const newPasswordSchema = z
+  .object({ password: z.string().min(8, 'Use at least 8 characters').max(128), confirm: z.string() })
+  .refine((d) => d.password === d.confirm, { message: "The two passwords don't match", path: ['confirm'] })
+
+export async function setNewPassword(input: { password: string; confirm: string }): Promise<{ error: string }> {
+  const parsed = newPasswordSchema.safeParse(input)
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? 'Check the password' }
+  const { supabase, userId } = await getSessionContext()
+  if (!userId) return { error: 'Sign in again.' }
+  const { error } = await supabase.auth.updateUser({ password: parsed.data.password })
+  if (error) {
+    if (error.code === 'same_password') return { error: 'Choose a different password from your old one.' }
+    if (error.code === 'weak_password') return { error: 'Choose a longer password.' }
+    return { error: "That didn't work. Try again." }
+  }
+  const cleared = await createAdminClient().auth.admin.updateUserById(userId, { app_metadata: { must_set_password: null } })
+  if (cleared.error) return { error: "That didn't work. Try again." }
+  const { data } = await supabase.auth.refreshSession()
+  if (!data.session) return { error: 'Your password is set. Sign in again with it.' }
+  const claims = parseJwtPayload(data.session.access_token)
+  const home = roleHome(claims['user_role'] as string | undefined)
+  redirect(needsSecondStep(claims['user_role'] as string | undefined, claims['aal']) ? verifyHref(home) : home)
 }
 
 // ─────────────────────────────────────────────

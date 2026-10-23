@@ -59,11 +59,12 @@ test.describe('state module (changeMemberState)', () => {
 })
 
 test.describe('actions (members.ts)', () => {
-  test('exports exactly the three actions, all async functions', () => {
+  test('exports exactly the three state actions plus the two Phase 67 sign-in code actions, all async functions', () => {
     const s = src(ACTIONS)
     expect(s.trimStart().startsWith("'use server'")).toBe(true)
-    expect((s.match(/^export /gm) ?? []).length).toBe(3)
-    expect((s.match(/^export async function /gm) ?? []).length).toBe(3)
+    expect((s.match(/^export /gm) ?? []).length).toBe(5)
+    expect((s.match(/^export async function /gm) ?? []).length).toBe(5)
+    for (const n of ['issueSigninCode', 'listSigninCodeWorkers']) expect(s).toContain(`export async function ${n}(`)
     for (const n of ['suspendMember', 'markMemberLeft', 'reinstateMember']) {
       expect(s).toContain(`export async function ${n}(memberId: string)`)
     }

@@ -19,7 +19,7 @@ function kindList(src: string): string[] {
 
 test.describe('Ledger kinds (60-02)', () => {
   test('the five new kinds are in DECISION_KINDS, after the 59 kinds and before the ADR-0008 kinds', () => {
-    expect(DECISION_KINDS.length).toBe(44)
+    expect(DECISION_KINDS.length).toBe(46)
     expect([...DECISION_KINDS].slice(18, 23)).toEqual(NEW_KINDS)
   })
 
@@ -45,8 +45,8 @@ test.describe('Ledger kinds (60-02)', () => {
     expect(KIND_WORDS.objective_confirmed).toBe('Confirmed an objective')
   })
 
-  test('the latest migration kind list (00086) equals DECISION_KINDS', () => {
-    const kinds = kindList(read('supabase/migrations/00086_mfa_recovery_codes.sql'))
+  test('the latest migration kind list (00088) equals DECISION_KINDS', () => {
+    const kinds = kindList(read('supabase/migrations/00088_signin_codes.sql'))
     expect(new Set(kinds)).toEqual(new Set(DECISION_KINDS))
     expect(kinds.length).toBe(DECISION_KINDS.length)
   })
