@@ -54,7 +54,12 @@ findings:
   medium: 3
   low: 7
   total: 11
-status: issues_found
+status: fixed
+fixed_at: 2026-10-24
+fix_commits: c21f01a6..fe3e231c
+findings_status:
+  fixed: 9
+  accepted_gap: 2
 ---
 
 # Phase 64: Code Review Report
@@ -62,7 +67,7 @@ status: issues_found
 **Reviewed:** 2026-10-23T14:49:05Z
 **Depth:** deep (00082 traced against every earlier policy on `organisation_members` and every `organisation_members` subquery in `supabase/migrations/`; server actions traced to `getSessionContext`, `changeMemberState`, `recordDecision`, `stopAskingCore`, `approveStep`)
 **Files Reviewed:** 43
-**Status:** issues_found
+**Status:** fixed (9 fixed, 2 accepted gaps recorded in ADR-0025; see each finding's Resolution line)
 
 ## Summary
 
@@ -88,6 +93,8 @@ None.
 
 ### HI-01: `organisation_members` INSERT is still open to session clients, so a safety manager can create an admin and get around D-05
 
+**Resolution:** fixed in `c21f01a6`. 00083 drops `admins_can_insert_members` and revokes INSERT and DELETE from `anon` and `authenticated`. `acceptInvite` inserts with the service role, using the org and role from `app_metadata` that `inviteWorker` writes (never `user_metadata`). Live: a safety manager's session INSERT and DELETE return 42501 (rolled-back probe in `scripts/apply-phase64b-migration.mjs`).
+
 **File:** `supabase/migrations/00082_member_status.sql:40-44` (only UPDATE locked); live policy `supabase/migrations/00002_rls_policies.sql:19-25` (`admins_can_insert_members`)
 **Issue:** 00082 revokes UPDATE and grants back only `update (role)`. The INSERT grant stays, and so does the INSERT policy, whose only check is `organisation_id = current_organisation_id() and current_user_role() in ('admin','safety_manager')`. Nothing limits the inserted `role`, `status`, `status_changed_by` or `status_changed_at`. Research row 267 records the blanket INSERT/UPDATE/DELETE table grant as live.
 **Failure scenario:**
@@ -108,6 +115,8 @@ Then move the `acceptInvite` insert to the service role, but **not** keyed on `u
 ## Medium
 
 ### ME-01: Two admins can suspend each other at the same moment and leave no active admin
+
+**Resolution:** fixed in `8773203a`. The `keep_one_active_admin` BEFORE UPDATE trigger takes a `for no key update` lock on the organisation and recounts. `changeMemberState` filters on the role the caller saw. Live: two committed suspensions racing over two connections in a scratch organisation leave one active admin (one refused, `last active admin`). A session demoting the last admin gets P0001.
 
 **File:** `src/actions/members.ts:45-56`, `src/lib/members/state.ts:28-40`
 **Issue:** the last-admin check is a count followed by a separate update. The update only checks the target's `status`, never how many admins are left. The target's `role` isn't checked again either.
@@ -142,6 +151,8 @@ Also add `.eq('role', target.role)` to the `changeMemberState` update, so a role
 
 ### ME-02: `reassignApprovalStep` lets one person complete a chain that needs two people (including via suspend, take the step, approve, reinstate)
 
+**Resolution:** fixed in `227e5aeb`. The step can't be handed to the caller, to anyone who approved this version, or to anyone named on another step. Self-handover is refused, recorded in ADR-0025.
+
 **File:** `src/actions/approvals.ts:289-361` (target check `297-308`, write `341-347`)
 **Issue:** the target only has to be an active admin or safety manager. The target can be the caller. The target can also be someone who already approved an earlier step of the same version, or who is named on a later step. `approveStep` (`approvals.ts:180-229`) only checks that the caller matches the next step. So handing the step to yourself lets you approve it.
 **Failure scenario:**
@@ -164,6 +175,8 @@ if (userId === ctx.userId || (prior ?? []).some((r: { approver_user_id: string }
 
 ### ME-03: Cross-tenant read: any active admin or safety manager reads every organisation's `member_departments` and `users_sub_trades` rows
 
+**Resolution:** fixed in `90c21a3c`. Both policies now put the org predicate outside the own-row / admin OR. The `rls-org-scope` guard fails on a caller-is-admin arm with no org tie (red before the fix). Live: the eval-site admin saw 38 foreign `member_departments` rows before the fix and 0 after.
+
 **File:** `supabase/migrations/00035_departments_schema.sql:160-169` (`member_departments_self_read`), `supabase/migrations/00030_sub_trades.sql:53-63` (`users_sub_trades_self_read`). Neither was redefined later (grep across `supabase/migrations/`).
 **Issue:** the admin arm is `exists (select 1 from organisation_members om where om.user_id = auth.uid() and om.role in ('admin','safety_manager'))`. It checks the caller's own role but never ties the **target row** to the caller's organisation. These junction tables have no `organisation_id` column. Research row 266 marks these policies "Covered". That is true for a suspended caller (the subquery sees no rows), but it misses this hole: for an active admin the arm is true for every row in the table. 00048 fixed exactly this for `sop_access_people`, but not for these two.
 **Failure scenario:** an admin of org A runs `GET /rest/v1/member_departments?select=*` and receives every organisation's `(member_id, department_id, assigned_by)` rows, which tie user ids to other tenants' departments. `users_sub_trades` returns the same kind of cross-tenant data. This was there before Phase 64, but it answers "can an active member of org A affect org B" with a yes for reads.
@@ -183,6 +196,8 @@ For `users_sub_trades`, do the same with a join to the target's membership in `c
 
 ### LO-01: `reassignApprovalStep` can write an old snapshot over a newer, resubmitted chain
 
+**Resolution:** fixed in `04b7a6da`. The write filters on `version` and on the snapshot it read (jsonb equality), because a resubmit keeps the version number. Zero rows returns "That has already changed. Refresh and try again."
+
 **File:** `src/actions/approvals.ts:341-347`
 **Issue:** the update is filtered only by `id` and `approval_state = 'pending'`. It doesn't check `version` or the snapshot it read.
 **Failure scenario:**
@@ -193,12 +208,16 @@ For `users_sub_trades`, do the same with a join to the target's membership in `c
 
 ### LO-02: The new approval-step holder is never told
 
+**Resolution:** fixed in `2b6c4211`. `notifyNextApprover` runs for the reassigned step after the write and the ledger row.
+
 **File:** `src/actions/approvals.ts:339-360` (compare `approveStep` `244-255`, which calls `notifyNextApprover`)
 **Issue:** after a reassign, the row leaves "Needs a new owner" (its holder is now active), and the new holder gets no notification.
 **Failure scenario:** an admin hands Bob's step to Carol. Carol never hears about it, so the SOP sits pending with nothing flagging it.
 **Fix:** after the write, call `notifyNextApprover({ organisationId: ctx.organisationId, sopId, sopTitle, version: sop.version, stepIndex: nextIndex, step: { userId, label }, actorId: ctx.userId })`. Select `title` in the read.
 
 ### LO-03: The paused redirect in `acceptInvite` can't be reached
+
+**Resolution:** fixed in `c21f01a6` (with HI-01). `acceptInvite` reads the row's status with the service role before any insert and sends a non-active row to `/pending`. It also turned out that every fresh invitee failed to accept before this fix: RLS refused the session insert.
 
 **File:** `src/actions/auth.ts:361-380`
 **Issue:** in Postgres, the RLS `WITH CHECK` runs before the unique-index check. An invitee's token carries no admin claim for the invite org, so `admins_can_insert_members` rejects the insert with `42501` before `23505` is ever raised. The new `if (memberError)` branch (369-380) only runs for a code that this path never produces.
@@ -207,12 +226,16 @@ For `users_sub_trades`, do the same with a join to the target's membership in `c
 
 ### LO-04: The `sop_observation_refs_in_org` SECURITY DEFINER can be called by any signed-in account and leaks membership
 
+**Resolution:** fixed in `791c28f4`. Execute stays granted, because the insert policy calls the function as the invoker. The function now takes `(sop_id, worker_id)` and reads `current_organisation_id()`. The 3-argument version is dropped. Live: true for a site SOP and an active member, false for another org's SOP.
+
 **File:** `supabase/migrations/00082_member_status.sql:227-240` (no revoke in 00053 or 00082)
 **Issue:** this function takes user and org ids and bypasses RLS. That goes against ADR-0024 "How to comply" #5 and the CLAUDE.md rule. Its execute grant can't simply be revoked, because the INSERT policy calls it as the invoker.
 **Failure scenario:** any authenticated token, including one for a suspended person, a departed person, or an account with no site, calls `rpc('sop_observation_refs_in_org', {p_sop_id, p_worker_id, p_org_id})`. From the result it can tell whether a given user is an active member of any organisation, and whether a SOP belongs to it. The caller needs the uuids.
 **Fix:** drop the org parameter and use `public.current_organisation_id()` inside the function. Keep the policy call as `sop_observation_refs_in_org(sop_id, observed_worker_id)`.
 
 ### LO-05: Any member in the org can read who is suspended over REST
+
+**Resolution:** accepted gap, recorded in ADR-0025. The session-client status filters in `session-context.ts`, `members.ts`, `auth.ts`, `load-inbox.ts` and `people.ts` read `status`, so a column grant would break them. ADR-0025 records the upgrade path.
 
 **File:** `supabase/migrations/00002_rls_policies.sql:13-16` (`org_members_can_view_own_org`, all columns), `00082:30-34` (new columns, no column grant)
 **Issue:** the app shows `status` to admins and safety managers only (`getOrgMembers` and `getTeamMembersWithEmails` are admin-gated). But any worker can `GET /rest/v1/organisation_members?select=user_id,status,status_changed_by`. Suspension is described as covering things like investigations (D-01).
@@ -221,12 +244,16 @@ For `users_sub_trades`, do the same with a join to the target's membership in `c
 
 ### LO-06: ADR-0024 says suspended and left people lose all access, but `using (true)` junction tables stay readable
 
+**Resolution:** accepted gap, recorded in ADR-0025 (uuid pairs only; `using (true)` avoids the recursion trap). ADR-0024 is not edited. Its status now notes that ADR-0025 narrows its access claim.
+
 **File:** `docs/adr/0024-membership-states-replace-removal.md:15`; policies `00035:112,135`, `00031:32-33`, `00046:257-258,280-281`
 **Issue:** `sop_departments`, `sop_collections`, `role_members`, `sops_sub_trades` and `block_departments` are `using (true)` for every authenticated user. That was the D-02a design for uuid-pair junctions. So a suspended or departed person's still-valid token keeps reading every tenant's uuid pairs. ADR-0024 and the 64-01 summary ("matches no RLS policy") claim more than this.
 **Failure scenario:** within the hour after a suspension, the person's token still returns `role_members` (who sits in which job role, across all orgs).
 **Fix:** record this as an accepted residual in ADR-0024 (uuids only, no names). Or scope `role_members` and `sop_access_people`-style tables with the helper the way 00048 does.
 
 ### LO-07: Type drift in the hand-maintained types
+
+**Resolution:** fixed in `c4577723`. `status` is typed `'active' | 'suspended' | 'left'` and `revoke_user_sessions` returns `number`. The `reassignApprovalStep` sops read, sop_approvals read and sops write filter by `ctx.organisationId`.
 
 **File:** `src/types/database.types.ts:43,2607`
 **Issue:** `organisation_members.status` is typed `string`, so a misspelt state compiles and only the database CHECK catches it. `revoke_user_sessions` is typed `Returns: undefined`, but the SQL returns `integer` (`00082:247`). `reassignApprovalStep` also reads `sops` without `.eq('organisation_id', ctx.organisationId)` (`approvals.ts:310-314`). RLS covers that read, but it skips the project's convention of filtering by the session org.
