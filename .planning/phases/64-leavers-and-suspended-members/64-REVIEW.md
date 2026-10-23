@@ -56,7 +56,7 @@ findings:
   total: 11
 status: fixed
 fixed_at: 2026-10-24
-fix_commits: c21f01a6..fe3e231c
+fix_commits: c21f01a6..2b95bb9f
 findings_status:
   fixed: 9
   accepted_gap: 2
@@ -151,7 +151,7 @@ Also add `.eq('role', target.role)` to the `changeMemberState` update, so a role
 
 ### ME-02: `reassignApprovalStep` lets one person complete a chain that needs two people (including via suspend, take the step, approve, reinstate)
 
-**Resolution:** fixed in `227e5aeb`. The step can't be handed to the caller, to anyone who approved this version, or to anyone named on another step. Self-handover is refused, recorded in ADR-0025.
+**Resolution:** fixed in `227e5aeb`. The step can't be handed to the caller, to anyone who approved this version, or to anyone named on another step. Self-handover is refused, recorded in ADR-0025. `tests/evals/people.eval.ts` case 4 now expects the refusal and hands the step to the safety manager (`2b95bb9f`). The picker still offers the caller, and the server refuses with a message.
 
 **File:** `src/actions/approvals.ts:289-361` (target check `297-308`, write `341-347`)
 **Issue:** the target only has to be an active admin or safety manager. The target can be the caller. The target can also be someone who already approved an earlier step of the same version, or who is named on a later step. `approveStep` (`approvals.ts:180-229`) only checks that the caller matches the next step. So handing the step to yourself lets you approve it.
