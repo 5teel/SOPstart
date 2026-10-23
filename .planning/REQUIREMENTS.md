@@ -1207,11 +1207,11 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 - [x] **MEMB-01**: A membership has a state (active, suspended or left) with when and by whom it last changed; every existing membership starts active; only the server can change a state (a signed-in user cannot update the state columns over the database API)
 - [x] **MEMB-02**: A suspended or departed person loses all access to the site's data on their very next request, through the app, the database API and file storage alike; the organisation and role in their token no longer open anything once the membership is not active (the RLS helpers, the access-token hook, the policies that read token claims directly and the observations own-row arm all require an active membership)
 - [x] **MEMB-03**: Suspend and Has left sign the person out everywhere (every session of theirs ends) without banning the account, so any other site they belong to still opens after they sign in again
-- [ ] **MEMB-04**: An admin or safety manager can suspend, mark as left or reinstate a person; nobody changes their own state; only an admin changes an admin's state; the last active admin cannot be suspended or marked as left; a double click or a stale screen is a clean refusal, never a second change
+- [x] **MEMB-04**: An admin or safety manager can suspend, mark as left or reinstate a person; nobody changes their own state; only an admin changes an admin's state; the last active admin cannot be suspended or marked as left; a double click or a stale screen is a clean refusal, never a second change
 - [ ] **MEMB-05**: People shows Suspend, Has left and Reinstate in the person sheet; a suspended person stays in every People view with a "Suspended" tag; a departed person moves to a collapsed "Former staff" group; governance views show "(left)" or "(suspended)" after the person's name
 - [ ] **MEMB-06**: Removing a person is gone: the hard delete of a membership, the code only it used and its Remove button are deleted, and a guard fails the build if a membership delete comes back
-- [ ] **MEMB-07**: A suspended or departed person who signs in or reloads sees "Your access to {site} has been paused. Talk to your supervisor."
-- [ ] **MEMB-08**: Invites, the join code, accepting an invite and the site switcher honour the state; inviting a departed person's email reactivates their existing membership (same row, same history) instead of creating a second one; a suspended person is pointed to Reinstate
+- [x] **MEMB-07**: A suspended or departed person who signs in or reloads sees "Your access to {site} has been paused. Talk to your supervisor."
+- [x] **MEMB-08**: Invites, the join code, accepting an invite and the site switcher honour the state; inviting a departed person's email reactivates their existing membership (same row, same history) instead of creating a second one; a suspended person is pointed to Reinstate
 - [ ] **MEMB-09**: What a suspended or departed person was looking after (SOPs they own, departments they own, approval chains and in-flight approvals that name them, open asks to them, workers left with no active supervisor) appears under "Needs a new owner" in the Sign-offs inbox for admins and safety managers, who reassign each with the existing owner picker (active people only); nothing is reassigned automatically
 - [x] **MEMB-10**: Suspending, marking as left, reinstating and every reassignment each write a decision-ledger row (new kinds member_suspended, member_left, member_reinstated; reassignment reuses owner_change)
 - [ ] **MEMB-11**: Everywhere the app counts or picks people (notifications and their recipients, asks, training lanes, owner and approver pickers, admin counts, site picker) only active members count; records and name labels keep everyone
@@ -1234,11 +1234,11 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 | MEMB-01 | 64-01 | Complete |
 | MEMB-02 | 64-01, 64-02, 64-03 | Complete |
 | MEMB-03 | 64-01, 64-02, 64-03 | Complete |
-| MEMB-04 | 64-02 | Pending |
+| MEMB-04 | 64-02 | Complete |
 | MEMB-05 | 64-03, 64-04 | Pending |
 | MEMB-06 | 64-03, 64-04 | Pending |
-| MEMB-07 | 64-02, 64-03 | Pending |
-| MEMB-08 | 64-02, 64-03 | Pending |
+| MEMB-07 | 64-02, 64-03 | Complete |
+| MEMB-08 | 64-02, 64-03 | Complete |
 | MEMB-09 | 64-04, 64-05 | Pending |
 | MEMB-10 | 64-01, 64-02, 64-05 | Complete |
 | MEMB-11 | 64-04 | Pending |
