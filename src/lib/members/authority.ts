@@ -11,7 +11,7 @@
 import { stepMatchesCaller, type ChainStep } from '@/lib/governance/approvals'
 import { canAsk } from '@/lib/requests/model'
 import { categoryLabel } from '@/lib/sop-categories'
-import type { AppRole } from '@/types/auth'
+import type { AppRole, MemberStatus } from '@/types/auth'
 
 export interface Authority {
   /** 'any' = any worker's completion; 'supervised' = only the workers they supervise. */
@@ -30,6 +30,19 @@ export const ROLE_WORDS: Record<AppRole, string> = {
   supervisor: 'Supervisor',
   admin: 'SOP Admin',
   safety_manager: 'Safety Manager',
+}
+
+/** The word shown after a non-active person's name in governance views (Phase 64, D-09). */
+export const STATUS_WORDS: Record<MemberStatus, string> = {
+  active: '',
+  suspended: 'suspended',
+  left: 'left',
+}
+
+/** "Sam Lee" -> "Sam Lee (left)"; unchanged for an active or unknown person. */
+export function statusSuffix(label: string, status: MemberStatus | undefined | null): string {
+  const word = status ? STATUS_WORDS[status] : ''
+  return word ? `${label} (${word})` : label
 }
 
 /** Display order: who carries the most authority first. */

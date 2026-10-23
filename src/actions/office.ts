@@ -23,6 +23,8 @@ import { nzStartOfDayIso } from '@/lib/office/format'
 import { deriveInbox, type InboxItem } from '@/lib/governance/inbox'
 import { listMyReviewRows, listOpenRequests, listPendingSignOffs, loadInbox } from '@/lib/governance/load-inbox'
 import { memberLabel, userLabels } from '@/lib/members/labels'
+import { memberStatusMap } from '@/lib/members/active'
+import { statusSuffix } from '@/lib/members/authority'
 import type { OfficeRequest } from '@/lib/requests/model'
 
 export type OfficeInbox = { role: 'admin' | 'safety_manager' | 'supervisor'; items: InboxItem[]; requests: OfficeRequest[] }
@@ -129,11 +131,12 @@ export async function getCompletionForReview(completionId: string): Promise<Comp
   const sop = Array.isArray(row.sops) ? (row.sops[0] ?? null) : row.sops
   const stepData = row.step_data ?? {}
 
-  const [photos, ordered, isAssessor, labels] = await Promise.all([
+  const [photos, ordered, isAssessor, labels, statuses] = await Promise.all([
     signCompletionPhotos(row.completion_photos ?? [], organisationId),
     orderedReviewSteps(supabase, { sopId: row.sop_id, organisationId, stepData }),
     assessorFor(userId, row.sop_id, organisationId),
     userLabels([row.worker_id]),
+    memberStatusMap(organisationId, [row.worker_id]),
   ])
 
   const steps: ReviewStep[] = ordered.map((st) => {
@@ -160,7 +163,7 @@ export async function getCompletionForReview(completionId: string): Promise<Comp
     sopVersion: sop?.version ?? row.sop_version,
     status: row.status,
     submittedAt: row.submitted_at,
-    workerLabel: memberLabel(labels.get(row.worker_id)),
+    workerLabel: statusSuffix(memberLabel(labels.get(row.worker_id)), statuses.get(row.worker_id)),
     steps,
     photos,
     isAssessor,
@@ -201,6 +204,7 @@ type LedgerRow = {
   kind: DecisionKind
   actor_kind: 'person' | 'agent'
   actor_name: string | null
+  actor_id: string | null
   subject_kind: string
   subject_id: string | null
   sop_id: string | null
@@ -215,7 +219,7 @@ async function ledgerReader() {
   if (!ctx.userId) return { supabase: null, error: 'Not authenticated' }
   if (!ctx.organisationId) return { supabase: null, error: 'No organisation found' }
   if (ctx.role !== 'admin' && ctx.role !== 'safety_manager') return { supabase: null, error: 'Admin access required' }
-  return { supabase: ctx.supabase, error: null }
+  return { supabase: ctx.supabase, organisationId: ctx.organisationId, error: null }
 }
 
 export async function listDecisions(input: unknown): Promise<DecisionPage | { error: string }> {
@@ -225,11 +229,11 @@ export async function listDecisions(input: unknown): Promise<DecisionPage | { er
 
   const reader = await ledgerReader()
   if (!reader.supabase) return { error: reader.error }
-  const { supabase } = reader
+  const { supabase, organisationId } = reader
 
   let q = supabase
     .from('decisions')
-    .select('id, kind, actor_kind, actor_id, actor_name, subject_kind, subject_id, sop_id, summary, details, created_at')
+    .select('id, kind, actor_kind, actor_name, actor_id, subject_kind, subject_id, sop_id, summary, details, created_at')
     .order('created_at', { ascending: false })
     .order('id', { ascending: false })
     .limit(PAGE_SIZE + 1)
@@ -266,6 +270,10 @@ export async function listDecisions(input: unknown): Promise<DecisionPage | { er
     if (typeof asker === 'string') personIds.add(asker)
   }
   const labels = await userLabels([...personIds])
+  const actorIds = [...new Set(page.filter((r) => r.actor_kind === 'person' && r.actor_id).map((r) => r.actor_id as string))]
+  const statuses = await memberStatusMap(organisationId, [...personIds, ...actorIds])
+  // "(left)" / "(suspended)" after a non-active person's name (Phase 64, D-09).
+  const named = (id: string) => statusSuffix(memberLabel(labels.get(id)), statuses.get(id))
 
   const rows: DecisionListRow[] = page.map((r) => {
     let about: DecisionAbout = { type: 'text', text: r.summary }
@@ -273,19 +281,24 @@ export async function listDecisions(input: unknown): Promise<DecisionPage | { er
       about = { type: 'sop', sopId: r.subject_id, title: titles.get(r.subject_id) as string }
     } else if (r.subject_kind === 'completion' && r.subject_id && completions.has(r.subject_id)) {
       const c = completions.get(r.subject_id) as { worker_id: string; sop_id: string }
-      about = { type: 'text', text: `${memberLabel(labels.get(c.worker_id))}'s completion of ${titles.get(c.sop_id) ?? 'a SOP'}` }
+      about = { type: 'text', text: `${named(c.worker_id)}'s completion of ${titles.get(c.sop_id) ?? 'a SOP'}` }
     } else if ((r.subject_kind === 'member' || r.subject_kind === 'worker') && r.subject_id) {
-      about = { type: 'text', text: memberLabel(labels.get(r.subject_id)) }
+      about = { type: 'text', text: named(r.subject_id) }
     } else if (r.subject_kind === 'request') {
       // "<asker>'s request about <SOP or machine>"; a ledger row with no details keeps its summary.
       const d = r.details ?? {}
-      const asker = typeof d.asker_user_id === 'string' ? memberLabel(labels.get(d.asker_user_id)) : typeof d.asker_agent === 'string' ? d.asker_agent : null
+      const asker = typeof d.asker_user_id === 'string' ? named(d.asker_user_id) : typeof d.asker_agent === 'string' ? d.asker_agent : null
       if (asker && typeof d.about_title === 'string') about = { type: 'text', text: `${asker}'s request about ${d.about_title}` }
     }
     return {
       id: r.id,
       when: r.created_at,
-      who: { name: r.actor_name ?? (r.actor_kind === 'agent' ? 'An agent' : 'Someone'), agent: r.actor_kind === 'agent' },
+      who: {
+        name: r.actor_name
+          ? r.actor_kind === 'person' && r.actor_id ? statusSuffix(r.actor_name, statuses.get(r.actor_id)) : r.actor_name
+          : r.actor_kind === 'agent' ? 'An agent' : 'Someone',
+        agent: r.actor_kind === 'agent',
+      },
       kind: r.kind,
       about,
     }

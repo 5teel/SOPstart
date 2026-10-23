@@ -43,6 +43,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireAdmin } from '@/actions/governance'
 import { getOrgMembers } from '@/actions/assignments'
+import { statusSuffix } from '@/lib/members/authority'
 import { resolveNextStepIndex, stepMatchesCaller, type ChainStep } from '@/lib/governance/approvals'
 import { performPublish } from '@/lib/governance/publish-core'
 import { recordDecision } from '@/lib/decisions/record'
@@ -446,7 +447,7 @@ export async function getApprovalHistory(
   const approverLabelById: Record<string, string> = {}
   if (membersResult.success) {
     for (const m of membersResult.members) {
-      approverLabelById[m.user_id] = m.email ?? m.full_name ?? `${m.role} (${m.user_id.slice(0, 8)})`
+      approverLabelById[m.user_id] = statusSuffix(m.email ?? m.full_name ?? `${m.role} (${m.user_id.slice(0, 8)})`, m.status)
     }
   }
 

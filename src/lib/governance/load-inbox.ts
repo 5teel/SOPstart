@@ -16,6 +16,8 @@ import { listSiteHealthForOrg } from '@/actions/site'
 import { getSessionContext } from '@/lib/auth/session-context'
 import { deriveInbox, type InboxItem, type OwnedReview, type PendingSignOff } from '@/lib/governance/inbox'
 import { memberLabel, userLabels } from '@/lib/members/labels'
+import { memberStatusMap } from '@/lib/members/active'
+import { statusSuffix } from '@/lib/members/authority'
 import { aboutTitles } from '@/lib/requests/core'
 import { RAISABLE_KINDS, type OfficeRequest, type RequestSubjectType } from '@/lib/requests/model'
 import type { MillerSop } from '@/lib/sop-list/admin-rows'
@@ -60,14 +62,15 @@ export async function listPendingSignOffs(): Promise<PendingSignOff[] | { error:
     completion_photos: Array<{ id: string }> | null
   }
   const rows = (data ?? []) as unknown as Row[]
-  const labels = await userLabels(rows.map((r) => r.worker_id))
+  const workerIds = rows.map((r) => r.worker_id)
+  const [labels, statuses] = await Promise.all([userLabels(workerIds), memberStatusMap(organisationId, workerIds)])
   return rows.map((r) => ({
     completionId: r.id,
     sopId: r.sop_id,
     sopTitle: r.sops?.title ?? 'Untitled SOP',
     sopVersion: r.sop_version,
     workerId: r.worker_id,
-    workerLabel: memberLabel(labels.get(r.worker_id)),
+    workerLabel: statusSuffix(memberLabel(labels.get(r.worker_id)), statuses.get(r.worker_id)),
     submittedAt: r.submitted_at,
     photoCount: r.completion_photos?.length ?? 0,
   }))

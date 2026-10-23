@@ -49,6 +49,7 @@ import { markReviewedAsOwner } from '@/lib/governance/owner-review'
 import { classifyGovernanceRow, type GovernanceFlag } from '@/lib/governance/classify'
 import { resolveNextStepIndex, stepMatchesCaller, type ChainStep } from '@/lib/governance/approvals'
 import { getOrgMembers } from '@/actions/assignments'
+import { statusSuffix } from '@/lib/members/authority'
 import { categoryLabel, isValidCategorySlug } from '@/lib/sop-categories'
 import type { AppRole } from '@/types/auth'
 
@@ -448,7 +449,7 @@ export async function listGovernanceQueue(): Promise<
   const ownerLabelById: Record<string, string> = {}
   if (membersResult.success) {
     for (const m of membersResult.members) {
-      ownerLabelById[m.user_id] = m.email ?? m.full_name ?? `${m.role} (${m.user_id.slice(0, 8)})`
+      ownerLabelById[m.user_id] = statusSuffix(m.email ?? m.full_name ?? `${m.role} (${m.user_id.slice(0, 8)})`, m.status)
     }
   }
 

@@ -13,6 +13,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Check, Circle, Loader2 } from 'lucide-react'
 import { approveStep, getApprovalStatus, requestChanges } from '@/actions/approvals'
 import { getOrgMembers } from '@/actions/assignments'
+import { statusSuffix } from '@/lib/members/authority'
 import { nzDay } from '@/lib/office/format'
 import { focusHref } from '@/lib/sop/focus-path'
 import { ReasonDialog } from './ReasonDialog'
@@ -59,7 +60,7 @@ export function ApprovePanel({ sopId, title, onDone }: { sopId: string; title: s
 
   const emailById = new Map<string, string>()
   const list = members.data
-  if (list && list.success) for (const m of list.members) emailById.set(m.user_id, m.email ?? m.full_name ?? m.role)
+  if (list && list.success) for (const m of list.members) emailById.set(m.user_id, statusSuffix(m.email ?? m.full_name ?? m.role, m.status))
 
   return <ApproveBody key={sopId} sopId={sopId} title={title} status={result.status} emailById={emailById} onDone={onDone} />
 }
