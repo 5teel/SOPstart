@@ -14,7 +14,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Check, ClipboardCheck, Send, Stamp, X } from 'lucide-react'
+import { Check, ChevronRight, ClipboardCheck, Send, Stamp, X } from 'lucide-react'
 import {
   getTeamMembersWithEmails,
   inviteWorker,
@@ -270,7 +270,7 @@ function DepartmentBoard({
           key={g.key}
           data-testid="people-department"
           data-department={g.key}
-          className={`flex flex-col gap-3 rounded-lg border bg-paper-1 p-4 ${g.key === 'none' ? 'border-dashed border-ink-300' : 'border-ink-200'}`}
+          className={`flex min-w-0 flex-col gap-3 rounded-lg border bg-paper-1 p-4 ${g.key === 'none' ? 'border-dashed border-ink-300' : 'border-ink-200'}`}
         >
           <header className="flex items-center gap-2">
             {g.colour && <i aria-hidden="true" className="size-2.5 shrink-0 rounded-full" style={{ background: g.colour }} />}
@@ -794,8 +794,9 @@ export function PeopleTab({ onReceipt, siteName = '', onPinSop }: { onReceipt(r:
       )}
 
       {former.length > 0 && (
-        <details data-testid="people-former" className="flex flex-col gap-2">
-          <summary className="flex min-h-tap cursor-pointer items-center gap-2">
+        <details data-testid="people-former" className="group flex flex-col gap-2">
+          <summary className="flex min-h-tap cursor-pointer list-none items-center gap-2">
+            <ChevronRight size={16} aria-hidden="true" className="text-ink-600 transition-transform group-open:rotate-90" />
             <h3 className="section-heading">Former staff</h3>
             <span className="mono text-meta text-ink-600">{former.length}</span>
           </summary>

@@ -266,12 +266,12 @@ export function OrgChart({
         <span className="flex items-center gap-1.5">
           <span className="face-av">{initials(label(m))}</span>
           <span className="min-w-0 truncate">{shortName(label(m))}</span>
-          {m.status === 'suspended' && (
-            <span data-testid="people-status-tag" className="tag shrink-0">
-              Suspended
-            </span>
-          )}
         </span>
+        {m.status === 'suspended' && (
+          <span data-testid="people-status-tag" className="tag self-start">
+            Suspended
+          </span>
+        )}
         {extra && <span className="org-person-note">{extra}</span>}
       </button>
     )
