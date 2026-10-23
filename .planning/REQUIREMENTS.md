@@ -1247,6 +1247,22 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 
 **Phase 64 Coverage:** 13 requirements (MEMB-01..13); 13/13 mapped to plans. Added 2026-10-21.
 
+**Phase 64 evidence (64-06, deployed `17b5004a`, full run in `64-EVAL.md`):**
+
+- MEMB-01: `tests/phase64/member-status-migration.spec.ts`; `apply-phase64-migration.mjs --assert-only` PASS (column, CHECK, backfill, no `authenticated` UPDATE on the status columns).
+- MEMB-02: `--assert-only` suspended probe (NULL helpers, zero rows on the same claims, hook issues no site); `people.eval` case 2 (same token reads nothing, browser shows the paused page); sibling evals green across every role, so the helper change broke no reader.
+- MEMB-03: `people.eval` case 2 (old refresh token refused); `revoke_user_sessions` service_role-only in the migration spec.
+- MEMB-04: `tests/phase64/member-actions.spec.ts`; `people.eval` case 6 and `64-member-self`.
+- MEMB-05: `people.eval` cases 1 and 5; `64-member-suspend-dialog`, `-sheet-suspended`, `-suspended-grid`, `-suspended-phone`, `-former`, `-former-phone`, `64-member-handover` ("(left)").
+- MEMB-06: `tests/lint/member-status.spec.ts` (no membership delete, `removeMember` gone); `tests/phase64/people-states.spec.ts`.
+- MEMB-07: `people.eval` case 2, `64-member-paused`.
+- MEMB-08: `people.eval` case 5 (re-invite of a departed address reuses the row); source contract in `tests/phase64`.
+- MEMB-09: `tests/phase64/handover.spec.ts`; `people.eval` case 4 (`64-member-handover*`).
+- MEMB-10: `tests/phase56`, `tests/phase59`, `tests/phase60` ledger-kind specs at 37 kinds; ledger rows in `64-member-ledger`, `64-decisions-people`, `64-member-handover-ledger`.
+- MEMB-11: `tests/lint/member-status.spec.ts` (every membership read active-only or allowlisted, with a stale-entry test; mutation-checked in 64-04).
+- MEMB-12: ADR-0024; `tests/phase59/capability-matrix.spec.ts`; `home.eval` DOCS-01 (pathways, zero unmapped); the `phase64-leavers` uat entry.
+- MEMB-13: `64-EVAL.md`: people.eval 6 of 6 and the full deployed run.
+
 ---
 *v11.0 requirements added: 2026-10-03*
 

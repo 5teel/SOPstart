@@ -80,6 +80,7 @@ Distilled rules below. **Full dated log with the stories: `docs/LEARNINGS.md` â€
 - Permissive policies OR together: a narrowing arm must be ANDed with the org predicate. A `WITH CHECK` replaces `USING`, so restate the org predicate. A command with no policy silently matches zero rows: session `.update()`/`.delete()` end in `.select('id')` and treat empty as failure; dropping a table's last policy for a command is a full deny.
 - `SECURITY DEFINER` functions taking an org id parameter are `service_role` only.
 - Every `'use server'` export is a public endpoint and must be async; the first client import of an action is a trigger to re-audit its parameters. Deleting a feature's UI means dropping the server params only it supplied.
+- RLS helpers and policies never trust the token's organisation / role claims alone: re-check the `organisation_members` row (`status = 'active'`); revoking sessions signs a person out but a signed token stays valid. Memberships are never deleted (ADR-0024).
 - CSV exports neutralise leading `= + - @`.
 
 **Build / deploy**
