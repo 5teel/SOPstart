@@ -7,30 +7,31 @@
  *     authority (signs off, asks people to do SOPs, approves SOPs).
  *   - Who can do what: one row per person, one column per authority.
  * Clicking a person opens the person sheet, the one place their role, departments, objective and
- * removal are edited. The marks come from `authorityOf()` (lib/members/authority), which mirrors
+ * membership state (Suspend, Has left, Reinstate) are edited. There is no Remove (ADR-0024). The marks come from `authorityOf()` (lib/members/authority), which mirrors
  * the server gates for display only; the server still decides. Admin-chunk code: the Office pane
  * is the only importer. No router, no navigation.
  */
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Check, ClipboardCheck, Send, Stamp, Trash2, X } from 'lucide-react'
+import { Check, ClipboardCheck, Send, Stamp, X } from 'lucide-react'
 import {
   getTeamMembersWithEmails,
   inviteWorker,
   regenerateInviteCode,
-  removeMember,
   updateMemberRoleSafe,
   type InvitedPerson,
   type TeamMember,
 } from '@/actions/auth'
 import { listDepartments } from '@/actions/departments'
+import { markMemberLeft, reinstateMember, suspendMember } from '@/actions/members'
 import { getPeopleAuthorityData, setSupervision } from '@/actions/people'
 import { DChip } from '@/components/admin/departments/DChip'
 import { DepartmentPicker } from '@/components/admin/departments/DepartmentPicker'
 import { useRole } from '@/components/providers/RoleProvider'
 import { useObjectives } from '@/components/shell/ObjectiveLine'
 import { ObjectiveSlot } from '@/components/shell/ObjectiveSlot'
+import { OFFICE_INBOX_KEY } from '@/lib/shell/query-keys'
 import { authorityLines, authorityOf, ROLE_ORDER, ROLE_PLURAL, ROLE_WORDS, type Authority } from '@/lib/members/authority'
 import type { Department } from '@/types/sop'
 import type { AppRole } from '@/types/auth'
@@ -50,6 +51,21 @@ const FAILED_COPY = "That didn't work. Nothing was changed — try again."
 type View = 'chart' | 'departments' | 'authority'
 
 const nameOf = (m: TeamMember) => m.email ?? `${ROLE_WORDS[m.role]} (${m.user_id.slice(0, 8)})`
+
+/** The plain-word tag for a person who is not active. Active people carry none. */
+function StatusTag({ m }: { m: TeamMember }) {
+  if (m.status === 'active') return null
+  return (
+    <span data-testid="people-status-tag" className="tag shrink-0">
+      {m.status === 'suspended' ? 'Suspended' : 'Has left'}
+    </span>
+  )
+}
+
+const leftOn = (m: TeamMember) =>
+  m.status_changed_at
+    ? `Left ${new Date(m.status_changed_at).toLocaleDateString('en-NZ', { day: 'numeric', month: 'short', year: 'numeric' })}`
+    : 'Has left'
 
 /** The three marks a person can carry on the board. Ink tags: authority is not a safety signal. */
 function Marks({ a }: { a: Authority }) {
@@ -108,14 +124,29 @@ function Legend() {
   )
 }
 
-function RemoveDialog({
-  email,
+const STATE_COPY = {
+  suspended: {
+    title: (name: string) => `Suspend ${name}?`,
+    body: 'They are signed out everywhere and cannot open anything on this site until you reinstate them. Their records stay under their name.',
+    confirm: 'Suspend',
+  },
+  left: {
+    title: (name: string) => `Mark ${name} as left?`,
+    body: 'They are signed out everywhere and move to Former staff. Their completions, sign-offs and records stay under their name. Anything they looked after shows in Sign-offs under Needs a new owner.',
+    confirm: 'Has left',
+  },
+} as const
+
+function MemberStateDialog({
+  name,
+  to,
   pending,
   error,
   onConfirm,
   onCancel,
 }: {
-  email: string
+  name: string
+  to: 'suspended' | 'left'
   pending: boolean
   error: string | null
   onConfirm(): void
@@ -129,6 +160,7 @@ function RemoveDialog({
       if (opener && opener.isConnected) opener.focus()
     }
   }, [])
+  const copy = STATE_COPY[to]
   return (
     <div
       className="fixed inset-0 z-50 grid place-items-center bg-ink-900/40 p-4"
@@ -142,14 +174,15 @@ function RemoveDialog({
       <div
         role="dialog"
         aria-modal="true"
-        aria-labelledby="people-remove-title"
-        data-testid="people-remove-dialog"
+        aria-labelledby="people-state-title"
+        data-testid="people-state-dialog"
+        data-to={to}
         className="flex w-full max-w-md flex-col gap-4 rounded-2xl bg-paper-1 p-6"
       >
-        <h2 id="people-remove-title" className="text-lg font-semibold text-ink-900">
-          Remove {email}?
+        <h2 id="people-state-title" className="text-lg font-semibold text-ink-900">
+          {copy.title(name)}
         </h2>
-        <p className="text-ui text-ink-700">They lose access to the site. Their past sign-offs stay on record.</p>
+        <p className="text-ui text-ink-700">{copy.body}</p>
         {error && (
           <p role="alert" className="text-ui text-accent-escalate">
             {error}
@@ -158,17 +191,17 @@ function RemoveDialog({
         <div className="flex flex-col gap-2 sm:flex-row-reverse">
           <button
             type="button"
-            data-testid="people-remove-confirm"
+            data-testid="people-state-confirm"
             disabled={pending}
             onClick={onConfirm}
-            className="min-h-tap flex-1 rounded-lg bg-accent-escalate text-ui font-semibold text-white disabled:opacity-50"
+            className="min-h-tap flex-1 rounded-lg bg-ink-900 text-ui font-semibold text-paper disabled:opacity-50"
           >
-            Remove
+            {copy.confirm}
           </button>
           <button
             type="button"
             ref={cancelRef}
-            data-testid="people-remove-cancel"
+            data-testid="people-state-cancel"
             disabled={pending}
             onClick={onCancel}
             className="min-h-tap flex-1 rounded-lg text-ui text-ink-700 hover:bg-paper-2"
@@ -191,8 +224,11 @@ function PersonCard({ m, a, onOpen }: { m: TeamMember; a: Authority; onOpen(): v
       onClick={onOpen}
       className="flex w-full flex-col items-start gap-1 rounded-lg px-2 py-2 text-left hover:bg-paper-2"
     >
-      <span className="w-full truncate text-ui font-semibold text-ink-900" title={nameOf(m)}>
-        {nameOf(m)}
+      <span className="flex w-full items-center gap-2">
+        <span className="min-w-0 flex-1 truncate text-ui font-semibold text-ink-900" title={nameOf(m)}>
+          {nameOf(m)}
+        </span>
+        <StatusTag m={m} />
       </span>
       <Marks a={a} />
     </button>
@@ -340,7 +376,7 @@ function AuthorityGrid({
                 <tr
                   key={m.id}
                   data-testid="people-row"
-                  data-status="active"
+                  data-status={m.status}
                   data-member-id={m.id}
                   tabIndex={0}
                   onClick={() => onOpen(m)}
@@ -357,6 +393,7 @@ function AuthorityGrid({
                       {nameOf(m)}
                     </span>
                     {m.user_id === currentUserId && <span className="text-meta text-ink-600">You</span>}
+                    <StatusTag m={m} />
                   </td>
                   <td className={`${TD} text-ink-700`}>{ROLE_WORDS[m.role]}</td>
                   <td className={TD}>
@@ -434,13 +471,18 @@ export function PeopleTab({ onReceipt, siteName = '', onPinSop }: { onReceipt(r:
   const auth = (m: TeamMember) => authorityOf(m, authData.chains, authData.supervision)
 
   const data = team.data && 'members' in team.data ? team.data : null
-  const members: TeamMember[] = data?.members ?? []
+  const everyone: TeamMember[] = data?.members ?? []
+  // Present people (active and suspended) fill every view; a departed person sits in Former staff.
+  const members = everyone.filter((m) => m.status !== 'left')
+  const former = everyone
+    .filter((m) => m.status === 'left')
+    .sort((a, b) => (b.status_changed_at ?? '').localeCompare(a.status_changed_at ?? ''))
   const invited: InvitedPerson[] = data?.invited ?? []
   const refetch = () => qc.invalidateQueries({ queryKey: PEOPLE_KEY })
 
   const [view, setView] = useState<View>('chart')
   const [openId, setOpenId] = useState<string | null>(null)
-  const open = members.find((m) => m.id === openId) ?? null
+  const open = everyone.find((m) => m.id === openId) ?? null
 
   // Invite form
   const [inviteOpen, setInviteOpen] = useState(false)
@@ -453,9 +495,10 @@ export function PeopleTab({ onReceipt, siteName = '', onPinSop }: { onReceipt(r:
   const [rowError, setRowError] = useState<{ id: string; text: string } | null>(null)
   const [pendingRole, setPendingRole] = useState<string | null>(null)
   const [pickerOpen, setPickerOpen] = useState(false)
-  const [removing, setRemoving] = useState<TeamMember | null>(null)
-  const [removePending, setRemovePending] = useState(false)
-  const [removeError, setRemoveError] = useState<string | null>(null)
+  const [stateTarget, setStateTarget] = useState<{ member: TeamMember; to: 'suspended' | 'left' } | null>(null)
+  const [statePending, setStatePending] = useState(false)
+  const [stateError, setStateError] = useState<string | null>(null)
+  const [reinstating, setReinstating] = useState<string | null>(null)
 
   // Join code
   const [code, setCode] = useState<string | null>(null)
@@ -516,24 +559,48 @@ export function PeopleTab({ onReceipt, siteName = '', onPinSop }: { onReceipt(r:
     }
   }
 
-  async function confirmRemove() {
-    if (!removing) return
-    setRemovePending(true)
-    setRemoveError(null)
+  const afterState = async () => {
+    await Promise.all([refetch(), qc.invalidateQueries({ queryKey: OFFICE_INBOX_KEY })])
+  }
+  const signedOutWords = (r: { signedOut?: boolean }) => (r.signedOut ? 'Signed out everywhere' : 'They are signed out within the hour')
+
+  async function confirmState() {
+    if (!stateTarget) return
+    const { member, to } = stateTarget
+    setStatePending(true)
+    setStateError(null)
     try {
-      const res = await removeMember(removing.id)
-      if ('error' in res && res.error) {
-        setRemoveError(res.error)
+      const res = to === 'suspended' ? await suspendMember(member.id) : await markMemberLeft(member.id)
+      if ('error' in res) {
+        setStateError(res.error)
         return
       }
-      setRemoving(null)
-      setOpenId(null)
-      onReceipt({ receipt: 'Removed', logged: 'logged' in res ? (res.logged ?? null) : null })
-      await refetch()
+      setStateTarget(null)
+      if (to === 'left') setOpenId(null)
+      onReceipt({ receipt: to === 'suspended' ? 'Suspended' : 'Marked as left', logged: res.logged, after: signedOutWords(res) })
+      await afterState()
     } catch {
-      setRemoveError(FAILED_COPY)
+      setStateError(FAILED_COPY)
     } finally {
-      setRemovePending(false)
+      setStatePending(false)
+    }
+  }
+
+  async function reinstate(m: TeamMember) {
+    setReinstating(m.id)
+    setRowError(null)
+    try {
+      const res = await reinstateMember(m.id)
+      if ('error' in res) {
+        setRowError({ id: m.id, text: res.error })
+        return
+      }
+      onReceipt({ receipt: 'Reinstated', logged: res.logged })
+      await afterState()
+    } catch {
+      setRowError({ id: m.id, text: FAILED_COPY })
+    } finally {
+      setReinstating(null)
     }
   }
 
@@ -726,6 +793,33 @@ export function PeopleTab({ onReceipt, siteName = '', onPinSop }: { onReceipt(r:
         />
       )}
 
+      {former.length > 0 && (
+        <details data-testid="people-former" className="flex flex-col gap-2">
+          <summary className="flex min-h-tap cursor-pointer items-center gap-2">
+            <h3 className="section-heading">Former staff</h3>
+            <span className="mono text-meta text-ink-600">{former.length}</span>
+          </summary>
+          <div className="list mt-2">
+            {former.map((m) => (
+              <button
+                key={m.id}
+                type="button"
+                data-testid="people-former-row"
+                data-member-id={m.id}
+                onClick={() => openPerson(m)}
+                className="flex min-h-tap w-full items-center gap-3 px-3 py-2 text-left text-ui hover:bg-paper-2"
+              >
+                <span className="min-w-0 flex-1 truncate font-semibold text-ink-900" title={nameOf(m)}>
+                  {nameOf(m)}
+                </span>
+                <span className="shrink-0 text-meta text-ink-600">{ROLE_WORDS[m.role]}</span>
+                <span className="mono shrink-0 text-meta text-ink-600">{leftOn(m)}</span>
+              </button>
+            ))}
+          </div>
+        </details>
+      )}
+
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-2 text-ui text-ink-500">
         <Link href="/admin/settings" className="underline-offset-2 hover:underline">
           Settings →
@@ -770,28 +864,31 @@ export function PeopleTab({ onReceipt, siteName = '', onPinSop }: { onReceipt(r:
             onReceipt({ receipt: 'Departments updated', logged: logged ?? null })
             void refetch()
           }}
-          onRemove={() => {
-            setRemoveError(null)
-            setRemoving(open)
+          reinstatePending={reinstating === open.id}
+          onState={(to) => {
+            setStateError(null)
+            setStateTarget({ member: open, to })
           }}
+          onReinstate={() => void reinstate(open)}
           onClose={() => setOpenId(null)}
         />
       )}
 
-      {removing && (
-        <RemoveDialog
-          email={removing.email ?? 'this person'}
-          pending={removePending}
-          error={removeError}
-          onConfirm={() => void confirmRemove()}
-          onCancel={() => setRemoving(null)}
+      {stateTarget && (
+        <MemberStateDialog
+          name={nameOf(stateTarget.member)}
+          to={stateTarget.to}
+          pending={statePending}
+          error={stateError}
+          onConfirm={() => void confirmState()}
+          onCancel={() => setStateTarget(null)}
         />
       )}
     </div>
   )
 }
 
-/** The one place a person is edited: role, departments, objective, removal; and what they may do. */
+/** The one place a person is edited: role, departments, objective, membership state; and what they may do. */
 function PersonSheet({
   m,
   a,
@@ -808,7 +905,9 @@ function PersonSheet({
   onRole,
   onLink,
   onDepartments,
-  onRemove,
+  reinstatePending,
+  onState,
+  onReinstate,
   onClose,
 }: {
   m: TeamMember
@@ -826,7 +925,9 @@ function PersonSheet({
   onRole(r: AppRole): void
   onLink(workerId: string, linked: boolean): Promise<string | null>
   onDepartments(logged?: boolean): void
-  onRemove(): void
+  reinstatePending: boolean
+  onState(to: 'suspended' | 'left'): void
+  onReinstate(): void
   onClose(): void
 }) {
   const objectives = useObjectives()
@@ -866,9 +967,12 @@ function PersonSheet({
             <h2 id="person-sheet-title" className="truncate text-lg font-semibold text-ink-900" title={label}>
               {label}
             </h2>
-            <p className="text-ui text-ink-600">
-              {ROLE_WORDS[m.role]}
-              {mine ? ' · You' : ''}
+            <p className="flex items-center gap-2 text-ui text-ink-600">
+              <span>
+                {ROLE_WORDS[m.role]}
+                {mine ? ' · You' : ''}
+              </span>
+              <StatusTag m={m} />
             </p>
           </div>
           <button
@@ -905,7 +1009,7 @@ function PersonSheet({
             data-testid="people-role-select"
             aria-label={`Role for ${label}`}
             value={m.role}
-            disabled={!isAdmin || pendingRole}
+            disabled={!isAdmin || pendingRole || m.status !== 'active'}
             onChange={(e) => onRole(e.target.value as AppRole)}
             className={SELECT}
           >
@@ -916,6 +1020,7 @@ function PersonSheet({
             ))}
           </select>
           {!isAdmin && <span className="text-meta text-ink-500">Only an admin can change roles.</span>}
+          {isAdmin && m.status !== 'active' && <span className="text-meta text-ink-500">Reinstate them to change their role.</span>}
           {rowError && (
             <p role="alert" data-testid="people-row-error" className="text-ui text-accent-escalate">
               {rowError}
@@ -930,7 +1035,7 @@ function PersonSheet({
             {chips.map((d) => (
               <DChip key={d.id} variant="department" department={d} />
             ))}
-            {departments.length > 0 && !pickerOpen && <DChip variant="add" onClick={() => onPicker(true)} />}
+            {departments.length > 0 && !pickerOpen && m.status === 'active' && <DChip variant="add" onClick={() => onPicker(true)} />}
           </div>
           {pickerOpen && (
             <div>
@@ -971,18 +1076,42 @@ function PersonSheet({
           />
         </section>
 
-        {!mine && (
-          <div className="mt-auto border-t border-ink-200 pt-4">
-            <button
-              type="button"
-              data-testid="people-remove"
-              aria-label={`Remove ${label}`}
-              onClick={onRemove}
-              className="inline-flex min-h-tap items-center gap-2 rounded-lg px-3 text-ui text-ink-700 hover:text-accent-escalate"
-            >
-              <Trash2 size={16} aria-hidden="true" />
-              Remove from the site
-            </button>
+        {!mine && (isAdmin || m.role !== 'admin') && (
+          <div className="mt-auto flex flex-wrap gap-2 border-t border-ink-200 pt-4">
+            {m.status === 'active' && (
+              <button
+                type="button"
+                data-testid="people-suspend"
+                aria-label={`Suspend ${label}`}
+                onClick={() => onState('suspended')}
+                className="min-h-tap rounded-lg border border-ink-300 bg-paper-1 px-4 text-ui font-semibold text-ink-900 hover:bg-paper-2"
+              >
+                Suspend
+              </button>
+            )}
+            {m.status !== 'left' && (
+              <button
+                type="button"
+                data-testid="people-left"
+                aria-label={`Mark ${label} as left`}
+                onClick={() => onState('left')}
+                className="min-h-tap rounded-lg border border-ink-300 bg-paper-1 px-4 text-ui font-semibold text-ink-900 hover:bg-paper-2"
+              >
+                Has left
+              </button>
+            )}
+            {m.status !== 'active' && (
+              <button
+                type="button"
+                data-testid="people-reinstate"
+                aria-label={`Reinstate ${label}`}
+                disabled={reinstatePending}
+                onClick={onReinstate}
+                className="min-h-tap rounded-lg bg-ink-900 px-4 text-ui font-semibold text-paper disabled:opacity-50"
+              >
+                Reinstate
+              </button>
+            )}
           </div>
         )}
       </aside>
@@ -1013,7 +1142,7 @@ function SupervisesPicker({
   const linked = new Set(supervises.map((x) => x.user_id))
   const near = (x: TeamMember) => x.department_ids.some((d) => m.department_ids.includes(d))
   const workers = members
-    .filter((x) => x.role === 'worker')
+    .filter((x) => x.role === 'worker' && x.status === 'active')
     .sort((a, b) => Number(near(b)) - Number(near(a)) || nameOf(a).localeCompare(nameOf(b)))
   const H = 'text-ui font-semibold text-ink-700'
 

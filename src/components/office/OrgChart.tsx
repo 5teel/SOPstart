@@ -152,6 +152,9 @@ export function OrgChart({
   const allNodes = (ns: DeptNode[]): DeptNode[] => ns.flatMap((n) => [n, ...allNodes(n.children)])
 
   // Job roles per department (the org tree), with filled-of-planned seats.
+  // A seat counts only for a person who is present: a departed person's seat reads as empty.
+  const filledOf = (r: { people: Array<{ id?: string | null; isVacancy?: boolean }> }) =>
+    r.people.filter((p) => !p.isVacancy && p.id && byUser.has(p.id)).length
   const rolesOf = (deptId: string) => {
     const d = [...(tree?.areas.flatMap((a) => a.departments) ?? []), ...(tree?.ungroupedDepartments ?? [])].find((x) => x.id === deptId)
     return d?.roles ?? []
@@ -263,6 +266,11 @@ export function OrgChart({
         <span className="flex items-center gap-1.5">
           <span className="face-av">{initials(label(m))}</span>
           <span className="min-w-0 truncate">{shortName(label(m))}</span>
+          {m.status === 'suspended' && (
+            <span data-testid="people-status-tag" className="tag shrink-0">
+              Suspended
+            </span>
+          )}
         </span>
         {extra && <span className="org-person-note">{extra}</span>}
       </button>
@@ -290,7 +298,7 @@ export function OrgChart({
       )
     }
     if (lens === 'access' && access) return access.depts.has(n.dept.id) ? <b className="text-ink-900">Can see it</b> : <span>Can’t see it</span>
-    const seats = rolesOf(n.dept.id).reduce((s, r) => s + Math.max(0, r.budgetedCount - r.filledCount), 0)
+    const seats = rolesOf(n.dept.id).reduce((s, r) => s + Math.max(0, r.budgetedCount - filledOf(r)), 0)
     return (
       <span>
         {uniq.length === 1 ? '1 person' : `${uniq.length} people`}
@@ -306,7 +314,7 @@ export function OrgChart({
     const groups: Array<{ key: string; roleId: string | null; name: string; cap: string; ppl: TeamMember[]; seats: number; planned: number }> = roles.map((r) => {
       const ppl = r.people.filter((p) => !p.isVacancy && p.id).map((p) => byUser.get(p.id!)).filter((m): m is TeamMember => !!m)
       ppl.forEach((m) => seated.add(m.id))
-      return { key: r.id, roleId: r.id, name: r.name, cap: `${r.filledCount} of ${r.budgetedCount}`, ppl, seats: Math.max(0, r.budgetedCount - r.filledCount), planned: r.budgetedCount }
+      return { key: r.id, roleId: r.id, name: r.name, cap: `${filledOf(r)} of ${r.budgetedCount}`, ppl, seats: Math.max(0, r.budgetedCount - filledOf(r)), planned: r.budgetedCount }
     })
     const rest = here.filter((m) => !seated.has(m.id))
     for (const role of ROLE_ORDER) {

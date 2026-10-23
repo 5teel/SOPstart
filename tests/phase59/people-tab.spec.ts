@@ -27,7 +27,7 @@ test.describe('people tab', () => {
     expect(TAB).toContain('data-testid="people-row"')
     expect(TAB).toContain('data-testid="person-sheet"')
     expect(TAB).toContain('data-testid="people-role-select"')
-    expect(TAB).toContain('data-testid="people-remove"')
+    expect(TAB).toContain('data-testid="people-suspend"')
     for (const w of ['Person', 'Role', 'Departments', 'Signs off work', 'Assigns SOPs', 'Approves SOPs']) expect(TAB).toContain(`>${w}<`)
     // The marks come from the one authority module, never a private copy of the role rules.
     expect(TAB).toContain("from '@/lib/members/authority'")
@@ -38,10 +38,11 @@ test.describe('people tab', () => {
     expect(TAB).toContain('updateMemberRoleSafe({')
     expect(TAB).not.toContain('updateMemberRole(')
     expect(TAB).toContain('inviteWorker({')
-    expect(TAB).toContain('removeMember(')
+    for (const a of ['suspendMember(', 'markMemberLeft(', 'reinstateMember(']) expect(TAB).toContain(a)
+    expect(TAB).not.toContain('removeMember')
     expect(TAB).not.toContain('addMemberByEmail')
     // A safety manager sees the role select and the Invite button disabled, with the server's words.
-    expect(TAB).toMatch(/disabled=\{!isAdmin \|\| pendingRole\}/)
+    expect(TAB).toMatch(/disabled=\{!isAdmin \|\| pendingRole \|\| m\.status !== 'active'\}/)
     expect(TAB).toMatch(/data-testid="people-invite"[\s\S]{0,80}disabled=\{!isAdmin\}/)
     expect(TAB).toContain('Only an admin can invite people.')
     expect(TAB).toContain('Only an admin can change roles.')
@@ -52,11 +53,10 @@ test.describe('people tab', () => {
     expect(TAB).toContain('value={m.role}')
   })
 
-  test('Remove asks for confirmation in an aria-modal dialog with "Keep them"', () => {
+  test('Suspend and Has left ask for confirmation in an aria-modal dialog with "Keep them"', () => {
     expect(TAB).toContain('aria-modal="true"')
     expect(TAB).toContain('Keep them')
-    expect(TAB).toContain('They lose access to the site. Their past sign-offs stay on record.')
-    expect(TAB).toContain('aria-label={`Remove ${label}`}')
+    expect(TAB).toContain('aria-label={`Suspend ${label}`}')
     // Esc closes only the dialog.
     expect(TAB).toMatch(/e\.key !== 'Escape'[\s\S]{0,120}e\.stopPropagation\(\)/)
   })
@@ -95,7 +95,7 @@ test.describe('people tab', () => {
   test('review WR-03: every action call is wrapped, so a thrown action re-enables the control and says so', () => {
     const FAILED = `"That didn't work. Nothing was changed — try again."`
     for (const [file, calls, finals] of [
-      ['src/components/office/PeopleTab.tsx', ['inviteWorker(', 'updateMemberRoleSafe(', 'removeMember(', 'regenerateInviteCode('], ['setInviting(false)', 'setPendingRole(null)', 'setRemovePending(false)', 'setCodeBusy(false)']],
+      ['src/components/office/PeopleTab.tsx', ['inviteWorker(', 'updateMemberRoleSafe(', 'suspendMember(', 'markMemberLeft(', 'reinstateMember(', 'regenerateInviteCode('], ['setInviting(false)', 'setPendingRole(null)', 'setStatePending(false)', 'setReinstating(null)', 'setCodeBusy(false)']],
       ['src/components/focus/admin/ThisSopBlock.tsx', ['confirmSopCurrent('], ['setMarking(false)']],
       ['src/components/admin/governance/OwnerPicker.tsx', ['getOrgMembers(', 'setSopOwner('], ['setLoading(false)', 'setSaving(false)']],
     ] as const) {
