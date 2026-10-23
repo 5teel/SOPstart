@@ -1216,7 +1216,7 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 - [x] **MEMB-10**: Suspending, marking as left, reinstating and every reassignment each write a decision-ledger row (new kinds member_suspended, member_left, member_reinstated; reassignment reuses owner_change)
 - [x] **MEMB-11**: Everywhere the app counts or picks people (notifications and their recipients, asks, training lanes, owner and approver pickers, admin counts, site picker) only active members count; records and name labels keep everyone
 - [x] **MEMB-12**: ADR-0024, the capability matrix, the pathways map (zero unmapped screens) and the feedback page describe membership states, in the same commits as the changes they describe
-- [ ] **MEMB-13**: A deployed eval proves the cut-off on the same token, the sign-out of the old session, the paused page, reinstate, the move to Former staff, re-invite reactivation and the Needs a new owner list with reassignment
+- [x] **MEMB-13**: A deployed eval proves the cut-off on the same token, the sign-out of the old session, the paused page, reinstate, the move to Former staff, re-invite reactivation and the Needs a new owner list with reassignment
 
 ### Phase 64 Out of Scope
 
@@ -1243,7 +1243,7 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 | MEMB-10 | 64-01, 64-02, 64-05 | Complete |
 | MEMB-11 | 64-04 | Complete |
 | MEMB-12 | 64-01, 64-02, 64-03, 64-05 | Complete |
-| MEMB-13 | 64-03, 64-05, 64-06 | Pending |
+| MEMB-13 | 64-03, 64-05, 64-06 | Complete |
 
 **Phase 64 Coverage:** 13 requirements (MEMB-01..13); 13/13 mapped to plans. Added 2026-10-21.
 
