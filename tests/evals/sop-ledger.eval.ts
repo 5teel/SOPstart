@@ -196,11 +196,10 @@ test.describe.serial('Phase 56 -- simpler SOP + decision ledger (deployed)', () 
     await expect(browse.getByText('Cut-resistant gloves').first()).toBeVisible(SLOW)
     await expect(browse.getByText('Isolate the press.')).toHaveCount(1)
     await expect(browse.getByText('Photograph the isolation lock.')).toHaveCount(1)
-    // Hazards and PPE come first in walking order (D-07).
+    // ADR-0023 (narrows D-07): the hazard / PPE-only section comes first ("Before you start"); a warning inside
+    // the Procedure section stays before the step it guards.
     const kinds = await browse.getByTestId('step-row').evaluateAll((els) => els.map((e) => e.getAttribute('data-kind')))
-    // Source order within them: the PPE card sits between the hazards of its own section, so assert the group, not the sequence.
-    expect([...kinds.slice(0, 5)].sort()).toEqual(['hazard', 'hazard', 'hazard', 'hazard', 'ppe'])
-    expect(['hazard', 'ppe']).not.toContain(kinds[5])
+    expect(kinds.slice(0, 5)).toEqual(['hazard', 'hazard', 'ppe', 'hazard', 'step'])
     await shot(page, 'ledger-b-browse')
     expect(errors, errors.join('\n')).toEqual([])
     await page.close()
