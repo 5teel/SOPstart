@@ -1212,9 +1212,9 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 - [x] **MEMB-06**: Removing a person is gone: the hard delete of a membership, the code only it used and its Remove button are deleted, and a guard fails the build if a membership delete comes back
 - [x] **MEMB-07**: A suspended or departed person who signs in or reloads sees "Your access to {site} has been paused. Talk to your supervisor."
 - [x] **MEMB-08**: Invites, the join code, accepting an invite and the site switcher honour the state; inviting a departed person's email reactivates their existing membership (same row, same history) instead of creating a second one; a suspended person is pointed to Reinstate
-- [ ] **MEMB-09**: What a suspended or departed person was looking after (SOPs they own, departments they own, approval chains and in-flight approvals that name them, open asks to them, workers left with no active supervisor) appears under "Needs a new owner" in the Sign-offs inbox for admins and safety managers, who reassign each with the existing owner picker (active people only); nothing is reassigned automatically
+- [x] **MEMB-09**: What a suspended or departed person was looking after (SOPs they own, departments they own, approval chains and in-flight approvals that name them, open asks to them, workers left with no active supervisor) appears under "Needs a new owner" in the Sign-offs inbox for admins and safety managers, who reassign each with the existing owner picker (active people only); nothing is reassigned automatically
 - [x] **MEMB-10**: Suspending, marking as left, reinstating and every reassignment each write a decision-ledger row (new kinds member_suspended, member_left, member_reinstated; reassignment reuses owner_change)
-- [ ] **MEMB-11**: Everywhere the app counts or picks people (notifications and their recipients, asks, training lanes, owner and approver pickers, admin counts, site picker) only active members count; records and name labels keep everyone
+- [x] **MEMB-11**: Everywhere the app counts or picks people (notifications and their recipients, asks, training lanes, owner and approver pickers, admin counts, site picker) only active members count; records and name labels keep everyone
 - [x] **MEMB-12**: ADR-0024, the capability matrix, the pathways map (zero unmapped screens) and the feedback page describe membership states, in the same commits as the changes they describe
 - [ ] **MEMB-13**: A deployed eval proves the cut-off on the same token, the sign-out of the old session, the paused page, reinstate, the move to Former staff, re-invite reactivation and the Needs a new owner list with reassignment
 
@@ -1239,9 +1239,9 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 | MEMB-06 | 64-03, 64-04 | Complete |
 | MEMB-07 | 64-02, 64-03 | Complete |
 | MEMB-08 | 64-02, 64-03 | Complete |
-| MEMB-09 | 64-04, 64-05 | Pending |
+| MEMB-09 | 64-04, 64-05 | Complete |
 | MEMB-10 | 64-01, 64-02, 64-05 | Complete |
-| MEMB-11 | 64-04 | Pending |
+| MEMB-11 | 64-04 | Complete |
 | MEMB-12 | 64-01, 64-02, 64-03, 64-05 | Complete |
 | MEMB-13 | 64-03, 64-05, 64-06 | Pending |
 

@@ -4,13 +4,13 @@ milestone: v11.0
 milestone_name: — One-Screen MVP
 status: executing
 stopped_at: Completed 64-03-PLAN.md
-last_updated: "2026-10-23T12:58:59.660Z"
+last_updated: "2026-10-23T13:26:02.730Z"
 last_activity: 2026-10-23 -- Phase 64 execution started
 progress:
   total_phases: 16
   completed_phases: 7
   total_plans: 113
-  completed_plans: 110
+  completed_plans: 111
   percent: 44
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-03)
 ## Current Position
 
 Phase: 64 (leavers-and-suspended-members) — EXECUTING
-Plan: 4 of 6
+Plan: 5 of 6
 Status: Ready to execute
 Last activity: 2026-10-23 -- Phase 64 execution started
 
@@ -304,6 +304,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 64 P01 | 95min | 3 tasks | 18 files |
 | Phase 64 P02 | 50min | 3 tasks | 13 files |
 | Phase 64 P03 | 3h | 3 tasks | 26 files |
+| Phase 64 P04 | 2h | 3 tasks | 21 files |
 
 ## Accumulated Context
 
@@ -607,6 +608,7 @@ Recent decisions affecting current work:
 - [Phase 64]: Phase 64-01: ADR-0024 accepted residuals: signed links live their TTL, reinstate within the hour revives an old token, sign-out covers every site the person belongs to
 - [Phase 64-02]: Paused page applies only to approved accounts with only paused sites; approval pending/declined keep precedence
 - [Phase 64]: [64-03] Departed people leave every People view and sit in a folded Former staff group; suspended stay with a tag; state buttons are ink, never red
+- [Phase 64-04]: Membership reads are active-only by default; records and labels keep everyone and use statusSuffix; tests/lint/member-status.spec.ts enforces it with a reasoned ALLOW map
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -752,6 +754,6 @@ deliberate decision, not a side-effect.
 
 ## Session Continuity
 
-Last session: 2026-10-23T12:58:59.644Z
+Last session: 2026-10-23T13:25:56.869Z
 Stopped at: Completed 64-03-PLAN.md
 Resume file: None
