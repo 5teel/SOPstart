@@ -56,6 +56,8 @@ export interface HomeShellProps {
   initial: HomeState
   /** The org's site map packing (ADR-0010). */
   packing?: Packing
+  /** Phase 66: an admin or safety manager before the second step (shown the way back to admin work). */
+  secondStep?: boolean
 }
 
 function isTypingTarget(t: EventTarget | null): boolean {
@@ -63,7 +65,7 @@ function isTypingTarget(t: EventTarget | null): boolean {
   return t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable
 }
 
-export function HomeShell({ siteName, siteId, sites, userEmail, userId, role, initial, packing }: HomeShellProps) {
+export function HomeShell({ siteName, siteId, sites, userEmail, userId, role, initial, packing, secondStep = false }: HomeShellProps) {
   const [state, setState] = useState<HomeState>(() => resolveHome(initial, role))
   // Phone: My SOPs opens on the site map; List is the other tab.
   const [phoneMap, setPhoneMap] = useState(true)
@@ -197,7 +199,7 @@ export function HomeShell({ siteName, siteId, sites, userEmail, userId, role, in
 
   return (
     <div data-testid="home" className="flex h-dvh flex-col bg-paper lg:flex-row">
-      <SectionMenu role={role} section={state.s} userEmail={userEmail} orgName={siteName} orgId={siteId} sites={sites} onSelect={openSection} collapsed={sopOpen && !menuOpen} />
+      <SectionMenu role={role} section={state.s} userEmail={userEmail} orgName={siteName} orgId={siteId} sites={sites} onSelect={openSection} collapsed={sopOpen && !menuOpen} secondStep={secondStep} />
 
       {state.s === 'sops' ? (
         <div className="flex min-h-0 min-w-0 flex-1 flex-col lg:flex-row">
@@ -251,7 +253,7 @@ export function HomeShell({ siteName, siteId, sites, userEmail, userId, role, in
                 />
               )}
               <div className="mt-6 lg:hidden">
-                <AccountControl email={userEmail} isAdmin={canWrite} org={siteName} orgId={siteId} sites={sites} />
+                <AccountControl email={userEmail} isAdmin={canWrite} secondStep={secondStep} org={siteName} orgId={siteId} sites={sites} />
               </div>
             </div>
           </div>

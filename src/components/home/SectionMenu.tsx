@@ -16,6 +16,7 @@ export function SectionMenu({
   sites,
   onSelect,
   collapsed = false,
+  secondStep = false,
 }: {
   role: string | null
   section: Section
@@ -26,6 +27,8 @@ export function SectionMenu({
   onSelect(s: Section): void
   /** Desktop, while a SOP is open: folded away until the reader opens it (ADR-0011). */
   collapsed?: boolean
+  /** Phase 66: an admin or safety manager before the second step. */
+  secondStep?: boolean
 }) {
   return (
     <aside data-testid="home-menu" data-folded={collapsed} inert={collapsed} className="fold w-55 shrink-0 border-r border-ink-200 bg-paper max-lg:hidden">
@@ -50,7 +53,7 @@ export function SectionMenu({
           ))}
         </nav>
         <div className="mt-auto">
-          <AccountControl email={userEmail} org={orgName} orgId={orgId} sites={sites} isAdmin={role === 'admin' || role === 'safety_manager'} />
+          <AccountControl email={userEmail} org={orgName} orgId={orgId} sites={sites} isAdmin={role === 'admin' || role === 'safety_manager'} secondStep={secondStep} />
         </div>
       </div>
     </aside>

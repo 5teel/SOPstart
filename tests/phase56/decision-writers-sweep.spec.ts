@@ -59,6 +59,10 @@ const LIVE_WRITERS: string[] = [
   'src/actions/objectives.ts#clearObjective',
   'src/actions/objectives.ts#confirmObjective',
   'src/actions/passkeys.ts#recordPasskeyChange',
+  'src/actions/mfa.ts#recordFactorChange',
+  'src/actions/mfa.ts#issueRecoveryCodes',
+  'src/actions/mfa.ts#redeemRecoveryCode',
+  'src/actions/mfa.ts#resetMemberFactors',
 ]
 // performPublish is hooked outside the gate body (56-05).
 const PUBLISH_GUARD_LIVE = true

@@ -1896,7 +1896,7 @@ export type Database = {
         Row: {
           id: string
           organisation_id: string
-          kind: 'approve' | 'reject' | 'sign_off' | 'countersign' | 'assign' | 'unassign' | 'publish' | 'owner_change' | 'review' | 'observation' | 'verify' | 'verify_withdrawn' | 'ai_finding_cleared' | 'cadence_change' | 'ai_field_write' | 'role_change' | 'member_invited' | 'member_removed' | 'request_accepted' | 'request_declined' | 'objective_set' | 'objective_cleared' | 'objective_confirmed' | 'supervisor_linked' | 'supervisor_unlinked' | 'department_change' | 'access_change' | 'sop_created' | 'sop_edited' | 'sop_deleted' | 'sop_version' | 'standard_change' | 'site_change' | 'settings_change' | 'member_suspended' | 'member_left' | 'member_reinstated' | 'passkey_added' | 'passkey_removed'
+          kind: 'approve' | 'reject' | 'sign_off' | 'countersign' | 'assign' | 'unassign' | 'publish' | 'owner_change' | 'review' | 'observation' | 'verify' | 'verify_withdrawn' | 'ai_finding_cleared' | 'cadence_change' | 'ai_field_write' | 'role_change' | 'member_invited' | 'member_removed' | 'request_accepted' | 'request_declined' | 'objective_set' | 'objective_cleared' | 'objective_confirmed' | 'supervisor_linked' | 'supervisor_unlinked' | 'department_change' | 'access_change' | 'sop_created' | 'sop_edited' | 'sop_deleted' | 'sop_version' | 'standard_change' | 'site_change' | 'settings_change' | 'member_suspended' | 'member_left' | 'member_reinstated' | 'passkey_added' | 'passkey_removed' | 'mfa_enrolled' | 'mfa_removed' | 'mfa_reset' | 'recovery_codes_issued' | 'recovery_code_used'
           actor_kind: 'person' | 'agent'
           actor_id: string | null
           actor_name: string | null
@@ -1914,7 +1914,7 @@ export type Database = {
         Insert: {
           id?: string
           organisation_id: string
-          kind: 'approve' | 'reject' | 'sign_off' | 'countersign' | 'assign' | 'unassign' | 'publish' | 'owner_change' | 'review' | 'observation' | 'verify' | 'verify_withdrawn' | 'ai_finding_cleared' | 'cadence_change' | 'ai_field_write' | 'role_change' | 'member_invited' | 'member_removed' | 'request_accepted' | 'request_declined' | 'objective_set' | 'objective_cleared' | 'objective_confirmed' | 'supervisor_linked' | 'supervisor_unlinked' | 'department_change' | 'access_change' | 'sop_created' | 'sop_edited' | 'sop_deleted' | 'sop_version' | 'standard_change' | 'site_change' | 'settings_change' | 'member_suspended' | 'member_left' | 'member_reinstated' | 'passkey_added' | 'passkey_removed'
+          kind: 'approve' | 'reject' | 'sign_off' | 'countersign' | 'assign' | 'unassign' | 'publish' | 'owner_change' | 'review' | 'observation' | 'verify' | 'verify_withdrawn' | 'ai_finding_cleared' | 'cadence_change' | 'ai_field_write' | 'role_change' | 'member_invited' | 'member_removed' | 'request_accepted' | 'request_declined' | 'objective_set' | 'objective_cleared' | 'objective_confirmed' | 'supervisor_linked' | 'supervisor_unlinked' | 'department_change' | 'access_change' | 'sop_created' | 'sop_edited' | 'sop_deleted' | 'sop_version' | 'standard_change' | 'site_change' | 'settings_change' | 'member_suspended' | 'member_left' | 'member_reinstated' | 'passkey_added' | 'passkey_removed' | 'mfa_enrolled' | 'mfa_removed' | 'mfa_reset' | 'recovery_codes_issued' | 'recovery_code_used'
           actor_kind: 'person' | 'agent'
           actor_id?: string | null
           actor_name?: string | null
@@ -1932,7 +1932,7 @@ export type Database = {
         Update: {
           id?: string
           organisation_id?: string
-          kind?: 'approve' | 'reject' | 'sign_off' | 'countersign' | 'assign' | 'unassign' | 'publish' | 'owner_change' | 'review' | 'observation' | 'verify' | 'verify_withdrawn' | 'ai_finding_cleared' | 'cadence_change' | 'ai_field_write' | 'role_change' | 'member_invited' | 'member_removed' | 'request_accepted' | 'request_declined' | 'objective_set' | 'objective_cleared' | 'objective_confirmed' | 'supervisor_linked' | 'supervisor_unlinked' | 'department_change' | 'access_change' | 'sop_created' | 'sop_edited' | 'sop_deleted' | 'sop_version' | 'standard_change' | 'site_change' | 'settings_change' | 'member_suspended' | 'member_left' | 'member_reinstated' | 'passkey_added' | 'passkey_removed'
+          kind?: 'approve' | 'reject' | 'sign_off' | 'countersign' | 'assign' | 'unassign' | 'publish' | 'owner_change' | 'review' | 'observation' | 'verify' | 'verify_withdrawn' | 'ai_finding_cleared' | 'cadence_change' | 'ai_field_write' | 'role_change' | 'member_invited' | 'member_removed' | 'request_accepted' | 'request_declined' | 'objective_set' | 'objective_cleared' | 'objective_confirmed' | 'supervisor_linked' | 'supervisor_unlinked' | 'department_change' | 'access_change' | 'sop_created' | 'sop_edited' | 'sop_deleted' | 'sop_version' | 'standard_change' | 'site_change' | 'settings_change' | 'member_suspended' | 'member_left' | 'member_reinstated' | 'passkey_added' | 'passkey_removed' | 'mfa_enrolled' | 'mfa_removed' | 'mfa_reset' | 'recovery_codes_issued' | 'recovery_code_used'
           actor_kind?: 'person' | 'agent'
           actor_id?: string | null
           actor_name?: string | null
@@ -2026,7 +2026,7 @@ export type Database = {
           id: string
           organisation_id: string
           user_id: string
-          kind: 'approve_next' | 'review_due' | 'signoff' | 'request_answered' | 'new_version' | 'asked'
+          kind: 'approve_next' | 'review_due' | 'signoff' | 'request_answered' | 'new_version' | 'asked' | 'signin_reset'
           title: string
           place: string
           subject_type: string
@@ -2040,7 +2040,7 @@ export type Database = {
           id?: string
           organisation_id: string
           user_id: string
-          kind: 'approve_next' | 'review_due' | 'signoff' | 'request_answered' | 'new_version' | 'asked'
+          kind: 'approve_next' | 'review_due' | 'signoff' | 'request_answered' | 'new_version' | 'asked' | 'signin_reset'
           title: string
           place: string
           subject_type: string
@@ -2054,7 +2054,7 @@ export type Database = {
           id?: string
           organisation_id?: string
           user_id?: string
-          kind?: 'approve_next' | 'review_due' | 'signoff' | 'request_answered' | 'new_version' | 'asked'
+          kind?: 'approve_next' | 'review_due' | 'signoff' | 'request_answered' | 'new_version' | 'asked' | 'signin_reset'
           title?: string
           place?: string
           subject_type?: string

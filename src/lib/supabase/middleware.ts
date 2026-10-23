@@ -4,6 +4,7 @@ import { roleHome } from '@/lib/auth/role-home'
 import { safeNextPath } from '@/lib/auth/next-redirect'
 import { legacyRedirectFor } from '@/lib/sop/focus-path'
 import { legacyPathRedirect } from '@/lib/shell/home-state'
+import { needsSecondStep, verifyHref } from '@/lib/auth/elevated'
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request })
@@ -95,14 +96,25 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
+  // Phase 66 / ADR-0028: an admin or safety manager reaches an admin screen only with an aal2
+  // session. The role here is the token's claim, which only routes; the page and every action
+  // re-check through getSessionContext(), and RLS through public.is_elevated().
+  const claimRole = claims ? ((claims as Record<string, unknown>)['user_role'] as string | undefined) : undefined
+  const secondStep = !!claims && needsSecondStep(claimRole, (claims as Record<string, unknown>)['aal'])
+  if (secondStep && path.startsWith('/admin')) {
+    const redirect = NextResponse.redirect(new URL(verifyHref(path + request.nextUrl.search), request.url))
+    response.cookies.getAll().forEach((c) => redirect.cookies.set(c))
+    return redirect
+  }
+
   if (isAuthRoute && claims) {
     // UX-01: land each role directly on its home. Role comes from the JWT
     // claim (no DB call in middleware); absent claim → /pending safe default.
     // Phase 53 PHN-02: an already-signed-in visit to /login?next=<safe path>
     // (e.g. from a scanned plate) goes straight there instead of the role home.
-    const role = (claims as Record<string, unknown>)['user_role'] as string | undefined
-    const next = safeNextPath(request.nextUrl.searchParams.get('next'))
-    return NextResponse.redirect(new URL(next ?? roleHome(role), request.url))
+    const next = safeNextPath(request.nextUrl.searchParams.get('next')) ?? roleHome(claimRole)
+    // Phase 66: straight after signing in, an elevated person proves the second step first.
+    return NextResponse.redirect(new URL(secondStep ? verifyHref(next) : next, request.url))
   }
 
   return response

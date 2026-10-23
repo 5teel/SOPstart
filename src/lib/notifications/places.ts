@@ -18,6 +18,8 @@ export function notificationPlace(kind: NotificationKind, subject: { sopId?: str
       return formatHome({ ...HOME, s: 'signoffs' })
     case 'request_answered':
       return formatHome(MINE)
+    case 'signin_reset':
+      return formatHome({ ...HOME, s: 'people' })
     case 'new_version':
     case 'asked':
       return focusHref(subject.sopId ?? '') // throws on anything but a UUID

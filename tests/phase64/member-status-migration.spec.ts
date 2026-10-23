@@ -178,8 +178,9 @@ test.describe('00082 member status migration (source contract)', () => {
     const m = s.match(/check\s*\(\s*kind\s+in\s*\(([^)]*)\)/i)
     expect(m).not.toBeNull()
     const kinds = [...m![1].matchAll(/'([a-z_]+)'/g)].map((x) => x[1])
-    // 00085 (Phase 65) widened the list again with the two passkey kinds.
-    const at82 = DECISION_KINDS.filter((k) => !k.startsWith('passkey_'))
+    // 00085 (Phase 65) and 00086 (Phase 66) widened the list again with the passkey and MFA kinds.
+    const later = ['passkey_added', 'passkey_removed', 'mfa_enrolled', 'mfa_removed', 'mfa_reset', 'recovery_codes_issued', 'recovery_code_used']
+    const at82 = DECISION_KINDS.filter((k) => !later.includes(k))
     expect(new Set(kinds)).toEqual(new Set(at82))
     expect(kinds.length).toBe(at82.length)
     for (const k of ['member_suspended', 'member_left', 'member_reinstated', 'member_removed']) expect(kinds).toContain(k)

@@ -14,7 +14,7 @@ export interface Site { id: string; name: string }
 
 const LINK = 'flex min-h-tap w-full items-center rounded-lg px-2 text-left text-ui text-ink-700 hover:bg-paper-2 hover:text-ink-900'
 
-export function AccountControl({ email, isAdmin, org, orgId, sites = [] }: { email: string | null; isAdmin: boolean; org?: string; orgId?: string | null; sites?: Site[] }) {
+export function AccountControl({ email, isAdmin, secondStep = false, org, orgId, sites = [] }: { email: string | null; isAdmin: boolean; secondStep?: boolean; org?: string; orgId?: string | null; sites?: Site[] }) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   async function pick(id: string) {
@@ -64,6 +64,13 @@ export function AccountControl({ email, isAdmin, org, orgId, sites = [] }: { ema
       <Link href="/profile" className={LINK}>
         Profile
       </Link>
+      {secondStep && (
+        // Phase 66 / ADR-0028: an admin or safety manager reads and runs SOPs at once, and gets the
+        // admin side back after the second step. A full load, so /verify's server redirect runs.
+        <a href="/verify" data-testid="shell-second-step" className={LINK}>
+          Confirm it&apos;s you for admin work
+        </a>
+      )}
       {isAdmin && (
         <>
           <Link href="/admin/settings" data-testid="shell-settings" className={LINK}>

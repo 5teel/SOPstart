@@ -20,11 +20,11 @@ test.describe("Capability matrix rows (60-02 / 60-04 / 60-06 / 60-09 / 60-11 / 6
     const o = row('Read objectives')
     for (const name of ['objectives_read_org', '00074', 'service-role']) expect(o).toContain(name)
     // the three new read rows grant a worker a read (own rows for requests), never a write
-    expect(n.split('|').map((c) => c.trim()).slice(2, 6)).toEqual(['✅', '✅', '✅', '✅'])
-    expect(o.split('|').map((c) => c.trim()).slice(2, 6)).toEqual(['✅', '✅', '✅', '✅'])
+    expect(n.split('|').map((c) => c.trim().replace(' aal2', '')).slice(2, 6)).toEqual(['✅', '✅', '✅', '✅'])
+    expect(o.split('|').map((c) => c.trim().replace(' aal2', '')).slice(2, 6)).toEqual(['✅', '✅', '✅', '✅'])
   })
   test('60-04: raise, withdraw, answer and agent rows', () => {
-    const cells = (l: string) => l.split('|').map((c) => c.trim()).slice(2, 7)
+    const cells = (l: string) => l.split('|').map((c) => c.trim().replace(' aal2', '')).slice(2, 7)
     const raise = row('Raise a request (change a SOP, new SOP, observe me)')
     expect(cells(raise)).toEqual(['✅', '✅', '✅', '✅', '✅'])
     for (const name of ['raiseRequest()', 'src/lib/requests/core.ts', 'No ledger row']) expect(raise).toContain(name)
@@ -39,7 +39,7 @@ test.describe("Capability matrix rows (60-02 / 60-04 / 60-06 / 60-09 / 60-11 / 6
     for (const name of ['raiseRequestAsAgent()', 'machine-coverage producer was removed', 'ADR-0004 rule 4']) expect(agent).toContain(name)
   })
   test('60-06: ask, decline, stop asking and list-targets rows', () => {
-    const cells = (l: string) => l.split('|').map((c) => c.trim()).slice(2, 7)
+    const cells = (l: string) => l.split('|').map((c) => c.trim().replace(' aal2', '')).slice(2, 7)
     const ask = row('Ask someone to do a SOP')
     expect(cells(ask)).toEqual(['—', '✅', '✅', '✅', '—']) // a worker never asks
     for (const name of ['askToDoSop()', 'src/lib/requests/ask-core.ts', 'service role', 'request_accepted']) expect(ask).toContain(name)
@@ -54,7 +54,7 @@ test.describe("Capability matrix rows (60-02 / 60-04 / 60-06 / 60-09 / 60-11 / 6
     for (const name of ['listAskTargets()', 'getOrgMembers']) expect(targets).toContain(name)
   })
   test('60-09: set, confirm and agent objective rows, and the list read', () => {
-    const cells = (l: string) => l.split('|').map((c) => c.trim()).slice(2, 7)
+    const cells = (l: string) => l.split('|').map((c) => c.trim().replace(' aal2', '')).slice(2, 7)
     const set = row('Set, change or remove an objective')
     expect(cells(set)).toEqual(['—', '—', '✅', '✅', '—']) // only admin and safety manager
     for (const name of ['setObjective()', 'clearObjective()', 'src/lib/objectives/core.ts', 'service role', 'lineage root', 'objective_set', 'objective_cleared']) expect(set).toContain(name)
@@ -68,7 +68,7 @@ test.describe("Capability matrix rows (60-02 / 60-04 / 60-06 / 60-09 / 60-11 / 6
   })
   test('60-11: Sign-offs Requests tab row: worker none, supervisor, admin and safety manager yes', () => {
     const r = row('Sign-offs -- Requests tab')
-    expect(r.split('|').map((c) => c.trim()).slice(2, 6)).toEqual(['—', '✅', '✅', '✅'])
+    expect(r.split('|').map((c) => c.trim().replace(' aal2', '')).slice(2, 6)).toEqual(['—', '✅', '✅', '✅'])
     for (const name of ['tabsForRole()', 'getOfficeInbox()', 'requests_read', 'answerRequest()', 'browse address']) expect(r).toContain(name)
   })
   test('60-17: no matrix row names a live assign action; the self-add note says assignments come from asks', () => {

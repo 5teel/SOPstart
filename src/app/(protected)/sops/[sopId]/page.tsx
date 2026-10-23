@@ -1,5 +1,6 @@
 import { notFound, redirect } from 'next/navigation'
 import { getSessionContext } from '@/lib/auth/session-context'
+import { verifyHref } from '@/lib/auth/elevated'
 import { requireSopEditAccess } from '@/lib/auth/guards'
 import { loadFocusSop } from '@/lib/sop/focus-read'
 import { focusHref } from '@/lib/sop/focus-path'
@@ -34,9 +35,14 @@ export default async function SopFocusPage({
   // Raw; every consumer (Back, the superseded link) passes it through the place whitelist.
   const from = typeof rawFrom === 'string' ? rawFrom : null
 
-  const { supabase, userId, role, organisationId } = await getSessionContext()
+  const { supabase, userId, role, organisationId, needsSecondStep } = await getSessionContext()
   if (!userId) redirect('/login')
   if (!organisationId || !UUID.test(sopId)) notFound()
+  // Phase 66 / ADR-0028: an admin or safety manager edits only after the second step.
+  if (needsSecondStep && rawMode === 'edit') {
+    const back = new URLSearchParams({ mode: 'edit', ...(from ? { from } : {}) })
+    redirect(verifyHref(`/sops/${sopId}?${back}`))
+  }
 
   const { data: requested } = await supabase
     .from('sops')

@@ -103,6 +103,6 @@ test.describe('read view', () => {
   test('the capability matrix names the owner row with the workers cell empty', () => {
     const m = src('.planning/codebase/CAPABILITY-MATRIX.md')
     const row = m.split('\n').find((l) => l.startsWith('| SOP owner name on Read (home) |')) ?? ''
-    expect(row.split('|').map((c) => c.trim()).slice(2, 6)).toEqual(['—', '✅', '✅', '✅'])
+    expect(row.split('|').map((c) => c.trim().replace(' aal2', '')).slice(2, 6)).toEqual(['—', '✅', '✅', '✅'])
   })
 })

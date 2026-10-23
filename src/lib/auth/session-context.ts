@@ -1,11 +1,23 @@
 import { cache } from 'react'
 import { createClient } from '@/lib/supabase/server'
+import { needsSecondStep } from '@/lib/auth/elevated'
 
 export interface SessionContext {
   supabase: Awaited<ReturnType<typeof createClient>>
   userId: string | null
   userEmail: string | null
+  /**
+   * The role every app check reads. Phase 66 (ADR-0028): an admin or safety manager whose
+   * session is not aal2 yet is reported as 'worker' here, so admin screens and actions refuse
+   * them until /verify; their real role is memberRole.
+   */
   role: string | null
+  /** The membership row's role, whatever the session's assurance level. */
+  memberRole: string | null
+  /** The access token's aal claim ('aal1' | 'aal2'). */
+  aal: string | null
+  /** memberRole is elevated and the session has not proved the second step. */
+  needsSecondStep: boolean
   organisationId: string | null
 }
 
@@ -27,7 +39,7 @@ export const getSessionContext = cache(async (): Promise<SessionContext> => {
   const { data, error } = await supabase.auth.getClaims()
   const claims = data?.claims
   if (error || !claims?.sub) {
-    return { supabase, userId: null, userEmail: null, role: null, organisationId: null }
+    return { supabase, userId: null, userEmail: null, role: null, memberRole: null, aal: null, needsSecondStep: false, organisationId: null }
   }
 
   // Org-aware membership lookup (LR-05): scope to the caller's JWT org when
@@ -44,11 +56,17 @@ export const getSessionContext = cache(async (): Promise<SessionContext> => {
   if (orgClaim) memberQuery = memberQuery.eq('organisation_id', orgClaim)
   const { data: member } = await memberQuery.maybeSingle()
 
+  const memberRole = member?.role ?? null
+  const aal = ((claims as Record<string, unknown>)['aal'] as string | undefined) ?? null
+  const secondStep = needsSecondStep(memberRole, aal)
   return {
     supabase,
     userId: claims.sub,
     userEmail: (claims.email as string | undefined) ?? null,
-    role: member?.role ?? null,
+    role: secondStep ? 'worker' : memberRole,
+    memberRole,
+    aal,
+    needsSecondStep: secondStep,
     organisationId: member?.organisation_id ?? null,
   }
 })

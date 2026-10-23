@@ -4,9 +4,11 @@ import { LogoutButton } from '@/components/profile/LogoutButton'
 import { ObservationsSection } from '@/components/profile/ObservationsSection'
 import { CompetencySection } from '@/components/profile/CompetencySection'
 import { PasskeysSection } from '@/components/profile/PasskeysSection'
+import { SecondStepSection } from '@/components/profile/SecondStepSection'
+import { isElevatedRole } from '@/lib/auth/elevated'
 
 export default async function ProfilePage() {
-  const { userId, userEmail } = await getSessionContext()
+  const { userId, userEmail, memberRole, aal } = await getSessionContext()
 
   if (!userId) {
     redirect('/login')
@@ -29,6 +31,9 @@ export default async function ProfilePage() {
 
       {/* Passkeys (Phase 65, ADR-0027) */}
       <PasskeysSection />
+
+      {/* Second step at sign-in (Phase 66, ADR-0028) */}
+      <SecondStepSection aal2={aal === 'aal2'} elevated={isElevatedRole(memberRole)} />
 
       {/* Observations about you (OBS-02) */}
       <ObservationsSection />

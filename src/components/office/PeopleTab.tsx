@@ -26,6 +26,7 @@ import {
 import { listDepartments } from '@/actions/departments'
 import { markMemberLeft, reinstateMember, suspendMember } from '@/actions/members'
 import { getPeopleAuthorityData, setSupervision } from '@/actions/people'
+import { resetMemberFactors } from '@/actions/mfa'
 import { DChip } from '@/components/admin/departments/DChip'
 import { DepartmentPicker } from '@/components/admin/departments/DepartmentPicker'
 import { useRole } from '@/components/providers/RoleProvider'
@@ -871,6 +872,12 @@ export function PeopleTab({ onReceipt, siteName = '', onPinSop }: { onReceipt(r:
             setStateTarget({ member: open, to })
           }}
           onReinstate={() => void reinstate(open)}
+          onResetSteps={async () => {
+            const res = await resetMemberFactors(open.user_id)
+            if ('error' in res) return res.error
+            onReceipt({ receipt: 'Sign-in steps reset', logged: res.logged })
+            return null
+          }}
           onClose={() => setOpenId(null)}
         />
       )}
@@ -909,6 +916,7 @@ function PersonSheet({
   reinstatePending,
   onState,
   onReinstate,
+  onResetSteps,
   onClose,
 }: {
   m: TeamMember
@@ -929,9 +937,14 @@ function PersonSheet({
   reinstatePending: boolean
   onState(to: 'suspended' | 'left'): void
   onReinstate(): void
+  /** Phase 66 D-06: clear this person's second steps; resolves to an error sentence or null. */
+  onResetSteps(): Promise<string | null>
   onClose(): void
 }) {
   const objectives = useObjectives()
+  const [resetAsk, setResetAsk] = useState(false)
+  const [resetBusy, setResetBusy] = useState(false)
+  const [resetError, setResetError] = useState<string | null>(null)
   const label = nameOf(m)
   const closeRef = useRef<HTMLButtonElement>(null)
   useEffect(() => {
@@ -1112,6 +1125,48 @@ function PersonSheet({
               >
                 Reinstate
               </button>
+            )}
+            {isAdmin && !resetAsk && (
+              <button
+                type="button"
+                data-testid="people-reset-steps"
+                aria-label={`Reset sign-in steps for ${label}`}
+                onClick={() => setResetAsk(true)}
+                className="min-h-tap rounded-lg border border-ink-300 bg-paper-1 px-4 text-ui font-semibold text-ink-900 hover:bg-paper-2"
+              >
+                Reset sign-in steps
+              </button>
+            )}
+            {isAdmin && resetAsk && (
+              <div data-testid="people-reset-ask" className="flex w-full flex-col gap-2">
+                <p className="text-ui text-ink-900">
+                  Clear {label}&apos;s authenticator app and recovery codes? They set it up again next time they sign in. Every admin is told.
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    data-testid="people-reset-confirm"
+                    disabled={resetBusy}
+                    onClick={async () => {
+                      setResetBusy(true)
+                      setResetError(await onResetSteps())
+                      setResetBusy(false)
+                      setResetAsk(false)
+                    }}
+                    className="min-h-tap rounded-lg bg-ink-900 px-4 text-ui font-semibold text-paper disabled:opacity-50"
+                  >
+                    Reset
+                  </button>
+                  <button type="button" onClick={() => setResetAsk(false)} className="min-h-tap rounded-lg border border-ink-300 bg-paper-1 px-4 text-ui font-semibold text-ink-900">
+                    Keep
+                  </button>
+                </div>
+              </div>
+            )}
+            {resetError && (
+              <p role="alert" className="w-full text-ui text-accent-escalate">
+                {resetError}
+              </p>
             )}
           </div>
         )}

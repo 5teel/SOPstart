@@ -14,7 +14,7 @@ const row = (label: string) => MATRIX.split(/\r?\n/).find((l) => l.startsWith(`|
 
 test.describe('capability matrix', () => {
   test('Office inbox row: admin and safety manager see all, supervisor sees own sign-offs (59-04)', () => {
-    const cells = row('Governance queue').split('|').map((c) => c.trim())
+    const cells = row('Governance queue').split('|').map((c) => c.trim().replace(' aal2', ''))
     // | label | worker | supervisor | admin | safety_manager | chain approver | enforced at |
     expect(cells.slice(2, 6)).toEqual(['—', '✅', '✅', '✅'])
     for (const name of ['getOfficeInbox()', 'listPendingSignOffs()', 'listMyReviewRows()', 'src/actions/office.ts']) {
@@ -23,7 +23,7 @@ test.describe('capability matrix', () => {
   })
   test('Manage team row: invite is admin-only, role change guarded, suspend and leave logged (59-05, 64-03)', () => {
     const r = row('Manage team')
-    const cells = r.split('|').map((c) => c.trim())
+    const cells = r.split('|').map((c) => c.trim().replace(' aal2', ''))
     expect(cells[4]).toBe('✅')
     expect(cells[5]).toContain('⚠')
     for (const name of ['inviteWorker()', 'updateMemberRoleSafe()', 'suspendMember()', 'cannot invite', 'member_invited']) {
@@ -33,7 +33,7 @@ test.describe('capability matrix', () => {
   })
   test('Sign off completion row: self sign-off refused, supervisor scoped to assigned workers (59-06)', () => {
     const r = row('Sign off completion')
-    expect(r.split('|').map((c) => c.trim()).slice(2, 6)).toEqual(['—', '✅', '✅', '✅'])
+    expect(r.split('|').map((c) => c.trim().replace(' aal2', '')).slice(2, 6)).toEqual(['—', '✅', '✅', '✅'])
     for (const name of ['own completion', 'getCompletionForReview()', 'src/actions/office.ts', 'assigned to the worker', 'override reason']) {
       expect(r).toContain(name)
     }
@@ -41,14 +41,14 @@ test.describe('capability matrix', () => {
   })
   test('Approve step row: the drifted supervisor cell is corrected to admin and safety manager (59-06)', () => {
     const r = row('Approval chains')
-    expect(r.split('|').map((c) => c.trim()).slice(2, 6)).toEqual(['—', '—', '✅', '✅'])
+    expect(r.split('|').map((c) => c.trim().replace(' aal2', '')).slice(2, 6)).toEqual(['—', '—', '✅', '✅'])
     for (const name of ['requireAdmin()', 'setApprovalChain', 'refuses anyone else', '/admin/settings']) {
       expect(r).toContain(name)
     }
   })
   test('Mark reviewed row: owner or admin; workers have no Office until Phase 60/61 (59-07)', () => {
     const r = row('Mark a SOP reviewed')
-    const cells = r.split('|').map((c) => c.trim())
+    const cells = r.split('|').map((c) => c.trim().replace(' aal2', ''))
     expect(cells[2]).toContain('Phase 60/61')
     expect(cells[3]).toContain('own')
     expect(cells.slice(4, 6)).toEqual(['✅', '✅'])
@@ -58,13 +58,13 @@ test.describe('capability matrix', () => {
   })
   test('Decisions tab row: admin and safety manager only (59-10)', () => {
     const r = row('Read decision ledger')
-    expect(r.split('|').map((c) => c.trim()).slice(2, 6)).toEqual(['—', '—', '✅', '✅'])
+    expect(r.split('|').map((c) => c.trim().replace(' aal2', '')).slice(2, 6)).toEqual(['—', '—', '✅', '✅'])
     for (const name of ['listDecisions()', 'countClearedToday()', 'src/actions/office.ts', 'admins_can_read_decisions']) {
       expect(r).toContain(name)
     }
   })
   test('Office tab rows: worker none, supervisor the Inbox and Requests, admin and safety manager all five; the training bridge and the redirects are named (59-13)', () => {
-    const cells = (label: string) => row(label).split('|').map((c) => c.trim())
+    const cells = (label: string) => row(label).split('|').map((c) => c.trim().replace(' aal2', ''))
     expect(cells('Sign-offs -- Inbox tab').slice(2, 6)).toEqual(['—', expect.stringContaining('✅'), '✅', '✅'])
     for (const label of ['Sign-offs -- Decisions tab', 'People -- people and roles tab', 'People -- access tab']) {
       expect(cells(label).slice(2, 5), label).toEqual(['—', '—', '✅'])
@@ -83,7 +83,7 @@ test.describe('capability matrix', () => {
   })
   test('Activity row: a non-owner completion address redirects to the Office, with no service-role read by id (59-15)', () => {
     const r = row('Activity -- own completion record')
-    expect(r.split('|').map((c) => c.trim()).slice(2, 6)).toEqual(['✅', '✅', '✅', '✅'])
+    expect(r.split('|').map((c) => c.trim().replace(' aal2', '')).slice(2, 6)).toEqual(['✅', '✅', '✅', '✅'])
     for (const name of ['/?s=signoffs', 'worker_id', 'signCompletionPhotos', 'no service-role read by id']) expect(r).toContain(name)
     expect(row('Record observation')).toContain('Training section')
     expect(row('Record observation')).toContain('Phase 61')

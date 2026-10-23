@@ -283,6 +283,12 @@ function samples(sopId: string): Record<DecisionKind, DecisionInput> {
       summary: 'Removed a passkey',
       details: { ...probe, name: 'x'.repeat(120) },
     },
+    // Phase 66 (ADR-0028): factor rows name the factor; code and reset rows name the person.
+    mfa_enrolled: { kind: 'mfa_enrolled', subject: { kind: 'mfa_factor', id: randomUUID() }, sopId: null, summary: 'Set up an authenticator app', details: { ...probe, factor_type: 'totp' } },
+    mfa_removed: { kind: 'mfa_removed', subject: { kind: 'mfa_factor', id: randomUUID() }, sopId: null, summary: 'Removed an authenticator app', details: { ...probe, factor_type: 'totp' } },
+    mfa_reset: { kind: 'mfa_reset', subject: { kind: 'person', id: randomUUID() }, sopId: null, summary: 'Reset a person’s sign-in steps', details: { ...probe, factors_removed: 1 } },
+    recovery_codes_issued: { kind: 'recovery_codes_issued', subject: { kind: 'person', id: randomUUID() }, sopId: null, summary: 'Made new recovery codes', details: { ...probe, count: 10 } },
+    recovery_code_used: { kind: 'recovery_code_used', subject: { kind: 'person', id: randomUUID() }, sopId: null, summary: 'Used a recovery code', details: { ...probe, factors_removed: 1 } },
   }
 }
 

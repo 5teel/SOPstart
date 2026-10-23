@@ -80,7 +80,7 @@ test.describe('login ?next= wiring', () => {
     const src = stripComments(read('src/lib/supabase/middleware.ts'))
     const idx = src.indexOf("safeNextPath(request.nextUrl.searchParams.get('next'))")
     expect(idx).toBeGreaterThan(-1)
-    expect(src.indexOf('roleHome(role)')).toBeGreaterThan(idx)
+    expect(src.indexOf('roleHome(claimRole)')).toBeGreaterThan(idx)
   })
 
   test('the login page type accepts next and passes it to LoginForm', () => {
@@ -96,7 +96,8 @@ test.describe('login ?next= wiring', () => {
 
   test('auth.ts redirects via safeNextPath(next) ?? roleHome(...) and never defines its own safeNextPath', () => {
     const src = stripComments(read('src/actions/auth.ts'))
-    expect(src).toMatch(/redirect\(safeNextPath\(next\) \?\? roleHome\(/)
+    // Phase 66: the destination is safeNextPath(next) ?? roleHome(...), then wrapped in /verify for an elevated person.
+    expect(src).toMatch(/const dest = safeNextPath\(next\) \?\? roleHome\(/)
     expect(src).not.toContain('function safeNextPath')
   })
 })

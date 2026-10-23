@@ -23,7 +23,7 @@ const T = 'Press 3 — Lockout / Tagout'
 
 test.describe('Notification kinds, titles and places (60-03)', () => {
   test('kinds are a closed list with a word each', () => {
-    expect([...NOTIFICATION_KINDS]).toEqual(['approve_next', 'review_due', 'signoff', 'request_answered', 'new_version', 'asked'])
+    expect([...NOTIFICATION_KINDS]).toEqual(['approve_next', 'review_due', 'signoff', 'request_answered', 'new_version', 'asked', 'signin_reset'])
     expect(NOTIFICATION_KINDS.map((k) => NOTIFICATION_KIND_WORDS[k])).toEqual([
       'Approve',
       'Review',
@@ -31,6 +31,7 @@ test.describe('Notification kinds, titles and places (60-03)', () => {
       'Answered',
       'New version',
       'Asked',
+      'Sign-in reset',
     ])
   })
 

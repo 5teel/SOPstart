@@ -31,6 +31,7 @@ const ALLOW: Record<string, string> = {
   'src/actions/auth.ts#inviteWorker': 'inserts a new row, which defaults to active; it reads status before inserting',
   'src/actions/auth.ts#acceptInvite': 'inserts a new row, which defaults to active; it reads status before inserting',
   'src/actions/auth.ts#updateMemberRoleSafe': 'role-only update; its target read refuses a non-active member',
+  'src/actions/mfa.ts#resetMemberFactors': 'any status on purpose: an admin may clear the sign-in steps of a suspended or departed person too (ADR-0028)',
   'src/actions/grants.ts#verifySubjectInOrg': 'table name held in a lookup map; person subjects add the status filter in code',
   'src/lib/objectives/core.ts#resolveSubject': 'an objective about a departed person stays readable and clearable (D-09)',
 }

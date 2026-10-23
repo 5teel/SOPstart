@@ -23,7 +23,8 @@ export function safeNextPath(next: string | null | undefined): string | null {
     return null
   }
   if (url.origin !== 'https://next.invalid') return null
-  if (url.pathname === '/login' || url.pathname.startsWith('/login/') || url.pathname.startsWith('/api/')) {
+  // /verify is refused too (Phase 66): it is where `next` comes from, never where it goes.
+  if (url.pathname === '/login' || url.pathname.startsWith('/login/') || url.pathname.startsWith('/api/') || url.pathname === '/verify') {
     return null
   }
   return url.pathname + url.search + url.hash

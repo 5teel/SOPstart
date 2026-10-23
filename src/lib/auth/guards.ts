@@ -3,6 +3,7 @@ import type { SessionContext } from './session-context'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { stepMatchesCaller, type ChainStep } from '@/lib/governance/approvals'
 import type { AppRole } from '@/types/auth'
+import { isElevatedRole } from './elevated'
 
 export interface AdminContext {
   supabase: SessionContext['supabase']
@@ -19,13 +20,15 @@ export interface AdminContext {
  * hook mints the user_role claim from, so the value is equal or fresher
  * than the old claim read.
  */
-export async function requireAdminContext(): Promise<AdminContext | { error: string }> {
-  const { supabase, userId, role, organisationId } = await getSessionContext()
+export async function requireAdminContext(): Promise<AdminContext | { error: string; needsAal2?: true }> {
+  const { supabase, userId, role, organisationId, needsSecondStep } = await getSessionContext()
   if (!userId) return { error: 'Not authenticated' }
-  if (!role || !['admin', 'safety_manager'].includes(role)) {
+  // Phase 66 / ADR-0028: an admin or safety manager acts as one only after the second step.
+  if (needsSecondStep) return { error: "Confirm it's you", needsAal2: true }
+  if (!isElevatedRole(role)) {
     return { error: 'Admin access required' }
   }
-  return { supabase, user: { id: userId }, role, organisationId }
+  return { supabase, user: { id: userId }, role: role!, organisationId }
 }
 
 // ---------------------------------------------------------------------------
@@ -71,8 +74,10 @@ export interface SopEditContext {
 export async function requireSopEditAccess(
   target: SopEditTarget
 ): Promise<SopEditContext | { error: string }> {
-  const { supabase, userId, role, organisationId } = await getSessionContext()
+  const { supabase, userId, role, organisationId, needsSecondStep } = await getSessionContext()
   if (!userId) return { error: 'Not authenticated' }
+  // Phase 66: an elevated person before the second step is not an approver either (RLS agrees).
+  if (needsSecondStep) return { error: "Confirm it's you" }
   if (!organisationId) return { error: 'No organisation found' }
 
   const admin = createAdminClient()
@@ -114,8 +119,8 @@ export async function requireSopEditAccess(
     .maybeSingle()
   if (!sop) return { error: 'SOP not found in your organisation.' }
 
-  if (role === 'admin' || role === 'safety_manager') {
-    return { supabase, user: { id: userId }, role, organisationId, sopId, viaApproverStep: false }
+  if (isElevatedRole(role)) {
+    return { supabase, user: { id: userId }, role: role!, organisationId, sopId, viaApproverStep: false }
   }
 
   // A1: chain lookup mirrors the canonical publish-route lookup —

@@ -375,6 +375,28 @@ export const UAT_TESTS: UatTest[] = [
     ],
   },
   {
+    id: 'phase66-second-step',
+    dateAdded: '2026-10-24',
+    category: 'Signing in',
+    title: 'Admins confirm it is them with a code from their phone',
+    status: 'active',
+    summary:
+      'Admins and safety managers now type a six-digit code from an authenticator app before admin work. The first time, you set it up and get ten recovery codes to keep. Reading and running SOPs still works without it.',
+    tryIt: [
+      'Install an authenticator app on your phone (Google Authenticator or Microsoft Authenticator).',
+      'Sign in to sopstart.com as an admin. Tap Set up an authenticator app, scan the picture and type the code it shows.',
+      'Save the recovery codes (Copy or Download), then tap Continue and open Settings.',
+      'Sign out and sign in again: type the code from the app when asked.',
+      'On Profile, check how many recovery codes are left.',
+    ],
+    links: [{ label: 'Profile', href: '/profile' }, { label: 'Settings', href: '/admin/settings' }],
+    questions: [
+      { id: 'setup-easy', text: 'Was setting up the authenticator app easy?' },
+      { id: 'codes-clear', text: 'Was it clear what the recovery codes are for and how to keep them?' },
+      { id: 'daily-ok', text: 'Is typing the code when you sign in OK for everyday use?' },
+    ],
+  },
+  {
     id: 'phase65-passkeys',
     dateAdded: '2026-10-24',
     category: 'Signing in',

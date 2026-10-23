@@ -8,6 +8,7 @@ import { parseJwtPayload } from '@/lib/supabase/jwt'
 import { getSessionContext } from '@/lib/auth/session-context'
 import { roleHome } from '@/lib/auth/role-home'
 import { safeNextPath } from '@/lib/auth/next-redirect'
+import { needsSecondStep, verifyHref } from '@/lib/auth/elevated'
 import { recordDecision } from '@/lib/decisions/record'
 import { changeMemberState, isLastAdminError } from '@/lib/members/state'
 import type { TablesInsert, TablesUpdate } from '@/types/database.types'
@@ -118,7 +119,9 @@ export async function loginWithEmail(
   // over the role home when present -- re-validated here (defence in depth,
   // T-53-03) since `next` arrives from the client form call.
   const claims = data.session ? parseJwtPayload(data.session.access_token) : {}
-  redirect(safeNextPath(next) ?? roleHome(claims['user_role'] as string | undefined))
+  const dest = safeNextPath(next) ?? roleHome(claims['user_role'] as string | undefined)
+  // Phase 66 / ADR-0028: an admin or safety manager proves the second step before anything else.
+  redirect(needsSecondStep(claims['user_role'] as string | undefined, claims['aal']) ? verifyHref(dest) : dest)
 }
 
 // ─────────────────────────────────────────────

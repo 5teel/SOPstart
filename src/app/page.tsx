@@ -23,7 +23,7 @@ export default async function Home({
 }: {
   searchParams: Promise<Record<string, Q>>
 }) {
-  const { supabase, userId, userEmail, role, organisationId } = await getSessionContext()
+  const { supabase, userId, userEmail, role, organisationId, needsSecondStep } = await getSessionContext()
 
   if (!userId) redirect('/welcome')
   if (!role) redirect('/pending')
@@ -59,7 +59,7 @@ export default async function Home({
 
   return (
     <ProtectedProviders role={role as AppRole}>
-      <HomeShell siteName={siteName} siteId={organisationId} sites={sites} userEmail={userEmail} userId={userId} role={role} initial={parseHome(query)} packing={packing} />
+      <HomeShell siteName={siteName} siteId={organisationId} sites={sites} userEmail={userEmail} userId={userId} role={role} initial={parseHome(query)} packing={packing} secondStep={needsSecondStep} />
     </ProtectedProviders>
   )
 }

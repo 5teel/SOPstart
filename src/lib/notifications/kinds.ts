@@ -7,7 +7,7 @@
  */
 import { nzDay } from '@/lib/office/format'
 
-export const NOTIFICATION_KINDS = ['approve_next', 'review_due', 'signoff', 'request_answered', 'new_version', 'asked'] as const
+export const NOTIFICATION_KINDS = ['approve_next', 'review_due', 'signoff', 'request_answered', 'new_version', 'asked', 'signin_reset'] as const
 export type NotificationKind = (typeof NOTIFICATION_KINDS)[number]
 
 export const NOTIFICATION_KIND_WORDS: Record<NotificationKind, string> = {
@@ -17,6 +17,7 @@ export const NOTIFICATION_KIND_WORDS: Record<NotificationKind, string> = {
   request_answered: 'Answered',
   new_version: 'New version',
   asked: 'Asked',
+  signin_reset: 'Sign-in reset',
 }
 
 const MAX_TITLE = 200
@@ -29,6 +30,7 @@ export type TitleInput =
   | { kind: 'request_answered'; outcome: 'observe_accepted' | 'ask_declined'; sop: string; name: string | null }
   | { kind: 'new_version'; sop: string; version: number }
   | { kind: 'asked'; sop: string }
+  | { kind: 'signin_reset'; name: string | null }
 
 const tidy = (s: string) => s.replace(/\s+/g, ' ').trim()
 const first = (name: string | null | undefined) => tidy(name ?? '').split(' ')[0] || 'Someone'
@@ -59,6 +61,9 @@ export function notificationTitle(input: TitleInput, now: Date = new Date()): st
     case 'asked':
       t = `You've been asked to do ${tidy(input.sop)}.`
       break
+    case 'signin_reset':
+      t = `${first(input.name)}'s second sign-in step was reset. They set it up again next time they sign in.`
+      break
   }
   return t.length > MAX_TITLE ? `${t.slice(0, MAX_TITLE - 1)}…` : t
 }
@@ -69,6 +74,7 @@ export type DedupeInput =
   | { kind: 'signoff'; completionId: string }
   | { kind: 'request_answered' | 'asked'; requestId: string }
   | { kind: 'new_version'; sopId: string }
+  | { kind: 'signin_reset'; userId: string; decisionId: string }
 
 /** One notification per event: a re-run writes nothing new (unique on user + key). */
 export function dedupeKey(input: DedupeInput): string {
@@ -85,5 +91,7 @@ export function dedupeKey(input: DedupeInput): string {
       return `${input.kind}:${input.requestId}`
     case 'new_version':
       return `new_version:${input.sopId}`
+    case 'signin_reset':
+      return `signin_reset:${input.userId}:${input.decisionId}`
   }
 }
