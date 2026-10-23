@@ -1,41 +1,33 @@
-# Handoff — 2026-10-09 (end of the Phase 63 + typography session)
+# Handoff — 2026-10-24 (end of the Phase 64 session)
 
-Pick up here in a fresh context. Read CLAUDE.md, docs/adr/README.md (ADR-0004, 0005, 0006 are new and binding), and this file. Master is at `12db1d8b` or later; Railway deploys from master.
+Pick up here in a fresh context. Read CLAUDE.md, docs/adr/README.md (ADR-0024 and 0025 are new), and this file. Master is at the "docs(handoff)" commit or later; Fly.io deploys from master.
 
 ## Where things stand
 
 ### Shipped and live on sopstart.com
-- **Phase 63 — SOP-first home, library site map and the SOPstart start** (21 plans, `.planning/phases/63-sop-first-home-library-site-map-and-the-sopstart-start/`). Deployed eval 98/98 (`63-EVAL.md`), verification `63-VERIFICATION.md` (gaps 1, 2, 4 closed in `250bdbfd`; gap 3 = tool search is exact-name only, accepted limit). ADR-0005 (library map replaces rooms) supersedes ADR-0003.
-- **Typography — ADR-0006 "Typography: Inter for reading, Saira for labels"** (`7fd3ebe8`, `22725e54`, `28db4997`, `f86d4871`, `12db1d8b`):
-  - Inter is now actually loaded via `next/font` (before, CSS named it but nothing loaded it — every device showed its system font). Learning logged in CLAUDE.md.
-  - Saira Semi Condensed replaces JetBrains Mono for every label, tag and data line; JetBrains Mono removed. Tokens `--font-label` (Saira), `--font-reading` (Inter); `font-mono` → `font-label` at call sites; the `.mono` class name was kept (~160 call sites) but now renders Saira (500; `.mono.uppercase` 700 + 0.06em).
-  - Size floor: `--text-micro` 10 → 12 px, `--text-meta` 11 → 13 px. Data lines in `.mono`/`font-label` at `text-ink-600`.
-  - Guard: `tests/lint/typography.spec.ts` (phase15-stubs), mutation-proven.
-  - Rule from the verdict: Saira only for short strings (labels, tags, counts, data lines), never step instructions or long text; caps only for labels/tags.
-
-### Verified live 2026-10-09 (next session)
-- home + sop-focus + office evals 53/53 against `6ec09329`. Sign-offs, My record, Manage SOPs read at 1440 and 390: clean, except that the phone tab bar wrapped "My record" and a bold current "Sign-offs". Fixed in `4d4d9c1b` / `b77ae968` (tab reads "Record", `whitespace-nowrap`); the HOME-04 phone case now checks every tab stays on one line with each tab selected, and takes `63-home-phone-signoffs` / `-record` shots. Invite leg was rate-limited again.
-
-### (was) Not yet verified live
-1. `28db4997` (darker data lines) has no deployed eval run. Run once (wait for `/api/version` = HEAD):
-   `npx playwright test --project=evals --workers=1 --retries=0 tests/evals/home.eval.ts tests/evals/sop-focus.eval.ts tests/evals/office.eval.ts` with `EVAL_BASE_URL=https://sopstart.com` — sop-focus was not re-run after its `font-mono` → `font-label` selector fix.
-2. Read live screenshots of **Sign-offs, My record, Manage SOPs** (desktop 1440 + phone 390) — the bigger 12/13 px labels have not been looked at there. Check row-height ceilings (`getBoundingClientRect` limits in evals) and fixed-width segmented controls for clipping (CLAUDE.md 2026-10-06 (7)).
-
-## Open decisions for Simon (ask, don't assume)
-1. ~~**Signage colour system (sketch 011)**~~ DECIDED 2026-10-14 → ADR-0013 (hazard yellow ▲ warning, PPE blue ● mandatory; corners, Saira titles and type scale not adopted). Original note: — https://claude.ai/artifact/CXFn17ssSFfb3t9xAZwkhR. Proposal: four AS/NZS 1319 / ISO 7010 safety colours each with a shape (danger ▲ red #B91C1C, mandatory ● blue #1D4ED8 = **PPE moves from amber to blue**, caution ◆ amber #B45309, safe ■ green #15803D), ordinary steps in ink, brand tape yellow only in the wordmark (never a flat fill), muted area colours for the map (no pure red/blue/amber/green), radius vocabulary squared (2 px chips, 4 px controls/cards, 12 px sheets), type scale 15 × 1.25 (12 · 15 · 19 · 23 · 29 · 37 · 46). Not approved yet. If approved: a new ADR (accent set refines ADR-0004 rule 8 — check whether it supersedes), token renames in `src/styles/blueprint-theme.css`, a sweep phase with a deployed eval; drop the dead `--accent-voice`, merge `--accent-measure` into step.
-2. ~~**Department colours**~~ DECIDED 2026-10-14 → ADR-0014 (swatch retired; a department wears its map area colour). Original note: — the home and map colour areas by `--area-N` (name order), so the colour swatch set on a department in Manage › Site & departments shows nowhere. Retire the swatch, or feed `departments.colour` into the map?
-3. **Self-host full Inter** to get the safety glyphs (`cv05` tailed l, `cv08` serifed I, `zero` slashed zero) — Google's Inter strips them; only `tnum` is on. Small job; needs its own ADR (external font service vs self-hosted asset). Check the bundle gate (fonts are CSS, not counted, but verify).
-4. **Tool search** matches an exact tool name only (array containment in `src/hooks/useSopSearch.ts`); make it partial/case-insensitive?
+- **Phase 64 — Leavers and suspended members** (6 plans, `.planning/phases/64-leavers-and-suspended-members/`). A membership is `active` | `suspended` | `left`, and memberships are never deleted (ADR-0024). Suspend / Has left sign the person out and RLS re-checks the membership row on every request. People has Suspend / Has left / Reinstate and a folded Former staff group. The Sign-offs inbox has a "Needs a new owner" chip, and `reassignApprovalStep` hands over a stuck approval. Verification passed 13 of 13 (`64-VERIFICATION.md`), the deployed eval is in `64-EVAL.md`, and migrations 00082 and 00083 are live with assertions (`scripts/apply-phase64-migration.mjs`, `apply-phase64b-migration.mjs --assert-only`).
+- **Code-review hardening** (`64-REVIEW.md`, all 11 findings closed, ADR-0025):
+  - Signed-in users can no longer insert or delete `organisation_members`. Invites live in `app_metadata`, and `acceptInvite` inserts with the service role.
+  - A per-org trigger (`keep_one_active_admin`) keeps at least one active admin.
+  - Admin reads of `member_departments` / `users_sub_trades` are now scoped to the caller's org.
+  - Approval reassign refuses self and earlier approvers.
+- **`2411dc67`**: `assignMemberDepartments` no longer deletes a member's department rows in other orgs.
 
 ## Small follow-ups (no decision needed)
-- **Invite-email leg** of `tests/evals/office.eval.ts` is unproven twice (mailer "email rate limit exceeded"). Run that one case once in a quiet hour, no other invite runs in the prior hour.
-- **Saira has no tabular digits.** A `figures` utility (Inter, tabular) exists for number columns; apply it wherever numbers must align in a column (training matrix counts, any table of times) — nothing uses it yet.
-- **Training default** now opens on the department with the most people — untested against an org with real department members.
-- `tests/phase26/konva-worker-isolation.spec.ts` has a permanently self-skipping case — delete it.
-- Deferred items list: `.planning/phases/63-*/deferred-items.md`.
+- **Missing invite data:** an invite sent in the few minutes between migration 00083 and its deploy (2026-10-23) has no `app_metadata` invite; the invitee needs a re-send.
+- **Reassign picker:** it still lists the signed-in admin; choosing yourself shows the refusal. Hide self by passing the user id into `InboxRow`.
+- **Supervises picker:** an admin can't untick an already-linked suspended worker (from 64-05).
+- **Chart screenshot:** the chart-view eval shot cuts off before the Suspended tag (grid, phone and sheet shots show it).
+- **Rate-limited probe:** `tests/phase46` `IMAGES NEGATIVE` live probe was OTP rate-limited. Re-run it once in a quiet window.
+- **Bundle baseline:** `/page` has sat at 831 against an 834 baseline since 64-01. Lowering the baseline is an orchestrator call (diff the chunk list first; never re-capture blindly).
+- **TRUNCATE grant:** authenticated still holds Supabase's default TRUNCATE on `organisation_members`. REST can't reach it, but a revoke would tidy it.
+- **Traceability table:** `REQUIREMENTS.md` has 119 IDs missing from it (gsd-tools warning). It's bookkeeping only.
 
-## Process notes for the next session
-- GSD: Phase 63 is executed + verified (gaps closed). Run `/gsd-progress` to see the roadmap position; Phases 61/62 were moved out of GSD into a Claude Doc and their room-shaped items are superseded by Phase 63.
+## Open decisions for Simon (carried over)
+1. **Self-host full Inter** for the safety glyphs (`cv05`, `cv08`, slashed zero). Needs an ADR.
+2. **Tool search** matches an exact tool name only (`src/hooks/useSopSearch.ts`). Make it partial and case-insensitive?
+3. **Next security steps** from the 2026-10-21 discussion (out of Phase 64's scope): passkeys, admin MFA (aal2), recovery codes, supervisor-issued recovery, security headers (backlog 999.3). Which comes next?
+
+## Process notes
+- GSD: the roadmap's next entry is backlog 999.1. Run `/gsd-progress` to choose.
 - Executors ran sequentially on the main tree; keep doing so for anything that pushes and runs a deployed eval.
-- Bundle baselines: `/page` 831, `/sops/[sopId]/page` 802 (tolerance 2); moves are orchestrator decisions recorded in `.bundle-baseline.json` history and the ROADMAP Phase 63 "Bundle decisions" line — never re-captured.
-- Design artifacts this session: wordmark showcase https://claude.ai/artifact/Peh4t3Z2yNYVip4R6eLqU9 · wordmark comparison https://claude.ai/artifact/WxeZykiefpJr4XDyPgfbrz · type (Inter + Saira) https://claude.ai/artifact/7jaBTLUH8SF5eouHqjsaT4 · signage sketch 011 https://claude.ai/artifact/CXFn17ssSFfb3t9xAZwkhR
