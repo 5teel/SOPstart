@@ -523,12 +523,12 @@ export function PeopleTab({ onReceipt, siteName = '', onPinSop }: { onReceipt(r:
         setInviteError(res.error)
         return
       }
-      const added = 'success' in res && res.success === 'Added to the site'
+      const done = 'success' in res ? res.success : ''
       setInviteOpen(false)
       setEmail('')
       setInviteRole('worker')
       onReceipt({
-        receipt: `${added ? 'Added to the site' : 'Invite sent'}`,
+        receipt: done === 'Added to the site' || done === 'Reinstated' ? done : 'Invite sent',
         logged: 'logged' in res ? (res.logged ?? null) : null,
       })
       await refetch()
