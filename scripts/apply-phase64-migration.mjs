@@ -29,7 +29,11 @@ import { fileURLToPath } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
-const MIGRATION_FILES = [path.join(ROOT, 'supabase/migrations/00082_member_status.sql')]
+const MIGRATION_FILES = [
+  path.join(ROOT, 'supabase/migrations/00082_member_status.sql'),
+  // 00083 corrects 00082 section 7 (the 3-argument sop_observation_refs_in_org) and hardens the table.
+  path.join(ROOT, 'supabase/migrations/00083_member_hardening.sql'),
+]
 
 for (const f of ['.env.local', '.env']) {
   try {
