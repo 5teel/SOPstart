@@ -2211,7 +2211,7 @@ Plans:
 **Goal:** Removing someone stops their access at once and keeps their record. A membership has a state (active, suspended, left) instead of being hard-deleted; "Suspend" and "Has left" in People sign the person out everywhere and RLS stops their data access on the next request; their completions, sign-offs and ledger rows stay under their name; SOPs and pending sign-offs they owned land in a "needs a new owner" list for the safety manager; a suspended member can be reinstated; every action writes a ledger row (ADR-0008).
 **Requirements**: MEMB-01, MEMB-02, MEMB-03, MEMB-04, MEMB-05, MEMB-06, MEMB-07, MEMB-08, MEMB-09, MEMB-10, MEMB-11, MEMB-12, MEMB-13
 **Depends on:** Phase 63
-**Plans:** 6 plans
+**Plans:** 1/6 plans executed
 **Same-commit duties:** new ADR (membership states replace hard delete) · `.planning/codebase/CAPABILITY-MATRIX.md` · `src/lib/journeys/journeys.ts` + `src/lib/uat/tests.ts` · deployed eval `tests/evals/people.eval.ts` (or extend `office.eval.ts`)
 **Context:** first step of the security plan discussed 2026-10-21 (passkeys, admin aal2 and recovery follow in later phases). Gap today: `removeMember` (`src/actions/auth.ts:461`) deletes the membership row but leaves sessions live and no owner handover; `src/actions/governance.ts:395` notes the missing "deactivated" state.
 
@@ -2220,7 +2220,7 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 64-01-PLAN.md — Migration 00082 (status column, UPDATE lock, RLS helpers re-check the row, hook skips non-active rows, raw-claim policies closed, revoke_user_sessions, ledger kinds), ADR-0024, applier with audit / rollback; applied live and proven
+- [x] 64-01-PLAN.md — Migration 00082 (status column, UPDATE lock, RLS helpers re-check the row, hook skips non-active rows, raw-claim policies closed, revoke_user_sessions, ledger kinds), ADR-0024, applier with audit / rollback; applied live and proven
 
 **Wave 2** *(blocked on Wave 1 completion)*
 

@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v11.0
 milestone_name: — One-Screen MVP
-status: executed
-stopped_at: 63-21 complete (Phase 63 executed: full deployed eval 98 / 98 on 07a9f65c with every screenshot read, build gates 802 / 832, full suite once with only environment failures, VALIDATION signed off, 17/17 requirements ticked, Learnings added); awaiting /gsd-verify-work 63
-last_updated: "2026-10-08T21:30:00.000Z"
-last_activity: 2026-10-08
+status: executing
+stopped_at: Completed 64-01-PLAN.md
+last_updated: "2026-10-23T12:14:11.881Z"
+last_activity: 2026-10-23 -- Phase 64 execution started
 progress:
-  total_phases: 15
-  completed_phases: 6
-  total_plans: 107
-  completed_plans: 107
-  percent: 40
+  total_phases: 16
+  completed_phases: 7
+  total_plans: 113
+  completed_plans: 108
+  percent: 44
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-03)
 
 **Core value:** A worker can find the SOP for the machine in front of them and follow it step by step with nothing else on the screen — and the business can see, in one ledger, who decided and did what.
-**Current focus:** Phase 63 — sop-first-home-library-site-map-and-the-sopstart-start
+**Current focus:** Phase 64 — leavers-and-suspended-members
 
 ## Current Position
 
-Phase: 63 (SOP-first Home, Library Site Map and the SOPstart Start)
-Plan: 63-21 complete -- Phase 63 executed (21 / 21 plans); awaiting verification (`/gsd-verify-work 63`)
-Status: Phase 63 executed, awaiting verification
-Last activity: 2026-10-08
+Phase: 64 (leavers-and-suspended-members) — EXECUTING
+Plan: 2 of 6
+Status: Ready to execute
+Last activity: 2026-10-23 -- Phase 64 execution started
 
 ### v11.0 roadmap (created 2026-10-03)
 
@@ -301,6 +301,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 56 P06 | 25min | 2 tasks | 7 files |
 | Phase 56 P10 | 70min | 2 tasks | 5 files |
 | Phase 63 P01 | 40min | 2 tasks | 7 files |
+| Phase 64 P01 | 95min | 3 tasks | 18 files |
 
 ## Accumulated Context
 
@@ -600,6 +601,8 @@ Recent decisions affecting current work:
 - [Phase 56]: 56-05: publish decision written inside performPublish after the flip; assertPublishGates untouched, hash pin unchanged
 - [Phase 56]: 56-06: standards actions use the session client only; sections scoped through their SOP; no ledger write for label management
 - [Phase 56]: 56-10: eval A scopes to SOPs predating the last conversion run; gate regressions fixed at cause (harness stub, admin read moved to plain module)
+- [Phase 64]: Phase 64-01: D-19 sop-videos SELECT scoped to the organisation folder (7 objects, 0 outside); 00082 applied before app code (backwards compatible); RLS helpers re-check the active membership row, status is service-role-only
+- [Phase 64]: Phase 64-01: ADR-0024 accepted residuals: signed links live their TTL, reinstate within the hour revives an old token, sign-out covers every site the person belongs to
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -745,6 +748,6 @@ deliberate decision, not a side-effect.
 
 ## Session Continuity
 
-Last session: 2026-10-08
-Stopped at: Completed 63-14-PLAN.md
-Resume file: .planning/phases/60-requests-notifications-objectives/60-01-PLAN.md
+Last session: 2026-10-23T12:14:11.864Z
+Stopped at: Completed 64-01-PLAN.md
+Resume file: None
