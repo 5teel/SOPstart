@@ -253,7 +253,7 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       // A clean walk fixture: no stale completion can be mistaken for a seeded one.
       await deleteEvalCompletions(db, walkSopId)
 
-      // The disposable member the People tab changes and removes (eval-site org, worker, .invalid address).
+      // The disposable member the People tab changes (eval-site org, worker, .invalid address).
       const made = await db.auth.admin.createUser({ email: DISPOSABLE_EMAIL, email_confirm: true, user_metadata: { eval_fixture: true } })
       if (made.error || !made.data.user) throw new Error(`disposable member create failed: ${made.error?.message}`)
       disposableId = made.data.user.id
@@ -280,7 +280,7 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       // Completions and seeded SOPs go; ledger rows stay (append-only by design).
       await deleteEvalCompletions(db, walkSopId).catch(() => 0)
       await db.from('sops').delete().eq('organisation_id', siteOrgId).in('title', [APPROVE_BACK_TITLE, APPROVE_PUBLISH_TITLE, OWNER_REVIEW_TITLE])
-      // The disposable member (membership first, if the remove case failed) and the invited address.
+      // The disposable member (membership first) and the invited address.
       if (disposableId) {
         await db.from('organisation_members').delete().eq('organisation_id', siteOrgId).eq('user_id', disposableId)
         await db.auth.admin.deleteUser(disposableId).catch(() => {})
@@ -819,7 +819,7 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       }
     })
 
-    test('people: department board, who-can-do-what grid, invite with a role, Invited chip, role change both ways in the person sheet, remove with confirmation (59-11, 2026-10-11)', async () => {
+    test('people: department board, who-can-do-what grid, invite with a role, Invited chip, role change both ways in the person sheet (59-11, 2026-10-11)', async () => {
       const page = await adminCtx.newPage()
       const errors = watchConsole(page)
       await page.goto('/?s=people')
@@ -878,7 +878,7 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
         await expect(invitedRow).toHaveCount(1, SLOW)
         await expect(invitedRow).toContainText('Invited')
         await expect(invitedRow).toContainText('Waiting to accept')
-        await expect(invitedRow.getByTestId('people-remove')).toHaveCount(0)
+        await expect(invitedRow.getByTestId('people-suspend')).toHaveCount(0)
       }
 
       // Role change on the disposable member, both ways in one session (state must not leak).
@@ -900,22 +900,6 @@ test.describe('Phase 59 -- the Office (deployed)', () => {
       await select.selectOption('worker')
       await expect(receipt).toContainText('Role changed to Worker' + LEDGER, SLOW)
       await expect(select).toHaveValue('worker', SLOW)
-
-      // Remove: Keep them leaves the row; Remove takes it away.
-      const remove = sheet.getByTestId('people-remove')
-      await expect(remove).toHaveCount(1, SHORT)
-      await remove.click()
-      const dialog = page.getByTestId('people-remove-dialog')
-      await expect(dialog).toBeVisible(SLOW)
-      await expect(dialog).toContainText(`Remove ${DISPOSABLE_EMAIL}?`)
-      await page.getByTestId('people-remove-cancel').click()
-      await expect(dialog).toHaveCount(0)
-      await expect(row).toHaveCount(1)
-      await expect(sheet).toBeVisible()
-      await remove.click()
-      await page.getByTestId('people-remove-confirm').click()
-      await expect(receipt).toContainText('Removed' + LEDGER, SLOW)
-      await expect(row).toHaveCount(0, SLOW)
 
       // ADR-0008: the supervisor link and unlink above are in the ledger, under the People chip.
       await page.goto('/?s=signoffs&tab=decisions')
