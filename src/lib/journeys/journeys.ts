@@ -65,7 +65,7 @@ export const JOURNEYS: Journey[] = [
         { label: 'No role yet', to: 'pending-home' },
       ] },
       { id: 'one-screen', type: 'screen', label: 'The home - search and the SOP list', route: '/', detail: 'Every role lands here (Phase 63). Admins and safety managers also see the Sign-offs, People, Training and Manage SOPs sections.' },
-      { id: 'pending-home', type: 'screen', label: 'Account pending', route: '/pending', detail: 'Holding screen for an account that cannot open a site yet. A new account waits here for a SOPstart admin to approve it (ADR-0018): Waiting for approval, with Check again; a turned-down account says so. Otherwise it waits for an admin to give it a role.' },
+      { id: 'pending-home', type: 'screen', label: 'Account pending', route: '/pending', detail: 'Holding screen for an account that cannot open a site yet. A new account waits here for a SOPstart admin to approve it (ADR-0018): Waiting for approval, with Check again; a turned-down account says so. Otherwise it waits for an admin to give it a role. A suspended person, or one marked as having left, lands here too and reads "Your access to {site} has been paused. Talk to your supervisor."' },
       { id: 'e', type: 'end', label: 'Signed in' },
     ],
   },
