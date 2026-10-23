@@ -1,6 +1,6 @@
 # ADR-0024: Membership states replace removal
 
-- **Status:** Accepted
+- **Status:** Accepted (the "deny all org data access" claim is narrowed by ADR-0025)
 - **Date:** 2026-10-21
 - **Decided by:** Simon (security discussion 2026-10-21; Claude's calls D-01..D-20 in `.planning/phases/64-leavers-and-suspended-members/64-CONTEXT.md`, overturnable at review)
 - **Supersedes:** — (it refines ADR-0018's token gate; the approval gate itself is unchanged)
