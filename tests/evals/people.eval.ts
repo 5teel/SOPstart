@@ -10,7 +10,9 @@
  *  5. Has left moves a person to a collapsed Former staff group, and inviting their email brings the same
  *     membership row back as active (logged as a reinstatement);
  *  6. nobody can suspend or mark themselves as left.
- * (Case 4 is the owner handover case, added by plan 64-05.)
+ *  4. Needs a new owner: a person marked as left leaves a SOP, a department and an in-flight approval
+ *     behind; each shows under the Needs a new owner chip with "(left)" after the name, is handed on with the
+ *     owner picker, clears its row and reaches the ledger.
  *
  * It creates its OWN disposable members in the eval-site organisation, so no other eval ever sees a
  * suspended or departed fixture. They are told apart by their run address, never by a count. The real
@@ -35,6 +37,10 @@ const LEDGER = ' · logged in the decision ledger'
 const RUN = randomUUID().slice(0, 8)
 const A_EMAIL = `eval-site-suspend-${RUN}@sopstart.invalid`
 const B_EMAIL = `eval-site-left-${RUN}@sopstart.invalid`
+const C_EMAIL = `eval-site-handover-${RUN}@sopstart.invalid`
+const OWNER_SOP = `EVAL handover owner ${RUN}`
+const APPROVAL_SOP = `EVAL handover approval ${RUN}`
+const DEPT_NAME = `EVAL handover ${RUN}`
 const PROBE = `phase64-probe-${RUN}.bin`
 const URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const ANON = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
@@ -63,6 +69,8 @@ test.describe('Phase 64 -- leavers and suspended members (deployed)', () => {
     let bUserId = ''
     let aMemberId = ''
     let bMemberId = ''
+    let cUserId = ''
+    let adminId = ''
     let adminCtx: BrowserContext
     let aCtx: BrowserContext | undefined
     let adminToken = ''
@@ -113,14 +121,44 @@ test.describe('Phase 64 -- leavers and suspended members (deployed)', () => {
       const b = await makeMember(B_EMAIL, 'worker')
       bUserId = b.userId
       bMemberId = b.memberId
+      const c = await makeMember(C_EMAIL, 'safety_manager')
+      cUserId = c.userId
 
       const viewport = { width: 1440, height: 900 }
       adminCtx = await browser.newContext({ viewport })
-      adminToken = (await signInAs(adminCtx, 'siteAdmin')).access_token
+      const adminSession = await signInAs(adminCtx, 'siteAdmin')
+      adminToken = adminSession.access_token
+      adminId = adminSession.user.id
       aCtx = await browser.newContext({ viewport })
       const aSession = await signInAsEmail(aCtx, A_EMAIL)
       aToken = aSession.access_token
       aRefresh = aSession.refresh_token
+
+      // Case 4 fixtures: C (a safety manager) owns a published SOP and a department, and is the next
+      // approver on a pending SOP the site admin owns (so that SOP is not also an unowned row).
+      const sopBase = { organisation_id: siteOrgId, source_file_type: 'docx', source_file_path: '', uploaded_by: adminId, source_type: 'blank', version: 1 }
+      const ownerSop = await db.from('sops').insert({
+        ...sopBase,
+        title: OWNER_SOP,
+        source_file_name: OWNER_SOP,
+        status: 'published',
+        published_at: new Date().toISOString(),
+        owner_user_id: cUserId,
+      })
+      if (ownerSop.error) throw new Error(`handover owner SOP seed failed: ${ownerSop.error.message}`)
+      const approvalSop = await db.from('sops').insert({
+        ...sopBase,
+        title: APPROVAL_SOP,
+        source_file_name: APPROVAL_SOP,
+        status: 'draft',
+        category_slug: 'quality',
+        owner_user_id: adminId,
+        approval_state: 'pending',
+        approval_snapshot: [{ userId: cUserId, label: C_EMAIL }],
+      })
+      if (approvalSop.error) throw new Error(`handover approval SOP seed failed: ${approvalSop.error.message}`)
+      const dept = await db.from('departments').insert({ organisation_id: siteOrgId, name: DEPT_NAME, code: `h${RUN}`, owner_user_id: cUserId })
+      if (dept.error) throw new Error(`handover department seed failed: ${dept.error.message}`)
 
       // D-19: two probe objects, one inside the organisation folder and one outside any organisation.
       probeOrgPath = `${siteOrgId}/${PROBE}`
@@ -135,8 +173,10 @@ test.describe('Phase 64 -- leavers and suspended members (deployed)', () => {
     test.afterAll(async () => {
       if (!EVAL_ENV_READY || !db || !siteOrgId || siteOrgId === REAL_SOPSTART_ORG_ID) return
       await db.storage.from('sop-videos').remove([probeOrgPath, probeOtherPath]).catch(() => {})
+      await db.from('sops').delete().eq('organisation_id', siteOrgId).in('title', [OWNER_SOP, APPROVAL_SOP])
+      await db.from('departments').delete().eq('organisation_id', siteOrgId).eq('name', DEPT_NAME)
       // Memberships first, then the accounts (tests only; the ledger rows stay by design).
-      for (const uid of [aUserId, bUserId]) {
+      for (const uid of [aUserId, bUserId, cUserId]) {
         if (!uid) continue
         await db.from('organisation_members').delete().eq('organisation_id', siteOrgId).eq('user_id', uid)
         await db.auth.admin.deleteUser(uid).catch(() => {})
@@ -270,6 +310,94 @@ test.describe('Phase 64 -- leavers and suspended members (deployed)', () => {
       expect(aPage.url()).not.toContain('/pending')
       await shot(aPage, '64-member-reinstated')
       await aPage.close()
+    })
+
+    test('4. needs a new owner: what a left person owned lands under the chip and is handed on, each step logged', async () => {
+      test.setTimeout(180_000)
+      const page = await adminCtx.newPage()
+      const errors = watchConsole(page)
+      const { sheet } = await openGridSheet(page, C_EMAIL)
+      await sheet.getByTestId('people-left').click()
+      await page.getByTestId('people-state-confirm').click()
+      const receipt = page.getByTestId('office-receipt')
+      await expect(receipt).toContainText('Marked as left' + LEDGER, SLOW)
+
+      await page.goto('/?s=signoffs')
+      await expect(page.getByTestId('office-pane')).toHaveCount(1, SLOW)
+      const chip = page.locator('[data-testid="office-chip"][data-chip="handover"]')
+      await expect(chip).toHaveCount(1, SLOW)
+      await expect(chip).toContainText('Needs a new owner')
+      await chip.click()
+
+      const rowOf = (kind: 'governance' | 'handover', title: string) =>
+        page.locator(`[data-testid="office-row"][data-kind="${kind}"]`).filter({ hasText: title })
+      const ownerRow = rowOf('governance', OWNER_SOP)
+      const deptRow = rowOf('handover', DEPT_NAME)
+      const approvalRow = rowOf('handover', APPROVAL_SOP)
+      for (const row of [ownerRow, deptRow, approvalRow]) {
+        await expect(row).toHaveCount(1, SLOW)
+        await expect(row).toContainText('Needs a new owner')
+        await expect(row).toContainText(`${C_EMAIL} (left)`)
+      }
+      await shot(page, '64-member-handover')
+      await page.setViewportSize({ width: 390, height: 844 })
+      await page.waitForTimeout(600)
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true)
+      await approvalRow.scrollIntoViewIfNeeded()
+      await shot(page, '64-member-handover-phone')
+      await page.setViewportSize({ width: 1440, height: 900 })
+      await page.waitForTimeout(400)
+
+      const siteAdmin = new RegExp(EVAL_USERS.siteAdmin.split('@')[0])
+      /** Open a row's picker; the left person is never offered, the site admin is. Returns the option for the site admin. */
+      async function openPicker(row: ReturnType<typeof rowOf>) {
+        const action = row.getByTestId('office-row-action')
+        await expect(action).toHaveCount(1, SHORT)
+        await action.click()
+        const admin = row.getByRole('button', { name: siteAdmin })
+        await expect(admin.first()).toBeVisible(SLOW)
+        await expect(row.getByRole('button', { name: C_EMAIL })).toHaveCount(0)
+        return { admin: admin.first(), row }
+      }
+
+      // The SOP they owned: reassign through the usual owner picker.
+      const owner = await openPicker(ownerRow)
+      await owner.admin.click()
+      await expect(receipt).toContainText('Owner set' + LEDGER, SLOW)
+      await expect(ownerRow).toHaveCount(0, SLOW)
+
+      // The department they owned.
+      const dept = await openPicker(deptRow)
+      await dept.admin.click()
+      await expect(receipt).toContainText('Department owner set', SLOW)
+      await expect(deptRow).toHaveCount(0, SLOW)
+
+      // The in-flight approval: only admins and safety managers are offered (B is a worker).
+      const step = await openPicker(approvalRow)
+      await expect(step.row.getByRole('button', { name: B_EMAIL })).toHaveCount(0)
+      await shot(page, '64-member-handover-picker')
+      await step.admin.click()
+      await expect(receipt).toContainText('Approval handed on' + LEDGER, SLOW)
+      await expect(approvalRow).toHaveCount(0, SLOW)
+
+      // The same SOP now waits on the site admin: an Approve row.
+      await page.locator('[data-testid="office-chip"][data-chip="all"]').click()
+      const approve = rowOf('governance', APPROVAL_SOP)
+      await expect(approve).toHaveCount(1, SLOW)
+      await expect(approve.getByTestId('office-row-action')).toHaveText('Approve')
+      await shot(page, '64-member-handover-done')
+
+      // The ledger holds each hand-over.
+      await page.goto('/?s=signoffs&tab=decisions')
+      await page.locator('[data-testid="decisions-chip"][data-chip="ownership"]').click()
+      const rows = page.getByTestId('decisions-row')
+      await expect(rows.first()).toBeVisible(SLOW)
+      for (const words of ['Changed the SOP owner', 'Handed an approval step to someone else']) {
+        await expect(rows.filter({ hasText: words }).first(), words).toBeVisible(SLOW)
+      }
+      await shot(page, '64-member-handover-ledger')
+      expect(errors).toEqual([])
+      await page.close()
     })
 
     test('5. has left: Former staff holds them, and inviting their email brings the same row back', async () => {
