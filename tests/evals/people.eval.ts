@@ -392,8 +392,9 @@ test.describe('Phase 64 -- leavers and suspended members (deployed)', () => {
       await page.locator('[data-testid="decisions-chip"][data-chip="ownership"]').click()
       const rows = page.getByTestId('decisions-row')
       await expect(rows.first()).toBeVisible(SLOW)
-      for (const words of ['Changed the SOP owner', 'Handed an approval step to someone else']) {
-        await expect(rows.filter({ hasText: words }).first(), words).toBeVisible(SLOW)
+      // Both hand-overs are owner changes; the row names the SOP they were about.
+      for (const title of [OWNER_SOP, APPROVAL_SOP]) {
+        await expect(rows.filter({ hasText: 'Changed owner' }).filter({ hasText: title }).first(), title).toBeVisible(SLOW)
       }
       await shot(page, '64-member-handover-ledger')
       expect(errors).toEqual([])
