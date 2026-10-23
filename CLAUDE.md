@@ -105,6 +105,7 @@ Distilled rules below. **Full dated log with the stories: `docs/LEARNINGS.md` â€
 - Deployed evals start when the "Deploy to Fly" workflow for HEAD has completed, not when one request sees the new sha (two machines roll a minute apart).
 - A hanging click = empty locator: assert `toHaveCount(1)` before raising timeouts. Assert rendered content, not HTTP status, for `notFound()`.
 - Scope `getByRole('alert')` to the component: Next's route announcer is also `role="alert"`.
+- Prove a server action refuses by rewriting the browser's own action call in `page.route` (the `next-action` POST), not only by checking the button is hidden.
 - Fixtures key on their own markers; shared eval orgs mean no "exactly N" assertions; author and run each eval case against the deploy as plans land.
 
 **Data / infra**

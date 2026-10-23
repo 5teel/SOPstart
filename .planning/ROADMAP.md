@@ -1721,7 +1721,7 @@ Executes 55 → 56 → 57 → 58 → 59 → 60 → 61 → 62, strictly sequentia
 - [x] **Phase 64: Leavers and Suspended Members** - Suspend / has-left membership states replace the hard delete; sign out everywhere; records kept under the name; owner handover list; reinstate (completed 2026-10-23)
 - [x] **Phase 65: Passkeys** - People sign in with a passkey (Face ID, fingerprint or the phone's screen lock) instead of typing a password (completed 2026-10-24)
 - [x] **Phase 66: Admin MFA and Recovery Codes** - Admins and safety managers prove a second factor (an authenticator app; WebAuthn MFA is refused by the hosted project) before any admin action: the session must be aal2, enforced in the `require*` guards and in RLS for elevated writes (completed 2026-10-24)
-- [ ] **Phase 67: Supervisor-issued Recovery** - A worker who has lost their phone or email access gets back in through their supervisor or an admin, in person: a short-lived, single-use recovery code issued from People, bound to that person, logged to the ledger
+- [x] **Phase 67: Supervisor-issued Recovery** - A worker who has lost their phone or email access gets back in through their supervisor or an admin, in person: a short-lived, single-use recovery code issued from People, bound to that person, logged to the ledger
 - [ ] **Phase 68: Security Headers** - sopstart.com sends Content-Security-Policy (self, Supabase REST/Realtime/Storage, the AI providers the browser actually calls), HSTS with preload, frame-ancestors 'none', nosniff, a strict Referrer-Policy and a Permissions-Policy
 
 ### Phase 55: Cut the Dropped Features & One Organisation
@@ -2358,7 +2358,7 @@ Plans:
 
 Plans:
 
-- [ ] TBD (run /gsd-plan-phase 67 to break down)
+- [x] PLAN.md — in-person sign-in codes (ADR-0029); shipped 2026-10-24, see the Outcome in `.planning/phases/67-supervisor-issued-recovery/PLAN.md`
 
 ### Phase 68: Security Headers
 
