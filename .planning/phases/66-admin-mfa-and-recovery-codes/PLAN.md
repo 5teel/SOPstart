@@ -76,3 +76,11 @@
 - **Lockout:** an elevated person who loses both their factor and their codes. Mitigated by D-06 (another admin resets them) and Phase 67. With a single admin left, the fallback is Simon using the service role. Document that in the ADR.
 - **Policy sweep misses an arm:** an elevated write then stays open at aal1. Mitigated by the live assertion over all `pg_policies` that mention `current_user_role` and by a lint that greps migrations after 00086.
 - **Evals:** every admin eval depends on the aal2 session helper. Change the helper first and run one admin eval before the policy migration goes live.
+
+## Spike result (step 1, 2026-10-24)
+- **TOTP works.** Throwaway account: enrol, challenge, verify → the access token's `aal` is `aal2`, and it stays `aal2` after a refresh. A fresh sign-in is `aal1` with `nextLevel: 'aal2'`. A wrong code is `422 mfa_verification_failed`. The same code is accepted twice inside one 30 s window.
+- **Supabase generates the TOTP secret**; enrol takes none. The eval fixtures' "fixed secret" is the one captured at enrolment (`scripts/eval-mfa-fixtures.mjs`).
+- **Deleting a factor revokes the user's other sessions** (their refresh tokens fail). So eval fixtures are enrolled once and never re-enrolled per sign-in, and a recovery-code use (which deletes factors) signs the person out everywhere else.
+- **An aal1 session cannot enrol a second factor** once one is verified (`insufficient_aal`): adding a factor needs aal2.
+- **WebAuthn as an MFA factor: dropped (D-03 → TOTP only).** The Management API refuses `mfa_web_authn_enroll_enabled: true` with "Enabling of MFA with WebAuthn not currently supported". Auth config left unchanged (TOTP enrol and verify were already on).
+- supabase-js 2.118 has experimental built-in recovery codes (`auth.mfa.recoveryCodes`), but the project's auth config exposes no recovery-code setting, so D-05 (our own table) stands.
