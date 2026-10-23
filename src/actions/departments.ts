@@ -389,6 +389,7 @@ export async function setDepartmentOwner(
       .select('id')
       .eq('user_id', userId)
       .eq('organisation_id', ctx.organisationId)
+      .eq('status', 'active')
       .maybeSingle()
 
     if (!member) {
@@ -451,6 +452,7 @@ async function callerOrgId(admin: any, ctx: AdminCtx): Promise<string | null> {
     .from('organisation_members')
     .select('organisation_id')
     .eq('user_id', ctx.user.id)
+    .eq('status', 'active')
     .maybeSingle()
   return (data?.organisation_id as string | undefined) ?? ctx.organisationId
 }
@@ -478,6 +480,7 @@ export async function assignMemberDepartments(
     .from('organisation_members')
     .select('organisation_id')
     .eq('user_id', memberId)
+    .eq('status', 'active')
     .maybeSingle()
   if (!memberRow) return { error: 'Member not found' }
   if (memberRow.organisation_id !== orgId) return { error: 'Member belongs to another organisation' }

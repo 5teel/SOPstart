@@ -335,6 +335,7 @@ export async function listWorkerSopsForPicker(workerId: string): Promise<WorkerS
     .select('role')
     .eq('user_id', workerId)
     .eq('organisation_id', organisationId)
+    .eq('status', 'active')
     .maybeSingle()
 
   // sop_assignments RLS (00007 workers_can_view_own_assignments) only
@@ -445,6 +446,7 @@ export async function requestAssessorReview(
     .from('organisation_members')
     .select('user_id')
     .eq('organisation_id', organisationId)
+    .eq('status', 'active')
     .in('role', ['admin', 'safety_manager'])
   if (!recipients || recipients.length === 0) {
     return { success: false, error: 'No admin or safety manager available to request assessment from.' }

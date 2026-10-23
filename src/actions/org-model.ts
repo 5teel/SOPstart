@@ -272,7 +272,7 @@ export async function setRoleSeat(input: z.input<typeof SeatInput>): Promise<Log
   const admin: any = createAdminClient()
   const [{ data: role }, { data: member }] = await Promise.all([
     admin.from('roles').select('id, department_id, name').eq('id', roleId).eq('organisation_id', orgId).maybeSingle(),
-    admin.from('organisation_members').select('user_id').eq('user_id', memberId).eq('organisation_id', orgId).maybeSingle(),
+    admin.from('organisation_members').select('user_id').eq('user_id', memberId).eq('organisation_id', orgId).eq('status', 'active').maybeSingle(),
   ])
   if (!role) return { error: 'Role not found in this organisation' }
   if (!member) return { error: 'That person is not on this site' }

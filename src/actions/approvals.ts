@@ -106,6 +106,7 @@ export async function setApprovalChain(
       .from('organisation_members')
       .select('user_id, role')
       .eq('organisation_id', ctx.organisationId)
+      .eq('status', 'active')
       .in('user_id', personIds)
     const eligible = new Set(
       (people ?? []).filter((m) => ['admin', 'safety_manager'].includes(m.role as string)).map((m) => m.user_id as string),

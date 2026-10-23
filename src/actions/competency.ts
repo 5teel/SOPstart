@@ -38,6 +38,7 @@
  */
 import { getSessionContext } from '@/lib/auth/session-context'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { activeMemberIds } from '@/lib/members/active'
 import { classifyCompetency, type CompetencyState } from '@/lib/competency/classify'
 import { resolveLineage } from '@/lib/competency/lineage'
 import { isOutdatedVersion } from '@/lib/competency/version-currency'
@@ -63,6 +64,7 @@ async function callerOrgId(admin: any, userId: string, sessionOrgId: string | nu
     .from('organisation_members')
     .select('organisation_id')
     .eq('user_id', userId)
+    .eq('status', 'active')
     .maybeSingle()
   return (data?.organisation_id as string | undefined) ?? sessionOrgId
 }
@@ -149,6 +151,10 @@ export async function getTrainingMatrix(
     .eq('department_id', departmentId)
   let personIds = ((memberRows ?? []) as Array<{ member_id: string }>).map(m => m.member_id)
   if (workerId) personIds = personIds.filter(id => id === workerId)
+  // Suspended and departed people leave the training lanes; their records stay readable
+  // in getTrainingRecordForPerson (Phase 64, D-09).
+  const activeIds = await activeMemberIds(orgId, personIds)
+  personIds = personIds.filter(id => activeIds.has(id))
 
   const empty: { matrix: TrainingMatrix; people: MatrixPerson[]; sops: MatrixSop[] } = {
     matrix: { cells: [], rowRollups: [], colRollups: [] },

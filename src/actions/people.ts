@@ -49,15 +49,16 @@ export async function setSupervision(input: { supervisorId: string; workerId: st
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = ctx.supabase as any
   const org = ctx.organisationId
+  // Linking needs two active people; unlinking accepts any row so a departed supervisor's links can be cleared.
   const { data: people } = await db
     .from('organisation_members')
     .select('user_id, role')
     .eq('organisation_id', org)
     .in('user_id', [supervisorId, workerId])
+    .in('status', linked ? ['active'] : ['active', 'suspended', 'left'])
   const sup = (people ?? []).find((p: { user_id: string }) => p.user_id === supervisorId)
   if (!sup || !(people ?? []).some((p: { user_id: string }) => p.user_id === workerId)) return { error: 'Member not found' }
   if (linked && sup.role !== 'supervisor') return { error: 'Only a supervisor can be linked to workers.' }
-
   const res = linked
     ? await db
         .from('supervisor_assignments')

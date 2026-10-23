@@ -86,6 +86,7 @@ export async function askToDoSopCore(
       .select('user_id')
       .eq('organisation_id', organisationId)
       .eq('user_id', target.userId)
+      .eq('status', 'active')
       .maybeSingle()
     if (!member) return { error: 'We could not find that person.' }
   }
@@ -274,6 +275,7 @@ export async function listAskTargetsCore(organisationId: string, sopId: string |
     .from('organisation_members')
     .select('user_id, role')
     .eq('organisation_id', organisationId)
+    .eq('status', 'active')
   if (error) {
     console.error('[listAskTargetsCore] members read error', error)
     return null

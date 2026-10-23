@@ -126,7 +126,7 @@ export async function setSopOwner(
   const ctx = await requireAdmin()
   if ('error' in ctx) return { error: ctx.error }
 
-  // T-28-03-01: verify userId is an organisation_members row for the SAME org
+  // T-28-03-01: verify userId is an ACTIVE organisation_members row for the SAME org
   // (never trust a client-supplied userId to belong to this org — mirrors
   // setDepartmentOwner in src/actions/departments.ts).
   if (userId !== null) {
@@ -136,6 +136,7 @@ export async function setSopOwner(
       .select('id')
       .eq('user_id', userId)
       .eq('organisation_id', ctx.organisationId)
+      .eq('status', 'active')
       .maybeSingle()
 
     if (!member) return { error: 'Owner must be a member of this organisation' }
@@ -392,12 +393,14 @@ export async function listGovernanceQueue(): Promise<
   const sopRows = sops ?? []
   const sopIds = sopRows.map((s) => s.id)
 
-  // Active-member lookup (OWN-03/D28-02) — absence means unowned. Suspended and departed
-  // members keep their row (Phase 64); plan 64-04 narrows this lookup to active people.
+  // Active-member lookup (OWN-03/D28-02) — absence means unowned. A SOP whose owner is
+  // suspended, has left or is no longer a member is unowned and shows in the Inbox
+  // (Phase 64, ADR-0024).
   const { data: memberRows } = await supabase
     .from('organisation_members')
     .select('user_id')
     .eq('organisation_id', ctx.organisationId)
+    .eq('status', 'active')
   const memberSet = new Set((memberRows ?? []).map((m) => m.user_id))
 
   // sop_departments / departments are not yet in database.types.ts — (as any)

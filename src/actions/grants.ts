@@ -64,6 +64,7 @@ async function callerOrgId(admin: any, ctx: AdminCtx): Promise<string | null> {
     .from('organisation_members')
     .select('organisation_id')
     .eq('user_id', ctx.user.id)
+    .eq('status', 'active')
     .maybeSingle()
   return (data?.organisation_id as string | undefined) ?? ctx.organisationId
 }
@@ -81,7 +82,10 @@ async function verifySubjectInOrg(admin: any, orgId: string, subjectType: Subjec
   }
   const table = TABLE_BY_TYPE[subjectType]
   const idColumn = subjectType === 'person' ? 'user_id' : 'id'
-  const { data } = await admin.from(table).select(idColumn).eq(idColumn, subjectId).eq('organisation_id', orgId).maybeSingle()
+  let q = admin.from(table).select(idColumn).eq(idColumn, subjectId).eq('organisation_id', orgId)
+  // A grant to a suspended or departed person would be a grant nobody can use (Phase 64).
+  if (subjectType === 'person') q = q.eq('status', 'active')
+  const { data } = await q.maybeSingle()
   return !!data
 }
 
