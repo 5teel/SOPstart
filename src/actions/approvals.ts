@@ -312,7 +312,7 @@ export async function reassignApprovalStep(
 
   const { data: sop } = await supabase
     .from('sops')
-    .select('id, version, approval_state, approval_snapshot')
+    .select('id, title, version, approval_state, approval_snapshot')
     .eq('id', sopId)
     .maybeSingle()
   if (!sop || sop.approval_state !== 'pending') return { error: 'No pending approval for this SOP' }
@@ -374,6 +374,22 @@ export async function reassignApprovalStep(
     summary: 'Handed an approval step to someone else',
     details: { target: 'approval_step', step_index: nextIndex, from_user_id: fromUserId, to_user_id: userId, version: sop.version },
   })
+
+  // The new holder is told it is their turn, as approveStep tells the next step (64-REVIEW LO-02).
+  // Never fails the reassignment.
+  try {
+    await notifyNextApprover({
+      organisationId: ctx.organisationId,
+      sopId,
+      sopTitle: sop.title ?? 'a SOP',
+      version: sop.version,
+      stepIndex: nextIndex,
+      step: next[nextIndex],
+      actorId: ctx.userId,
+    })
+  } catch (err) {
+    console.error('[reassignApprovalStep] new holder notification failed', err)
+  }
   return { success: true, logged: rec.ok }
 }
 

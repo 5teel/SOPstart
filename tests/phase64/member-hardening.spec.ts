@@ -156,3 +156,16 @@ test.describe('reassignApprovalStep write (LO-01)', () => {
     expect(s).toContain("return { error: 'That has already changed. Refresh and try again.' }")
   })
 })
+
+test.describe('reassignApprovalStep notification (LO-02)', () => {
+  test('after the write and the ledger row, the new holder is told through notifyNextApprover', () => {
+    const s = body(src('src/actions/approvals.ts'), 'reassignApprovalStep')
+    expect(s).toContain(".select('id, title, version, approval_state, approval_snapshot')")
+    const n = s.indexOf('await notifyNextApprover({')
+    expect(n).toBeGreaterThan(s.indexOf('recordDecision('))
+    const call = s.slice(n, s.indexOf('})', n))
+    for (const part of ['organisationId: ctx.organisationId', 'sopTitle: sop.title', 'version: sop.version', 'stepIndex: nextIndex', 'step: next[nextIndex]', 'actorId: ctx.userId']) {
+      expect(call).toContain(part)
+    }
+  })
+})
