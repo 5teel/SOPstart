@@ -119,7 +119,7 @@ test.describe('Phase 65 -- passkeys (deployed)', () => {
     await page.getByRole('button', { name: 'Sign out' }).click()
     await page.waitForURL(/\/login/, SLOW)
     await page.getByRole('button', { name: 'Sign in with a passkey' }).click()
-    await expect(page.getByRole('alert')).toHaveText(
+    await expect(page.locator('p[role="alert"]')).toHaveText(
       "That passkey didn't sign you in. Use your password, or try another passkey.",
       SLOW,
     )
