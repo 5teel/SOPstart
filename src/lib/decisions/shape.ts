@@ -7,7 +7,7 @@
  * actor field on DecisionInput: both come from the session (T-56-02).
  */
 
-// Mirrors the kind CHECK in supabase/migrations/00070_decisions_ledger.sql, widened by 00073, 00074, 00076_ledger_every_action.sql (ADR-0008) and 00082_member_status.sql (ADR-0024).
+// Mirrors the kind CHECK in supabase/migrations/00070_decisions_ledger.sql, widened by 00073, 00074, 00076_ledger_every_action.sql (ADR-0008) 00082_member_status.sql (ADR-0024) and 00085_passkey_ledger_kinds.sql (ADR-0027).
 export const DECISION_KINDS = [
   'approve', 'reject', 'sign_off', 'countersign', 'assign', 'unassign', 'publish',
   'owner_change', 'review', 'observation', 'verify', 'verify_withdrawn',
@@ -18,6 +18,7 @@ export const DECISION_KINDS = [
   'sop_created', 'sop_edited', 'sop_deleted', 'sop_version', 'standard_change',
   'site_change', 'settings_change',
   'member_suspended', 'member_left', 'member_reinstated',
+  'passkey_added', 'passkey_removed',
 ] as const
 export type DecisionKind = (typeof DECISION_KINDS)[number]
 

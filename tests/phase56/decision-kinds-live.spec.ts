@@ -268,6 +268,21 @@ function samples(sopId: string): Record<DecisionKind, DecisionInput> {
       summary: 'Changed a setting',
       details: probe,
     },
+    // Phase 65 (ADR-0027): the subject is the passkey; details carry its friendly name, no email.
+    passkey_added: {
+      kind: 'passkey_added',
+      subject: { kind: 'passkey', id: randomUUID() },
+      sopId: null,
+      summary: 'Added a passkey',
+      details: { ...probe, name: 'x'.repeat(120) },
+    },
+    passkey_removed: {
+      kind: 'passkey_removed',
+      subject: { kind: 'passkey', id: randomUUID() },
+      sopId: null,
+      summary: 'Removed a passkey',
+      details: { ...probe, name: 'x'.repeat(120) },
+    },
   }
 }
 
