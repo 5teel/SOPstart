@@ -480,18 +480,25 @@ export async function assignMemberDepartments(
     .from('organisation_members')
     .select('organisation_id')
     .eq('user_id', memberId)
+    .eq('organisation_id', orgId)
     .eq('status', 'active')
     .maybeSingle()
   if (!memberRow) return { error: 'Member not found' }
-  if (memberRow.organisation_id !== orgId) return { error: 'Member belongs to another organisation' }
 
   const validIds = await orgScopedDeptIds(admin, orgId, departmentIds)
 
-  // Replace semantics: delete existing rows for this member, then insert new ones.
+  // Replace semantics within this organisation only: a member of two sites keeps
+  // the other site's department rows.
+  const { data: orgDepts } = await admin
+    .from('departments')
+    .select('id')
+    .eq('organisation_id', orgId)
+  const orgDeptIds = ((orgDepts ?? []) as Array<{ id: string }>).map(d => d.id)
   const { error: delErr } = await admin
     .from('member_departments')
     .delete()
     .eq('member_id', memberId)
+    .in('department_id', orgDeptIds)
   if (delErr) {
     console.error('[assignMemberDepartments] delete error', delErr)
     return { error: delErr.message }

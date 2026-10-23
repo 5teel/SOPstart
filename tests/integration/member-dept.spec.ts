@@ -48,6 +48,13 @@ test.describe('REQ-4 — multi-dept assignment source-contract', () => {
     expect(src).toContain('.insert(rows)')
   })
 
+  test('assignMemberDepartments deletes only rows in the caller organisation', () => {
+    const src = read(DEPARTMENTS_ACTIONS)
+    const fn = src.slice(src.indexOf('export async function assignMemberDepartments'))
+    const del = fn.slice(fn.indexOf('.delete()'), fn.indexOf('.insert(rows)'))
+    expect(del).toContain(".in('department_id', orgDeptIds)")
+  })
+
   test('member_departments table exists in migration 00035', () => {
     const sql = read(SCHEMA_MIGRATION)
     expect(sql).toContain('create table if not exists public.member_departments')
