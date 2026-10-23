@@ -8,6 +8,7 @@ export async function mySites(userId: string): Promise<MySite[]> {
     .from('organisation_members')
     .select('role, organisations ( id, name, hidden_from_picker )')
     .eq('user_id', userId)
+    .eq('status', 'active')
   return (data ?? [])
     .flatMap((m) => {
       const o = m.organisations as unknown as { id: string; name: string; hidden_from_picker: boolean } | null

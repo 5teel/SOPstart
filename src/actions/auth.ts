@@ -10,8 +10,9 @@ import { roleHome } from '@/lib/auth/role-home'
 import { safeNextPath } from '@/lib/auth/next-redirect'
 import { recordDecision } from '@/lib/decisions/record'
 import { deleteOrgMember } from '@/lib/members/remove'
+import { changeMemberState } from '@/lib/members/state'
 import type { TablesInsert, TablesUpdate } from '@/types/database.types'
-import type { AppRole } from '@/types/auth'
+import type { AppRole, MemberStatus } from '@/types/auth'
 import {
   loginSchema,
   inviteCodeSchema,
@@ -45,6 +46,7 @@ export async function switchSite(orgId: string): Promise<{ error?: string }> {
     .select('id')
     .eq('user_id', userId)
     .eq('organisation_id', orgId)
+    .eq('status', 'active')
     .maybeSingle()
   if (!member) return { error: 'You are not a member of that site.' }
   const { data: site } = await createAdminClient().from('organisations').select('hidden_from_picker').eq('id', orgId).maybeSingle()
@@ -74,6 +76,7 @@ export async function setSiteHidden(orgId: string, hidden: boolean): Promise<{ e
     .select('role')
     .eq('user_id', userId)
     .eq('organisation_id', orgId)
+    .eq('status', 'active')
     .maybeSingle()
   if (!member || !['admin', 'safety_manager'].includes(member.role)) return { error: 'Only an admin of that site can hide it.' }
   const { data: org, error } = await admin.from('organisations').update({ hidden_from_picker: hidden }).eq('id', orgId).select('name')
@@ -153,13 +156,16 @@ export async function joinWithInviteCode(formData: {
   const admin = createAdminClient()
   const { data: existingMember } = await admin
     .from('organisation_members')
-    .select('id')
+    .select('id, status')
     .eq('user_id', userId)
     .eq('organisation_id', org.id)
     .maybeSingle()
 
   if (existingMember) {
-    return { error: `You are already a member of ${(org as { name?: string }).name ?? 'this organisation'}.` }
+    const siteName = (org as { name?: string }).name ?? 'this organisation'
+    // A suspended or departed person never rejoins by code (MEMB-07): an admin reinstates them.
+    if (existingMember.status !== 'active') return { error: `Your access to ${siteName} has been paused. Talk to your supervisor.` }
+    return { error: `You are already a member of ${siteName}.` }
   }
 
   // Join the organisation as a worker (multi-org allowed)
@@ -228,10 +234,32 @@ export async function inviteWorker(formData: {
   if (existing) {
     const { data: already } = await admin
       .from('organisation_members')
-      .select('id')
+      .select('id, status')
       .eq('user_id', existing.id)
       .eq('organisation_id', organisationId)
       .maybeSingle()
+    if (already?.status === 'suspended') {
+      return { error: 'They are suspended. Open them in People and choose Reinstate.' }
+    }
+    if (already?.status === 'left') {
+      // D-03: inviting a departed person's email reactivates the same row; no email is sent.
+      const back = await changeMemberState({
+        memberId: already.id,
+        organisationId,
+        actorId: userId,
+        from: ['left'],
+        to: 'active',
+        role: newRole,
+      })
+      if (!back.ok) return { error: 'Failed to add this person. Please try again.' }
+      const rec = await recordDecision({
+        kind: 'member_reinstated',
+        subject: { kind: 'member', id: existing.id },
+        summary: 'Reinstated a person',
+        details: { role: newRole, from: 'left', to: 'active', via: 'invite' },
+      })
+      return { success: 'Reinstated', logged: rec.ok }
+    }
     if (already) return { error: 'This person is already a member of your organisation.' }
     pending =
       existing.user_metadata?.['organisation_id'] === organisationId &&
@@ -338,6 +366,20 @@ export async function acceptInvite(formData: {
     return { error: 'Failed to complete account setup. Please try again.' }
   }
 
+  // The duplicate may be a suspended or departed row: they wait on the paused page, not the role home.
+  if (memberError) {
+    const { data: row } = await createAdminClient()
+      .from('organisation_members')
+      .select('status')
+      .eq('user_id', user.id)
+      .eq('organisation_id', organisationId)
+      .maybeSingle()
+    if (row && row.status !== 'active') {
+      await supabase.auth.refreshSession()
+      redirect('/pending')
+    }
+  }
+
   // Refresh JWT to get updated org claims
   await supabase.auth.refreshSession()
 
@@ -355,6 +397,9 @@ export interface TeamMember {
   role: AppRole
   email: string | null
   created_at: string | null
+  /** Phase 64: active, suspended or left. */
+  status: MemberStatus
+  status_changed_at: string | null
   /** Phase 25: department IDs this member is assigned to (from member_departments junction). */
   department_ids: string[]
 }
@@ -378,7 +423,7 @@ export async function getTeamMembersWithEmails() {
   // Fetch members
   const { data: members } = await supabase
     .from('organisation_members')
-    .select('id, user_id, role, created_at')
+    .select('id, user_id, role, status, status_changed_at, created_at')
     .eq('organisation_id', organisationId)
     .order('created_at', { ascending: true })
 
@@ -436,6 +481,8 @@ export async function getTeamMembersWithEmails() {
     role: m.role as AppRole,
     email: emailMap[m.user_id] ?? null,
     created_at: m.created_at,
+    status: m.status as MemberStatus,
+    status_changed_at: m.status_changed_at,
     department_ids: deptMap[m.user_id] ?? [],
   }))
 
@@ -561,12 +608,13 @@ export async function updateMemberRoleSafe(formData: {
 
   const { data: target } = await supabase
     .from('organisation_members')
-    .select('user_id, role')
+    .select('user_id, role, status')
     .eq('id', memberId)
     .eq('organisation_id', organisationId)
     .maybeSingle()
 
   if (!target) return { error: 'Member not found' }
+  if (target.status !== 'active') return { error: 'Reinstate them before changing their role.' }
 
   // Demoting an admin: someone must stay admin.
   if (target.role === 'admin' && newRole !== 'admin') {
@@ -575,6 +623,7 @@ export async function updateMemberRoleSafe(formData: {
       .select('id', { count: 'exact', head: true })
       .eq('organisation_id', organisationId)
       .eq('role', 'admin')
+      .eq('status', 'active')
 
     if ((count ?? 0) <= 1) {
       return { error: 'There has to be at least one admin.' }

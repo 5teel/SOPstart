@@ -38,6 +38,9 @@ export const getSessionContext = cache(async (): Promise<SessionContext> => {
     .from('organisation_members')
     .select('role, organisation_id')
     .eq('user_id', claims.sub)
+    // RLS already hides a non-active row (00082 helpers); this keeps the app's answer identical:
+    // a suspended or departed caller has no role and no organisation, so / sends them to /pending.
+    .eq('status', 'active')
   if (orgClaim) memberQuery = memberQuery.eq('organisation_id', orgClaim)
   const { data: member } = await memberQuery.maybeSingle()
 
