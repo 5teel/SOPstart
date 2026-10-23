@@ -121,8 +121,8 @@ test.describe('inbox model', () => {
     expect(dup[0].kind).toBe('governance')
   })
 
-  test('chip order is All, Owner, Overdue, Approve, Sign-off, Stuck', () => {
-    expect(INBOX_CHIPS.map((c) => c.key)).toEqual(['all', 'owner', 'overdue', 'approve', 'signoff', 'stuck'])
+  test('chip order is All, Owner, Handover, Overdue, Approve, Sign-off, Stuck', () => {
+    expect(INBOX_CHIPS.map((c) => c.key)).toEqual(['all', 'owner', 'handover', 'overdue', 'approve', 'signoff', 'stuck'])
     expect(INBOX_CHIPS.find((c) => c.key === 'signoff')?.label).toBe('Sign-off')
   })
 

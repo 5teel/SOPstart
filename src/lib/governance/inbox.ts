@@ -16,7 +16,7 @@ import { focusHref } from '@/lib/sop/focus-path'
 import { DUE_SOON_WINDOW_DAYS } from '@/lib/governance/classify'
 import { relativeWhen } from '@/lib/office/format'
 
-export type InboxChip = 'owner' | 'overdue' | 'approve' | 'signoff' | 'stuck'
+export type InboxChip = 'owner' | 'handover' | 'overdue' | 'approve' | 'signoff' | 'stuck'
 export type InboxSeverity = 'bad' | 'warn' | 'info' | 'grey'
 
 /** A completion waiting for a counter-signature (never the caller's own walk). */
@@ -38,9 +38,18 @@ export interface OwnedReview {
   reviewDueAt: string
 }
 
+/** Phase 64 (D-10): one thing a suspended or departed person was looking after. personLabel carries "(left)" / "(suspended)". */
+export type HandoverItem = { key: string; title: string; personLabel: string } & (
+  | { type: 'department'; departmentId: string }
+  | { type: 'approval_step'; sopId: string; stepIndex: number }
+  | { type: 'chain_step'; category: string; stepIndex: number }
+  | { type: 'ask'; requestId: string; sopId: string }
+  | { type: 'supervision'; workerId: string }
+)
+
 export interface InboxItem {
   key: string
-  kind: 'governance' | 'stuck' | 'signoff' | 'review'
+  kind: 'governance' | 'stuck' | 'signoff' | 'review' | 'handover'
   chips: InboxChip[]
   severity: InboxSeverity
   title: string
@@ -49,6 +58,7 @@ export interface InboxItem {
   gov: GovernanceRow | null
   signOff: PendingSignOff | null
   review: OwnedReview | null
+  handover: HandoverItem | null
   /** The row's one button when it is a link or a retry; null where the row opens its own panel. */
   action: {
     label: 'Try again' | 'Open'
@@ -60,6 +70,7 @@ export interface InboxItem {
 export const INBOX_CHIPS: ReadonlyArray<{ key: 'all' | InboxChip; label: string }> = [
   { key: 'all', label: 'All' },
   { key: 'owner', label: 'No owner' },
+  { key: 'handover', label: 'Needs a new owner' },
   { key: 'overdue', label: 'Overdue' },
   { key: 'approve', label: 'Approve' },
   { key: 'signoff', label: 'Sign-off' },
@@ -92,7 +103,8 @@ function classifyGovernanceRow(row: GovernanceRow): { chips: InboxChip[]; severi
   const severities: InboxSeverity[] = []
 
   if (row.flags.includes('unowned')) {
-    chips.push('owner')
+    // An owner who is still named but no longer active is a handover, not an empty slot.
+    chips.push(row.ownerUserId ? 'handover' : 'owner')
     severities.push('bad')
   }
   if (row.flags.includes('overdue')) {
@@ -112,11 +124,27 @@ function classifyGovernanceRow(row: GovernanceRow): { chips: InboxChip[]; severi
   return { chips, severity }
 }
 
+function handoverMeta(h: HandoverItem): string {
+  switch (h.type) {
+    case 'department':
+      return `Department owner ${h.personLabel}`
+    case 'approval_step':
+      return `Approval waiting on ${h.personLabel}`
+    case 'chain_step':
+      return `Approval chain for ${h.title} names ${h.personLabel}`
+    case 'ask':
+      return `Asked ${h.personLabel} to do this SOP`
+    case 'supervision':
+      return `${h.personLabel} was their supervisor`
+  }
+}
+
 export function deriveInbox(input: {
   governance: ReadonlyArray<GovernanceRow>
   library: ReadonlyArray<MillerSop>
   signOffs?: ReadonlyArray<PendingSignOff>
   ownedReviews?: ReadonlyArray<OwnedReview>
+  handover?: ReadonlyArray<HandoverItem>
   now?: Date
 }): InboxItem[] {
   const now = input.now ?? new Date()
@@ -141,6 +169,7 @@ export function deriveInbox(input: {
       gov: row,
       signOff: null,
       review: null,
+      handover: null,
       action: null,
     })
   }
@@ -160,6 +189,7 @@ export function deriveInbox(input: {
       gov: null,
       signOff: null,
       review: null,
+      handover: null,
       action: stuckAction(lib),
     })
   }
@@ -176,6 +206,7 @@ export function deriveInbox(input: {
       gov: null,
       signOff: so,
       review: null,
+      handover: null,
       action: null,
     })
   }
@@ -198,6 +229,24 @@ export function deriveInbox(input: {
       gov: null,
       signOff: null,
       review: r,
+      handover: null,
+      action: null,
+    })
+  }
+
+  for (const h of input.handover ?? []) {
+    items.push({
+      key: h.key,
+      kind: 'handover',
+      chips: ['handover'],
+      severity: 'bad',
+      title: h.title,
+      meta: handoverMeta(h),
+      age: '',
+      gov: null,
+      signOff: null,
+      review: null,
+      handover: h,
       action: null,
     })
   }
@@ -209,6 +258,7 @@ export function inboxCounts(items: ReadonlyArray<InboxItem>): Record<'all' | Inb
   const counts: Record<'all' | InboxChip, number> = {
     all: items.length,
     owner: 0,
+    handover: 0,
     overdue: 0,
     approve: 0,
     signoff: 0,

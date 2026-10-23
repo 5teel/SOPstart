@@ -39,11 +39,13 @@
  * sop_review_cadences/sop_review_events precedent (RESEARCH Pitfall 4).
  */
 
+import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireAdmin } from '@/actions/governance'
 import { getOrgMembers } from '@/actions/assignments'
 import { statusSuffix } from '@/lib/members/authority'
+import { memberLabel, userLabels } from '@/lib/members/labels'
 import { resolveNextStepIndex, stepMatchesCaller, type ChainStep } from '@/lib/governance/approvals'
 import { performPublish } from '@/lib/governance/publish-core'
 import { recordDecision } from '@/lib/decisions/record'
@@ -273,6 +275,91 @@ export async function approveStep(
   }
 
   return { success: true, logged, published }
+}
+
+// ---------------------------------------------------------------------------
+// reassignApprovalStep -- Phase 64 D-17
+// ---------------------------------------------------------------------------
+
+/**
+ * Hand the next step of a pending approval to an active admin or safety manager, but only when that
+ * step names someone who is no longer an active member (suspended or left): otherwise nothing moves.
+ * Session client, like the other approval writes (admins_can_update_sops covers it).
+ */
+export async function reassignApprovalStep(
+  sopId: string,
+  userId: string,
+): Promise<{ success: true; logged: boolean } | { error: string }> {
+  const ctx = await requireAdmin()
+  if ('error' in ctx) return { error: ctx.error }
+  const ids = z.object({ sopId: z.string().uuid(), userId: z.string().uuid() }).safeParse({ sopId, userId })
+  if (!ids.success) return { error: 'That is not valid.' }
+
+  const supabase = await createClient()
+  const { data: target } = await supabase
+    .from('organisation_members')
+    .select('role')
+    .eq('organisation_id', ctx.organisationId)
+    .eq('user_id', userId)
+    .eq('status', 'active')
+    .maybeSingle()
+  if (!target || !['admin', 'safety_manager'].includes(target.role as string)) {
+    return { error: 'Pick an admin or safety manager who is still on the site.' }
+  }
+
+  const { data: sop } = await supabase
+    .from('sops')
+    .select('id, version, approval_state, approval_snapshot')
+    .eq('id', sopId)
+    .maybeSingle()
+  if (!sop || sop.approval_state !== 'pending') return { error: 'No pending approval for this SOP' }
+  const steps = (sop.approval_snapshot as unknown as ChainStep[]) ?? []
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: approvedRows } = await (supabase as any)
+    .from('sop_approvals')
+    .select('step_index')
+    .eq('sop_id', sopId)
+    .eq('version', sop.version)
+    .eq('action', 'approved')
+  const approvedIndexes = new Set(((approvedRows ?? []) as Array<{ step_index: number }>).map((r) => r.step_index))
+  const nextIndex = resolveNextStepIndex(steps.length, approvedIndexes)
+  if (nextIndex === -1) return { error: 'Chain already complete' }
+
+  const fromUserId = steps[nextIndex].userId
+  if (!fromUserId) return { error: 'That step is still with someone who is on the site.' }
+  const { data: holder } = await supabase
+    .from('organisation_members')
+    .select('id')
+    .eq('organisation_id', ctx.organisationId)
+    .eq('user_id', fromUserId)
+    .eq('status', 'active')
+    .maybeSingle()
+  if (holder) return { error: 'That step is still with someone who is on the site.' }
+
+  const label = memberLabel((await userLabels([userId])).get(userId))
+  const next = steps.map((st, i) => (i === nextIndex ? { userId, label } : st))
+  const { data: updated, error } = await supabase
+    .from('sops')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .update({ approval_snapshot: next } as any)
+    .eq('id', sopId)
+    .eq('approval_state', 'pending')
+    .select('id')
+  if (error) {
+    console.error('[reassignApprovalStep] update error', error)
+    return { error: error.message }
+  }
+  if (!updated || updated.length === 0) return { error: 'SOP not found' }
+
+  const rec = await recordDecision({
+    kind: 'owner_change',
+    subject: { kind: 'sop', id: sopId },
+    sopId,
+    summary: 'Handed an approval step to someone else',
+    details: { target: 'approval_step', step_index: nextIndex, from_user_id: fromUserId, to_user_id: userId, version: sop.version },
+  })
+  return { success: true, logged: rec.ok }
 }
 
 // ---------------------------------------------------------------------------
