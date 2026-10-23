@@ -167,3 +167,20 @@ test.describe('member status guard', () => {
     expect(stale, `ALLOW entries with no site that needs them:\n${stale.join('\n')}`).toEqual([])
   })
 })
+
+test.describe('pickers offer active people only (64-05)', () => {
+  const code = (rel: string) => stripComments(read(rel))
+
+  test('the owner picker, the supervises picker and the seat picker filter to active members', () => {
+    const owner = code('src/components/admin/governance/OwnerPicker.tsx')
+    expect(owner).toMatch(/\.filter\(\(m\) => m\.status === 'active'\)/)
+
+    const people = code('src/components/office/PeopleTab.tsx')
+    const supervises = people.slice(people.indexOf('function SupervisesPicker'))
+    expect(supervises).toMatch(/\.filter\(\(x\) => x\.role === 'worker' && x\.status === 'active'\)/)
+
+    const chart = code('src/components/office/OrgChart.tsx')
+    const pick = chart.slice(chart.indexOf('data-testid="org-seat-pick"'), chart.indexOf('data-testid="org-seat-person"'))
+    expect(pick, 'seat picker reads people before org-seat-person').toContain("m.status === 'active'")
+  })
+})

@@ -408,7 +408,7 @@ export function OrgChart({
                   <span className="text-micro text-ink-500">Put someone in this seat</span>
                   <div className="flex flex-wrap gap-1.5">
                     {here
-                      .filter((m) => !g.ppl.some((p) => p.id === m.id))
+                      .filter((m) => m.status === 'active' && !g.ppl.some((p) => p.id === m.id))
                       .sort((a, b) => Number(seated.has(a.id)) - Number(seated.has(b.id)))
                       .map((m) => (
                         <button key={m.id} type="button" className="face" disabled={busy} onClick={() => void seat(g.roleId!, m.user_id, true)} data-testid="org-seat-person">
@@ -416,7 +416,7 @@ export function OrgChart({
                           {shortName(label(m))}
                         </button>
                       ))}
-                    {here.length === 0 && <span className="text-meta text-ink-500">Nobody in this department yet.</span>}
+                    {!here.some((m) => m.status === 'active') && <span className="text-meta text-ink-500">Nobody in this department yet.</span>}
                   </div>
                   <div className="flex flex-wrap gap-2">
                     <button type="button" className={quiet} onClick={onInvite}>
