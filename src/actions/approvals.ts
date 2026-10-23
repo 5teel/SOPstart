@@ -294,6 +294,9 @@ export async function reassignApprovalStep(
   if ('error' in ctx) return { error: ctx.error }
   const ids = z.object({ sopId: z.string().uuid(), userId: z.string().uuid() }).safeParse({ sopId, userId })
   if (!ids.success) return { error: 'That is not valid.' }
+  // A two-person chain stays two people (64-REVIEW ME-02): the caller can't hand a step to
+  // themselves, then approve it.
+  if (userId === ctx.userId) return { error: 'Pick someone other than yourself.' }
 
   const supabase = await createClient()
   const { data: target } = await supabase
@@ -318,13 +321,21 @@ export async function reassignApprovalStep(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: approvedRows } = await (supabase as any)
     .from('sop_approvals')
-    .select('step_index')
+    .select('step_index, approver_user_id')
     .eq('sop_id', sopId)
     .eq('version', sop.version)
     .eq('action', 'approved')
-  const approvedIndexes = new Set(((approvedRows ?? []) as Array<{ step_index: number }>).map((r) => r.step_index))
+  const approved = (approvedRows ?? []) as Array<{ step_index: number; approver_user_id: string | null }>
+  const approvedIndexes = new Set(approved.map((r) => r.step_index))
   const nextIndex = resolveNextStepIndex(steps.length, approvedIndexes)
   if (nextIndex === -1) return { error: 'Chain already complete' }
+  // Nor to someone who already approved this version or is named on another step (ME-02).
+  if (
+    approved.some((r) => r.approver_user_id === userId) ||
+    steps.some((st, i) => i !== nextIndex && st.userId === userId)
+  ) {
+    return { error: 'Pick someone who has not approved this SOP and is not on another step.' }
+  }
 
   const fromUserId = steps[nextIndex].userId
   if (!fromUserId) return { error: 'That step is still with someone who is on the site.' }

@@ -130,3 +130,19 @@ test.describe('LO-04: the observation reference check takes no organisation id',
     expect(s.indexOf('drop function if exists public.sop_observation_refs_in_org')).toBeGreaterThan(s.search(/create\s+policy\s+sop_observations_insert_recorder/i))
   })
 })
+
+test.describe('reassignApprovalStep hardening (ME-02, LO-01, LO-02, LO-07)', () => {
+  const b = () => body(src('src/actions/approvals.ts'), 'reassignApprovalStep')
+
+  test('ME-02: refuses the caller, anyone who approved this version and anyone named on another step, before any write', () => {
+    const s = b()
+    expect(s).toContain('if (userId === ctx.userId)')
+    expect(s).toContain('Pick someone other than yourself.')
+    expect(s).toContain(".select('step_index, approver_user_id')")
+    expect(s).toContain('approved.some((r) => r.approver_user_id === userId)')
+    expect(s).toContain('steps.some((st, i) => i !== nextIndex && st.userId === userId)')
+    expect(s).toContain('Pick someone who has not approved this SOP and is not on another step.')
+    expect(s.indexOf('if (userId === ctx.userId)')).toBeLessThan(s.indexOf('.update('))
+    expect(s.indexOf('approved.some(')).toBeLessThan(s.indexOf('.update('))
+  })
+})
