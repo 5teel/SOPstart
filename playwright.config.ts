@@ -749,5 +749,15 @@ export default defineConfig({
       testMatch: /tests\/phase63\/.*\.(spec|test)\.ts$/,
       use: { browserName: 'chromium' },
     },
+    {
+      // Phase 64 -- membership states (suspended / left) replace removal.
+      // Wave 0 / Plan 64-01. Deliberately broad testMatch (tests/phase64/**) so
+      // later plans drop specs in with no further config edit (CLAUDE.md 2026-05-25).
+      // Verify registration: `npx playwright test --list --project=phase64`
+      name: 'phase64',
+      testDir: '.',
+      testMatch: /tests\/phase64\/.*\.(spec|test)\.ts$/,
+      use: { browserName: 'chromium' },
+    },
   ],
 })
