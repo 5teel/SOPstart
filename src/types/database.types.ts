@@ -2125,6 +2125,7 @@ export type Database = {
       // Plan 56-03: manually extended (type regen unavailable)
       sop_focus_steps: {
         Row: {
+          tools_text: string | null
           created_at: string
           id: string
           image_paths: string[]

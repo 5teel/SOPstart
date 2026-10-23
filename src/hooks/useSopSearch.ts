@@ -3,8 +3,8 @@
  * Phase 63 -- step and tool search over the visible SOPs. One debounced browser-client
  * query on sop_focus_steps under RLS; no server action (CLAUDE.md 2026-09-29).
  *
- * ponytail: tools match on an exact tool name (array contains) and the response caps at
- * 500 step rows; a search view if a site outgrows that.
+ * Tools match on part of the name, any case (tools_text, migration 00084).
+ * ponytail: the response caps at 500 step rows; a search view if a site outgrows that.
  */
 import { useEffect, useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
@@ -32,7 +32,7 @@ export function useSopSearch(query: string, visibleIds: readonly string[]) {
         .from('sop_focus_steps')
         .select('sop_id')
         .in('sop_id', ids)
-        .or(`text.ilike.%${term}%,required_tools.cs.{${term}}`)
+        .or(`text.ilike.%${term}%,tools_text.ilike.%${term}%`)
         .limit(500)
       if (error) throw new Error(error.message)
       return new Set((data ?? []).map((r: { sop_id: string }) => r.sop_id))

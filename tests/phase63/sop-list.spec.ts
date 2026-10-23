@@ -34,6 +34,13 @@ test.describe('sop list', () => {
     }
   })
 
+  test('tool search matches part of a tool name, any case (tools_text, migration 00084)', () => {
+    const s = code('src/hooks/useSopSearch.ts')
+    expect(s).toContain('tools_text.ilike.%${term}%')
+    expect(s).not.toContain('required_tools.cs')
+    expect(src('supabase/migrations/00084_step_tools_text.sql')).toMatch(/generated always as \(public\.tools_text\(required_tools\)\) stored/)
+  })
+
   test('useLibrary owns the library query function (the old worker list hook is gone)', () => {
     const s = code('src/hooks/useLibrary.ts')
     expect(s).not.toContain('useWorkerSops')
