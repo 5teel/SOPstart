@@ -199,7 +199,12 @@ export function InboxTab({
   for (const g of ghosts) rows.splice(Math.min(g.index, rows.length), 0, { item: g.item, ghost: g })
 
   return (
-    <ul ref={listRef} data-testid="office-list" className="list">
+    <ul
+      ref={listRef}
+      data-testid="office-list"
+      // A row's owner picker opens below it and must not be cut off when it is the last row.
+      className="list overflow-visible [&>li:first-child]:rounded-t-lg [&>li:last-child]:rounded-b-lg"
+    >
       {rows.map(({ item, ghost }) => (
         <InboxRow
           key={item.key}

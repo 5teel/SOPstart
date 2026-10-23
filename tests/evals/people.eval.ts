@@ -356,6 +356,13 @@ test.describe('Phase 64 -- leavers and suspended members (deployed)', () => {
         await action.click()
         const admin = row.getByRole('button', { name: siteAdmin })
         await expect(admin.first()).toBeVisible(SLOW)
+        // Not cut off by the list: the option is what a click at its centre would hit (the last row has nothing below it).
+        const hit = await admin.first().evaluate((el) => {
+          const r = el.getBoundingClientRect()
+          const at = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2)
+          return at === el || el.contains(at)
+        })
+        expect(hit, 'the picker option is reachable').toBe(true)
         await expect(row.getByRole('button', { name: C_EMAIL })).toHaveCount(0)
         return { admin: admin.first(), row }
       }
