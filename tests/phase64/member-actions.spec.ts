@@ -92,7 +92,7 @@ test.describe('actions (members.ts)', () => {
     expect(b).toContain(".eq('organisation_id', organisationId)")
     expect(b).toContain(".eq('role', 'admin')")
     expect(b).toContain(".eq('status', 'active')")
-    expect(b).toContain('from: [target.status')
+    expect(b).toContain('from: [seen]')
   })
 
   test('allowed transitions', () => {
