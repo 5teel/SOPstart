@@ -314,6 +314,7 @@ export async function reassignApprovalStep(
     .from('sops')
     .select('id, title, version, approval_state, approval_snapshot')
     .eq('id', sopId)
+    .eq('organisation_id', ctx.organisationId)
     .maybeSingle()
   if (!sop || sop.approval_state !== 'pending') return { error: 'No pending approval for this SOP' }
   const steps = (sop.approval_snapshot as unknown as ChainStep[]) ?? []
@@ -322,6 +323,7 @@ export async function reassignApprovalStep(
   const { data: approvedRows } = await (supabase as any)
     .from('sop_approvals')
     .select('step_index, approver_user_id')
+    .eq('organisation_id', ctx.organisationId)
     .eq('sop_id', sopId)
     .eq('version', sop.version)
     .eq('action', 'approved')
@@ -357,6 +359,7 @@ export async function reassignApprovalStep(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .update({ approval_snapshot: next } as any)
     .eq('id', sopId)
+    .eq('organisation_id', ctx.organisationId)
     .eq('approval_state', 'pending')
     .eq('version', sop.version)
     .eq('approval_snapshot', JSON.stringify(steps))

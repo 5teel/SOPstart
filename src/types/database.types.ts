@@ -40,7 +40,7 @@ export type Database = {
           id: string
           organisation_id: string
           role: Database["public"]["Enums"]["app_role"]
-          status: string
+          status: "active" | "suspended" | "left"
           status_changed_at: string | null
           status_changed_by: string | null
           user_id: string
@@ -50,7 +50,7 @@ export type Database = {
           id?: string
           organisation_id: string
           role?: Database["public"]["Enums"]["app_role"]
-          status?: string
+          status?: "active" | "suspended" | "left"
           status_changed_at?: string | null
           status_changed_by?: string | null
           user_id: string
@@ -60,7 +60,7 @@ export type Database = {
           id?: string
           organisation_id?: string
           role?: Database["public"]["Enums"]["app_role"]
-          status?: string
+          status?: "active" | "suspended" | "left"
           status_changed_at?: string | null
           status_changed_by?: string | null
           user_id?: string
@@ -2604,7 +2604,7 @@ export type Database = {
       }
       custom_access_token_hook: { Args: { event: Json }; Returns: Json }
       is_platform_admin: { Args: Record<string, never>; Returns: boolean }
-      revoke_user_sessions: { Args: { p_user_id: string }; Returns: undefined }
+      revoke_user_sessions: { Args: { p_user_id: string }; Returns: number }
       accept_block_update: {
         Args: {
           p_sop_section_block_id: string

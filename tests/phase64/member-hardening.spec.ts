@@ -169,3 +169,23 @@ test.describe('reassignApprovalStep notification (LO-02)', () => {
     }
   })
 })
+
+test.describe('LO-07: session-org filters and the hand-maintained types', () => {
+  test('reassignApprovalStep filters the sops read, the approvals read and the sops write by the session organisation', () => {
+    const s = body(src('src/actions/approvals.ts'), 'reassignApprovalStep')
+    const read = s.slice(s.indexOf(".from('sops')"), s.indexOf('.maybeSingle()', s.indexOf(".from('sops')")))
+    expect(read).toContain(".eq('organisation_id', ctx.organisationId)")
+    const appr = s.slice(s.indexOf(".from('sop_approvals')"), s.indexOf(".eq('action', 'approved')"))
+    expect(appr).toContain(".eq('organisation_id', ctx.organisationId)")
+    const write = s.slice(s.indexOf('.update('), s.indexOf(".select('id')", s.indexOf('.update(')))
+    expect(write).toContain(".eq('organisation_id', ctx.organisationId)")
+  })
+
+  test('organisation_members.status is the three-state union and revoke_user_sessions returns a number', () => {
+    const t = norm(fs.readFileSync(path.join(process.cwd(), 'src/types/database.types.ts'), 'utf8'))
+    const om = t.slice(t.indexOf('      organisation_members: {'), t.indexOf('Relationships:', t.indexOf('      organisation_members: {')))
+    expect([...om.matchAll(/status\??: "active" \| "suspended" \| "left"/g)].length).toBe(3)
+    expect(om).not.toMatch(/\bstatus\??: string/)
+    expect(t).toContain('revoke_user_sessions: { Args: { p_user_id: string }; Returns: number }')
+  })
+})
