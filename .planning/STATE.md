@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v11.0
 milestone_name: — One-Screen MVP
 status: executing
-stopped_at: Completed 64-02-PLAN.md
-last_updated: "2026-10-23T12:29:21.242Z"
+stopped_at: Completed 64-03-PLAN.md
+last_updated: "2026-10-23T12:58:59.660Z"
 last_activity: 2026-10-23 -- Phase 64 execution started
 progress:
   total_phases: 16
   completed_phases: 7
   total_plans: 113
-  completed_plans: 109
+  completed_plans: 110
   percent: 44
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-03)
 ## Current Position
 
 Phase: 64 (leavers-and-suspended-members) — EXECUTING
-Plan: 3 of 6
+Plan: 4 of 6
 Status: Ready to execute
 Last activity: 2026-10-23 -- Phase 64 execution started
 
@@ -303,6 +303,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 63 P01 | 40min | 2 tasks | 7 files |
 | Phase 64 P01 | 95min | 3 tasks | 18 files |
 | Phase 64 P02 | 50min | 3 tasks | 13 files |
+| Phase 64 P03 | 3h | 3 tasks | 26 files |
 
 ## Accumulated Context
 
@@ -605,6 +606,7 @@ Recent decisions affecting current work:
 - [Phase 64]: Phase 64-01: D-19 sop-videos SELECT scoped to the organisation folder (7 objects, 0 outside); 00082 applied before app code (backwards compatible); RLS helpers re-check the active membership row, status is service-role-only
 - [Phase 64]: Phase 64-01: ADR-0024 accepted residuals: signed links live their TTL, reinstate within the hour revives an old token, sign-out covers every site the person belongs to
 - [Phase 64-02]: Paused page applies only to approved accounts with only paused sites; approval pending/declined keep precedence
+- [Phase 64]: [64-03] Departed people leave every People view and sit in a folded Former staff group; suspended stay with a tag; state buttons are ink, never red
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -750,6 +752,6 @@ deliberate decision, not a side-effect.
 
 ## Session Continuity
 
-Last session: 2026-10-23T12:29:21.219Z
-Stopped at: Completed 64-02-PLAN.md
+Last session: 2026-10-23T12:58:59.644Z
+Stopped at: Completed 64-03-PLAN.md
 Resume file: None
