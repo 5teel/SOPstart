@@ -357,6 +357,7 @@ test.describe('Phase 64 -- leavers and suspended members (deployed)', () => {
         const admin = row.getByRole('button', { name: siteAdmin })
         await expect(admin.first()).toBeVisible(SLOW)
         // Not cut off by the list: the option is what a click at its centre would hit (the last row has nothing below it).
+        await admin.first().scrollIntoViewIfNeeded()
         const hit = await admin.first().evaluate((el) => {
           const r = el.getBoundingClientRect()
           const at = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2)
