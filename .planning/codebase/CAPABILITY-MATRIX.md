@@ -1,12 +1,12 @@
 # Capability Matrix
 
-**Last updated:** 2026-10-16 (ADR-0021 job roles)
+**Last updated:** 2026-10-21 (ADR-0024 membership states)
 
 This document is the single reference for who can see and do what in SafeStart. When a capability gate changes (an RLS policy, a `require*` guard, or a role check), this file changes in the **same commit**. If this file disagrees with the code, the code is the bug or the file is stale — treat any drift as a finding, not a footnote.
 
 ## Two channels (D1: obligation ≠ access)
 
-**Access channel** — whether a role *can* reach and act on a surface. Enforced today by RLS policies + server-action guards (`requireAdminContext()`, `requireSopEditAccess()`, RLS `USING`/`WITH CHECK` clauses). This is shipped, and it is what the table below documents.
+**Access channel** — whether a role *can* reach and act on a surface. Enforced today by RLS policies + server-action guards (`requireAdminContext()`, `requireSopEditAccess()`, RLS `USING`/`WITH CHECK` clauses). This is shipped, and it is what the table below documents. Since 00082 (ADR-0024) the RLS helpers `current_organisation_id()` and `current_user_role()` re-check an active `organisation_members` row on every request, so a suspended or departed member matches no policy even with a token issued earlier; `status` is service-role-only.
 
 **Obligation channel** — whether a role *is required* to complete a SOP (assigned vs. optional, mandatory vs. bookmarked). This is a separate concept: a worker can have *access* to read a SOP without being *obligated* to complete it, and vice versa is meaningless (obligation without access is a bug). Today obligation is only implied by `sop_assignments` rows; a first-class manager-set obligation record ships in **Phase 44a**. Access must never be read as a proxy for obligation, and obligation must never be read as a proxy for access — they are tracked, and will be enforced, independently.
 

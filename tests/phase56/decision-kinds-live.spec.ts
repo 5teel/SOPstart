@@ -132,6 +132,28 @@ function samples(sopId: string): Record<DecisionKind, DecisionInput> {
       summary: 'Removed a person',
       details: probe,
     },
+    // Phase 64: membership states. Details carry the states and whether sessions were revoked, no email.
+    member_suspended: {
+      kind: 'member_suspended',
+      subject: { kind: 'member', id: randomUUID() },
+      sopId: null,
+      summary: 'Suspended a person',
+      details: { ...probe, role: 'safety_manager', from: 'active', to: 'suspended', signed_out: true },
+    },
+    member_left: {
+      kind: 'member_left',
+      subject: { kind: 'member', id: randomUUID() },
+      sopId: null,
+      summary: 'Marked a person as left',
+      details: { ...probe, role: 'safety_manager', from: 'active', to: 'left', signed_out: true },
+    },
+    member_reinstated: {
+      kind: 'member_reinstated',
+      subject: { kind: 'member', id: randomUUID() },
+      sopId: null,
+      summary: 'Reinstated a person',
+      details: { ...probe, role: 'safety_manager', from: 'suspended', to: 'active', signed_out: false },
+    },
     // Phase 60: plain-words summaries, no email anywhere.
     request_accepted: {
       kind: 'request_accepted',

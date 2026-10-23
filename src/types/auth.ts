@@ -1,5 +1,7 @@
 export type AppRole = 'worker' | 'supervisor' | 'admin' | 'safety_manager'
 
+export type MemberStatus = 'active' | 'suspended' | 'left'
+
 export interface JWTClaims {
   organisation_id: string | null
   user_role: AppRole | 'pending'

@@ -28,6 +28,7 @@ const ROOT = path.resolve(__dirname, '..')
 const MIGRATION_FILES = [
   path.join(ROOT, 'supabase/migrations/00074_requests_notifications_objectives.sql'),
   path.join(ROOT, 'supabase/migrations/00076_ledger_every_action.sql'),
+  path.join(ROOT, 'supabase/migrations/00082_member_status.sql'),
 ]
 
 for (const f of ['.env.local', '.env']) {
@@ -161,9 +162,10 @@ const KINDS = [
   'supervisor_linked', 'supervisor_unlinked', 'department_change', 'access_change',
   'sop_created', 'sop_edited', 'sop_deleted', 'sop_version', 'standard_change',
   'site_change', 'settings_change',
+  'member_suspended', 'member_left', 'member_reinstated',
 ]
 await assertSql(
-  'decisions_kind_check accepts all 34 kinds',
+  'decisions_kind_check accepts all 37 kinds',
   `SELECT pg_get_constraintdef(oid) AS def FROM pg_constraint
     WHERE conrelid = 'public.decisions'::regclass AND conname = 'decisions_kind_check'`,
   (rows) => {

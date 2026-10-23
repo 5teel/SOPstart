@@ -36,7 +36,7 @@ export const KIND_GROUPS: Record<Exclude<DecisionGroupKey, 'all'>, ReadonlyArray
   changes: ['sop_created', 'sop_edited', 'sop_deleted', 'sop_version', 'standard_change'],
   reviews: ['review', 'cadence_change'],
   ai: ['ai_finding_cleared', 'ai_field_write', 'verify', 'verify_withdrawn'],
-  people: ['role_change', 'member_invited', 'member_removed', 'supervisor_linked', 'supervisor_unlinked', 'department_change'],
+  people: ['role_change', 'member_invited', 'member_removed', 'member_suspended', 'member_left', 'member_reinstated', 'supervisor_linked', 'supervisor_unlinked', 'department_change'],
   setup: ['access_change', 'site_change', 'settings_change'],
   other: ['observation', 'objective_set', 'objective_cleared', 'objective_confirmed'],
 }
@@ -62,6 +62,9 @@ export const KIND_WORDS: Record<DecisionKind, string> = {
   role_change: 'Changed a role',
   member_invited: 'Invited someone',
   member_removed: 'Removed someone',
+  member_suspended: 'Suspended someone',
+  member_left: 'Marked someone as left',
+  member_reinstated: 'Reinstated someone',
   request_accepted: 'Accepted a request',
   request_declined: 'Declined a request',
   objective_set: 'Set an objective',
