@@ -67,7 +67,7 @@ export function OwnerPicker({
         setError(result.error)
         return
       }
-      setMembers(result.members)
+      setMembers(result.members.filter((m) => m.status === 'active'))
     } catch {
       setError(FAILED_COPY)
     } finally {

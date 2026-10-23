@@ -248,6 +248,7 @@ export async function notifyAssignedWorkers(
         .from('organisation_members')
         .select('user_id')
         .eq('organisation_id', organisationId)
+        .eq('status', 'active')
         .eq('role', assignment.role)
 
       if (members) {

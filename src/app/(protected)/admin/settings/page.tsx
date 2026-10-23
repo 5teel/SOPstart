@@ -102,7 +102,7 @@ export default async function AdminSettingsPage() {
   const members: ChainMember[] =
     membersResult.success
       ? membersResult.members
-          .filter((m) => m.role === 'admin' || m.role === 'safety_manager')
+          .filter((m) => m.status === 'active' && (m.role === 'admin' || m.role === 'safety_manager'))
           .map((m) => ({ user_id: m.user_id, role: m.role, label: m.email ?? m.full_name ?? `${m.role} (${m.user_id.slice(0, 8)})` }))
       : []
 

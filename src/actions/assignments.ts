@@ -2,7 +2,7 @@
 
 import { getSessionContext } from '@/lib/auth/session-context'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { AppRole } from '@/types/auth'
+import type { AppRole, MemberStatus } from '@/types/auth'
 import { userLabels } from '@/lib/members/labels'
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -37,7 +37,7 @@ export async function getOrgMembers(): Promise<
   // auth users via userLabels, for the member ids read below only (A-07).
   const { data, error } = await supabase
     .from('organisation_members')
-    .select('user_id, role')
+    .select('user_id, role, status')
     .eq('organisation_id', organisationId)
     .order('role', { ascending: true })
 
@@ -52,6 +52,7 @@ export async function getOrgMembers(): Promise<
     members: (data ?? []).map(m => ({
       user_id: m.user_id,
       role: m.role as AppRole,
+      status: m.status as MemberStatus,
       full_name: labels.get(m.user_id)?.fullName ?? null,
       email: labels.get(m.user_id)?.email ?? null,
     })),
@@ -116,6 +117,7 @@ export interface SopAssignment {
 export interface OrgMemberWithProfile {
   user_id: string
   role: AppRole
+  status: MemberStatus
   full_name: string | null
   email: string | null
 }

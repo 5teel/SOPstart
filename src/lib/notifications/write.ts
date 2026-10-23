@@ -1,5 +1,6 @@
 import 'server-only'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { activeMemberIds } from '@/lib/members/active'
 import { isSafePlace, notificationPlace } from '@/lib/notifications/places'
 import { dedupeKey, notificationTitle, type NotificationKind } from '@/lib/notifications/kinds'
 import type { ChainStep } from '@/lib/governance/approvals'
@@ -35,6 +36,7 @@ export async function notify(organisationId: string, rows: NotifyRow[]): Promise
       .from('organisation_members')
       .select('user_id')
       .eq('organisation_id', organisationId)
+      .eq('status', 'active')
       .in('user_id', [...new Set(safe.map((r) => r.userId))])
     if (memberError) throw memberError
     const inOrg = new Set((members ?? []).map((m) => m.user_id as string))
@@ -128,7 +130,10 @@ export async function signOffRecipients(organisationId: string, workerId: string
     .eq('organisation_id', organisationId)
     .eq('worker_id', workerId)
   if (error) console.error('[signOffRecipients] read error', error)
-  let ids = (data ?? []).map((r) => r.supervisor_id as string)
+  // Supervisors who are suspended or have left are not told; if none remain, the admins and safety managers are.
+  const supervisorIds = (data ?? []).map((r) => r.supervisor_id as string)
+  const active = await activeMemberIds(organisationId, supervisorIds)
+  let ids = supervisorIds.filter((id) => active.has(id))
   if (ids.length === 0) {
     ids = [...(await membersWithRole(organisationId, 'admin')), ...(await membersWithRole(organisationId, 'safety_manager'))]
   }
@@ -141,6 +146,7 @@ export async function membersWithRole(organisationId: string, role: 'worker' | '
     .from('organisation_members')
     .select('user_id')
     .eq('organisation_id', organisationId)
+    .eq('status', 'active')
     .eq('role', role)
   if (error) {
     console.error('[membersWithRole] read error', error)
