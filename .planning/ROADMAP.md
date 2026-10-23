@@ -2324,8 +2324,6 @@ Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 2
 | **61. The Workshop & the Smoko Room (v11.0)** | 0/0 | Not started |  |
 | **62. Removal Certified, Addresses & Maps (v11.0)** | 0/0 | Not started |  |
 
-## Backlog
-
 ### Phase 65: Passkeys
 
 **Goal:** People sign in with a passkey (Face ID, fingerprint or the phone's screen lock) instead of waiting for an emailed code. A passkey is added from Profile after a normal sign-in; the emailed code stays as the fallback; adding or removing a passkey writes a ledger row (ADR-0008). Research first: Supabase Auth's own WebAuthn / passkey support versus SimpleWebAuthn with server-minted sessions.
@@ -2373,6 +2371,8 @@ Plans:
 Plans:
 
 - [ ] TBD (run /gsd-plan-phase 68 to break down)
+
+## Backlog
 
 ### Phase 999.1: Stale video job cleanup service (BACKLOG)
 
