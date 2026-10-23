@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { getSessionContext } from '@/lib/auth/session-context'
 import { recordDecision } from '@/lib/decisions/record'
 import { changeMemberState } from '@/lib/members/state'
-import type { MemberStatus } from '@/types/auth'
+import type { AppRole, MemberStatus } from '@/types/auth'
 
 // Phase 64 (MEMB-02..04, D-03, D-05): suspend, mark as left, reinstate. Admin or safety manager,
 // never on yourself, only an admin changes an admin, the last active admin stays. Not exported:
@@ -52,9 +52,19 @@ async function applyMemberState(memberId: string, to: MemberStatus): Promise<Res
     if ((count ?? 0) <= 1) return { error: 'There has to be at least one admin.' }
   }
 
-  // The state the caller saw, so a double click is a clean refusal.
-  const changed = await changeMemberState({ memberId, organisationId, actorId: userId, from: [seen], to })
-  if (!changed.ok) return { error: "That didn't work. Nothing was changed — try again." }
+  // The state and role the caller saw: a double click or a role changed meanwhile is a clean
+  // refusal. The database keeps the last active admin even when two changes race (00083).
+  const changed = await changeMemberState({
+    memberId,
+    organisationId,
+    actorId: userId,
+    from: [seen],
+    to,
+    seenRole: target.role as AppRole,
+  })
+  if (!changed.ok) {
+    return { error: changed.lastAdmin ? 'There has to be at least one admin.' : "That didn't work. Nothing was changed — try again." }
+  }
 
   const rec = await recordDecision({
     kind: KIND[to],

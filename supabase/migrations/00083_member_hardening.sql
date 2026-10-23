@@ -7,6 +7,9 @@
 --   1. HI-01  organisation_members INSERT / DELETE are service-role-only; the 00002 admin
 --             INSERT policy is dropped. Pending invitees get their invite copied into
 --             app_metadata (server-only), which acceptInvite now reads instead of user_metadata.
+--   2. ME-01  the last active admin of an organisation can't be suspended, marked as left or
+--             demoted by any path: a BEFORE UPDATE trigger locks the organisation row and
+--             recounts inside the transaction.
 
 -- 1. Membership inserts are service-role-only (HI-01) ----------------------------------------
 -- The 00002 policy let any admin or safety manager insert a row with any role, so a safety
@@ -30,3 +33,39 @@ where u.invited_at is not null
   and u.last_sign_in_at is null
   and u.raw_user_meta_data ? 'organisation_id'
   and not (coalesce(u.raw_app_meta_data, '{}'::jsonb) ? 'invite_org_id');
+
+-- 2. Keep one active admin (ME-01) -------------------------------------------------------------
+-- The app counted active admins, then updated: two admins suspending each other at the same
+-- moment both counted 2 and both succeeded. The trigger serialises every change that takes an
+-- active admin away, per organisation (FOR NO KEY UPDATE on the organisations row, which does not
+-- block foreign-key checks from other tables), and recounts after the lock with a fresh snapshot,
+-- so the second change sees the first and is refused. Update only: deleting an organisation's
+-- members (org merges, service-role scripts) is not a state change.
+create or replace function public.keep_one_active_admin()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  if old.role = 'admin' and old.status = 'active'
+     and (new.role <> 'admin' or new.status <> 'active') then
+    perform 1 from public.organisations where id = old.organisation_id for no key update;
+    if not exists (
+      select 1 from public.organisation_members
+      where organisation_id = old.organisation_id
+        and id <> old.id
+        and role = 'admin'
+        and status = 'active'
+    ) then
+      raise exception 'last active admin' using errcode = 'P0001';
+    end if;
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists organisation_members_keep_admin on public.organisation_members;
+create trigger organisation_members_keep_admin
+  before update on public.organisation_members
+  for each row execute function public.keep_one_active_admin();

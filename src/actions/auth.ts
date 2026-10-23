@@ -9,7 +9,7 @@ import { getSessionContext } from '@/lib/auth/session-context'
 import { roleHome } from '@/lib/auth/role-home'
 import { safeNextPath } from '@/lib/auth/next-redirect'
 import { recordDecision } from '@/lib/decisions/record'
-import { changeMemberState } from '@/lib/members/state'
+import { changeMemberState, isLastAdminError } from '@/lib/members/state'
 import type { TablesInsert, TablesUpdate } from '@/types/database.types'
 import type { AppRole, MemberStatus } from '@/types/auth'
 import {
@@ -600,7 +600,8 @@ export async function updateMemberRoleSafe(formData: {
     .select('id')
 
   if (error) {
-    return { error: 'Failed to update role' }
+    // A concurrent change took the other admin away first (00083 trigger, ME-01).
+    return { error: isLastAdminError(error) ? 'There has to be at least one admin.' : 'Failed to update role' }
   }
   // Zero rows means RLS or the scope filtered the write out: not a success.
   if (!updated || updated.length === 0) {

@@ -71,3 +71,39 @@ test.describe('HI-01 / LO-03: membership inserts are service-role-only', () => {
     expect(b).not.toContain("supabase.from('organisation_members')")
   })
 })
+
+test.describe('ME-01: the last active admin is kept by the database', () => {
+  test('00083 trigger locks the organisation row, recounts other active admins and refuses', () => {
+    const s = sql()
+    const at = s.search(/create\s+or\s+replace\s+function\s+public\.keep_one_active_admin\(\)/i)
+    expect(at).toBeGreaterThanOrEqual(0)
+    const fn = s.slice(at)
+    const b = fn.slice(0, fn.indexOf('$$', fn.indexOf('$$') + 2)).replace(/\s+/g, ' ')
+    expect(b).toMatch(/returns trigger/i)
+    expect(b).toMatch(/security definer/i)
+    expect(b).toMatch(/set search_path = ''/i)
+    expect(b).toMatch(/old\.role = 'admin' and old\.status = 'active' and \(new\.role <> 'admin' or new\.status <> 'active'\)/i)
+    expect(b).toMatch(/from public\.organisations where id = old\.organisation_id for no key update/i)
+    expect(b).toMatch(/id <> old\.id and role = 'admin' and status = 'active'/i)
+    expect(b).toMatch(/raise exception 'last active admin'/i)
+    expect(s.replace(/\s+/g, ' ')).toMatch(
+      /create trigger organisation_members_keep_admin before update on public\.organisation_members for each row execute function public\.keep_one_active_admin\(\)/i,
+    )
+  })
+
+  test('changeMemberState filters on the role the caller saw and reports the trigger refusal', () => {
+    const s = src('src/lib/members/state.ts')
+    const b = body(s, 'changeMemberState')
+    expect(b).toContain("if (seenRole) query = query.eq('role', seenRole)")
+    expect(b).toContain('lastAdmin: isLastAdminError(error)')
+    expect(s).toContain("error?.message?.includes('last active admin')")
+  })
+
+  test('the member actions pass the seen role and word the refusal; the role change words it too', () => {
+    const m = body(src('src/actions/members.ts'), 'applyMemberState')
+    expect(m).toContain('seenRole: target.role as AppRole')
+    expect(m).toContain("changed.lastAdmin ? 'There has to be at least one admin.'")
+    const r = body(src('src/actions/auth.ts'), 'updateMemberRoleSafe')
+    expect(r).toContain("isLastAdminError(error) ? 'There has to be at least one admin.'")
+  })
+})

@@ -23,10 +23,12 @@ export async function changeMemberState(a: {
   to: MemberStatus
   /** Set on the same update; used by the invite reactivation. */
   role?: AppRole
-}): Promise<{ ok: false } | { ok: true; userId: string; role: string; signedOut: boolean }> {
-  const { memberId, organisationId, actorId, from, to, role } = a
+  /** The role the caller checked; a role changed in the meantime matches zero rows (ME-01). */
+  seenRole?: AppRole
+}): Promise<{ ok: false; lastAdmin: boolean } | { ok: true; userId: string; role: string; signedOut: boolean }> {
+  const { memberId, organisationId, actorId, from, to, role, seenRole } = a
   const admin = createAdminClient()
-  const { data, error } = await admin
+  let query = admin
     .from('organisation_members')
     .update({
       status: to,
@@ -37,11 +39,13 @@ export async function changeMemberState(a: {
     .eq('id', memberId)
     .eq('organisation_id', organisationId)
     .in('status', from)
-    .select('user_id, role')
+  if (seenRole) query = query.eq('role', seenRole)
+  const { data, error } = await query.select('user_id, role')
 
   if (error || !data?.length) {
     if (error) console.error('[changeMemberState] update error', error)
-    return { ok: false }
+    // The 00083 trigger refuses to take away an organisation's last active admin.
+    return { ok: false, lastAdmin: isLastAdminError(error) }
   }
   const { user_id: userId, role: newRole } = data[0]
 
@@ -52,4 +56,9 @@ export async function changeMemberState(a: {
     signedOut = !revokeError
   }
   return { ok: true, userId, role: newRole as string, signedOut }
+}
+
+/** The 00083 keep_one_active_admin trigger's refusal. */
+export function isLastAdminError(error: { message?: string } | null | undefined): boolean {
+  return Boolean(error?.message?.includes('last active admin'))
 }
