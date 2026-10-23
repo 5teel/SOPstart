@@ -23,11 +23,11 @@ Pick up here in a fresh context. Read CLAUDE.md, docs/adr/README.md (ADR-0024 an
 - **TRUNCATE grant:** authenticated still holds Supabase's default TRUNCATE on `organisation_members`. REST can't reach it, but a revoke would tidy it.
 - **Traceability table:** `REQUIREMENTS.md` has 119 IDs missing from it (gsd-tools warning). It's bookkeeping only.
 
-## Open decisions for Simon (carried over)
-1. **Self-host full Inter** for the safety glyphs (`cv05`, `cv08`, slashed zero). Needs an ADR.
-2. **Tool search** matches an exact tool name only (`src/hooks/useSopSearch.ts`). Make it partial and case-insensitive?
-3. **Next security steps** from the 2026-10-21 discussion (out of Phase 64's scope): passkeys, admin MFA (aal2), recovery codes, supervisor-issued recovery, security headers (backlog 999.3). Which comes next?
+## Decided 2026-10-24
+- **Inter is self-hosted** (ADR-0026, `ed072d6f`): Latin subset, 118 KB, `cv05` / `cv08` / `zero` on.
+- **Tool search matches part of a name, in any case** (`a5084877`, migration 00084 applied).
+- **All four security steps are on the roadmap** as Phases 65 (passkeys), 66 (admin MFA and recovery codes), 67 (supervisor-issued recovery) and 68 (security headers, promoted from 999.3). Next: `/gsd-discuss-phase 65` or `/gsd-plan-phase 65`.
 
 ## Process notes
-- GSD: the roadmap's next entry is backlog 999.1. Run `/gsd-progress` to choose.
+- GSD: the next phase is 65 (Passkeys).
 - Executors ran sequentially on the main tree; keep doing so for anything that pushes and runs a deployed eval.

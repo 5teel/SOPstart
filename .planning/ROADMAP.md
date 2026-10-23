@@ -1719,6 +1719,10 @@ Executes 55 → 56 → 57 → 58 → 59 → 60 → 61 → 62, strictly sequentia
 - [~] **Phase 62: Removal Certified, Addresses & Maps** - MOVED OUT OF GSD 2026-10-06: tracked as clean-up todos in the Claude Doc https://claude.ai/code/artifact/16b59e56-b699-4972-81e8-d946f140234f
 - [x] **Phase 63: SOP-first Home, Library Site Map and the SOPstart Start** - The home becomes find · read · start (sketch 009 A + the library site map); rooms retired; the SOPstart wordmark and the start merge (sketch 010); "walk" leaves the screen
 - [x] **Phase 64: Leavers and Suspended Members** - Suspend / has-left membership states replace the hard delete; sign out everywhere; records kept under the name; owner handover list; reinstate (completed 2026-10-23)
+- [ ] **Phase 65: Passkeys** - People sign in with a passkey (Face ID, fingerprint or the phone's screen lock) instead of waiting for an emailed code
+- [ ] **Phase 66: Admin MFA and Recovery Codes** - Admins and safety managers prove a second factor (passkey or authenticator app) before any admin action: the session must be aal2, enforced in the `require*` guards and in RLS for elevated writes
+- [ ] **Phase 67: Supervisor-issued Recovery** - A worker who has lost their phone or email access gets back in through their supervisor or an admin, in person: a short-lived, single-use recovery code issued from People, bound to that person, logged to the ledger
+- [ ] **Phase 68: Security Headers** - sopstart.com sends Content-Security-Policy (self, Supabase REST/Realtime/Storage, the AI providers the browser actually calls), HSTS with preload, frame-ancestors 'none', nosniff, a strict Referrer-Policy and a Permissions-Policy
 
 ### Phase 55: Cut the Dropped Features & One Organisation
 
@@ -2322,6 +2326,54 @@ Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 2
 
 ## Backlog
 
+### Phase 65: Passkeys
+
+**Goal:** People sign in with a passkey (Face ID, fingerprint or the phone's screen lock) instead of waiting for an emailed code. A passkey is added from Profile after a normal sign-in; the emailed code stays as the fallback; adding or removing a passkey writes a ledger row (ADR-0008). Research first: Supabase Auth's own WebAuthn / passkey support versus SimpleWebAuthn with server-minted sessions.
+**Requirements**: TBD
+**Depends on:** Phase 64
+**Plans:** 0 plans
+**Context:** security plan discussed with Simon 2026-10-21; Simon approved all four steps 2026-10-24.
+
+Plans:
+
+- [ ] TBD (run /gsd-plan-phase 65 to break down)
+
+### Phase 66: Admin MFA and Recovery Codes
+
+**Goal:** Admins and safety managers prove a second factor (passkey or authenticator app) before any admin action: the session must be aal2, enforced in the `require*` guards and in RLS for elevated writes. Enrolling a factor issues one-time recovery codes, stored hashed and each usable once. Every enrolment, removal and recovery-code use writes a ledger row.
+**Requirements**: TBD
+**Depends on:** Phase 65
+**Plans:** 0 plans
+**Context:** security plan discussed with Simon 2026-10-21; Simon approved all four steps 2026-10-24.
+
+Plans:
+
+- [ ] TBD (run /gsd-plan-phase 66 to break down)
+
+### Phase 67: Supervisor-issued Recovery
+
+**Goal:** A worker who has lost their phone or email access gets back in through their supervisor or an admin, in person: a short-lived, single-use recovery code issued from People, bound to that person, logged to the ledger. No SMS. An admin cannot recover another admin this way (ties to Phase 66).
+**Requirements**: TBD
+**Depends on:** Phase 66
+**Plans:** 0 plans
+**Context:** security plan discussed with Simon 2026-10-21; Simon approved all four steps 2026-10-24.
+
+Plans:
+
+- [ ] TBD (run /gsd-plan-phase 67 to break down)
+
+### Phase 68: Security Headers
+
+**Goal:** sopstart.com sends Content-Security-Policy (self, Supabase REST/Realtime/Storage, the AI providers the browser actually calls), HSTS with preload, frame-ancestors 'none', nosniff, a strict Referrer-Policy and a Permissions-Policy. Promoted from backlog 999.3; re-check its allowlist against the current stack (Fly.io, not Railway; client OCR may be gone).
+**Requirements**: TBD
+**Depends on:** Phase 67
+**Plans:** 0 plans
+**Context:** security plan discussed with Simon 2026-10-21; Simon approved all four steps 2026-10-24.
+
+Plans:
+
+- [ ] TBD (run /gsd-plan-phase 68 to break down)
+
 ### Phase 999.1: Stale video job cleanup service (BACKLOG)
 
 **Goal:** Scheduled task or cron that marks video_generation_jobs stuck in queued/analyzing/generating_audio/rendering for >30 minutes as 'failed' with a timeout error. Could also notify admin. Triggered by finding a hours-old rendering job during Phase 10 verification.
@@ -2342,7 +2394,7 @@ Plans:
 
 - [ ] Full-corpus graphify run: dispatch ~40+ semantic subagents on src/ + .planning/ + supabase/migrations/; build `graphify-out/graph.json` with EXTRACTED/INFERRED/AMBIGUOUS edges; label communities; produce HTML viz. Estimated cost: ~40 subagents × ~45s = ~10-15 min wall, ~$1-3 token spend. Triggered when Phase 13 planning needs cross-document concept surfacing (e.g. "which phase-12 blocks relate to phase-13 reusable library requirements").
 
-### Phase 999.3: Security hardening pass — CSP, HSTS, frame-ancestors (BACKLOG)
+### Phase 999.3: Security hardening pass — CSP, HSTS, frame-ancestors (BACKLOG — promoted to Phase 68 on 2026-10-24)
 
 **Goal:** Add proper response-header security to sopstart.com:
 
