@@ -12,6 +12,8 @@
 --             recounts inside the transaction.
 --   3. ME-03  member_departments / users_sub_trades reads are tied to the caller's organisation
 --             (the admin arm checked the caller's role but never the row's organisation).
+--   4. LO-04  sop_observation_refs_in_org loses its organisation parameter and answers only for
+--             the caller's own organisation, so it can't be used to probe other tenants.
 
 -- 1. Membership inserts are service-role-only (HI-01) ----------------------------------------
 -- The 00002 policy let any admin or safety manager insert a row with any role, so a safety
@@ -107,3 +109,43 @@ create policy "users_sub_trades_self_read" on public.users_sub_trades
       or public.current_user_role() in ('admin', 'safety_manager')
     )
   );
+
+-- 4. Observation reference check without an organisation parameter (LO-04) ----------------------
+-- The 3-argument definer function took any organisation id, so any signed-in token could ask
+-- "is this user an active member of that organisation, does this SOP belong to it". Execute can't
+-- be revoked: sop_observations_insert_recorder calls it as the inserting user. It now reads the
+-- caller's organisation from the helper, so it only answers about the caller's own site (which the
+-- caller can already read). The policy is the 00057 policy with the 2-argument call; the old
+-- function is dropped after the policy stops depending on it.
+create or replace function public.sop_observation_refs_in_org(p_sop_id uuid, p_worker_id uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select
+    exists (
+      select 1 from public.sops s
+      where s.id = p_sop_id and s.organisation_id = public.current_organisation_id()
+    )
+    and exists (
+      select 1 from public.organisation_members m
+      where m.user_id = p_worker_id
+        and m.organisation_id = public.current_organisation_id()
+        and m.status = 'active'
+    )
+$$;
+
+drop policy if exists sop_observations_insert_recorder on public.sop_observations;
+create policy sop_observations_insert_recorder on public.sop_observations
+  for insert to authenticated
+  with check (
+    organisation_id = public.current_organisation_id()
+    and public.current_user_role() in ('admin', 'safety_manager', 'supervisor')
+    and observed_by = auth.uid()
+    and public.sop_observation_refs_in_org(sop_id, observed_worker_id)
+    and (not is_assessor_override or public.current_user_role() in ('admin', 'safety_manager'))
+  );
+
+drop function if exists public.sop_observation_refs_in_org(uuid, uuid, uuid);

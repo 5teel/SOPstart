@@ -107,3 +107,26 @@ test.describe('ME-01: the last active admin is kept by the database', () => {
     expect(r).toContain("isLastAdminError(error) ? 'There has to be at least one admin.'")
   })
 })
+
+test.describe('LO-04: the observation reference check takes no organisation id', () => {
+  test('00083 defines the 2-argument helper on current_organisation_id(), repoints the policy, drops the 3-argument one', () => {
+    const s = sql()
+    const at = s.search(/create\s+or\s+replace\s+function\s+public\.sop_observation_refs_in_org\s*\(\s*p_sop_id\s+uuid\s*,\s*p_worker_id\s+uuid\s*\)/i)
+    expect(at).toBeGreaterThanOrEqual(0)
+    const rest = s.slice(at)
+    const b = rest.slice(0, rest.indexOf('$$', rest.indexOf('$$') + 2))
+    expect(b).toMatch(/security\s+definer/i)
+    expect(b).toMatch(/set\s+search_path\s*=\s*''/i)
+    expect([...b.matchAll(/public\.current_organisation_id\(\)/gi)].length).toBe(2)
+    expect(b).toMatch(/m\.status\s*=\s*'active'/i)
+    expect(b).not.toMatch(/p_org_id/i)
+
+    const pol = s.slice(s.search(/create\s+policy\s+sop_observations_insert_recorder/i)).split(';')[0].replace(/\s+/g, ' ')
+    expect(pol).toContain('organisation_id = public.current_organisation_id()')
+    expect(pol).toContain('observed_by = auth.uid()')
+    expect(pol).toContain('public.sop_observation_refs_in_org(sop_id, observed_worker_id)')
+    expect(pol).toContain("(not is_assessor_override or public.current_user_role() in ('admin', 'safety_manager'))")
+    expect(s).toMatch(/drop\s+function\s+if\s+exists\s+public\.sop_observation_refs_in_org\s*\(\s*uuid\s*,\s*uuid\s*,\s*uuid\s*\)\s*;/i)
+    expect(s.indexOf('drop function if exists public.sop_observation_refs_in_org')).toBeGreaterThan(s.search(/create\s+policy\s+sop_observations_insert_recorder/i))
+  })
+})
