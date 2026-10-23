@@ -1,6 +1,6 @@
 # ADR-0006: Typography: Inter for reading, Saira for labels
 
-- **Status:** Accepted (its caps-label rule superseded by ADR-0007)
+- **Status:** Accepted (its caps-label rule superseded by ADR-0007; Inter source refined by ADR-0026)
 - **Date:** 2026-10-09
 - **Decided by:** Simon
 - **Supersedes:** none. Refines ADR-0004 rule 8 (one design source in `blueprint-theme.css`); the faces and sizes live there.

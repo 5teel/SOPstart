@@ -1,9 +1,11 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter, Saira_Semi_Condensed } from 'next/font/google'
+import { Saira_Semi_Condensed } from 'next/font/google'
+import localFont from 'next/font/local'
 import { PRODUCT_NAME, PRODUCT_DESCRIPTION } from '@/lib/constants'
 import './globals.css'
 
-const inter = Inter({ subsets: ['latin'], display: 'swap', variable: '--font-inter' })
+// ADR-0026: self-hosted Inter 4.1 (Latin subset) keeps the cv05 / cv08 / zero safety glyphs Google strips.
+const inter = localFont({ src: './fonts/InterVariable.woff2', weight: '100 900', display: 'swap', variable: '--font-inter' })
 const saira = Saira_Semi_Condensed({ weight: ['500', '600', '700', '800'], subsets: ['latin'], display: 'swap', variable: '--font-saira' })
 
 export const metadata: Metadata = {

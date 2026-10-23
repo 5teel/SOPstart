@@ -231,8 +231,8 @@ body[data-theme="paper"] {
   background-image: none;
   color: var(--ink-900);
   font-family: var(--font-reading);
-  /* ADR-0006: tabular digits. The cv05 / cv08 / zero glyphs are stripped from the Google Fonts Inter build (checked on the shipped woff2), so they are not enabled. */
-  font-feature-settings: 'tnum';
+  /* ADR-0006 tabular digits; ADR-0026 safety glyphs: tailed l (cv05), serifed I (cv08), slashed zero. */
+  font-feature-settings: 'tnum', 'cv05', 'cv08', 'zero';
   -webkit-font-smoothing: antialiased;
 }
 

@@ -23,7 +23,8 @@ test.describe('ADR-0006 typography', () => {
 
   test('the app layout loads Inter and Saira Semi Condensed only', () => {
     const layout = read('app', 'layout.tsx')
-    expect(layout).toMatch(/\bInter\(/)
+    expect(layout).toMatch(/localFont\(\{ src: '\.\/fonts\/InterVariable\.woff2'/)
+    expect(layout).not.toMatch(/\bInter\(/)
     expect(layout).toMatch(/Saira_Semi_Condensed\(/)
     expect(layout).toMatch(/--font-inter/)
     expect(layout).toMatch(/--font-saira/)
@@ -40,6 +41,12 @@ test.describe('ADR-0006 typography', () => {
   test('Inter turns on tabular digits', () => {
     const theme = read('styles', 'blueprint-theme.css')
     expect(theme).toMatch(/font-feature-settings:\s*'tnum'/)
+  })
+
+  test('ADR-0026: self-hosted Inter carries and turns on the safety glyphs', () => {
+    const theme = read('styles', 'blueprint-theme.css')
+    expect(theme).toMatch(/font-feature-settings:\s*'tnum', 'cv05', 'cv08', 'zero'/)
+    expect(fs.existsSync(path.join(SRC, 'app', 'fonts', 'InterVariable.woff2'))).toBe(true)
   })
 
   test('micro and meta type tokens meet the 12 px floor', () => {
