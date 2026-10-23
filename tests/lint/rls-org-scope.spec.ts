@@ -179,3 +179,64 @@ test('no SELECT policy set on one table disagrees about org scope', () => {
       `every tenant (migration 00061): ${mixed.join('; ')}`
   ).toEqual([])
 })
+
+/** Every `exists ( … )` subquery in a clause, paren-aware. */
+function existsSubqueries(text: string): string[] {
+  const out: string[] = []
+  for (const m of text.matchAll(/exists\s*\(/gi)) {
+    const start = (m.index ?? 0) + m[0].length - 1
+    let depth = 0
+    for (let i = start; i < text.length; i++) {
+      if (text[i] === '(') depth++
+      else if (text[i] === ')') {
+        depth--
+        if (depth === 0) {
+          out.push(text.slice(start, i + 1))
+          break
+        }
+      }
+    }
+  }
+  return out
+}
+
+/**
+ * 64-REVIEW ME-03: an arm that asks "is the CALLER an admin" (a members-table subquery on the
+ * caller's id and role, with no organisation in it) says nothing about which tenant the ROW
+ * belongs to. Unless the rest of the policy ties the row to an organisation, every tenant's rows
+ * pass. The subquery itself is fine: it runs under the members table's own org-scoped policy.
+ */
+function looseAdminArm(p: Pick<Policy, 'using' | 'check'>): boolean {
+  const text = `${p.using} ${p.check}`
+  const arms = existsSubqueries(text).filter(
+    (s) => /organisation_members/i.test(s) && /\brole\b/i.test(s) && /auth\.uid\(\)/i.test(s) && !/organisation_id/i.test(s),
+  )
+  if (arms.length === 0) return false
+  let rest = text
+  for (const a of arms) rest = rest.replace(a, '')
+  return !/organisation_id/i.test(rest)
+}
+
+test('a caller-is-admin arm never stands without tying the row to the organisation (64-REVIEW ME-03)', () => {
+  const { policies } = livePolicies()
+  const loose = [...policies.values()].filter(looseAdminArm).map((p) => `${p.table}.${p.name} [${p.cmd}]`)
+  expect(
+    loose,
+    `These policies let any admin read every tenant's rows: the admin arm checks the caller's ` +
+      `role but nothing ties the row to current_organisation_id(). Join the row to its ` +
+      `organisation (00048 / 00083 shape): ${loose.join(', ')}`,
+  ).toEqual([])
+})
+
+test('the ME-03 matcher flags the 00035 shape and passes the 00048 shape (not vacuous)', () => {
+  const loose = `member_id = auth.uid() or exists (select 1 from public.organisation_members om
+    where om.user_id = auth.uid() and om.role in ('admin', 'safety_manager'))`
+  const scoped00048 = `member_id = auth.uid() or exists (select 1 from public.organisation_members om
+    join public.organisation_members target on target.organisation_id = om.organisation_id
+    where om.user_id = auth.uid() and om.role in ('admin', 'safety_manager') and target.user_id = sop_access_people.member_id)`
+  const outerScoped = `organisation_id = public.current_organisation_id() and exists (select 1 from public.organisation_members om
+    where om.user_id = auth.uid() and om.role in ('admin', 'safety_manager'))`
+  expect(looseAdminArm({ using: loose, check: '' })).toBe(true)
+  expect(looseAdminArm({ using: scoped00048, check: '' })).toBe(false)
+  expect(looseAdminArm({ using: outerScoped, check: '' })).toBe(false)
+})

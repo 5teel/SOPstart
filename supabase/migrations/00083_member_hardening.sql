@@ -10,6 +10,8 @@
 --   2. ME-01  the last active admin of an organisation can't be suspended, marked as left or
 --             demoted by any path: a BEFORE UPDATE trigger locks the organisation row and
 --             recounts inside the transaction.
+--   3. ME-03  member_departments / users_sub_trades reads are tied to the caller's organisation
+--             (the admin arm checked the caller's role but never the row's organisation).
 
 -- 1. Membership inserts are service-role-only (HI-01) ----------------------------------------
 -- The 00002 policy let any admin or safety manager insert a row with any role, so a safety
@@ -69,3 +71,39 @@ drop trigger if exists organisation_members_keep_admin on public.organisation_me
 create trigger organisation_members_keep_admin
   before update on public.organisation_members
   for each row execute function public.keep_one_active_admin();
+
+-- 3. Junction reads tied to the organisation (ME-03) ----------------------------------------------
+-- Neither table has an organisation_id. The 00035 / 00030 admin arm was "the caller is an admin
+-- or safety manager", true for every row of every tenant (00048 fixed the same shape on
+-- sop_access_people). The organisation predicate now sits outside the own-row / role OR, so
+-- neither arm escapes it (CLAUDE.md: a policy that narrows by auth.uid() ANDs the org helper in).
+-- No recursion: departments_org_read and org_members_can_view_own_org only call the helpers.
+drop policy if exists "member_departments_self_read" on public.member_departments;
+create policy "member_departments_self_read" on public.member_departments
+  for select to authenticated
+  using (
+    exists (
+      select 1 from public.departments d
+      where d.id = member_departments.department_id
+        and d.organisation_id = public.current_organisation_id()
+    )
+    and (
+      member_id = auth.uid()
+      or public.current_user_role() in ('admin', 'safety_manager')
+    )
+  );
+
+drop policy if exists "users_sub_trades_self_read" on public.users_sub_trades;
+create policy "users_sub_trades_self_read" on public.users_sub_trades
+  for select to authenticated
+  using (
+    exists (
+      select 1 from public.organisation_members m
+      where m.user_id = users_sub_trades.user_id
+        and m.organisation_id = public.current_organisation_id()
+    )
+    and (
+      user_id = auth.uid()
+      or public.current_user_role() in ('admin', 'safety_manager')
+    )
+  );
