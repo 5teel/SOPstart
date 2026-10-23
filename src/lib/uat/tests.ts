@@ -351,6 +351,28 @@ export const UAT_TESTS: UatTest[] = [
   },
 
   {
+    id: 'phase64-leavers',
+    dateAdded: '2026-10-21',
+    category: 'People',
+    title: 'Suspend someone, mark someone as left, and bring them back',
+    status: 'active',
+    summary:
+      'In People you can now suspend a person or mark them as having left, instead of removing them. They are signed out straight away, and their records stay under their name.',
+    tryIt: [
+      'Open People and open a person who is not you.',
+      'Choose Suspend and confirm. You should see a Suspended tag next to their name.',
+      'Choose Reinstate on the same person.',
+      'Choose Has left and confirm, then find them under Former staff at the bottom of People.',
+      'Invite their email address again and check they are back with their old history.',
+    ],
+    links: [{ label: 'People', href: '/?s=people' }],
+    questions: [
+      { id: 'suspend-clear', text: 'Was it clear what Suspend does before you confirmed?' },
+      { id: 'former-find', text: 'Could you find someone who has left?' },
+      { id: 'reinvite-history', text: 'Did inviting them again bring their history back?' },
+    ],
+  },
+  {
     id: 'adr20-people-chart',
     dateAdded: '2026-10-16',
     category: 'People chart',

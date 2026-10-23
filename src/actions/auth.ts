@@ -9,7 +9,6 @@ import { getSessionContext } from '@/lib/auth/session-context'
 import { roleHome } from '@/lib/auth/role-home'
 import { safeNextPath } from '@/lib/auth/next-redirect'
 import { recordDecision } from '@/lib/decisions/record'
-import { deleteOrgMember } from '@/lib/members/remove'
 import { changeMemberState } from '@/lib/members/state'
 import type { TablesInsert, TablesUpdate } from '@/types/database.types'
 import type { AppRole, MemberStatus } from '@/types/auth'
@@ -498,59 +497,6 @@ export async function getTeamMembersWithEmails() {
   }
 
   return { members: result, currentUserId: userId, invited, inviteCode }
-}
-
-// ─────────────────────────────────────────────
-// removeMember — remove a user from the organisation
-// The delete itself is deleteOrgMember: organisation_members has no delete policy.
-// ─────────────────────────────────────────────
-
-export async function removeMember(memberId: string) {
-  const { supabase, userId, role, organisationId } = await getSessionContext()
-  if (!userId) return { error: 'Not authenticated' }
-  if (!role || !['admin', 'safety_manager'].includes(role)) {
-    return { error: 'Admin access required' }
-  }
-  if (!organisationId) return { error: 'No organisation' }
-  if (!z.string().uuid().safeParse(memberId).success) return { error: 'Member not found' }
-
-  // Read the target (and its user id) BEFORE the delete, in the session organisation.
-  const { data: target } = await supabase
-    .from('organisation_members')
-    .select('user_id, role')
-    .eq('id', memberId)
-    .eq('organisation_id', organisationId)
-    .maybeSingle()
-
-  if (!target) return { error: 'Member not found' }
-  if (target.user_id === userId) return { error: 'You cannot remove yourself' }
-  if (target.role === 'admin' && role !== 'admin') {
-    return { error: 'Only an admin can remove an admin.' }
-  }
-
-  // Prevent removing the last admin
-  if (target.role === 'admin') {
-    const { count } = await supabase
-      .from('organisation_members')
-      .select('id', { count: 'exact', head: true })
-      .eq('organisation_id', organisationId)
-      .eq('role', 'admin')
-
-    if ((count ?? 0) <= 1) {
-      return { error: 'There has to be at least one admin.' }
-    }
-  }
-
-  const removed = await deleteOrgMember({ memberId, organisationId })
-  if (removed === 0) return { error: 'Failed to remove member' }
-
-  const rec = await recordDecision({
-    kind: 'member_removed',
-    subject: { kind: 'member', id: target.user_id },
-    summary: 'Removed a person',
-    details: { role: target.role },
-  })
-  return { success: true, logged: rec.ok }
 }
 
 // ─────────────────────────────────────────────

@@ -96,29 +96,7 @@ test.describe('people actions', () => {
     }
   })
 
-  test('removeMember captures the target user id before the row is deleted, then writes member_removed', () => {
-    const b = body('removeMember')
-    expect(b).not.toContain('.delete(')
-    expect(b).toContain('z.string().uuid()')
-    const read1 = b.indexOf("from('organisation_members')")
-    const del = b.indexOf('deleteOrgMember(')
-    expect(read1).toBeGreaterThan(-1)
-    expect(del).toBeGreaterThan(read1)
-    expect(b).toContain('target.user_id === userId')
-    expect(b).toMatch(/target\.role === 'admin' && role !== 'admin'/)
-    expect(b.lastIndexOf('await recordDecision({')).toBeGreaterThan(del)
-    expect(b).toContain("kind: 'member_removed'")
-    expect(b).toMatch(/subject: \{ kind: 'member', id: target\.user_id \}/)
-
-    const helper = strip(read('src/lib/members/remove.ts'))
-    expect(helper).not.toMatch(/['"]use server['"]/)
-    expect(helper).not.toContain('server-only')
-    expect(helper).toContain('export async function deleteOrgMember')
-    expect(helper).toContain('createAdminClient()')
-    expect(helper).toMatch(/\.eq\('id', memberId\)\s*\.eq\('organisation_id', organisationId\)\s*\.select\('id'\)/)
-  })
-
-  test('the three ledger writers (role_change, member_invited, member_removed) are registered in decision-writers.json', () => {
+  test('the three ledger writers (role_change, member_invited, member_suspended/left/reinstated) are registered in decision-writers.json', () => {
     const w = JSON.parse(read('scripts/decision-writers.json'))
     expect(w.tables).toContain('organisation_members')
     const kinds = new Map<string, string>(
@@ -126,11 +104,12 @@ test.describe('people actions', () => {
     )
     expect(kinds.get('src/actions/auth.ts#inviteWorker')).toBe('member_invited')
     expect(kinds.get('src/actions/auth.ts#updateMemberRoleSafe')).toBe('role_change')
-    expect(kinds.get('src/actions/auth.ts#removeMember')).toBe('member_removed')
+    expect(kinds.get('src/actions/members.ts#applyMemberState')).toBe('member_suspended/member_left/member_reinstated')
   })
 
   test('ledger summaries are plain literals and details carry no email', () => {
-    for (const name of ['inviteWorker', 'updateMemberRoleSafe', 'removeMember']) {
+    expect(strip(read('src/actions/members.ts'))).not.toMatch(/details:[^\n]*email/)
+    for (const name of ['inviteWorker', 'updateMemberRoleSafe']) {
       const b = body(name)
       for (const m of b.matchAll(/summary:\s*([^\n]+)/g)) expect(m[1], `${name} summary`).toMatch(/^(?:'[^'$`]*'|"[^"$`]*"),?\s*$/)
       expect(b).not.toMatch(/details:[^\n]*email/)

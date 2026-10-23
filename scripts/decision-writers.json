@@ -40,7 +40,6 @@
   ],
   "extraHooks": [
     { "file": "src/actions/ai-fields.ts", "function": "applyAiWrite", "status": "hook", "anchor": "gateWrite(", "kind": "ai_field_write", "actor": "agent", "plan": 8 },
-    { "file": "src/actions/auth.ts", "function": "removeMember", "status": "hook", "anchor": "deleteOrgMember(", "kind": "member_removed", "plan": 59 },
     { "file": "src/actions/members.ts", "function": "applyMemberState", "status": "hook", "anchor": "changeMemberState(", "kind": "member_suspended/member_left/member_reinstated", "plan": 64 },
     { "file": "src/actions/requests.ts", "function": "answerRequest", "status": "hook", "anchor": "claimOpenRequest(", "kind": "request_accepted/request_declined", "plan": 60 },
     { "file": "src/actions/asks.ts", "function": "askToDoSop", "status": "hook", "anchor": "askToDoSopCore(", "kind": "request_accepted", "plan": 60 },
@@ -62,7 +61,6 @@
     { "file": "src/actions/versioning.ts", "function": "notifyAssignedWorkers", "key": "sop_assignments", "reason": "Housekeeping: re-points existing assignments to the new version when it replaces the old one. The version publish is the decision." },
     { "file": "src/actions/sops.ts", "function": "deleteSop", "key": "sop_assignments", "reason": "Housekeeping: assignments are cleared as part of deleting the SOP itself." },
     { "file": "src/lib/ai-fields/approval.ts", "function": "defaultAdminInsert", "key": "ai_field_proposals", "reason": "gateWrite inserts a proposal, which is a request, not a decision (Phase 60). Its accept/reject is logged in acceptProposal/rejectProposal." },
-    { "file": "src/lib/members/remove.ts", "function": "deleteOrgMember", "key": "organisation_members", "reason": "The service-role delete behind removeMember, which records member_removed after it returns." },
     { "file": "src/actions/auth.ts", "function": "joinWithInviteCode", "key": "organisation_members", "reason": "A person joining with the site's join code; the code the admin handed out is the authorisation, no governance decision is taken here." },
     { "file": "src/actions/auth.ts", "function": "acceptInvite", "key": "organisation_members", "reason": "Completes an invitation already logged as member_invited when it was sent." },
     { "file": "src/lib/requests/core.ts", "function": "insertRequest", "key": "requests", "reason": "Raising a request is a request, not a decision (D-01); its answer is logged in answerRequest." },

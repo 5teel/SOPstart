@@ -21,14 +21,15 @@ test.describe('capability matrix', () => {
       expect(row('Governance queue')).toContain(name)
     }
   })
-  test('Manage team row: invite is admin-only, role change guarded, removal logged (59-05)', () => {
+  test('Manage team row: invite is admin-only, role change guarded, suspend and leave logged (59-05, 64-03)', () => {
     const r = row('Manage team')
     const cells = r.split('|').map((c) => c.trim())
     expect(cells[4]).toBe('✅')
     expect(cells[5]).toContain('⚠')
-    for (const name of ['inviteWorker()', 'updateMemberRoleSafe()', 'removeMember()', 'deleteOrgMember()', 'src/lib/members/remove.ts', 'cannot invite', 'member_removed']) {
+    for (const name of ['inviteWorker()', 'updateMemberRoleSafe()', 'suspendMember()', 'cannot invite', 'member_invited']) {
       expect(r).toContain(name)
     }
+    expect(r).not.toContain('removeMember')
   })
   test('Sign off completion row: self sign-off refused, supervisor scoped to assigned workers (59-06)', () => {
     const r = row('Sign off completion')

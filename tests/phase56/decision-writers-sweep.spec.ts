@@ -50,7 +50,6 @@ const LIVE_WRITERS: string[] = [
   'src/actions/ai-fields.ts#applyAiWrite',
   'src/actions/auth.ts#inviteWorker',
   'src/actions/auth.ts#updateMemberRoleSafe',
-  'src/actions/auth.ts#removeMember',
   'src/actions/members.ts#applyMemberState',
   'src/actions/requests.ts#answerRequest',
   'src/actions/asks.ts#askToDoSop',

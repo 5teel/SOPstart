@@ -392,9 +392,8 @@ export async function listGovernanceQueue(): Promise<
   const sopRows = sops ?? []
   const sopIds = sopRows.map((s) => s.id)
 
-  // Active-member lookup (OWN-03/D28-02) — absence means unowned; removeMember
-  // hard-deletes the organisation_members row, so there is no other
-  // "deactivated" state to model.
+  // Active-member lookup (OWN-03/D28-02) — absence means unowned. Suspended and departed
+  // members keep their row (Phase 64); plan 64-04 narrows this lookup to active people.
   const { data: memberRows } = await supabase
     .from('organisation_members')
     .select('user_id')
