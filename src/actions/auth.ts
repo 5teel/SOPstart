@@ -292,6 +292,17 @@ export async function inviteWorker(formData: {
       return { error: inviteError.message ?? 'Failed to send invite. Please try again.' }
     }
     subjectId = invited?.user?.id ?? null
+    // acceptInvite reads the invite from app_metadata, which only the service role can write
+    // (user_metadata above is user-writable, so it is display only). 64-REVIEW HI-01.
+    const { error: metaError } = subjectId
+      ? await admin.auth.admin.updateUserById(subjectId, {
+          app_metadata: { invite_org_id: organisationId, invite_role: newRole },
+        })
+      : { error: new Error('invite returned no user') }
+    if (metaError) {
+      console.error('invite app_metadata error:', metaError)
+      return { error: 'Failed to send invite. Please try again.' }
+    }
   }
 
   const rec = await recordDecision({
@@ -334,9 +345,13 @@ export async function acceptInvite(formData: {
 
   const user = verifyData.user
 
-  // Read organisation_id and invited_role from user metadata (set by inviteWorker)
-  const organisationId: string | null = user.user_metadata?.['organisation_id'] ?? null
-  const invitedRole: string = user.user_metadata?.['invited_role'] ?? 'worker'
+  // The invite as inviteWorker recorded it in app_metadata (service-role-only). Never
+  // user_metadata: the invitee can rewrite that, and the insert below runs as the service role.
+  const invite = user.app_metadata ?? {}
+  const organisationId: string | null =
+    typeof invite['invite_org_id'] === 'string' ? (invite['invite_org_id'] as string) : null
+  const roleParse = updateRoleSchema.shape.role.safeParse(invite['invite_role'])
+  const invitedRole: AppRole = roleParse.success ? roleParse.data : 'worker'
 
   if (!organisationId) {
     return { error: 'Invite is missing organisation details. Please ask your admin to send a new invite.' }
@@ -351,31 +366,31 @@ export async function acceptInvite(formData: {
     return { error: 'Failed to set password. Please try again.' }
   }
 
-  // Insert into organisation_members. 23505 = already a member (an admin added
-  // the account meanwhile, or this is a retry): that is the state we want.
-  const inviteInsert: TablesInsert<'organisation_members'> = {
-    organisation_id: organisationId,
-    user_id: user.id,
-    role: invitedRole as TablesInsert<'organisation_members'>['role'],
+  // Membership inserts are service-role-only (00083). A suspended or departed row waits on the
+  // paused page, not the role home (D-08), so its status is read before any insert (LO-03).
+  const admin = createAdminClient()
+  const { data: row } = await admin
+    .from('organisation_members')
+    .select('status')
+    .eq('user_id', user.id)
+    .eq('organisation_id', organisationId)
+    .maybeSingle()
+  if (row && row.status !== 'active') {
+    await supabase.auth.refreshSession()
+    redirect('/pending')
   }
-  const { error: memberError } = await supabase.from('organisation_members').insert(inviteInsert)
 
-  if (memberError && memberError.code !== '23505') {
-    console.error('accept invite member insert error:', memberError)
-    return { error: 'Failed to complete account setup. Please try again.' }
-  }
-
-  // The duplicate may be a suspended or departed row: they wait on the paused page, not the role home.
-  if (memberError) {
-    const { data: row } = await createAdminClient()
-      .from('organisation_members')
-      .select('status')
-      .eq('user_id', user.id)
-      .eq('organisation_id', organisationId)
-      .maybeSingle()
-    if (row && row.status !== 'active') {
-      await supabase.auth.refreshSession()
-      redirect('/pending')
+  if (!row) {
+    // 23505 = an admin added the account meanwhile, or this is a retry: that is the state we want.
+    const inviteInsert: TablesInsert<'organisation_members'> = {
+      organisation_id: organisationId,
+      user_id: user.id,
+      role: invitedRole,
+    }
+    const { error: memberError } = await admin.from('organisation_members').insert(inviteInsert)
+    if (memberError && memberError.code !== '23505') {
+      console.error('accept invite member insert error:', memberError)
+      return { error: 'Failed to complete account setup. Please try again.' }
     }
   }
 
