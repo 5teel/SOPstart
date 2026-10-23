@@ -55,7 +55,7 @@ A change is not done until these match it, in the same commit:
 1. **Routes / flows** → `src/lib/journeys/journeys.ts` (`/pathways` "All screens" must show 0 not-mapped). Worth team review → also `src/lib/uat/tests.ts`.
 2. **RLS policy, `require*` guard or role check** → `.planning/codebase/CAPABILITY-MATRIX.md`.
 3. **Structural decision** → new ADR.
-4. GSD plan-phase adds these as explicit tasks; code-review / verify-work confirm them.
+4. Phase plans (`.planning/phases/<n>-<slug>/PLAN.md`, plain docs; GSD retired 2026-10-24) list these as explicit steps.
 
 ## Commands
 

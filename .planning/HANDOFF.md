@@ -26,8 +26,8 @@ Pick up here in a fresh context. Read CLAUDE.md, docs/adr/README.md (ADR-0024 an
 ## Decided 2026-10-24
 - **Inter is self-hosted** (ADR-0026, `ed072d6f`): Latin subset, 118 KB, `cv05` / `cv08` / `zero` on.
 - **Tool search matches part of a name, in any case** (`a5084877`, migration 00084 applied).
-- **All four security steps are on the roadmap** as Phases 65 (passkeys), 66 (admin MFA and recovery codes), 67 (supervisor-issued recovery) and 68 (security headers, promoted from 999.3). Next: `/gsd-discuss-phase 65` or `/gsd-plan-phase 65`.
+- **All four security steps are on the roadmap** as Phases 65 (passkeys), 66 (admin MFA and recovery codes), 67 (supervisor-issued recovery) and 68 (security headers, promoted from 999.3). Plans written: `.planning/phases/65..68-*/PLAN.md`. Next: build Phase 65.
 
 ## Process notes
-- GSD: the next phase is 65 (Passkeys).
+- **GSD is retired (2026-10-24).** Plans are plain `PLAN.md` files; build directly and keep the project rules (ADRs, same-commit duties, deployed evals). The next phase is 65 (Passkeys).
 - Executors ran sequentially on the main tree; keep doing so for anything that pushes and runs a deployed eval.
