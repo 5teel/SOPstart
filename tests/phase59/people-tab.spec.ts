@@ -97,7 +97,7 @@ test.describe('people tab', () => {
     for (const [file, calls, finals] of [
       ['src/components/office/PeopleTab.tsx', ['inviteWorker(', 'updateMemberRoleSafe(', 'suspendMember(', 'markMemberLeft(', 'reinstateMember(', 'regenerateInviteCode('], ['setInviting(false)', 'setPendingRole(null)', 'setStatePending(false)', 'setReinstating(null)', 'setCodeBusy(false)']],
       ['src/components/focus/admin/ThisSopBlock.tsx', ['confirmSopCurrent('], ['setMarking(false)']],
-      ['src/components/admin/governance/OwnerPicker.tsx', ['getOrgMembers(', 'setSopOwner('], ['setLoading(false)', 'setSaving(false)']],
+      ['src/components/admin/governance/OwnerPicker.tsx', ['getOrgMembers(', 'setSopOwner(', 'assign('], ['setLoading(false)', 'setSaving(false)']],
     ] as const) {
       const src = strip(read(file))
       expect(src, file).toContain(FAILED)

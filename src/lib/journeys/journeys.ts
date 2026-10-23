@@ -530,6 +530,7 @@ export const JOURNEYS: Journey[] = [
       { id: 'grid', type: 'screen', label: 'Who can do what', route: '/', detail: 'The same people as a grid: departments, signs off work, assigns SOPs, approves SOPs (by category), publishes, manages people.' },
       { id: 'sheet', type: 'action', label: 'Open a person', detail: 'The person sheet says in plain words what they can do. An admin changes the role, sets departments (and a department owner), ticks the workers a supervisor signs off, sets an objective, or suspends them or marks them as left (they move to Former staff; Reinstate brings them back, same history).' },
       { id: 'former', type: 'screen', label: 'Former staff', route: '/', detail: 'Below the People views, a folded Former staff list holds everyone marked as left; their records stay under their name and their sheet offers Reinstate.' },
+      { id: 'handover', type: 'screen', label: 'Needs a new owner', route: '/', detail: 'In Sign-offs, the Needs a new owner chip in the Inbox lists what a suspended or departed person was looking after (SOPs, departments, approvals, approval chains, asks, workers with no supervisor); each row is fixed with the owner picker or the usual action.' },
       { id: 'access', type: 'screen', label: 'SOP access', route: '/', detail: 'The SOP access tab: who can see which SOPs, in plain language. See "Choose who sees a SOP".' },
       { id: 'e', type: 'end', label: 'Access configured' },
     ],

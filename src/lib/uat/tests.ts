@@ -364,12 +364,14 @@ export const UAT_TESTS: UatTest[] = [
       'Choose Reinstate on the same person.',
       'Choose Has left and confirm, then find them under Former staff at the bottom of People.',
       'Invite their email address again and check they are back with their old history.',
+      'Mark someone who owns a SOP as left, open Sign-offs, choose Needs a new owner and give the SOP a new owner.',
     ],
     links: [{ label: 'People', href: '/?s=people' }],
     questions: [
       { id: 'suspend-clear', text: 'Was it clear what Suspend does before you confirmed?' },
       { id: 'former-find', text: 'Could you find someone who has left?' },
       { id: 'reinvite-history', text: 'Did inviting them again bring their history back?' },
+      { id: 'handover-see', text: 'Could you see everything the person who left was looking after, and hand it on?' },
     ],
   },
   {

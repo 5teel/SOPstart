@@ -13,15 +13,19 @@
  * (the pane keeps one open at a time). Admin-chunk code: the Office pane is the
  * only importer. No router, no navigation from an effect.
  */
-import { HOME, homeFrom } from '@/lib/shell/home-state'
+import { HOME, formatHome, homeFrom } from '@/lib/shell/home-state'
 import { useEffect, useId, useRef, useState } from 'react'
 import Link from 'next/link'
 import { Loader2 } from 'lucide-react'
 import { confirmSopCurrent } from '@/actions/governance'
+import { reassignApprovalStep } from '@/actions/approvals'
+import { stopAsking } from '@/actions/asks'
+import { setDepartmentOwner } from '@/actions/departments'
 import { requeueParse } from '@/hooks/useParseJob'
 import { OwnerPicker } from '@/components/admin/governance/OwnerPicker'
 import { OwnerReviewMeta } from '@/components/admin/governance/OwnerReviewMeta'
-import type { InboxItem } from '@/lib/governance/inbox'
+import type { OrgMemberWithProfile } from '@/actions/assignments'
+import type { HandoverItem, InboxItem } from '@/lib/governance/inbox'
 import { focusHref } from '@/lib/sop/focus-path'
 import { ApprovePanel } from './ApprovePanel'
 import { SignOffPanel } from './SignOffPanel'
@@ -40,10 +44,15 @@ const CHIP_STYLE: Record<InboxItem['severity'], string> = {
   grey: 'tag',
 }
 
+// Phase 64: the note an admin's Stop asking leaves on an ask to someone who is no longer on the site.
+const STOP_ASK_NOTE = 'This person no longer has access to the site.'
+// A handover row names someone already, so its picker button says Reassign.
+const NAMED = 'named'
+
 const ROW_BUTTON =
   'inline-flex min-h-tap shrink-0 items-center justify-center gap-1.5 self-center rounded-lg border border-ink-300 bg-paper-1 px-3 text-ui font-semibold text-ink-900 hover:border-ink-900 focus-visible:outline-2 focus-visible:outline-accent-step disabled:opacity-60'
 
-type Branch = 'approve' | 'owner' | 'fix' | 'confirm' | 'review' | 'signoff' | 'stuck' | 'machine'
+type Branch = 'approve' | 'owner' | 'fix' | 'confirm' | 'review' | 'signoff' | 'stuck' | 'machine' | 'handover'
 
 function branchOf(item: InboxItem): Branch {
   const g = item.gov
@@ -54,6 +63,7 @@ function branchOf(item: InboxItem): Branch {
     if (g.flags.includes('stale_role')) return 'fix'
     return 'confirm'
   }
+  if (item.kind === 'handover') return 'handover'
   if (item.kind === 'signoff') return 'signoff'
   if (item.kind === 'review') return 'review'
   if (item.kind === 'stuck') return 'stuck'
@@ -69,13 +79,16 @@ const CHIP_WORD: Record<Branch, string> = {
   signoff: 'Sign-off',
   stuck: 'Stuck',
   machine: 'No SOP',
+  handover: 'Needs a new owner',
 }
 
 function detailOf(item: InboxItem, branch: Branch): string {
   const g = item.gov
   switch (branch) {
     case 'owner':
-      return 'Nobody looks after this SOP.'
+      return g?.ownerUserId ? `Owned by ${g.ownerLabel}.` : 'Nobody looks after this SOP.'
+    case 'handover':
+      return item.meta
     case 'fix':
       return 'The role that owned this was removed.'
     case 'approve':
@@ -167,7 +180,8 @@ export function InboxRow({
       return line ?? { receipt: 'Reading it again.', logged: null }
     })
 
-  const sopId = g?.id ?? item.signOff?.sopId ?? item.review?.sopId ?? null
+  const h = item.handover
+  const sopId = g?.id ?? item.signOff?.sopId ?? item.review?.sopId ?? (h && 'sopId' in h ? h.sopId : null)
   const titleHref = sopId ? focusHref(sopId, { from: homeFrom({ ...HOME, s: 'signoffs' }) }) : branch === 'stuck' ? (item.action?.href ?? null) : null
 
   const busyLabel = (label: string) =>
@@ -180,8 +194,82 @@ export function InboxRow({
       label
     )
 
+  const pickHandover = (
+    assign: (picked: OrgMemberWithProfile | null) => Promise<{ logged: boolean } | { error: string }>,
+    h: HandoverItem,
+    receipt: string,
+    eligible?: (m: OrgMemberWithProfile) => boolean,
+  ) => (
+    <OwnerPicker
+      ownerUserId={NAMED}
+      ownerLabel={h.personLabel}
+      triggerTestId="office-row-action"
+      triggerClassName={`${ROW_BUTTON} gap-1.5`}
+      assign={assign}
+      eligible={eligible}
+      allowNone={!eligible}
+      onDone={(r) => onDone({ receipt, logged: r.logged })}
+    />
+  )
+
+  // One button per handover row: a picker, Stop asking, or a link to where the fix lives.
+  const handoverButton = (h: HandoverItem): React.ReactNode => {
+    switch (h.type) {
+      case 'department': {
+        const id = h.departmentId
+        return pickHandover(
+          (picked) => setDepartmentOwner(id, picked?.user_id ?? null).then((r) => ('error' in r ? r : { logged: r.logged })),
+          h,
+          'Department owner set',
+        )
+      }
+      case 'approval_step': {
+        const id = h.sopId
+        return pickHandover(
+          (picked) => (picked ? reassignApprovalStep(id, picked.user_id).then((r) => ('error' in r ? r : { logged: r.logged })) : Promise.resolve({ error: 'Pick someone.' })),
+          h,
+          'Approval handed on',
+          (m) => m.role === 'admin' || m.role === 'safety_manager',
+        )
+      }
+      case 'ask': {
+        const requestId = h.requestId
+        return (
+          <button
+            type="button"
+            data-testid="office-row-action"
+            disabled={pending !== null}
+            onClick={() =>
+              void run('Stopping…', async () => {
+                const result = await stopAsking({ requestId, note: STOP_ASK_NOTE })
+                return 'error' in result ? result.error : { receipt: 'Stopped asking', logged: result.logged }
+              })
+            }
+            className={ROW_BUTTON}
+          >
+            {busyLabel('Stop asking')}
+          </button>
+        )
+      }
+      case 'chain_step':
+        return (
+          <Link data-testid="office-row-action" href="/admin/settings" className={ROW_BUTTON}>
+            Open approval settings
+          </Link>
+        )
+      case 'supervision':
+        return (
+          <Link data-testid="office-row-action" href={formatHome({ ...HOME, s: 'people' })} className={ROW_BUTTON}>
+            Open People
+          </Link>
+        )
+    }
+  }
+
   let button: React.ReactNode
-  if (expandable) {
+  if (branch === 'handover' && h) {
+    button = handoverButton(h)
+  } else if (expandable) {
     button = (
       <button
         ref={buttonRef}
@@ -270,7 +358,7 @@ export function InboxRow({
           )}
           <div className="flex items-center gap-2">
             <span className={CHIP_STYLE[item.severity]}>
-              {CHIP_WORD[branch]}
+              {branch === 'owner' && g?.ownerUserId ? CHIP_WORD.handover : CHIP_WORD[branch]}
             </span>
             {item.age && <span className="mono text-meta text-ink-600">{item.age}</span>}
           </div>

@@ -22,7 +22,7 @@ const ROW = strip(read('src/components/office/InboxRow.tsx'))
 test.describe('inbox row (59-09)', () => {
   test('every branch renders exactly one button element', () => {
     // One `button =` assignment per branch of the if / else chain, each carrying the one test id.
-    const chain = ROW.slice(ROW.indexOf('let button'), ROW.indexOf('return (\n    <li'))
+    const chain = ROW.slice(ROW.indexOf('} else if (expandable) {'),ROW.indexOf('return (\n    <li'))
     const assignments = chain.match(/button = /g) ?? []
     expect(assignments.length).toBeGreaterThanOrEqual(6)
     // A branch yields a <button>, a <Link> or the picker trigger -- never two of them.
@@ -31,6 +31,13 @@ test.describe('inbox row (59-09)', () => {
     expect(chain).toContain('button = null')
     // The row element itself never holds a second action outside `{button}`.
     expect(ROW.match(/\{button\}/g)?.length).toBe(1)
+  })
+
+  test('every handover row renders exactly one button element (64-05)', () => {
+    const fn = ROW.slice(ROW.indexOf('const pickHandover'), ROW.indexOf('let button'))
+    // picker, Stop asking, approval settings link, People link; the picker serves two kinds.
+    expect(fn.match(/data-testid="office-row-action"|triggerTestId="office-row-action"/g)?.length).toBe(4)
+    expect(ROW).toContain('button = handoverButton(h)')
   })
 
   test('the approve-me, unowned, stale-role, confirm precedence is kept (APR-03/04)', () => {
