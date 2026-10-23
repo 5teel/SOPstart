@@ -384,15 +384,18 @@ test.describe('Phase 64 -- leavers and suspended members (deployed)', () => {
       const step = await openPicker(approvalRow)
       await expect(step.row.getByRole('button', { name: B_EMAIL })).toHaveCount(0)
       await shot(page, '64-member-handover-picker')
+      // The caller can't hand the step to themselves and then approve it (64-REVIEW ME-02).
       await step.admin.click()
+      await expect(step.row.getByText('Pick someone other than yourself.')).toBeVisible(SLOW)
+      await expect(approvalRow).toHaveCount(1)
+      await shot(page, '64-member-handover-self-refused')
+      // Another safety manager takes it.
+      const safety = step.row.getByRole('button', { name: new RegExp(EVAL_USERS.siteSafety.split('@')[0]) })
+      await expect(safety.first()).toBeVisible(SLOW)
+      await safety.first().click()
       await expect(receipt).toContainText('Approval handed on' + LEDGER, SLOW)
       await expect(approvalRow).toHaveCount(0, SLOW)
-
-      // The same SOP now waits on the site admin: an Approve row.
       await page.locator('[data-testid="office-chip"][data-chip="all"]').click()
-      const approve = rowOf('governance', APPROVAL_SOP)
-      await expect(approve).toHaveCount(1, SLOW)
-      await expect(approve.getByTestId('office-row-action')).toHaveText('Approve')
       await shot(page, '64-member-handover-done')
 
       // The ledger holds each hand-over.
