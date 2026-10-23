@@ -299,6 +299,17 @@ max_frequency = "5s"
 # enroll_enabled = true
 # verify_enabled = true
 
+# Phase 65 / ADR-0027: passkey sign-in (aal1, same as a password). Mirrors the live project,
+# set through the Management API. The RP ID must never change: every passkey is bound to it.
+# Supabase rejects origins outside the RP ID, so localhost cannot sign in with a passkey.
+[auth.passkey]
+enabled = true
+
+[auth.webauthn]
+rp_id = "sopstart.com"
+rp_display_name = "SOPstart"
+rp_origins = ["https://sopstart.com"]
+
 # Use an external OAuth provider. The full list of providers are: `apple`, `azure`, `bitbucket`,
 # `discord`, `facebook`, `github`, `gitlab`, `google`, `keycloak`, `linkedin_oidc`, `notion`, `twitch`,
 # `twitter`, `x`, `slack`, `spotify`, `workos`, `zoom`.
