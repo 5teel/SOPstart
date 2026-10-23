@@ -353,8 +353,8 @@ function AuthorityGrid({
   const TD = 'border-b border-ink-100 px-3 py-3 align-top text-ui'
   return (
     <div className="flex flex-col gap-3">
-      {/* relative: the sr-only labels are absolute and would otherwise escape the scroll box and widen the page */}
-      <div className="relative overflow-x-auto">
+      {/* relative: the sr-only labels are absolute and would otherwise escape the scroll box and widen the page; isolate keeps the sticky column's z-10 under the tab group */}
+      <div className="relative isolate overflow-x-auto">
         <table data-testid="people-grid" className="w-full min-w-200 border-collapse">
           <thead>
             <tr>

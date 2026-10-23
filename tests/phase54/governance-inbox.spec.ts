@@ -202,8 +202,8 @@ test.describe('deriveInbox', () => {
     expect(items).toEqual([])
   })
 
-  test('INBOX_CHIPS carries all seven chip keys in order', () => {
-    expect(INBOX_CHIPS.map((c) => c.key)).toEqual(['all', 'owner', 'overdue', 'approve', 'signoff', 'stuck'])
+  test('INBOX_CHIPS carries every chip key in order (handover joined in 64-05)', () => {
+    expect(INBOX_CHIPS.map((c) => c.key)).toEqual(['all', 'owner', 'handover', 'overdue', 'approve', 'signoff', 'stuck'])
   })
 })
 

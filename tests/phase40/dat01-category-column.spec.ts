@@ -151,6 +151,9 @@ interface CategoryExemptEntry {
 // identical fingerprint in the same file share one entry (e.g. the four
 // `source_file_path`-only finalize writes across the upload-session creators).
 const CATEGORY_EXEMPT: CategoryExemptEntry[] = [
+  { file: 'src/actions/approvals.ts', keys: 'approval_snapshot', reason: 'Phase 64-05 reassignApprovalStep rewrites the pending step holder in the approval snapshot; not a category-bearing write.' },
+  { file: 'src/actions/sops.ts', keys: 'clear_approved_at,clear_approved_by', reason: 'ADR-0015 clear-version approval stamp; not a category-bearing write.' },
+  { file: 'src/lib/parsers/enhance-sop.ts', keys: 'clear_approved_at,clear_approved_by,clear_version', reason: 'ADR-0015 regenerated clear version resets its approval stamp; not a category-bearing write.' },
   { file: 'src/actions/approvals.ts', keys: 'approval_state', reason: 'Approval-chain state stamp; not a category-bearing write.' },
   { file: 'src/actions/departments.ts', keys: 'organisation_id', reason: 'Repairs a SOP row’s organisation_id; not a category-bearing write.' },
   { file: 'src/actions/departments.ts', keys: 'all_departments', reason: 'Toggles the all-departments grant flag; not a category-bearing write.' },
@@ -205,7 +208,9 @@ const CATEGORY_EXEMPT: CategoryExemptEntry[] = [
 // the objective now lives in the objectives table.
 // 2026-10-11: 40 -> 39. ADR-0008 deleted triggerParse from src/actions/sops.ts (an
 // uncalled status-only flip); no remaining path lost category_slug.
-const EXPECTED_SOPS_WRITE_SITE_COUNT = 39
+// 2026-10-24: 39 -> 42. Three exempt, classified sites: ADR-0015 clear-version approval stamps
+// (src/actions/sops.ts, enhance-sop.ts) and Phase 64-05 reassignApprovalStep (approval_snapshot).
+const EXPECTED_SOPS_WRITE_SITE_COUNT = 42
 
 // Extracts the substring between a `(` at `openIdx` and its matching `)`,
 // tracking paren depth so nested calls/objects don't truncate the payload.

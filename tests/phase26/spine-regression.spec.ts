@@ -62,9 +62,11 @@ test.describe('R8 — frozen spine regression (post-block-model retirement)', ()
   //     no UPDATE/DELETE (legal evidence). Tripwire on the action source.
   test('worker completion records remain append-only', () => {
     const src = read('src/actions/completions.ts')
-    expect(src, 'sop_completions must be written via insert').toMatch(
-      /from\('sop_completions'\)\s*\.insert\(/,
+    // Since 2026-10-15 (perf(run)) the record is written by the complete_walk RPC, one transaction; no UPDATE of a record's content, no DELETE.
+    expect(src, 'sop_completions must be written via insert or the complete_walk RPC').toMatch(
+      /from\('sop_completions'\)\s*\.insert\(|\.rpc\('complete_walk'/,
     )
+    expect(src, 'no completion is ever deleted').not.toMatch(/from\('sop_completions'\)\s*\.delete\(/)
     expect(src, 'sign-off chain is documented append-only').toContain('append-only')
   })
 })
