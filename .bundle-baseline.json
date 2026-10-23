@@ -96,10 +96,16 @@
       "value": 831,
       "capturedAt": "2026-10-12T00:00:00.000Z",
       "note": "Raised 831 -> 834 by hand, signed off by Simon 2026-10-12 (ROADMAP 'Decisions: bundle baseline'). Diffed against a build of the parent commit 968c47a9: the site picker (2026-10-11) took /page to 833 KB, and ADR-0010's area tree (areas.ts, the list's tree filter and grouping) adds ~0.8 KB to the home's own chunk, measured 853,490 bytes = 833 KB after trimming."
+    },
+    {
+      "route": "/sops/[sopId]/page + /page",
+      "value": 802,
+      "capturedAt": "2026-10-24T00:00:00.000Z",
+      "note": "Phase 65 (orchestrator decision, delegated by Simon 2026-10-24): @supabase/supabase-js pinned 2.100.0 -> 2.118.0 for passkeys (ADR-0027). Summed-file diff against a 2.100.0 build of the same tree: the shared Supabase chunk 222,321 B became two shared chunks of 190,413 + 67,465 B (+35,557 B), webpack runtime +52 B, page chunks +4 to +9 B; nothing else moved. Measured on 2.100.0: /sops/[sopId]/page 803, /page 832; on 2.118.0: 838 and 867. Raised UP by hand by the measured +35 KB: /sops/[sopId]/page 802 -> 837, /page 834 -> 869. 2.105.0 (oldest with passkeys) measured +16 KB; rejected because the experimental API is pinned against a moving Supabase server and 2.118 carries security fixes."
     }
   ],
   "routes": {
-    "/sops/[sopId]/page": 802,
-    "/page": 834
+    "/sops/[sopId]/page": 837,
+    "/page": 869
   }
 }

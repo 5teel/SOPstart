@@ -1207,6 +1207,7 @@ export type Database = {
           source_file_name: string
           source_file_path: string
           source_file_type: string
+          source_type: string
           status: Database["public"]["Enums"]["sop_status"]
           superseded_by: string | null
           title: string | null
@@ -1251,6 +1252,7 @@ export type Database = {
           source_file_name: string
           source_file_path: string
           source_file_type: string
+          source_type?: string
           status?: Database["public"]["Enums"]["sop_status"]
           superseded_by?: string | null
           title?: string | null
@@ -1295,6 +1297,7 @@ export type Database = {
           source_file_name?: string
           source_file_path?: string
           source_file_type?: string
+          source_type?: string
           status?: Database["public"]["Enums"]["sop_status"]
           superseded_by?: string | null
           title?: string | null

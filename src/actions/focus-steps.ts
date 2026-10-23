@@ -27,6 +27,7 @@ import { loadFocusSop, type FocusSop } from '@/lib/sop/focus-read'
 import { editableSop } from '@/lib/sop/editable'
 import { createAdminClient } from '@/lib/supabase/admin'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import type { TablesUpdate } from '@/types/database.types'
 
 const uuid = z.string().uuid()
 const KINDS = ['hazard', 'ppe', 'step', 'check'] as const
@@ -122,7 +123,7 @@ export async function updateFocusStep(input: {
   const open = await editableSop(ctx.organisationId, ctx.sopId)
   if ('error' in open) return open
 
-  const row: Record<string, unknown> = {}
+  const row: TablesUpdate<'sop_focus_steps'> = {}
   if (patch.text !== undefined) row.text = patch.text
   if (patch.kind !== undefined) row.kind = patch.kind
   if (patch.tip !== undefined) row.tip = patch.tip === null || patch.tip === '' ? null : patch.tip
