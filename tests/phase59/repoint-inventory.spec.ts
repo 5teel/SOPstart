@@ -51,7 +51,8 @@ export const RETIRED: Retired[] = [
   ...[
     'GovernanceInbox', 'GovernanceQueueRow', 'gov-inbox', 'gov-clear', 'gov-chip', 'gov-row',
     'TeamViewShell', 'OrgChartCanvas', 'OrgColumnsBoard', 'RoleAssignmentTable', 'ViewToggle',
-    'createRole', 'assignRoleMembers',
+    // createRole came back with ADR-0021 (job roles, 63), so it is no longer a retired token
+    'assignRoleMembers',
     // governance page, slash and path.join spellings
     'governance/page.tsx', "'governance', 'page.tsx'",
     // team page, slash and path.join spellings

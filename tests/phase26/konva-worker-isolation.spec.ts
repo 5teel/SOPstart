@@ -19,9 +19,8 @@
  * Phase 52 (52 D-02): src/components/sop/plant/ is a WORKER-facing surface --
  * deny-listed for Konva/SiteEditor the same as any other
  * non-admin directory. It is not in ALLOWED_DIRS, so the deny-by-default
- * checks above already cover it; the test below makes that explicit for the
- * plant directory specifically (both static AND dynamic references), so a
- * future rename of ALLOWED_DIRS can't silently widen it.
+ * checks above cover it (the directory never landed; its own self-skipping
+ * case was deleted in 64-06).
  *
  * Registered under the `phase26` Playwright project (playwright.config.ts,
  * testMatch tests/phase26/**). CLAUDE.md 2026-05-25: a spec in no project
@@ -112,38 +111,6 @@ test('D-03: no static import of react-konva outside admin/site/', () => {
     )
   }
   expect(violations).toEqual([])
-})
-
-test('52 D-02: nothing under src/components/sop/plant/ references konva, react-konva, SiteEditor or SiteEditorLoader -- static OR dynamic', () => {
-  const plantDir = path.join(SRC_DIR, 'components', 'sop', 'plant')
-  if (!fs.existsSync(plantDir)) {
-    test.skip(true, 'src/components/sop/plant/ does not exist yet (lands in Plan 52-02)')
-    return
-  }
-  const files: string[] = []
-  walk(plantDir, files)
-  const banned = /konva|SiteEditor/
-  const violations: Hit[] = []
-  for (const file of files) {
-    const rel = path.relative(REPO_ROOT, file).replace(/\\/g, '/')
-    const text = fs.readFileSync(file, 'utf-8')
-    const lines = text.split(/\r?\n/)
-    for (let i = 0; i < lines.length; i++) {
-      if (banned.test(lines[i])) violations.push({ file: rel, line: i + 1, text: lines[i].trim() })
-    }
-  }
-  if (violations.length > 0) {
-    console.error(
-      'src/components/sop/plant/ Konva/SiteEditor reference violations:\n' +
-        violations.map((v) => `  ${v.file}:${v.line}  ${v.text}`).join('\n')
-    )
-  }
-  expect(violations).toEqual([])
-
-  expect(
-    ALLOWED_DIRS.some((dir) => dir.startsWith('src/components/sop/plant')),
-    'ALLOWED_DIRS must never include the plant directory'
-  ).toBe(false)
 })
 
 test('T-51-02: no direct SiteEditor import anywhere except SiteEditorLoader', () => {

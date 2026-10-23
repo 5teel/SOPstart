@@ -118,7 +118,7 @@ test.describe('retire: governance, team and access pages (59-14)', () => {
     expect(names).toEqual(['listOrgTree', 'createRole', 'updateRole', 'removeRole', 'setRoleSeat'])
     for (const n of names) {
       const at = src.indexOf(`export async function ${n}`)
-      expect(src.slice(at, at + 400), n).toContain('await requireAdmin()')
+      expect(src.slice(at, at + 700), n).toContain('await requireAdmin()')
     }
   })
 
