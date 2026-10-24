@@ -1722,7 +1722,7 @@ Executes 55 → 56 → 57 → 58 → 59 → 60 → 61 → 62, strictly sequentia
 - [x] **Phase 65: Passkeys** - People sign in with a passkey (Face ID, fingerprint or the phone's screen lock) instead of typing a password (completed 2026-10-24)
 - [x] **Phase 66: Admin MFA and Recovery Codes** - Admins and safety managers prove a second factor (an authenticator app; WebAuthn MFA is refused by the hosted project) before any admin action: the session must be aal2, enforced in the `require*` guards and in RLS for elevated writes (completed 2026-10-24)
 - [x] **Phase 67: Supervisor-issued Recovery** - A worker who has lost their phone or email access gets back in through their supervisor or an admin, in person: a short-lived, single-use recovery code issued from People, bound to that person, logged to the ledger
-- [ ] **Phase 68: Security Headers** - sopstart.com sends Content-Security-Policy (self, Supabase REST/Realtime/Storage, the AI providers the browser actually calls), HSTS with preload, frame-ancestors 'none', nosniff, a strict Referrer-Policy and a Permissions-Policy
+- [x] **Phase 68: Security Headers** - sopstart.com sends Content-Security-Policy (self, Supabase REST/Realtime/Storage, the AI providers the browser actually calls), HSTS with preload, frame-ancestors 'none', nosniff, a strict Referrer-Policy and a Permissions-Policy
 
 ### Phase 55: Cut the Dropped Features & One Organisation
 
@@ -2370,7 +2370,7 @@ Plans:
 
 Plans:
 
-- [ ] TBD (run /gsd-plan-phase 68 to break down)
+- [x] PLAN.md — nonce CSP in the proxy, static headers in next.config (ADR-0030); shipped 2026-10-24, see the Outcome in `.planning/phases/68-security-headers/PLAN.md`
 
 ## Backlog
 
@@ -2394,7 +2394,7 @@ Plans:
 
 - [ ] Full-corpus graphify run: dispatch ~40+ semantic subagents on src/ + .planning/ + supabase/migrations/; build `graphify-out/graph.json` with EXTRACTED/INFERRED/AMBIGUOUS edges; label communities; produce HTML viz. Estimated cost: ~40 subagents × ~45s = ~10-15 min wall, ~$1-3 token spend. Triggered when Phase 13 planning needs cross-document concept surfacing (e.g. "which phase-12 blocks relate to phase-13 reusable library requirements").
 
-### Phase 999.3: Security hardening pass — CSP, HSTS, frame-ancestors (BACKLOG — promoted to Phase 68 on 2026-10-24)
+### Phase 999.3: Security hardening pass — CSP, HSTS, frame-ancestors (BACKLOG — promoted to Phase 68 on 2026-10-24; DONE by Phase 68, 2026-10-24)
 
 **Goal:** Add proper response-header security to sopstart.com:
 

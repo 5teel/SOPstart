@@ -88,6 +88,7 @@ Distilled rules below. **Full dated log with the stories: `docs/LEARNINGS.md` â€
 - Header-authed routes need a middleware exemption. Windows-only or binary-postinstall deps go in `optionalDependencies`.
 - Redirects belong in the proxy or a server component, never a client effect + `router.replace` (Next 16.2.1 orphans in-flight server actions).
 - Never derive first render from `navigator` / `window` / `Date.now()`.
+- The CSP is enforced (ADR-0030): no eval anywhere in the browser (Zod runs jitless from `src/instrumentation-client.ts`); a new browser-side host means widening `buildCsp()` with a new ADR.
 
 **UI**
 - Undefined CSS tokens, unloaded fonts and inert `@theme` blocks fail silently: look at deployed screenshots, check `document.fonts` (first family only), grep compiled CSS.
