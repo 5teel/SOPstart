@@ -6,8 +6,9 @@ import { legacyRedirectFor } from '@/lib/sop/focus-path'
 import { legacyPathRedirect } from '@/lib/shell/home-state'
 import { needsSecondStep, verifyHref } from '@/lib/auth/elevated'
 
-export async function updateSession(request: NextRequest) {
-  let response = NextResponse.next({ request })
+// requestHeaders: the proxy passes a copy carrying the CSP (Phase 68), so Next reads the nonce.
+export async function updateSession(request: NextRequest, requestHeaders: Headers = request.headers) {
+  let response = NextResponse.next({ request: { headers: requestHeaders } })
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
@@ -42,9 +43,11 @@ export async function updateSession(request: NextRequest) {
   // The kill-switch worker must reach signed-out browsers: a redirected
   // service-worker script fails the update check and the old worker stays.
   const isServiceWorkerScript = path === '/sw.js'
+  // Phase 68 / ADR-0030: browsers post CSP violation reports with no session.
+  const isCspReport = path === '/api/csp-report'
   // The signed-out homepage and its privacy and terms pages: static content, no tenant data.
   const isPublicPage = path === '/welcome' || path === '/privacy' || path === '/terms'
-  const isPublicRoute = path === '/' || isPublicPage || isAuthRoute || isSchemaIntrospection || isVersionRoute || isServiceWorkerScript
+  const isPublicRoute = path === '/' || isPublicPage || isAuthRoute || isSchemaIntrospection || isVersionRoute || isServiceWorkerScript || isCspReport
 
   if (!isPublicRoute && !claims) {
     // Phase 53 PHN-02: preserve the requested path (e.g. a scanned /m/<code>

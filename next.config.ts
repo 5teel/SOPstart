@@ -48,6 +48,27 @@ const nextConfig: NextConfig = {
    * mapping. Destinations are fixed strings, never built from request
    * input (T-43-02).
    */
+  /**
+   * Phase 68 / ADR-0030 (D-03): static security headers on every path. The CSP is per request (nonce), so it
+   * lives in src/proxy.ts. includeSubDomains: every *.sopstart.com host serves HTTPS (checked 2026-10-24:
+   * only www, which Cloudflare redirects to the apex over HTTPS). Preload submission is Simon's step.
+   */
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          // camera: step photos and video SOPs; microphone: the video SOP recorder records sound (admin upload).
+          { key: 'Permissions-Policy', value: 'camera=(self), microphone=(self), geolocation=(), payment=(), usb=(), serial=(), interest-cohort=()' },
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
+        ],
+      },
+    ]
+  },
   async redirects() {
     return [
       {

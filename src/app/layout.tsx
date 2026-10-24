@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Saira_Semi_Condensed } from 'next/font/google'
 import localFont from 'next/font/local'
+import { connection } from 'next/server'
 import { PRODUCT_NAME, PRODUCT_DESCRIPTION } from '@/lib/constants'
 import './globals.css'
 
@@ -24,11 +25,14 @@ export const viewport: Viewport = {
   viewportFit: 'cover',
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  // Phase 68 / ADR-0030: every page renders per request so its scripts carry that request's CSP nonce
+  // (a prerendered page would ship without one, or with a stale one).
+  await connection()
   return (
     <html lang="en" className={`${inter.variable} ${saira.variable}`}>
       <body data-theme="paper">
