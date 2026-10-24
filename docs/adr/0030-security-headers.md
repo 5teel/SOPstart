@@ -3,7 +3,7 @@
 - **Status:** Accepted
 - **Date:** 2026-10-24
 - **Decided by:** Simon (Phase 68 plan, 2026-10-24); the calls marked "Claude's call" are overturnable at review
-- **Enforced by:** `tests/lint/security-headers.spec.ts` · `tests/evals/security-headers.eval.ts`
+- **Enforced by:** `src/instrumentation-client.ts`, `tests/lint/security-headers.spec.ts` · `tests/evals/security-headers.eval.ts`
 
 ## Context
 sopstart.com sent no security headers. A Content-Security-Policy stops injected scripts and framing; HSTS stops downgrade
@@ -40,6 +40,9 @@ signed URLs). AI calls run on the server. Fonts are self-hosted (ADR-0026; `next
 - *Claude's call:* no CSP under `next dev`: its webpack runtime evaluates code, which production never allows.
 - *Claude's call:* the plan had the root layout read an `x-nonce` header. Nothing in the app renders its own script, so the
   layout only needs to be dynamic; Next takes the nonce from the CSP request header.
+- Zod 4 probes for eval (`new Function('')`) whenever an object schema is defined, which the Report-Only run reported on
+  every page. `src/instrumentation-client.ts` sets Zod's jitless mode before the app's code, so the probe never runs. It
+  imports Zod's `core.js` file directly: the `zod/v4/core` entry put all of Zod (+86 KB) into every page's first chunk.
 - HSTS `includeSubDomains` is safe because every `*.sopstart.com` host serves HTTPS (2026-10-24: only `www`, which
   Cloudflare redirects to the apex). A new subdomain must serve HTTPS from day one.
 - HSTS preload submission (hstspreload.org) is Simon's step after a clean week; it is close to permanent.

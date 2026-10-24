@@ -3,7 +3,8 @@
  * Next reads the nonce from the request's CSP header and tags its own scripts with it.
  * The Supabase host comes from NEXT_PUBLIC_SUPABASE_URL (REST, Auth, Realtime, Storage signed URLs).
  */
-export const CSP_HEADER = 'Content-Security-Policy-Report-Only'
+// Enforced since the second Phase 68 deploy; the Report-Only run's only violation was Zod's eval probe (src/instrumentation-client.ts).
+export const CSP_HEADER = 'Content-Security-Policy'
 
 export function buildCsp(nonce: string, supabaseUrl: string): string {
   const host = new URL(supabaseUrl).host

@@ -39,7 +39,8 @@ test.describe('ADR-0030: security headers', () => {
     expect(proxy).toContain('response.headers.set(CSP_HEADER, csp)')
     expect(proxy).toContain('crypto.randomUUID()')
     expect(proxy).toMatch(/matcher: \[[^\n]*_next\/static[^\n]*sw\\\.js[^\n]*webmanifest[^\n]*woff2/)
-    expect(CSP_HEADER).toMatch(/^Content-Security-Policy(-Report-Only)?$/)
+    expect(CSP_HEADER).toBe('Content-Security-Policy')
+    expect(read('src/instrumentation-client.ts')).toContain('config({ jitless: true })')
   })
 
   test('every page renders per request, so no page ships a stale nonce', () => {
