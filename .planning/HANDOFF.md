@@ -21,7 +21,7 @@ The last full deployed eval run passed 143 of 143 with the enforced CSP.
 
 ## Simon's steps
 - **Simon and Joe:** on your next admin visit, set up an authenticator app and save your ten recovery codes.
-- **HSTS preload:** after a clean week on sopstart.com (from 2026-10-31), submit it at hstspreload.org. This is close to permanent.
+- **HSTS preload:** submitted 2026-10-24 at Simon's call (the site has no production users yet, so any breakage marks the cause). Check its status at hstspreload.org; it should read "pending", then "preloaded".
 - **Any new `*.sopstart.com` subdomain** must serve HTTPS from day one, because HSTS covers subdomains.
 
 ## Follow-ups (no decision needed)
