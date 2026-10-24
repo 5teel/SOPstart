@@ -1,33 +1,56 @@
-# Handoff — 2026-10-24 (end of the Phase 64 session)
+# Handoff — 2026-10-24 (end of the Phases 65–68 session)
 
-Pick up here in a fresh context. Read CLAUDE.md, docs/adr/README.md (ADR-0024 and 0025 are new), and this file. Master is at the "docs(handoff)" commit or later; Fly.io deploys from master.
+Pick up here in a fresh context. Read CLAUDE.md, docs/adr/README.md (ADR-0027 to 0030 are new), and this file. Fly.io deploys from master.
 
 ## Where things stand
 
 ### Shipped and live on sopstart.com
-- **Phase 64 — Leavers and suspended members** (6 plans, `.planning/phases/64-leavers-and-suspended-members/`). A membership is `active` | `suspended` | `left`, and memberships are never deleted (ADR-0024). Suspend / Has left sign the person out and RLS re-checks the membership row on every request. People has Suspend / Has left / Reinstate and a folded Former staff group. The Sign-offs inbox has a "Needs a new owner" chip, and `reassignApprovalStep` hands over a stuck approval. Verification passed 13 of 13 (`64-VERIFICATION.md`), the deployed eval is in `64-EVAL.md`, and migrations 00082 and 00083 are live with assertions (`scripts/apply-phase64-migration.mjs`, `apply-phase64b-migration.mjs --assert-only`).
-- **Code-review hardening** (`64-REVIEW.md`, all 11 findings closed, ADR-0025):
-  - Signed-in users can no longer insert or delete `organisation_members`. Invites live in `app_metadata`, and `acceptInvite` inserts with the service role.
-  - A per-org trigger (`keep_one_active_admin`) keeps at least one active admin.
-  - Admin reads of `member_departments` / `users_sub_trades` are now scoped to the caller's org.
-  - Approval reassign refuses self and earlier approvers.
-- **`2411dc67`**: `assignMemberDepartments` no longer deletes a member's department rows in other orgs.
+Each phase's `PLAN.md` has an Outcome section with commits, checks, deviations and follow-ups.
 
-## Small follow-ups (no decision needed)
-- **Missing invite data:** an invite sent in the few minutes between migration 00083 and its deploy (2026-10-23) has no `app_metadata` invite; the invitee needs a re-send.
-- **Reassign picker:** it still lists the signed-in admin; choosing yourself shows the refusal. Hide self by passing the user id into `InboxRow`.
-- **Supervises picker:** an admin can't untick an already-linked suspended worker (from 64-05).
-- **Chart screenshot:** the chart-view eval shot cuts off before the Suspended tag (grid, phone and sheet shots show it).
-- **Rate-limited probe:** `tests/phase46` `IMAGES NEGATIVE` live probe was OTP rate-limited. Re-run it once in a quiet window.
-- **Bundle baseline:** `/page` has sat at 831 against an 834 baseline since 64-01. Lowering the baseline is an orchestrator call (diff the chunk list first; never re-capture blindly).
-- **TRUNCATE grant:** authenticated still holds Supabase's default TRUNCATE on `organisation_members`. REST can't reach it, but a revoke would tidy it.
-- **Traceability table:** `REQUIREMENTS.md` has 119 IDs missing from it (gsd-tools warning). It's bookkeeping only.
+| Phase | What | ADR | Migration | Eval |
+|---|---|---|---|---|
+| 64 Leavers and suspended members | active / suspended / left; RLS re-checks membership | 0024, 0025 | 00082, 00083 | `people.eval.ts` |
+| 65 Passkeys | Add / rename / remove on Profile; sign in with a passkey; RP ID `sopstart.com` (never change it) | 0027 | 00085 | `passkeys.eval.ts` |
+| 66 Admin MFA and recovery codes | Admins and safety managers need aal2 (TOTP) for admin screens and writes, in the app and in 48 RLS write policies; 10 recovery codes; People "Reset sign-in steps" | 0028 | 00086, 00087 | `mfa.eval.ts` |
+| 67 Supervisor-issued recovery | "Give a sign-in code" (People, or "Your workers" under the supervisor's Sign-offs inbox); 30 min, single use, 5 tries; forces a new password | 0029 | 00088 | `signin-code.eval.ts` |
+| 68 Security headers | Enforced nonce CSP (proxy), HSTS with preload, nosniff, frame DENY, COOP, Permissions-Policy; `/api/csp-report`; securityheaders.com A+ | 0030 | — | `security-headers.eval.ts` |
 
-## Decided 2026-10-24
-- **Inter is self-hosted** (ADR-0026, `ed072d6f`): Latin subset, 118 KB, `cv05` / `cv08` / `zero` on.
-- **Tool search matches part of a name, in any case** (`a5084877`, migration 00084 applied).
-- **All four security steps are on the roadmap** as Phases 65 (passkeys), 66 (admin MFA and recovery codes), 67 (supervisor-issued recovery) and 68 (security headers, promoted from 999.3). Plans written: `.planning/phases/65..68-*/PLAN.md`. Next: build Phase 65.
+Also live today: self-hosted Inter (ADR-0026), and tool search now matches part of a tool name in any case (migration 00084).
+
+The last full deployed eval run passed 143 of 143 with the enforced CSP.
+
+## Simon's steps
+- **Simon and Joe:** on your next admin visit, set up an authenticator app and save your ten recovery codes.
+- **HSTS preload:** after a clean week on sopstart.com (from 2026-10-31), submit it at hstspreload.org. This is close to permanent.
+- **Any new `*.sopstart.com` subdomain** must serve HTTPS from day one, because HSTS covers subdomains.
+
+## Follow-ups (no decision needed)
+
+**Security**
+- **Video SOP upload is untested under the enforced CSP.** Its audio extraction worker may need `'wasm-unsafe-eval'`, which would also need a new ADR. Settle it with one real video upload.
+- **Sole-admin lockout:** a sole admin who loses their phone and every recovery code can only be recovered by clearing their factors with the service role.
+- **Report route:** `/api/csp-report` has no rate limit.
+- **Header leak:** `X-Powered-By` is still sent.
+- **Policy gaps:** platform-admin policies aren't behind aal2 (ADR-0028), and two admin-named tables still accept any member's writes to their own organisation's rows.
+- **TRUNCATE grant:** authenticated still holds Supabase's default TRUNCATE on `organisation_members`. A revoke would tidy it.
+
+**Tests**
+- **Local admin probes:** the `tests/phase33–51` probes that make admin writes need the aal2 eval session helper since 00087. About 25 of them haven't been re-run since the OTP budget ran out.
+- **Site-editor eval:** `site-editor.eval.ts` should wait for the renamed machine's own save, not any "Saved"; it flaked once.
+- **Rate-limited probe:** the `tests/phase46` `IMAGES NEGATIVE` live probe was OTP rate-limited; re-run it once in a quiet window.
+- **Lint error:** `src/lib/supabase/middleware.ts:10` has a `prefer-const` error that predates these phases.
+
+**People and approvals**
+- **Missing invite data:** an invite sent between migration 00083 and its deploy (2026-10-23) has no invite data in `app_metadata`. The invitee needs a re-send.
+- **Reassign picker:** it lists the signed-in admin. Hide self by passing the user id into `InboxRow`.
+- **Supervises picker:** an admin can't untick a suspended worker who is already linked.
+- **Chart screenshot:** the chart-view eval shot is cut off before the Suspended tag.
+
+**Housekeeping**
+- **Bundle baselines:** `/sops/[sopId]` is at 839 against an 837 baseline, and `/` at 867 against 869, both within ±2. Diff the chunk list before any change and never re-capture blindly.
+- **Traceability table:** `REQUIREMENTS.md` has 119 IDs missing from it. It's bookkeeping only.
 
 ## Process notes
-- **GSD is retired (2026-10-24).** Plans are plain `PLAN.md` files; build directly and keep the project rules (ADRs, same-commit duties, deployed evals). The next phase is 65 (Passkeys).
-- Executors ran sequentially on the main tree; keep doing so for anything that pushes and runs a deployed eval.
+- **GSD is retired (2026-10-24).** Plans are plain `PLAN.md` files, built directly under the project rules: ADRs, same-commit duties, deployed evals.
+- **OTP budget:** run the full local suite at most once per gate, and the full deployed eval once per deploy.
+- **No next phase is planned.** The roadmap's security phases (65–68) are done.
