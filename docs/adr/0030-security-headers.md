@@ -46,5 +46,7 @@ signed URLs). AI calls run on the server. Fonts are self-hosted (ADR-0026; `next
 - HSTS `includeSubDomains` is safe because every `*.sopstart.com` host serves HTTPS (2026-10-24: only `www`, which
   Cloudflare redirects to the apex). A new subdomain must serve HTTPS from day one.
 - HSTS preload submission (hstspreload.org) is Simon's step after a clean week; it is close to permanent.
+  *Update 2026-10-24:* Simon submitted it the same day (no production users yet, so any breakage marks the cause);
+  status "pending". Removal takes months to reach browsers, so `max-age`, `includeSubDomains` and `preload` stay.
 - A new browser-side host (an analytics script, a CDN, another API) needs this ADR superseded and `buildCsp()` widened.
 - Anyone can add lines to the Fly log through the report route. Lines are short and carry no secrets.

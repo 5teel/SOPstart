@@ -85,6 +85,7 @@ Distilled rules below. **Full dated log with the stories: `docs/LEARNINGS.md` â€
 
 **Build / deploy**
 - Never rewrite a bundle baseline to pass. When the gate moves, diff the summed chunk list against a parent build first. Layouts import tiny pure modules only.
+- sopstart.com is on the HSTS preload list (submitted 2026-10-24, ADR-0030): every new `*.sopstart.com` host must serve HTTPS from day one; never drop `includeSubDomains`/`preload`.
 - Header-authed routes need a middleware exemption. Windows-only or binary-postinstall deps go in `optionalDependencies`.
 - Redirects belong in the proxy or a server component, never a client effect + `router.replace` (Next 16.2.1 orphans in-flight server actions).
 - Never derive first render from `navigator` / `window` / `Date.now()`.

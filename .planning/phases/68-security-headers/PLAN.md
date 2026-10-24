@@ -167,6 +167,7 @@ securityheaders.com grades both `https://sopstart.com` (following its redirect) 
 
 **Simon's steps.**
 - After a clean week, submit sopstart.com at hstspreload.org. It is close to permanent. Any future `*.sopstart.com` host must serve HTTPS from day one.
+  *Done 2026-10-24:* Simon submitted it the same day; hstspreload.org shows "pending".
 - `www` still CNAMEs to the old Railway host. Cloudflare redirects it before the origin, so it works, but it could point at the apex.
 
 **Follow-ups.**
