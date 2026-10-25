@@ -208,14 +208,6 @@ function FlowExample() {
 
 // -- Founding sites --------------------------------------------------------------
 
-// The offer reads the same wherever it is opened.
-const OFFER = {
-  label: 'Send us 3 SOPs',
-  title: 'Send us 3 SOPs',
-  body: 'Attach three of your SOPs (Word, PDF or scans) to an email. We convert them for free and show you them running on your own site.',
-  subject: 'Three SOPs to convert',
-}
-
 const SENT = ['Filler changeover.docx', 'Shrink wrapper jam.pdf', 'Forklift pre-start (scan).jpg']
 
 function FoundingExample() {
@@ -260,7 +252,6 @@ function Founding() {
           ))}
         </ul>
         <div className="hp-a mt-6 flex flex-wrap items-center gap-x-6 gap-y-3" style={d(0.7)}>
-          <Enquiries id="offer-slide" {...OFFER} className="flex min-h-tap-glove items-center rounded-lg bg-ink-900 px-6 text-reading font-semibold text-paper hover:opacity-90" />
           <span className="text-meta text-ink-500">
             <Link href="/privacy" className={legal}>Privacy</Link> · <Link href="/terms" className={legal}>Terms</Link>
           </span>
@@ -536,9 +527,6 @@ export function Homepage() {
           <p className="hp-lead mt-4 hidden max-w-md text-reading text-ink-300 lg:block" style={d(2.9)}>
             Safe work, one step at a time: SOPs, PMs, lockout / tagout, safety meetings and permits to work, in one place everyone on site can use.
           </p>
-          <div className="hp-lead mt-8 hidden lg:block" style={d(3.2)}>
-            <Enquiries id="offer" {...OFFER} className="flex min-h-tap-glove items-center rounded-lg bg-paper px-6 text-reading font-semibold text-ink-900 hover:bg-paper-2" />
-          </div>
         </div>
         <div className="flex items-center gap-2">
           <Enquiries className={`${pill} text-paper hover:bg-ink-700`} />

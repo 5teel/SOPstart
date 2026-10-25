@@ -3,7 +3,7 @@
  *
  * Signed out (no session minted, so no OTP budget spent). Proves the root sends a
  * visitor to the homepage; the page is one screen (no vertical scroll); the
- * slides change on their own and stop once the visitor takes over; the Send us 3 SOPs offer opens the enquiries address; privacy and terms are public; every slide
+ * slides change on their own and stop once the visitor takes over; there is no Send us 3 SOPs button; privacy and terms are public; every slide
  * fits its screen at desktop and phone size; no Potenco and no founder details.
  * One screenshot per slide, read by eye.
  *
@@ -46,12 +46,8 @@ test.describe('homepage', () => {
     await expect(current(page)).toHaveAttribute('id', 'audit')
     await expect(page.getByRole('button', { name: 'Play' })).toBeVisible()
     await expect(page.getByText(/Potenco|founder|Simon Scott/i)).toHaveCount(0)
-    // The offer opens the enquiries address with its own subject line.
-    await page.getByTestId('offer').click()
-    await expect(page.getByTestId('offer-popover')).toBeVisible()
-    await expect(page.getByTestId('offer-email')).toHaveAttribute('href', /^mailto:enquiries@sopstart\.com\?subject=/)
-    await shot(page, 'welcome-desktop-offer')
-    await page.keyboard.press('Escape')
+    // The Send us 3 SOPs button is gone (Simon, 2026-10-25).
+    await expect(page.getByText('Send us 3 SOPs')).toHaveCount(0)
     expect(errors).toEqual([])
   })
 
