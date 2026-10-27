@@ -1,4 +1,4 @@
-# Handoff — 2026-10-24 (end of the Phases 65–68 session)
+# Handoff — 2026-10-27 (after Phases 65–68 and the ISO / ANZ research)
 
 Pick up here in a fresh context. Read CLAUDE.md, docs/adr/README.md (ADR-0027 to 0030 are new), and this file. Fly.io deploys from master.
 
@@ -18,6 +18,29 @@ Each phase's `PLAN.md` has an Outcome section with commits, checks, deviations a
 Also live today: self-hosted Inter (ADR-0026), and tool search now matches part of a tool name in any case (migration 00084).
 
 The last full deployed eval run passed 143 of 143 with the enforced CSP.
+
+## Since then (2026-10-25 to 27)
+- **Homepage:** the "Send us 3 SOPs" button is gone from both places (`f07e55f8`, welcome eval passed). The Founding sites slide text still offers three free conversions, and Enquiries is now the only way in. Ask Simon whether the slide text should change.
+- **Enquiries:** `enquiries@sopstart.com` forwards to Simon's Gmail through Cloudflare Email Routing. Verified by a delivered test in the routing log on 2026-10-25.
+- **Research done:** `.planning/research/iso-and-anz-hs-best-practice.md` maps ISO 45001 / 9001 §7.5, the AU WHS codes and the **NZ Health and Safety at Work Amendment Act 2026** (in force 1 April 2027) to SOPstart. It covers critical risks, and the new duty on officers to verify that controls are used.
+
+## Next up (pick this up in the new session)
+1. **Open question for Simon:** the homepage lists PMs, lockout / tagout, safety meetings and permits to work as modules, but none of them exist in `src/`. Should the homepage label them "coming", or remove them?
+2. **Proposed next phase** (not yet agreed with Simon): research rows 1 and 2 combined.
+   - **Critical controls:** mark a step as a critical control, linked to a critical-risk type.
+   - **Officer view:** "critical controls verified", built from existing completion records, photos and sign-offs.
+   - **Reviews:** a shorter review interval for critical-control SOPs.
+   - **Hierarchy of controls:** tag each hazard's controls (eliminate / substitute / isolate or engineer / administrative / PPE) with Jev, and have the authoring check flag hazards controlled only by PPE or administrative steps.
+   - **Why now:** the strongest NZ sales story, and it has to land before 1 April 2027.
+   - **Before planning:** confirm the Schedule 1A hazard list against the Act text on legislation.govt.nz.
+   - **Rules to respect:** ADR-0002 (no cron: review prompts fire on the event or on read), ADR-0004 (authoring stays quiet), ADR-0013 (sign colours), "visual, no new symbols", and the Visy point "don't sell the worker out".
+3. **Smaller follow-ons from the research:**
+   - document codes, register export and a "what changed" note on each version (backlog 999.5);
+   - an audit pack export;
+   - management of change when a machine is edited;
+   - a "this step isn't how we do it" request from a run.
+
+To start: ask Simon about item 1, then write `.planning/phases/69-critical-controls/PLAN.md` (plain doc, no GSD) once he agrees the scope.
 
 ## Simon's steps
 - **Simon and Joe:** on your next admin visit, set up an authenticator app and save your ten recovery codes.
@@ -53,4 +76,4 @@ The last full deployed eval run passed 143 of 143 with the enforced CSP.
 ## Process notes
 - **GSD is retired (2026-10-24).** Plans are plain `PLAN.md` files, built directly under the project rules: ADRs, same-commit duties, deployed evals.
 - **OTP budget:** run the full local suite at most once per gate, and the full deployed eval once per deploy.
-- **No next phase is planned.** The roadmap's security phases (65–68) are done.
+- The security phases (65–68) are done. The next phase is proposed under "Next up" and not yet agreed.
