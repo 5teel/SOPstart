@@ -14,6 +14,7 @@ import Link from 'next/link'
 import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from 'react'
 import { Check, ChevronLeft, ChevronRight, ClipboardCheck, FileText, Lock, Pause, Play, ShieldCheck, Users, Wrench } from 'lucide-react'
 import { Enquiries } from '@/components/contact/Enquiries'
+import { ENQUIRIES_EMAIL } from '@/lib/contact'
 import { Wordmark } from '@/components/brand/Wordmark'
 import { KindChip } from '@/components/focus/KindChip'
 import type { FocusKind } from '@/lib/sop/focus'
@@ -241,7 +242,9 @@ function Founding() {
         <p className="hp-a font-label text-meta font-semibold uppercase text-ink-500">Founding sites</p>
         <h2 className="hp-a mt-2 text-2xl font-semibold text-ink-900 lg:text-4xl" style={d(0.1)}>Be one of the first sites on SOPstart</h2>
         <p className="hp-a mt-3 text-reading text-ink-600" style={d(0.2)}>
-          Send us three of your SOPs. We convert them for free and show you them running on your own site.
+          Email three of your SOPs to{' '}
+          <a href={`mailto:${ENQUIRIES_EMAIL}?subject=Three%20SOPs%20to%20convert`} className="font-semibold text-ink-900 underline underline-offset-4">{ENQUIRIES_EMAIL}</a>.
+          We convert them for free and show you them running on your own site.
         </p>
         <ul className="hp-tall mt-6 hidden flex-col gap-2 lg:flex">
           {['Your first three SOPs converted, free', 'Shown on a map of your own site', 'No commitment to buy', 'Founding sites help decide what we build next'].map((p, i) => (

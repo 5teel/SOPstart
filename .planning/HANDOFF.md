@@ -25,22 +25,18 @@ The last full deployed eval run passed 143 of 143 with the enforced CSP.
 - **Research done:** `.planning/research/iso-and-anz-hs-best-practice.md` maps ISO 45001 / 9001 §7.5, the AU WHS codes and the **NZ Health and Safety at Work Amendment Act 2026** (in force 1 April 2027) to SOPstart. It covers critical risks, and the new duty on officers to verify that controls are used.
 
 ## Next up (pick this up in the new session)
-1. **Open question for Simon:** the homepage lists PMs, lockout / tagout, safety meetings and permits to work as modules, but none of them exist in `src/`. Should the homepage label them "coming", or remove them?
-2. **Proposed next phase** (not yet agreed with Simon): research rows 1 and 2 combined.
-   - **Critical controls:** mark a step as a critical control, linked to a critical-risk type.
-   - **Officer view:** "critical controls verified", built from existing completion records, photos and sign-offs.
-   - **Reviews:** a shorter review interval for critical-control SOPs.
-   - **Hierarchy of controls:** tag each hazard's controls (eliminate / substitute / isolate or engineer / administrative / PPE) with Jev, and have the authoring check flag hazards controlled only by PPE or administrative steps.
-   - **Why now:** the strongest NZ sales story, and it has to land before 1 April 2027.
-   - **Before planning:** confirm the Schedule 1A hazard list against the Act text on legislation.govt.nz.
-   - **Rules to respect:** ADR-0002 (no cron: review prompts fire on the event or on read), ADR-0004 (authoring stays quiet), ADR-0013 (sign colours), "visual, no new symbols", and the Visy point "don't sell the worker out".
-3. **Smaller follow-ons from the research:**
-   - document codes, register export and a "what changed" note on each version (backlog 999.5);
-   - an audit pack export;
-   - management of change when a machine is edited;
-   - a "this step isn't how we do it" request from a run.
+Simon's answers, 2026-10-27:
+- **Homepage modules:** build them. They are Phases 70–73 (LOTO, permits, safety meetings, PMs), and the order is in the Phase 69 plan. The homepage keeps listing them until then.
+- **Founding slide:** now asks visitors to email three SOPs to enquiries@sopstart.com.
+- **Phase 69, critical controls:** all four parts agreed. The plan is `.planning/phases/69-critical-controls/PLAN.md`.
 
-To start: ask Simon about item 1, then write `.planning/phases/69-critical-controls/PLAN.md` (plain doc, no GSD) once he agrees the scope.
+To start, run Phase 69 step 1. Simon reads the enacted Schedule 1A (legislation.govt.nz blocks fetches) and confirms the D-02 risk list. Then build.
+
+Smaller follow-ons from the research, still in the backlog:
+- document codes, register export and a "what changed" note on each version (999.5);
+- an audit pack export;
+- management of change when a machine is edited;
+- a "this step isn't how we do it" request from a run.
 
 ## Simon's steps
 - **Simon and Joe:** on your next admin visit, set up an authenticator app and save your ten recovery codes.
